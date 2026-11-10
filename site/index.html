@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>دليل عوالم DC</title>
 <meta name="description" content="دليل عربي تفاعلي لكل أفلام ومسلسلات DC حسب العالم وترتيب المشاهدة.">
-<meta name="theme-color" content="#070b14">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta name="theme-color" content="#07183a">
 <link rel="preconnect" href="https://image.tmdb.org">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/lalezar-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="atmo" aria-hidden="true"><div class="scene"><div class="scene-img"></div><div class="motif"></div></div><div class="scene"><div class="scene-img"></div><div class="motif"></div></div></div>
 <header class="top" id="top">
   <div class="brand">
     <span class="logo" aria-hidden="true">DC</span>
@@ -24,11 +24,11 @@
     <button data-act="view" data-view="arrow">ترتيب آروفيرس</button>
   </nav>
   <div class="tools">
-    <button data-act="jump">🧭 فهرس وبحث</button>
-    <button data-act="shield" id="shieldBtn">🛡️ درع الحرق</button>
-    <button data-act="tonight">⚡ ماذا أشاهد؟</button>
-    <button data-act="backup">💾 سجلّي</button>
-    <button data-act="guide">📖 الدليل</button>
+    <button data-act="jump">فهرس وبحث</button>
+    <button data-act="shield" id="shieldBtn">درع الحرق</button>
+    <button data-act="tonight">ماذا أشاهد؟</button>
+    <button data-act="backup">سجلّي</button>
+    <button data-act="guide">الدليل</button>
   </div>
 </header>
 <div class="unibar" id="unibar" role="tablist" aria-label="العوالم"></div>
@@ -44,10 +44,10 @@
 </footer>
 <div class="sheet-backdrop" id="backdrop" hidden></div>
 <aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
-  <div class="sheet-head"><h2 id="sheetTitle"></h2><button class="x" data-act="close" aria-label="إغلاق">✕</button></div>
+  <div class="sheet-head"><h2 id="sheetTitle"></h2><button class="close" data-act="close" aria-label="إغلاق">✕</button></div>
   <div class="sheet-body" id="sheetBody"></div>
 </aside>
-<div class="lightbox" id="lightbox" hidden><img alt="" id="lightImg"><button class="x" data-act="lightclose" aria-label="إغلاق">✕</button></div>
+<div class="lightbox" id="lightbox" hidden><img alt="" id="lightImg"><button class="close" data-act="lightclose" aria-label="إغلاق">✕</button></div>
 <div class="toast" id="toast" role="status" hidden></div>
 <script type="module" src="app.js"></script>
 </body>

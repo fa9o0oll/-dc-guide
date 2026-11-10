@@ -8,7 +8,9 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.
 const server = http.createServer((q, r) => { const f = path.join(siteDir, decodeURIComponent(q.url.split('?')[0]).replace(/\/$/, '/index.html'));
   fs.readFile(f, (e, b) => e ? (r.writeHead(404), r.end()) : (r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'text/plain' }), r.end(b))); }).listen(0);
 const url = `http://127.0.0.1:${server.address().port}/`;
-const ph = (w, h, t) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="#22304a"/><text x="50%" y="50%" fill="#7f93b5" font-size="${Math.round(w / 9)}" text-anchor="middle">${t}</text></svg>`;
+const hues = [8, 28, 205, 262, 150, 340, 45, 190];
+const ph = (w, h, seed) => { const a = hues[seed % 8], b = hues[(seed * 3 + 2) % 8];
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${a} 70% 46%)"/><stop offset=".55" stop-color="hsl(${b} 55% 22%)"/><stop offset="1" stop-color="#05070c"/></linearGradient><radialGradient id="s" cx=".3" cy=".3" r=".5"><stop offset="0" stop-color="hsl(${a} 90% 78%)" stop-opacity=".85"/><stop offset="1" stop-color="hsl(${a} 90% 60%)" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><rect width="100%" height="100%" fill="url(#s)"/><path d="M0 ${h} L${w * .2} ${h * .55} L${w * .34} ${h * .7} L${w * .52} ${h * .38} L${w * .7} ${h * .66} L${w * .86} ${h * .5} L${w} ${h * .72} V${h}z" fill="#04060b" opacity=".8"/></svg>`; };
 const fails = []; const check = (name, ok, extra = '') => { console.log((ok ? '  ✓ ' : '  ✗ ') + name + (extra ? ' — ' + extra : '')); if (!ok) fails.push(name); };
 const legacy = Buffer.from(JSON.stringify({ trackerState: { w_2: 'watched', w_6: 'watching', w_21: 'watched', w_30: 'watched', w_45: 'watchlist' }, epState: {} })).toString('base64');
 
@@ -18,14 +20,15 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   const ctx = await browser.newContext({ viewport, isMobile: mobile, hasTouch: mobile, deviceScaleFactor: shots ? 2 : 1, locale: 'ar-SA' });
   const page = await ctx.newPage(); const errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource/.test(m.text())) errs.push(m.text()); });
-  await page.route(/image\.tmdb\.org/, r => { const s = r.request().url(); const wide = /w300|w780\/.*|w1280/.test(s) && !/w780\/[^/]+$/.test(s) ? 1 : /w300|w1280/.test(s); return r.fulfill({ contentType: 'image/svg+xml', body: wide ? ph(640, 360, 'صورة') : ph(342, 513, 'بوستر') }); });
-  await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+  await page.route(/image\.tmdb\.org/, r => { const u = r.request().url(), seed = [...u].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7);
+    const wide = /\/(w300|w1280)\//.test(u) || (/\/w780\//.test(u) && r.request().resourceType() !== 'image');
+    return r.fulfill({ contentType: 'image/svg+xml', body: wide ? ph(640, 360, seed) : ph(342, 513, seed) }); });
   const tap = sel => mobile ? page.locator(sel).first().tap() : page.locator(sel).first().click();
   const snap = async n => { if (shots) await page.screenshot({ path: `${shots}/${name}-${n}.png` }); };
   const overflow = async label => { await page.waitForTimeout(350); const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
-      out: [...document.querySelectorAll('body *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > innerWidth + 1 || r.left < -1) && !e.closest('.unibar,.seasons,[hidden]'); }).length }));
+      out: [...document.querySelectorAll('body *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > innerWidth + 1 || r.left < -1) && !e.closest('.unibar,.seasons,.tools,.atmo,[hidden]'); }).length }));
     check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw && o.out === 0, `عرض الصفحة ${o.sw}/${o.iw}، عناصر خارجة ${o.out}`);
-    const spill = await page.evaluate(() => [...document.querySelectorAll('.card,.step,.row,.node,.ep,.uni-head,.rates a,.status button,.chip,.top button,.unibar button')].filter(e => e.getBoundingClientRect().width > 0 && (e.scrollWidth > e.clientWidth + 2 || e.scrollHeight > e.clientHeight + 2)).map(e => e.className + ':' + e.textContent.trim().slice(0, 18)));
+    const spill = await page.evaluate(() => [...document.querySelectorAll('.card,.step,.row,.node,.ep,.rates a,.status button,.tag,.top button,.unibar button,.facts')].filter(e => e.getBoundingClientRect().width > 0 && (e.scrollWidth > e.clientWidth + 2 || e.scrollHeight > e.clientHeight + 2)).map(e => e.className + ':' + e.textContent.trim().slice(0, 18)));
     check(`${label}: لا محتوى يخرج من إطاره`, spill.length === 0, spill.slice(0, 4).join(' | '));
     const lap = await page.evaluate(() => { const b = [...document.querySelectorAll('.card,.step,.node,.ep')].map(e => e.getBoundingClientRect()).filter(r => r.width); let n = 0; for (let i = 1; i < b.length; i++) if (b[i].top < b[i - 1].bottom - 1 && b[i].left < b[i - 1].right - 1 && b[i].right > b[i - 1].left + 1 && b[i].top >= b[i - 1].top + 1) n++; return n; });
     check(`${label}: لا عناصر متراكبة`, lap === 0, String(lap)); };
