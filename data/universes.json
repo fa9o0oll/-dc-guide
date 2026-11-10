@@ -1,0 +1,211 @@
+[
+  {
+    "id": "dcu",
+    "section": "القسم 1",
+    "name": "عالم جيمس غان الجديد",
+    "nameEn": "DCU - Chapter One",
+    "serial": true,
+    "status": "متسلسل ومستمر (2024–2026)",
+    "color": "#10b981",
+    "motif": "metropolis",
+    "description": "الريميك الشامل الجديد الذي يربط الأفلام والمسلسلات والأنميشن في قصة واحدة."
+  },
+  {
+    "id": "dceu",
+    "section": "القسم 2",
+    "name": "عالم سنايدر الممتد السابق",
+    "nameEn": "DCEU / Snyderverse",
+    "serial": true,
+    "status": "متسلسل ومكتمل (2013–2023)",
+    "color": "#3b82f6",
+    "motif": "justice",
+    "description": "العالم السينمائي الممتد الأول مرتباً حسب التسلسل الزمني لأحداث القصة."
+  },
+  {
+    "id": "reeves",
+    "section": "القسم 3",
+    "name": "ملحمة باتمان الجنائية (مات ريفز)",
+    "nameEn": "The Batman Crime Saga",
+    "serial": true,
+    "status": "متسلسل ومستمر (Elseworlds)",
+    "color": "#ef4444",
+    "motif": "gotham_rain",
+    "description": "عالم التحقيقات والمافيا المظلم لروبرت باتينسون في مدينة غوثام."
+  },
+  {
+    "id": "nolan",
+    "section": "القسم 4",
+    "name": "ثلاثية فارس الظلام (نولان)",
+    "nameEn": "The Dark Knight Trilogy",
+    "serial": true,
+    "status": "متسلسل ومكتمل (Elseworlds)",
+    "color": "#f59e0b",
+    "motif": "dark_knight",
+    "description": "ثلاثية كريستوفر نولان الواقعية الخالدة (2005–2012)."
+  },
+  {
+    "id": "joker",
+    "section": "القسم 5",
+    "name": "ثنائية الجوكر (تود فيليبس)",
+    "nameEn": "Joker Duology",
+    "serial": true,
+    "status": "متسلسل ومكتمل (Elseworlds)",
+    "color": "#ec4899",
+    "motif": "joker_stairs",
+    "description": "دراما آرثر فليك النفسية المستقلة في غوثام الثمانينيات."
+  },
+  {
+    "id": "burton",
+    "section": "القسم 6",
+    "name": "سلسلة باتمان الكلاسيكية",
+    "nameEn": "Burton & Schumacher (1989–1997)",
+    "serial": true,
+    "status": "متسلسل ومكتمل",
+    "color": "#8b5cf6",
+    "motif": "gotham_gothic",
+    "description": "رباعية تيم بيرتون وجويل شوماخر الكلاسيكية."
+  },
+  {
+    "id": "reeve",
+    "section": "القسم 7",
+    "name": "سلسلة سوبرمان الكلاسيكية",
+    "nameEn": "Christopher Reeve (1978–2006)",
+    "serial": true,
+    "status": "متسلسل ومكتمل",
+    "color": "#0ea5e9",
+    "motif": "fortress",
+    "description": "سلسلة كريستوفر ريف الكلاسيكية وتكملتها في Superman Returns."
+  },
+  {
+    "id": "arrow",
+    "section": "القسم 8",
+    "name": "عالم المسلسلات التلفزيونية",
+    "nameEn": "Arrowverse (2012–2024)",
+    "serial": true,
+    "status": "متسلسل بالخطوات الزمنية",
+    "color": "#14b8a6",
+    "motif": "speedforce",
+    "description": "عالم شبكة CW التلفزيوني المترابط؛ مرتب بخطوات عربية مرقمة توضح أي موسم وأي حلقة تشاهدها أولاً بدون أي حرق."
+  },
+  {
+    "id": "titans",
+    "section": "القسم 9",
+    "name": "عالم تايتنز ودووم باترول",
+    "nameEn": "Titans & Doom Patrol",
+    "serial": true,
+    "status": "متسلسل ومكتمل (2018–2023)",
+    "color": "#a855f7",
+    "motif": "titans_tower",
+    "description": "عالم تلفزيوني ناضج للبالغين بدأ بـ Titans وانبثق منه Doom Patrol."
+  },
+  {
+    "id": "sandman",
+    "section": "القسم 10",
+    "name": "عالم رجل الرمل",
+    "nameEn": "The Sandman Universe",
+    "serial": true,
+    "status": "متسلسل ومكتمل (2022–2025)",
+    "color": "#6366f1",
+    "motif": "dreaming",
+    "description": "عالم الفانتازيا المظلمة المقتبس من روايات نيل غايمان."
+  },
+  {
+    "id": "dcau",
+    "section": "القسم 11",
+    "name": "عالم الأنميشن الكلاسيكي",
+    "nameEn": "DCAU / Timmverse",
+    "serial": true,
+    "status": "متسلسل ومكتمل (1992–2006)",
+    "color": "#f43f5e",
+    "motif": "watchtower",
+    "description": "أعظم عالم كرتوني مترابط من باتمان التسعينيات حتى مستقبل Batman Beyond."
+  },
+  {
+    "id": "dcamu",
+    "section": "القسم 12",
+    "name": "عالم أفلام الأنميشن الأول",
+    "nameEn": "DCAMU - New 52 (17 Films)",
+    "serial": true,
+    "status": "متسلسل ومكتمل (17 فيلماً)",
+    "color": "#06b6d4",
+    "motif": "apokolips",
+    "description": "عالم أفلام الأنميشن المتصل بالكامل من Flashpoint Paradox حتى Apokolips War."
+  },
+  {
+    "id": "tomorrow",
+    "section": "القسم 13",
+    "name": "عالم الغد الكرتوني",
+    "nameEn": "Tomorrowverse (10 Films)",
+    "serial": true,
+    "status": "متسلسل ومكتمل (10 أفلام)",
+    "color": "#22c55e",
+    "motif": "crisis_wave",
+    "description": "الريميك الكرتوني الذي تلا Apokolips War واختتم بثلاثية Crisis on Infinite Earths."
+  },
+  {
+    "id": "harley",
+    "section": "القسم 14",
+    "name": "عالم هارلي كوين الكرتوني",
+    "nameEn": "Harley Quinn & Kite Man",
+    "serial": true,
+    "status": "متسلسل ومستمر (2019–2025)",
+    "color": "#e11d48",
+    "motif": "chaos_neon",
+    "description": "عالم الكوميديا السوداء الكرتوني للبالغين."
+  },
+  {
+    "id": "early_st",
+    "section": "القسم 15",
+    "name": "الحقبة التأسيسية المبكرة",
+    "nameEn": "Golden & Silver Age (1941–1989)",
+    "serial": false,
+    "status": "أعمال منفردة كلاسيكية",
+    "color": "#d97706",
+    "motif": "golden_age",
+    "description": "أوائل إنتاجات DC السينمائية والتلفزيونية والكرتونية منذ الأربعينيات."
+  },
+  {
+    "id": "movie_st",
+    "section": "القسم 16",
+    "name": "الأفلام الواقعية المنفردة",
+    "nameEn": "Standalone Live-Action Films",
+    "serial": false,
+    "status": "أفلام منفردة بذاتها",
+    "color": "#ef4444",
+    "motif": "vertigo",
+    "description": "أفلام واقعية مستقلة تماماً لا تتطلب مشاهدة أي عمل آخر."
+  },
+  {
+    "id": "tv_st",
+    "section": "القسم 17",
+    "name": "المسلسلات الواقعية المنفردة",
+    "nameEn": "Standalone Live-Action Series",
+    "serial": false,
+    "status": "مسلسلات منفردة بذاتها",
+    "color": "#3b82f6",
+    "motif": "gotham_sky",
+    "description": "مسلسلات تلفزيونية واقعية مستقلة لكل منها عالمها الخاص."
+  },
+  {
+    "id": "anim_tv_st",
+    "section": "القسم 18",
+    "name": "المسلسلات الكرتونية المنفردة",
+    "nameEn": "Standalone Animated Series",
+    "serial": false,
+    "status": "مسلسلات أنميشن منفردة",
+    "color": "#10b981",
+    "motif": "lantern_corps",
+    "description": "مسلسلات أنميشن مستقلة خارج العوالم المتسلسلة."
+  },
+  {
+    "id": "anim_mv_st",
+    "section": "القسم 19",
+    "name": "أفلام الأنميشن المنفردة",
+    "nameEn": "DC Animated Original Movies",
+    "serial": false,
+    "status": "أفلام أنميشن منفردة",
+    "color": "#8b5cf6",
+    "motif": "red_hood",
+    "description": "أفلام DC الكرتونية المستقلة المقتبسة من أشهر الروايات المصورة."
+  }
+]

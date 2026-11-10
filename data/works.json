@@ -1,0 +1,3803 @@
+[
+  {
+    "id": "the-suicide-squad-2021",
+    "title": "The Suicide Squad",
+    "year": 2021,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Suicide Squad",
+      "rtCritics": "90%",
+      "imdb": "7.2",
+      "rtAudience": "78%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "peacemaker-2022",
+    "title": "Peacemaker",
+    "year": 2022,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Peacemaker",
+      "rtCritics": "94%",
+      "imdb": "8.3",
+      "rtAudience": "89%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "blue-beetle-2023",
+    "title": "Blue Beetle",
+    "year": 2023,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Blue Beetle",
+      "rtCritics": "78%",
+      "imdb": "6.0",
+      "rtAudience": "83%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "creature-commandos-2024",
+    "title": "Creature Commandos",
+    "year": 2024,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Creature Commandos",
+      "rtCritics": "93%",
+      "imdb": "7.8",
+      "rtAudience": "79%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-2025",
+    "title": "Superman",
+    "year": 2025,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman",
+      "rtCritics": "83%",
+      "imdb": "7.7",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "supergirl-2026",
+    "title": "Supergirl",
+    "year": 2026,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Supergirl: Woman of Tomorrow",
+      "rtCritics": "52%",
+      "imdb": "6.5",
+      "rtAudience": "72%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "lanterns-2026",
+    "title": "Lanterns",
+    "year": 2026,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Lanterns",
+      "rtCritics": "92%",
+      "imdb": "7.5",
+      "rtAudience": "67%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "clayface-2026",
+    "title": "Clayface",
+    "year": 2026,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Clayface",
+      "rtCritics": "78%",
+      "imdb": "7.6",
+      "rtAudience": "94%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "wonder-woman-2017",
+    "title": "Wonder Woman",
+    "year": 2017,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Wonder Woman",
+      "rtCritics": "93%",
+      "imdb": "7.3",
+      "rtAudience": "83%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "wonder-woman-1984-2020",
+    "title": "Wonder Woman 1984",
+    "year": 2020,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Wonder Woman 1984",
+      "rtCritics": "58%",
+      "imdb": "5.4",
+      "rtAudience": "40%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "man-of-steel-2013",
+    "title": "Man of Steel",
+    "year": 2013,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Man of Steel",
+      "rtCritics": "56%",
+      "imdb": "7.1",
+      "rtAudience": "75%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-v-superman-dawn-of-justice-2016",
+    "title": "Batman v Superman: Dawn of Justice",
+    "year": 2016,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman v Superman: Dawn of Justice",
+      "rtCritics": "29%",
+      "imdb": "6.5",
+      "rtAudience": "63%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "suicide-squad-2016",
+    "title": "Suicide Squad",
+    "year": 2016,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Suicide Squad",
+      "rtCritics": "26%",
+      "imdb": "5.9",
+      "rtAudience": "58%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "zack-snyder-s-justice-league-2021",
+    "title": "Zack Snyder's Justice League",
+    "year": 2021,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Zack Snyder's Justice League",
+      "rtCritics": "72%",
+      "imdb": "7.9",
+      "rtAudience": "93%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-2017",
+    "title": "Justice League",
+    "year": 2017,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League",
+      "rtCritics": "39%",
+      "imdb": "6.1",
+      "rtAudience": "67%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "aquaman-2018",
+    "title": "Aquaman",
+    "year": 2018,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Aquaman",
+      "rtCritics": "65%",
+      "imdb": "6.8",
+      "rtAudience": "72%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "shazam-2019",
+    "title": "Shazam!",
+    "year": 2019,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Shazam!",
+      "rtCritics": "90%",
+      "imdb": "7.0",
+      "rtAudience": "82%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "birds-of-prey-2020",
+    "title": "Birds of Prey",
+    "year": 2020,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Birds of Prey",
+      "rtCritics": "78%",
+      "imdb": "6.1",
+      "rtAudience": "68%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "black-adam-2022",
+    "title": "Black Adam",
+    "year": 2022,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Black Adam",
+      "rtCritics": "38%",
+      "imdb": "6.2",
+      "rtAudience": "85%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "shazam-fury-of-the-gods-2023",
+    "title": "Shazam! Fury of the Gods",
+    "year": 2023,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Shazam! Fury of the Gods",
+      "rtCritics": "49%",
+      "imdb": "5.9",
+      "rtAudience": "76%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-flash-2023",
+    "title": "The Flash",
+    "year": 2023,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Flash",
+      "rtCritics": "63%",
+      "imdb": "6.6",
+      "rtAudience": "78%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "aquaman-and-the-lost-kingdom-2023",
+    "title": "Aquaman and the Lost Kingdom",
+    "year": 2023,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Aquaman and the Lost Kingdom",
+      "rtCritics": "34%",
+      "imdb": "5.6",
+      "rtAudience": "79%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-batman-2022",
+    "title": "The Batman",
+    "year": 2022,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Batman",
+      "rtCritics": "85%",
+      "imdb": "7.8",
+      "rtAudience": "87%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-penguin-2024",
+    "title": "The Penguin",
+    "year": 2024,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Penguin",
+      "rtCritics": "95%",
+      "imdb": "8.7",
+      "rtAudience": "92%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-begins-2005",
+    "title": "Batman Begins",
+    "year": 2005,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman Begins",
+      "rtCritics": "85%",
+      "imdb": "8.2",
+      "rtAudience": "94%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-dark-knight-2008",
+    "title": "The Dark Knight",
+    "year": 2008,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Dark Knight",
+      "rtCritics": "94%",
+      "imdb": "9.0",
+      "rtAudience": "94%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-dark-knight-rises-2012",
+    "title": "The Dark Knight Rises",
+    "year": 2012,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Dark Knight Rises",
+      "rtCritics": "87%",
+      "imdb": "8.4",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "joker-2019",
+    "title": "Joker",
+    "year": 2019,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Joker",
+      "rtCritics": "69%",
+      "imdb": "8.4",
+      "rtAudience": "89%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "joker-folie-a-deux-2024",
+    "title": "Joker: Folie à Deux",
+    "year": 2024,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Joker: Folie à Deux",
+      "rtCritics": "32%",
+      "imdb": "5.2",
+      "rtAudience": "32%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-1989",
+    "title": "Batman",
+    "year": 1989,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman (1989 film)",
+      "rtCritics": "76%",
+      "imdb": "7.5",
+      "rtAudience": "84%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-returns-1992",
+    "title": "Batman Returns",
+    "year": 1992,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman Returns",
+      "rtCritics": "82%",
+      "imdb": "7.1",
+      "rtAudience": "73%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-forever-1995",
+    "title": "Batman Forever",
+    "year": 1995,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman Forever",
+      "rtCritics": "41%",
+      "imdb": "5.4",
+      "rtAudience": "32%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-and-robin-1997",
+    "title": "Batman & Robin",
+    "year": 1997,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman & Robin (film)",
+      "rtCritics": "12%",
+      "imdb": "3.8",
+      "rtAudience": "16%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-1978",
+    "title": "Superman",
+    "year": 1978,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman (1978 film)",
+      "rtCritics": "94%",
+      "imdb": "7.4",
+      "rtAudience": "86%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-ii-1980",
+    "title": "Superman II",
+    "year": 1980,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman II",
+      "rtCritics": "88%",
+      "imdb": "7.6",
+      "rtAudience": "85%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-iii-1983",
+    "title": "Superman III",
+    "year": 1983,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman III",
+      "rtCritics": "30%",
+      "imdb": "5.0",
+      "rtAudience": "23%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "supergirl-1984",
+    "title": "Supergirl",
+    "year": 1984,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Supergirl (1984 film)",
+      "rtCritics": "8%",
+      "imdb": "4.4",
+      "rtAudience": "25%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-iv-the-quest-for-peace-1987",
+    "title": "Superman IV: The Quest for Peace",
+    "year": 1987,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman IV: The Quest for Peace",
+      "rtCritics": "10%",
+      "imdb": "3.7",
+      "rtAudience": "16%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-returns-2006",
+    "title": "Superman Returns",
+    "year": 2006,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman Returns",
+      "rtCritics": "74%",
+      "imdb": "6.1",
+      "rtAudience": "60%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "arrow-2012",
+    "title": "Arrow",
+    "year": 2012,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Arrow",
+      "rtCritics": "86%",
+      "imdb": "7.5",
+      "rtAudience": "74%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-flash-2014",
+    "title": "The Flash",
+    "year": 2014,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Flash",
+      "rtCritics": "89%",
+      "imdb": "7.5",
+      "rtAudience": "70%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "constantine-2014",
+    "title": "Constantine",
+    "year": 2014,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Constantine",
+      "rtCritics": "73%",
+      "imdb": "7.5",
+      "rtAudience": "86%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "supergirl-2015",
+    "title": "Supergirl",
+    "year": 2015,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Supergirl",
+      "rtCritics": "88%",
+      "imdb": "6.2",
+      "rtAudience": "53%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "dc-s-legends-of-tomorrow-2016",
+    "title": "DC's Legends of Tomorrow",
+    "year": 2016,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "DC's Legends of Tomorrow",
+      "rtCritics": "89%",
+      "imdb": "6.8",
+      "rtAudience": "76%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "black-lightning-2018",
+    "title": "Black Lightning",
+    "year": 2018,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Black Lightning",
+      "rtCritics": "92%",
+      "imdb": "6.1",
+      "rtAudience": "58%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batwoman-2019",
+    "title": "Batwoman",
+    "year": 2019,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batwoman",
+      "rtCritics": "83%",
+      "imdb": "3.6",
+      "rtAudience": "22%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "stargirl-2020",
+    "title": "Stargirl",
+    "year": 2020,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Stargirl",
+      "rtCritics": "94%",
+      "imdb": "7.2",
+      "rtAudience": "80%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-and-lois-2021",
+    "title": "Superman & Lois",
+    "year": 2021,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman & Lois",
+      "rtCritics": "88%",
+      "imdb": "7.8",
+      "rtAudience": "85%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "titans-2018",
+    "title": "Titans",
+    "year": 2018,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Titans",
+      "rtCritics": "85%",
+      "imdb": "7.5",
+      "rtAudience": "70%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "doom-patrol-2019",
+    "title": "Doom Patrol",
+    "year": 2019,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Doom Patrol",
+      "rtCritics": "97%",
+      "imdb": "7.7",
+      "rtAudience": "80%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-sandman-2022",
+    "title": "The Sandman",
+    "year": 2022,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Sandman",
+      "rtCritics": "88%",
+      "imdb": "7.7",
+      "rtAudience": "81%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "dead-boy-detectives-2024",
+    "title": "Dead Boy Detectives",
+    "year": 2024,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Dead Boy Detectives",
+      "rtCritics": "92%",
+      "imdb": "7.5",
+      "rtAudience": "84%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-the-animated-series-1992",
+    "title": "Batman: The Animated Series",
+    "year": 1992,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: The Animated Series",
+      "rtCritics": "100%",
+      "imdb": "9.0",
+      "rtAudience": "96%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-mask-of-the-phantasm-1993",
+    "title": "Batman: Mask of the Phantasm",
+    "year": 1993,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Mask of the Phantasm",
+      "rtCritics": "83%",
+      "imdb": "7.8",
+      "rtAudience": "88%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-and-mr-freeze-subzero-1998",
+    "title": "Batman & Mr. Freeze: SubZero",
+    "year": 1998,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman & Mr. Freeze: SubZero",
+      "rtCritics": "92%",
+      "imdb": "7.2",
+      "rtAudience": "76%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-the-animated-series-1996",
+    "title": "Superman: The Animated Series",
+    "year": 1996,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman: The Animated Series",
+      "rtCritics": "96%",
+      "imdb": "8.1",
+      "rtAudience": "88%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-new-batman-adventures-1997",
+    "title": "The New Batman Adventures",
+    "year": 1997,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The New Batman Adventures",
+      "rtCritics": "100%",
+      "imdb": "8.5",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-mystery-of-the-batwoman-2003",
+    "title": "Batman: Mystery of the Batwoman",
+    "year": 2003,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Mystery of the Batwoman",
+      "rtCritics": "67%",
+      "imdb": "6.7",
+      "rtAudience": "63%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "static-shock-2000",
+    "title": "Static Shock",
+    "year": 2000,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Static Shock",
+      "rtCritics": "90%",
+      "imdb": "7.4",
+      "rtAudience": "83%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-2001",
+    "title": "Justice League",
+    "year": 2001,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League (TV series)",
+      "rtCritics": "96%",
+      "imdb": "8.6",
+      "rtAudience": "93%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-unlimited-2004",
+    "title": "Justice League Unlimited",
+    "year": 2004,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League Unlimited",
+      "rtCritics": "100%",
+      "imdb": "8.7",
+      "rtAudience": "95%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-vs-the-fatal-five-2019",
+    "title": "Justice League vs. the Fatal Five",
+    "year": 2019,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League vs. the Fatal Five",
+      "rtCritics": "100%",
+      "imdb": "6.5",
+      "rtAudience": "62%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-beyond-1999",
+    "title": "Batman Beyond",
+    "year": 1999,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman Beyond",
+      "rtCritics": "100%",
+      "imdb": "8.1",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-beyond-return-of-the-joker-2000",
+    "title": "Batman Beyond: Return of the Joker",
+    "year": 2000,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman Beyond: Return of the Joker",
+      "rtCritics": "88%",
+      "imdb": "7.8",
+      "rtAudience": "87%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-the-flashpoint-paradox-2013",
+    "title": "Justice League: The Flashpoint Paradox",
+    "year": 2013,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: The Flashpoint Paradox",
+      "rtCritics": "100%",
+      "imdb": "8.1",
+      "rtAudience": "93%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-war-2014",
+    "title": "Justice League: War",
+    "year": 2014,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: War",
+      "rtCritics": "50%",
+      "imdb": "7.2",
+      "rtAudience": "76%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "son-of-batman-2014",
+    "title": "Son of Batman",
+    "year": 2014,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Son of Batman",
+      "rtCritics": "64%",
+      "imdb": "6.7",
+      "rtAudience": "65%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-throne-of-atlantis-2015",
+    "title": "Justice League: Throne of Atlantis",
+    "year": 2015,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: Throne of Atlantis",
+      "rtCritics": "63%",
+      "imdb": "6.7",
+      "rtAudience": "66%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-vs-robin-2015",
+    "title": "Batman vs. Robin",
+    "year": 2015,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman vs. Robin",
+      "rtCritics": "100%",
+      "imdb": "7.1",
+      "rtAudience": "73%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-bad-blood-2016",
+    "title": "Batman: Bad Blood",
+    "year": 2016,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Bad Blood",
+      "rtCritics": "100%",
+      "imdb": "6.8",
+      "rtAudience": "70%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-vs-teen-titans-2016",
+    "title": "Justice League vs. Teen Titans",
+    "year": 2016,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League vs. Teen Titans",
+      "rtCritics": "80%",
+      "imdb": "7.0",
+      "rtAudience": "73%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-dark-2017",
+    "title": "Justice League Dark",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League Dark (film)",
+      "rtCritics": "79%",
+      "imdb": "7.1",
+      "rtAudience": "75%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "teen-titans-the-judas-contract-2017",
+    "title": "Teen Titans: The Judas Contract",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Teen Titans: The Judas Contract",
+      "rtCritics": "83%",
+      "imdb": "7.0",
+      "rtAudience": "75%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "suicide-squad-hell-to-pay-2018",
+    "title": "Suicide Squad: Hell to Pay",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Suicide Squad: Hell to Pay",
+      "rtCritics": "88%",
+      "imdb": "7.0",
+      "rtAudience": "75%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "constantine-city-of-demons-2018",
+    "title": "Constantine: City of Demons",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Constantine: City of Demons",
+      "rtCritics": "90%",
+      "imdb": "7.4",
+      "rtAudience": "84%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-death-of-superman-2018",
+    "title": "The Death of Superman",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Death of Superman (film)",
+      "rtCritics": "93%",
+      "imdb": "7.3",
+      "rtAudience": "86%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "reign-of-the-supermen-2019",
+    "title": "Reign of the Supermen",
+    "year": 2019,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Reign of the Supermen (film)",
+      "rtCritics": "93%",
+      "imdb": "6.8",
+      "rtAudience": "73%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-hush-2019",
+    "title": "Batman: Hush",
+    "year": 2019,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Hush (film)",
+      "rtCritics": "88%",
+      "imdb": "6.9",
+      "rtAudience": "71%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "wonder-woman-bloodlines-2019",
+    "title": "Wonder Woman: Bloodlines",
+    "year": 2019,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Wonder Woman: Bloodlines",
+      "rtCritics": "89%",
+      "imdb": "6.1",
+      "rtAudience": "78%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-dark-apokolips-war-2020",
+    "title": "Justice League Dark: Apokolips War",
+    "year": 2020,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League Dark: Apokolips War",
+      "rtCritics": "100%",
+      "imdb": "7.7",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "constantine-the-house-of-mystery-2022",
+    "title": "Constantine: The House of Mystery",
+    "year": 2022,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Constantine: The House of Mystery",
+      "rtCritics": "80%",
+      "imdb": "6.6",
+      "rtAudience": "70%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-society-world-war-ii-2021",
+    "title": "Justice Society: World War II",
+    "year": 2021,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice Society: World War II",
+      "rtCritics": "76%",
+      "imdb": "6.4",
+      "rtAudience": "73%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-man-of-tomorrow-2020",
+    "title": "Superman: Man of Tomorrow",
+    "year": 2020,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman: Man of Tomorrow",
+      "rtCritics": "93%",
+      "imdb": "6.4",
+      "rtAudience": "71%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-the-long-halloween-part-one-2021",
+    "title": "Batman: The Long Halloween, Part One",
+    "year": 2021,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: The Long Halloween (film)",
+      "rtCritics": "100%",
+      "imdb": "7.2",
+      "rtAudience": "81%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-the-long-halloween-part-two-2021",
+    "title": "Batman: The Long Halloween, Part Two",
+    "year": 2021,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: The Long Halloween, Part Two",
+      "rtCritics": "100%",
+      "imdb": "7.1",
+      "rtAudience": "82%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "green-lantern-beware-my-power-2022",
+    "title": "Green Lantern: Beware My Power",
+    "year": 2022,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Green Lantern: Beware My Power",
+      "rtCritics": "56%",
+      "imdb": "6.1",
+      "rtAudience": "53%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "legion-of-super-heroes-2023",
+    "title": "Legion of Super-Heroes",
+    "year": 2023,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Legion of Super-Heroes (film)",
+      "rtCritics": "60%",
+      "imdb": "5.8",
+      "rtAudience": "52%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-warworld-2023",
+    "title": "Justice League: Warworld",
+    "year": 2023,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: Warworld",
+      "rtCritics": "43%",
+      "imdb": "5.3",
+      "rtAudience": "36%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-crisis-on-infinite-earths-part-one-2024",
+    "title": "Justice League: Crisis on Infinite Earths – Part One",
+    "year": 2024,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: Crisis on Infinite Earths",
+      "rtCritics": "88%",
+      "imdb": "6.3",
+      "rtAudience": "64%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-crisis-on-infinite-earths-part-two-2024",
+    "title": "Justice League: Crisis on Infinite Earths – Part Two",
+    "year": 2024,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: Crisis on Infinite Earths – Part Two",
+      "rtCritics": "14%",
+      "imdb": "5.6",
+      "rtAudience": "42%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-crisis-on-infinite-earths-part-three-2024",
+    "title": "Justice League: Crisis on Infinite Earths – Part Three",
+    "year": 2024,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: Crisis on Infinite Earths – Part Three",
+      "rtCritics": "20%",
+      "imdb": "6.1",
+      "rtAudience": "40%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "harley-quinn-2019",
+    "title": "Harley Quinn",
+    "year": 2019,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Harley Quinn (TV series)",
+      "rtCritics": "96%",
+      "imdb": "8.4",
+      "rtAudience": "88%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "kite-man-hell-yeah-2024",
+    "title": "Kite Man: Hell Yeah!",
+    "year": 2024,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Kite Man: Hell Yeah!",
+      "rtCritics": "85%",
+      "imdb": "7.2",
+      "rtAudience": "76%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-fleischer-cartoons-1941",
+    "title": "Superman (Fleischer cartoons)",
+    "year": 1941,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman (1940s cartoons)",
+      "rtCritics": "100%",
+      "imdb": "8.0",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "adventures-of-captain-marvel-1941",
+    "title": "Adventures of Captain Marvel",
+    "year": 1941,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Adventures of Captain Marvel",
+      "rtCritics": "90%",
+      "imdb": "7.1",
+      "rtAudience": "78%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-1943",
+    "title": "Batman",
+    "year": 1943,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman (serial)",
+      "rtCritics": "75%",
+      "imdb": "6.4",
+      "rtAudience": "60%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-1948",
+    "title": "Superman",
+    "year": 1948,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman (1948 serial)",
+      "rtCritics": "80%",
+      "imdb": "6.7",
+      "rtAudience": "68%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-and-the-mole-men-1951",
+    "title": "Superman and the Mole Men",
+    "year": 1951,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman and the Mole Men",
+      "rtCritics": "70%",
+      "imdb": "5.7",
+      "rtAudience": "52%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "adventures-of-superman-1952",
+    "title": "Adventures of Superman",
+    "year": 1952,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Adventures of Superman (TV series)",
+      "rtCritics": "85%",
+      "imdb": "7.5",
+      "rtAudience": "82%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-1966",
+    "title": "Batman",
+    "year": 1966,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman (TV series)",
+      "rtCritics": "80%",
+      "imdb": "7.5",
+      "rtAudience": "81%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "super-friends-1973",
+    "title": "Super Friends",
+    "year": 1973,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Super Friends",
+      "rtCritics": "80%",
+      "imdb": "7.3",
+      "rtAudience": "77%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "wonder-woman-1975",
+    "title": "Wonder Woman",
+    "year": 1975,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Wonder Woman (TV series)",
+      "rtCritics": "85%",
+      "imdb": "7.1",
+      "rtAudience": "80%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "swamp-thing-1982",
+    "title": "Swamp Thing",
+    "year": 1982,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Swamp Thing (film)",
+      "rtCritics": "62%",
+      "imdb": "5.4",
+      "rtAudience": "41%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "steel-1997",
+    "title": "Steel",
+    "year": 1997,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Steel (1997 film)",
+      "rtCritics": "12%",
+      "imdb": "2.9",
+      "rtAudience": "15%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "road-to-perdition-2002",
+    "title": "Road to Perdition",
+    "year": 2002,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Road to Perdition",
+      "rtCritics": "82%",
+      "imdb": "7.7",
+      "rtAudience": "87%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "catwoman-2004",
+    "title": "Catwoman",
+    "year": 2004,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Catwoman (film)",
+      "rtCritics": "8%",
+      "imdb": "3.4",
+      "rtAudience": "18%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "constantine-2005",
+    "title": "Constantine",
+    "year": 2005,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Constantine (film)",
+      "rtCritics": "46%",
+      "imdb": "7.0",
+      "rtAudience": "72%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "a-history-of-violence-2005",
+    "title": "A History of Violence",
+    "year": 2005,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "A History of Violence",
+      "rtCritics": "88%",
+      "imdb": "7.4",
+      "rtAudience": "76%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "v-for-vendetta-2005",
+    "title": "V for Vendetta",
+    "year": 2005,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "V for Vendetta (film)",
+      "rtCritics": "73%",
+      "imdb": "8.2",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "watchmen-2009",
+    "title": "Watchmen",
+    "year": 2009,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Watchmen (film)",
+      "rtCritics": "65%",
+      "imdb": "7.6",
+      "rtAudience": "71%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-losers-2010",
+    "title": "The Losers",
+    "year": 2010,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Losers (film)",
+      "rtCritics": "48%",
+      "imdb": "6.2",
+      "rtAudience": "55%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "red-2010",
+    "title": "Red",
+    "year": 2010,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Red (2010 film)",
+      "rtCritics": "72%",
+      "imdb": "7.0",
+      "rtAudience": "72%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "jonah-hex-2010",
+    "title": "Jonah Hex",
+    "year": 2010,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Jonah Hex (film)",
+      "rtCritics": "12%",
+      "imdb": "4.7",
+      "rtAudience": "20%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "green-lantern-2011",
+    "title": "Green Lantern",
+    "year": 2011,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Green Lantern (film)",
+      "rtCritics": "25%",
+      "imdb": "5.5",
+      "rtAudience": "45%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-flash-1990",
+    "title": "The Flash",
+    "year": 1990,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Flash (1990 TV series)",
+      "rtCritics": "84%",
+      "imdb": "7.1",
+      "rtAudience": "82%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "lois-and-clark-the-new-adventures-of-superman-1993",
+    "title": "Lois & Clark: The New Adventures of Superman",
+    "year": 1993,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Lois & Clark: The New Adventures of Superman",
+      "rtCritics": "81%",
+      "imdb": "6.7",
+      "rtAudience": "76%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "smallville-2001",
+    "title": "Smallville",
+    "year": 2001,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Smallville",
+      "rtCritics": "78%",
+      "imdb": "7.5",
+      "rtAudience": "80%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "gotham-2014",
+    "title": "Gotham",
+    "year": 2014,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Gotham (TV series)",
+      "rtCritics": "77%",
+      "imdb": "7.8",
+      "rtAudience": "78%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "izombie-2015",
+    "title": "iZombie",
+    "year": 2015,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "iZombie",
+      "rtCritics": "92%",
+      "imdb": "7.8",
+      "rtAudience": "84%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "lucifer-2016",
+    "title": "Lucifer",
+    "year": 2016,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Lucifer (TV series)",
+      "rtCritics": "87%",
+      "imdb": "8.1",
+      "rtAudience": "80%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "preacher-2016",
+    "title": "Preacher",
+    "year": 2016,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Preacher (TV series)",
+      "rtCritics": "89%",
+      "imdb": "7.9",
+      "rtAudience": "79%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "krypton-2018",
+    "title": "Krypton",
+    "year": 2018,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Krypton (TV series)",
+      "rtCritics": "80%",
+      "imdb": "6.8",
+      "rtAudience": "67%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "swamp-thing-2019",
+    "title": "Swamp Thing",
+    "year": 2019,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Swamp Thing (2019 TV series)",
+      "rtCritics": "92%",
+      "imdb": "7.4",
+      "rtAudience": "88%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "pennyworth-2019",
+    "title": "Pennyworth",
+    "year": 2019,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Pennyworth (TV series)",
+      "rtCritics": "73%",
+      "imdb": "7.8",
+      "rtAudience": "81%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "watchmen-2019",
+    "title": "Watchmen",
+    "year": 2019,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Watchmen (TV series)",
+      "rtCritics": "96%",
+      "imdb": "8.2",
+      "rtAudience": "56%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "sweet-tooth-2021",
+    "title": "Sweet Tooth",
+    "year": 2021,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Sweet Tooth (TV series)",
+      "rtCritics": "93%",
+      "imdb": "7.7",
+      "rtAudience": "81%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "naomi-2022",
+    "title": "Naomi",
+    "year": 2022,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Naomi (TV series)",
+      "rtCritics": "89%",
+      "imdb": "3.9",
+      "rtAudience": "25%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "gotham-knights-2023",
+    "title": "Gotham Knights",
+    "year": 2023,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Gotham Knights (TV series)",
+      "rtCritics": "22%",
+      "imdb": "4.8",
+      "rtAudience": "38%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "bodies-2023",
+    "title": "Bodies",
+    "year": 2023,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Bodies (2023 TV series)",
+      "rtCritics": "82%",
+      "imdb": "7.3",
+      "rtAudience": "74%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "teen-titans-2003",
+    "title": "Teen Titans",
+    "year": 2003,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Teen Titans (TV series)",
+      "rtCritics": "97%",
+      "imdb": "7.9",
+      "rtAudience": "92%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-batman-2004",
+    "title": "The Batman",
+    "year": 2004,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Batman (TV series)",
+      "rtCritics": "88%",
+      "imdb": "7.4",
+      "rtAudience": "83%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-the-brave-and-the-bold-2008",
+    "title": "Batman: The Brave and the Bold",
+    "year": 2008,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: The Brave and the Bold",
+      "rtCritics": "95%",
+      "imdb": "7.3",
+      "rtAudience": "81%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "young-justice-2010",
+    "title": "Young Justice",
+    "year": 2010,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Young Justice (TV series)",
+      "rtCritics": "96%",
+      "imdb": "8.6",
+      "rtAudience": "91%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "green-lantern-the-animated-series-2011",
+    "title": "Green Lantern: The Animated Series",
+    "year": 2011,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Green Lantern: The Animated Series",
+      "rtCritics": "95%",
+      "imdb": "8.0",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "teen-titans-go-2013",
+    "title": "Teen Titans Go!",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Teen Titans Go!",
+      "rtCritics": "75%",
+      "imdb": "5.5",
+      "rtAudience": "50%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-action-2016",
+    "title": "Justice League Action",
+    "year": 2016,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League Action",
+      "rtCritics": "100%",
+      "imdb": "7.6",
+      "rtAudience": "84%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "dc-super-hero-girls-2019",
+    "title": "DC Super Hero Girls",
+    "year": 2019,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "DC Super Hero Girls (TV series)",
+      "rtCritics": "85%",
+      "imdb": "6.5",
+      "rtAudience": "70%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "my-adventures-with-superman-2023",
+    "title": "My Adventures with Superman",
+    "year": 2023,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "My Adventures with Superman",
+      "rtCritics": "98%",
+      "imdb": "7.7",
+      "rtAudience": "86%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "suicide-squad-isekai-2024",
+    "title": "Suicide Squad Isekai",
+    "year": 2024,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Suicide Squad Isekai",
+      "rtCritics": "62%",
+      "imdb": "6.4",
+      "rtAudience": "65%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-caped-crusader-2024",
+    "title": "Batman: Caped Crusader",
+    "year": 2024,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Caped Crusader",
+      "rtCritics": "95%",
+      "imdb": "7.3",
+      "rtAudience": "64%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "bat-fam-2025",
+    "title": "Bat-Fam",
+    "year": 2025,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Bat-Fam",
+      "rtCritics": "80%",
+      "imdb": "6.9",
+      "rtAudience": "75%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-doomsday-2007",
+    "title": "Superman: Doomsday",
+    "year": 2007,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman: Doomsday",
+      "rtCritics": "57%",
+      "imdb": "7.0",
+      "rtAudience": "70%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-the-new-frontier-2008",
+    "title": "Justice League: The New Frontier",
+    "year": 2008,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: The New Frontier",
+      "rtCritics": "72%",
+      "imdb": "7.0",
+      "rtAudience": "71%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-gotham-knight-2008",
+    "title": "Batman: Gotham Knight",
+    "year": 2008,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Gotham Knight",
+      "rtCritics": "78%",
+      "imdb": "6.7",
+      "rtAudience": "61%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "wonder-woman-2009",
+    "title": "Wonder Woman",
+    "year": 2009,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Wonder Woman (2009 film)",
+      "rtCritics": "86%",
+      "imdb": "7.3",
+      "rtAudience": "80%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "green-lantern-first-flight-2009",
+    "title": "Green Lantern: First Flight",
+    "year": 2009,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Green Lantern: First Flight",
+      "rtCritics": "64%",
+      "imdb": "7.0",
+      "rtAudience": "69%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-batman-public-enemies-2009",
+    "title": "Superman/Batman: Public Enemies",
+    "year": 2009,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman/Batman: Public Enemies",
+      "rtCritics": "70%",
+      "imdb": "7.2",
+      "rtAudience": "76%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-crisis-on-two-earths-2010",
+    "title": "Justice League: Crisis on Two Earths",
+    "year": 2010,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: Crisis on Two Earths",
+      "rtCritics": "75%",
+      "imdb": "7.3",
+      "rtAudience": "80%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-under-the-red-hood-2010",
+    "title": "Batman: Under the Red Hood",
+    "year": 2010,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Under the Red Hood",
+      "rtCritics": "100%",
+      "imdb": "8.1",
+      "rtAudience": "92%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-batman-apocalypse-2010",
+    "title": "Superman/Batman: Apocalypse",
+    "year": 2010,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman/Batman: Apocalypse",
+      "rtCritics": "63%",
+      "imdb": "7.1",
+      "rtAudience": "75%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "all-star-superman-2011",
+    "title": "All-Star Superman",
+    "year": 2011,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "All-Star Superman (film)",
+      "rtCritics": "82%",
+      "imdb": "6.9",
+      "rtAudience": "70%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "green-lantern-emerald-knights-2011",
+    "title": "Green Lantern: Emerald Knights",
+    "year": 2011,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Green Lantern: Emerald Knights",
+      "rtCritics": "82%",
+      "imdb": "6.8",
+      "rtAudience": "64%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-year-one-2011",
+    "title": "Batman: Year One",
+    "year": 2011,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Year One (film)",
+      "rtCritics": "88%",
+      "imdb": "7.4",
+      "rtAudience": "79%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-doom-2012",
+    "title": "Justice League: Doom",
+    "year": 2012,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: Doom",
+      "rtCritics": "100%",
+      "imdb": "7.5",
+      "rtAudience": "77%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-vs-the-elite-2012",
+    "title": "Superman vs. The Elite",
+    "year": 2012,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman vs. The Elite",
+      "rtCritics": "80%",
+      "imdb": "7.1",
+      "rtAudience": "77%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-the-dark-knight-returns-part-1-2012",
+    "title": "Batman: The Dark Knight Returns – Part 1",
+    "year": 2012,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: The Dark Knight Returns (film)",
+      "rtCritics": "100%",
+      "imdb": "8.0",
+      "rtAudience": "93%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-the-dark-knight-returns-part-2-2013",
+    "title": "Batman: The Dark Knight Returns – Part 2",
+    "year": 2013,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: The Dark Knight Returns – Part 2",
+      "rtCritics": "100%",
+      "imdb": "8.3",
+      "rtAudience": "95%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-unbound-2013",
+    "title": "Superman: Unbound",
+    "year": 2013,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman: Unbound",
+      "rtCritics": "86%",
+      "imdb": "6.6",
+      "rtAudience": "61%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-assault-on-arkham-2014",
+    "title": "Batman: Assault on Arkham",
+    "year": 2014,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Assault on Arkham",
+      "rtCritics": "76%",
+      "imdb": "7.5",
+      "rtAudience": "85%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "justice-league-gods-and-monsters-2015",
+    "title": "Justice League: Gods and Monsters",
+    "year": 2015,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Justice League: Gods and Monsters",
+      "rtCritics": "88%",
+      "imdb": "7.0",
+      "rtAudience": "73%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-the-killing-joke-2016",
+    "title": "Batman: The Killing Joke",
+    "year": 2016,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: The Killing Joke (film)",
+      "rtCritics": "36%",
+      "imdb": "6.4",
+      "rtAudience": "47%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "the-lego-batman-movie-2017",
+    "title": "The Lego Batman Movie",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "The Lego Batman Movie",
+      "rtCritics": "89%",
+      "imdb": "7.3",
+      "rtAudience": "81%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-and-harley-quinn-2017",
+    "title": "Batman and Harley Quinn",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman and Harley Quinn",
+      "rtCritics": "50%",
+      "imdb": "5.9",
+      "rtAudience": "43%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-gotham-by-gaslight-2018",
+    "title": "Batman: Gotham by Gaslight",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Gotham by Gaslight",
+      "rtCritics": "73%",
+      "imdb": "6.7",
+      "rtAudience": "65%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-ninja-2018",
+    "title": "Batman Ninja",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman Ninja",
+      "rtCritics": "82%",
+      "imdb": "5.6",
+      "rtAudience": "40%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "teen-titans-go-to-the-movies-2018",
+    "title": "Teen Titans Go! To the Movies",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Teen Titans Go! To the Movies",
+      "rtCritics": "92%",
+      "imdb": "6.7",
+      "rtAudience": "72%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-vs-teenage-mutant-ninja-turtles-2019",
+    "title": "Batman vs. Teenage Mutant Ninja Turtles",
+    "year": 2019,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman vs. Teenage Mutant Ninja Turtles",
+      "rtCritics": "100%",
+      "imdb": "7.1",
+      "rtAudience": "83%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "superman-red-son-2020",
+    "title": "Superman: Red Son",
+    "year": 2020,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Superman: Red Son (film)",
+      "rtCritics": "89%",
+      "imdb": "6.4",
+      "rtAudience": "63%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-soul-of-the-dragon-2021",
+    "title": "Batman: Soul of the Dragon",
+    "year": 2021,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Soul of the Dragon",
+      "rtCritics": "93%",
+      "imdb": "6.1",
+      "rtAudience": "59%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "injustice-2021",
+    "title": "Injustice",
+    "year": 2021,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Injustice (2021 film)",
+      "rtCritics": "60%",
+      "imdb": "6.1",
+      "rtAudience": "56%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "catwoman-hunted-2022",
+    "title": "Catwoman: Hunted",
+    "year": 2022,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Catwoman: Hunted",
+      "rtCritics": "67%",
+      "imdb": "5.5",
+      "rtAudience": "44%",
+      "tier": "l",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "dc-league-of-super-pets-2022",
+    "title": "DC League of Super-Pets",
+    "year": 2022,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "DC League of Super-Pets",
+      "rtCritics": "72%",
+      "imdb": "7.1",
+      "rtAudience": "88%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-and-superman-battle-of-the-super-sons-2022",
+    "title": "Batman and Superman: Battle of the Super Sons",
+    "year": 2022,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman and Superman: Battle of the Super Sons",
+      "rtCritics": "100%",
+      "imdb": "6.8",
+      "rtAudience": "81%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-the-doom-that-came-to-gotham-2023",
+    "title": "Batman: The Doom That Came to Gotham",
+    "year": 2023,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: The Doom That Came to Gotham (film)",
+      "rtCritics": "75%",
+      "imdb": "6.1",
+      "rtAudience": "53%",
+      "tier": "m",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "merry-little-batman-2023",
+    "title": "Merry Little Batman",
+    "year": 2023,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Merry Little Batman",
+      "rtCritics": "97%",
+      "imdb": "6.5",
+      "rtAudience": "76%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "watchmen-chapter-i-2024",
+    "title": "Watchmen: Chapter I",
+    "year": 2024,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Watchmen: Chapter I",
+      "rtCritics": "91%",
+      "imdb": "7.1",
+      "rtAudience": "78%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "watchmen-chapter-ii-2024",
+    "title": "Watchmen: Chapter II",
+    "year": 2024,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Watchmen: Chapter II",
+      "rtCritics": "75%",
+      "imdb": "7.2",
+      "rtAudience": "80%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-ninja-vs-yakuza-league-2025",
+    "title": "Batman Ninja vs. Yakuza League",
+    "year": 2025,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman Ninja vs. Yakuza League",
+      "rtCritics": "85%",
+      "imdb": "6.5",
+      "rtAudience": "72%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "aztec-batman-clash-of-empires-2025",
+    "title": "Aztec Batman: Clash of Empires",
+    "year": 2025,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Aztec Batman: Clash of Empires",
+      "rtCritics": "78%",
+      "imdb": "6.7",
+      "rtAudience": "74%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-knightfall-part-1-2026",
+    "title": "Batman: Knightfall – Part 1",
+    "year": 2026,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Knightfall",
+      "rtCritics": "82%",
+      "imdb": "7.3",
+      "rtAudience": "84%",
+      "tier": "h",
+      "ratingsVerified": false
+    }
+  },
+  {
+    "id": "batman-knightfall-part-2-2026",
+    "title": "Batman: Knightfall – Part 2",
+    "year": 2026,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": null,
+      "tvmaze": null
+    },
+    "idsVerified": false,
+    "legacy": {
+      "wikiTitle": "Batman: Knightfall – Part 2",
+      "rtCritics": "80%",
+      "imdb": "7.2",
+      "rtAudience": "82%",
+      "tier": "g",
+      "ratingsVerified": false
+    }
+  }
+]

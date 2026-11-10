@@ -1,0 +1,560 @@
+{
+  "w_1": {
+    "work": "the-suicide-squad-2021"
+  },
+  "w_2": {
+    "work": "peacemaker-2022",
+    "season": 1
+  },
+  "w_3": {
+    "work": "blue-beetle-2023"
+  },
+  "w_4": {
+    "work": "creature-commandos-2024"
+  },
+  "w_5": {
+    "work": "superman-2025"
+  },
+  "w_6": {
+    "work": "peacemaker-2022",
+    "season": 2
+  },
+  "w_7": {
+    "work": "supergirl-2026"
+  },
+  "w_8": {
+    "work": "lanterns-2026"
+  },
+  "w_9": {
+    "work": "clayface-2026"
+  },
+  "w_10": {
+    "work": "wonder-woman-2017"
+  },
+  "w_11": {
+    "work": "wonder-woman-1984-2020"
+  },
+  "w_12": {
+    "work": "man-of-steel-2013"
+  },
+  "w_13": {
+    "work": "batman-v-superman-dawn-of-justice-2016"
+  },
+  "w_14": {
+    "work": "suicide-squad-2016"
+  },
+  "w_15": {
+    "work": "zack-snyder-s-justice-league-2021"
+  },
+  "w_16": {
+    "work": "justice-league-2017"
+  },
+  "w_17": {
+    "work": "aquaman-2018"
+  },
+  "w_18": {
+    "work": "shazam-2019"
+  },
+  "w_19": {
+    "work": "birds-of-prey-2020"
+  },
+  "w_20": {
+    "work": "the-suicide-squad-2021"
+  },
+  "w_21": {
+    "work": "peacemaker-2022",
+    "season": 1
+  },
+  "w_22": {
+    "work": "black-adam-2022"
+  },
+  "w_23": {
+    "work": "shazam-fury-of-the-gods-2023"
+  },
+  "w_24": {
+    "work": "the-flash-2023"
+  },
+  "w_25": {
+    "work": "blue-beetle-2023"
+  },
+  "w_26": {
+    "work": "aquaman-and-the-lost-kingdom-2023"
+  },
+  "w_27": {
+    "work": "the-batman-2022"
+  },
+  "w_28": {
+    "work": "the-penguin-2024"
+  },
+  "w_29": {
+    "work": "batman-begins-2005"
+  },
+  "w_30": {
+    "work": "the-dark-knight-2008"
+  },
+  "w_31": {
+    "work": "the-dark-knight-rises-2012"
+  },
+  "w_32": {
+    "work": "joker-2019"
+  },
+  "w_33": {
+    "work": "joker-folie-a-deux-2024"
+  },
+  "w_34": {
+    "work": "batman-1989"
+  },
+  "w_35": {
+    "work": "batman-returns-1992"
+  },
+  "w_36": {
+    "work": "batman-forever-1995"
+  },
+  "w_37": {
+    "work": "batman-and-robin-1997"
+  },
+  "w_38": {
+    "work": "superman-1978"
+  },
+  "w_39": {
+    "work": "superman-ii-1980"
+  },
+  "w_40": {
+    "work": "superman-iii-1983"
+  },
+  "w_41": {
+    "work": "supergirl-1984"
+  },
+  "w_42": {
+    "work": "superman-iv-the-quest-for-peace-1987"
+  },
+  "w_43": {
+    "work": "superman-returns-2006"
+  },
+  "w_44": {
+    "work": "arrow-2012"
+  },
+  "w_45": {
+    "work": "the-flash-2014"
+  },
+  "w_46": {
+    "work": "constantine-2014"
+  },
+  "w_47": {
+    "work": "supergirl-2015"
+  },
+  "w_48": {
+    "work": "dc-s-legends-of-tomorrow-2016"
+  },
+  "w_49": {
+    "work": "black-lightning-2018"
+  },
+  "w_50": {
+    "work": "batwoman-2019"
+  },
+  "w_51": {
+    "work": "stargirl-2020"
+  },
+  "w_52": {
+    "work": "superman-and-lois-2021"
+  },
+  "w_53": {
+    "work": "titans-2018"
+  },
+  "w_54": {
+    "work": "doom-patrol-2019"
+  },
+  "w_55": {
+    "work": "the-sandman-2022"
+  },
+  "w_56": {
+    "work": "dead-boy-detectives-2024"
+  },
+  "w_57": {
+    "work": "batman-the-animated-series-1992"
+  },
+  "w_58": {
+    "work": "batman-mask-of-the-phantasm-1993"
+  },
+  "w_59": {
+    "work": "batman-and-mr-freeze-subzero-1998"
+  },
+  "w_60": {
+    "work": "superman-the-animated-series-1996"
+  },
+  "w_61": {
+    "work": "the-new-batman-adventures-1997"
+  },
+  "w_62": {
+    "work": "batman-mystery-of-the-batwoman-2003"
+  },
+  "w_63": {
+    "work": "static-shock-2000"
+  },
+  "w_64": {
+    "work": "justice-league-2001"
+  },
+  "w_65": {
+    "work": "justice-league-unlimited-2004"
+  },
+  "w_66": {
+    "work": "justice-league-vs-the-fatal-five-2019"
+  },
+  "w_67": {
+    "work": "batman-beyond-1999"
+  },
+  "w_68": {
+    "work": "batman-beyond-return-of-the-joker-2000"
+  },
+  "w_69": {
+    "work": "justice-league-the-flashpoint-paradox-2013"
+  },
+  "w_70": {
+    "work": "justice-league-war-2014"
+  },
+  "w_71": {
+    "work": "son-of-batman-2014"
+  },
+  "w_72": {
+    "work": "justice-league-throne-of-atlantis-2015"
+  },
+  "w_73": {
+    "work": "batman-vs-robin-2015"
+  },
+  "w_74": {
+    "work": "batman-bad-blood-2016"
+  },
+  "w_75": {
+    "work": "justice-league-vs-teen-titans-2016"
+  },
+  "w_76": {
+    "work": "justice-league-dark-2017"
+  },
+  "w_77": {
+    "work": "teen-titans-the-judas-contract-2017"
+  },
+  "w_78": {
+    "work": "suicide-squad-hell-to-pay-2018"
+  },
+  "w_79": {
+    "work": "constantine-city-of-demons-2018"
+  },
+  "w_80": {
+    "work": "the-death-of-superman-2018"
+  },
+  "w_81": {
+    "work": "reign-of-the-supermen-2019"
+  },
+  "w_82": {
+    "work": "batman-hush-2019"
+  },
+  "w_83": {
+    "work": "wonder-woman-bloodlines-2019"
+  },
+  "w_84": {
+    "work": "justice-league-dark-apokolips-war-2020"
+  },
+  "w_85": {
+    "work": "constantine-the-house-of-mystery-2022"
+  },
+  "w_86": {
+    "work": "justice-society-world-war-ii-2021"
+  },
+  "w_87": {
+    "work": "superman-man-of-tomorrow-2020"
+  },
+  "w_88": {
+    "work": "batman-the-long-halloween-part-one-2021"
+  },
+  "w_89": {
+    "work": "batman-the-long-halloween-part-two-2021"
+  },
+  "w_90": {
+    "work": "green-lantern-beware-my-power-2022"
+  },
+  "w_91": {
+    "work": "legion-of-super-heroes-2023"
+  },
+  "w_92": {
+    "work": "justice-league-warworld-2023"
+  },
+  "w_93": {
+    "work": "justice-league-crisis-on-infinite-earths-part-one-2024"
+  },
+  "w_94": {
+    "work": "justice-league-crisis-on-infinite-earths-part-two-2024"
+  },
+  "w_95": {
+    "work": "justice-league-crisis-on-infinite-earths-part-three-2024"
+  },
+  "w_96": {
+    "work": "harley-quinn-2019"
+  },
+  "w_97": {
+    "work": "kite-man-hell-yeah-2024"
+  },
+  "w_98": {
+    "work": "superman-fleischer-cartoons-1941"
+  },
+  "w_99": {
+    "work": "adventures-of-captain-marvel-1941"
+  },
+  "w_100": {
+    "work": "batman-1943"
+  },
+  "w_101": {
+    "work": "superman-1948"
+  },
+  "w_102": {
+    "work": "superman-and-the-mole-men-1951"
+  },
+  "w_103": {
+    "work": "adventures-of-superman-1952"
+  },
+  "w_104": {
+    "work": "batman-1966"
+  },
+  "w_105": {
+    "work": "super-friends-1973"
+  },
+  "w_106": {
+    "work": "wonder-woman-1975"
+  },
+  "w_107": {
+    "work": "swamp-thing-1982"
+  },
+  "w_108": {
+    "work": "steel-1997"
+  },
+  "w_109": {
+    "work": "road-to-perdition-2002"
+  },
+  "w_110": {
+    "work": "catwoman-2004"
+  },
+  "w_111": {
+    "work": "constantine-2005"
+  },
+  "w_112": {
+    "work": "a-history-of-violence-2005"
+  },
+  "w_113": {
+    "work": "v-for-vendetta-2005"
+  },
+  "w_114": {
+    "work": "watchmen-2009"
+  },
+  "w_115": {
+    "work": "the-losers-2010"
+  },
+  "w_116": {
+    "work": "red-2010"
+  },
+  "w_117": {
+    "work": "jonah-hex-2010"
+  },
+  "w_118": {
+    "work": "green-lantern-2011"
+  },
+  "w_119": {
+    "work": "the-flash-1990"
+  },
+  "w_120": {
+    "work": "lois-and-clark-the-new-adventures-of-superman-1993"
+  },
+  "w_121": {
+    "work": "smallville-2001"
+  },
+  "w_122": {
+    "work": "gotham-2014"
+  },
+  "w_123": {
+    "work": "izombie-2015"
+  },
+  "w_124": {
+    "work": "lucifer-2016"
+  },
+  "w_125": {
+    "work": "preacher-2016"
+  },
+  "w_126": {
+    "work": "krypton-2018"
+  },
+  "w_127": {
+    "work": "swamp-thing-2019"
+  },
+  "w_128": {
+    "work": "pennyworth-2019"
+  },
+  "w_129": {
+    "work": "watchmen-2019"
+  },
+  "w_130": {
+    "work": "sweet-tooth-2021"
+  },
+  "w_131": {
+    "work": "naomi-2022"
+  },
+  "w_132": {
+    "work": "gotham-knights-2023"
+  },
+  "w_133": {
+    "work": "bodies-2023"
+  },
+  "w_134": {
+    "work": "teen-titans-2003"
+  },
+  "w_135": {
+    "work": "the-batman-2004"
+  },
+  "w_136": {
+    "work": "batman-the-brave-and-the-bold-2008"
+  },
+  "w_137": {
+    "work": "young-justice-2010"
+  },
+  "w_138": {
+    "work": "green-lantern-the-animated-series-2011"
+  },
+  "w_139": {
+    "work": "teen-titans-go-2013"
+  },
+  "w_140": {
+    "work": "justice-league-action-2016"
+  },
+  "w_141": {
+    "work": "dc-super-hero-girls-2019"
+  },
+  "w_142": {
+    "work": "my-adventures-with-superman-2023"
+  },
+  "w_143": {
+    "work": "suicide-squad-isekai-2024"
+  },
+  "w_144": {
+    "work": "batman-caped-crusader-2024"
+  },
+  "w_145": {
+    "work": "bat-fam-2025"
+  },
+  "w_146": {
+    "work": "superman-doomsday-2007"
+  },
+  "w_147": {
+    "work": "justice-league-the-new-frontier-2008"
+  },
+  "w_148": {
+    "work": "batman-gotham-knight-2008"
+  },
+  "w_149": {
+    "work": "wonder-woman-2009"
+  },
+  "w_150": {
+    "work": "green-lantern-first-flight-2009"
+  },
+  "w_151": {
+    "work": "superman-batman-public-enemies-2009"
+  },
+  "w_152": {
+    "work": "justice-league-crisis-on-two-earths-2010"
+  },
+  "w_153": {
+    "work": "batman-under-the-red-hood-2010"
+  },
+  "w_154": {
+    "work": "superman-batman-apocalypse-2010"
+  },
+  "w_155": {
+    "work": "all-star-superman-2011"
+  },
+  "w_156": {
+    "work": "green-lantern-emerald-knights-2011"
+  },
+  "w_157": {
+    "work": "batman-year-one-2011"
+  },
+  "w_158": {
+    "work": "justice-league-doom-2012"
+  },
+  "w_159": {
+    "work": "superman-vs-the-elite-2012"
+  },
+  "w_160": {
+    "work": "batman-the-dark-knight-returns-part-1-2012"
+  },
+  "w_161": {
+    "work": "batman-the-dark-knight-returns-part-2-2013"
+  },
+  "w_162": {
+    "work": "superman-unbound-2013"
+  },
+  "w_163": {
+    "work": "batman-assault-on-arkham-2014"
+  },
+  "w_164": {
+    "work": "justice-league-gods-and-monsters-2015"
+  },
+  "w_165": {
+    "work": "batman-the-killing-joke-2016"
+  },
+  "w_166": {
+    "work": "the-lego-batman-movie-2017"
+  },
+  "w_167": {
+    "work": "batman-and-harley-quinn-2017"
+  },
+  "w_168": {
+    "work": "batman-gotham-by-gaslight-2018"
+  },
+  "w_169": {
+    "work": "batman-ninja-2018"
+  },
+  "w_170": {
+    "work": "teen-titans-go-to-the-movies-2018"
+  },
+  "w_171": {
+    "work": "batman-vs-teenage-mutant-ninja-turtles-2019"
+  },
+  "w_172": {
+    "work": "superman-red-son-2020"
+  },
+  "w_173": {
+    "work": "batman-soul-of-the-dragon-2021"
+  },
+  "w_174": {
+    "work": "injustice-2021"
+  },
+  "w_175": {
+    "work": "catwoman-hunted-2022"
+  },
+  "w_176": {
+    "work": "dc-league-of-super-pets-2022"
+  },
+  "w_177": {
+    "work": "batman-and-superman-battle-of-the-super-sons-2022"
+  },
+  "w_178": {
+    "work": "batman-the-doom-that-came-to-gotham-2023"
+  },
+  "w_179": {
+    "work": "merry-little-batman-2023"
+  },
+  "w_180": {
+    "work": "watchmen-chapter-i-2024"
+  },
+  "w_181": {
+    "work": "watchmen-chapter-ii-2024"
+  },
+  "w_182": {
+    "work": "batman-ninja-vs-yakuza-league-2025"
+  },
+  "w_183": {
+    "work": "aztec-batman-clash-of-empires-2025"
+  },
+  "w_184": {
+    "work": "batman-knightfall-part-1-2026"
+  },
+  "w_185": {
+    "work": "batman-knightfall-part-2-2026"
+  }
+}

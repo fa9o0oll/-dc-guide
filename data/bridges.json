@@ -1,0 +1,42 @@
+[
+  {
+    "from": "justice-league-the-flashpoint-paradox-2013",
+    "to": "justice-league-war-2014",
+    "toUniverse": "dcamu",
+    "label": "⚡ جسر ريميك: إطلاق عالم DCAMU (New 52)",
+    "description": "يمثل هذا الفيلم نقطة الانطلاق الزمنية التي أسست عالم أفلام الأنميشن المتصل المكوّن من 17 فيلماً.",
+    "spoiler": "ركض باري آلين عبر السبيد فورس (قوة السرعة) في نهاية Flashpoint Paradox أعاد كتابة الكون وأنشأ خط New 52 الزمني."
+  },
+  {
+    "from": "justice-league-dark-apokolips-war-2020",
+    "to": "superman-man-of-tomorrow-2020",
+    "toUniverse": "tomorrow",
+    "label": "🔥 جسر ريميك: الانتقال من DCAMU إلى Tomorrowverse",
+    "description": "يمثل نهاية الحقبة الأولى لأفلام الأنميشن المتصلة وبداية الريميك الجديد في عالم الغد (Tomorrowverse).",
+    "spoiler": "بعد دمار الأرض في المعركة الأخيرة ضد دارك سايد، طلب قسطنطين من فلاش إحداث فلاش بوينت ثاني أنهى العالم القديم وولّد عالم الغد."
+  },
+  {
+    "from": "the-suicide-squad-2021",
+    "to": "creature-commandos-2024",
+    "toUniverse": "dcu",
+    "label": "🌌 جسر استمرارية (Soft Reboot): الانتقال لعالم جيمس غان",
+    "description": "اعتمد جيمس غان أحداث وشخصيات هذا الفيلم والموسم الأول من Peacemaker كخلفية مباشرة لبدء عالم DCU الجديد.",
+    "spoiler": "مقتل ريك فلاغ الابن في الفيلم هو المحرك الدرامي المباشر لشخصية والده ريك فلاغ الأب في Creature Commandos وPeacemaker S2."
+  },
+  {
+    "from": "the-flash-2023",
+    "to": "superman-2025",
+    "toUniverse": "dcu",
+    "label": "⚡ جسر إعادة الإطلاق السينمائي: إغلاق DCEU وبدء DCU",
+    "description": "يمثل فيلم The Flash (2023) محطة إغلاق الخط الزمني لعالم سنايدر القديم والتمهيد للانطلاقة الجديدة في Superman (2025).",
+    "spoiler": "تدخل باري آلين في الماضي وتصادم الملتيفيرس (الأكوان المتعددة) في نهاية الفيلم أعاد ضبط الخط الزمني السينمائي بالكامل."
+  },
+  {
+    "from": "justice-league-crisis-on-infinite-earths-part-three-2024",
+    "to": "batman-the-animated-series-1992",
+    "toUniverse": "dcau",
+    "label": "🪐 جسر أزمة الأنميشن الكبرى: ربط العوالم الكرتونية",
+    "description": "تجمع ثلاثية Crisis (2024) خيوط عوالم الأنميشن الكلاسيكية والحديثة في حدث ختامي واحد.",
+    "spoiler": "شهدت الثلاثية ظهور عوالم DCAU وDCAMU وTomorrowverse معاً قبل دمج الملتيفيرس في أرض كرتونية واحدة."
+  }
+]

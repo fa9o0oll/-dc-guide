@@ -1,0 +1,1329 @@
+[
+  {
+    "universe": "dcu",
+    "work": "the-suicide-squad-2021",
+    "position": 1,
+    "label": "مقدمة 1 (شبه رسمي)",
+    "note": "مغامرة أكشن وكوميديا سوداء لفرقة المهمات المستحيلة (تاسك فورس إكس)؛ تمثل المقدمة التأسيسية لقصص وشخصيات العالم الجديد.",
+    "spoiler": "يشهد مقتل ريك فلاغ الابن على يد بيس ميكر، وهو الحدث المحرك للموسم الأول والثاني من Peacemaker ومسلسل Creature Commandos.",
+    "canon": {
+      "status": "canon",
+      "note": "أُنتج ضمن DCEU؛ جيمس غان صرّح (أكتوبر 2026) أنه معتمد في DCU مع استثناء صغير يخص هارلي كوين.",
+      "source": "https://gizmodo.com/james-gunn-reveals-if-the-suicide-squad-is-canon-to-his-dc-universe-2000832570"
+    }
+  },
+  {
+    "universe": "dcu",
+    "work": "peacemaker-2022",
+    "season": 1,
+    "position": 2,
+    "label": "مقدمة 2 (شبه رسمي)",
+    "note": "يتابع مسيرة كريستوفر سميث مباشرة بعد أحداث فيلم The Suicide Squad؛ معتمد قصصياً في العالم الجديد (8 حلقات).",
+    "spoiler": "جميع أحداث الموسم ضد غزو الباترفلايز (كيانات الفراشات الفضائية) معتمدة بالكامل باستثناء مشهد ظهور فرقة العدالة القديمة في الحلقة الأخيرة.",
+    "canon": {
+      "status": "mostly-canon",
+      "note": "أُنتج ضمن DCEU؛ معتمد في DCU ما عدا ظهور فرقة العدالة في الحلقة الأخيرة.",
+      "source": "https://nerdist.com/article/james-gunn-peacemaker-season-1-dcu-canon-not-justice-league/"
+    }
+  },
+  {
+    "universe": "dcu",
+    "work": "blue-beetle-2023",
+    "position": 3,
+    "label": "مقدمة 3 (شبه رسمي)",
+    "note": "قصة أصل عائلية مستقلة وخفيفة، وتستمر نفس النسخة من البطل في عالم DCU الجديد.",
+    "canon": {
+      "status": "retro-canon",
+      "note": "أُنتج ضمن DCEU؛ غان قال إنه «يتماشى» مع DCU مع احتمال تعديلات بسيطة.",
+      "source": "https://www.slashfilm.com/1952273/james-gunn-confirms-blue-beetle-dcu-canon-retcons"
+    }
+  },
+  {
+    "universe": "dcu",
+    "work": "creature-commandos-2024",
+    "position": 4,
+    "label": "1 (البداية الرسمية)",
+    "note": "الانطلاقة الرسمية الأولى لعالم DCU؛ تدور أحداثه بعد سنتين من الموسم الأول لـ Peacemaker (7 حلقات)."
+  },
+  {
+    "universe": "dcu",
+    "work": "superman-2025",
+    "position": 5,
+    "label": "2",
+    "note": "الانطلاقة السينمائية الكبرى للعالم الجديد ببطولة ديفيد كورينسويت وتقديم مجموعة من أبطال الكون."
+  },
+  {
+    "universe": "dcu",
+    "work": "peacemaker-2022",
+    "season": 2,
+    "position": 6,
+    "label": "3",
+    "note": "يدور مباشرة بعد أحداث فيلم Superman ويكمل مسار الشخصية في العالم الجديد (8 حلقات).",
+    "spoiler": "يشرح كيف انتقل مسار بيس ميكر عبر الملتيفيرس (الأكوان المتعددة) ليتكامل مع عالم DCU الجديد."
+  },
+  {
+    "universe": "dcu",
+    "work": "supergirl-2026",
+    "position": 7,
+    "label": "4",
+    "note": "مغامرة فضائية ملحمية تستعرض خلفية كارا زور-إل في أرجاء الكون.",
+    "spoiler": "يشهد الفيلم الظهور السينمائي لشخصية صائد الجوائز الفضائي لوبو (جيسون موموا)."
+  },
+  {
+    "universe": "dcu",
+    "work": "lanterns-2026",
+    "position": 8,
+    "label": "5",
+    "note": "تحقيق بوليسي مظلم على HBO يجمع هال جوردان وجون ستيوارت في لغز كوني على الأرض (8 حلقات)."
+  },
+  {
+    "universe": "dcu",
+    "work": "clayface-2026",
+    "position": 9,
+    "label": "6",
+    "note": "مفاجأة أكتوبر 2026؛ فيلم إثارة نفسية ورعب جسدي نال إشادة جماهيرية كاسحة."
+  },
+  {
+    "universe": "dceu",
+    "work": "wonder-woman-2017",
+    "position": 1,
+    "label": "1 (زمن القصة: 1918)",
+    "note": "البداية الزمنية لعالم DCEU خلال الحرب العالمية الأولى وقصة نشأة ديانا برينس."
+  },
+  {
+    "universe": "dceu",
+    "work": "wonder-woman-1984-2020",
+    "position": 2,
+    "label": "2 (زمن القصة: 1984)",
+    "note": "تدور أحداثه في عام 1984؛ مستقل بحدثه ويمكن تجاوزه دون تأثير على السلسلة."
+  },
+  {
+    "universe": "dceu",
+    "work": "man-of-steel-2013",
+    "position": 3,
+    "label": "3",
+    "note": "البداية الفعلية لعصر الأبطال في الحاضر؛ عمل سينمائي ملحمي."
+  },
+  {
+    "universe": "dceu",
+    "work": "batman-v-superman-dawn-of-justice-2016",
+    "position": 4,
+    "label": "4",
+    "note": "المواجهة الكبرى التي تلي أحداث Man of Steel؛ شاهد النسخة الممتدة (Ultimate Edition - 3 ساعات) حصراً.",
+    "spoiler": "ينتهي الفيلم بتضحية سوبرمان ضد الوحش دومزداي، وهو ما يدفع بروس واين لتأسيس فرقة العدالة."
+  },
+  {
+    "universe": "dceu",
+    "work": "suicide-squad-2016",
+    "position": 5,
+    "label": "5",
+    "note": "تدور أحداثه مباشرة عقب نهاية فيلم Batman v Superman؛ يقدم شخصيتي هارلي كوين وديدشوت.",
+    "spoiler": "تتشكل فرقة تاسك فورس إكس الحكومية استجابةً لغياب سوبرمان بعد أحداث الفيلم السابق."
+  },
+  {
+    "universe": "dceu",
+    "work": "zack-snyder-s-justice-league-2021",
+    "position": 6,
+    "label": "6 (النسخة المعتمدة)",
+    "note": "نسخة المخرج الكاملة (4 ساعات)؛ ملحمة متكاملة تتفوق جذرياً على نسخة السينما لعام 2017."
+  },
+  {
+    "universe": "dceu",
+    "work": "justice-league-2017",
+    "position": 7,
+    "label": "6-بديل",
+    "note": "نسخة السينما المختصرة؛ لا يُنصح بمشاهدتها بعد توفر نسخة المخرج الكاملة."
+  },
+  {
+    "universe": "dceu",
+    "work": "aquaman-2018",
+    "position": 8,
+    "label": "7",
+    "note": "يتبع أحداث Justice League مباشرة في مغامرة بصرية ممتعة في مملكة أتلانتس."
+  },
+  {
+    "universe": "dceu",
+    "work": "shazam-2019",
+    "position": 9,
+    "label": "8",
+    "note": "كوميديا عائلية خفيفة وممتعة تدور داخل نفس العالم السينمائي."
+  },
+  {
+    "universe": "dceu",
+    "work": "birds-of-prey-2020",
+    "position": 10,
+    "label": "9",
+    "note": "مغامرة حركية تركز على مسار هارلي كوين المستقل في شوارع غوثام."
+  },
+  {
+    "universe": "dceu",
+    "work": "the-suicide-squad-2021",
+    "position": 11,
+    "label": "10",
+    "note": "من أقوى أعمال العالم، ويمثل الجسر المباشر نحو عالم جيمس غان الجديد."
+  },
+  {
+    "universe": "dceu",
+    "work": "peacemaker-2022",
+    "season": 1,
+    "position": 12,
+    "label": "11",
+    "note": "يكمل مباشرة أحداث فيلم The Suicide Squad (8 حلقات)."
+  },
+  {
+    "universe": "dceu",
+    "work": "black-adam-2022",
+    "position": 13,
+    "label": "12",
+    "note": "أكشن خالص يقدم فريق العدالة الأمريكية (JSA) في هذا العالم.",
+    "spoiler": "يتضمن مشهد ما بعد النهاية عودة قصيرة لسوبرمان (هنري كافيل) قبل إلغاء العالم القديم."
+  },
+  {
+    "universe": "dceu",
+    "work": "shazam-fury-of-the-gods-2023",
+    "position": 14,
+    "label": "13",
+    "note": "الجزء الثاني المكمل لمغامرة شازام وعائلته."
+  },
+  {
+    "universe": "dceu",
+    "work": "the-flash-2023",
+    "position": 15,
+    "label": "14",
+    "note": "حدث سينمائي محوري يغلق الخط الزمني لعالم سنايدر ويمهد لإعادة ضبط الكون عبر السبيد فورس (قوة السرعة).",
+    "spoiler": "يشهد فتح الملتيفيرس وعودة نسخة باتمان الكلاسيكية (مايكل كيتون) لتغيير مسار التاريخ."
+  },
+  {
+    "universe": "dceu",
+    "work": "blue-beetle-2023",
+    "position": 16,
+    "label": "15",
+    "note": "بطل مستقل تماماً عن صراعات العالم القديم."
+  },
+  {
+    "universe": "dceu",
+    "work": "aquaman-and-the-lost-kingdom-2023",
+    "position": 17,
+    "label": "16 (الختام)",
+    "note": "آخر فيلم صدر في عالم DCEU القديم؛ مغامرة مستقلة خفيفة."
+  },
+  {
+    "universe": "reeves",
+    "work": "the-batman-2022",
+    "position": 1,
+    "label": "1",
+    "note": "تحفة بوليسية مظلمة تركز على السنة الثانية لباتمان (روبرت باتينسون) كمحقق في غوثام."
+  },
+  {
+    "universe": "reeves",
+    "work": "the-penguin-2024",
+    "position": 2,
+    "label": "2",
+    "note": "مسلسل جريمة أسطوري يبدأ بعد أسبوع واحد من نهاية فيلم The Batman (8 حلقات)."
+  },
+  {
+    "universe": "nolan",
+    "work": "batman-begins-2005",
+    "position": 1,
+    "label": "1",
+    "note": "بداية تدريب بروس واين وظهوره الأول في غوثام."
+  },
+  {
+    "universe": "nolan",
+    "work": "the-dark-knight-2008",
+    "position": 2,
+    "label": "2",
+    "note": "أعظم فيلم أبطال خارقين في التاريخ؛ المواجهة الخالدة مع الجوكر (هيث ليدجر)."
+  },
+  {
+    "universe": "nolan",
+    "work": "the-dark-knight-rises-2012",
+    "position": 3,
+    "label": "3",
+    "note": "الختام الملحمي للثلاثية بعد 8 سنوات من أحداث الجزء الثاني."
+  },
+  {
+    "universe": "joker",
+    "work": "joker-2019",
+    "position": 1,
+    "label": "1",
+    "note": "دراما نفسية استثنائية حائزة على الأوسكار من بطولة خواكين فينيكس."
+  },
+  {
+    "universe": "joker",
+    "work": "joker-folie-a-deux-2024",
+    "position": 2,
+    "label": "2",
+    "note": "الجزء الثاني بطابع موسيقي؛ نال تقييمات منخفضة جداً ويُنصح بالاكتفاء بالجزء الأول."
+  },
+  {
+    "universe": "burton",
+    "work": "batman-1989",
+    "position": 1,
+    "label": "1",
+    "note": "الفيلم الكلاسيكي الشهير لتيم بيرتون ببطولة مايكل كيتون وجاك نيكلسون."
+  },
+  {
+    "universe": "burton",
+    "work": "batman-returns-1992",
+    "position": 2,
+    "label": "2",
+    "note": "تكملة ممتازة بطابع قوطي مظلم في أجواء شتاء غوثام."
+  },
+  {
+    "universe": "burton",
+    "work": "batman-forever-1995",
+    "position": 3,
+    "label": "3",
+    "note": "الجزء الثالث مع تغيير المخرج والبطل إلى فال كيلمر وتحول النبرة للكوميديا."
+  },
+  {
+    "universe": "burton",
+    "work": "batman-and-robin-1997",
+    "position": 4,
+    "label": "4",
+    "note": "الجزء الرابع والأخير في السلسلة الكلاسيكية؛ ذو طابع هزلي ضعيف جداً."
+  },
+  {
+    "universe": "reeve",
+    "work": "superman-1978",
+    "position": 1,
+    "label": "1",
+    "note": "العمل الكلاسيكي الخالد الذي أسس لأفلام الأبطال الخارقين الحديثة."
+  },
+  {
+    "universe": "reeve",
+    "work": "superman-ii-1980",
+    "position": 2,
+    "label": "2",
+    "note": "الجزء الثاني المكمل مباشرة للأول؛ نسخة المخرج ريتشارد دونر هي الأفضل."
+  },
+  {
+    "universe": "reeve",
+    "work": "superman-iii-1983",
+    "position": 3,
+    "label": "3",
+    "note": "الجزء الثالث مع غلبة الطابع الكوميدي وتراجع المستوى."
+  },
+  {
+    "universe": "reeve",
+    "work": "supergirl-1984",
+    "position": 4,
+    "label": "4 (فرعي)",
+    "note": "فيلم فرعي يدور في نفس العالم الكلاسيكي."
+  },
+  {
+    "universe": "reeve",
+    "work": "superman-iv-the-quest-for-peace-1987",
+    "position": 5,
+    "label": "5",
+    "note": "الجزء الرابع والأخير لكريستوفر ريف؛ تضرر كثيراً من تقليص الميزانية."
+  },
+  {
+    "universe": "reeve",
+    "work": "superman-returns-2006",
+    "position": 6,
+    "label": "6 (تكملة للثاني)",
+    "note": "صُنع كتكملة مباشرة لأحداث الجزء الثاني مع تجاهل أحداث الثالث والرابع."
+  },
+  {
+    "universe": "arrow",
+    "work": "arrow-2012",
+    "position": 1,
+    "label": "1 (حجر الأساس)",
+    "note": "حجر الأساس لعالم CW التلفزيوني (8 مواسم، 170 حلقة)؛ المواسم 1 و2 و5 ممتازة جداً."
+  },
+  {
+    "universe": "arrow",
+    "work": "the-flash-2014",
+    "position": 2,
+    "label": "2",
+    "note": "انبثق من الموسم الثاني لـ Arrow (9 مواسم، 184 حلقة)؛ أول 3 مواسم ممتازة جداً."
+  },
+  {
+    "universe": "arrow",
+    "work": "constantine-2014",
+    "position": 3,
+    "label": "3",
+    "note": "مسلسل رعب وغموض (موسم واحد، 13 حلقة) يرتبط لاحقاً بمسلسلات العالم."
+  },
+  {
+    "universe": "arrow",
+    "work": "supergirl-2015",
+    "position": 4,
+    "label": "4",
+    "note": "يمتد لـ 6 مواسم (126 حلقة) ويشارك بقوة في جميع حلقات التقاطع السنوية."
+  },
+  {
+    "universe": "arrow",
+    "work": "dc-s-legends-of-tomorrow-2016",
+    "position": 5,
+    "label": "5",
+    "note": "فريق السفر عبر الزمن بروح كوميدية ومغامرات ممتعة (7 مواسم، 110 حلقات)."
+  },
+  {
+    "universe": "arrow",
+    "work": "black-lightning-2018",
+    "position": 6,
+    "label": "6",
+    "note": "مسلسل درامي من 4 مواسم (58 حلقة) يتقاطع مع العالم في المراحل المتقدمة."
+  },
+  {
+    "universe": "arrow",
+    "work": "batwoman-2019",
+    "position": 7,
+    "label": "7",
+    "note": "يمتد لـ 3 مواسم (51 حلقة)؛ يُنصح بالاكتفاء بحلقات التقاطع المشتركة فقط."
+  },
+  {
+    "universe": "arrow",
+    "work": "stargirl-2020",
+    "position": 8,
+    "label": "8",
+    "note": "عمل شبابي متقن يدور في أرض موازية مستقلة (3 مواسم، 39 حلقة)."
+  },
+  {
+    "universe": "arrow",
+    "work": "superman-and-lois-2021",
+    "position": 9,
+    "label": "9 (درة العالم)",
+    "note": "أفضل مسلسل درامي وعائلي لسوبرمان؛ يدور في أرض موازية مستقلة (4 مواسم، 53 حلقة)."
+  },
+  {
+    "universe": "titans",
+    "work": "titans-2018",
+    "position": 1,
+    "label": "1",
+    "note": "تقديم مظلم وعنيف لفريق التايتنز الشباب (4 مواسم، 49 حلقة)."
+  },
+  {
+    "universe": "titans",
+    "work": "doom-patrol-2019",
+    "position": 2,
+    "label": "2",
+    "note": "تحفة سريالية نفسية وكوميديا سوداء عميقة للبالغين (4 مواسم، 46 حلقة)."
+  },
+  {
+    "universe": "sandman",
+    "work": "the-sandman-2022",
+    "position": 1,
+    "label": "1",
+    "note": "فانتازيا مظلمة متقنة جداً تمتد لموسمين (2022–2025)."
+  },
+  {
+    "universe": "sandman",
+    "work": "dead-boy-detectives-2024",
+    "position": 2,
+    "label": "2",
+    "note": "مسلسل تحقيقات خارق للطبيعة يدور في نفس عالم The Sandman (8 حلقات)."
+  },
+  {
+    "universe": "dcau",
+    "work": "batman-the-animated-series-1992",
+    "position": 1,
+    "label": "1",
+    "note": "أعظم مسلسل كرتوني في تاريخ الأبطال الخارقين (85 حلقة)."
+  },
+  {
+    "universe": "dcau",
+    "work": "batman-mask-of-the-phantasm-1993",
+    "position": 2,
+    "label": "2",
+    "note": "تحفة سينمائية كرتونية خالدة تتخلل أحداث المسلسل الأول."
+  },
+  {
+    "universe": "dcau",
+    "work": "batman-and-mr-freeze-subzero-1998",
+    "position": 3,
+    "label": "3",
+    "note": "فيلم ممتاز يكمل مسار مستر فريز في هذا العالم."
+  },
+  {
+    "universe": "dcau",
+    "work": "superman-the-animated-series-1996",
+    "position": 4,
+    "label": "4",
+    "note": "يؤسس لجانب ميتروبوليس والفضاء في نفس العالم الكرتوني (54 حلقة)."
+  },
+  {
+    "universe": "dcau",
+    "work": "the-new-batman-adventures-1997",
+    "position": 5,
+    "label": "5",
+    "note": "الموسم المكمل لمسلسل باتمان بتصميم رسم محدّث (24 حلقة)."
+  },
+  {
+    "universe": "dcau",
+    "work": "batman-mystery-of-the-batwoman-2003",
+    "position": 6,
+    "label": "6",
+    "note": "فيلم مغامرة خفيف يدور في حقبة The New Batman Adventures."
+  },
+  {
+    "universe": "dcau",
+    "work": "static-shock-2000",
+    "position": 7,
+    "label": "7",
+    "note": "مسلسل شبابي يتقاطع مع أبطال هذا العالم (52 حلقة)."
+  },
+  {
+    "universe": "dcau",
+    "work": "justice-league-2001",
+    "position": 8,
+    "label": "8",
+    "note": "اتحاد الأبطال السبعة الكبار في قصص ملحمية (52 حلقة)."
+  },
+  {
+    "universe": "dcau",
+    "work": "justice-league-unlimited-2004",
+    "position": 9,
+    "label": "9",
+    "note": "توسع الفريق ليشمل عشرات الأبطال في حبكة مترابطة عميقة (39 حلقة)."
+  },
+  {
+    "universe": "dcau",
+    "work": "justice-league-vs-the-fatal-five-2019",
+    "position": 10,
+    "label": "10",
+    "note": "فيلم مكمل صدر لاحقاً بنفس الرسم والأصوات الأصلية."
+  },
+  {
+    "universe": "dcau",
+    "work": "batman-beyond-1999",
+    "position": 11,
+    "label": "11 (المستقبل 2039)",
+    "note": "ينتقل بالخط الزمني إلى مستقبل هذا العالم (عام 2039) مع جيل جديد في نيو-غوثام (52 حلقة)."
+  },
+  {
+    "universe": "dcau",
+    "work": "batman-beyond-return-of-the-joker-2000",
+    "position": 12,
+    "label": "12 (ختام المستقبل)",
+    "note": "فيلم سينمائي يمثل ذروة أحداث مستقبل Batman Beyond (شاهد نسخة Uncut)."
+  },
+  {
+    "universe": "dcamu",
+    "work": "justice-league-the-flashpoint-paradox-2013",
+    "position": 1,
+    "label": "1",
+    "note": "الشرارة القصصية التي أسست عالم أفلام الأنميشن المشترك بالكامل."
+  },
+  {
+    "universe": "dcamu",
+    "work": "justice-league-war-2014",
+    "position": 2,
+    "label": "2",
+    "note": "اللقاء الأول بين الأبطال وتأسيس فرقة العدالة في هذا العالم."
+  },
+  {
+    "universe": "dcamu",
+    "work": "son-of-batman-2014",
+    "position": 3,
+    "label": "3",
+    "note": "يفتتح الخط القصصي الخاص بعائلة باتمان في هذا العالم."
+  },
+  {
+    "universe": "dcamu",
+    "work": "justice-league-throne-of-atlantis-2015",
+    "position": 4,
+    "label": "4",
+    "note": "يروي قصة أكوامان ومملكة أتلانتس بالتوازي مع فرقة العدالة."
+  },
+  {
+    "universe": "dcamu",
+    "work": "batman-vs-robin-2015",
+    "position": 5,
+    "label": "5",
+    "note": "يكمل أحداث Son of Batman في مواجهة منظمة كورت أوف أولز (محكمة البوم) السرية."
+  },
+  {
+    "universe": "dcamu",
+    "work": "batman-bad-blood-2016",
+    "position": 6,
+    "label": "6",
+    "note": "يوسع فريق وعائلة باتمان في مدينة غوثام."
+  },
+  {
+    "universe": "dcamu",
+    "work": "justice-league-vs-teen-titans-2016",
+    "position": 7,
+    "label": "7",
+    "note": "يقدم فريق التايتنز الشباب ويربطهم بفرقة العدالة."
+  },
+  {
+    "universe": "dcamu",
+    "work": "justice-league-dark-2017",
+    "position": 8,
+    "label": "8",
+    "note": "يفتح الجانب السحري المظلم في العالم مع جون قسطنطين وزاتانا."
+  },
+  {
+    "universe": "dcamu",
+    "work": "teen-titans-the-judas-contract-2017",
+    "position": 9,
+    "label": "9",
+    "note": "مواجهة مصيرية لفريق التايتنز ضد خصمهم الأخطر في قصة درامية شهيرة.",
+    "spoiler": "يقتبس القصة الكلاسيكية لاختراق وخيانة تيرا للفريق لصالح ديث ستروك."
+  },
+  {
+    "universe": "dcamu",
+    "work": "suicide-squad-hell-to-pay-2018",
+    "position": 10,
+    "label": "10",
+    "note": "مهمة عنيفة لفرقة تاسك فورس إكس ترتبط بخيوط الفيلم الأول في السلسلة."
+  },
+  {
+    "universe": "dcamu",
+    "work": "constantine-city-of-demons-2018",
+    "position": 11,
+    "label": "11",
+    "note": "قصة رعب سوداوية عميقة ومستقلة لجون قسطنطين داخل نفس العالم."
+  },
+  {
+    "universe": "dcamu",
+    "work": "the-death-of-superman-2018",
+    "position": 12,
+    "label": "12",
+    "note": "ملحمة قتالية كبرى لسوبرمان وفرقة العدالة في مواجهة خطر غير مسبوق."
+  },
+  {
+    "universe": "dcamu",
+    "work": "reign-of-the-supermen-2019",
+    "position": 13,
+    "label": "13",
+    "note": "الفصل المكمل مباشرة لأحداث الفيلم السابق ويمهد للخطر الفضائي القادم."
+  },
+  {
+    "universe": "dcamu",
+    "work": "batman-hush-2019",
+    "position": 14,
+    "label": "14",
+    "note": "لغز جنائي مشوق في غوثام يسبق المعركة الختامية للعالم."
+  },
+  {
+    "universe": "dcamu",
+    "work": "wonder-woman-bloodlines-2019",
+    "position": 15,
+    "label": "15",
+    "note": "مغامرة خاصة لووندر وومان تسبق الفصل الأخير من السلسلة."
+  },
+  {
+    "universe": "dcamu",
+    "work": "justice-league-dark-apokolips-war-2020",
+    "position": 16,
+    "label": "16 (الختام الملحمي)",
+    "note": "الملحمة الختامية الكبرى التي تجمع كافة أبطال الـ 15 فيلماً السابقة في معركة حاسمة.",
+    "spoiler": "تنتهي المعركة الدامية ضد دارك سايد بطلب قسطنطين من فلاش إحداث فلاش بوينت جديد لإعادة ضبط الكون."
+  },
+  {
+    "universe": "dcamu",
+    "work": "constantine-the-house-of-mystery-2022",
+    "position": 17,
+    "label": "17 (خاتمة وجسر)",
+    "note": "فيلم قصير يعمل كخاتمة لعالم DCAMU وجسر مباشر نحو عالم Tomorrowverse التالي."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "justice-society-world-war-ii-2021",
+    "position": 1,
+    "label": "1",
+    "note": "مغامرة في حقبة الحرب العالمية الثانية تفتتح مسارات عالم الغد."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "superman-man-of-tomorrow-2020",
+    "position": 2,
+    "label": "2",
+    "note": "الانطلاقة التأسيسية لسوبرمان في عالم الغد الكرتوني الجديد."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "batman-the-long-halloween-part-one-2021",
+    "position": 3,
+    "label": "3",
+    "note": "الجزء الأول: تحقيق بوليسي ممتاز في السنوات الأولى لباتمان."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "batman-the-long-halloween-part-two-2021",
+    "position": 4,
+    "label": "4",
+    "note": "الجزء الثاني: الفصل المكمل والحاسم للتحقيق الجنائي في غوثام.",
+    "spoiler": "يكشف هوية قاتل العطلات ويشهد التحول المأساوي للمدعي العام هارفي دينت إلى تو-فيس (Two-Face)."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "green-lantern-beware-my-power-2022",
+    "position": 5,
+    "label": "5",
+    "note": "يقدم الفانوس الأخضر جون ستيوارت ويوسع الجانب الفضائي للعالم."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "legion-of-super-heroes-2023",
+    "position": 6,
+    "label": "6",
+    "note": "مغامرة تدريبية في القرن الـ31 تمهد للأحداث الكونية القادمة."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "justice-league-warworld-2023",
+    "position": 7,
+    "label": "7",
+    "note": "التمهيد المباشر الذي يقود في مشاهده الأخيرة إلى ثلاثية الأزمة الكبرى."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "justice-league-crisis-on-infinite-earths-part-one-2024",
+    "position": 8,
+    "label": "8",
+    "note": "الجزء الأول من الثلاثية الختامية الكبرى لعوالم الأنميشن."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "justice-league-crisis-on-infinite-earths-part-two-2024",
+    "position": 9,
+    "label": "9",
+    "note": "الجزء الثاني الذي يربط خيوط العوالم الكرتونية المتعددة."
+  },
+  {
+    "universe": "tomorrow",
+    "work": "justice-league-crisis-on-infinite-earths-part-three-2024",
+    "position": 10,
+    "label": "10 (الختام)",
+    "note": "الجزء الثالث والأخير الذي يختتم رسمياً حقبة عوالم الأنميشن المتصلة."
+  },
+  {
+    "universe": "harley",
+    "work": "harley-quinn-2019",
+    "position": 1,
+    "label": "1",
+    "note": "كوميديا سوداء جريئة وممتعة جداً للبالغين (5 مواسم، 57 حلقة)."
+  },
+  {
+    "universe": "harley",
+    "work": "kite-man-hell-yeah-2024",
+    "position": 2,
+    "label": "2",
+    "note": "مسلسل فرعي كوميدي يدور في نفس العالم بعد الموسم الرابع لهارلي (10 حلقات)."
+  },
+  {
+    "universe": "early_st",
+    "work": "superman-fleischer-cartoons-1941",
+    "position": 1,
+    "label": "منفرد (1941)",
+    "note": "أول عمل أنميشن في تاريخ DC من استوديو Fleischer؛ تحفة فنية تاريخية (17 حلقة)."
+  },
+  {
+    "universe": "early_st",
+    "work": "adventures-of-captain-marvel-1941",
+    "position": 2,
+    "label": "منفرد (1941)",
+    "note": "أول عمل سينمائي واقعي لبطل خارق في التاريخ (شازام حالياً)."
+  },
+  {
+    "universe": "early_st",
+    "work": "batman-1943",
+    "position": 3,
+    "label": "منفرد (1943)",
+    "note": "أول ظهور واقعي لباتمان على الشاشة في فصول سينمائية بالأبيض والأسود."
+  },
+  {
+    "universe": "early_st",
+    "work": "superman-1948",
+    "position": 4,
+    "label": "منفرد (1948)",
+    "note": "أول ظهور سينمائي واقعي لسوبرمان ببطولة كيرك ألين."
+  },
+  {
+    "universe": "early_st",
+    "work": "superman-and-the-mole-men-1951",
+    "position": 5,
+    "label": "منفرد (1951)",
+    "note": "أول فيلم سينمائي طويل لسوبرمان ببطولة جورج ريفز."
+  },
+  {
+    "universe": "early_st",
+    "work": "adventures-of-superman-1952",
+    "position": 6,
+    "label": "منفرد (1952)",
+    "note": "المسلسل التلفزيوني الكلاسيكي الشهير في الخمسينيات (6 مواسم، 104 حلقات)."
+  },
+  {
+    "universe": "early_st",
+    "work": "batman-1966",
+    "position": 7,
+    "label": "منفرد (1966)",
+    "note": "مسلسل آدم ويست الكلاسيكي الشهير (3 مواسم، 120 حلقة)."
+  },
+  {
+    "universe": "early_st",
+    "work": "super-friends-1973",
+    "position": 8,
+    "label": "منفرد (1973)",
+    "note": "أشهر كرتون كلاسيكي لفرقة العدالة في السبعينيات والثمانينيات."
+  },
+  {
+    "universe": "early_st",
+    "work": "wonder-woman-1975",
+    "position": 9,
+    "label": "منفرد (1975)",
+    "note": "مسلسل ليندا كارتر الكلاسيكي الشهير (3 مواسم، 60 حلقة)."
+  },
+  {
+    "universe": "early_st",
+    "work": "swamp-thing-1982",
+    "position": 10,
+    "label": "منفرد (1982)",
+    "note": "فيلم رعب كلاسيكي بسيط للمخرج ويس كرافن."
+  },
+  {
+    "universe": "movie_st",
+    "work": "steel-1997",
+    "position": 1,
+    "label": "منفرد",
+    "note": "فيلم ضعيف جداً من بطولة شاكيل أونيل."
+  },
+  {
+    "universe": "movie_st",
+    "work": "road-to-perdition-2002",
+    "position": 2,
+    "label": "منفرد",
+    "note": "تحفة سينمائية عن المافيا من بطولة توم هانكس (مقتبس من DC Paradox)."
+  },
+  {
+    "universe": "movie_st",
+    "work": "catwoman-2004",
+    "position": 3,
+    "label": "منفرد",
+    "note": "فيلم مستقل نال تقييمات منخفضة جداً."
+  },
+  {
+    "universe": "movie_st",
+    "work": "constantine-2005",
+    "position": 4,
+    "label": "منفرد",
+    "note": "فيلم رعب وغموض أيقوني محبوب جماهيرياً ببطولة كيانو ريفز."
+  },
+  {
+    "universe": "movie_st",
+    "work": "a-history-of-violence-2005",
+    "position": 5,
+    "label": "منفرد",
+    "note": "دراما جريمة نفسية رائعة من مطبوعات DC Vertigo."
+  },
+  {
+    "universe": "movie_st",
+    "work": "v-for-vendetta-2005",
+    "position": 6,
+    "label": "منفرد",
+    "note": "تحفة سياسية وفلسفية خالدة لا تفوت."
+  },
+  {
+    "universe": "movie_st",
+    "work": "watchmen-2009",
+    "position": 7,
+    "label": "منفرد",
+    "note": "عمل بصري وفلسفي عميق ومستقل من إخراج زاك سنايدر."
+  },
+  {
+    "universe": "movie_st",
+    "work": "the-losers-2010",
+    "position": 8,
+    "label": "منفرد",
+    "note": "فيلم أكشن وكوميديا خفيف وممتع."
+  },
+  {
+    "universe": "movie_st",
+    "work": "red-2010",
+    "position": 9,
+    "label": "منفرد",
+    "note": "أكشن وكوميديا ممتع من بطولة بروس ويليس."
+  },
+  {
+    "universe": "movie_st",
+    "work": "jonah-hex-2010",
+    "position": 10,
+    "label": "منفرد",
+    "note": "فيلم غرب أمريكي قصير ومستقل."
+  },
+  {
+    "universe": "movie_st",
+    "work": "green-lantern-2011",
+    "position": 11,
+    "label": "منفرد",
+    "note": "محاولة سينمائية مستقلة للفانوس الأخضر من بطولة رايان رينولدز."
+  },
+  {
+    "universe": "tv_st",
+    "work": "the-flash-1990",
+    "position": 1,
+    "label": "منفرد",
+    "note": "مسلسل كلاسيكي جميل من موسم واحد (22 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "lois-and-clark-the-new-adventures-of-superman-1993",
+    "position": 2,
+    "label": "منفرد",
+    "note": "يركز على الجانب الرومانسي والصحفي لكلارك ولويس (4 مواسم، 88 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "smallville-2001",
+    "position": 3,
+    "label": "منفرد",
+    "note": "يروي شباب كلارك كينت في سمولفيل قبل ارتداء عباءة سوبرمان (10 مواسم، 217 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "gotham-2014",
+    "position": 4,
+    "label": "منفرد",
+    "note": "يركز على المحقق جيم غوردون ونشأة عالم الجريمة في غوثام (5 مواسم، 100 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "izombie-2015",
+    "position": 5,
+    "label": "منفرد",
+    "note": "تحقيقات بوليسية ذكية بطابع كوميدي خفيف (5 مواسم، 71 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "lucifer-2016",
+    "position": 6,
+    "label": "منفرد",
+    "note": "مسلسل تحقيقات وفانتازيا ذو شعبية جماهيرية واسعة (6 مواسم، 93 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "preacher-2016",
+    "position": 7,
+    "label": "منفرد",
+    "note": "كوميديا سوداء ودموية جريئة من مطبوعات Vertigo (4 مواسم، 43 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "krypton-2018",
+    "position": 8,
+    "label": "منفرد",
+    "note": "يروي تاريخ عائلة آل-إل على كوكب كريبتون في الماضي البعيد (موسمان، 20 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "swamp-thing-2019",
+    "position": 9,
+    "label": "منفرد",
+    "note": "مسلسل رعب وغموض متقن فنياً (موسم واحد، 10 حلقات)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "pennyworth-2019",
+    "position": 10,
+    "label": "منفرد",
+    "note": "يستعرض شباب ألفريد كعميل سري في لندن الستينيات (3 مواسم، 30 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "watchmen-2019",
+    "position": 11,
+    "label": "منفرد",
+    "note": "مسلسل قصير حائز على جوائز إيمي يبني على عالم الرواية المصورة الأصلية (9 حلقات)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "sweet-tooth-2021",
+    "position": 12,
+    "label": "منفرد",
+    "note": "قصة خيال ومغامرة عاطفية مكتملة على نتفليكس (3 مواسم، 24 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "naomi-2022",
+    "position": 13,
+    "label": "منفرد",
+    "note": "عمل شبابي مستقل توقف بعد موسم واحد (13 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "gotham-knights-2023",
+    "position": 14,
+    "label": "منفرد",
+    "note": "عمل مستقل في عالم موازٍ توقف بعد موسم واحد (13 حلقة)."
+  },
+  {
+    "universe": "tv_st",
+    "work": "bodies-2023",
+    "position": 15,
+    "label": "منفرد",
+    "note": "لغز جريمة وتحقيقات عبر 4 أزمنة مختلفة في لندن (8 حلقات)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "teen-titans-2003",
+    "position": 1,
+    "label": "منفرد",
+    "note": "من أروع مسلسلات الكرتون التي جمعت الأكشن والدراما (5 مواسم، 65 حلقة)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "the-batman-2004",
+    "position": 2,
+    "label": "منفرد",
+    "note": "تقديم عصري سريع الإيقاع لباتمان (5 مواسم، 65 حلقة)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "batman-the-brave-and-the-bold-2008",
+    "position": 3,
+    "label": "منفرد",
+    "note": "يحيي العصر الفضي للكوميكس بروح مرحة (3 مواسم، 65 حلقة)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "young-justice-2010",
+    "position": 4,
+    "label": "منفرد",
+    "note": "مسلسل ناضج جداً ومعقد سياسياً ونفسياً (4 مواسم، 98 حلقة)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "green-lantern-the-animated-series-2011",
+    "position": 5,
+    "label": "منفرد",
+    "note": "أفضل تقديم لعالم الفانوس الأخضر على الإطلاق (26 حلقة)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "teen-titans-go-2013",
+    "position": 6,
+    "label": "منفرد",
+    "note": "مسلسل كوميدي ساخر موجه للأطفال."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "justice-league-action-2016",
+    "position": 7,
+    "label": "منفرد",
+    "note": "حلقات قصيرة سريعة وممتعة لكل الأعمار (52 حلقة)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "dc-super-hero-girls-2019",
+    "position": 8,
+    "label": "منفرد",
+    "note": "عمل كرتوني خفيف موجه للفئة العمرية الصغيرة."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "my-adventures-with-superman-2023",
+    "position": 9,
+    "label": "منفرد",
+    "note": "إعادة تقديم شبابية رائعة لسوبرمان بطابع أنمي حركي (موسمان+)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "suicide-squad-isekai-2024",
+    "position": 10,
+    "label": "منفرد",
+    "note": "أنمي ياباني ينقل فرقة الانتحار إلى عالم فانتازيا (10 حلقات)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "batman-caped-crusader-2024",
+    "position": 11,
+    "label": "منفرد",
+    "note": "الوريث الروحي لمسلسل التسعينيات في أجواء أربعينيات مظلمة (10 حلقات)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "bat-fam-2025",
+    "position": 12,
+    "label": "منفرد",
+    "note": "كوميديا عائلية كرتونية لطيفة تكمل فيلم Merry Little Batman."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "superman-doomsday-2007",
+    "position": 1,
+    "label": "منفرد",
+    "note": "أول فيلم في سلسلة أفلام DC الكرتونية الأصلية المستقلة."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "justice-league-the-new-frontier-2008",
+    "position": 2,
+    "label": "منفرد",
+    "note": "يستعرض نشأة فرقة العدالة في حقبة الخمسينيات."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-gotham-knight-2008",
+    "position": 3,
+    "label": "منفرد",
+    "note": "6 قصص أنمي قصيرة لباتمان من استوديوهات يابانية."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "wonder-woman-2009",
+    "position": 4,
+    "label": "منفرد",
+    "note": "فيلم أنميشن ممتاز ألهم الفيلم الواقعي لاحقاً."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "green-lantern-first-flight-2009",
+    "position": 5,
+    "label": "منفرد",
+    "note": "يروي حصول هال جوردان على الخاتم وانضمامه للفيلق."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "superman-batman-public-enemies-2009",
+    "position": 6,
+    "label": "منفرد",
+    "note": "اتحاد سوبرمان وباتمان في مواجهة مؤامرة كبرى يقودها ليكس لوثر."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "justice-league-crisis-on-two-earths-2010",
+    "position": 7,
+    "label": "منفرد",
+    "note": "مواجهة أسطورية لفرقة العدالة ضد نظرائهم في أرض موازية."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-under-the-red-hood-2010",
+    "position": 8,
+    "label": "منفرد",
+    "note": "أعظم فيلم أنميشن منفرد لباتمان؛ صراع أخلاقي ونفسي عميق ضد حارس غامض في غوثام.",
+    "spoiler": "يكشف الفيلم أن شخصية ريد هود هو روبن الثاني (جايسون تود) بعد إحيائه عبر حفرة لازاروس (ينبوع البعث)."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "superman-batman-apocalypse-2010",
+    "position": 9,
+    "label": "منفرد",
+    "note": "ثنائية أكشن ممتازة لسوبرمان وباتمان في مواجهة تهديد من كوكب أبوكوليبس."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "all-star-superman-2011",
+    "position": 10,
+    "label": "منفرد",
+    "note": "قصة إنسانية وفلسفية ملهمة عن جوهر شخصية سوبرمان."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "green-lantern-emerald-knights-2011",
+    "position": 11,
+    "label": "منفرد",
+    "note": "قصص ملحمية عن تاريخ وأساطير فيلق الفانوس الأخضر."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-year-one-2011",
+    "position": 12,
+    "label": "منفرد",
+    "note": "اقتباس وفيّ جداً لأول سنة لبروس واين وجيم غوردون في غوثام."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "justice-league-doom-2012",
+    "position": 13,
+    "label": "منفرد",
+    "note": "إثارة عالية الوتيرة تضع أعضاء فرقة العدالة أمام خطط مضادة تستهدف نقاط ضعفهم."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "superman-vs-the-elite-2012",
+    "position": 14,
+    "label": "منفرد",
+    "note": "من أعمق أفلام سوبرمان؛ يناقش المبادئ الأخلاقية للبطل الخارق في عالم حديث."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-the-dark-knight-returns-part-1-2012",
+    "position": 15,
+    "label": "منفرد",
+    "note": "الجزء الأول: عودة بروس واين في سن الخامسة والخمسين لإنقاذ مدينة غوثام."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-the-dark-knight-returns-part-2-2013",
+    "position": 16,
+    "label": "منفرد",
+    "note": "الجزء الثاني: الفصل الختامي الملحمي لرواية فرانك ميلر الخالدة."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "superman-unbound-2013",
+    "position": 17,
+    "label": "منفرد",
+    "note": "مغامرة فضائية لسوبرمان في مواجهة خطر برينياك."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-assault-on-arkham-2014",
+    "position": 18,
+    "label": "منفرد",
+    "note": "أفضل فيلم لفرقة الانتحار، وتدور أحداثه في أجواء عالم ألعاب Batman: Arkham."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "justice-league-gods-and-monsters-2015",
+    "position": 19,
+    "label": "منفرد",
+    "note": "تخيل مبتكر لعالم موازٍ بنسخ مختلفة تماماً من الثالوث الرئيسي."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-the-killing-joke-2016",
+    "position": 20,
+    "label": "منفرد",
+    "note": "اقتباس للرواية الشهيرة لآلان مور، أضعفته مقدمة إضافية طويلة في بداية الفيلم."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "the-lego-batman-movie-2017",
+    "position": 21,
+    "label": "منفرد",
+    "note": "تحفة كوميدية وبصرية تفهم نفسية باتمان بذكاء مذهل."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-and-harley-quinn-2017",
+    "position": 22,
+    "label": "منفرد",
+    "note": "مغامرة كوميدية خفيفة بطابع رسم التسعينيات."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-gotham-by-gaslight-2018",
+    "position": 23,
+    "label": "منفرد",
+    "note": "تحقيق جنائي لباتمان في العصر الفيكتوري عام 1889."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-ninja-2018",
+    "position": 24,
+    "label": "منفرد",
+    "note": "انتقال باتمان إلى اليابان الإقطاعية بأسلوب أنمي بصري صاخب."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "teen-titans-go-to-the-movies-2018",
+    "position": 25,
+    "label": "منفرد",
+    "note": "فيلم سينمائي ساخر ومضحك جداً لجميع الأعمار."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-vs-teenage-mutant-ninja-turtles-2019",
+    "position": 26,
+    "label": "منفرد",
+    "note": "تقاطع مفاجئ بجودته العالية بين باتمان وسلاحف النينجا."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "superman-red-son-2020",
+    "position": 27,
+    "label": "منفرد",
+    "note": "قصة عالم موازٍ: ماذا لو هبطت مركبة سوبرمان في الاتحاد السوفيتي؟"
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-soul-of-the-dragon-2021",
+    "position": 28,
+    "label": "منفرد",
+    "note": "مغامرة فنون قتالية لباتمان في أجواء السبعينيات."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "injustice-2021",
+    "position": 29,
+    "label": "منفرد",
+    "note": "اقتباس سريع ومختصر لقصة عالم Injustice الشهير."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "catwoman-hunted-2022",
+    "position": 30,
+    "label": "منفرد",
+    "note": "فيلم سرقة وأكشن مستقل لشخصية كاتوومان بأسلوب الأنمي."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "dc-league-of-super-pets-2022",
+    "position": 31,
+    "label": "منفرد",
+    "note": "فيلم سينمائي عائلي ممتع عن الحيوانات الأليفة الخارقة."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-and-superman-battle-of-the-super-sons-2022",
+    "position": 32,
+    "label": "منفرد",
+    "note": "مغامرة ثلاثية الأبعاد ممتازة تجمع الجيل الجديد من أبناء الأبطال."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-the-doom-that-came-to-gotham-2023",
+    "position": 33,
+    "label": "منفرد",
+    "note": "غموض ورعب كوني في مدينة غوثام خلال عشرينيات القرن الماضي."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "merry-little-batman-2023",
+    "position": 34,
+    "label": "منفرد",
+    "note": "فيلم عائلي دافئ ومبتكر بصرياً في ليلة عيد الميلاد."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "watchmen-chapter-i-2024",
+    "position": 35,
+    "label": "منفرد",
+    "note": "الفصل الأول من الاقتباس الكرتوني الثلاثي الأبعاد المطابق للرواية المصورة."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "watchmen-chapter-ii-2024",
+    "position": 36,
+    "label": "منفرد",
+    "note": "الفصل الثاني المكمل لاقتباس رواية Watchmen الكرتوني."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-ninja-vs-yakuza-league-2025",
+    "position": 37,
+    "label": "منفرد",
+    "note": "تكملة أنمي يابانية مستقلة لفيلم Batman Ninja."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "aztec-batman-clash-of-empires-2025",
+    "position": 38,
+    "label": "منفرد",
+    "note": "إعادة تخيل مبتكرة لأسطورة الوطواط في حضارة الأزتك التاريخية."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-knightfall-part-1-2026",
+    "position": 39,
+    "label": "منفرد",
+    "note": "الجزء الأول (2026): اقتباس الملحمة الشهيرة التي تضع باتمان أمام أصعب اختبار في مسيرته.",
+    "spoiler": "يشهد الفيلم خطة بين لتحرير سجناء أركام وإنهاك باتمان حتى كسر ظهره."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-knightfall-part-2-2026",
+    "position": 40,
+    "label": "منفرد",
+    "note": "الجزء الثاني (2026): الفصل المكمل لملحمة Knightfall والصراع على حماية غوثام.",
+    "spoiler": "يتناول فترة تولي جان بول فالي (أزرائيل) عباءة الوطواط ورحلة تعافي بروس واين."
+  }
+]

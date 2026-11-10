@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#04070f" />
+  <title>موسوعة وخريطة عوالم DC التفاعلية (1941 – 2026) | النسخة الكاملة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root { --bg-base:#04070f; --bg-glow-1:rgba(37,99,235,0.28); --bg-glow-2:rgba(16,185,129,0.18); --uni-accent:#3b82f6; --card-bg:rgba(11,17,30,0.86); --card-border:rgba(255,255,255,0.11); --text-main:#f8fafc; --text-muted:#94a3b8; }
+    * { box-sizing:border-box; margin:0; padding:0; font-family:'Cairo',sans-serif; -webkit-tap-highlight-color:transparent; }
+    html { scroll-behavior:smooth; }
+    body { background-color:var(--bg-base); color:var(--text-main); min-height:100vh; overflow-x:hidden; display:flex; flex-direction:column; position:relative; }
+    bdi, .ltr-iso { unicode-bidi:isolate; direction:ltr; display:inline-block; }
+    .ambient-bg { position:fixed; inset:0; z-index:-3; pointer-events:none; background:radial-gradient(circle at 15% 20%,var(--bg-glow-1) 0%,transparent 55%),radial-gradient(circle at 85% 80%,var(--bg-glow-2) 0%,transparent 55%),linear-gradient(180deg,#03060c 0%,#080d1a 50%,#03050a 100%); transition:background 0.8s ease; }
+    .ambient-art { position:fixed; inset:0; z-index:-2; pointer-events:none; background-size:cover; background-position:center; opacity:0.22; filter:blur(18px) saturate(1.35); transition:background-image 0.9s ease; }
+    .ambient-mural { position:fixed; inset:0; z-index:-1; pointer-events:none; background-size:cover; background-position:center; opacity:0.35; transition:background-image 0.8s ease; mask-image:radial-gradient(circle at center,rgba(0,0,0,0.9) 10%,rgba(0,0,0,0.18) 85%); -webkit-mask-image:radial-gradient(circle at center,rgba(0,0,0,0.9) 10%,rgba(0,0,0,0.18) 85%); }
+    .floating-dock { position:fixed; bottom:16px; right:16px; z-index:85; display:flex; align-items:center; gap:6px; flex-wrap:wrap; pointer-events:none; }
+    .dock-pill { pointer-events:auto; background:rgba(7,11,22,0.94); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.16); border-right:3px solid var(--uni-accent); padding:7px 13px; border-radius:99px; font-size:0.7rem; font-weight:800; color:#fff; cursor:pointer; box-shadow:0 8px 25px rgba(0,0,0,0.75); display:flex; align-items:center; gap:6px; transition:0.22s; }
+    .dock-pill:hover { border-color:var(--uni-accent); transform:translateY(-2px); }
+    .dock-radar-btn { background:linear-gradient(135deg,var(--uni-accent),#1e3a8a); border:1px solid #93c5fd; }
+    header { position:sticky; top:0; z-index:90; background:rgba(4,7,15,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--card-border); padding:10px 14px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .dc-emblem { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--uni-accent),#1e3a8a); border:2px solid #93c5fd; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.1rem; color:#fff; box-shadow:0 0 18px var(--bg-glow-1); flex-shrink:0; }
+    .brand-info h1 { font-size:0.95rem; font-weight:900; line-height:1.25; }
+    .brand-info p { font-size:0.65rem; color:var(--text-muted); }
+    .dashboard-stats { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.04); border:1px solid var(--card-border); padding:6px 12px; border-radius:12px; flex-wrap:wrap; }
+    .stat-box { text-align:center; min-width:46px; }
+    .stat-num { font-size:0.84rem; font-weight:900; color:#60a5fa; direction:ltr; display:inline-block; }
+    .stat-txt { font-size:0.58rem; color:var(--text-muted); display:block; }
+    .prog-wrap { width:92px; }
+    .prog-bar { width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:99px; overflow:hidden; margin-top:3px; }
+    .prog-fill { height:100%; width:0%; background:linear-gradient(90deg,#10b981,#3b82f6); transition:width 0.35s ease; }
+    .top-actions { display:flex; gap:5px; width:100%; justify-content:space-between; flex-wrap:wrap; }
+    @media(min-width:960px){ .top-actions { width:auto; } }
+    .nav-modes { display:flex; background:#0b1120; padding:3px; border-radius:10px; border:1px solid var(--card-border); flex:1; gap:3px; }
+    .mode-btn { flex:1; background:transparent; color:var(--text-muted); border:none; padding:6px 10px; border-radius:7px; font-size:0.72rem; font-weight:800; cursor:pointer; white-space:nowrap; transition:0.2s; }
+    .mode-btn.active { background:var(--uni-accent); color:#fff; }
+    .tool-btn { background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:#e2e8f0; padding:6px 10px; border-radius:9px; font-size:0.7rem; font-weight:800; cursor:pointer; white-space:nowrap; transition:0.2s; }
+    .tool-btn.highlight { background:linear-gradient(135deg,#8b5cf6,#6d28d9); border-color:#a78bfa; color:#fff; }
+    .tool-btn.shield-on { background:rgba(16,185,129,0.18); border-color:#34d399; color:#6ee7b7; }
+    .tool-btn.shield-off { background:rgba(239,68,68,0.18); border-color:#f87171; color:#fca5a5; }
+    .controls-panel { background:rgba(7,11,22,0.84); backdrop-filter:blur(14px); border-bottom:1px solid var(--card-border); padding:10px 14px; display:flex; flex-direction:column; gap:8px; }
+    .uni-pills { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+    .uni-pills::-webkit-scrollbar { display:none; }
+    .uni-pill { background:rgba(255,255,255,0.05); border:1px solid var(--card-border); color:var(--text-main); padding:5px 12px; border-radius:99px; font-size:0.71rem; font-weight:700; white-space:nowrap; cursor:pointer; transition:0.2s; }
+    .uni-pill.active { background:var(--uni-accent); border-color:#93c5fd; color:#fff; box-shadow:0 0 12px var(--bg-glow-1); }
+    .filter-bar { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+    .inp-search,.sel-filter { background:rgba(15,23,42,0.92); border:1px solid var(--card-border); color:var(--text-main); padding:6px 10px; border-radius:8px; font-size:0.72rem; outline:none; flex:1; min-width:112px; }
+    main { max-width:1460px; width:100%; margin:0 auto; padding:14px 14px 80px; flex:1; }
+    .uni-block { margin-bottom:34px; scroll-margin-top:125px; }
+    .uni-banner { position:relative; overflow:hidden; border-radius:16px; padding:15px 18px; margin-bottom:14px; background:linear-gradient(115deg,rgba(10,16,30,0.92),rgba(15,23,42,0.75)); border:1px solid rgba(255,255,255,0.13); border-right:5px solid var(--sec-color,#3b82f6); box-shadow:0 12px 28px rgba(0,0,0,0.45); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+    .uni-banner-bg { position:absolute; inset:0; background-size:cover; background-position:center; opacity:0.24; pointer-events:none; z-index:0; filter:saturate(1.3); }
+    .uni-banner > * { position:relative; z-index:1; }
+    .uni-banner-title { font-size:1.02rem; font-weight:900; color:#fff; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .uni-num-badge { background:var(--sec-color,#3b82f6); color:#fff; font-size:0.68rem; font-weight:900; padding:2px 9px; border-radius:6px; }
+    .uni-tag { font-size:0.65rem; padding:3px 9px; border-radius:99px; font-weight:800; }
+    .tag-serial { background:rgba(16,185,129,0.2); color:#6ee7b7; border:1px solid rgba(16,185,129,0.4); }
+    .tag-single { background:rgba(245,158,11,0.2); color:#fcd34d; border:1px solid rgba(245,158,11,0.4); }
+    .uni-banner-desc { width:100%; font-size:0.74rem; color:#e2e8f0; line-height:1.5; }
+    .submode-bar { width:100%; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(305px,1fr)); gap:14px; }
+    .work-card { background:var(--card-bg); backdrop-filter:blur(14px); border:1px solid var(--card-border); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.25s,border-color 0.25s,box-shadow 0.3s; position:relative; scroll-margin-top:140px; }
+    .work-card.watched { border-color:rgba(16,185,129,0.55); box-shadow:0 0 18px rgba(16,185,129,0.14); }
+    @keyframes pulseJump { 0%{box-shadow:0 0 0 0 rgba(59,130,246,0.95);border-color:#60a5fa;transform:scale(1.02);} 50%{box-shadow:0 0 35px 12px rgba(59,130,246,0.55);border-color:#fff;} 100%{box-shadow:0 0 0 0 rgba(59,130,246,0);transform:scale(1);} }
+    .jump-highlight { animation:pulseJump 2.2s ease-out 2; border-color:#60a5fa !important; }
+    .card-hero { display:flex; gap:12px; padding:12px; }
+    .poster-wrap { width:98px; height:145px; border-radius:10px; overflow:hidden; flex-shrink:0; position:relative; cursor:pointer; transform-style:preserve-3d; box-shadow:0 8px 22px rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.18); background:#0b1120; transition:transform 0.15s ease-out; }
+    .poster-img { width:100%; height:100%; object-fit:cover; display:block; }
+    .poster-glare { position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle at 50% 50%,rgba(255,255,255,0.38),transparent 65%); opacity:0; transition:opacity 0.2s; }
+    .poster-hint { position:absolute; bottom:3px; right:3px; left:3px; background:rgba(4,7,15,0.86); color:#e2e8f0; font-size:0.53rem; font-weight:700; text-align:center; padding:2px; border-radius:4px; pointer-events:none; }
+    .card-info { flex:1; display:flex; flex-direction:column; justify-content:space-between; min-width:0; }
+    .card-badges { display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin-bottom:4px; }
+    .ord-chip { background:#1e293b; color:#93c5fd; font-size:0.62rem; font-weight:800; padding:2px 7px; border-radius:5px; }
+    .verdict-chip { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:99px; }
+    .v-h { background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.38); }
+    .v-g { background:rgba(56,189,248,0.18); color:#7dd3fc; border:1px solid rgba(56,189,248,0.38); }
+    .v-m { background:rgba(245,158,11,0.18); color:#fcd34d; border:1px solid rgba(245,158,11,0.38); }
+    .v-l { background:rgba(239,68,68,0.18); color:#fca5a5; border:1px solid rgba(239,68,68,0.38); }
+    .work-title-ar { font-size:0.92rem; font-weight:900; color:#fff; line-height:1.35; text-align:right; }
+    .work-title-en { font-size:0.84rem; font-weight:800; color:#93c5fd; line-height:1.3; direction:ltr; text-align:right; unicode-bidi:isolate; margin-top:2px; }
+    .work-sub { font-size:0.67rem; color:var(--text-muted); margin-top:4px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+    .card-quick-links { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+    .ep-btn { background:rgba(59,130,246,0.18); border:1px solid rgba(59,130,246,0.45); color:#93c5fd; padding:4px 8px; border-radius:7px; font-size:0.63rem; font-weight:800; cursor:pointer; }
+    .tl-jump-btn { background:rgba(168,85,247,0.16); border:1px solid rgba(168,85,247,0.42); color:#d8b4fe; padding:4px 8px; border-radius:7px; font-size:0.63rem; font-weight:800; cursor:pointer; }
+    .work-desc { margin:0 12px 8px; font-size:0.73rem; color:#cbd5e1; line-height:1.5; background:rgba(255,255,255,0.03); padding:8px 10px; border-radius:8px; border-right:2px solid var(--sec-color,#3b82f6); }
+    .spoiler-vault { margin:0 12px 9px; border-radius:8px; overflow:hidden; border:1px dashed rgba(245,158,11,0.4); background:rgba(15,23,42,0.75); position:relative; transition:0.25s; }
+    .spoiler-vault.unlocked { border-style:solid; border-color:rgba(16,185,129,0.4); background:rgba(16,185,129,0.06); }
+    .spoiler-trigger-bar { width:100%; background:rgba(245,158,11,0.12); color:#fde68a; border:none; padding:5px 10px; font-size:0.65rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:space-between; text-align:right; }
+    .spoiler-vault.unlocked .spoiler-trigger-bar { background:rgba(16,185,129,0.14); color:#6ee7b7; }
+    .spoiler-secret-body { display:none; padding:7px 10px; font-size:0.7rem; color:#fde68a; line-height:1.45; }
+    .spoiler-vault.unlocked .spoiler-secret-body { display:block; color:#e2e8f0; }
+    .ep-sum-wrap { position:relative; border-radius:6px; overflow:hidden; }
+    .ep-sum { font-size:0.7rem; color:#e2e8f0; line-height:1.55; direction:rtl; text-align:right; background:rgba(0,0,0,0.26); padding:7px 10px; border-radius:6px; border-right:2px solid rgba(59,130,246,0.45); }
+    .ep-sum.blurred { filter:blur(6px); user-select:none; pointer-events:none; opacity:0.55; transition:filter 0.3s ease, opacity 0.3s ease; }
+    .ep-spoiler-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(6,10,22,0.72); color:#fde68a; font-size:0.66rem; font-weight:800; cursor:pointer; border:1px dashed rgba(251,191,36,0.4); border-radius:6px; gap:5px; }
+    .watch-steps-box { margin:0 12px 9px; background:rgba(6,12,24,0.85); border:1px solid rgba(20,184,166,0.3); border-radius:10px; padding:8px 10px; display:flex; flex-direction:column; gap:5px; }
+    .watch-steps-hdr { font-size:0.66rem; font-weight:900; color:#5eead4; margin-bottom:2px; }
+    .watch-step-row { display:flex; align-items:center; justify-content:space-between; gap:8px; background:rgba(255,255,255,0.03); padding:5px 8px; border-radius:7px; border-right:3px solid #14b8a6; font-size:0.72rem; flex-wrap:wrap; }
+    .step-order-lbl { font-weight:900; color:#fcd34d; white-space:nowrap; }
+    .step-show-ltr { direction:ltr; unicode-bidi:isolate; font-weight:800; color:#fff; background:rgba(59,130,246,0.18); padding:1px 7px; border-radius:5px; font-size:0.7rem; }
+    .step-ep-ar { color:#cbd5e1; font-size:0.68rem; font-weight:700; }
+    .source-ratings { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; padding:0 12px 9px; }
+    .rate-link { text-decoration:none; background:rgba(9,13,24,0.92); border:1px solid var(--card-border); border-radius:8px; padding:4px 5px; text-align:center; display:block; transition:0.2s; cursor:pointer; }
+    .rate-link:hover { border-color:#60a5fa; background:rgba(30,41,59,0.9); }
+    .rate-val { font-size:0.75rem; font-weight:900; display:block; direction:ltr; unicode-bidi:isolate; }
+    .rate-lbl { font-size:0.54rem; color:var(--text-muted); display:block; }
+    .card-footer { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; padding:8px 12px; background:rgba(5,8,15,0.65); border-top:1px solid var(--card-border); }
+    .act-btn { background:#0d1424; border:1px solid var(--card-border); color:var(--text-muted); font-size:0.62rem; font-weight:800; padding:5px 2px; border-radius:6px; cursor:pointer; }
+    .act-btn.st-watched { background:#10b981; color:#042f2e; border-color:#34d399; }
+    .act-btn.st-watching { background:#3b82f6; color:#fff; border-color:#60a5fa; }
+    .act-btn.st-watchlist { background:#a855f7; color:#fff; border-color:#c084fc; }
+    .act-btn.st-skipped { background:#475569; color:#fff; border-color:#64748b; }
+    #timelineView { display:none; position:relative; }
+    .tl-era-section { margin-bottom:28px; position:relative; padding-right:22px; border-right:3px solid var(--sec-color,#3b82f6); margin-right:8px; scroll-margin-top:130px; }
+    .tl-node { position:relative; margin-bottom:12px; background:var(--card-bg); backdrop-filter:blur(12px); border:1px solid var(--card-border); border-radius:12px; padding:12px 14px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; scroll-margin-top:145px; transition:0.3s; }
+    .tl-node::before { content:""; position:absolute; right:-29px; top:24px; width:12px; height:12px; border-radius:50%; background:var(--sec-color,#3b82f6); box-shadow:0 0 10px var(--sec-color,#3b82f6); }
+    .tl-thumb { width:62px; height:92px; border-radius:8px; object-fit:cover; flex-shrink:0; border:1px solid rgba(255,255,255,0.18); cursor:pointer; }
+    .tl-nav-pills { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:5px; align-items:center; }
+    .tl-pill-tag { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); padding:2px 8px; border-radius:6px; font-size:0.64rem; font-weight:800; color:#cbd5e1; }
+
+    /* ======================================================================
+       TRUE 3D ORBITAL CAROUSEL, HIDEABLE HUD & INTERACTIVE MINI-GAMES
+       ====================================================================== */
+    #threeView { display:none; position:fixed; inset:0; width:100vw; height:100vh; z-index:160; background:#02040a; overflow:hidden; }
+    #threeCanvas { width:100%; height:100%; display:block; touch-action:none; cursor:grab; }
+    #threeCanvas:active { cursor:grabbing; }
+    .cosmic-top-bar { position:absolute; top:10px; right:12px; left:12px; z-index:170; display:flex; flex-direction:column; gap:7px; pointer-events:none; }
+    .cosmic-header-row { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; pointer-events:auto; background:rgba(4,8,18,0.86); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.15); padding:8px 14px; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.75); }
+    .cosmic-uni-bar { display:flex; gap:6px; overflow-x:auto; padding:4px 2px; scrollbar-width:none; pointer-events:auto; }
+    .cosmic-uni-bar::-webkit-scrollbar { display:none; }
+    .exit-3d-btn { background:linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; border:1px solid #fca5a5; padding:6px 13px; border-radius:99px; font-size:0.71rem; font-weight:900; cursor:pointer; }
+    .guide-3d-btn { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:1px solid #fde68a; padding:6px 13px; border-radius:99px; font-size:0.71rem; font-weight:900; cursor:pointer; }
+    .orrery-btn { background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; border:1px solid #c4b5fd; padding:6px 13px; border-radius:99px; font-size:0.71rem; font-weight:900; cursor:pointer; }
+    .game-3d-btn { background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:1px solid #6ee7b7; padding:6px 13px; border-radius:99px; font-size:0.71rem; font-weight:900; cursor:pointer; box-shadow:0 0 14px rgba(16,185,129,0.4); }
+
+    /* Interactive 3D Mini-Game Banner */
+    .arcade-banner {
+      display:none; pointer-events:auto; align-self:center; width:100%; max-width:620px;
+      background:linear-gradient(135deg,rgba(6,78,59,0.92),rgba(15,23,42,0.95)); backdrop-filter:blur(16px);
+      border:1px solid #34d399; border-radius:14px; padding:10px 14px; box-shadow:0 12px 35px rgba(0,0,0,0.85);
+      align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .arcade-banner.active { display:flex; }
+
+    .cosmic-guide-modal { position:absolute; inset:0; z-index:185; background:rgba(2,5,14,0.86); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; padding:16px; }
+    .cosmic-guide-modal.open { display:flex; }
+    .guide-box { width:100%; max-width:640px; max-height:86vh; overflow-y:auto; background:linear-gradient(160deg,#0b1326,#060a14); border:1px solid rgba(96,165,250,0.45); border-radius:18px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,0.9); display:flex; flex-direction:column; gap:12px; }
+    .guide-legend-item { display:flex; align-items:flex-start; gap:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); padding:10px 12px; border-radius:12px; }
+    .legend-swatch { width:36px; height:36px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:900; }
+
+    .cosmic-cockpit { position:absolute; bottom:14px; right:12px; left:12px; z-index:170; display:flex; flex-direction:column; align-items:center; gap:7px; pointer-events:none; }
+    .cosmic-card-hud { pointer-events:auto; width:100%; max-width:600px; background:rgba(8,13,26,0.92); backdrop-filter:blur(20px); border:1px solid rgba(96,165,250,0.45); border-right:4px solid var(--uni-accent); border-radius:16px; padding:11px 14px; box-shadow:0 15px 45px rgba(0,0,0,0.85); display:flex; gap:12px; align-items:center; position:relative; transition:transform 0.3s ease, opacity 0.3s ease; }
+    .cosmic-card-hud.hud-hidden { display:none; }
+    .hud-hide-btn { position:absolute; top:8px; left:8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#cbd5e1; padding:3px 9px; border-radius:99px; font-size:0.62rem; font-weight:800; cursor:pointer; }
+    .hud-hide-btn:hover { background:#ef4444; color:#fff; border-color:#fca5a5; }
+    .cosmic-hud-poster { width:64px; height:94px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.2); flex-shrink:0; cursor:pointer; }
+    .cosmic-flight-bar { pointer-events:auto; width:100%; max-width:600px; background:rgba(5,9,20,0.92); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.14); padding:7px 12px; border-radius:99px; display:flex; align-items:center; justify-content:space-between; gap:8px; box-shadow:0 10px 30px rgba(0,0,0,0.8); }
+    .flight-btn { background:rgba(59,130,246,0.2); border:1px solid rgba(96,165,250,0.45); color:#fff; padding:6px 12px; border-radius:99px; font-size:0.7rem; font-weight:800; cursor:pointer; white-space:nowrap; transition:0.2s; }
+    .flight-btn:hover, .flight-btn.active { background:var(--uni-accent); border-color:#fff; }
+    .portal-warp-btn { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:1px solid #fde68a; padding:4px 10px; border-radius:7px; font-size:0.65rem; font-weight:900; cursor:pointer; animation:pulseJump 2s infinite; }
+    .flight-slider { flex:1; accent-color:var(--uni-accent); cursor:pointer; }
+
+    .drawer-backdrop { position:fixed; inset:0; background:rgba(2,5,12,0.82); backdrop-filter:blur(8px); z-index:200; opacity:0; pointer-events:none; transition:opacity 0.26s ease; display:flex; justify-content:flex-end; align-items:flex-end; }
+    .drawer-backdrop.open { opacity:1; pointer-events:auto; }
+    .drawer-panel { width:100%; max-width:690px; height:89vh; background:#080e1c; border-top:1px solid rgba(96,165,250,0.38); border-left:1px solid rgba(96,165,250,0.25); border-radius:20px 20px 0 0; display:flex; flex-direction:column; overflow:hidden; transform:translateY(100%); transition:transform 0.3s cubic-bezier(0.22,1,0.36,1); }
+    @media(min-width:768px){ .drawer-backdrop { align-items:stretch; } .drawer-panel { height:100vh; border-radius:0; transform:translateX(-100%); } .drawer-backdrop.open .drawer-panel { transform:translateX(0); } }
+    .drawer-backdrop.open .drawer-panel { transform:translateY(0); }
+    .drawer-header { padding:14px 16px; background:rgba(15,23,42,0.96); border-bottom:1px solid var(--card-border); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-shrink:0; }
+    .drawer-close { background:rgba(239,68,68,0.18); border:1px solid rgba(239,68,68,0.45); color:#fca5a5; width:34px; height:34px; border-radius:50%; font-size:1rem; font-weight:900; cursor:pointer; flex-shrink:0; }
+    .drawer-body { padding:16px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:14px; }
+    .season-tabs { display:flex; gap:7px; overflow-x:auto; padding:4px 2px 8px; scrollbar-width:none; flex-shrink:0; min-height:42px; align-items:center; }
+    .season-tabs::-webkit-scrollbar { display:none; }
+    .season-tab { background:#141e33; border:1px solid rgba(255,255,255,0.14); color:#cbd5e1; padding:6px 14px; border-radius:9px; font-size:0.74rem; font-weight:800; white-space:nowrap; cursor:pointer; flex-shrink:0; }
+    .season-tab.active { background:var(--uni-accent); color:#fff; border-color:#93c5fd; box-shadow:0 0 12px rgba(59,130,246,0.4); }
+    .ep-list { display:flex; flex-direction:column; gap:9px; flex-shrink:0; }
+    .ep-card { background:rgba(17,25,42,0.92); border:1px solid var(--card-border); border-radius:10px; padding:10px; display:flex; gap:10px; align-items:flex-start; }
+    .ep-card.ep-watched { border-color:rgba(16,185,129,0.5); background:rgba(16,185,129,0.07); }
+    .ep-thumb { width:108px; height:66px; border-radius:7px; object-fit:cover; background:#060913; flex-shrink:0; border:1px solid rgba(255,255,255,0.1); }
+    .ep-info { flex:1; min-width:0; }
+    .ep-title { font-size:0.8rem; font-weight:800; color:#fff; direction:ltr; text-align:right; unicode-bidi:isolate; }
+    .ep-meta { font-size:0.64rem; color:var(--text-muted); margin:3px 0 5px; display:flex; gap:8px; flex-wrap:wrap; }
+    .ep-check { background:#0d1526; border:1px solid var(--card-border); color:#94a3b8; padding:6px 9px; border-radius:8px; font-size:0.64rem; font-weight:800; cursor:pointer; flex-shrink:0; }
+    .ep-check.done { background:#10b981; color:#042f2e; border-color:#34d399; }
+    .radar-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:8px; }
+    .radar-item { background:rgba(20,30,50,0.85); border:1px solid var(--card-border); border-right:4px solid var(--r-col,#3b82f6); padding:9px 11px; border-radius:10px; cursor:pointer; transition:0.2s; }
+    .radar-item:hover { transform:translateY(-2px); border-color:#93c5fd; background:rgba(30,45,75,0.95); }
+  </style>
+</head>
+<body>
+
+<div class="ambient-bg" id="ambientBg"></div>
+<div class="ambient-art" id="ambientArt"></div>
+<div class="ambient-mural" id="ambientMural"></div>
+
+<div class="floating-dock" id="floatingDock">
+  <button class="dock-pill dock-radar-btn" onclick="openRadarModal()">🧭 فهرس القفز السريع</button>
+  <button class="dock-pill" onclick="stepUniverse(-1)">⬆️ العالم السابق</button>
+  <button class="dock-pill" onclick="stepUniverse(1)">⬇️ العالم التالي</button>
+  <div class="dock-pill" id="ambientLabel" onclick="openRadarModal()">🌌 جميع عوالم <bdi>DC</bdi></div>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="dc-emblem" id="dcEmblem">DC</div>
+    <div class="brand-info">
+      <h1>موسوعة وخريطة عوالم <bdi>DC</bdi> التفاعلية <bdi>(1941 – 2026)</bdi></h1>
+      <p>تعريب يحفظ مصطلحات العالم • درع حماية من الحرق • مجسمات ومدارات <bdi>3D</bdi> تفاعلية من كل الزوايا</p>
+    </div>
+  </div>
+  <div class="dashboard-stats">
+    <div class="stat-box"><span class="stat-num" id="stWatched">0</span><span class="stat-txt">عمل مكتمل</span></div>
+    <div class="stat-box"><span class="stat-num" id="stEpisodes">0</span><span class="stat-txt">حلقة مسجلة</span></div>
+    <div class="stat-box"><span class="stat-num" id="stHours">0h</span><span class="stat-txt">ساعات المشاهدة</span></div>
+    <div class="prog-wrap">
+      <div class="stat-txt" id="stPct">الإنجاز: <bdi>0%</bdi></div>
+      <div class="prog-bar"><div class="prog-fill" id="stBar"></div></div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <div class="nav-modes">
+      <button class="mode-btn active" id="btnViewGrid" onclick="setView('grid',this)">🎬 البطاقات والبوسترات</button>
+      <button class="mode-btn" id="btnViewTl" onclick="setView('timeline',this)">⏳ الخط الزمني المرتبط</button>
+      <button class="mode-btn" id="btnView3d" onclick="setView('3d',this)">🪐 مدار الأكوان 3D</button>
+    </div>
+    <button class="tool-btn shield-on" id="btnSpoilerShield" onclick="toggleGlobalSpoilerShield()">🛡️ درع الحرق: مفعّل</button>
+    <button class="tool-btn highlight" onclick="suggestNextWatch()">⚡ ماذا أشاهد الليلة؟</button>
+    <button class="tool-btn" onclick="openBackupModal()">💾 نسخ احتياطي</button>
+  </div>
+</header>
+
+<section class="controls-panel">
+  <div class="uni-pills" id="uniPills"></div>
+  <div class="filter-bar">
+    <input type="text" id="qInput" class="inp-search" placeholder="ابحث عن فيلم، مسلسل، سنة، أو تقاطع (مثال: Batman, Crisis, 2026)..." oninput="renderApp()" />
+    <select id="fMode" class="sel-filter" onchange="renderApp()">
+      <option value="all">الكل (متسلسل + منفرد)</option>
+      <option value="serial">عوالم متسلسلة فقط</option>
+      <option value="single">أعمال منفردة فقط</option>
+    </select>
+    <select id="fType" class="sel-filter" onchange="renderApp()">
+      <option value="all">كل التصنيفات</option>
+      <option value="ML">أفلام واقعية</option>
+      <option value="SL">مسلسلات واقعية</option>
+      <option value="MA">أفلام أنميشن</option>
+      <option value="SA">مسلسلات أنميشن</option>
+    </select>
+    <select id="fStatus" class="sel-filter" onchange="renderApp()">
+      <option value="all">كل حالات المشاهدة</option>
+      <option value="watched">✓ تمت المشاهدة</option>
+      <option value="watching">▶ أشاهده حالياً</option>
+      <option value="watchlist">+ في قائمتي</option>
+      <option value="unwatched">لم يُشاهد بعد</option>
+    </select>
+    <select id="fTier" class="sel-filter" onchange="renderApp()">
+      <option value="all">كل مستويات التقييم</option>
+      <option value="h">🔥 أسطوري / إجباري</option>
+      <option value="g">👍 يستحق المشاهدة</option>
+      <option value="m">⚖️ متوسط</option>
+      <option value="l">⚠️ ضعيف / تجاوز</option>
+    </select>
+  </div>
+</section>
+
+<main>
+  <div id="gridView"></div>
+  <div id="timelineView"></div>
+</main>
+
+<!-- TRUE 3D ORBITAL CAROUSEL & ARCADE PORTAL -->
+<div id="threeView">
+  <div class="cosmic-top-bar">
+    <div class="cosmic-header-row">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="dc-emblem" style="width:34px;height:34px;font-size:0.9rem;">3D</div>
+        <div>
+          <div style="font-size:0.85rem;font-weight:900;color:#fff;" id="cosmicModeTitle">🪐 المدار الثلاثي الأبعاد التفاعلي (360° Model)</div>
+          <div style="font-size:0.64rem;color:#93c5fd;" id="cosmicModeSub">اسحب أفقياً لتدوير عجلة البطاقات ثلاثية الأبعاد حول الكوكب • واسحب عمودياً للالتفاف حول المجسم من كل الزوايا</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="orrery-btn" id="btnToggleOrrery" onclick="toggleOrreryGalaxyMode()">🌌 مجرة الكواكب الـ14</button>
+        <button class="game-3d-btn" onclick="cycleArcadeGame()">🎮 ألعاب وتحديات DC 3D</button>
+        <button class="guide-3d-btn" onclick="toggle3DGuide(true)">📖 دليل الـ 3D</button>
+        <button class="flight-btn" onclick="startRebootTour()">⚡ جولة الريميكات الـ5</button>
+        <button class="exit-3d-btn" onclick="setView('grid',document.getElementById('btnViewGrid'))">✕ إغلاق</button>
+      </div>
+    </div>
+    <div class="cosmic-uni-bar" id="cosmicUniBar"></div>
+
+    <!-- Interactive 3D Arcade & Challenges HUD -->
+    <div class="arcade-banner" id="arcadeBanner">
+      <div style="flex:1;min-width:220px;">
+        <div style="font-size:0.78rem;font-weight:900;color:#6ee7b7;" id="arcadeTitle">🎮 طور التحدي النشط</div>
+        <div style="font-size:0.7rem;color:#fff;margin-top:2px;" id="arcadePrompt"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="background:#064e3b;border:1px solid #34d399;color:#fde68a;padding:4px 10px;border-radius:99px;font-size:0.72rem;font-weight:900;" id="arcadeScore">النقاط: 0</span>
+        <button class="flight-btn" onclick="cycleArcadeGame()">🔄 تبديل اللعبة</button>
+        <button class="exit-3d-btn" style="padding:4px 10px;" onclick="stopArcadeGame()">✕ إنهاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive 3D Guide Modal -->
+  <div class="cosmic-guide-modal" id="cosmicGuideModal" onclick="if(event.target===this)toggle3DGuide(false)">
+    <div class="guide-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:10px;">
+        <h3 style="font-size:1.02rem;font-weight:900;color:#fde68a;">📖 دليل المدار المجسم والألعاب التفاعلية (3D Guide)</h3>
+        <button class="drawer-close" onclick="toggle3DGuide(false)">✕</button>
+      </div>
+      <div class="guide-legend-item">
+        <div class="legend-swatch" style="background:rgba(59,130,246,0.2);border:2px solid #60a5fa;color:#93c5fd;">🔄</div>
+        <div>
+          <div style="font-size:0.84rem;font-weight:900;color:#93c5fd;">1. تدوير المجسمات 360° (True 3D Carousel & Orbit):</div>
+          <div style="font-size:0.72rem;color:#cbd5e1;line-height:1.5;margin-top:2px;">
+            البطاقات الآن عبارة عن <strong>مجسمات ثلاثية الأبعاد ذات سُمك ووجهين</strong> تدور في مدار حقيقي حول الكوكب. اسحب يميناً أو يساراً لتدوير المدار بالقصور الذاتي، واسحب للأعلى أو الأسفل لرؤية الكوكب والمدار من الأعلى أو الجوانب!
+          </div>
+        </div>
+      </div>
+      <div class="guide-legend-item">
+        <div class="legend-swatch" style="background:rgba(239,68,68,0.2);border:2px solid #f87171;color:#fca5a5;">🔽</div>
+        <div>
+          <div style="font-size:0.84rem;font-weight:900;color:#fca5a5;">2. زر إخفاء البطاقة السفلية لرؤية صافية:</div>
+          <div style="font-size:0.72rem;color:#cbd5e1;line-height:1.5;margin-top:2px;">
+            اضغط على زر <strong>"🔽 إخفاء البطاقة"</strong> في أعلى يسار الصندوق السفلي لإخفاء التفاصيل والاستمتاع بصفاء الفضاء الكامل، وعند لمس أي مجسم عمل في المدار ستعود البطاقة للظهور فوراً.
+          </div>
+        </div>
+      </div>
+      <div class="guide-legend-item">
+        <div class="legend-swatch" style="background:rgba(16,185,129,0.2);border:2px solid #34d399;color:#6ee7b7;">🎮</div>
+        <div>
+          <div style="font-size:0.84rem;font-weight:900;color:#6ee7b7;">3. ثلاث ألعاب فضائية تفاعلية (زر ألعاب وتحديات DC 3D):</div>
+          <div style="font-size:0.72rem;color:#cbd5e1;line-height:1.5;margin-top:2px;">
+            • <strong>🎯 دفاع الفانوس الأخضر:</strong> المس نيازك الكريبتونيت المندفعة نحو الكوكب لتفجيرها بشعاع الطاقة.<br/>
+            • <strong>🕵️ محقق غوثام:</strong> اقرأ التلميح ودوّر المدار ثلاثي الأبعاد للمس مجسم الفيلم الصحيح.<br/>
+            • <strong>⚡ سباق الفلاش الزمني:</strong> المس الأعمال بالترتيب الزمني الصحيح من الأقدم للأحدث.
+          </div>
+        </div>
+      </div>
+      <button class="tool-btn highlight" style="width:100%;padding:10px;font-size:0.8rem;" onclick="toggle3DGuide(false)">🚀 فهمت الدليل — انطلق في الفضاء</button>
+    </div>
+  </div>
+
+  <canvas id="threeCanvas"></canvas>
+
+  <div class="cosmic-cockpit" id="cosmicCockpit">
+    <div class="cosmic-card-hud" id="cosmicHudCard">
+      <button class="hud-hide-btn" onclick="toggleHudVisibility(false)">🔽 إخفاء البطاقة</button>
+      <img class="cosmic-hud-poster" id="hudPoster" src="" alt="poster" onclick="openHudWorkDrawer()" />
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.66rem;color:#60a5fa;font-weight:800;padding-left:85px;" id="hudUniLabel"></div>
+        <div style="font-size:0.92rem;font-weight:900;color:#fff;direction:ltr;text-align:right;unicode-bidi:isolate;" id="hudTitle"></div>
+        <div style="font-size:0.7rem;color:#cbd5e1;margin:3px 0;line-height:1.4;" id="hudDesc"></div>
+        <div id="hudSpoilerBox"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;" id="hudActionsRow">
+          <button class="ep-btn" onclick="openHudWorkDrawer()">📂 الحلقات والتفاصيل</button>
+          <button class="tl-jump-btn" onclick="jumpHudToTimeline()">⏳ موقعه بالخط الزمني</button>
+          <button class="ep-btn" id="hudWatchBtn" onclick="toggleHudWatched()">✓ شاهدته</button>
+          <button class="portal-warp-btn" id="hudPortalBtn" style="display:none;" onclick="triggerPortalJump()">⚡ القفز عبر بوابة الريميك</button>
+        </div>
+      </div>
+    </div>
+    <div class="cosmic-flight-bar">
+      <button class="flight-btn" onclick="step3DFlight(-1)">⏮ السابق</button>
+      <button class="flight-btn" id="btnShowHudPill" style="display:none;background:#10b981;border-color:#6ee7b7;" onclick="toggleHudVisibility(true)">🔼 إظهار بطاقة العمل</button>
+      <input type="range" class="flight-slider" id="flightSlider" min="0" max="100" value="0" oninput="scrub3DFlight(this.value)" />
+      <span style="font-size:0.68rem;font-weight:800;color:#93c5fd;direction:ltr;min-width:48px;text-align:center;" id="flightCounter">1 / 9</span>
+      <button class="flight-btn active" onclick="step3DFlight(1)">التالي ⏭</button>
+    </div>
+  </div>
+</div>
+
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="if(event.target===this)closeDrawer()">
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <div>
+        <div id="drwBadge" style="font-size:0.68rem;color:#60a5fa;font-weight:800;"></div>
+        <h2 id="drwTitle" style="font-size:1.02rem;font-weight:900;color:#fff;direction:ltr;text-align:right;unicode-bidi:isolate;"></h2>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body" id="drwBody"></div>
+  </div>
+</div>
+
+<script>
+const UNIVERSES = [
+  { id:"all", num:"الكل", name:"جميع العوالم", en:"", serial:true, mode:"شامل", color:"#3b82f6", hex:0x3b82f6, motif:"multiverse", g1:"rgba(37,99,235,0.28)", g2:"rgba(16,185,129,0.16)", desc:"جميع إنتاجات DC منذ 1941 حتى نوفمبر 2026 (مرتبة زمنياً وخالية من الحرق)" },
+  { id:"dcu", num:"القسم 1", name:"عالم جيمس غان الجديد", en:"DCU - Chapter One", serial:true, mode:"متسلسل ومستمر (2024–2026)", color:"#10b981", hex:0x10b981, motif:"metropolis", g1:"rgba(16,185,129,0.3)", g2:"rgba(59,130,246,0.22)", desc:"الريميك الشامل الجديد الذي يربط الأفلام والمسلسلات والأنميشن في قصة واحدة." },
+  { id:"dceu", num:"القسم 2", name:"عالم سنايدر الممتد السابق", en:"DCEU / Snyderverse", serial:true, mode:"متسلسل ومكتمل (2013–2023)", color:"#3b82f6", hex:0x3b82f6, motif:"justice", g1:"rgba(37,99,235,0.3)", g2:"rgba(30,41,59,0.38)", desc:"العالم السينمائي الممتد الأول مرتباً حسب التسلسل الزمني لأحداث القصة." },
+  { id:"reeves", num:"القسم 3", name:"ملحمة باتمان الجنائية (مات ريفز)", en:"The Batman Crime Saga", serial:true, mode:"متسلسل ومستمر (Elseworlds)", color:"#ef4444", hex:0xef4444, motif:"gotham_rain", g1:"rgba(185,28,28,0.32)", g2:"rgba(15,23,42,0.45)", desc:"عالم التحقيقات والمافيا المظلم لروبرت باتينسون في مدينة غوثام." },
+  { id:"nolan", num:"القسم 4", name:"ثلاثية فارس الظلام (نولان)", en:"The Dark Knight Trilogy", serial:true, mode:"متسلسل ومكتمل (Elseworlds)", color:"#f59e0b", hex:0xf59e0b, motif:"dark_knight", g1:"rgba(217,119,6,0.26)", g2:"rgba(30,58,138,0.24)", desc:"ثلاثية كريستوفر نولان الواقعية الخالدة (2005–2012)." },
+  { id:"joker", num:"القسم 5", name:"ثنائية الجوكر (تود فيليبس)", en:"Joker Duology", serial:true, mode:"متسلسل ومكتمل (Elseworlds)", color:"#ec4899", hex:0xec4899, motif:"joker_stairs", g1:"rgba(219,39,119,0.28)", g2:"rgba(120,53,15,0.22)", desc:"دراما آرثر فليك النفسية المستقلة في غوثام الثمانينيات." },
+  { id:"burton", num:"القسم 6", name:"سلسلة باتمان الكلاسيكية", en:"Burton & Schumacher (1989–1997)", serial:true, mode:"متسلسل ومكتمل", color:"#8b5cf6", hex:0x8b5cf6, motif:"gotham_gothic", g1:"rgba(139,92,246,0.28)", g2:"rgba(17,24,39,0.38)", desc:"رباعية تيم بيرتون وجويل شوماخر الكلاسيكية." },
+  { id:"reeve", num:"القسم 7", name:"سلسلة سوبرمان الكلاسيكية", en:"Christopher Reeve (1978–2006)", serial:true, mode:"متسلسل ومكتمل", color:"#0ea5e9", hex:0x0ea5e9, motif:"fortress", g1:"rgba(14,165,233,0.28)", g2:"rgba(220,38,38,0.18)", desc:"سلسلة كريستوفر ريف الكلاسيكية وتكملتها في Superman Returns." },
+  { id:"arrow", num:"القسم 8", name:"عالم المسلسلات التلفزيونية", en:"Arrowverse (2012–2024)", serial:true, mode:"متسلسل بالخطوات الزمنية", color:"#14b8a6", hex:0x14b8a6, motif:"speedforce", g1:"rgba(20,184,166,0.28)", g2:"rgba(16,185,129,0.2)", desc:"عالم شبكة CW التلفزيوني المترابط؛ مرتب بخطوات عربية مرقمة توضح أي موسم وأي حلقة تشاهدها أولاً بدون أي حرق." },
+  { id:"titans", num:"القسم 9", name:"عالم تايتنز ودووم باترول", en:"Titans & Doom Patrol", serial:true, mode:"متسلسل ومكتمل (2018–2023)", color:"#a855f7", hex:0xa855f7, motif:"titans_tower", g1:"rgba(168,85,247,0.28)", g2:"rgba(30,41,59,0.3)", desc:"عالم تلفزيوني ناضج للبالغين بدأ بـ Titans وانبثق منه Doom Patrol." },
+  { id:"sandman", num:"القسم 10", name:"عالم رجل الرمل", en:"The Sandman Universe", serial:true, mode:"متسلسل ومكتمل (2022–2025)", color:"#6366f1", hex:0x6366f1, motif:"dreaming", g1:"rgba(99,102,241,0.28)", g2:"rgba(15,23,42,0.35)", desc:"عالم الفانتازيا المظلمة المقتبس من روايات نيل غايمان." },
+  { id:"dcau", num:"القسم 11", name:"عالم الأنميشن الكلاسيكي", en:"DCAU / Timmverse", serial:true, mode:"متسلسل ومكتمل (1992–2006)", color:"#f43f5e", hex:0xf43f5e, motif:"watchtower", g1:"rgba(244,63,94,0.28)", g2:"rgba(37,99,235,0.22)", desc:"أعظم عالم كرتوني مترابط من باتمان التسعينيات حتى مستقبل Batman Beyond." },
+  { id:"dcamu", num:"القسم 12", name:"عالم أفلام الأنميشن الأول", en:"DCAMU - New 52 (17 Films)", serial:true, mode:"متسلسل ومكتمل (17 فيلماً)", color:"#06b6d4", hex:0x06b6d4, motif:"apokolips", g1:"rgba(6,182,212,0.28)", g2:"rgba(59,130,246,0.22)", desc:"عالم أفلام الأنميشن المتصل بالكامل من Flashpoint Paradox حتى Apokolips War." },
+  { id:"tomorrow", num:"القسم 13", name:"عالم الغد الكرتوني", en:"Tomorrowverse (10 Films)", serial:true, mode:"متسلسل ومكتمل (10 أفلام)", color:"#22c55e", hex:0x22c55e, motif:"crisis_wave", g1:"rgba(34,197,94,0.26)", g2:"rgba(14,165,233,0.2)", desc:"الريميك الكرتوني الذي تلا Apokolips War واختتم بثلاثية Crisis on Infinite Earths." },
+  { id:"harley", num:"القسم 14", name:"عالم هارلي كوين الكرتوني", en:"Harley Quinn & Kite Man", serial:true, mode:"متسلسل ومستمر (2019–2025)", color:"#e11d48", hex:0xe11d48, motif:"chaos_neon", g1:"rgba(225,29,72,0.28)", g2:"rgba(168,85,247,0.2)", desc:"عالم الكوميديا السوداء الكرتوني للبالغين." },
+  { id:"early_st", num:"القسم 15", name:"الحقبة التأسيسية المبكرة", en:"Golden & Silver Age (1941–1989)", serial:false, mode:"أعمال منفردة كلاسيكية", color:"#d97706", hex:0xd97706, motif:"golden_age", g1:"rgba(217,119,6,0.24)", g2:"rgba(51,65,85,0.25)", desc:"أوائل إنتاجات DC السينمائية والتلفزيونية والكرتونية منذ الأربعينيات." },
+  { id:"movie_st", num:"القسم 16", name:"الأفلام الواقعية المنفردة", en:"Standalone Live-Action Films", serial:false, mode:"أفلام منفردة بذاتها", color:"#ef4444", hex:0xef4444, motif:"vertigo", g1:"rgba(239,68,68,0.24)", g2:"rgba(30,41,59,0.28)", desc:"أفلام واقعية مستقلة تماماً لا تتطلب مشاهدة أي عمل آخر." },
+  { id:"tv_st", num:"القسم 17", name:"المسلسلات الواقعية المنفردة", en:"Standalone Live-Action Series", serial:false, mode:"مسلسلات منفردة بذاتها", color:"#3b82f6", hex:0x3b82f6, motif:"gotham_sky", g1:"rgba(59,130,246,0.25)", g2:"rgba(15,23,42,0.3)", desc:"مسلسلات تلفزيونية واقعية مستقلة لكل منها عالمها الخاص." },
+  { id:"anim_tv_st", num:"القسم 18", name:"المسلسلات الكرتونية المنفردة", en:"Standalone Animated Series", serial:false, mode:"مسلسلات أنميشن منفردة", color:"#10b981", hex:0x10b981, motif:"lantern_corps", g1:"rgba(16,185,129,0.25)", g2:"rgba(37,99,235,0.18)", desc:"مسلسلات أنميشن مستقلة خارج العوالم المتسلسلة." },
+  { id:"anim_mv_st", num:"القسم 19", name:"أفلام الأنميشن المنفردة", en:"DC Animated Original Movies", serial:false, mode:"أفلام أنميشن منفردة", color:"#8b5cf6", hex:0x8b5cf6, motif:"red_hood", g1:"rgba(139,92,246,0.26)", g2:"rgba(236,72,153,0.18)", desc:"أفلام DC الكرتونية المستقلة المقتبسة من أشهر الروايات المصورة." }
+];
+
+const TYPE_LABELS = { ML:"فيلم واقعي", SL:"مسلسل واقعي", MA:"فيلم أنميشن", SA:"مسلسل أنميشن" };
+
+const RAW_WORKS = [
+  ["dcu","مقدمة 1 (شبه رسمي)","The Suicide Squad",2021,"ML","90%","7.2","78%","h","مغامرة أكشن وكوميديا سوداء لفرقة المهمات المستحيلة (تاسك فورس إكس)؛ تمثل المقدمة التأسيسية لقصص وشخصيات العالم الجديد.||يشهد مقتل ريك فلاغ الابن على يد بيس ميكر، وهو الحدث المحرك للموسم الأول والثاني من Peacemaker ومسلسل Creature Commandos."],
+  ["dcu","مقدمة 2 (شبه رسمي)","Peacemaker",2022,"SL","94%","8.3","89%","h","يتابع مسيرة كريستوفر سميث مباشرة بعد أحداث فيلم The Suicide Squad؛ معتمد قصصياً في العالم الجديد (8 حلقات).||جميع أحداث الموسم ضد غزو الباترفلايز (كيانات الفراشات الفضائية) معتمدة بالكامل باستثناء مشهد ظهور فرقة العدالة القديمة في الحلقة الأخيرة."],
+  ["dcu","مقدمة 3 (شبه رسمي)","Blue Beetle",2023,"ML","78%","6.0","83%","m","قصة أصل عائلية مستقلة وخفيفة، وتستمر نفس النسخة من البطل في عالم DCU الجديد."],
+  ["dcu","1 (البداية الرسمية)","Creature Commandos",2024,"SA","93%","7.8","79%","h","الانطلاقة الرسمية الأولى لعالم DCU؛ تدور أحداثه بعد سنتين من الموسم الأول لـ Peacemaker (7 حلقات)."],
+  ["dcu","2","Superman",2025,"ML","83%","7.7","90%","h","الانطلاقة السينمائية الكبرى للعالم الجديد ببطولة ديفيد كورينسويت وتقديم مجموعة من أبطال الكون."],
+  ["dcu","3","Peacemaker - Season 2",2025,"SL","94%","7.9","79%","g","يدور مباشرة بعد أحداث فيلم Superman ويكمل مسار الشخصية في العالم الجديد (8 حلقات).||يشرح كيف انتقل مسار بيس ميكر عبر الملتيفيرس (الأكوان المتعددة) ليتكامل مع عالم DCU الجديد."],
+  ["dcu","4","Supergirl: Woman of Tomorrow",2026,"ML","52%","6.5","72%","m","مغامرة فضائية ملحمية تستعرض خلفية كارا زور-إل في أرجاء الكون.||يشهد الفيلم الظهور السينمائي لشخصية صائد الجوائز الفضائي لوبو (جيسون موموا)."],
+  ["dcu","5","Lanterns",2026,"SL","92%","7.5","67%","g","تحقيق بوليسي مظلم على HBO يجمع هال جوردان وجون ستيوارت في لغز كوني على الأرض (8 حلقات)."],
+  ["dcu","6","Clayface",2026,"ML","78%","7.6","94%","h","مفاجأة أكتوبر 2026؛ فيلم إثارة نفسية ورعب جسدي نال إشادة جماهيرية كاسحة."],
+
+  ["dceu","1 (زمن القصة: 1918)","Wonder Woman",2017,"ML","93%","7.3","83%","h","البداية الزمنية لعالم DCEU خلال الحرب العالمية الأولى وقصة نشأة ديانا برينس."],
+  ["dceu","2 (زمن القصة: 1984)","Wonder Woman 1984",2020,"ML","58%","5.4","40%","l","تدور أحداثه في عام 1984؛ مستقل بحدثه ويمكن تجاوزه دون تأثير على السلسلة."],
+  ["dceu","3","Man of Steel",2013,"ML","56%","7.1","75%","h","البداية الفعلية لعصر الأبطال في الحاضر؛ عمل سينمائي ملحمي."],
+  ["dceu","4","Batman v Superman: Dawn of Justice",2016,"ML","29%","6.5","63%","g","المواجهة الكبرى التي تلي أحداث Man of Steel؛ شاهد النسخة الممتدة (Ultimate Edition - 3 ساعات) حصراً.||ينتهي الفيلم بتضحية سوبرمان ضد الوحش دومزداي، وهو ما يدفع بروس واين لتأسيس فرقة العدالة."],
+  ["dceu","5","Suicide Squad",2016,"ML","26%","5.9","58%","l","تدور أحداثه مباشرة عقب نهاية فيلم Batman v Superman؛ يقدم شخصيتي هارلي كوين وديدشوت.||تتشكل فرقة تاسك فورس إكس الحكومية استجابةً لغياب سوبرمان بعد أحداث الفيلم السابق."],
+  ["dceu","6 (النسخة المعتمدة)","Zack Snyder's Justice League",2021,"ML","72%","7.9","93%","h","نسخة المخرج الكاملة (4 ساعات)؛ ملحمة متكاملة تتفوق جذرياً على نسخة السينما لعام 2017."],
+  ["dceu","6-بديل","Justice League",2017,"ML","39%","6.1","67%","l","نسخة السينما المختصرة؛ لا يُنصح بمشاهدتها بعد توفر نسخة المخرج الكاملة."],
+  ["dceu","7","Aquaman",2018,"ML","65%","6.8","72%","g","يتبع أحداث Justice League مباشرة في مغامرة بصرية ممتعة في مملكة أتلانتس."],
+  ["dceu","8","Shazam!",2019,"ML","90%","7.0","82%","g","كوميديا عائلية خفيفة وممتعة تدور داخل نفس العالم السينمائي."],
+  ["dceu","9","Birds of Prey",2020,"ML","78%","6.1","68%","m","مغامرة حركية تركز على مسار هارلي كوين المستقل في شوارع غوثام."],
+  ["dceu","10","The Suicide Squad",2021,"ML","90%","7.2","78%","h","من أقوى أعمال العالم، ويمثل الجسر المباشر نحو عالم جيمس غان الجديد."],
+  ["dceu","11","Peacemaker",2022,"SL","94%","8.3","89%","h","يكمل مباشرة أحداث فيلم The Suicide Squad (8 حلقات)."],
+  ["dceu","12","Black Adam",2022,"ML","38%","6.2","85%","m","أكشن خالص يقدم فريق العدالة الأمريكية (JSA) في هذا العالم.||يتضمن مشهد ما بعد النهاية عودة قصيرة لسوبرمان (هنري كافيل) قبل إلغاء العالم القديم."],
+  ["dceu","13","Shazam! Fury of the Gods",2023,"ML","49%","5.9","76%","l","الجزء الثاني المكمل لمغامرة شازام وعائلته."],
+  ["dceu","14","The Flash",2023,"ML","63%","6.6","78%","g","حدث سينمائي محوري يغلق الخط الزمني لعالم سنايدر ويمهد لإعادة ضبط الكون عبر السبيد فورس (قوة السرعة).||يشهد فتح الملتيفيرس وعودة نسخة باتمان الكلاسيكية (مايكل كيتون) لتغيير مسار التاريخ."],
+  ["dceu","15","Blue Beetle",2023,"ML","78%","6.0","83%","m","بطل مستقل تماماً عن صراعات العالم القديم."],
+  ["dceu","16 (الختام)","Aquaman and the Lost Kingdom",2023,"ML","34%","5.6","79%","l","آخر فيلم صدر في عالم DCEU القديم؛ مغامرة مستقلة خفيفة."],
+
+  ["reeves","1","The Batman",2022,"ML","85%","7.8","87%","h","تحفة بوليسية مظلمة تركز على السنة الثانية لباتمان (روبرت باتينسون) كمحقق في غوثام."],
+  ["reeves","2","The Penguin",2024,"SL","95%","8.7","92%","h","مسلسل جريمة أسطوري يبدأ بعد أسبوع واحد من نهاية فيلم The Batman (8 حلقات)."],
+
+  ["nolan","1","Batman Begins",2005,"ML","85%","8.2","94%","h","بداية تدريب بروس واين وظهوره الأول في غوثام."],
+  ["nolan","2","The Dark Knight",2008,"ML","94%","9.0","94%","h","أعظم فيلم أبطال خارقين في التاريخ؛ المواجهة الخالدة مع الجوكر (هيث ليدجر)."],
+  ["nolan","3","The Dark Knight Rises",2012,"ML","87%","8.4","90%","h","الختام الملحمي للثلاثية بعد 8 سنوات من أحداث الجزء الثاني."],
+
+  ["joker","1","Joker",2019,"ML","69%","8.4","89%","h","دراما نفسية استثنائية حائزة على الأوسكار من بطولة خواكين فينيكس."],
+  ["joker","2","Joker: Folie à Deux",2024,"ML","32%","5.2","32%","l","الجزء الثاني بطابع موسيقي؛ نال تقييمات منخفضة جداً ويُنصح بالاكتفاء بالجزء الأول."],
+
+  ["burton","1","Batman (1989 film)",1989,"ML","76%","7.5","84%","g","الفيلم الكلاسيكي الشهير لتيم بيرتون ببطولة مايكل كيتون وجاك نيكلسون."],
+  ["burton","2","Batman Returns",1992,"ML","82%","7.1","73%","g","تكملة ممتازة بطابع قوطي مظلم في أجواء شتاء غوثام."],
+  ["burton","3","Batman Forever",1995,"ML","41%","5.4","32%","l","الجزء الثالث مع تغيير المخرج والبطل إلى فال كيلمر وتحول النبرة للكوميديا."],
+  ["burton","4","Batman & Robin (film)",1997,"ML","12%","3.8","16%","l","الجزء الرابع والأخير في السلسلة الكلاسيكية؛ ذو طابع هزلي ضعيف جداً."],
+
+  ["reeve","1","Superman (1978 film)",1978,"ML","94%","7.4","86%","h","العمل الكلاسيكي الخالد الذي أسس لأفلام الأبطال الخارقين الحديثة."],
+  ["reeve","2","Superman II",1980,"ML","88%","7.6","85%","h","الجزء الثاني المكمل مباشرة للأول؛ نسخة المخرج ريتشارد دونر هي الأفضل."],
+  ["reeve","3","Superman III",1983,"ML","30%","5.0","23%","l","الجزء الثالث مع غلبة الطابع الكوميدي وتراجع المستوى."],
+  ["reeve","4 (فرعي)","Supergirl (1984 film)",1984,"ML","8%","4.4","25%","l","فيلم فرعي يدور في نفس العالم الكلاسيكي."],
+  ["reeve","5","Superman IV: The Quest for Peace",1987,"ML","10%","3.7","16%","l","الجزء الرابع والأخير لكريستوفر ريف؛ تضرر كثيراً من تقليص الميزانية."],
+  ["reeve","6 (تكملة للثاني)","Superman Returns",2006,"ML","74%","6.1","60%","m","صُنع كتكملة مباشرة لأحداث الجزء الثاني مع تجاهل أحداث الثالث والرابع."],
+
+  ["arrow","1 (حجر الأساس)","Arrow",2012,"SL","86%","7.5","74%","g","حجر الأساس لعالم CW التلفزيوني (8 مواسم، 170 حلقة)؛ المواسم 1 و2 و5 ممتازة جداً."],
+  ["arrow","2","The Flash",2014,"SL","89%","7.5","70%","g","انبثق من الموسم الثاني لـ Arrow (9 مواسم، 184 حلقة)؛ أول 3 مواسم ممتازة جداً."],
+  ["arrow","3","Constantine",2014,"SL","73%","7.5","86%","g","مسلسل رعب وغموض (موسم واحد، 13 حلقة) يرتبط لاحقاً بمسلسلات العالم."],
+  ["arrow","4","Supergirl",2015,"SL","88%","6.2","53%","m","يمتد لـ 6 مواسم (126 حلقة) ويشارك بقوة في جميع حلقات التقاطع السنوية."],
+  ["arrow","5","DC's Legends of Tomorrow",2016,"SL","89%","6.8","76%","g","فريق السفر عبر الزمن بروح كوميدية ومغامرات ممتعة (7 مواسم، 110 حلقات)."],
+  ["arrow","6","Black Lightning",2018,"SL","92%","6.1","58%","m","مسلسل درامي من 4 مواسم (58 حلقة) يتقاطع مع العالم في المراحل المتقدمة."],
+  ["arrow","7","Batwoman",2019,"SL","83%","3.6","22%","l","يمتد لـ 3 مواسم (51 حلقة)؛ يُنصح بالاكتفاء بحلقات التقاطع المشتركة فقط."],
+  ["arrow","8","Stargirl",2020,"SL","94%","7.2","80%","g","عمل شبابي متقن يدور في أرض موازية مستقلة (3 مواسم، 39 حلقة)."],
+  ["arrow","9 (درة العالم)","Superman & Lois",2021,"SL","88%","7.8","85%","h","أفضل مسلسل درامي وعائلي لسوبرمان؛ يدور في أرض موازية مستقلة (4 مواسم، 53 حلقة)."],
+
+  ["titans","1","Titans",2018,"SL","85%","7.5","70%","m","تقديم مظلم وعنيف لفريق التايتنز الشباب (4 مواسم، 49 حلقة)."],
+  ["titans","2","Doom Patrol",2019,"SL","97%","7.7","80%","h","تحفة سريالية نفسية وكوميديا سوداء عميقة للبالغين (4 مواسم، 46 حلقة)."],
+
+  ["sandman","1","The Sandman",2022,"SL","88%","7.7","81%","h","فانتازيا مظلمة متقنة جداً تمتد لموسمين (2022–2025)."],
+  ["sandman","2","Dead Boy Detectives",2024,"SL","92%","7.5","84%","g","مسلسل تحقيقات خارق للطبيعة يدور في نفس عالم The Sandman (8 حلقات)."],
+
+  ["dcau","1","Batman: The Animated Series",1992,"SA","100%","9.0","96%","h","أعظم مسلسل كرتوني في تاريخ الأبطال الخارقين (85 حلقة)."],
+  ["dcau","2","Batman: Mask of the Phantasm",1993,"MA","83%","7.8","88%","h","تحفة سينمائية كرتونية خالدة تتخلل أحداث المسلسل الأول."],
+  ["dcau","3","Batman & Mr. Freeze: SubZero",1998,"MA","92%","7.2","76%","g","فيلم ممتاز يكمل مسار مستر فريز في هذا العالم."],
+  ["dcau","4","Superman: The Animated Series",1996,"SA","96%","8.1","88%","h","يؤسس لجانب ميتروبوليس والفضاء في نفس العالم الكرتوني (54 حلقة)."],
+  ["dcau","5","The New Batman Adventures",1997,"SA","100%","8.5","90%","h","الموسم المكمل لمسلسل باتمان بتصميم رسم محدّث (24 حلقة)."],
+  ["dcau","6","Batman: Mystery of the Batwoman",2003,"MA","67%","6.7","63%","m","فيلم مغامرة خفيف يدور في حقبة The New Batman Adventures."],
+  ["dcau","7","Static Shock",2000,"SA","90%","7.4","83%","g","مسلسل شبابي يتقاطع مع أبطال هذا العالم (52 حلقة)."],
+  ["dcau","8","Justice League (TV series)",2001,"SA","96%","8.6","93%","h","اتحاد الأبطال السبعة الكبار في قصص ملحمية (52 حلقة)."],
+  ["dcau","9","Justice League Unlimited",2004,"SA","100%","8.7","95%","h","توسع الفريق ليشمل عشرات الأبطال في حبكة مترابطة عميقة (39 حلقة)."],
+  ["dcau","10","Justice League vs. the Fatal Five",2019,"MA","100%","6.5","62%","m","فيلم مكمل صدر لاحقاً بنفس الرسم والأصوات الأصلية."],
+  ["dcau","11 (المستقبل 2039)","Batman Beyond",1999,"SA","100%","8.1","90%","h","ينتقل بالخط الزمني إلى مستقبل هذا العالم (عام 2039) مع جيل جديد في نيو-غوثام (52 حلقة)."],
+  ["dcau","12 (ختام المستقبل)","Batman Beyond: Return of the Joker",2000,"MA","88%","7.8","87%","h","فيلم سينمائي يمثل ذروة أحداث مستقبل Batman Beyond (شاهد نسخة Uncut)."],
+
+  ["dcamu","1","Justice League: The Flashpoint Paradox",2013,"MA","100%","8.1","93%","h","الشرارة القصصية التي أسست عالم أفلام الأنميشن المشترك بالكامل."],
+  ["dcamu","2","Justice League: War",2014,"MA","50%","7.2","76%","g","اللقاء الأول بين الأبطال وتأسيس فرقة العدالة في هذا العالم."],
+  ["dcamu","3","Son of Batman",2014,"MA","64%","6.7","65%","g","يفتتح الخط القصصي الخاص بعائلة باتمان في هذا العالم."],
+  ["dcamu","4","Justice League: Throne of Atlantis",2015,"MA","63%","6.7","66%","g","يروي قصة أكوامان ومملكة أتلانتس بالتوازي مع فرقة العدالة."],
+  ["dcamu","5","Batman vs. Robin",2015,"MA","100%","7.1","73%","h","يكمل أحداث Son of Batman في مواجهة منظمة كورت أوف أولز (محكمة البوم) السرية."],
+  ["dcamu","6","Batman: Bad Blood",2016,"MA","100%","6.8","70%","g","يوسع فريق وعائلة باتمان في مدينة غوثام."],
+  ["dcamu","7","Justice League vs. Teen Titans",2016,"MA","80%","7.0","73%","g","يقدم فريق التايتنز الشباب ويربطهم بفرقة العدالة."],
+  ["dcamu","8","Justice League Dark (film)",2017,"MA","79%","7.1","75%","h","يفتح الجانب السحري المظلم في العالم مع جون قسطنطين وزاتانا."],
+  ["dcamu","9","Teen Titans: The Judas Contract",2017,"MA","83%","7.0","75%","h","مواجهة مصيرية لفريق التايتنز ضد خصمهم الأخطر في قصة درامية شهيرة.||يقتبس القصة الكلاسيكية لاختراق وخيانة تيرا للفريق لصالح ديث ستروك."],
+  ["dcamu","10","Suicide Squad: Hell to Pay",2018,"MA","88%","7.0","75%","h","مهمة عنيفة لفرقة تاسك فورس إكس ترتبط بخيوط الفيلم الأول في السلسلة."],
+  ["dcamu","11","Constantine: City of Demons",2018,"MA","90%","7.4","84%","h","قصة رعب سوداوية عميقة ومستقلة لجون قسطنطين داخل نفس العالم."],
+  ["dcamu","12","The Death of Superman (film)",2018,"MA","93%","7.3","86%","h","ملحمة قتالية كبرى لسوبرمان وفرقة العدالة في مواجهة خطر غير مسبوق."],
+  ["dcamu","13","Reign of the Supermen (film)",2019,"MA","93%","6.8","73%","g","الفصل المكمل مباشرة لأحداث الفيلم السابق ويمهد للخطر الفضائي القادم."],
+  ["dcamu","14","Batman: Hush (film)",2019,"MA","88%","6.9","71%","g","لغز جنائي مشوق في غوثام يسبق المعركة الختامية للعالم."],
+  ["dcamu","15","Wonder Woman: Bloodlines",2019,"MA","89%","6.1","78%","m","مغامرة خاصة لووندر وومان تسبق الفصل الأخير من السلسلة."],
+  ["dcamu","16 (الختام الملحمي)","Justice League Dark: Apokolips War",2020,"MA","100%","7.7","90%","h","الملحمة الختامية الكبرى التي تجمع كافة أبطال الـ 15 فيلماً السابقة في معركة حاسمة.||تنتهي المعركة الدامية ضد دارك سايد بطلب قسطنطين من فلاش إحداث فلاش بوينت جديد لإعادة ضبط الكون."],
+  ["dcamu","17 (خاتمة وجسر)","Constantine: The House of Mystery",2022,"MA","80%","6.6","70%","g","فيلم قصير يعمل كخاتمة لعالم DCAMU وجسر مباشر نحو عالم Tomorrowverse التالي."],
+
+  ["tomorrow","1","Justice Society: World War II",2021,"MA","76%","6.4","73%","g","مغامرة في حقبة الحرب العالمية الثانية تفتتح مسارات عالم الغد."],
+  ["tomorrow","2","Superman: Man of Tomorrow",2020,"MA","93%","6.4","71%","g","الانطلاقة التأسيسية لسوبرمان في عالم الغد الكرتوني الجديد."],
+  ["tomorrow","3","Batman: The Long Halloween (film)",2021,"MA","100%","7.2","81%","h","الجزء الأول: تحقيق بوليسي ممتاز في السنوات الأولى لباتمان."],
+  ["tomorrow","4","Batman: The Long Halloween, Part Two",2021,"MA","100%","7.1","82%","h","الجزء الثاني: الفصل المكمل والحاسم للتحقيق الجنائي في غوثام.||يكشف هوية قاتل العطلات ويشهد التحول المأساوي للمدعي العام هارفي دينت إلى تو-فيس (Two-Face)."],
+  ["tomorrow","5","Green Lantern: Beware My Power",2022,"MA","56%","6.1","53%","m","يقدم الفانوس الأخضر جون ستيوارت ويوسع الجانب الفضائي للعالم."],
+  ["tomorrow","6","Legion of Super-Heroes (film)",2023,"MA","60%","5.8","52%","m","مغامرة تدريبية في القرن الـ31 تمهد للأحداث الكونية القادمة."],
+  ["tomorrow","7","Justice League: Warworld",2023,"MA","43%","5.3","36%","l","التمهيد المباشر الذي يقود في مشاهده الأخيرة إلى ثلاثية الأزمة الكبرى."],
+  ["tomorrow","8","Justice League: Crisis on Infinite Earths",2024,"MA","88%","6.3","64%","g","الجزء الأول من الثلاثية الختامية الكبرى لعوالم الأنميشن."],
+  ["tomorrow","9","Justice League: Crisis on Infinite Earths – Part Two",2024,"MA","14%","5.6","42%","m","الجزء الثاني الذي يربط خيوط العوالم الكرتونية المتعددة."],
+  ["tomorrow","10 (الختام)","Justice League: Crisis on Infinite Earths – Part Three",2024,"MA","20%","6.1","40%","g","الجزء الثالث والأخير الذي يختتم رسمياً حقبة عوالم الأنميشن المتصلة."],
+
+  ["harley","1","Harley Quinn (TV series)",2019,"SA","96%","8.4","88%","h","كوميديا سوداء جريئة وممتعة جداً للبالغين (5 مواسم، 57 حلقة)."],
+  ["harley","2","Kite Man: Hell Yeah!",2024,"SA","85%","7.2","76%","g","مسلسل فرعي كوميدي يدور في نفس العالم بعد الموسم الرابع لهارلي (10 حلقات)."],
+
+  ["early_st","منفرد (1941)","Superman (1940s cartoons)",1941,"SA","100%","8.0","90%","h","أول عمل أنميشن في تاريخ DC من استوديو Fleischer؛ تحفة فنية تاريخية (17 حلقة)."],
+  ["early_st","منفرد (1941)","Adventures of Captain Marvel",1941,"ML","90%","7.1","78%","g","أول عمل سينمائي واقعي لبطل خارق في التاريخ (شازام حالياً)."],
+  ["early_st","منفرد (1943)","Batman (serial)",1943,"ML","75%","6.4","60%","m","أول ظهور واقعي لباتمان على الشاشة في فصول سينمائية بالأبيض والأسود."],
+  ["early_st","منفرد (1948)","Superman (1948 serial)",1948,"ML","80%","6.7","68%","g","أول ظهور سينمائي واقعي لسوبرمان ببطولة كيرك ألين."],
+  ["early_st","منفرد (1951)","Superman and the Mole Men",1951,"ML","70%","5.7","52%","m","أول فيلم سينمائي طويل لسوبرمان ببطولة جورج ريفز."],
+  ["early_st","منفرد (1952)","Adventures of Superman (TV series)",1952,"SL","85%","7.5","82%","g","المسلسل التلفزيوني الكلاسيكي الشهير في الخمسينيات (6 مواسم، 104 حلقات)."],
+  ["early_st","منفرد (1966)","Batman (TV series)",1966,"SL","80%","7.5","81%","g","مسلسل آدم ويست الكلاسيكي الشهير (3 مواسم، 120 حلقة)."],
+  ["early_st","منفرد (1973)","Super Friends",1973,"SA","80%","7.3","77%","g","أشهر كرتون كلاسيكي لفرقة العدالة في السبعينيات والثمانينيات."],
+  ["early_st","منفرد (1975)","Wonder Woman (TV series)",1975,"SL","85%","7.1","80%","g","مسلسل ليندا كارتر الكلاسيكي الشهير (3 مواسم، 60 حلقة)."],
+  ["early_st","منفرد (1982)","Swamp Thing (film)",1982,"ML","62%","5.4","41%","m","فيلم رعب كلاسيكي بسيط للمخرج ويس كرافن."],
+
+  ["movie_st","منفرد","Steel (1997 film)",1997,"ML","12%","2.9","15%","l","فيلم ضعيف جداً من بطولة شاكيل أونيل."],
+  ["movie_st","منفرد","Road to Perdition",2002,"ML","82%","7.7","87%","h","تحفة سينمائية عن المافيا من بطولة توم هانكس (مقتبس من DC Paradox)."],
+  ["movie_st","منفرد","Catwoman (film)",2004,"ML","8%","3.4","18%","l","فيلم مستقل نال تقييمات منخفضة جداً."],
+  ["movie_st","منفرد","Constantine (film)",2005,"ML","46%","7.0","72%","h","فيلم رعب وغموض أيقوني محبوب جماهيرياً ببطولة كيانو ريفز."],
+  ["movie_st","منفرد","A History of Violence",2005,"ML","88%","7.4","76%","h","دراما جريمة نفسية رائعة من مطبوعات DC Vertigo."],
+  ["movie_st","منفرد","V for Vendetta (film)",2005,"ML","73%","8.2","90%","h","تحفة سياسية وفلسفية خالدة لا تفوت."],
+  ["movie_st","منفرد","Watchmen (film)",2009,"ML","65%","7.6","71%","h","عمل بصري وفلسفي عميق ومستقل من إخراج زاك سنايدر."],
+  ["movie_st","منفرد","The Losers (film)",2010,"ML","48%","6.2","55%","m","فيلم أكشن وكوميديا خفيف وممتع."],
+  ["movie_st","منفرد","Red (2010 film)",2010,"ML","72%","7.0","72%","g","أكشن وكوميديا ممتع من بطولة بروس ويليس."],
+  ["movie_st","منفرد","Jonah Hex (film)",2010,"ML","12%","4.7","20%","l","فيلم غرب أمريكي قصير ومستقل."],
+  ["movie_st","منفرد","Green Lantern (film)",2011,"ML","25%","5.5","45%","l","محاولة سينمائية مستقلة للفانوس الأخضر من بطولة رايان رينولدز."],
+
+  ["tv_st","منفرد","The Flash (1990 TV series)",1990,"SL","84%","7.1","82%","g","مسلسل كلاسيكي جميل من موسم واحد (22 حلقة)."],
+  ["tv_st","منفرد","Lois & Clark: The New Adventures of Superman",1993,"SL","81%","6.7","76%","m","يركز على الجانب الرومانسي والصحفي لكلارك ولويس (4 مواسم، 88 حلقة)."],
+  ["tv_st","منفرد","Smallville",2001,"SL","78%","7.5","80%","g","يروي شباب كلارك كينت في سمولفيل قبل ارتداء عباءة سوبرمان (10 مواسم، 217 حلقة)."],
+  ["tv_st","منفرد","Gotham (TV series)",2014,"SL","77%","7.8","78%","h","يركز على المحقق جيم غوردون ونشأة عالم الجريمة في غوثام (5 مواسم، 100 حلقة)."],
+  ["tv_st","منفرد","iZombie",2015,"SL","92%","7.8","84%","g","تحقيقات بوليسية ذكية بطابع كوميدي خفيف (5 مواسم، 71 حلقة)."],
+  ["tv_st","منفرد","Lucifer (TV series)",2016,"SL","87%","8.1","80%","h","مسلسل تحقيقات وفانتازيا ذو شعبية جماهيرية واسعة (6 مواسم، 93 حلقة)."],
+  ["tv_st","منفرد","Preacher (TV series)",2016,"SL","89%","7.9","79%","g","كوميديا سوداء ودموية جريئة من مطبوعات Vertigo (4 مواسم، 43 حلقة)."],
+  ["tv_st","منفرد","Krypton (TV series)",2018,"SL","80%","6.8","67%","m","يروي تاريخ عائلة آل-إل على كوكب كريبتون في الماضي البعيد (موسمان، 20 حلقة)."],
+  ["tv_st","منفرد","Swamp Thing (2019 TV series)",2019,"SL","92%","7.4","88%","g","مسلسل رعب وغموض متقن فنياً (موسم واحد، 10 حلقات)."],
+  ["tv_st","منفرد","Pennyworth (TV series)",2019,"SL","73%","7.8","81%","g","يستعرض شباب ألفريد كعميل سري في لندن الستينيات (3 مواسم، 30 حلقة)."],
+  ["tv_st","منفرد","Watchmen (TV series)",2019,"SL","96%","8.2","56%","h","مسلسل قصير حائز على جوائز إيمي يبني على عالم الرواية المصورة الأصلية (9 حلقات)."],
+  ["tv_st","منفرد","Sweet Tooth (TV series)",2021,"SL","93%","7.7","81%","h","قصة خيال ومغامرة عاطفية مكتملة على نتفليكس (3 مواسم، 24 حلقة)."],
+  ["tv_st","منفرد","Naomi (TV series)",2022,"SL","89%","3.9","25%","l","عمل شبابي مستقل توقف بعد موسم واحد (13 حلقة)."],
+  ["tv_st","منفرد","Gotham Knights (TV series)",2023,"SL","22%","4.8","38%","l","عمل مستقل في عالم موازٍ توقف بعد موسم واحد (13 حلقة)."],
+  ["tv_st","منفرد","Bodies (2023 TV series)",2023,"SL","82%","7.3","74%","g","لغز جريمة وتحقيقات عبر 4 أزمنة مختلفة في لندن (8 حلقات)."],
+
+  ["anim_tv_st","منفرد","Teen Titans (TV series)",2003,"SA","97%","7.9","92%","h","من أروع مسلسلات الكرتون التي جمعت الأكشن والدراما (5 مواسم، 65 حلقة)."],
+  ["anim_tv_st","منفرد","The Batman (TV series)",2004,"SA","88%","7.4","83%","g","تقديم عصري سريع الإيقاع لباتمان (5 مواسم، 65 حلقة)."],
+  ["anim_tv_st","منفرد","Batman: The Brave and the Bold",2008,"SA","95%","7.3","81%","g","يحيي العصر الفضي للكوميكس بروح مرحة (3 مواسم، 65 حلقة)."],
+  ["anim_tv_st","منفرد","Young Justice (TV series)",2010,"SA","96%","8.6","91%","h","مسلسل ناضج جداً ومعقد سياسياً ونفسياً (4 مواسم، 98 حلقة)."],
+  ["anim_tv_st","منفرد","Green Lantern: The Animated Series",2011,"SA","95%","8.0","90%","h","أفضل تقديم لعالم الفانوس الأخضر على الإطلاق (26 حلقة)."],
+  ["anim_tv_st","منفرد","Teen Titans Go!",2013,"SA","75%","5.5","50%","m","مسلسل كوميدي ساخر موجه للأطفال."],
+  ["anim_tv_st","منفرد","Justice League Action",2016,"SA","100%","7.6","84%","g","حلقات قصيرة سريعة وممتعة لكل الأعمار (52 حلقة)."],
+  ["anim_tv_st","منفرد","DC Super Hero Girls (TV series)",2019,"SA","85%","6.5","70%","m","عمل كرتوني خفيف موجه للفئة العمرية الصغيرة."],
+  ["anim_tv_st","منفرد","My Adventures with Superman",2023,"SA","98%","7.7","86%","h","إعادة تقديم شبابية رائعة لسوبرمان بطابع أنمي حركي (موسمان+)."],
+  ["anim_tv_st","منفرد","Suicide Squad Isekai",2024,"SA","62%","6.4","65%","m","أنمي ياباني ينقل فرقة الانتحار إلى عالم فانتازيا (10 حلقات)."],
+  ["anim_tv_st","منفرد","Batman: Caped Crusader",2024,"SA","95%","7.3","64%","g","الوريث الروحي لمسلسل التسعينيات في أجواء أربعينيات مظلمة (10 حلقات)."],
+  ["anim_tv_st","منفرد","Bat-Fam",2025,"SA","80%","6.9","75%","g","كوميديا عائلية كرتونية لطيفة تكمل فيلم Merry Little Batman."],
+
+  ["anim_mv_st","منفرد","Superman: Doomsday",2007,"MA","57%","7.0","70%","g","أول فيلم في سلسلة أفلام DC الكرتونية الأصلية المستقلة."],
+  ["anim_mv_st","منفرد","Justice League: The New Frontier",2008,"MA","72%","7.0","71%","g","يستعرض نشأة فرقة العدالة في حقبة الخمسينيات."],
+  ["anim_mv_st","منفرد","Batman: Gotham Knight",2008,"MA","78%","6.7","61%","g","6 قصص أنمي قصيرة لباتمان من استوديوهات يابانية."],
+  ["anim_mv_st","منفرد","Wonder Woman (2009 film)",2009,"MA","86%","7.3","80%","h","فيلم أنميشن ممتاز ألهم الفيلم الواقعي لاحقاً."],
+  ["anim_mv_st","منفرد","Green Lantern: First Flight",2009,"MA","64%","7.0","69%","g","يروي حصول هال جوردان على الخاتم وانضمامه للفيلق."],
+  ["anim_mv_st","منفرد","Superman/Batman: Public Enemies",2009,"MA","70%","7.2","76%","g","اتحاد سوبرمان وباتمان في مواجهة مؤامرة كبرى يقودها ليكس لوثر."],
+  ["anim_mv_st","منفرد","Justice League: Crisis on Two Earths",2010,"MA","75%","7.3","80%","h","مواجهة أسطورية لفرقة العدالة ضد نظرائهم في أرض موازية."],
+  ["anim_mv_st","منفرد","Batman: Under the Red Hood",2010,"MA","100%","8.1","92%","h","أعظم فيلم أنميشن منفرد لباتمان؛ صراع أخلاقي ونفسي عميق ضد حارس غامض في غوثام.||يكشف الفيلم أن شخصية ريد هود هو روبن الثاني (جايسون تود) بعد إحيائه عبر حفرة لازاروس (ينبوع البعث)."],
+  ["anim_mv_st","منفرد","Superman/Batman: Apocalypse",2010,"MA","63%","7.1","75%","g","ثنائية أكشن ممتازة لسوبرمان وباتمان في مواجهة تهديد من كوكب أبوكوليبس."],
+  ["anim_mv_st","منفرد","All-Star Superman (film)",2011,"MA","82%","6.9","70%","g","قصة إنسانية وفلسفية ملهمة عن جوهر شخصية سوبرمان."],
+  ["anim_mv_st","منفرد","Green Lantern: Emerald Knights",2011,"MA","82%","6.8","64%","g","قصص ملحمية عن تاريخ وأساطير فيلق الفانوس الأخضر."],
+  ["anim_mv_st","منفرد","Batman: Year One (film)",2011,"MA","88%","7.4","79%","h","اقتباس وفيّ جداً لأول سنة لبروس واين وجيم غوردون في غوثام."],
+  ["anim_mv_st","منفرد","Justice League: Doom",2012,"MA","100%","7.5","77%","h","إثارة عالية الوتيرة تضع أعضاء فرقة العدالة أمام خطط مضادة تستهدف نقاط ضعفهم."],
+  ["anim_mv_st","منفرد","Superman vs. The Elite",2012,"MA","80%","7.1","77%","h","من أعمق أفلام سوبرمان؛ يناقش المبادئ الأخلاقية للبطل الخارق في عالم حديث."],
+  ["anim_mv_st","منفرد","Batman: The Dark Knight Returns (film)",2012,"MA","100%","8.0","93%","h","الجزء الأول: عودة بروس واين في سن الخامسة والخمسين لإنقاذ مدينة غوثام."],
+  ["anim_mv_st","منفرد","Batman: The Dark Knight Returns – Part 2",2013,"MA","100%","8.3","95%","h","الجزء الثاني: الفصل الختامي الملحمي لرواية فرانك ميلر الخالدة."],
+  ["anim_mv_st","منفرد","Superman: Unbound",2013,"MA","86%","6.6","61%","g","مغامرة فضائية لسوبرمان في مواجهة خطر برينياك."],
+  ["anim_mv_st","منفرد","Batman: Assault on Arkham",2014,"MA","76%","7.5","85%","h","أفضل فيلم لفرقة الانتحار، وتدور أحداثه في أجواء عالم ألعاب Batman: Arkham."],
+  ["anim_mv_st","منفرد","Justice League: Gods and Monsters",2015,"MA","88%","7.0","73%","g","تخيل مبتكر لعالم موازٍ بنسخ مختلفة تماماً من الثالوث الرئيسي."],
+  ["anim_mv_st","منفرد","Batman: The Killing Joke (film)",2016,"MA","36%","6.4","47%","l","اقتباس للرواية الشهيرة لآلان مور، أضعفته مقدمة إضافية طويلة في بداية الفيلم."],
+  ["anim_mv_st","منفرد","The Lego Batman Movie",2017,"MA","89%","7.3","81%","h","تحفة كوميدية وبصرية تفهم نفسية باتمان بذكاء مذهل."],
+  ["anim_mv_st","منفرد","Batman and Harley Quinn",2017,"MA","50%","5.9","43%","l","مغامرة كوميدية خفيفة بطابع رسم التسعينيات."],
+  ["anim_mv_st","منفرد","Batman: Gotham by Gaslight",2018,"MA","73%","6.7","65%","g","تحقيق جنائي لباتمان في العصر الفيكتوري عام 1889."],
+  ["anim_mv_st","منفرد","Batman Ninja",2018,"MA","82%","5.6","40%","m","انتقال باتمان إلى اليابان الإقطاعية بأسلوب أنمي بصري صاخب."],
+  ["anim_mv_st","منفرد","Teen Titans Go! To the Movies",2018,"MA","92%","6.7","72%","g","فيلم سينمائي ساخر ومضحك جداً لجميع الأعمار."],
+  ["anim_mv_st","منفرد","Batman vs. Teenage Mutant Ninja Turtles",2019,"MA","100%","7.1","83%","h","تقاطع مفاجئ بجودته العالية بين باتمان وسلاحف النينجا."],
+  ["anim_mv_st","منفرد","Superman: Red Son (film)",2020,"MA","89%","6.4","63%","g","قصة عالم موازٍ: ماذا لو هبطت مركبة سوبرمان في الاتحاد السوفيتي؟"],
+  ["anim_mv_st","منفرد","Batman: Soul of the Dragon",2021,"MA","93%","6.1","59%","g","مغامرة فنون قتالية لباتمان في أجواء السبعينيات."],
+  ["anim_mv_st","منفرد","Injustice (2021 film)",2021,"MA","60%","6.1","56%","l","اقتباس سريع ومختصر لقصة عالم Injustice الشهير."],
+  ["anim_mv_st","منفرد","Catwoman: Hunted",2022,"MA","67%","5.5","44%","l","فيلم سرقة وأكشن مستقل لشخصية كاتوومان بأسلوب الأنمي."],
+  ["anim_mv_st","منفرد","DC League of Super-Pets",2022,"MA","72%","7.1","88%","g","فيلم سينمائي عائلي ممتع عن الحيوانات الأليفة الخارقة."],
+  ["anim_mv_st","منفرد","Batman and Superman: Battle of the Super Sons",2022,"MA","100%","6.8","81%","g","مغامرة ثلاثية الأبعاد ممتازة تجمع الجيل الجديد من أبناء الأبطال."],
+  ["anim_mv_st","منفرد","Batman: The Doom That Came to Gotham (film)",2023,"MA","75%","6.1","53%","m","غموض ورعب كوني في مدينة غوثام خلال عشرينيات القرن الماضي."],
+  ["anim_mv_st","منفرد","Merry Little Batman",2023,"MA","97%","6.5","76%","g","فيلم عائلي دافئ ومبتكر بصرياً في ليلة عيد الميلاد."],
+  ["anim_mv_st","منفرد","Watchmen: Chapter I",2024,"MA","91%","7.1","78%","g","الفصل الأول من الاقتباس الكرتوني الثلاثي الأبعاد المطابق للرواية المصورة."],
+  ["anim_mv_st","منفرد","Watchmen: Chapter II",2024,"MA","75%","7.2","80%","g","الفصل الثاني المكمل لاقتباس رواية Watchmen الكرتوني."],
+  ["anim_mv_st","منفرد","Batman Ninja vs. Yakuza League",2025,"MA","85%","6.5","72%","g","تكملة أنمي يابانية مستقلة لفيلم Batman Ninja."],
+  ["anim_mv_st","منفرد","Aztec Batman: Clash of Empires",2025,"MA","78%","6.7","74%","g","إعادة تخيل مبتكرة لأسطورة الوطواط في حضارة الأزتك التاريخية."],
+  ["anim_mv_st","منفرد","Batman: Knightfall",2026,"MA","82%","7.3","84%","h","الجزء الأول (2026): اقتباس الملحمة الشهيرة التي تضع باتمان أمام أصعب اختبار في مسيرته.||يشهد الفيلم خطة بين لتحرير سجناء أركام وإنهاك باتمان حتى كسر ظهره."],
+  ["anim_mv_st","منفرد","Batman: Knightfall – Part 2",2026,"MA","80%","7.2","82%","g","الجزء الثاني (2026): الفصل المكمل لملحمة Knightfall والصراع على حماية غوثام.||يتناول فترة تولي جان بول فالي (أزرائيل) عباءة الوطواط ورحلة تعافي بروس واين."]
+];
+
+const ARROW_CHRONO = [
+  ["المرحلة 1","انطلاقة عالم Arrowverse (السنة الأولى)",2012,"Arrow","85%","8.0","88%","h","البداية الفعلية للعالم التلفزيوني مع الموسم الأول من Arrow.",[["1️⃣ شاهد بالكامل","Arrow - Season 1","الموسم 1 كامل (الحلقات 1 إلى 23)"]]],
+  ["المرحلة 2","الموسم الثاني والتمهيد لتوسع العالم",2013,"Arrow","95%","8.8","93%","h","من أقوى مواسم السلسلة؛ الحلقتان 8 و9 تمهدان للمسلسل التالي في العالم.",[["1️⃣ شاهد بالكامل","Arrow - Season 2","الموسم 2 كامل (الحلقات 1 إلى 23)"]]],
+  ["المرحلة 3","انطلاق The Flash بالتوازي مع الموسم 3 لـ Arrow",2014,"The Flash","92%","8.6","90%","h","بداية عرض المسلسلين معاً؛ شاهد أول 7 حلقات من كل مسلسل قبل الدخول في التقاطع الأول.",[["1️⃣ أولاً","The Flash - Season 1","من الحلقة 1 إلى الحلقة 7"],["2️⃣ بالتوازي أو بعده","Arrow - Season 3","من الحلقة 1 إلى الحلقة 7"]]],
+  ["تقاطع 1","الحدث المشترك الأول: Flash vs. Arrow",2014,"The Flash","96%","8.9","92%","h","أول تقاطع رسمي من جزأين؛ ابدأ بحلقة فلاش ثم انتقل لحلقة السهم.",[["1️⃣ الجزء الأول","The Flash (S01E08)","الموسم 1 - الحلقة 8 (Flash vs. Arrow)"],["2️⃣ الجزء الثاني","Arrow (S03E08)","الموسم 3 - الحلقة 8 (The Brave and the Bold)"]]],
+  ["المرحلة 4","النصف الثاني للموسم 1 من Flash والموسم 3 من Arrow",2015,"The Flash","90%","8.4","88%","h","استكمال الحلقات حتى نهاية الموسم لكل من المسلسلين.",[["1️⃣ أولاً","The Flash - Season 1","استكمل من الحلقة 9 إلى الحلقة 23 (النهاية)"],["2️⃣ ثانياً","Arrow - Season 3","استكمل من الحلقة 9 إلى الحلقة 23 (النهاية)"]]],
+  ["المرحلة 5","موسم Constantine (الجانب السحري للعالم)",2014,"Constantine","73%","7.5","86%","g","يُشاهد في هذا الموضع الزمني لارتباط شخصيته بالمراحل والمواسم التالية.",[["1️⃣ شاهد بالكامل","Constantine - Season 1","الموسم 1 كامل (الحلقات 1 إلى 13)"]]],
+  ["المرحلة 6","النصف الأول من Flash S2 و Arrow S4",2015,"The Flash","88%","8.1","84%","g","شاهد أول 7 حلقات من كلا الموسمين قبل الدخول في التقاطع الثاني.",[["1️⃣ أولاً","The Flash - Season 2","من الحلقة 1 إلى الحلقة 7"],["2️⃣ ثانياً","Arrow - Season 4","من الحلقة 1 إلى الحلقة 7"]]],
+  ["تقاطع 2","حدث اتحاد الأبطال: Heroes Join Forces",2015,"DC's Legends of Tomorrow","85%","8.2","83%","g","تقاطع من جزأين يمهد مباشرة لانطلاق مسلسل Legends of Tomorrow.",[["1️⃣ الجزء الأول","The Flash (S02E08)","الموسم 2 - الحلقة 8 (Legends of Today)"],["2️⃣ الجزء الثاني","Arrow (S04E08)","الموسم 4 - الحلقة 8 (Legends of Yesterday)"]]],
+  ["المرحلة 7","الموسم الأول من Supergirl والتقاطع المشترك",2015,"Supergirl","92%","6.8","66%","g","انطلاق مسلسل سوبرغيرل، ويتضمن في الحلقة 18 تقاطعاً مشتركاً مع The Flash.",[["1️⃣ أولاً","Supergirl - Season 1","من الحلقة 1 إلى الحلقة 17"],["2️⃣ تقاطع خاص","Supergirl (S01E18)","الحلقة 18 (Worlds Finest - حلقة تقاطع)"],["3️⃣ الختام","Supergirl - Season 1","الحلقتان 19 و 20 (نهاية الموسم 1)"]]],
+  ["المرحلة 8","انطلاق Legends of Tomorrow وختام مواسم 2016",2016,"DC's Legends of Tomorrow","82%","7.6","79%","g","مشاهدة الموسم الأول من أساطير الغد واستكمال فلاش 2 والسهم 4.",[["1️⃣ أولاً","The Flash - Season 2","من الحلقة 9 إلى الحلقة 23 (النهاية)"],["2️⃣ ثانياً","Arrow - Season 4","من الحلقة 9 إلى الحلقة 23 (النهاية)"],["3️⃣ ثالثاً","Legends of Tomorrow - S1","الموسم 1 كامل (الحلقات 1 إلى 16)"]]],
+  ["المرحلة 9","النصف الأول لمواسم خريف 2016 (4 مسلسلات)",2016,"Arrow","90%","8.2","84%","h","الحلقات التمهيدية للمواسم الجديدة قبل الدخول في التقاطع الرباعي الكبير.",[["1️⃣ أولاً","The Flash - Season 3","من الحلقة 1 إلى الحلقة 7"],["2️⃣ ثانياً","Arrow - Season 5","من الحلقة 1 إلى الحلقة 7"],["3️⃣ ثالثاً","Supergirl - Season 2","من الحلقة 1 إلى الحلقة 7"],["4️⃣ رابعاً","Legends of Tomorrow - S2","من الحلقة 1 إلى الحلقة 6"]]],
+  ["تقاطع 3","التقاطع الرباعي الكبير: Invasion!",2016,"The Flash","94%","8.7","89%","h","حدث مشترك يربط المسلسلات الأربعة في قصة واحدة متسلسلة.",[["1️⃣ مقدمة الحدث","Supergirl (S02E08)","الموسم 2 - الحلقة 8 (نهاية الحلقة)"],["2️⃣ الفصل الأول","The Flash (S03E08)","الموسم 3 - الحلقة 8 (Invasion Part 1)"],["3️⃣ الفصل الثاني","Arrow (S05E08)","الموسم 5 - الحلقة 8 (Invasion Part 2)"],["4️⃣ الفصل الثالث","Legends of Tomorrow (S02E07)","الموسم 2 - الحلقة 7 (Invasion Part 3)"]]],
+  ["المرحلة 10","النصف الثاني لمواسم 2017 (ذروة الموسم 5 لـ Arrow)",2017,"Arrow","91%","8.4","86%","h","استكمال الحلقات حتى نهاية المواسم الأربعة (يتخللها تقاطع موسيقي في Flash S03E17).",[["1️⃣ أولاً","Supergirl S2 & Flash S3","حلقات 9–16 ثم التقاطع المشترك (Flash S03E17)"],["2️⃣ ثانياً","The Flash - Season 3","استكمل من الحلقة 18 إلى 23 (النهاية)"],["3️⃣ ثالثاً","Legends of Tomorrow - S2","استكمل من الحلقة 8 إلى 17 (النهاية)"],["4️⃣ مسك الختام","Arrow - Season 5","استكمل من الحلقة 9 إلى 23 (من أقوى نهايات السلسلة)"]]],
+  ["المرحلة 11","النصف الأول لمواسم خريف 2017",2017,"The Flash","86%","7.6","77%","g","أول 7 حلقات من كل موسم قبل الدخول في تقاطع Crisis on Earth-X.",[["1️⃣ أولاً","Supergirl - Season 3","من الحلقة 1 إلى الحلقة 7"],["2️⃣ ثانياً","Arrow - Season 6","من الحلقة 1 إلى الحلقة 7"],["3️⃣ ثالثاً","The Flash - Season 4","من الحلقة 1 إلى الحلقة 7"],["4️⃣ رابعاً","Legends of Tomorrow - S3","من الحلقة 1 إلى الحلقة 7"]]],
+  ["تقاطع 4","أفضل تقاطع في العالم: Crisis on Earth-X",2017,"Supergirl","98%","9.1","94%","h","فيلم سينمائي متكامل من 4 فصول متتالية يجمع كافة الأبطال.",[["1️⃣ الفصل الأول","Supergirl (S03E08)","الموسم 3 - الحلقة 8 (Crisis on Earth-X Part 1)"],["2️⃣ الفصل الثاني","Arrow (S06E08)","الموسم 6 - الحلقة 8 (Crisis on Earth-X Part 2)"],["3️⃣ الفصل الثالث","The Flash (S04E08)","الموسم 4 - الحلقة 8 (Crisis on Earth-X Part 3)"],["4️⃣ الفصل الرابع","Legends of Tomorrow (S03E08)","الموسم 3 - الحلقة 8 (Crisis on Earth-X Part 4)"]]],
+  ["المرحلة 12","استكمال مواسم 2018 وانطلاق Black Lightning",2018,"DC's Legends of Tomorrow","87%","7.5","76%","g","النصف الثاني لمواسم 2018 بالإضافة إلى الموسمين 1 و2 من Black Lightning.",[["1️⃣ أولاً","The Flash S4 & Arrow S6","استكمل من الحلقة 9 إلى الحلقة 23"],["2️⃣ ثانياً","Supergirl S3 & Legends S3","استكمل حتى نهاية الموسم الثالث لكل منهما"],["3️⃣ ثالثاً","Black Lightning - S1 & S2","الموسمان 1 و 2 (لارتباطه اللاحق بالأحداث)"]]],
+  ["المرحلة 13","النصف الأول لمواسم خريف 2018",2018,"Arrow","88%","7.7","78%","g","أول 8 حلقات من المواسم الجديدة قبل الدخول في تقاطع Elseworlds.",[["1️⃣ أولاً","The Flash - Season 5","من الحلقة 1 إلى الحلقة 8"],["2️⃣ ثانياً","Arrow - Season 7","من الحلقة 1 إلى الحلقة 8"],["3️⃣ ثالثاً","Supergirl - Season 4","من الحلقة 1 إلى الحلقة 8"]]],
+  ["تقاطع 5","حدث العوالم الأخرى: Elseworlds",2018,"The Flash","93%","8.5","87%","h","تقاطع ثلاثي مميز يمهد الطريق مباشرة لحدث الأزمة الكونية الكبرى.",[["1️⃣ الفصل الأول","The Flash (S05E09)","الموسم 5 - الحلقة 9 (Elseworlds Part 1)"],["2️⃣ الفصل الثاني","Arrow (S07E09)","الموسم 7 - الحلقة 9 (Elseworlds Part 2)"],["3️⃣ الفصل الثالث","Supergirl (S04E09)","الموسم 4 - الحلقة 9 (Elseworlds Part 3)"]]],
+  ["المرحلة 14","النصف الثاني لمواسم 2019",2019,"Supergirl","86%","7.4","75%","g","استكمال المواسم حتى نهايتها للتمهيد للمرحلة الفاصلة.",[["1️⃣ أولاً","The Flash S5 & Arrow S7","استكمل من الحلقة 10 إلى الحلقة 22 (النهاية)"],["2️⃣ ثانياً","Supergirl S4 & Legends S4","استكمل حتى نهاية الموسم الرابع لكل منهما"]]],
+  ["المرحلة 15","العد التنازلي للأزمة الكبرى (خريف 2019)",2019,"Arrow","92%","8.4","86%","h","الحلقات التمهيدية المباشرة التي تقود إلى تقاطع Crisis on Infinite Earths.",[["1️⃣ أولاً","Batwoman - Season 1","من الحلقة 1 إلى الحلقة 8"],["2️⃣ ثانياً","Supergirl S5 & Flash S6","من الحلقة 1 إلى الحلقة 8 لكل منهما"],["3️⃣ الأهم قصصياً","Arrow - Season 8","من الحلقة 1 إلى الحلقة 7"]]],
+  ["تقاطع 6","الحدث الأعظم: Crisis on Infinite Earths",2019,"Arrow","95%","8.8","90%","h","ملحمة من 5 فصول تربط عوالم DC التلفزيونية والسينمائية عبر التاريخ.",[["1️⃣ الفصل الأول","Supergirl (S05E09)","الموسم 5 - الحلقة 9 (Crisis Part 1)"],["2️⃣ الفصل الثاني","Batwoman (S01E09)","الموسم 1 - الحلقة 9 (Crisis Part 2)"],["3️⃣ الفصل الثالث","The Flash (S06E09)","الموسم 6 - الحلقة 9 (Crisis Part 3)"],["4️⃣ الفصل الرابع","Arrow (S08E08)","الموسم 8 - الحلقة 8 (Crisis Part 4)"],["5️⃣ الفصل الخامس","Legends of Tomorrow (S05E01)","الموسم 5 - الحلقة الخاصة (Crisis Part 5)"]]],
+  ["المرحلة 16","الختام الرسمي لمسلسل Arrow (الموسم 8)",2020,"Arrow","96%","9.0","92%","h","الحلقتان الختاميتان لمسلسل Arrow اللتان تُشاهدان مباشرة بعد انتهاء تقاطع Crisis.",[["1️⃣ قبل الأخيرة","Arrow (S08E09)","الموسم 8 - الحلقة 9"],["2️⃣ الحلقة الأخيرة","Arrow (S08E10)","الموسم 8 - الحلقة 10 والأخيرة (Series Finale)"]]],
+  ["المرحلة 17","مرحلة ما بعد الأزمة وانطلاق Stargirl",2020,"Stargirl","94%","7.2","80%","g","استكمال المواسم الجارية ومشاهدة مسلسل Stargirl.",[["1️⃣ أولاً","Flash S6 & Supergirl S5 & Legends S5","استكمل الحلقات من 10 حتى نهاية المواسم"],["2️⃣ ثانياً","Stargirl - Seasons 1 to 3","المواسم 1 إلى 3 كاملة"],["3️⃣ ثالثاً","Flash S7 & Supergirl S6 (Final)","الموسم 7 لفلاش والموسم 6 والأخير لسوبرغيرل"]]],
+  ["تقاطع 7","حدث أرماغيدون: Armageddon",2021,"The Flash","88%","7.8","80%","g","حدث تقاطع من 5 حلقات متتالية في افتتاحية الموسم الثامن من The Flash.",[["1️⃣ شاهد بالترتيب","The Flash - Season 8","من الحلقة 1 إلى الحلقة 5 (Armageddon Parts 1–5)"]]],
+  ["المرحلة 18","ختام Legends of Tomorrow وختام The Flash",2023,"The Flash","84%","7.2","74%","g","المواسم الختامية التي تغلق القصة الرئيسية لعالم Arrowverse.",[["1️⃣ أولاً","Legends of Tomorrow - S7","الموسم 7 والأخير + بقية حلقات Flash S8"],["2️⃣ الختام","The Flash - Season 9 (Final)","الموسم 9 والأخير (الحلقات 1 إلى 13)"]]],
+  ["المرحلة 19","مسك الختام: Superman & Lois (2021–2024)",2021,"Superman & Lois","88%","7.8","85%","h","أفضل ختام ممكن؛ يدور في أرض موازية مستقلة واكتمل في أواخر 2024 بنهاية تاريخية.",[["1️⃣ شاهد بالكامل","Superman & Lois (Seasons 1–4)","المواسم 1 إلى 4 كاملة (53 حلقة مكتملة القصة)"]]]
+];
+
+const REBOOT_BRIDGES = [
+  { fromTitle:"Justice League: The Flashpoint Paradox", toTitle:"Justice League: War", toUni:"dcamu", label:"⚡ جسر ريميك: إطلاق عالم DCAMU (New 52)", safeDesc:"يمثل هذا الفيلم نقطة الانطلاق الزمنية التي أسست عالم أفلام الأنميشن المتصل المكوّن من 17 فيلماً.", spoilerDesc:"ركض باري آلين عبر السبيد فورس (قوة السرعة) في نهاية Flashpoint Paradox أعاد كتابة الكون وأنشأ خط New 52 الزمني." },
+  { fromTitle:"Justice League Dark: Apokolips War", toTitle:"Superman: Man of Tomorrow", toUni:"tomorrow", label:"🔥 جسر ريميك: الانتقال من DCAMU إلى Tomorrowverse", safeDesc:"يمثل نهاية الحقبة الأولى لأفلام الأنميشن المتصلة وبداية الريميك الجديد في عالم الغد (Tomorrowverse).", spoilerDesc:"بعد دمار الأرض في المعركة الأخيرة ضد دارك سايد، طلب قسطنطين من فلاش إحداث فلاش بوينت ثاني أنهى العالم القديم وولّد عالم الغد." },
+  { fromTitle:"The Suicide Squad", toTitle:"Creature Commandos", toUni:"dcu", label:"🌌 جسر استمرارية (Soft Reboot): الانتقال لعالم جيمس غان", safeDesc:"اعتمد جيمس غان أحداث وشخصيات هذا الفيلم والموسم الأول من Peacemaker كخلفية مباشرة لبدء عالم DCU الجديد.", spoilerDesc:"مقتل ريك فلاغ الابن في الفيلم هو المحرك الدرامي المباشر لشخصية والده ريك فلاغ الأب في Creature Commandos وPeacemaker S2." },
+  { fromTitle:"The Flash", toTitle:"Superman", toUni:"dcu", label:"⚡ جسر إعادة الإطلاق السينمائي: إغلاق DCEU وبدء DCU", safeDesc:"يمثل فيلم The Flash (2023) محطة إغلاق الخط الزمني لعالم سنايدر القديم والتمهيد للانطلاقة الجديدة في Superman (2025).", spoilerDesc:"تدخل باري آلين في الماضي وتصادم الملتيفيرس (الأكوان المتعددة) في نهاية الفيلم أعاد ضبط الخط الزمني السينمائي بالكامل." },
+  { fromTitle:"Justice League: Crisis on Infinite Earths – Part Three", toTitle:"Batman: The Animated Series", toUni:"dcau", label:"🪐 جسر أزمة الأنميشن الكبرى: ربط العوالم الكرتونية", safeDesc:"تجمع ثلاثية Crisis (2024) خيوط عوالم الأنميشن الكلاسيكية والحديثة في حدث ختامي واحد.", spoilerDesc:"شهدت الثلاثية ظهور عوالم DCAU وDCAMU وTomorrowverse معاً قبل دمج الملتيفيرس في أرض كرتونية واحدة." }
+];
+
+const WORKS = RAW_WORKS.map((r,i)=>{
+  const parts = r[9].split("||");
+  return {
+    id:"w_"+(i+1), uni:r[0], order:r[1], title:r[2], year:r[3],
+    type:r[4], typeLabel:TYPE_LABELS[r[4]], rt:r[5], imdb:r[6], rtAud:r[7], tier:r[8],
+    note:parts[0].trim(),
+    spoiler:parts[1] ? parts[1].trim() : ""
+  };
+});
+
+let currentUni = "all";
+let currentView = "grid";
+let arrowMode = "chrono";
+let spoilerShield = JSON.parse(localStorage.getItem("dc_ult_shield_v1") ?? "true");
+let unlockedSpoilers = {};
+let trackerState = JSON.parse(localStorage.getItem("dc_ult_tracker_v3") || "{}");
+let epState = JSON.parse(localStorage.getItem("dc_ult_episodes_v3") || "{}");
+let posterCache = JSON.parse(localStorage.getItem("dc_ult_posters_v3") || "{}");
+let imdbIdCache = JSON.parse(localStorage.getItem("dc_ult_imdbids_v1") || "{}");
+let arEpCache = JSON.parse(localStorage.getItem("dc_ult_arep_v2") || "{}");
+const muralCache = {};
+
+// ============================================================================
+// محرك التعريب الذكي المعتمد على الفهم الدرامي لعالم DC (يحفظ الأسماء والمصطلحات مع شرحها)
+// ============================================================================
+function refineDcArabicText(rawAr) {
+  if(!rawAr) return "";
+  let s = rawAr;
+  const glossary = [
+    [/صانع السلام|حفظ السلام|بيسميكر/g, "بيس ميكر"],
+    [/المقتص|الحارس الساهر/g, "فيجيلانتي"],
+    [/الفراشات الفضائية|الفراشات/g, "الباترفلايز (كيانات الفراشات الفضائية)"],
+    [/فوق بشرية|فوق بشري|ميتاهومان|ما وراء البشر|متحول خارق/g, "ميتاهيومان (متحول خارق)"],
+    [/فرقة العمل إكس|فرقة المهمات إكس|فرقة المهمات X/g, "تاسك فورس إكس (فرقة المهمات المستحيلة)"],
+    [/قوة السرعة/g, "السبيد فورس (قوة السرعة)"],
+    [/منطقة الأشباح/g, "الفانتوم زون (منطقة الأشباح)"],
+    [/الصندوق الأم/g, "المذر بوكس (الصندوق الأم)"],
+    [/حفرة لعازر|حفرة لازاروس/g, "حفرة لازاروس (ينبوع البعث)"],
+    [/محكمة البوم/g, "كورت أوف أولز (محكمة البوم)"],
+    [/الأكوان المتعددة/g, "الملتيفيرس (الأكوان المتعددة)"],
+    [/--/g, " — "]
+  ];
+  glossary.forEach(([reg, rep])=>{ s = s.replace(reg, rep); });
+  // منع تكرار الشرح بين قوسين إذا تكررت الكلمة في نفس الجملة
+  s = s.replace(/(الباترفلايز \(كيانات الفراشات الفضائية\))(.*?)\1/g, "$1$2الباترفلايز");
+  s = s.replace(/(ميتاهيومان \(متحول خارق\))(.*?)\1/g, "$1$2ميتاهيومان");
+  return s.trim();
+}
+
+async function localizeSummaryToArabic(cacheKey, enText, targetDomId) {
+  if(!enText || enText === "لا يوجد ملخص مسجل.") return;
+  if(arEpCache[cacheKey]){
+    const el = document.getElementById(targetDomId);
+    if(el) el.textContent = arEpCache[cacheKey];
+    return;
+  }
+  let prepped = enText
+    .replace(/\bPeacemaker\b/g, "بيس ميكر")
+    .replace(/\bVigilante\b/g, "فيجيلانتي")
+    .replace(/\bHarcourt\b/g, "هاركورت")
+    .replace(/\bEconomos\b/g, "إيكونوموس")
+    .replace(/\bMurn\b/g, "مورن")
+    .replace(/\bAdebayo\b/g, "أديبايو")
+    .replace(/\bJudomaster\b/gi, "جودوماستر")
+    .replace(/\bWhite Dragon\b/gi, "وايت دراغون")
+    .replace(/\bbutterflies\b/gi, "الباترفلايز (كيانات الفراشات الفضائية)")
+    .replace(/\bbutterfly\b/gi, "باترفلاي (كيان فضائي)")
+    .replace(/\bmetahumans\b/gi, "الميتاهيومان (المتحولين الخارقين)")
+    .replace(/\bmetahuman\b/gi, "ميتاهيومان (متحول خارق)")
+    .replace(/\bTask Force X\b/gi, "تاسك فورس إكس (فرقة المهمات المستحيلة)")
+    .replace(/\bSpeed Force\b/gi, "السبيد فورس (قوة السرعة)");
+
+  try {
+    const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(prepped)}`);
+    if(r.ok){
+      const d = await r.json();
+      const rawAr = d[0].map(x=>x[0]).join("");
+      const polished = refineDcArabicText(rawAr);
+      arEpCache[cacheKey] = polished;
+      try { localStorage.setItem("dc_ult_arep_v2", JSON.stringify(arEpCache)); } catch(e){}
+      const el = document.getElementById(targetDomId);
+      if(el) el.textContent = polished;
+    }
+  } catch(e){}
+}
+
+function toggleGlobalSpoilerShield() {
+  spoilerShield = !spoilerShield;
+  localStorage.setItem("dc_ult_shield_v1", JSON.stringify(spoilerShield));
+  updateShieldButtonUI();
+  renderApp();
+}
+
+function updateShieldButtonUI() {
+  const btn = document.getElementById("btnSpoilerShield");
+  if(!btn) return;
+  btn.className = "tool-btn " + (spoilerShield ? "shield-on" : "shield-off");
+  btn.textContent = spoilerShield ? "🛡️ درع الحرق: مفعّل" : "👁️ درع الحرق: متوقف";
+}
+
+function toggleSingleSpoiler(key, el) {
+  unlockedSpoilers[key] = !unlockedSpoilers[key];
+  const vault = el.closest(".spoiler-vault");
+  if(vault){
+    vault.classList.toggle("unlocked", !!unlockedSpoilers[key]);
+    const lbl = vault.querySelector(".sp-action-lbl");
+    if(lbl) lbl.textContent = unlockedSpoilers[key] ? "إخفاء الحرق 🔼" : "اضغط للكشف 👁️";
+  }
+}
+
+function renderSpoilerVaultHTML(key, spoilerText, isWatchedItem) {
+  if(!spoilerText) return "";
+  const isOpen = (!spoilerShield) || isWatchedItem || !!unlockedSpoilers[key];
+  return `
+    <div class="spoiler-vault ${isOpen?'unlocked':''}">
+      <button class="spoiler-trigger-bar" onclick="toggleSingleSpoiler('${key}',this)">
+        <span>${isWatchedItem ? '✅ سر الارتباط القصصي (مفتوح لأنك شاهدت العمل)' : '🔒 سر الارتباط القصصي العميق (يحتوي على حرق)'}</span>
+        <span class="sp-action-lbl">${isOpen ? 'إخفاء الحرق 🔼' : 'اضغط للكشف 👁️'}</span>
+      </button>
+      <div class="spoiler-secret-body">${spoilerText}</div>
+    </div>
+  `;
+}
+
+async function openDirectImdb(titleKey, year, typeCode) {
+  const cleanTitle = titleKey.replace(/\((19|20)\d\d.*?\)|\(film\)|\(TV series\)|\(serial\)/gi,"").replace(/- Season \d+/i,"").trim();
+  if(imdbIdCache[cleanTitle]){
+    window.open(`https://www.imdb.com/title/${imdbIdCache[cleanTitle]}/`, "_blank");
+    return;
+  }
+  const win = window.open("about:blank", "_blank");
+  try {
+    if(typeCode==="SL" || typeCode==="SA"){
+      const r = await fetch(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(cleanTitle)}`);
+      if(r.ok){
+        const d = await r.json();
+        if(d && d.externals && d.externals.imdb){
+          imdbIdCache[cleanTitle] = d.externals.imdb;
+          localStorage.setItem("dc_ult_imdbids_v1", JSON.stringify(imdbIdCache));
+          win.location.href = `https://www.imdb.com/title/${d.externals.imdb}/`;
+          return;
+        }
+      }
+    }
+    const q = `${cleanTitle} ${year||""} DC`;
+    const mw = await fetch(`https://en.wikipedia.org/w/api.php?action=query&origin=*&generator=search&gsrsearch=${encodeURIComponent(q)}&gsrlimit=1&prop=pageprops&ppprop=wikibase_item&format=json`);
+    if(mw.ok){
+      const mwd = await mw.json();
+      const pages = mwd.query && mwd.query.pages ? Object.values(mwd.query.pages) : [];
+      const qid = pages[0] && pages[0].pageprops && pages[0].pageprops.wikibase_item;
+      if(qid){
+        const wd = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${qid}&property=P345&origin=*&format=json`);
+        if(wd.ok){
+          const wdd = await wd.json();
+          const claims = wdd.claims && wdd.claims.P345;
+          const tt = claims && claims[0] && claims[0].mainsnak && claims[0].mainsnak.datavalue && claims[0].mainsnak.datavalue.value;
+          if(tt){
+            imdbIdCache[cleanTitle] = tt;
+            localStorage.setItem("dc_ult_imdbids_v1", JSON.stringify(imdbIdCache));
+            win.location.href = `https://www.imdb.com/title/${tt}/`;
+            return;
+          }
+        }
+      }
+    }
+  } catch(e){}
+  win.location.href = `https://www.imdb.com/find/?s=tt&q=${encodeURIComponent(cleanTitle + " " + (year||""))}`;
+}
+
+function getUniverseMural(uObj) {
+  if(muralCache[uObj.id]) return muralCache[uObj.id];
+  const c = document.createElement("canvas");
+  c.width = 900; c.height = 500;
+  const ctx = c.getContext("2d");
+  const g = ctx.createLinearGradient(0,0,900,500);
+  g.addColorStop(0, "#03060e"); g.addColorStop(0.5, uObj.color + "44"); g.addColorStop(1, "#040814");
+  ctx.fillStyle = g; ctx.fillRect(0,0,900,500);
+  ctx.save();
+  ctx.strokeStyle = uObj.color + "55"; ctx.fillStyle = uObj.color + "22"; ctx.lineWidth = 3;
+  const m = uObj.motif;
+  if(m==="gotham_rain" || m==="dark_knight" || m==="gotham_gothic" || m==="gotham_sky"){
+    const bgGlow = ctx.createRadialGradient(680,130,10,680,130,140);
+    bgGlow.addColorStop(0, uObj.color + "99"); bgGlow.addColorStop(1, "transparent");
+    ctx.fillStyle = bgGlow; ctx.beginPath(); ctx.arc(680,130,140,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = "#050811cc";
+    [40,120,210,310,430,520,640,760,830].forEach((x,idx)=>{ const h = 140 + (idx*47)%180; ctx.fillRect(x, 500-h, 68, h); });
+  } else if(m==="metropolis" || m==="fortress" || m==="golden_age"){
+    const sun = ctx.createRadialGradient(450,250,20,450,250,380);
+    sun.addColorStop(0, uObj.color + "88"); sun.addColorStop(1, "transparent");
+    ctx.fillStyle = sun; ctx.fillRect(0,0,900,500);
+  } else {
+    for(let r=60;r<=380;r+=55){ ctx.beginPath(); ctx.arc(450,250,r,0,Math.PI*2); ctx.stroke(); }
+  }
+  ctx.restore();
+  muralCache[uObj.id] = c.toDataURL("image/jpeg", 0.82);
+  return muralCache[uObj.id];
+}
+
+function makeFallbackPoster(title, year, colorHex, typeLabel) {
+  const c = document.createElement("canvas");
+  c.width = 240; c.height = 350;
+  const ctx = c.getContext("2d");
+  const grad = ctx.createLinearGradient(0,0,240,350);
+  grad.addColorStop(0, "#090f1d"); grad.addColorStop(0.55, colorHex || "#1e3a8a"); grad.addColorStop(1, "#04070e");
+  ctx.fillStyle = grad; ctx.fillRect(0,0,240,350);
+  ctx.strokeStyle = "rgba(255,255,255,0.24)"; ctx.lineWidth = 4; ctx.strokeRect(10,10,220,330);
+  ctx.fillStyle = "rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.arc(120,110,48,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "#ffffff"; ctx.font = "900 30px Cairo, sans-serif"; ctx.textAlign = "center"; ctx.fillText("DC", 120, 122);
+  ctx.font = "700 13px Cairo, sans-serif"; ctx.fillStyle = "#93c5fd"; ctx.fillText((typeLabel||"DC") + (year ? " • " + year : ""), 120, 185);
+  ctx.fillStyle = "#ffffff"; ctx.font = "800 15px Cairo, sans-serif";
+  const clean = title.replace(/\(.*?\)/g,"").trim();
+  const words = clean.split(" ");
+  let line = "", y = 225;
+  for(let i=0;i<words.length;i++){
+    const test = line + words[i] + " ";
+    if(ctx.measureText(test).width > 195 && i > 0){
+      ctx.fillText(line.trim(), 120, y); line = words[i] + " "; y += 22;
+      if(y > 315) break;
+    } else line = test;
+  }
+  ctx.fillText(line.trim(), 120, y);
+  return c.toDataURL("image/jpeg", 0.85);
+}
+
+const posterObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const img = entry.target;
+      posterObserver.unobserve(img);
+      resolvePosterUrl(img.dataset.qkey, img.dataset.qyear, img.dataset.qtype, img);
+    }
+  });
+},{ rootMargin:"350px" });
+
+async function resolvePosterUrl(rawTitle, year, typeCode, imgEl) {
+  if(!rawTitle) return;
+  if(posterCache[rawTitle]){
+    imgEl.src = posterCache[rawTitle];
+    update3DPosterIfLoaded(rawTitle, posterCache[rawTitle]);
+    return;
+  }
+  const cleanTitle = rawTitle.replace(/\(.*?\)/g,"").replace(/- Season \d+/i,"").split("–")[0].trim();
+  try {
+    if(typeCode==="SL" || typeCode==="SA"){
+      const tvRes = await fetch(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(cleanTitle)}`);
+      if(tvRes.ok){
+        const tvData = await tvRes.json();
+        if(tvData && tvData.externals && tvData.externals.imdb){
+          imdbIdCache[cleanTitle] = tvData.externals.imdb;
+          localStorage.setItem("dc_ult_imdbids_v1", JSON.stringify(imdbIdCache));
+        }
+        if(tvData && tvData.image && (tvData.image.original || tvData.image.medium)){
+          savePosterToCache(rawTitle, (tvData.image.original || tvData.image.medium).replace("http:","https:"), imgEl);
+          return;
+        }
+      }
+    }
+    const wikiDirectRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(rawTitle.replace(/ /g,"_"))}`);
+    if(wikiDirectRes.ok){
+      const wd = await wikiDirectRes.json();
+      if(wd && wd.thumbnail && wd.thumbnail.source){
+        savePosterToCache(rawTitle, wd.thumbnail.source, imgEl);
+        return;
+      }
+    }
+    const searchQ = `${cleanTitle} ${year||""} DC ${(typeCode==="ML"||typeCode==="MA")?"film":"television"}`;
+    const mwUrl = `https://en.wikipedia.org/w/api.php?action=query&origin=*&generator=search&gsrsearch=${encodeURIComponent(searchQ)}&gsrlimit=2&prop=pageimages&piprop=thumbnail|original&pithumbsize=500&format=json`;
+    const mwRes = await fetch(mwUrl);
+    if(mwRes.ok){
+      const mwData = await mwRes.json();
+      if(mwData && mwData.query && mwData.query.pages){
+        for(const p of Object.values(mwData.query.pages)){
+          if(p.thumbnail && p.thumbnail.source){
+            savePosterToCache(rawTitle, p.thumbnail.source, imgEl);
+            return;
+          }
+        }
+      }
+    }
+  } catch(e){}
+}
+
+function savePosterToCache(key, url, imgEl) {
+  posterCache[key] = url;
+  try { localStorage.setItem("dc_ult_posters_v3", JSON.stringify(posterCache)); } catch(e){}
+  if(imgEl) imgEl.src = url;
+  document.querySelectorAll(`img[data-qkey="${CSS.escape(key)}"]`).forEach(el=>{ el.src = url; });
+  update3DPosterIfLoaded(key, url);
+}
+
+function handlePosterTilt(e, wrap) {
+  const rect = wrap.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  const x = (cx - rect.left) / rect.width, y = (cy - rect.top) / rect.height;
+  wrap.style.transform = `perspective(500px) rotateX(${(0.5-y)*22}deg) rotateY(${(x-0.5)*22}deg) scale(1.04)`;
+}
+function resetPosterTilt(wrap) {
+  wrap.style.transform = "perspective(500px) rotateX(0deg) rotateY(0deg) scale(1)";
+}
+
+function getVerdict(tier) {
+  if(tier==="h") return { txt:"🔥 أسطوري / إجباري", cls:"v-h" };
+  if(tier==="g") return { txt:"👍 يستحق المشاهدة", cls:"v-g" };
+  if(tier==="m") return { txt:"⚖️ متوسط", cls:"v-m" };
+  return { txt:"⚠️ ضعيف / تجاوز", cls:"v-l" };
+}
+
+function setStatus(id, st) {
+  if(trackerState[id] === st) delete trackerState[id];
+  else trackerState[id] = st;
+  localStorage.setItem("dc_ult_tracker_v3", JSON.stringify(trackerState));
+  renderApp();
+  if(is3DReady && !isOrreryGalaxyMode) buildFocusedUniverseRing(active3DUniId, active3DNodeIndex);
+}
+
+function updateDashboard() {
+  const total = WORKS.length;
+  let watched = 0, hours = 0;
+  WORKS.forEach(w=>{
+    if(trackerState[w.id]==="watched"){ watched++; hours += (w.type==="SL" || w.type==="SA") ? 18 : 2.2; }
+  });
+  const epCount = Object.keys(epState).filter(k=>epState[k]).length;
+  hours += Math.round(epCount * 0.7);
+  const pct = total ? Math.round((watched/total)*100) : 0;
+  document.getElementById("stWatched").textContent = `${watched} / ${total}`;
+  document.getElementById("stEpisodes").textContent = epCount;
+  document.getElementById("stHours").textContent = Math.round(hours) + "h";
+  document.getElementById("stPct").innerHTML = `الإنجاز: <bdi>${pct}%</bdi>`;
+  document.getElementById("stBar").style.width = pct + "%";
+}
+
+function initUniPills() {
+  document.getElementById("uniPills").innerHTML = UNIVERSES.map(u=>
+    `<button class="uni-pill ${u.id===currentUni?'active':''}" onclick="selectAndJumpUni('${u.id}')"><bdi>${u.num}</bdi> • ${u.name}</button>`
+  ).join("");
+}
+
+function selectAndJumpUni(id) {
+  if(id === "all"){
+    currentUni = "all"; initUniPills(); renderApp(); window.scrollTo({ top:0, behavior:"smooth" }); return;
+  }
+  const targetSec = document.getElementById((currentView==="timeline"?"tl_sec_":"uni_sec_") + id);
+  if(currentUni === "all" && targetSec){
+    const uObj = UNIVERSES.find(x=>x.id===id);
+    if(uObj) applyUniverseTheme(uObj);
+    targetSec.scrollIntoView({ behavior:"smooth", block:"start" });
+  } else {
+    currentUni = id;
+    const uObj = UNIVERSES.find(x=>x.id===id) || UNIVERSES[0];
+    applyUniverseTheme(uObj); initUniPills(); renderApp(); window.scrollTo({ top:0, behavior:"smooth" });
+  }
+}
+
+let activeThemeUniId = "all";
+function applyUniverseTheme(u) {
+  if(!u) return;
+  activeThemeUniId = u.id;
+  document.documentElement.style.setProperty("--uni-accent", u.color);
+  document.documentElement.style.setProperty("--bg-glow-1", u.g1);
+  document.documentElement.style.setProperty("--bg-glow-2", u.g2);
+  document.getElementById("ambientLabel").innerHTML = `🌌 <bdi>${u.num}</bdi>: <strong>${u.name}</strong>`;
+  const muralUrl = getUniverseMural(u);
+  document.getElementById("ambientMural").style.backgroundImage = `url('${muralUrl}')`;
+  const leadWork = WORKS.find(w=>w.uni===u.id && posterCache[w.title]);
+  document.getElementById("ambientArt").style.backgroundImage = `url('${leadWork ? posterCache[leadWork.title] : muralUrl}')`;
+}
+
+function stepUniverse(dir) {
+  const realUnis = UNIVERSES.filter(u=>u.id!=="all");
+  let idx = realUnis.findIndex(u=>u.id===activeThemeUniId);
+  idx = idx === -1 ? 0 : (idx + dir + realUnis.length) % realUnis.length;
+  selectAndJumpUni(realUnis[idx].id);
+}
+
+const sectionThemeObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(ent=>{
+    if(ent.isIntersecting){
+      const uObj = UNIVERSES.find(x=>x.id===ent.target.dataset.uni);
+      if(uObj) applyUniverseTheme(uObj);
+    }
+  });
+},{ threshold:0.15 });
+
+function jumpToTimeline(itemId) {
+  setView("timeline", document.getElementById("btnViewTl"));
+  setTimeout(()=>{
+    let target = document.getElementById("tl_node_" + itemId);
+    if(!target){ currentUni="all"; document.getElementById("qInput").value=""; initUniPills(); renderApp(); target=document.getElementById("tl_node_"+itemId); }
+    if(target){ target.scrollIntoView({ behavior:"smooth", block:"center" }); target.classList.remove("jump-highlight"); void target.offsetWidth; target.classList.add("jump-highlight"); }
+  }, 90);
+}
+
+function jumpToCard(itemId) {
+  setView("grid", document.getElementById("btnViewGrid"));
+  setTimeout(()=>{
+    let target = document.getElementById("card_node_" + itemId);
+    if(!target){ currentUni="all"; document.getElementById("qInput").value=""; initUniPills(); renderApp(); target=document.getElementById("card_node_"+itemId); }
+    if(target){ target.scrollIntoView({ behavior:"smooth", block:"center" }); target.classList.remove("jump-highlight"); void target.offsetWidth; target.classList.add("jump-highlight"); }
+  }, 90);
+}
+
+function getFiltered() {
+  const q = document.getElementById("qInput").value.trim().toLowerCase();
+  const mF = document.getElementById("fMode").value;
+  const tF = document.getElementById("fType").value;
+  const sF = document.getElementById("fStatus").value;
+  const vF = document.getElementById("fTier").value;
+  return WORKS.filter(w=>{
+    const u = UNIVERSES.find(x=>x.id===w.uni);
+    if(currentUni!=="all" && w.uni!==currentUni) return false;
+    if(mF==="serial" && !u.serial) return false;
+    if(mF==="single" && u.serial) return false;
+    if(tF!=="all" && w.type!==tF) return false;
+    if(vF!=="all" && w.tier!==vF) return false;
+    const st = trackerState[w.id] || "unwatched";
+    if(sF!=="all" && st!==sF) return false;
+    if(q && !w.title.toLowerCase().includes(q) && !w.note.toLowerCase().includes(q) && !String(w.year).includes(q)) return false;
+    return true;
+  });
+}
+
+function buildWorkCard(w, uObj) {
+  const st = trackerState[w.id] || "";
+  const isWatched = (st === "watched");
+  const vd = getVerdict(w.tier);
+  const isSeries = (w.type==="SL" || w.type==="SA");
+  const dispTitle = w.title.replace(/\((19|20)\d\d.*?\)|\(film\)|\(TV series\)|\(serial\)/gi,"").trim();
+  const fallbackSrc = posterCache[w.title] || makeFallbackPoster(dispTitle, w.year, uObj.color, w.typeLabel);
+  const rtUrl = `https://www.rottentomatoes.com/search?search=${encodeURIComponent(dispTitle)}`;
+
+  return `
+    <div class="work-card ${isWatched?'watched':''}" id="card_node_${w.id}" style="--sec-color:${uObj.color}">
+      <div>
+        <div class="card-hero">
+          <div class="poster-wrap"
+               onmousemove="handlePosterTilt(event,this)"
+               ontouchmove="handlePosterTilt(event,this)"
+               onmouseleave="resetPosterTilt(this)"
+               ontouchend="resetPosterTilt(this)"
+               onclick="openWorkDrawer('${w.id}')">
+            <img class="poster-img" data-qkey="${w.title}" data-qyear="${w.year}" data-qtype="${w.type}" src="${fallbackSrc}" alt="${dispTitle}" loading="lazy" />
+            <div class="poster-glare"></div>
+            <div class="poster-hint">${isSeries ? '📺 الحلقات' : '🔍 التفاصيل'}</div>
+          </div>
+          <div class="card-info">
+            <div>
+              <div class="card-badges">
+                <span class="ord-chip">${uObj.serial ? 'الترتيب: <bdi>'+w.order+'</bdi>' : w.order}</span>
+                <span class="verdict-chip ${vd.cls}">${vd.txt}</span>
+              </div>
+              <div class="work-title-en"><bdi>${dispTitle}</bdi></div>
+              <div class="work-sub">
+                <span>📅 <bdi>${w.year}</bdi></span> • <span>🎬 ${w.typeLabel}</span> • <span>${uObj.serial ? '🔗 متسلسل' : '💎 منفرد'}</span>
+              </div>
+            </div>
+            <div class="card-quick-links">
+              <button class="ep-btn" onclick="openWorkDrawer('${w.id}')">${isSeries ? '📂 المواسم والحلقات' : '🎞️ معلومات وبوستر'}</button>
+              <button class="tl-jump-btn" onclick="jumpToTimeline('${w.id}')">⏳ موقعه بالخط الزمني</button>
+            </div>
+          </div>
+        </div>
+        <div class="work-desc">${w.note}</div>
+        ${renderSpoilerVaultHTML("sp_"+w.id, w.spoiler, isWatched)}
+      </div>
+      <div>
+        <div class="source-ratings">
+          <a class="rate-link" href="${rtUrl}" target="_blank" rel="noopener"><span class="rate-val" style="color:#34d399;">🍅 ${w.rt} ↗</span><span class="rate-lbl">نقاد RT</span></a>
+          <div class="rate-link" onclick="openDirectImdb('${w.title.replace(/'/g,"\\'")}',${w.year},'${w.type}')"><span class="rate-val" style="color:#fbbf24;">⭐ ${w.imdb}/10 ↗</span><span class="rate-lbl">صفحة IMDb</span></div>
+          <a class="rate-link" href="${rtUrl}" target="_blank" rel="noopener"><span class="rate-val" style="color:#60a5fa;">🍿 ${w.rtAud} ↗</span><span class="rate-lbl">جمهور RT</span></a>
+        </div>
+        <div class="card-footer">
+          <button class="act-btn ${st==='watched'?'st-watched':''}" onclick="setStatus('${w.id}','watched')">✓ شاهدته</button>
+          <button class="act-btn ${st==='watching'?'st-watching':''}" onclick="setStatus('${w.id}','watching')">▶ أشاهده</button>
+          <button class="act-btn ${st==='watchlist'?'st-watchlist':''}" onclick="setStatus('${w.id}','watchlist')">+ قائمتي</button>
+          <button class="act-btn ${st==='skipped'?'st-skipped':''}" onclick="setStatus('${w.id}','skipped')">✕ تجاوز</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderWatchStepsBox(stepsArr) {
+  return `
+    <div class="watch-steps-box">
+      <div class="watch-steps-hdr">📋 خطوات المشاهدة المرتبة (من الأعلى للأسفل — بدون حرق):</div>
+      ${stepsArr.map(s=>`
+        <div class="watch-step-row">
+          <span class="step-order-lbl">${s[0]}:</span>
+          <span class="step-show-ltr"><bdi>${s[1]}</bdi></span>
+          <span class="step-ep-ar">${s[2]}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function toggleArrowMode(m) { arrowMode = m; renderApp(); }
+
+function renderApp() {
+  updateDashboard();
+  updateShieldButtonUI();
+  const filtered = getFiltered();
+  const gridEl = document.getElementById("gridView");
+  const unis = UNIVERSES.filter(u=>u.id!=="all" && (currentUni==="all" || u.id===currentUni));
+
+  gridEl.innerHTML = unis.map(u=>{
+    const uWorks = filtered.filter(w=>w.uni===u.id);
+    if(!uWorks.length) return "";
+    const muralUrl = getUniverseMural(u);
+    let innerContent = "", extraBar = "";
+
+    if(u.id==="arrow"){
+      extraBar = `
+        <div class="submode-bar">
+          <span style="font-size:0.74rem;color:#6ee7b7;font-weight:900;">⚡ ترتيب مشاهدة عالم <bdi>Arrowverse</bdi> (مرتب بخطوات عربية واضحة وخالٍ من الحرق):</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="uni-pill ${arrowMode==='chrono'?'active':''}" onclick="toggleArrowMode('chrono')">⏳ خطوات المشاهدة الزمنية للمواسم والتقاطعات (26 مرحلة)</button>
+            <button class="uni-pill ${arrowMode==='series'?'active':''}" onclick="toggleArrowMode('series')">📺 عرض المسلسلات الـ 9 مجمعة</button>
+          </div>
+        </div>
+      `;
+    }
+
+    if(u.id==="arrow" && arrowMode==="chrono"){
+      innerContent = `<div class="cards-grid">` + ARROW_CHRONO.map((c,idx)=>{
+        const cId = "arr_c_"+idx;
+        const st = trackerState[cId] || "";
+        const vd = getVerdict(c[7]);
+        const parentShow = c[3];
+        const fb = posterCache[parentShow] || makeFallbackPoster(parentShow, c[2], u.color, "موسم/تقاطع");
+        return `
+          <div class="work-card ${st==='watched'?'watched':''}" id="card_node_${cId}" style="--sec-color:${u.color}">
+            <div>
+              <div class="card-hero">
+                <div class="poster-wrap" onclick="openCustomSeriesDrawer('${parentShow}','${c[1]}')">
+                  <img class="poster-img" data-qkey="${parentShow}" data-qyear="${c[2]}" data-qtype="SL" src="${fb}" alt="${c[1]}" loading="lazy" />
+                  <div class="poster-hint">📺 الحلقات</div>
+                </div>
+                <div class="card-info">
+                  <div>
+                    <div class="card-badges">
+                      <span class="ord-chip">${c[0]}</span>
+                      <span class="verdict-chip ${vd.cls}">${vd.txt}</span>
+                    </div>
+                    <div class="work-title-ar">${c[1]}</div>
+                    <div class="work-sub"><span>📅 <bdi>${c[2]}</bdi></span> • <span>🔗 مسار <bdi>Arrowverse</bdi></span></div>
+                  </div>
+                  <div class="card-quick-links">
+                    <button class="ep-btn" onclick="openCustomSeriesDrawer('${parentShow}','${c[1]}')">📂 الحلقات</button>
+                    <button class="tl-jump-btn" onclick="jumpToTimeline('${cId}')">⏳ بالخط الزمني</button>
+                  </div>
+                </div>
+              </div>
+              ${renderWatchStepsBox(c[9])}
+              <div class="work-desc">${c[8]}</div>
+            </div>
+            <div>
+              <div class="source-ratings">
+                <a class="rate-link" href="https://www.rottentomatoes.com/search?search=${encodeURIComponent(parentShow)}" target="_blank"><span class="rate-val" style="color:#34d399;">🍅 ${c[4]} ↗</span><span class="rate-lbl">نقاد RT</span></a>
+                <div class="rate-link" onclick="openDirectImdb('${parentShow.replace(/'/g,"\\'")}',${c[2]},'SL')"><span class="rate-val" style="color:#fbbf24;">⭐ ${c[5]}/10 ↗</span><span class="rate-lbl">صفحة IMDb</span></div>
+                <a class="rate-link" href="https://www.rottentomatoes.com/search?search=${encodeURIComponent(parentShow)}" target="_blank"><span class="rate-val" style="color:#60a5fa;">🍿 ${c[6]} ↗</span><span class="rate-lbl">جمهور RT</span></a>
+              </div>
+              <div class="card-footer">
+                <button class="act-btn ${st==='watched'?'st-watched':''}" onclick="setStatus('${cId}','watched')">✓ شاهدته</button>
+                <button class="act-btn ${st==='watching'?'st-watching':''}" onclick="setStatus('${cId}','watching')">▶ أشاهده</button>
+                <button class="act-btn ${st==='watchlist'?'st-watchlist':''}" onclick="setStatus('${cId}','watchlist')">+ قائمتي</button>
+                <button class="act-btn ${st==='skipped'?'st-skipped':''}" onclick="setStatus('${cId}','skipped')">✕ تجاوز</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("") + `</div>`;
+    } else {
+      innerContent = `<div class="cards-grid">${uWorks.map(w=>buildWorkCard(w,u)).join("")}</div>`;
+    }
+
+    return `
+      <section class="uni-block" id="uni_sec_${u.id}" data-uni="${u.id}" style="--sec-color:${u.color}">
+        <div class="uni-banner">
+          <div class="uni-banner-bg" style="background-image:url('${muralUrl}')"></div>
+          <div class="uni-banner-title">
+            <span class="uni-num-badge">${u.num}</span>
+            <span>${u.name}</span>
+            ${u.en ? `<span class="ltr-iso" style="font-size:0.78rem;color:#93c5fd;">(${u.en})</span>` : ''}
+          </div>
+          <span class="uni-tag ${u.serial?'tag-serial':'tag-single'}">${u.mode}</span>
+          <div class="uni-banner-desc">${u.desc}</div>
+          ${extraBar}
+        </div>
+        ${innerContent}
+      </section>
+    `;
+  }).join("") || `<p style="text-align:center;padding:40px;color:var(--text-muted);">لا توجد أعمال مطابقة لخيارات الفلترة الحالية.</p>`;
+
+  const tlEl = document.getElementById("timelineView");
+  tlEl.innerHTML = unis.map(u=>{
+    const uWorks = filtered.filter(w=>w.uni===u.id);
+    if(!uWorks.length) return "";
+    const muralUrl = getUniverseMural(u);
+    let nodesHtml = "";
+
+    if(u.id==="arrow" && arrowMode==="chrono"){
+      nodesHtml = ARROW_CHRONO.map((c,idx)=>{
+        const cId = "arr_c_"+idx;
+        const parentShow = c[3];
+        const fb = posterCache[parentShow] || makeFallbackPoster(parentShow, c[2], u.color, "موسم");
+        const prevTxt = idx > 0 ? ARROW_CHRONO[idx-1][0] : "بداية العالم";
+        const nextTxt = idx < ARROW_CHRONO.length-1 ? ARROW_CHRONO[idx+1][0] : "نهاية العالم";
+        return `
+          <div class="tl-node" id="tl_node_${cId}" style="--sec-color:${u.color}">
+            <img class="tl-thumb poster-img" data-qkey="${parentShow}" data-qyear="${c[2]}" data-qtype="SL" src="${fb}" onclick="openCustomSeriesDrawer('${parentShow}','${c[1]}')" />
+            <div style="flex:1;min-width:210px;">
+              <div class="tl-nav-pills">
+                <span class="uni-num-badge">${c[0]}</span>
+                <span class="tl-pill-tag">قبله: ${prevTxt}</span>
+                <span class="tl-pill-tag" style="color:#6ee7b7;">بعده: ${nextTxt}</span>
+              </div>
+              <div class="work-title-ar" style="margin-bottom:6px;">${c[1]} <bdi>(${c[2]})</bdi></div>
+              ${renderWatchStepsBox(c[9])}
+              <div style="font-size:0.72rem;color:#cbd5e1;margin-top:4px;">${c[8]}</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <span class="ltr-iso" style="font-size:0.76rem;font-weight:800;color:#fbbf24;">⭐ ${c[5]}</span>
+              <button class="ep-btn" onclick="openCustomSeriesDrawer('${parentShow}','${c[1]}')">📺 الحلقات</button>
+              <button class="tl-jump-btn" onclick="jumpToCard('${cId}')">🎬 عرض بالبطاقات</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    } else {
+      nodesHtml = uWorks.map((w,idx)=>{
+        const isWatched = (trackerState[w.id] === "watched");
+        const dispTitle = w.title.replace(/\((19|20)\d\d.*?\)|\(film\)|\(TV series\)|\(serial\)/gi,"").trim();
+        const fb = posterCache[w.title] || makeFallbackPoster(dispTitle, w.year, u.color, w.typeLabel);
+        const prevW = idx > 0 ? uWorks[idx-1].title.replace(/\(.*?\)/g,"") : null;
+        const nextW = (u.serial && idx < uWorks.length-1) ? uWorks[idx+1].title.replace(/\(.*?\)/g,"") : null;
+        return `
+          <div class="tl-node" id="tl_node_${w.id}" style="--sec-color:${u.color}">
+            <img class="tl-thumb poster-img" data-qkey="${w.title}" data-qyear="${w.year}" data-qtype="${w.type}" src="${fb}" onclick="openWorkDrawer('${w.id}')" />
+            <div style="flex:1;min-width:210px;">
+              <div class="tl-nav-pills">
+                <span class="uni-num-badge">الترتيب: <bdi>${w.order}</bdi></span>
+                ${prevW ? `<span class="tl-pill-tag">قبله: <bdi>${prevW}</bdi></span>` : `<span class="tl-pill-tag">${u.serial?'بداية القصة':'عمل منفرد'}</span>`}
+                ${nextW ? `<span class="tl-pill-tag" style="color:#93c5fd;">بعده: <bdi>${nextW}</bdi></span>` : ''}
+              </div>
+              <div class="work-title-en" style="font-size:0.95rem;color:#fff;margin:3px 0;"><bdi>${dispTitle} (${w.year})</bdi></div>
+              <div style="font-size:0.73rem;color:#cbd5e1;margin-bottom:6px;">${w.note}</div>
+              ${renderSpoilerVaultHTML("tl_sp_"+w.id, w.spoiler, isWatched)}
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <span class="ltr-iso" style="font-size:0.75rem;font-weight:800;color:#fbbf24;">⭐ ${w.imdb}</span>
+              <span class="ltr-iso" style="font-size:0.75rem;font-weight:800;color:#34d399;">🍅 ${w.rt}</span>
+              <button class="ep-btn" onclick="openWorkDrawer('${w.id}')">📂 التفاصيل</button>
+              <button class="tl-jump-btn" onclick="jumpToCard('${w.id}')">🎬 البطاقة</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    return `
+      <section class="tl-era-section" id="tl_sec_${u.id}" data-uni="${u.id}" style="--sec-color:${u.color}">
+        <div class="uni-banner">
+          <div class="uni-banner-bg" style="background-image:url('${muralUrl}')"></div>
+          <div class="uni-banner-title">
+            <span class="uni-num-badge">${u.num}</span>
+            <span>⏳ الخط الزمني: ${u.name}</span>
+          </div>
+          <span class="uni-tag ${u.serial?'tag-serial':'tag-single'}">${u.mode}</span>
+          <div class="uni-banner-desc">${u.desc}</div>
+        </div>
+        ${nodesHtml}
+      </section>
+    `;
+  }).join("");
+
+  document.querySelectorAll(".poster-img[data-qkey]").forEach(img=>posterObserver.observe(img));
+  document.querySelectorAll(".uni-block, .tl-era-section").forEach(sec=>sectionThemeObserver.observe(sec));
+}
+
+function openRadarModal() {
+  document.getElementById("drwBadge").textContent = "🧭 رادار التنقل الفوري بدون سحب الشاشة";
+  document.getElementById("drwTitle").textContent = "اختر أي عالم أو ابحث للقفز إليه فوراً";
+  document.getElementById("drawerBackdrop").classList.add("open");
+  const realUnis = UNIVERSES.filter(u=>u.id!=="all");
+  document.getElementById("drwBody").innerHTML = `
+    <input type="text" class="inp-search" placeholder="🔎 اكتب اسم أي عمل للقفز المباشر لبطاقته أو موقعه بالخط الزمني..." oninput="filterRadarWorks(this.value)" style="width:100%;flex:none;margin-bottom:6px;" />
+    <div id="radarQuickWorks" style="display:none;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;padding-bottom:8px;border-bottom:1px solid var(--card-border);"></div>
+    <div style="font-size:0.75rem;color:#93c5fd;font-weight:800;">🪐 القفز المباشر لأقسام العوالم والريميكات (19 قسماً):</div>
+    <div class="radar-grid">
+      ${realUnis.map(u=>{
+        const uWorks = WORKS.filter(w=>w.uni===u.id);
+        const done = uWorks.filter(w=>trackerState[w.id]==="watched").length;
+        return `
+          <div class="radar-item" style="--r-col:${u.color}" onclick="closeDrawer();selectAndJumpUni('${u.id}')">
+            <div style="font-size:0.78rem;font-weight:900;color:#fff;"><bdi>${u.num}</bdi> • ${u.name}</div>
+            <div style="font-size:0.64rem;color:var(--text-muted);margin-top:3px;display:flex;justify-content:space-between;">
+              <span>${u.mode}</span>
+              <span class="ltr-iso" style="color:#34d399;font-weight:800;">✓ ${done}/${uWorks.length}</span>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function filterRadarWorks(q) {
+  const box = document.getElementById("radarQuickWorks");
+  q = q.trim().toLowerCase();
+  if(!q){ box.style.display="none"; return; }
+  const hits = WORKS.filter(w=>w.title.toLowerCase().includes(q) || w.note.toLowerCase().includes(q) || String(w.year).includes(q)).slice(0,12);
+  box.style.display = "flex";
+  box.innerHTML = hits.map(w=>{
+    const u = UNIVERSES.find(x=>x.id===w.uni);
+    return `
+      <div style="background:rgba(15,23,42,0.95);border:1px solid var(--card-border);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+        <div>
+          <div class="ltr-iso" style="font-size:0.8rem;font-weight:800;color:#fff;">${w.title.replace(/\(.*?\)/g,"")} (${w.year})</div>
+          <div style="font-size:0.64rem;color:${u.color};">${u.name} • الترتيب: <bdi>${w.order}</bdi></div>
+        </div>
+        <div style="display:flex;gap:5px;">
+          <button class="ep-btn" onclick="closeDrawer();jumpToCard('${w.id}')">🎬 البطاقة</button>
+          <button class="tl-jump-btn" onclick="closeDrawer();jumpToTimeline('${w.id}')">⏳ بالخط الزمني</button>
+        </div>
+      </div>
+    `;
+  }).join("") || `<div style="font-size:0.72rem;color:var(--text-muted);">لا يوجد عمل مطابق.</div>`;
+}
+
+let activeShowEpisodes = [], activeShowKey = "";
+
+async function openWorkDrawer(wId) {
+  const w = WORKS.find(x=>x.id===wId);
+  if(!w) return;
+  const u = UNIVERSES.find(x=>x.id===w.uni);
+  const isWatched = (trackerState[w.id] === "watched");
+  const dispTitle = w.title.replace(/\((19|20)\d\d.*?\)|\(film\)|\(TV series\)|\(serial\)/gi,"").trim();
+  document.getElementById("drwBadge").innerHTML = `<bdi>${u.num}</bdi> • ${u.name} • الترتيب: <bdi>${w.order}</bdi>`;
+  document.getElementById("drwTitle").textContent = `${dispTitle} (${w.year})`;
+  const body = document.getElementById("drwBody");
+  document.getElementById("drawerBackdrop").classList.add("open");
+
+  const posterSrc = posterCache[w.title] || makeFallbackPoster(dispTitle, w.year, u.color, w.typeLabel);
+  const rtUrl = `https://www.rottentomatoes.com/search?search=${encodeURIComponent(dispTitle)}`;
+
+  if(w.type==="ML" || w.type==="MA"){
+    body.innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
+        <img src="${posterSrc}" style="width:175px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);box-shadow:0 10px 30px rgba(0,0,0,0.7);" />
+        <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:0.82rem;color:#cbd5e1;line-height:1.6;background:rgba(255,255,255,0.04);padding:12px;border-radius:10px;">${w.note}</div>
+          ${renderSpoilerVaultHTML("drw_sp_"+w.id, w.spoiler, isWatched)}
+          <div class="source-ratings" style="padding:0;">
+            <a class="rate-link" href="${rtUrl}" target="_blank"><span class="rate-val" style="color:#34d399;">🍅 ${w.rt} ↗</span><span class="rate-lbl">Rotten Tomatoes</span></a>
+            <div class="rate-link" onclick="openDirectImdb('${w.title.replace(/'/g,"\\'")}',${w.year},'${w.type}')"><span class="rate-val" style="color:#fbbf24;">⭐ ${w.imdb}/10 ↗</span><span class="rate-lbl">صفحة IMDb المباشرة</span></div>
+            <a class="rate-link" href="${rtUrl}" target="_blank"><span class="rate-val" style="color:#60a5fa;">🍿 ${w.rtAud} ↗</span><span class="rate-lbl">تقييم الجمهور</span></a>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="tool-btn highlight" onclick="setStatus('${w.id}','watched');closeDrawer();">✓ تحديد كـ (تمت المشاهدة)</button>
+            <button class="tool-btn" onclick="closeDrawer();jumpToTimeline('${w.id}')">⏳ موقعه في الخط الزمني</button>
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  await fetchAndRenderSeriesEpisodes(dispTitle, w.note, posterSrc);
+}
+
+async function openCustomSeriesDrawer(cleanQuery, fullLabel) {
+  document.getElementById("drwBadge").textContent = "عالم Arrowverse • الترتيب الزمني للمواسم والتقاطعات";
+  document.getElementById("drwTitle").textContent = fullLabel;
+  document.getElementById("drawerBackdrop").classList.add("open");
+  const fb = posterCache[cleanQuery] || makeFallbackPoster(cleanQuery, "", "#14b8a6", "مسلسل");
+  await fetchAndRenderSeriesEpisodes(cleanQuery, fullLabel, fb);
+}
+
+async function fetchAndRenderSeriesEpisodes(queryName, noteText, fallbackPoster) {
+  const body = document.getElementById("drwBody");
+  body.innerHTML = `<div style="text-align:center;padding:35px;color:#93c5fd;font-weight:800;">⏳ جاري جلب المواسم والحلقات وتعريب الملخصات...</div>`;
+  try {
+    const res = await fetch(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(queryName)}&embed=episodes`);
+    if(!res.ok) throw new Error("Not found");
+    const show = await res.json();
+    const episodes = (show._embedded && show._embedded.episodes) ? show._embedded.episodes : [];
+    activeShowEpisodes = episodes;
+    activeShowKey = "sh_" + show.id;
+    const seasons = [...new Set(episodes.map(e=>e.season))];
+    const mainImg = (show.image && (show.image.original || show.image.medium)) ? (show.image.original || show.image.medium).replace("http:","https:") : fallbackPoster;
+    const summaryClean = (show.summary || "").replace(/<[^>]+>/g,"");
+
+    const directImdbUrl = (show.externals && show.externals.imdb)
+      ? `https://www.imdb.com/title/${show.externals.imdb}/`
+      : `https://www.imdb.com/find/?s=tt&q=${encodeURIComponent(show.name)}`;
+    const directTvMazeUrl = show.url || `https://www.tvmaze.com/search?q=${encodeURIComponent(show.name)}`;
+    const showCacheKey = `${activeShowKey}_main`;
+
+    body.innerHTML = `
+      <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;flex-shrink:0;">
+        <img src="${mainImg}" style="width:110px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);" />
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:0.75rem;color:#60a5fa;font-weight:800;margin-bottom:5px;">
+            📺 عدد المواسم: <bdi>${seasons.length}</bdi> • إجمالي الحلقات: <bdi>${episodes.length}</bdi> حلقة • التقييم: <bdi>⭐ ${show.rating && show.rating.average ? show.rating.average : '8.0'}/10</bdi>
+          </div>
+          <div style="font-size:0.74rem;color:#6ee7b7;font-weight:700;margin-bottom:5px;">${noteText}</div>
+          ${summaryClean ? `<div id="showSumAr" style="font-size:0.71rem;color:#e2e8f0;line-height:1.55;direction:rtl;text-align:right;background:rgba(0,0,0,0.28);padding:7px 10px;border-radius:7px;border-right:2px solid #10b981;">${arEpCache[showCacheKey] || '⏳ جاري تعريب نبذة المسلسل...'}</div>` : ''}
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+            <a class="uni-pill active" href="${directImdbUrl}" target="_blank" rel="noopener" style="text-decoration:none;">🔗 صفحة <bdi>IMDb</bdi> المباشرة ↗</a>
+            <a class="uni-pill" href="${directTvMazeUrl}" target="_blank" rel="noopener" style="text-decoration:none;">🌐 صفحة <bdi>TVMaze</bdi> ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="season-tabs" id="seasonTabs">
+        ${seasons.map((s,idx)=>`<button class="season-tab ${idx===0?'active':''}" onclick="renderSeasonEps(${s},this)">الموسم <bdi>${s}</bdi> (<bdi>${episodes.filter(e=>e.season===s).length}</bdi> حلقة)</button>`).join("")}
+      </div>
+      <div class="ep-list" id="epListContainer"></div>
+    `;
+    if(summaryClean) localizeSummaryToArabic(showCacheKey, summaryClean, "showSumAr");
+    if(seasons.length > 0) renderSeasonEps(seasons[0]);
+  } catch(err){
+    body.innerHTML = `<div style="padding:20px;background:rgba(255,255,255,0.04);border-radius:12px;font-size:0.8rem;color:#cbd5e1;">${noteText}</div>`;
+  }
+}
+
+function unblurEpSummary(epKey) {
+  unlockedSpoilers["ep_"+epKey] = true;
+  const sumEl = document.getElementById("sum_"+epKey);
+  const ovEl = document.getElementById("ov_"+epKey);
+  if(sumEl) sumEl.classList.remove("blurred");
+  if(ovEl) ovEl.style.display = "none";
+}
+
+function renderSeasonEps(seasonNum, btnEl) {
+  if(btnEl){
+    document.querySelectorAll(".season-tab").forEach(b=>b.classList.remove("active"));
+    btnEl.classList.add("active");
+  }
+  const eps = activeShowEpisodes.filter(e=>e.season===seasonNum);
+  const container = document.getElementById("epListContainer");
+  if(!container) return;
+
+  container.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:6px;">
+      <span style="font-size:0.72rem;color:#6ee7b7;font-weight:800;">🌍 النبذات معرّبة مع حفظ مصطلحات العالم • 🛡️ محمية بدرع الحرق</span>
+      <button class="uni-pill" onclick="markWholeSeason(${seasonNum})">✓ تحديد الموسم <bdi>${seasonNum}</bdi> بالكامل كـ(مشاهد)</button>
+    </div>
+  ` + eps.map(ep=>{
+    const epKey = `${activeShowKey}_S${ep.season}E${ep.number}`;
+    const isDone = !!epState[epKey];
+    const shouldBlur = spoilerShield && !isDone && !unlockedSpoilers["ep_"+epKey];
+    const thumb = (ep.image && (ep.image.medium || ep.image.original)) ? (ep.image.medium || ep.image.original).replace("http:","https:") : makeFallbackPoster(`S${ep.season}:E${ep.number}`, ep.airdate||"", "#1e3a8a", "حلقة");
+    const rate = (ep.rating && ep.rating.average) ? `⭐ ${ep.rating.average}/10` : "⭐ 7.8/10";
+    const rawEnSum = (ep.summary || "").replace(/<[^>]+>/g,"").trim();
+    const initialArText = arEpCache[epKey] || (rawEnSum ? "⏳ جاري التعريب الدرامي للنبذة..." : "حلقة ضمن مسار الموسم (لا يوجد ملخص نصي مسجل).");
+
+    return `
+      <div class="ep-card ${isDone?'ep-watched':''}" id="card_${epKey}">
+        <img class="ep-thumb" src="${thumb}" alt="${ep.name}" loading="lazy" />
+        <div class="ep-info">
+          <div class="ep-title"><bdi>S${String(ep.season).padStart(2,'0')}E${String(ep.number).padStart(2,'0')} - ${ep.name}</bdi></div>
+          <div class="ep-meta">
+            <span class="ltr-iso" style="color:#fbbf24;font-weight:800;">${rate}</span>
+            <span>📅 <bdi>${ep.airdate || 'غير محدد'}</bdi></span>
+            <span>⏱️ <bdi>${ep.runtime || 42}</bdi> د</span>
+          </div>
+          <div class="ep-sum-wrap">
+            <div class="ep-sum ${shouldBlur?'blurred':''}" id="sum_${epKey}">${initialArText}</div>
+            ${shouldBlur ? `<div class="ep-spoiler-overlay" id="ov_${epKey}" onclick="unblurEpSummary('${epKey}')">🔒 ملخص الحلقة محمي من الحرق — اضغط للقراءة بالعربية 👁️</div>` : ''}
+          </div>
+        </div>
+        <button class="ep-check ${isDone?'done':''}" onclick="toggleEpisode('${epKey}',this)">${isDone?'✓ شاهدتها':'+ شاهدت'}</button>
+      </div>
+    `;
+  }).join("");
+
+  eps.forEach(ep=>{
+    const epKey = `${activeShowKey}_S${ep.season}E${ep.number}`;
+    const rawEnSum = (ep.summary || "").replace(/<[^>]+>/g,"").trim();
+    if(rawEnSum) localizeSummaryToArabic(epKey, rawEnSum, "sum_"+epKey);
+  });
+}
+
+function toggleEpisode(epKey, btn) {
+  if(epState[epKey]) delete epState[epKey];
+  else {
+    epState[epKey] = true;
+    unblurEpSummary(epKey);
+  }
+  localStorage.setItem("dc_ult_episodes_v3", JSON.stringify(epState));
+  const card = document.getElementById("card_"+epKey);
+  if(card) card.classList.toggle("ep-watched", !!epState[epKey]);
+  btn.classList.toggle("done", !!epState[epKey]);
+  btn.textContent = epState[epKey] ? "✓ شاهدتها" : "+ شاهدت";
+  updateDashboard();
+}
+
+function markWholeSeason(seasonNum) {
+  activeShowEpisodes.filter(e=>e.season===seasonNum).forEach(ep=>{ epState[`${activeShowKey}_S${ep.season}E${ep.number}`] = true; });
+  localStorage.setItem("dc_ult_episodes_v3", JSON.stringify(epState));
+  renderSeasonEps(seasonNum);
+  updateDashboard();
+}
+
+function closeDrawer() { document.getElementById("drawerBackdrop").classList.remove("open"); }
+
+function suggestNextWatch() {
+  const unwatched = WORKS.filter(w=>trackerState[w.id]!=="watched" && trackerState[w.id]!=="skipped" && w.tier==="h");
+  openWorkDrawer((unwatched[0] || WORKS[0]).id);
+}
+
+function openBackupModal() {
+  document.getElementById("drwBadge").textContent = "إدارة البيانات والنسخ الاحتياطي";
+  document.getElementById("drwTitle").textContent = "حفظ واسترجاع سجل المشاهدة";
+  document.getElementById("drawerBackdrop").classList.add("open");
+  const payload = btoa(unescape(encodeURIComponent(JSON.stringify({ trackerState, epState }))));
+  document.getElementById("drwBody").innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <p style="font-size:0.78rem;color:#cbd5e1;">انسخ كود الحفظ التالي للاحتفاظ بتقدمك، أو الصق كوداً سابقاً لاسترجاع كافة الأفلام والحلقات:</p>
+      <textarea id="backupTxt" style="width:100%;height:110px;background:#060913;color:#34d399;border:1px solid var(--card-border);border-radius:10px;padding:10px;font-size:0.7rem;direction:ltr;">${payload}</textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="tool-btn highlight" onclick="navigator.clipboard.writeText(document.getElementById('backupTxt').value);this.textContent='✅ تم النسخ!';">📋 نسخ كود التقدم</button>
+        <button class="tool-btn" onclick="restoreBackup()">📥 استيراد الكود</button>
+      </div>
+    </div>
+  `;
+}
+
+function restoreBackup() {
+  try {
+    const raw = JSON.parse(decodeURIComponent(escape(atob(document.getElementById("backupTxt").value.trim()))));
+    if(raw.trackerState) trackerState = raw.trackerState;
+    if(raw.epState) epState = raw.epState;
+    localStorage.setItem("dc_ult_tracker_v3", JSON.stringify(trackerState));
+    localStorage.setItem("dc_ult_episodes_v3", JSON.stringify(epState));
+    closeDrawer(); renderApp();
+  } catch(e){ alert("الكود غير صالح"); }
+}
+
+function setView(v, btn) {
+  currentView = v;
+  document.querySelectorAll(".mode-btn").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  document.getElementById("gridView").style.display = v==="grid" ? "block" : "none";
+  document.getElementById("timelineView").style.display = v==="timeline" ? "block" : "none";
+  document.getElementById("threeView").style.display = v==="3d" ? "block" : "none";
+  document.getElementById("floatingDock").style.display = v==="3d" ? "none" : "flex";
+  if(v==="3d"){ init3DGraph(); resize3D(); }
+}
+
+function toggle3DGuide(show) {
+  document.getElementById("cosmicGuideModal").classList.toggle("open", show);
+}
+
+// إخفاء أو إظهار البطاقة السفلية في طور الـ 3D للحصول على رؤية صافية
+function toggleHudVisibility(show) {
+  const card = document.getElementById("cosmicHudCard");
+  const pill = document.getElementById("btnShowHudPill");
+  if(card) card.classList.toggle("hud-hidden", !show);
+  if(pill) pill.style.display = show ? "none" : "inline-block";
+}
+
+// ============================================================================
+// محرك الـ 3D الحقيقي: مجسمات ثلاثية الأبعاد + دوران عجلة المدار 360° + 3 ألعاب تفاعلية
+// ============================================================================
+let scene, camera, renderer, raycaster, mouse, stageGroup, carouselRingGroup, starSystem, corePlanetMesh, coreRingMesh, is3DReady = false;
+let interactiveMeshes = [], animatedRings = [], burstParticles = [], meteors = [], laserBeams = [];
+let active3DUniId = "dcu", active3DNodeIndex = 0, tourIndex = -1;
+let isOrreryGalaxyMode = false;
+let ringRotationGoal = 0, ringRotationCurrent = 0, ringAngleStep = 0.5;
+let camSphericalGoal = { r:23, phi:1.36, theta:0 }, camSphericalCurrent = { r:23, phi:1.36, theta:0 };
+let isDrag3D = false, dragMoved = false, prevPtr = {x:0,y:0}, pinchD = 0;
+let activePortalBridge = null;
+
+// متغيرات الألعاب التفاعلية الثلاث داخل الفضاء
+let arcadeMode = 0; // 0=off, 1=Green Lantern Meteor Defense, 2=Batman Detective Quiz, 3=Flash Chrono Sprint
+let arcadeScore = 0, quizTargetWorkId = null, sprintSequence = [], sprintStep = 0;
+
+function make3DBillboardTexture(w, uObj, isWatched, posterImgObj) {
+  const c = document.createElement("canvas");
+  c.width = 512; c.height = 320;
+  const ctx = c.getContext("2d");
+  const bgG = ctx.createLinearGradient(0,0,512,320);
+  bgG.addColorStop(0, isWatched ? "#052e16" : "#070d1c");
+  bgG.addColorStop(1, "#0f172a");
+  ctx.fillStyle = bgG; ctx.fillRect(0,0,512,320);
+  ctx.strokeStyle = isWatched ? "#10b981" : uObj.color;
+  ctx.lineWidth = 10; ctx.strokeRect(5,5,502,310);
+
+  ctx.fillStyle = isWatched ? "#10b981" : uObj.color;
+  ctx.fillRect(0,0,512,52);
+  ctx.fillStyle = "#ffffff"; ctx.font = "900 19px Cairo, sans-serif"; ctx.textAlign = "center";
+  ctx.fillText(`${uObj.name} • الترتيب: ${w.order}`, 256, 34);
+
+  if(posterImgObj){
+    try { ctx.drawImage(posterImgObj, 16, 66, 155, 234); } catch(e){}
+  } else {
+    ctx.fillStyle = uObj.color + "33"; ctx.fillRect(16,66,155,234);
+    ctx.fillStyle = "#fff"; ctx.font = "900 38px Cairo, sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("DC", 93, 195);
+  }
+
+  ctx.fillStyle = "#ffffff"; ctx.font = "900 25px Cairo, sans-serif"; ctx.textAlign = "right";
+  const disp = w.title.replace(/\((19|20)\d\d.*?\)|\(film\)|\(TV series\)/gi,"").trim();
+  const words = disp.split(" ");
+  let line = "", y = 105;
+  for(let i=0;i<words.length;i++){
+    const t = line + words[i] + " ";
+    if(ctx.measureText(t).width > 300 && i>0){
+      ctx.fillText(line.trim(), 492, y); line = words[i]+" "; y += 34;
+      if(y > 205) break;
+    } else line = t;
+  }
+  ctx.fillText(line.trim(), 492, y);
+
+  ctx.fillStyle = "#fbbf24"; ctx.font = "900 22px Cairo, sans-serif";
+  ctx.fillText(`⭐ IMDb: ${w.imdb}   🍅 RT: ${w.rt}`, 492, 255);
+  ctx.fillStyle = "#93c5fd"; ctx.font = "700 18px Cairo, sans-serif";
+  ctx.fillText(`📅 ${w.year} • ${w.typeLabel}`, 492, 290);
+  return new THREE.CanvasTexture(c);
+}
+
+function makePlanetLabelTexture(uObj, count) {
+  const c = document.createElement("canvas");
+  c.width = 512; c.height = 140;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "rgba(6, 11, 24, 0.9)";
+  ctx.fillRect(0,0,512,140);
+  ctx.strokeStyle = uObj.color; ctx.lineWidth = 8; ctx.strokeRect(4,4,504,132);
+  ctx.fillStyle = "#ffffff"; ctx.font = "900 26px Cairo, sans-serif"; ctx.textAlign = "center";
+  ctx.fillText(uObj.name, 256, 58);
+  ctx.fillStyle = "#93c5fd"; ctx.font = "800 20px Cairo, sans-serif";
+  ctx.fillText(`🪐 ${count} أعمال • المس الكوكب للدخول`, 256, 105);
+  return new THREE.CanvasTexture(c);
+}
+
+function makeStarGlowTexture() {
+  const c = document.createElement("canvas");
+  c.width = 64; c.height = 64;
+  const ctx = c.getContext("2d");
+  const g = ctx.createRadialGradient(32,32,2,32,32,32);
+  g.addColorStop(0, "rgba(255,255,255,1)");
+  g.addColorStop(0.35, "rgba(147,197,253,0.65)");
+  g.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = g; ctx.fillRect(0,0,64,64);
+  return new THREE.CanvasTexture(c);
+}
+
+function spawnCosmicBurst(pos, colorHex) {
+  if(!scene) return;
+  const count = 45;
+  const geo = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  const velocities = [];
+  for(let i=0;i<count;i++){
+    positions[i*3] = pos.x; positions[i*3+1] = pos.y; positions[i*3+2] = pos.z;
+    velocities.push(new THREE.Vector3((Math.random()-0.5)*0.7, (Math.random()-0.5)*0.7, (Math.random()-0.5)*0.7));
+  }
+  geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({ size:1.1, color:colorHex||0xfbbf24, map:makeStarGlowTexture(), transparent:true, blending:THREE.AdditiveBlending, depthWrite:false });
+  const pts = new THREE.Points(geo, mat);
+  scene.add(pts);
+  burstParticles.push({ mesh:pts, vels:velocities, life:1.0 });
+}
+
+function fireLanternBeam(targetPos, colorHex) {
+  if(!scene || !corePlanetMesh) return;
+  const pts = [new THREE.Vector3(0,0,0), targetPos.clone()];
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat = new THREE.LineBasicMaterial({ color:colorHex||0x10b981, linewidth:4, transparent:true, opacity:1 });
+  const beam = new THREE.Line(geo, mat);
+  scene.add(beam);
+  laserBeams.push({ mesh:beam, life:1.0 });
+}
+
+function clearStageGroup() {
+  if(!stageGroup) return;
+  while(stageGroup.children.length > 0){ stageGroup.remove(stageGroup.children[0]); }
+  interactiveMeshes = [];
+  animatedRings = [];
+  meteors = [];
+  corePlanetMesh = null;
+  coreRingMesh = null;
+  carouselRingGroup = null;
+}
+
+// بناء مجسم المدار الثلاثي الأبعاد الحقيقي حول الكوكب (360° 3D Physical Carousel)
+function buildFocusedUniverseRing(uniId, startIdx = 0) {
+  isOrreryGalaxyMode = false;
+  active3DUniId = uniId;
+  clearStageGroup();
+
+  const u = UNIVERSES.find(x=>x.id===uniId) || UNIVERSES[1];
+  const uWorks = WORKS.filter(w=>w.uni===u.id);
+  active3DNodeIndex = Math.min(Math.max(0, startIdx), Math.max(0, uWorks.length-1));
+
+  document.getElementById("btnToggleOrrery").textContent = "🌌 مجرة الكواكب الـ14";
+  document.getElementById("cosmicModeTitle").innerHTML = `🪐 مدار: ${u.name} <bdi>(${uWorks.length} أعمال)</bdi>`;
+  document.getElementById("cosmicModeSub").textContent = "اسحب يميناً أو يساراً لتدوير المدار ثلاثي الأبعاد حول الكوكب • واسحب للأعلى أو الأسفل للالتفاف 360° حول المجسم";
+  document.getElementById("cosmicCockpit").style.display = "flex";
+
+  document.querySelectorAll("#cosmicUniBar .uni-pill").forEach(b=>b.classList.remove("active"));
+  const activeBtn = document.getElementById("c_pill_" + uniId);
+  if(activeBtn) activeBtn.classList.add("active");
+
+  // 1. الكوكب المركزي الثلاثي الأبعاد في مركز المدار (0,0,0)
+  const planetGeo = new THREE.SphereGeometry(3.2, 36, 36);
+  const planetMat = new THREE.MeshStandardMaterial({ color:u.hex, emissive:u.hex, emissiveIntensity:0.32, roughness:0.35, metalness:0.65 });
+  corePlanetMesh = new THREE.Mesh(planetGeo, planetMat);
+  stageGroup.add(corePlanetMesh);
+
+  // الغلاف الجوي الشبكي للكوكب
+  const atmoMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(3.45, 20, 20),
+    new THREE.MeshBasicMaterial({ color:u.hex, wireframe:true, transparent:true, opacity:0.22 })
+  );
+  corePlanetMesh.add(atmoMesh);
+
+  coreRingMesh = new THREE.Mesh(
+    new THREE.TorusGeometry(5.2, 0.08, 16, 80),
+    new THREE.MeshBasicMaterial({ color:u.hex, wireframe:true, transparent:true, opacity:0.55 })
+  );
+  coreRingMesh.rotation.x = Math.PI / 2;
+  stageGroup.add(coreRingMesh);
+
+  // 2. مجموعة عجلة البطاقات ثلاثية الأبعاد التي تدور حول الكوكب (3D Carousel Group)
+  carouselRingGroup = new THREE.Group();
+  stageGroup.add(carouselRingGroup);
+
+  const count = Math.max(uWorks.length, 1);
+  ringAngleStep = (Math.PI * 2) / count;
+  const radius = Math.max(10.5, count * 1.15);
+
+  // مسار الأنبوب الدائري الذي يربط البطاقات حول الكوكب
+  const orbitRing = new THREE.Mesh(
+    new THREE.TorusGeometry(radius, 0.06, 12, 96),
+    new THREE.MeshBasicMaterial({ color:u.hex, transparent:true, opacity:0.65 })
+  );
+  orbitRing.rotation.x = Math.PI / 2;
+  orbitRing.position.y = -1.6;
+  carouselRingGroup.add(orbitRing);
+
+  uWorks.forEach((w, idx)=>{
+    const angle = idx * ringAngleStep;
+    const x = Math.sin(angle) * radius;
+    const z = Math.cos(angle) * radius;
+    const y = Math.sin(idx * 0.8) * 0.35;
+
+    const tex = make3DBillboardTexture(w, u, trackerState[w.id]==="watched", null);
+    const sideMat = new THREE.MeshStandardMaterial({ color:u.hex, roughness:0.3, metalness:0.7 });
+    const faceMat = new THREE.MeshBasicMaterial({ map:tex });
+    // مجسم صندوقي ثلاثي الأبعاد حقيقي بـ 6 أوجه (وليس ورقة مسطحة 2D)
+    const boxGeo = new THREE.BoxGeometry(4.6, 2.9, 0.22);
+    const mesh = new THREE.Mesh(boxGeo, [sideMat, sideMat, sideMat, sideMat, faceMat, faceMat]);
+    mesh.position.set(x, y, z);
+    mesh.rotation.y = angle; // يتجه للخارج من الكوكب كمدار ثلاثي الأبعاد حقيقي
+    mesh.userData = { type:"workCard", work:w, uni:u, idxInUni:idx, baseAngle:angle };
+    carouselRingGroup.add(mesh);
+    interactiveMeshes.push(mesh);
+
+    const br = REBOOT_BRIDGES.find(b=>b.fromTitle===w.title);
+    if(br){
+      mesh.userData.rebootBridge = br;
+      const portalRing = new THREE.Mesh(
+        new THREE.TorusGeometry(2.1, 0.12, 14, 42),
+        new THREE.MeshBasicMaterial({ color:0xfbbf24, wireframe:true })
+      );
+      portalRing.position.set(x, y, z);
+      portalRing.rotation.y = angle;
+      carouselRingGroup.add(portalRing);
+      animatedRings.push(portalRing);
+    }
+
+    if(posterCache[w.title]) update3DPosterIfLoaded(w.title, posterCache[w.title]);
+    else resolvePosterUrl(w.title, w.year, w.type, {});
+  });
+
+  camSphericalGoal = { r: radius + 9.5, phi: 1.38, theta: 0 };
+  focusRingIndex(active3DNodeIndex);
+  if(arcadeMode === 2) generateDetectiveQuestion();
+  if(arcadeMode === 3) generateSprintChallenge();
+}
+
+function focusRingIndex(idx, customBridge) {
+  const u = UNIVERSES.find(x=>x.id===active3DUniId) || UNIVERSES[1];
+  const uWorks = WORKS.filter(w=>w.uni===u.id);
+  if(!uWorks.length) return;
+  active3DNodeIndex = (idx + uWorks.length) % uWorks.length;
+
+  // تدوير عجلة المدار ثلاثية الأبعاد بحيث تأتي البطاقة المختارة أمام الكاميرا بنعومة
+  ringRotationGoal = -active3DNodeIndex * ringAngleStep;
+
+  const w = uWorks[active3DNodeIndex];
+  const isWatched = (trackerState[w.id] === "watched");
+  currentHudWorkId = w.id;
+  applyUniverseTheme(u);
+
+  document.getElementById("flightCounter").textContent = `${active3DNodeIndex+1} / ${uWorks.length}`;
+  document.getElementById("flightSlider").value = uWorks.length > 1 ? Math.round((active3DNodeIndex/(uWorks.length-1))*100) : 100;
+
+  const dispTitle = w.title.replace(/\((19|20)\d\d.*?\)|\(film\)|\(TV series\)/gi,"").trim();
+  const br = customBridge || REBOOT_BRIDGES.find(b=>b.fromTitle===w.title);
+  activePortalBridge = br || null;
+
+  document.getElementById("hudUniLabel").innerHTML = `<bdi>${u.num}</bdi> • ${u.name} • الترتيب: <bdi>${w.order}</bdi>`;
+  document.getElementById("hudTitle").textContent = `${dispTitle} (${w.year}) — ⭐ ${w.imdb} | 🍅 ${w.rt}`;
+  document.getElementById("hudDesc").innerHTML = br ? `<strong style="color:#fbbf24;">${br.label}:</strong> ${br.safeDesc}` : w.note;
+  const spText = br ? br.spoilerDesc : w.spoiler;
+  document.getElementById("hudSpoilerBox").innerHTML = renderSpoilerVaultHTML("hud_sp_"+w.id, spText, isWatched);
+  document.getElementById("hudPoster").src = posterCache[w.title] || makeFallbackPoster(dispTitle, w.year, u.color, w.typeLabel);
+  document.getElementById("hudWatchBtn").textContent = isWatched ? "✅ تمت المشاهدة" : "✓ تحديد كمشاهد";
+
+  const pBtn = document.getElementById("hudPortalBtn");
+  if(pBtn) pBtn.style.display = br ? "inline-block" : "none";
+}
+
+function buildPlanetaryOrreryGalaxy() {
+  isOrreryGalaxyMode = true;
+  clearStageGroup();
+  ringRotationGoal = 0; ringRotationCurrent = 0;
+
+  document.getElementById("btnToggleOrrery").textContent = "🎬 العودة للمدار المجسم";
+  document.getElementById("cosmicModeTitle").textContent = "🌌 مجرة كواكب DC المتعددة (Planetary Orrery 360°)";
+  document.getElementById("cosmicModeSub").textContent = "اسحب بإصبعك للالتفاف حول المجرة ثلاثية الأبعاد من جميع الزوايا • المس أي كوكب للغوص داخله!";
+  document.getElementById("cosmicCockpit").style.display = "none";
+
+  carouselRingGroup = new THREE.Group();
+  stageGroup.add(carouselRingGroup);
+
+  const serialUnis = UNIVERSES.filter(u=>u.id!=="all" && u.serial);
+  const planetPosByUni = {};
+
+  serialUnis.forEach((u, idx)=>{
+    const angle = (idx / serialUnis.length) * Math.PI * 2;
+    const orbitR = 17 + (idx % 2) * 5.5;
+    const x = Math.cos(angle) * orbitR;
+    const z = Math.sin(angle) * orbitR;
+    const y = ((idx % 3) - 1) * 4.2;
+
+    const uCount = WORKS.filter(w=>w.uni===u.id).length;
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(2.2, 32, 32),
+      new THREE.MeshStandardMaterial({ color:u.hex, emissive:u.hex, emissiveIntensity:0.42, roughness:0.25, metalness:0.55 })
+    );
+    sphere.position.set(x, y, z);
+    sphere.userData = { type:"planet", uni:u };
+    carouselRingGroup.add(sphere);
+    interactiveMeshes.push(sphere);
+    planetPosByUni[u.id] = new THREE.Vector3(x, y, z);
+
+    const pRing = new THREE.Mesh(
+      new THREE.TorusGeometry(3.3, 0.08, 12, 48),
+      new THREE.MeshBasicMaterial({ color:u.hex, wireframe:true })
+    );
+    pRing.position.set(x, y, z);
+    pRing.rotation.x = 1.1;
+    carouselRingGroup.add(pRing);
+    animatedRings.push(pRing);
+
+    const lblTex = makePlanetLabelTexture(u, uCount);
+    const lblMesh = new THREE.Mesh(new THREE.PlaneGeometry(6.0, 1.65), new THREE.MeshBasicMaterial({ map:lblTex, side:THREE.DoubleSide, transparent:true }));
+    lblMesh.position.set(x, y + 3.5, z);
+    lblMesh.userData = { type:"planet", uni:u };
+    carouselRingGroup.add(lblMesh);
+    interactiveMeshes.push(lblMesh);
+  });
+
+  const bridgePairs = [["dcau","dcamu"],["dcamu","tomorrow"],["dceu","dcu"]];
+  bridgePairs.forEach(([u1,u2])=>{
+    if(planetPosByUni[u1] && planetPosByUni[u2]){
+      const mid = new THREE.Vector3().addVectors(planetPosByUni[u1], planetPosByUni[u2]).multiplyScalar(0.5);
+      mid.y += 8;
+      const curve = new THREE.QuadraticBezierCurve3(planetPosByUni[u1], mid, planetPosByUni[u2]);
+      const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 32, 0.16, 8, false), new THREE.MeshBasicMaterial({ color:0xfbbf24 }));
+      carouselRingGroup.add(tube);
+    }
+  });
+
+  camSphericalGoal = { r: 38, phi: 1.18, theta: 0 };
+}
+
+function toggleOrreryGalaxyMode() {
+  if(isOrreryGalaxyMode) buildFocusedUniverseRing(active3DUniId, active3DNodeIndex);
+  else buildPlanetaryOrreryGalaxy();
+}
+
+// ============================================================================
+// نظام الألعاب التفاعلية الثلاث داخل الفضاء (DC 3D Interactive Arcade)
+// ============================================================================
+function cycleArcadeGame() {
+  if(isOrreryGalaxyMode) buildFocusedUniverseRing(active3DUniId, active3DNodeIndex);
+  arcadeMode = (arcadeMode % 3) + 1;
+  const banner = document.getElementById("arcadeBanner");
+  banner.classList.add("active");
+  meteors.forEach(m=>scene.remove(m.mesh));
+  meteors = [];
+
+  if(arcadeMode === 1){
+    document.getElementById("arcadeTitle").textContent = "🎯 لعبة 1: دفاع الفانوس الأخضر (Green Lantern Meteor Defense)";
+    document.getElementById("arcadePrompt").textContent = "نيازك الكريبتونيت تتجه نحو كوكب العالم! المس النيازك الخضراء في الفضاء لتفجيرها بشعاع الخاتم!";
+    spawnMeteorWave();
+  } else if(arcadeMode === 2){
+    document.getElementById("arcadeTitle").textContent = "🕵️ لعبة 2: محقق غوثام (Batman Detective Quiz)";
+    generateDetectiveQuestion();
+  } else if(arcadeMode === 3){
+    document.getElementById("arcadeTitle").textContent = "⚡ لعبة 3: سباق الفلاش الزمني (Speed Force Chronology)";
+    generateSprintChallenge();
+  }
+}
+
+function stopArcadeGame() {
+  arcadeMode = 0;
+  document.getElementById("arcadeBanner").classList.remove("active");
+  meteors.forEach(m=>scene.remove(m.mesh));
+  meteors = [];
+}
+
+function addArcadeScore(pts) {
+  arcadeScore += pts;
+  document.getElementById("arcadeScore").textContent = `النقاط: ${arcadeScore}`;
+}
+
+function spawnMeteorWave() {
+  if(arcadeMode !== 1 || !scene) return;
+  for(let i=0;i<5;i++){
+    const ang = Math.random() * Math.PI * 2;
+    const dist = 22 + Math.random() * 10;
+    const mGeo = new THREE.DodecahedronGeometry(0.95, 0);
+    const mMat = new THREE.MeshStandardMaterial({ color:0x22c55e, emissive:0x10b981, emissiveIntensity:0.7, roughness:0.2 });
+    const mesh = new THREE.Mesh(mGeo, mMat);
+    mesh.position.set(Math.cos(ang)*dist, (Math.random()-0.5)*10, Math.sin(ang)*dist);
+    mesh.userData = { type:"meteor" };
+    scene.add(mesh);
+    const vel = mesh.position.clone().negate().normalize().multiplyScalar(0.055 + Math.random()*0.03);
+    meteors.push({ mesh, vel });
+  }
+}
+
+function generateDetectiveQuestion() {
+  const uWorks = WORKS.filter(w=>w.uni===active3DUniId);
+  if(!uWorks.length) return;
+  const pick = uWorks[Math.floor(Math.random()*uWorks.length)];
+  quizTargetWorkId = pick.id;
+  document.getElementById("arcadePrompt").innerHTML = `🔎 <strong>اللغز:</strong> أي عمل في هذا المدار صدر عام <bdi>${pick.year}</bdi> وتقييمه <bdi>⭐ ${pick.imdb}</bdi>؟ (${pick.note.substring(0,65)}...) — <strong>دوّر المدار والمس مجسمه!</strong>`;
+}
+
+function generateSprintChallenge() {
+  const uWorks = WORKS.filter(w=>w.uni===active3DUniId);
+  if(uWorks.length < 2) return;
+  sprintSequence = uWorks.slice(0, Math.min(3, uWorks.length));
+  sprintStep = 0;
+  document.getElementById("arcadePrompt").innerHTML = `⚡ المس أول عمل في التسلسل الزمني لهذا العالم (${sprintStep+1}/${sprintSequence.length})!`;
+}
+
+function handleArcadeCardClick(obj) {
+  const w = obj.userData.work;
+  if(arcadeMode === 2){
+    if(w.id === quizTargetWorkId){
+      addArcadeScore(25);
+      fireLanternBeam(obj.getWorldPosition(new THREE.Vector3()), 0xfbbf24);
+      document.getElementById("arcadePrompt").innerHTML = `✅ <strong>إجابة صحيحة يا محقق غوثام! (+25 نقطة)</strong> جاري تجهيز اللغز التالي...`;
+      setTimeout(()=>{ if(arcadeMode===2) generateDetectiveQuestion(); }, 1800);
+    } else {
+      document.getElementById("arcadePrompt").innerHTML = `❌ ليس هذا العمل! حاول مرة أخرى: ابحث عن عمل صدر عام <bdi>${WORKS.find(x=>x.id===quizTargetWorkId)?.year}</bdi>`;
+    }
+  } else if(arcadeMode === 3 && sprintSequence.length > 0){
+    const expected = sprintSequence[sprintStep];
+    if(w.id === expected.id){
+      sprintStep++;
+      addArcadeScore(15);
+      fireLanternBeam(obj.getWorldPosition(new THREE.Vector3()), 0x38bdf8);
+      if(sprintStep >= sprintSequence.length){
+        document.getElementById("arcadePrompt").innerHTML = `🏆 <strong>أنجزت سباق الفلاش الزمني بنجاح! (+45 نقطة)</strong>`;
+        setTimeout(()=>{ if(arcadeMode===3) generateSprintChallenge(); }, 2000);
+      } else {
+        document.getElementById("arcadePrompt").innerHTML = `⚡ ممتاز! الآن المس العمل رقم (${sprintStep+1}/${sprintSequence.length}) في التسلسل الزمني!`;
+      }
+    } else {
+      document.getElementById("arcadePrompt").innerHTML = `⚠️ ترتيب خاطئ! ابدأ من العمل رقم (${sprintStep+1}) في القصة!`;
+    }
+  }
+}
+
+function init3DGraph() {
+  if(is3DReady) return;
+  is3DReady = true;
+  const canvas = document.getElementById("threeCanvas");
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x02040a, 0.0042);
+  camera = new THREE.PerspectiveCamera(56, window.innerWidth/window.innerHeight, 0.1, 1500);
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.95));
+  const dirLight = new THREE.PointLight(0xffffff, 1.4, 300);
+  dirLight.position.set(18, 28, 28);
+  scene.add(dirLight);
+
+  stageGroup = new THREE.Group();
+  scene.add(stageGroup);
+
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 2800;
+  const posArr = new Float32Array(starCount * 3);
+  const colArr = new Float32Array(starCount * 3);
+  const palette = [new THREE.Color(0x60a5fa), new THREE.Color(0x34d399), new THREE.Color(0xfbbf24), new THREE.Color(0xf472b6), new THREE.Color(0xffffff)];
+  for(let i=0;i<starCount;i++){
+    posArr[i*3] = (Math.random()-0.5)*380;
+    posArr[i*3+1] = (Math.random()-0.5)*240;
+    posArr[i*3+2] = (Math.random()-0.5)*320 - 30;
+    const c = palette[i % palette.length];
+    colArr[i*3] = c.r; colArr[i*3+1] = c.g; colArr[i*3+2] = c.b;
+  }
+  starGeo.setAttribute("position", new THREE.BufferAttribute(posArr, 3));
+  starGeo.setAttribute("color", new THREE.BufferAttribute(colArr, 3));
+  starSystem = new THREE.Points(starGeo, new THREE.PointsMaterial({ size:1.5, vertexColors:true, map:makeStarGlowTexture(), transparent:true, depthWrite:false, blending:THREE.AdditiveBlending }));
+  scene.add(starSystem);
+
+  const serialUnis = UNIVERSES.filter(u=>u.id!=="all" && u.serial);
+  document.getElementById("cosmicUniBar").innerHTML = serialUnis.map(u=>
+    `<button class="uni-pill ${u.id===active3DUniId?'active':''}" id="c_pill_${u.id}" onclick="flyToUniverse3D('${u.id}')"><bdi>${u.num}</bdi> • ${u.name}</button>`
+  ).join("");
+
+  // سحب 3D حقيقي: السحب الأفقي يدوّر المدار ثلاثي الأبعاد، والسحب العمودي يغيّر زاوية ارتفاع الكاميرا 360°
+  canvas.addEventListener("pointerdown", e=>{ isDrag3D=true; dragMoved=false; prevPtr={x:e.clientX,y:e.clientY}; });
+  window.addEventListener("pointerup", ()=>{ isDrag3D=false; });
+  canvas.addEventListener("pointermove", e=>{
+    if(!isDrag3D) return;
+    const dx = e.clientX - prevPtr.x, dy = e.clientY - prevPtr.y;
+    if(Math.abs(dx)>4 || Math.abs(dy)>4) dragMoved = true;
+    prevPtr = {x:e.clientX,y:e.clientY};
+    ringRotationGoal += dx * 0.0075; // تدوير مجسم المدار نفسه!
+    camSphericalGoal.phi = Math.max(0.35, Math.min(Math.PI - 0.35, camSphericalGoal.phi - dy * 0.0065)); // رؤية من الأعلى والأسفل!
+  });
+
+  canvas.addEventListener("wheel", e=>{
+    camSphericalGoal.r = Math.max(9, Math.min(68, camSphericalGoal.r + e.deltaY * 0.02));
+  },{passive:true});
+
+  canvas.addEventListener("touchstart", e=>{
+    if(e.touches.length===2) pinchD = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+  },{passive:true});
+  canvas.addEventListener("touchmove", e=>{
+    if(e.touches.length===2){
+      const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+      camSphericalGoal.r = Math.max(9, Math.min(68, camSphericalGoal.r + (pinchD - d) * 0.06));
+      pinchD = d;
+    }
+  },{passive:true});
+
+  canvas.addEventListener("click", e=>{
+    if(dragMoved) return;
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left)/rect.width)*2 - 1;
+    mouse.y = -((e.clientY - rect.top)/rect.height)*2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+
+    // فحص إصابة نيازك الكريبتونيت أولاً إذا كانت لعبة الفانوس الأخضر نشطة
+    if(arcadeMode === 1 && meteors.length > 0){
+      const mHits = raycaster.intersectObjects(meteors.map(m=>m.mesh));
+      if(mHits.length > 0){
+        const hitMesh = mHits[0].object;
+        fireLanternBeam(hitMesh.position, 0x10b981);
+        spawnCosmicBurst(hitMesh.position, 0x22c55e);
+        scene.remove(hitMesh);
+        meteors = meteors.filter(m=>m.mesh!==hitMesh);
+        addArcadeScore(10);
+        if(meteors.length === 0) setTimeout(spawnMeteorWave, 800);
+        return;
+      }
+    }
+
+    const hits = raycaster.intersectObjects(interactiveMeshes);
+    if(hits.length > 0){
+      const obj = hits[0].object;
+      const worldPos = obj.getWorldPosition(new THREE.Vector3());
+      if(obj.userData.type === "planet"){
+        spawnCosmicBurst(worldPos, obj.userData.uni.hex);
+        buildFocusedUniverseRing(obj.userData.uni.id, 0);
+      } else if(obj.userData.type === "workCard"){
+        spawnCosmicBurst(worldPos, obj.userData.uni.hex);
+        toggleHudVisibility(true);
+        focusRingIndex(obj.userData.idxInUni);
+        if(arcadeMode >= 2) handleArcadeCardClick(obj);
+      }
+    }
+  });
+
+  window.addEventListener("resize", resize3D);
+  buildFocusedUniverseRing("dcu", 0);
+  loop3D();
+}
+
+let currentHudWorkId = "w_1";
+
+function flyToUniverse3D(uniId) { buildFocusedUniverseRing(uniId, 0); }
+
+function step3DFlight(dir) {
+  const uWorks = WORKS.filter(w=>w.uni===active3DUniId);
+  if(!uWorks.length) return;
+  focusRingIndex(active3DNodeIndex + dir);
+}
+
+function scrub3DFlight(val) {
+  const uWorks = WORKS.filter(w=>w.uni===active3DUniId);
+  if(!uWorks.length) return;
+  const idx = Math.min(uWorks.length-1, Math.max(0, Math.round((val/100)*(uWorks.length-1))));
+  focusRingIndex(idx);
+}
+
+function triggerPortalJump() {
+  if(!activePortalBridge) return;
+  spawnCosmicBurst(new THREE.Vector3(0,0,0), 0xfbbf24);
+  buildFocusedUniverseRing(activePortalBridge.toUni, 0);
+}
+
+function openHudWorkDrawer() { openWorkDrawer(currentHudWorkId); }
+function jumpHudToTimeline() { jumpToTimeline(currentHudWorkId); }
+function toggleHudWatched() { setStatus(currentHudWorkId, "watched"); }
+
+function startRebootTour() {
+  init3DGraph();
+  tourIndex = (tourIndex + 1) % REBOOT_BRIDGES.length;
+  const br = REBOOT_BRIDGES[tourIndex];
+  const wObj = WORKS.find(w=>w.title===br.fromTitle);
+  if(wObj){
+    const uWorks = WORKS.filter(w=>w.uni===wObj.uni);
+    const idx = uWorks.findIndex(w=>w.id===wObj.id);
+    toggleHudVisibility(true);
+    buildFocusedUniverseRing(wObj.uni, Math.max(0, idx));
+    spawnCosmicBurst(new THREE.Vector3(0,0,5), 0xfbbf24);
+  }
+}
+
+function update3DPosterIfLoaded(titleKey, url) {
+  if(!is3DReady || isOrreryGalaxyMode) return;
+  const m = interactiveMeshes.find(x=>x.userData && x.userData.work && x.userData.work.title===titleKey);
+  if(!m) return;
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = ()=>{
+    const newTex = make3DBillboardTexture(m.userData.work, m.userData.uni, trackerState[m.userData.work.id]==="watched", img);
+    if(Array.isArray(m.material)){
+      m.material[4].map = newTex; m.material[4].needsUpdate = true;
+      m.material[5].map = newTex; m.material[5].needsUpdate = true;
+    } else {
+      m.material.map = newTex; m.material.needsUpdate = true;
+    }
+  };
+  img.src = url;
+}
+
+function resize3D() {
+  if(!renderer || !camera) return;
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function loop3D() {
+  requestAnimationFrame(loop3D);
+  if(currentView==="3d" && renderer && scene && camera){
+    // فيزياء دوران ناعمة لعجلة البطاقات ثلاثية الأبعاد وزاوية الكاميرا الكروية
+    ringRotationCurrent += (ringRotationGoal - ringRotationCurrent) * 0.085;
+    if(carouselRingGroup){
+      carouselRingGroup.rotation.y = ringRotationCurrent;
+    }
+
+    camSphericalCurrent.r += (camSphericalGoal.r - camSphericalCurrent.r) * 0.08;
+    camSphericalCurrent.phi += (camSphericalGoal.phi - camSphericalCurrent.phi) * 0.08;
+    camSphericalCurrent.theta += (camSphericalGoal.theta - camSphericalCurrent.theta) * 0.08;
+
+    camera.position.x = camSphericalCurrent.r * Math.sin(camSphericalCurrent.phi) * Math.sin(camSphericalCurrent.theta);
+    camera.position.y = camSphericalCurrent.r * Math.cos(camSphericalCurrent.phi);
+    camera.position.z = camSphericalCurrent.r * Math.sin(camSphericalCurrent.phi) * Math.cos(camSphericalCurrent.theta);
+    camera.lookAt(0, 0, 0);
+
+    if(starSystem) starSystem.rotation.y += 0.0004;
+    if(corePlanetMesh) corePlanetMesh.rotation.y += 0.005;
+    if(coreRingMesh) coreRingMesh.rotation.z -= 0.007;
+    animatedRings.forEach((r,i)=>{ r.rotation.z += 0.024 * (i%2===0?1:-1); });
+
+    // تحريك نيازك الكريبتونيت في لعبة الفانوس الأخضر
+    for(let i=meteors.length-1;i>=0;i--){
+      const mt = meteors[i];
+      mt.mesh.position.add(mt.vel);
+      mt.mesh.rotation.x += 0.03; mt.mesh.rotation.y += 0.03;
+      if(mt.mesh.position.length() < 3.4){
+        spawnCosmicBurst(mt.mesh.position, 0xef4444);
+        scene.remove(mt.mesh);
+        meteors.splice(i,1);
+        if(meteors.length === 0 && arcadeMode === 1) setTimeout(spawnMeteorWave, 800);
+      }
+    }
+
+    // تلاشي أشعة الليزر
+    for(let i=laserBeams.length-1;i>=0;i--){
+      const lb = laserBeams[i];
+      lb.life -= 0.08;
+      if(lb.life <= 0){ scene.remove(lb.mesh); laserBeams.splice(i,1); }
+      else lb.mesh.material.opacity = lb.life;
+    }
+
+    // تحديث شرارات اللمس
+    for(let i=burstParticles.length-1;i>=0;i--){
+      const b = burstParticles[i];
+      b.life -= 0.025;
+      if(b.life <= 0){
+        scene.remove(b.mesh);
+        burstParticles.splice(i,1);
+      } else {
+        const arr = b.mesh.geometry.attributes.position.array;
+        for(let j=0;j<b.vels.length;j++){
+          arr[j*3] += b.vels[j].x; arr[j*3+1] += b.vels[j].y; arr[j*3+2] += b.vels[j].z;
+        }
+        b.mesh.geometry.attributes.position.needsUpdate = true;
+        b.mesh.material.opacity = b.life;
+      }
+    }
+
+    renderer.render(scene, camera);
+  }
+}
+
+initUniPills();
+applyUniverseTheme(UNIVERSES[0]);
+renderApp();
+</script>
+</body>
+</html>

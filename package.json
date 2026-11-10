@@ -1,0 +1,9 @@
+{
+  "name": "dc-guide",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "resolve": "node scripts/tmdb-resolve.mjs"
+  }
+}

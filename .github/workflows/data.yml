@@ -1,0 +1,33 @@
+name: data
+on:
+  push:
+    branches: [main, 'claude/**']
+    paths: ['data/*.json', 'scripts/**', '.github/workflows/data.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: data-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate catalog
+        run: node scripts/validate.mjs
+      - name: Resolve works against TMDB
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: node scripts/tmdb-resolve.mjs
+        continue-on-error: true
+      - name: Commit generated data
+        run: |
+          git config user.name "dc-guide-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated
+          git diff --cached --quiet || git commit -m "data: generated output [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

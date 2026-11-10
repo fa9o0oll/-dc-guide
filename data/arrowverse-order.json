@@ -1,0 +1,831 @@
+[
+  {
+    "id": "arrow-step-01",
+    "stage": "المرحلة 1",
+    "title": "انطلاقة عالم Arrowverse (السنة الأولى)",
+    "year": 2012,
+    "kind": "phase",
+    "note": "البداية الفعلية للعالم التلفزيوني مع الموسم الأول من Arrow.",
+    "steps": [
+      {
+        "order": "شاهد بالكامل",
+        "show": "Arrow - Season 1",
+        "what": "الموسم 1 كامل (الحلقات 1 إلى 23)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Arrow",
+      "rtCritics": "85%",
+      "imdb": "8.0",
+      "rtAudience": "88%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-02",
+    "stage": "المرحلة 2",
+    "title": "الموسم الثاني والتمهيد لتوسع العالم",
+    "year": 2013,
+    "kind": "phase",
+    "note": "من أقوى مواسم السلسلة؛ الحلقتان 8 و9 تمهدان للمسلسل التالي في العالم.",
+    "steps": [
+      {
+        "order": "شاهد بالكامل",
+        "show": "Arrow - Season 2",
+        "what": "الموسم 2 كامل (الحلقات 1 إلى 23)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Arrow",
+      "rtCritics": "95%",
+      "imdb": "8.8",
+      "rtAudience": "93%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-03",
+    "stage": "المرحلة 3",
+    "title": "انطلاق The Flash بالتوازي مع الموسم 3 لـ Arrow",
+    "year": 2014,
+    "kind": "phase",
+    "note": "بداية عرض المسلسلين معاً؛ شاهد أول 7 حلقات من كل مسلسل قبل الدخول في التقاطع الأول.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "The Flash - Season 1",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      },
+      {
+        "order": "بالتوازي أو بعده",
+        "show": "Arrow - Season 3",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      }
+    ],
+    "legacy": {
+      "leadShow": "The Flash",
+      "rtCritics": "92%",
+      "imdb": "8.6",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-04",
+    "stage": "تقاطع 1",
+    "title": "الحدث المشترك الأول: Flash vs. Arrow",
+    "year": 2014,
+    "kind": "crossover",
+    "note": "أول تقاطع رسمي من جزأين؛ ابدأ بحلقة فلاش ثم انتقل لحلقة السهم.",
+    "steps": [
+      {
+        "order": "الجزء الأول",
+        "show": "The Flash (S01E08)",
+        "what": "الموسم 1 - الحلقة 8 (Flash vs. Arrow)"
+      },
+      {
+        "order": "الجزء الثاني",
+        "show": "Arrow (S03E08)",
+        "what": "الموسم 3 - الحلقة 8 (The Brave and the Bold)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "The Flash",
+      "rtCritics": "96%",
+      "imdb": "8.9",
+      "rtAudience": "92%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-05",
+    "stage": "المرحلة 4",
+    "title": "النصف الثاني للموسم 1 من Flash والموسم 3 من Arrow",
+    "year": 2015,
+    "kind": "phase",
+    "note": "استكمال الحلقات حتى نهاية الموسم لكل من المسلسلين.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "The Flash - Season 1",
+        "what": "استكمل من الحلقة 9 إلى الحلقة 23 (النهاية)"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Arrow - Season 3",
+        "what": "استكمل من الحلقة 9 إلى الحلقة 23 (النهاية)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "The Flash",
+      "rtCritics": "90%",
+      "imdb": "8.4",
+      "rtAudience": "88%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-06",
+    "stage": "المرحلة 5",
+    "title": "موسم Constantine (الجانب السحري للعالم)",
+    "year": 2014,
+    "kind": "phase",
+    "note": "يُشاهد في هذا الموضع الزمني لارتباط شخصيته بالمراحل والمواسم التالية.",
+    "steps": [
+      {
+        "order": "شاهد بالكامل",
+        "show": "Constantine - Season 1",
+        "what": "الموسم 1 كامل (الحلقات 1 إلى 13)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Constantine",
+      "rtCritics": "73%",
+      "imdb": "7.5",
+      "rtAudience": "86%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-07",
+    "stage": "المرحلة 6",
+    "title": "النصف الأول من Flash S2 و Arrow S4",
+    "year": 2015,
+    "kind": "phase",
+    "note": "شاهد أول 7 حلقات من كلا الموسمين قبل الدخول في التقاطع الثاني.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "The Flash - Season 2",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Arrow - Season 4",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      }
+    ],
+    "legacy": {
+      "leadShow": "The Flash",
+      "rtCritics": "88%",
+      "imdb": "8.1",
+      "rtAudience": "84%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-08",
+    "stage": "تقاطع 2",
+    "title": "حدث اتحاد الأبطال: Heroes Join Forces",
+    "year": 2015,
+    "kind": "crossover",
+    "note": "تقاطع من جزأين يمهد مباشرة لانطلاق مسلسل Legends of Tomorrow.",
+    "steps": [
+      {
+        "order": "الجزء الأول",
+        "show": "The Flash (S02E08)",
+        "what": "الموسم 2 - الحلقة 8 (Legends of Today)"
+      },
+      {
+        "order": "الجزء الثاني",
+        "show": "Arrow (S04E08)",
+        "what": "الموسم 4 - الحلقة 8 (Legends of Yesterday)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "DC's Legends of Tomorrow",
+      "rtCritics": "85%",
+      "imdb": "8.2",
+      "rtAudience": "83%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-09",
+    "stage": "المرحلة 7",
+    "title": "الموسم الأول من Supergirl والتقاطع المشترك",
+    "year": 2015,
+    "kind": "phase",
+    "note": "انطلاق مسلسل سوبرغيرل، ويتضمن في الحلقة 18 تقاطعاً مشتركاً مع The Flash.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "Supergirl - Season 1",
+        "what": "من الحلقة 1 إلى الحلقة 17"
+      },
+      {
+        "order": "تقاطع خاص",
+        "show": "Supergirl (S01E18)",
+        "what": "الحلقة 18 (Worlds Finest - حلقة تقاطع)"
+      },
+      {
+        "order": "الختام",
+        "show": "Supergirl - Season 1",
+        "what": "الحلقتان 19 و 20 (نهاية الموسم 1)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Supergirl",
+      "rtCritics": "92%",
+      "imdb": "6.8",
+      "rtAudience": "66%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-10",
+    "stage": "المرحلة 8",
+    "title": "انطلاق Legends of Tomorrow وختام مواسم 2016",
+    "year": 2016,
+    "kind": "phase",
+    "note": "مشاهدة الموسم الأول من أساطير الغد واستكمال فلاش 2 والسهم 4.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "The Flash - Season 2",
+        "what": "من الحلقة 9 إلى الحلقة 23 (النهاية)"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Arrow - Season 4",
+        "what": "من الحلقة 9 إلى الحلقة 23 (النهاية)"
+      },
+      {
+        "order": "ثالثاً",
+        "show": "Legends of Tomorrow - S1",
+        "what": "الموسم 1 كامل (الحلقات 1 إلى 16)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "DC's Legends of Tomorrow",
+      "rtCritics": "82%",
+      "imdb": "7.6",
+      "rtAudience": "79%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-11",
+    "stage": "المرحلة 9",
+    "title": "النصف الأول لمواسم خريف 2016 (4 مسلسلات)",
+    "year": 2016,
+    "kind": "phase",
+    "note": "الحلقات التمهيدية للمواسم الجديدة قبل الدخول في التقاطع الرباعي الكبير.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "The Flash - Season 3",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Arrow - Season 5",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      },
+      {
+        "order": "ثالثاً",
+        "show": "Supergirl - Season 2",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      },
+      {
+        "order": "رابعاً",
+        "show": "Legends of Tomorrow - S2",
+        "what": "من الحلقة 1 إلى الحلقة 6"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Arrow",
+      "rtCritics": "90%",
+      "imdb": "8.2",
+      "rtAudience": "84%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-12",
+    "stage": "تقاطع 3",
+    "title": "التقاطع الرباعي الكبير: Invasion!",
+    "year": 2016,
+    "kind": "crossover",
+    "note": "حدث مشترك يربط المسلسلات الأربعة في قصة واحدة متسلسلة.",
+    "steps": [
+      {
+        "order": "مقدمة الحدث",
+        "show": "Supergirl (S02E08)",
+        "what": "الموسم 2 - الحلقة 8 (نهاية الحلقة)"
+      },
+      {
+        "order": "الفصل الأول",
+        "show": "The Flash (S03E08)",
+        "what": "الموسم 3 - الحلقة 8 (Invasion Part 1)"
+      },
+      {
+        "order": "الفصل الثاني",
+        "show": "Arrow (S05E08)",
+        "what": "الموسم 5 - الحلقة 8 (Invasion Part 2)"
+      },
+      {
+        "order": "الفصل الثالث",
+        "show": "Legends of Tomorrow (S02E07)",
+        "what": "الموسم 2 - الحلقة 7 (Invasion Part 3)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "The Flash",
+      "rtCritics": "94%",
+      "imdb": "8.7",
+      "rtAudience": "89%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-13",
+    "stage": "المرحلة 10",
+    "title": "النصف الثاني لمواسم 2017 (ذروة الموسم 5 لـ Arrow)",
+    "year": 2017,
+    "kind": "phase",
+    "note": "استكمال الحلقات حتى نهاية المواسم الأربعة (يتخللها تقاطع موسيقي في Flash S03E17).",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "Supergirl S2 & Flash S3",
+        "what": "حلقات 9–16 ثم التقاطع المشترك (Flash S03E17)"
+      },
+      {
+        "order": "ثانياً",
+        "show": "The Flash - Season 3",
+        "what": "استكمل من الحلقة 18 إلى 23 (النهاية)"
+      },
+      {
+        "order": "ثالثاً",
+        "show": "Legends of Tomorrow - S2",
+        "what": "استكمل من الحلقة 8 إلى 17 (النهاية)"
+      },
+      {
+        "order": "مسك الختام",
+        "show": "Arrow - Season 5",
+        "what": "استكمل من الحلقة 9 إلى 23 (من أقوى نهايات السلسلة)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Arrow",
+      "rtCritics": "91%",
+      "imdb": "8.4",
+      "rtAudience": "86%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-14",
+    "stage": "المرحلة 11",
+    "title": "النصف الأول لمواسم خريف 2017",
+    "year": 2017,
+    "kind": "phase",
+    "note": "أول 7 حلقات من كل موسم قبل الدخول في تقاطع Crisis on Earth-X.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "Supergirl - Season 3",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Arrow - Season 6",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      },
+      {
+        "order": "ثالثاً",
+        "show": "The Flash - Season 4",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      },
+      {
+        "order": "رابعاً",
+        "show": "Legends of Tomorrow - S3",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      }
+    ],
+    "legacy": {
+      "leadShow": "The Flash",
+      "rtCritics": "86%",
+      "imdb": "7.6",
+      "rtAudience": "77%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-15",
+    "stage": "تقاطع 4",
+    "title": "أفضل تقاطع في العالم: Crisis on Earth-X",
+    "year": 2017,
+    "kind": "crossover",
+    "note": "فيلم سينمائي متكامل من 4 فصول متتالية يجمع كافة الأبطال.",
+    "steps": [
+      {
+        "order": "الفصل الأول",
+        "show": "Supergirl (S03E08)",
+        "what": "الموسم 3 - الحلقة 8 (Crisis on Earth-X Part 1)"
+      },
+      {
+        "order": "الفصل الثاني",
+        "show": "Arrow (S06E08)",
+        "what": "الموسم 6 - الحلقة 8 (Crisis on Earth-X Part 2)"
+      },
+      {
+        "order": "الفصل الثالث",
+        "show": "The Flash (S04E08)",
+        "what": "الموسم 4 - الحلقة 8 (Crisis on Earth-X Part 3)"
+      },
+      {
+        "order": "الفصل الرابع",
+        "show": "Legends of Tomorrow (S03E08)",
+        "what": "الموسم 3 - الحلقة 8 (Crisis on Earth-X Part 4)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Supergirl",
+      "rtCritics": "98%",
+      "imdb": "9.1",
+      "rtAudience": "94%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-16",
+    "stage": "المرحلة 12",
+    "title": "استكمال مواسم 2018 وانطلاق Black Lightning",
+    "year": 2018,
+    "kind": "phase",
+    "note": "النصف الثاني لمواسم 2018 بالإضافة إلى الموسمين 1 و2 من Black Lightning.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "The Flash S4 & Arrow S6",
+        "what": "استكمل من الحلقة 9 إلى الحلقة 23"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Supergirl S3 & Legends S3",
+        "what": "استكمل حتى نهاية الموسم الثالث لكل منهما"
+      },
+      {
+        "order": "ثالثاً",
+        "show": "Black Lightning - S1 & S2",
+        "what": "الموسمان 1 و 2 (لارتباطه اللاحق بالأحداث)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "DC's Legends of Tomorrow",
+      "rtCritics": "87%",
+      "imdb": "7.5",
+      "rtAudience": "76%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-17",
+    "stage": "المرحلة 13",
+    "title": "النصف الأول لمواسم خريف 2018",
+    "year": 2018,
+    "kind": "phase",
+    "note": "أول 8 حلقات من المواسم الجديدة قبل الدخول في تقاطع Elseworlds.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "The Flash - Season 5",
+        "what": "من الحلقة 1 إلى الحلقة 8"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Arrow - Season 7",
+        "what": "من الحلقة 1 إلى الحلقة 8"
+      },
+      {
+        "order": "ثالثاً",
+        "show": "Supergirl - Season 4",
+        "what": "من الحلقة 1 إلى الحلقة 8"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Arrow",
+      "rtCritics": "88%",
+      "imdb": "7.7",
+      "rtAudience": "78%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-18",
+    "stage": "تقاطع 5",
+    "title": "حدث العوالم الأخرى: Elseworlds",
+    "year": 2018,
+    "kind": "crossover",
+    "note": "تقاطع ثلاثي مميز يمهد الطريق مباشرة لحدث الأزمة الكونية الكبرى.",
+    "steps": [
+      {
+        "order": "الفصل الأول",
+        "show": "The Flash (S05E09)",
+        "what": "الموسم 5 - الحلقة 9 (Elseworlds Part 1)"
+      },
+      {
+        "order": "الفصل الثاني",
+        "show": "Arrow (S07E09)",
+        "what": "الموسم 7 - الحلقة 9 (Elseworlds Part 2)"
+      },
+      {
+        "order": "الفصل الثالث",
+        "show": "Supergirl (S04E09)",
+        "what": "الموسم 4 - الحلقة 9 (Elseworlds Part 3)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "The Flash",
+      "rtCritics": "93%",
+      "imdb": "8.5",
+      "rtAudience": "87%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-19",
+    "stage": "المرحلة 14",
+    "title": "النصف الثاني لمواسم 2019",
+    "year": 2019,
+    "kind": "phase",
+    "note": "استكمال المواسم حتى نهايتها للتمهيد للمرحلة الفاصلة.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "The Flash S5 & Arrow S7",
+        "what": "استكمل من الحلقة 10 إلى الحلقة 22 (النهاية)"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Supergirl S4 & Legends S4",
+        "what": "استكمل حتى نهاية الموسم الرابع لكل منهما"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Supergirl",
+      "rtCritics": "86%",
+      "imdb": "7.4",
+      "rtAudience": "75%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-20",
+    "stage": "المرحلة 15",
+    "title": "العد التنازلي للأزمة الكبرى (خريف 2019)",
+    "year": 2019,
+    "kind": "phase",
+    "note": "الحلقات التمهيدية المباشرة التي تقود إلى تقاطع Crisis on Infinite Earths.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "Batwoman - Season 1",
+        "what": "من الحلقة 1 إلى الحلقة 8"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Supergirl S5 & Flash S6",
+        "what": "من الحلقة 1 إلى الحلقة 8 لكل منهما"
+      },
+      {
+        "order": "الأهم قصصياً",
+        "show": "Arrow - Season 8",
+        "what": "من الحلقة 1 إلى الحلقة 7"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Arrow",
+      "rtCritics": "92%",
+      "imdb": "8.4",
+      "rtAudience": "86%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-21",
+    "stage": "تقاطع 6",
+    "title": "الحدث الأعظم: Crisis on Infinite Earths",
+    "year": 2019,
+    "kind": "crossover",
+    "note": "ملحمة من 5 فصول تربط عوالم DC التلفزيونية والسينمائية عبر التاريخ.",
+    "steps": [
+      {
+        "order": "الفصل الأول",
+        "show": "Supergirl (S05E09)",
+        "what": "الموسم 5 - الحلقة 9 (Crisis Part 1)"
+      },
+      {
+        "order": "الفصل الثاني",
+        "show": "Batwoman (S01E09)",
+        "what": "الموسم 1 - الحلقة 9 (Crisis Part 2)"
+      },
+      {
+        "order": "الفصل الثالث",
+        "show": "The Flash (S06E09)",
+        "what": "الموسم 6 - الحلقة 9 (Crisis Part 3)"
+      },
+      {
+        "order": "الفصل الرابع",
+        "show": "Arrow (S08E08)",
+        "what": "الموسم 8 - الحلقة 8 (Crisis Part 4)"
+      },
+      {
+        "order": "الفصل الخامس",
+        "show": "Legends of Tomorrow (S05E01)",
+        "what": "الموسم 5 - الحلقة الخاصة (Crisis Part 5)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Arrow",
+      "rtCritics": "95%",
+      "imdb": "8.8",
+      "rtAudience": "90%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-22",
+    "stage": "المرحلة 16",
+    "title": "الختام الرسمي لمسلسل Arrow (الموسم 8)",
+    "year": 2020,
+    "kind": "phase",
+    "note": "الحلقتان الختاميتان لمسلسل Arrow اللتان تُشاهدان مباشرة بعد انتهاء تقاطع Crisis.",
+    "steps": [
+      {
+        "order": "قبل الأخيرة",
+        "show": "Arrow (S08E09)",
+        "what": "الموسم 8 - الحلقة 9"
+      },
+      {
+        "order": "الحلقة الأخيرة",
+        "show": "Arrow (S08E10)",
+        "what": "الموسم 8 - الحلقة 10 والأخيرة (Series Finale)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Arrow",
+      "rtCritics": "96%",
+      "imdb": "9.0",
+      "rtAudience": "92%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-23",
+    "stage": "المرحلة 17",
+    "title": "مرحلة ما بعد الأزمة وانطلاق Stargirl",
+    "year": 2020,
+    "kind": "phase",
+    "note": "استكمال المواسم الجارية ومشاهدة مسلسل Stargirl.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "Flash S6 & Supergirl S5 & Legends S5",
+        "what": "استكمل الحلقات من 10 حتى نهاية المواسم"
+      },
+      {
+        "order": "ثانياً",
+        "show": "Stargirl - Seasons 1 to 3",
+        "what": "المواسم 1 إلى 3 كاملة"
+      },
+      {
+        "order": "ثالثاً",
+        "show": "Flash S7 & Supergirl S6 (Final)",
+        "what": "الموسم 7 لفلاش والموسم 6 والأخير لسوبرغيرل"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Stargirl",
+      "rtCritics": "94%",
+      "imdb": "7.2",
+      "rtAudience": "80%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-24",
+    "stage": "تقاطع 7",
+    "title": "حدث أرماغيدون: Armageddon",
+    "year": 2021,
+    "kind": "crossover",
+    "note": "حدث تقاطع من 5 حلقات متتالية في افتتاحية الموسم الثامن من The Flash.",
+    "steps": [
+      {
+        "order": "شاهد بالترتيب",
+        "show": "The Flash - Season 8",
+        "what": "من الحلقة 1 إلى الحلقة 5 (Armageddon Parts 1–5)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "The Flash",
+      "rtCritics": "88%",
+      "imdb": "7.8",
+      "rtAudience": "80%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-25",
+    "stage": "المرحلة 18",
+    "title": "ختام Legends of Tomorrow وختام The Flash",
+    "year": 2023,
+    "kind": "phase",
+    "note": "المواسم الختامية التي تغلق القصة الرئيسية لعالم Arrowverse.",
+    "steps": [
+      {
+        "order": "أولاً",
+        "show": "Legends of Tomorrow - S7",
+        "what": "الموسم 7 والأخير + بقية حلقات Flash S8"
+      },
+      {
+        "order": "الختام",
+        "show": "The Flash - Season 9 (Final)",
+        "what": "الموسم 9 والأخير (الحلقات 1 إلى 13)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "The Flash",
+      "rtCritics": "84%",
+      "imdb": "7.2",
+      "rtAudience": "74%",
+      "tier": "g",
+      "ratingsVerified": false
+    },
+    "verified": false
+  },
+  {
+    "id": "arrow-step-26",
+    "stage": "المرحلة 19",
+    "title": "مسك الختام: Superman & Lois (2021–2024)",
+    "year": 2021,
+    "kind": "phase",
+    "note": "أفضل ختام ممكن؛ يدور في أرض موازية مستقلة واكتمل في أواخر 2024 بنهاية تاريخية.",
+    "steps": [
+      {
+        "order": "شاهد بالكامل",
+        "show": "Superman & Lois (Seasons 1–4)",
+        "what": "المواسم 1 إلى 4 كاملة (53 حلقة مكتملة القصة)"
+      }
+    ],
+    "legacy": {
+      "leadShow": "Superman & Lois",
+      "rtCritics": "88%",
+      "imdb": "7.8",
+      "rtAudience": "85%",
+      "tier": "h",
+      "ratingsVerified": false
+    },
+    "verified": false
+  }
+]
