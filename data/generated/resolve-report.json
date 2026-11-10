@@ -1,0 +1,6669 @@
+{
+ "ok": true,
+ "generatedAt": "2026-11-10T07:16:40.440Z",
+ "total": 181,
+ "confident": 170,
+ "review": 10,
+ "notFound": 1,
+ "errors": 0,
+ "ofConfident": {
+  "withImdbId": 170,
+  "withPoster": 170,
+  "withBackdrop": 170,
+  "withArabicOverview": 144,
+  "withArabicTitle": 87,
+  "flagged": 14
+ },
+ "rows": [
+  {
+   "id": "the-suicide-squad-2021",
+   "title": "The Suicide Squad",
+   "year": 2021,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 436969,
+     "title": "The Suicide Squad",
+     "date": "2021-07-28",
+     "votes": 10075,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 436969,
+    "imdb": "tt6334354",
+    "title": "The Suicide Squad",
+    "date": "2021-07-28",
+    "status": "Released",
+    "companies": [
+     "DC Films",
+     "Atlas Entertainment",
+     "The Safran Company",
+     "Warner Bros. Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.435,
+    "votes": 10075,
+    "arTitle": "فرقة الإنتحار",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "peacemaker-2022",
+   "title": "Peacemaker",
+   "year": 2022,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 110492,
+     "title": "Peacemaker",
+     "date": "2022-01-13",
+     "votes": 3626,
+     "exact": true
+    },
+    {
+     "tmdb": 324515,
+     "title": "Podly: The Peacemaker Podcast",
+     "date": "2022-01-13",
+     "votes": 2,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 110492,
+    "imdb": "tt13146488",
+    "tvdb": 391153,
+    "title": "Peacemaker",
+    "date": "2022-01-13",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Television",
+     "The Safran Company",
+     "Troll Court Entertainment",
+     "DC Studios",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.176,
+    "votes": 3625,
+    "seasons": 2,
+    "episodes": 16,
+    "arTitle": "صانع السلام",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "blue-beetle-2023",
+   "title": "Blue Beetle",
+   "year": 2023,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 565770,
+     "title": "Blue Beetle",
+     "date": "2023-08-16",
+     "votes": 3325,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 565770,
+    "imdb": "tt9362930",
+    "title": "Blue Beetle",
+    "date": "2023-08-16",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "The Safran Company",
+     "DC Films"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.604,
+    "votes": 3325,
+    "arTitle": "بلو بيتل",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "creature-commandos-2024",
+   "title": "Creature Commandos",
+   "year": 2024,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 219543,
+     "title": "Creature Commandos",
+     "date": "2024-12-05",
+     "votes": 407,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 219543,
+    "imdb": "tt26545355",
+    "tvdb": 430518,
+    "title": "Creature Commandos",
+    "date": "2024-12-05",
+    "status": "Returning Series",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC Studios",
+     "Lorey Stories",
+     "The Safran Company",
+     "Troll Court Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.8,
+    "votes": 407,
+    "seasons": 2,
+    "episodes": 8,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "superman-2025",
+   "title": "Superman",
+   "year": 2025,
+   "kind": "movie",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 1061474,
+     "title": "Superman",
+     "date": "2025-07-09",
+     "votes": 5733,
+     "exact": true
+    },
+    {
+     "tmdb": 1554871,
+     "title": "Superman",
+     "date": "2025-06-30",
+     "votes": 0,
+     "exact": true
+    },
+    {
+     "tmdb": 1553865,
+     "title": "NJPW Superhuman Taiji Ishimori Gets Even More Ridiculous",
+     "date": "2025-10-07",
+     "votes": 0,
+     "exact": false
+    },
+    {
+     "tmdb": 1317310,
+     "title": "Saving Superman",
+     "date": "2025-09-19",
+     "votes": 1,
+     "exact": false
+    }
+   ]
+  },
+  {
+   "id": "supergirl-2026",
+   "title": "Supergirl",
+   "year": 2026,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1081003,
+     "title": "Supergirl",
+     "date": "2026-06-24",
+     "votes": 2709,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 1081003,
+    "imdb": "tt8814476",
+    "title": "Supergirl",
+    "date": "2026-06-24",
+    "status": "Released",
+    "companies": [
+     "DC Studios",
+     "Troll Court Entertainment",
+     "The Safran Company",
+     "Domain Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.6,
+    "votes": 2709,
+    "arTitle": "سوبرجيرل",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "lanterns-2026",
+   "title": "Lanterns",
+   "year": 2026,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 95350,
+     "title": "Lanterns",
+     "date": "2026-08-16",
+     "votes": 864,
+     "exact": true
+    },
+    {
+     "tmdb": 331555,
+     "title": "Lanterns: The Official Podcast",
+     "date": "2026-08-16",
+     "votes": 5,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 95350,
+    "imdb": "tt26545992",
+    "tvdb": 376098,
+    "title": "Lanterns",
+    "date": "2026-08-16",
+    "status": "Returning Series",
+    "companies": [
+     "DC Studios",
+     "HBO",
+     "Warner Bros. Television",
+     "Man, Woman & Child Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.203,
+    "votes": 864,
+    "seasons": 1,
+    "episodes": 8,
+    "arTitle": "الفوانيس",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "clayface-2026",
+   "title": "Clayface",
+   "year": 2026,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1400940,
+     "title": "Clayface",
+     "date": "2026-10-19",
+     "votes": 413,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 1400940,
+    "imdb": "tt34890576",
+    "title": "Clayface",
+    "date": "2026-10-19",
+    "status": "Released",
+    "companies": [
+     "DC Studios",
+     "Domain Entertainment",
+     "6th & Idaho Motion Picture Company",
+     "Troll Court Entertainment",
+     "The Safran Company"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.4,
+    "votes": 411,
+    "arTitle": "كلايفيس",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "wonder-woman-2017",
+   "title": "Wonder Woman",
+   "year": 2017,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 297762,
+     "title": "Wonder Woman",
+     "date": "2017-05-30",
+     "votes": 21361,
+     "exact": true
+    },
+    {
+     "tmdb": 15359,
+     "title": "Wonder Woman",
+     "date": "2009-03-03",
+     "votes": 646,
+     "exact": true
+    },
+    {
+     "tmdb": 420622,
+     "title": "Professor Marston and the Wonder Women",
+     "date": "2017-10-13",
+     "votes": 968,
+     "exact": false
+    },
+    {
+     "tmdb": 1255345,
+     "title": "Etta's Mission",
+     "date": "2017-08-29",
+     "votes": 5,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 297762,
+    "imdb": "tt0451279",
+    "title": "Wonder Woman",
+    "date": "2017-05-30",
+    "status": "Released",
+    "companies": [
+     "Atlas Entertainment",
+     "Cruel & Unusual Films",
+     "DC Films",
+     "Warner Bros. Pictures",
+     "RatPac-Dune Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.198,
+    "votes": 21361,
+    "arTitle": "المرأة الأعجوبة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "wonder-woman-1984-2020",
+   "title": "Wonder Woman 1984",
+   "year": 2020,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 464052,
+     "title": "Wonder Woman 1984",
+     "date": "2020-12-16",
+     "votes": 9357,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 464052,
+    "imdb": "tt7126948",
+    "title": "Wonder Woman 1984",
+    "date": "2020-12-16",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "The Stone Quarry",
+     "DC Films",
+     "Atlas Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.338,
+    "votes": 9357,
+    "arTitle": "المرأة الأعجوبة ١٩٨٤",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "man-of-steel-2013",
+   "title": "Man of Steel",
+   "year": 2013,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 49521,
+     "title": "Man of Steel",
+     "date": "2013-06-12",
+     "votes": 16795,
+     "exact": true
+    },
+    {
+     "tmdb": 1681663,
+     "title": "Journey of Discovery: Creating Man of Steel",
+     "date": "2013-11-12",
+     "votes": 1,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 49521,
+    "imdb": "tt0770828",
+    "title": "Man of Steel",
+    "date": "2013-06-12",
+    "status": "Released",
+    "companies": [
+     "Syncopy",
+     "Peters Entertainment",
+     "Warner Bros. Pictures",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.663,
+    "votes": 16797,
+    "arTitle": "رجلٌ مِن الفولاذ",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-v-superman-dawn-of-justice-2016",
+   "title": "Batman v Superman: Dawn of Justice",
+   "year": 2016,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 209112,
+     "title": "Batman v Superman: Dawn of Justice",
+     "date": "2016-03-23",
+     "votes": 19542,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 209112,
+    "imdb": "tt2975590",
+    "title": "Batman v Superman: Dawn of Justice",
+    "date": "2016-03-23",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "RatPac Entertainment",
+     "Atlas Entertainment",
+     "Cruel & Unusual Films",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.015,
+    "votes": 19543,
+    "arTitle": "باتمان ضد سوبرمان: فجر العدالة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "suicide-squad-2016",
+   "title": "Suicide Squad",
+   "year": 2016,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 297761,
+     "title": "Suicide Squad",
+     "date": "2016-08-03",
+     "votes": 22611,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 297761,
+    "imdb": "tt1386697",
+    "title": "Suicide Squad",
+    "date": "2016-08-03",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "RatPac Entertainment",
+     "DC Films",
+     "Atlas Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.917,
+    "votes": 22611,
+    "arTitle": "الفرقة الإنتحارية",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "zack-snyder-s-justice-league-2021",
+   "title": "Zack Snyder's Justice League",
+   "year": 2021,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 791373,
+     "title": "Zack Snyder's Justice League",
+     "date": "2021-03-18",
+     "votes": 11290,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 791373,
+    "imdb": "tt12361974",
+    "title": "Zack Snyder's Justice League",
+    "date": "2021-03-18",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "The Stone Quarry",
+     "Atlas Entertainment",
+     "Access Entertainment",
+     "Dune Entertainment",
+     "DC Films"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.068,
+    "votes": 11290,
+    "arTitle": "فرقة العدالة: نسخة زاك سنايدر",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-2017",
+   "title": "Justice League",
+   "year": 2017,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 141052,
+     "title": "Justice League",
+     "date": "2017-11-15",
+     "votes": 14099,
+     "exact": true
+    },
+    {
+     "tmdb": 408220,
+     "title": "Justice League Dark",
+     "date": "2017-01-24",
+     "votes": 1188,
+     "exact": false
+    },
+    {
+     "tmdb": 183011,
+     "title": "Justice League: The Flashpoint Paradox",
+     "date": "2013-07-30",
+     "votes": 2071,
+     "exact": false
+    },
+    {
+     "tmdb": 14011,
+     "title": "Justice League: The New Frontier",
+     "date": "2008-02-26",
+     "votes": 581,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 141052,
+    "imdb": "tt0974015",
+    "title": "Justice League",
+    "date": "2017-11-15",
+    "status": "Released",
+    "companies": [
+     "Cruel & Unusual Films",
+     "Atlas Entertainment",
+     "Warner Bros. Pictures",
+     "RatPac Entertainment",
+     "DC Films"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.062,
+    "votes": 14098,
+    "arTitle": "فرقة العدالة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "aquaman-2018",
+   "title": "Aquaman",
+   "year": 2018,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 297802,
+     "title": "Aquaman",
+     "date": "2018-12-07",
+     "votes": 15348,
+     "exact": true
+    },
+    {
+     "tmdb": 513736,
+     "title": "LEGO DC Comics Super Heroes: Aquaman - Rage of Atlantis",
+     "date": "2018-12-21",
+     "votes": 124,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 297802,
+    "imdb": "tt1477834",
+    "title": "Aquaman",
+    "date": "2018-12-07",
+    "status": "Released",
+    "companies": [
+     "The Safran Company",
+     "Warner Bros. Pictures",
+     "DC Films"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.859,
+    "votes": 15349,
+    "arTitle": "أكوامان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "shazam-2019",
+   "title": "Shazam!",
+   "year": 2019,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 287947,
+     "title": "Shazam!",
+     "date": "2019-03-29",
+     "votes": 10573,
+     "exact": true
+    },
+    {
+     "tmdb": 748258,
+     "title": "DC Spotlight: Shazam!",
+     "date": "2019-08-09",
+     "votes": 0,
+     "exact": false
+    },
+    {
+     "tmdb": 1534414,
+     "title": "The Magical World of Shazam!",
+     "date": "2019-04-19",
+     "votes": 0,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 287947,
+    "imdb": "tt0448115",
+    "title": "Shazam!",
+    "date": "2019-03-29",
+    "status": "Released",
+    "companies": [
+     "New Line Cinema",
+     "The Safran Company",
+     "Seven Bucks Productions",
+     "DC Films"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.964,
+    "votes": 10574,
+    "arTitle": "شازام!",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "birds-of-prey-2020",
+   "title": "Birds of Prey",
+   "year": 2020,
+   "kind": "movie",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 495764,
+     "title": "Birds of Prey (and the Fantabulous Emancipation of One Harley Quinn)",
+     "date": "2020-02-05",
+     "votes": 11097,
+     "exact": false
+    }
+   ]
+  },
+  {
+   "id": "black-adam-2022",
+   "title": "Black Adam",
+   "year": 2022,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 436270,
+     "title": "Black Adam",
+     "date": "2022-10-19",
+     "votes": 7385,
+     "exact": true
+    },
+    {
+     "tmdb": 1040330,
+     "title": "Black Adam: Saviour or Destroyer?",
+     "date": "2022-10-15",
+     "votes": 459,
+     "exact": false
+    },
+    {
+     "tmdb": 607,
+     "title": "Men in Black",
+     "date": "1997-07-02",
+     "votes": 15418,
+     "exact": false
+    },
+    {
+     "tmdb": 608,
+     "title": "Men in Black II",
+     "date": "2002-07-03",
+     "votes": 11056,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 436270,
+    "imdb": "tt6443346",
+    "title": "Black Adam",
+    "date": "2022-10-19",
+    "status": "Released",
+    "companies": [
+     "New Line Cinema",
+     "Flynn Picture Company",
+     "DC Films",
+     "Seven Bucks Productions",
+     "Warner Bros. Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.745,
+    "votes": 7384,
+    "arTitle": "بلاك آدم",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "shazam-fury-of-the-gods-2023",
+   "title": "Shazam! Fury of the Gods",
+   "year": 2023,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 594767,
+     "title": "Shazam! Fury of the Gods",
+     "date": "2023-03-15",
+     "votes": 3857,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 594767,
+    "imdb": "tt10151854",
+    "title": "Shazam! Fury of the Gods",
+    "date": "2023-03-15",
+    "status": "Released",
+    "companies": [
+     "The Safran Company",
+     "New Line Cinema",
+     "DC Films"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.378,
+    "votes": 3856,
+    "arTitle": "شازام! غضب الملوك",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-flash-2023",
+   "title": "The Flash",
+   "year": 2023,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 298618,
+     "title": "The Flash",
+     "date": "2023-06-13",
+     "votes": 5388,
+     "exact": true
+    },
+    {
+     "tmdb": 1155289,
+     "title": "The Flash: Saga of the Scarlet Speedster",
+     "date": "2023-07-11",
+     "votes": 4,
+     "exact": false
+    },
+    {
+     "tmdb": 1178489,
+     "title": "Making The Flash: Worlds Collide",
+     "date": "2023-08-29",
+     "votes": 2,
+     "exact": false
+    },
+    {
+     "tmdb": 1202602,
+     "title": "Flash Wars - Autonomous Weapons, A.I. and the Future of Warfare",
+     "date": "2023-10-31",
+     "votes": 5,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 298618,
+    "imdb": "tt0439572",
+    "title": "The Flash",
+    "date": "2023-06-13",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Double Dream",
+     "The Disco Factory",
+     "DC Films"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.591,
+    "votes": 5387,
+    "arTitle": "ذا فلاش",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "aquaman-and-the-lost-kingdom-2023",
+   "title": "Aquaman and the Lost Kingdom",
+   "year": 2023,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 572802,
+     "title": "Aquaman and the Lost Kingdom",
+     "date": "2023-12-20",
+     "votes": 3758,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 572802,
+    "imdb": "tt9663764",
+    "title": "Aquaman and the Lost Kingdom",
+    "date": "2023-12-20",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "The Safran Company",
+     "Atomic Monster",
+     "DC Films",
+     "Domain Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.476,
+    "votes": 3758,
+    "arTitle": "أكوامان و المملكة المفقودة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-batman-2022",
+   "title": "The Batman",
+   "year": 2022,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 414906,
+     "title": "The Batman",
+     "date": "2022-03-01",
+     "votes": 12859,
+     "exact": true
+    },
+    {
+     "tmdb": 886396,
+     "title": "Batman and Superman: Battle of the Super Sons",
+     "date": "2022-10-17",
+     "votes": 375,
+     "exact": false
+    },
+    {
+     "tmdb": 1010830,
+     "title": "Batman: The Long Halloween Deluxe Edition",
+     "date": "2022-09-19",
+     "votes": 56,
+     "exact": false
+    },
+    {
+     "tmdb": 1766602,
+     "title": "The Batman: Unpacking the Icons",
+     "date": "2022-05-18",
+     "votes": 0,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 414906,
+    "imdb": "tt1877830",
+    "title": "The Batman",
+    "date": "2022-03-01",
+    "status": "Released",
+    "companies": [
+     "6th & Idaho Motion Picture Company",
+     "Dylan Clark Productions",
+     "DC Films",
+     "Warner Bros. Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.676,
+    "votes": 12859,
+    "arTitle": "ذا باتمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-penguin-2024",
+   "title": "The Penguin",
+   "year": 2024,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 194764,
+     "title": "The Penguin",
+     "date": "2024-09-19",
+     "votes": 1576,
+     "exact": true
+    },
+    {
+     "tmdb": 252747,
+     "title": "The Mothers of Penguins",
+     "date": "2024-11-13",
+     "votes": 23,
+     "exact": false
+    },
+    {
+     "tmdb": 271953,
+     "title": "Meet The Penguins",
+     "date": "2024-09-19",
+     "votes": 0,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 194764,
+    "imdb": "tt15435876",
+    "tvdb": 417648,
+    "title": "The Penguin",
+    "date": "2024-09-19",
+    "status": "Ended",
+    "companies": [
+     "6th & Idaho Motion Picture Company",
+     "Dylan Clark Productions",
+     "Warner Bros. Television",
+     "DC Studios",
+     "Acid and Tender Productions",
+     "Chapel Place Productions",
+     "Zobot Projects"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.358,
+    "votes": 1576,
+    "seasons": 1,
+    "episodes": 8,
+    "arTitle": "البطريق",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-begins-2005",
+   "title": "Batman Begins",
+   "year": 2005,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 272,
+     "title": "Batman Begins",
+     "date": "2005-06-10",
+     "votes": 23499,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 272,
+    "imdb": "tt0372784",
+    "title": "Batman Begins",
+    "date": "2005-06-10",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "DC",
+     "Syncopy",
+     "Legendary Pictures",
+     "Patalex III Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.733,
+    "votes": 23497,
+    "arTitle": "بداية باتمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-dark-knight-2008",
+   "title": "The Dark Knight",
+   "year": 2008,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 155,
+     "title": "The Dark Knight",
+     "date": "2008-07-16",
+     "votes": 37306,
+     "exact": true
+    },
+    {
+     "tmdb": 1406348,
+     "title": "Shadows of the Bat: The Cinematic Saga of the Dark Knight",
+     "date": "2008-10-18",
+     "votes": 0,
+     "exact": false
+    },
+    {
+     "tmdb": 29751,
+     "title": "Batman Unmasked: The Psychology of The Dark Knight",
+     "date": "2008-07-15",
+     "votes": 54,
+     "exact": false
+    },
+    {
+     "tmdb": 272,
+     "title": "Batman Begins",
+     "date": "2005-06-10",
+     "votes": 23499,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 155,
+    "imdb": "tt0468569",
+    "title": "The Dark Knight",
+    "date": "2008-07-16",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Legendary Pictures",
+     "Syncopy",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.54,
+    "votes": 37303,
+    "arTitle": "فارس الظلام",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-dark-knight-rises-2012",
+   "title": "The Dark Knight Rises",
+   "year": 2012,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 49026,
+     "title": "The Dark Knight Rises",
+     "date": "2012-07-17",
+     "votes": 25284,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 49026,
+    "imdb": "tt1345836",
+    "title": "The Dark Knight Rises",
+    "date": "2012-07-17",
+    "status": "Released",
+    "companies": [
+     "Syncopy",
+     "Legendary Pictures",
+     "Warner Bros. Pictures",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.801,
+    "votes": 25284,
+    "arTitle": "نهوض فارس الظلام",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "joker-2019",
+   "title": "Joker",
+   "year": 2019,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 475557,
+     "title": "Joker",
+     "date": "2019-10-01",
+     "votes": 28674,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 475557,
+    "imdb": "tt7286456",
+    "title": "Joker",
+    "date": "2019-10-01",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Joint Effort",
+     "Village Roadshow Pictures",
+     "Bron Studios",
+     "DC Films"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.113,
+    "votes": 28674,
+    "arTitle": "جوكر",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "joker-folie-a-deux-2024",
+   "title": "Joker: Folie à Deux",
+   "year": 2024,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 889737,
+     "title": "Joker: Folie à Deux",
+     "date": "2024-10-01",
+     "votes": 3146,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 889737,
+    "imdb": "tt11315808",
+    "title": "Joker: Folie à Deux",
+    "date": "2024-10-01",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Joint Effort",
+     "Domain Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.389,
+    "votes": 3146,
+    "arTitle": "جوكر: معًا في الجنون",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-1989",
+   "title": "Batman",
+   "year": 1989,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 268,
+     "title": "Batman",
+     "date": "1989-06-21",
+     "votes": 8937,
+     "exact": true
+    },
+    {
+     "tmdb": 157757,
+     "title": "Batmania: From Comics to Screen",
+     "date": "1989-01-01",
+     "votes": 5,
+     "exact": false
+    },
+    {
+     "tmdb": 158186,
+     "title": "Batman and Robin and Other Super Heroes",
+     "date": "1989-09-08",
+     "votes": 1,
+     "exact": false
+    },
+    {
+     "tmdb": 601973,
+     "title": "Holy Batmania",
+     "date": "1989-11-30",
+     "votes": 6,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 268,
+    "imdb": "tt0096895",
+    "title": "Batman",
+    "date": "1989-06-21",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Polygram Pictures",
+     "The Guber-Peters Company"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.235,
+    "votes": 8936,
+    "arTitle": "باتمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-returns-1992",
+   "title": "Batman Returns",
+   "year": 1992,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 364,
+     "title": "Batman Returns",
+     "date": "1992-06-19",
+     "votes": 7407,
+     "exact": true
+    },
+    {
+     "tmdb": 348909,
+     "title": "Batman Returns: The Bat, the Cat, and the Penguin",
+     "date": "1992-06-17",
+     "votes": 16,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 364,
+    "imdb": "tt0103776",
+    "title": "Batman Returns",
+    "date": "1992-06-19",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Polygram Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.955,
+    "votes": 7405,
+    "arTitle": "باتمان يعود",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-forever-1995",
+   "title": "Batman Forever",
+   "year": 1995,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 414,
+     "title": "Batman Forever",
+     "date": "1995-06-16",
+     "votes": 5836,
+     "exact": true
+    },
+    {
+     "tmdb": 294656,
+     "title": "Riddle Me This: Why Is Batman Forever?",
+     "date": "1995-06-14",
+     "votes": 18,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 414,
+    "imdb": "tt0112462",
+    "title": "Batman Forever",
+    "date": "1995-06-16",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Tim Burton Productions",
+     "Polygram Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.463,
+    "votes": 5836,
+    "arTitle": "باتمان للأبد",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-and-robin-1997",
+   "title": "Batman & Robin",
+   "year": 1997,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 415,
+     "title": "Batman & Robin",
+     "date": "1997-06-20",
+     "votes": 5637,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 415,
+    "imdb": "tt0118688",
+    "title": "Batman & Robin",
+    "date": "1997-06-20",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Polygram Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 4.4,
+    "votes": 5636,
+    "arTitle": "باتمان وروبن",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-1978",
+   "title": "Superman",
+   "year": 1978,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1924,
+     "title": "Superman",
+     "date": "1978-12-14",
+     "votes": 4500,
+     "exact": true
+    },
+    {
+     "tmdb": 60639,
+     "title": "Shaolin Kung-Fu Mystagogue",
+     "date": "1977-10-13",
+     "votes": 7,
+     "exact": false
+    },
+    {
+     "tmdb": 39264,
+     "title": "Godzilla vs. Megalon",
+     "date": "1973-03-17",
+     "votes": 252,
+     "exact": false
+    },
+    {
+     "tmdb": 106922,
+     "title": "Argoman the Fantastic Superman",
+     "date": "1967-03-24",
+     "votes": 23,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 1924,
+    "imdb": "tt0078346",
+    "title": "Superman",
+    "date": "1978-12-14",
+    "status": "Released",
+    "companies": [
+     "Dovemead Films",
+     "Alexander and Ilya Salkind Productions",
+     "International Film Production"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.165,
+    "votes": 4500,
+    "arTitle": "سوبرمان",
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "superman-ii-1980",
+   "title": "Superman II",
+   "year": 1980,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 8536,
+     "title": "Superman II",
+     "date": "1980-12-04",
+     "votes": 2659,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 8536,
+    "imdb": "tt0081573",
+    "title": "Superman II",
+    "date": "1980-12-04",
+    "status": "Released",
+    "companies": [
+     "Dovemead Films",
+     "Alexander and Ilya Salkind Productions",
+     "International Film Production"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.744,
+    "votes": 2659,
+    "arTitle": "سوبرمان 2",
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "superman-iii-1983",
+   "title": "Superman III",
+   "year": 1983,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 9531,
+     "title": "Superman III",
+     "date": "1983-06-17",
+     "votes": 1973,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 9531,
+    "imdb": "tt0086393",
+    "title": "Superman III",
+    "date": "1983-06-17",
+    "status": "Released",
+    "companies": [
+     "Dovemead Films",
+     "Alexander and Ilya Salkind Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.497,
+    "votes": 1973,
+    "arTitle": "سوبرمان 3",
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "supergirl-1984",
+   "title": "Supergirl",
+   "year": 1984,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 9651,
+     "title": "Supergirl",
+     "date": "1984-07-01",
+     "votes": 745,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 9651,
+    "imdb": "tt0088206",
+    "title": "Supergirl",
+    "date": "1984-07-01",
+    "status": "Released",
+    "companies": [
+     "Artistry",
+     "Alexander and Ilya Salkind Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.376,
+    "votes": 745,
+    "arTitle": null,
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "superman-iv-the-quest-for-peace-1987",
+   "title": "Superman IV: The Quest for Peace",
+   "year": 1987,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 11411,
+     "title": "Superman IV: The Quest for Peace",
+     "date": "1987-07-24",
+     "votes": 1477,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 11411,
+    "imdb": "tt0094074",
+    "title": "Superman IV: The Quest for Peace",
+    "date": "1987-07-24",
+    "status": "Released",
+    "companies": [
+     "The Cannon Group",
+     "London-Cannon Films",
+     "Golan-Globus Productions",
+     "Warner Bros. Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 4.59,
+    "votes": 1477,
+    "arTitle": "سوبرمان 4: البحث عن السلام",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-returns-2006",
+   "title": "Superman Returns",
+   "year": 2006,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1452,
+     "title": "Superman Returns",
+     "date": "2006-06-28",
+     "votes": 4770,
+     "exact": true
+    },
+    {
+     "tmdb": 324249,
+     "title": "Requiem for Krypton: Making 'Superman Returns'",
+     "date": "2006-11-28",
+     "votes": 9,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 1452,
+    "imdb": "tt0348150",
+    "title": "Superman Returns",
+    "date": "2006-06-28",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Legendary Pictures",
+     "Peters Entertainment",
+     "Bad Hat Harry Productions",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.832,
+    "votes": 4770,
+    "arTitle": "عودة سوبرمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "arrow-2012",
+   "title": "Arrow",
+   "year": 2012,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1412,
+     "title": "Arrow",
+     "date": "2012-10-10",
+     "votes": 6545,
+     "exact": true
+    },
+    {
+     "tmdb": 57202,
+     "title": "Arrows on the Bowstring",
+     "date": "2012-09-13",
+     "votes": 4,
+     "exact": false
+    },
+    {
+     "tmdb": 275685,
+     "title": "断箭",
+     "date": "2012-03-23",
+     "votes": 1,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 1412,
+    "imdb": "tt2193021",
+    "tvdb": 257655,
+    "title": "Arrow",
+    "date": "2012-10-10",
+    "status": "Ended",
+    "companies": [
+     "Berlanti Productions",
+     "DC Entertainment",
+     "Warner Bros. Television",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.835,
+    "votes": 6545,
+    "seasons": 8,
+    "episodes": 170,
+    "arTitle": "السهم",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-flash-2014",
+   "title": "The Flash",
+   "year": 2014,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 60735,
+     "title": "The Flash",
+     "date": "2014-10-07",
+     "votes": 11858,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 60735,
+    "imdb": "tt3107288",
+    "tvdb": 279121,
+    "title": "The Flash",
+    "date": "2014-10-07",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Television",
+     "Berlanti Productions",
+     "DC Entertainment",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.738,
+    "votes": 11858,
+    "seasons": 9,
+    "episodes": 184,
+    "arTitle": "فلاش",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "constantine-2014",
+   "title": "Constantine",
+   "year": 2014,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 60743,
+     "title": "Constantine",
+     "date": "2014-10-24",
+     "votes": 1677,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 60743,
+    "imdb": "tt3489184",
+    "tvdb": 273690,
+    "title": "Constantine",
+    "date": "2014-10-24",
+    "status": "Canceled",
+    "companies": [
+     "DC",
+     "Warner Bros. Television",
+     "Phantom Four",
+     "Ever After Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.747,
+    "votes": 1677,
+    "seasons": 1,
+    "episodes": 13,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "supergirl-2015",
+   "title": "Supergirl",
+   "year": 2015,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 62688,
+     "title": "Supergirl",
+     "date": "2015-10-26",
+     "votes": 4495,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 62688,
+    "imdb": "tt4016454",
+    "tvdb": 295759,
+    "title": "Supergirl",
+    "date": "2015-10-26",
+    "status": "Ended",
+    "companies": [
+     "DC Entertainment",
+     "Berlanti Productions",
+     "Warner Bros. Television",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.253,
+    "votes": 4495,
+    "seasons": 6,
+    "episodes": 126,
+    "arTitle": "الفتاة الخارقة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "dc-s-legends-of-tomorrow-2016",
+   "title": "DC's Legends of Tomorrow",
+   "year": 2016,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 62643,
+     "title": "DC's Legends of Tomorrow",
+     "date": "2016-01-21",
+     "votes": 2537,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 62643,
+    "imdb": "tt4532368",
+    "tvdb": 295760,
+    "title": "DC's Legends of Tomorrow",
+    "date": "2016-01-21",
+    "status": "Canceled",
+    "companies": [
+     "Warner Bros. Television",
+     "Bonanza Productions",
+     "Berlanti Productions",
+     "DC Entertainment",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.23,
+    "votes": 2537,
+    "seasons": 7,
+    "episodes": 110,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "black-lightning-2018",
+   "title": "Black Lightning",
+   "year": 2018,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 71663,
+     "title": "Black Lightning",
+     "date": "2018-01-16",
+     "votes": 993,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 71663,
+    "imdb": "tt6045840",
+    "tvdb": 332525,
+    "title": "Black Lightning",
+    "date": "2018-01-16",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Television",
+     "Akil Productions",
+     "Berlanti Productions",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.904,
+    "votes": 993,
+    "seasons": 4,
+    "episodes": 58,
+    "arTitle": "البرق اﻷسود",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batwoman-2019",
+   "title": "Batwoman",
+   "year": 2019,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 89247,
+     "title": "Batwoman",
+     "date": "2019-10-06",
+     "votes": 1620,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 89247,
+    "imdb": "tt8712204",
+    "tvdb": 361315,
+    "title": "Batwoman",
+    "date": "2019-10-06",
+    "status": "Canceled",
+    "companies": [
+     "Berlanti Productions",
+     "Warner Bros. Television",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.794,
+    "votes": 1620,
+    "seasons": 3,
+    "episodes": 51,
+    "arTitle": "بات ومن",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "stargirl-2020",
+   "title": "Stargirl",
+   "year": 2020,
+   "kind": "tv",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 80986,
+     "title": "DC's Stargirl",
+     "date": "2020-05-18",
+     "votes": 1203,
+     "exact": false
+    }
+   ]
+  },
+  {
+   "id": "superman-and-lois-2021",
+   "title": "Superman & Lois",
+   "year": 2021,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 95057,
+     "title": "Superman & Lois",
+     "date": "2021-02-23",
+     "votes": 2784,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 95057,
+    "imdb": "tt11192306",
+    "tvdb": 375655,
+    "title": "Superman & Lois",
+    "date": "2021-02-23",
+    "status": "Ended",
+    "companies": [
+     "Berlanti Productions",
+     "Warner Bros. Television",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.049,
+    "votes": 2784,
+    "seasons": 4,
+    "episodes": 53,
+    "arTitle": "سوبرمان ولويس",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "titans-2018",
+   "title": "Titans",
+   "year": 2018,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 75450,
+     "title": "Titans",
+     "date": "2018-10-12",
+     "votes": 2928,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 75450,
+    "imdb": "tt1043813",
+    "tvdb": 341663,
+    "title": "Titans",
+    "date": "2018-10-12",
+    "status": "Ended",
+    "companies": [
+     "Berlanti Productions",
+     "Warner Bros. Television",
+     "Weed Road Pictures",
+     "DC Entertainment",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.836,
+    "votes": 2928,
+    "seasons": 4,
+    "episodes": 49,
+    "arTitle": "تايتنز",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "doom-patrol-2019",
+   "title": "Doom Patrol",
+   "year": 2019,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 79501,
+     "title": "Doom Patrol",
+     "date": "2019-02-15",
+     "votes": 1511,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 79501,
+    "imdb": "tt8416494",
+    "tvdb": 355622,
+    "title": "Doom Patrol",
+    "date": "2019-02-15",
+    "status": "Ended",
+    "companies": [
+     "Berlanti Productions",
+     "Warner Bros. Television",
+     "Jeremy Carver Productions",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.47,
+    "votes": 1511,
+    "seasons": 4,
+    "episodes": 46,
+    "arTitle": "دوامة الموت",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-sandman-2022",
+   "title": "The Sandman",
+   "year": 2022,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 90802,
+     "title": "The Sandman",
+     "date": "2022-08-05",
+     "votes": 2801,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 90802,
+    "imdb": "tt1751634",
+    "tvdb": 366211,
+    "title": "The Sandman",
+    "date": "2022-08-05",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Television",
+     "DC Entertainment",
+     "Purepop",
+     "Phantom Four",
+     "The Blank Corporation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.833,
+    "votes": 2801,
+    "seasons": 2,
+    "episodes": 23,
+    "arTitle": "رجل الرمل",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "dead-boy-detectives-2024",
+   "title": "Dead Boy Detectives",
+   "year": 2024,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 132750,
+     "title": "Dead Boy Detectives",
+     "date": "2024-04-25",
+     "votes": 347,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 132750,
+    "imdb": "tt15358446",
+    "tvdb": 419024,
+    "title": "Dead Boy Detectives",
+    "date": "2024-04-25",
+    "status": "Canceled",
+    "companies": [
+     "Berlanti Productions",
+     "Warner Bros. Television",
+     "DC Entertainment",
+     "Ghost Octopus"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.607,
+    "votes": 347,
+    "seasons": 1,
+    "episodes": 8,
+    "arTitle": "محققان من عالم الموت",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-the-animated-series-1992",
+   "title": "Batman: The Animated Series",
+   "year": 1992,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 2098,
+     "title": "Batman: The Animated Series",
+     "date": "1992-09-05",
+     "votes": 1937,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 2098,
+    "imdb": "tt0103359",
+    "tvdb": 76168,
+    "title": "Batman: The Animated Series",
+    "date": "1992-09-05",
+    "status": "Ended",
+    "companies": [
+     "DC",
+     "Warner Bros. Television"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.6,
+    "votes": 1937,
+    "seasons": 4,
+    "episodes": 85,
+    "arTitle": "باتمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-mask-of-the-phantasm-1993",
+   "title": "Batman: Mask of the Phantasm",
+   "year": 1993,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 14919,
+     "title": "Batman: Mask of the Phantasm",
+     "date": "1993-12-25",
+     "votes": 1326,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 14919,
+    "imdb": "tt0106364",
+    "title": "Batman: Mask of the Phantasm",
+    "date": "1993-12-25",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Family Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.516,
+    "votes": 1326,
+    "arTitle": "باتمان: قناع الشبح",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-and-mr-freeze-subzero-1998",
+   "title": "Batman & Mr. Freeze: SubZero",
+   "year": 1998,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 15805,
+     "title": "Batman & Mr. Freeze: SubZero",
+     "date": "1998-02-11",
+     "votes": 534,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 15805,
+    "imdb": "tt0143127",
+    "title": "Batman & Mr. Freeze: SubZero",
+    "date": "1998-02-11",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.9,
+    "votes": 534,
+    "arTitle": "باتمان و سيد فريزير تحت الصفر",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-the-animated-series-1996",
+   "title": "Superman: The Animated Series",
+   "year": 1996,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 4303,
+     "title": "Superman: The Animated Series",
+     "date": "1996-09-06",
+     "votes": 394,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 4303,
+    "imdb": "tt0115378",
+    "tvdb": 71788,
+    "title": "Superman: The Animated Series",
+    "date": "1996-09-06",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.7,
+    "votes": 394,
+    "seasons": 3,
+    "episodes": 54,
+    "arTitle": "سوبرمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-new-batman-adventures-1997",
+   "title": "The New Batman Adventures",
+   "year": 1997,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 4625,
+     "title": "The New Batman Adventures",
+     "date": "1997-09-13",
+     "votes": 417,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 4625,
+    "imdb": "tt0118266",
+    "tvdb": 77084,
+    "title": "The New Batman Adventures",
+    "date": "1997-09-13",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC",
+     "Warner Bros. Television"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.073,
+    "votes": 417,
+    "seasons": 2,
+    "episodes": 24,
+    "arTitle": "مغامرات باتمان الجديدة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-mystery-of-the-batwoman-2003",
+   "title": "Batman: Mystery of the Batwoman",
+   "year": 2003,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 21683,
+     "title": "Batman: Mystery of the Batwoman",
+     "date": "2003-10-21",
+     "votes": 469,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 21683,
+    "imdb": "tt0346578",
+    "title": "Batman: Mystery of the Batwoman",
+    "date": "2003-10-21",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 469,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "static-shock-2000",
+   "title": "Static Shock",
+   "year": 2000,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1487,
+     "title": "Static Shock",
+     "date": "2000-09-23",
+     "votes": 241,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 1487,
+    "imdb": "tt0247729",
+    "tvdb": 79067,
+    "title": "Static Shock",
+    "date": "2000-09-23",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8,
+    "votes": 241,
+    "seasons": 4,
+    "episodes": 52,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "justice-league-2001",
+   "title": "Justice League",
+   "year": 2001,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1618,
+     "title": "Justice League",
+     "date": "2001-11-17",
+     "votes": 638,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 1618,
+    "imdb": "tt0275137",
+    "tvdb": 76320,
+    "title": "Justice League",
+    "date": "2001-11-17",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.218,
+    "votes": 638,
+    "seasons": 2,
+    "episodes": 50,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "justice-league-unlimited-2004",
+   "title": "Justice League Unlimited",
+   "year": 2004,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 84200,
+     "title": "Justice League Unlimited",
+     "date": "2004-07-31",
+     "votes": 907,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 84200,
+    "imdb": "tt6025022",
+    "title": "Justice League Unlimited",
+    "date": "2004-07-31",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.304,
+    "votes": 907,
+    "seasons": 3,
+    "episodes": 39,
+    "arTitle": "فرقة العدالة بلا حدود",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-vs-the-fatal-five-2019",
+   "title": "Justice League vs. the Fatal Five",
+   "year": 2019,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 537059,
+     "title": "Justice League vs. the Fatal Five",
+     "date": "2019-03-29",
+     "votes": 404,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 537059,
+    "imdb": "tt8752474",
+    "title": "Justice League vs. the Fatal Five",
+    "date": "2019-03-29",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 404,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-beyond-1999",
+   "title": "Batman Beyond",
+   "year": 1999,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 513,
+     "title": "Batman Beyond",
+     "date": "1999-01-10",
+     "votes": 646,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 513,
+    "imdb": "tt0147746",
+    "tvdb": 75417,
+    "title": "Batman Beyond",
+    "date": "1999-01-10",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.169,
+    "votes": 646,
+    "seasons": 3,
+    "episodes": 52,
+    "arTitle": "باتمان بيوند",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-beyond-return-of-the-joker-2000",
+   "title": "Batman Beyond: Return of the Joker",
+   "year": 2000,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 16234,
+     "title": "Batman Beyond: Return of the Joker",
+     "date": "2000-12-12",
+     "votes": 1225,
+     "exact": true
+    },
+    {
+     "tmdb": 1774904,
+     "title": "Making of 'Batman Beyond: Return of the Joker'",
+     "date": "2000-10-31",
+     "votes": 0,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 16234,
+    "imdb": "tt0233298",
+    "title": "Batman Beyond: Return of the Joker",
+    "date": "2000-12-12",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.35,
+    "votes": 1225,
+    "arTitle": "باتمان عودة الجوكر",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-the-flashpoint-paradox-2013",
+   "title": "Justice League: The Flashpoint Paradox",
+   "year": 2013,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 183011,
+     "title": "Justice League: The Flashpoint Paradox",
+     "date": "2013-07-30",
+     "votes": 2071,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 183011,
+    "imdb": "tt2820466",
+    "title": "Justice League: The Flashpoint Paradox",
+    "date": "2013-07-30",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC",
+     "Warner Premiere"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.889,
+    "votes": 2071,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-war-2014",
+   "title": "Justice League: War",
+   "year": 2014,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 217993,
+     "title": "Justice League: War",
+     "date": "2014-01-21",
+     "votes": 1221,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 217993,
+    "imdb": "tt3060952",
+    "title": "Justice League: War",
+    "date": "2014-01-21",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.4,
+    "votes": 1221,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "son-of-batman-2014",
+   "title": "Son of Batman",
+   "year": 2014,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 251519,
+     "title": "Son of Batman",
+     "date": "2014-05-13",
+     "votes": 1198,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 251519,
+    "imdb": "tt3139072",
+    "title": "Son of Batman",
+    "date": "2014-05-13",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.083,
+    "votes": 1198,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "justice-league-throne-of-atlantis-2015",
+   "title": "Justice League: Throne of Atlantis",
+   "year": 2015,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 297556,
+     "title": "Justice League: Throne of Atlantis",
+     "date": "2015-01-13",
+     "votes": 1035,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 297556,
+    "imdb": "tt3878542",
+    "title": "Justice League: Throne of Atlantis",
+    "date": "2015-01-13",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.969,
+    "votes": 1035,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-vs-robin-2015",
+   "title": "Batman vs. Robin",
+   "year": 2015,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 321528,
+     "title": "Batman vs. Robin",
+     "date": "2015-04-03",
+     "votes": 1035,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 321528,
+    "imdb": "tt4324274",
+    "title": "Batman vs. Robin",
+    "date": "2015-04-03",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.2,
+    "votes": 1035,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-bad-blood-2016",
+   "title": "Batman: Bad Blood",
+   "year": 2016,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 366924,
+     "title": "Batman: Bad Blood",
+     "date": "2016-01-19",
+     "votes": 1025,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 366924,
+    "imdb": "tt4870838",
+    "title": "Batman: Bad Blood",
+    "date": "2016-01-19",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7,
+    "votes": 1025,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-vs-teen-titans-2016",
+   "title": "Justice League vs. Teen Titans",
+   "year": 2016,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 379291,
+     "title": "Justice League vs. Teen Titans",
+     "date": "2016-03-26",
+     "votes": 1070,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 379291,
+    "imdb": "tt5091548",
+    "title": "Justice League vs. Teen Titans",
+    "date": "2016-03-26",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.27,
+    "votes": 1070,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-dark-2017",
+   "title": "Justice League Dark",
+   "year": 2017,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 408220,
+     "title": "Justice League Dark",
+     "date": "2017-01-24",
+     "votes": 1188,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 408220,
+    "imdb": "tt2494376",
+    "title": "Justice League Dark",
+    "date": "2017-01-24",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.303,
+    "votes": 1188,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "teen-titans-the-judas-contract-2017",
+   "title": "Teen Titans: The Judas Contract",
+   "year": 2017,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 408647,
+     "title": "Teen Titans: The Judas Contract",
+     "date": "2017-04-04",
+     "votes": 793,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 408647,
+    "imdb": "tt6315800",
+    "title": "Teen Titans: The Judas Contract",
+    "date": "2017-04-04",
+    "status": "Released",
+    "companies": [
+     "DC Entertainment",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.337,
+    "votes": 793,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "suicide-squad-hell-to-pay-2018",
+   "title": "Suicide Squad: Hell to Pay",
+   "year": 2018,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 487242,
+     "title": "Suicide Squad: Hell to Pay",
+     "date": "2018-03-23",
+     "votes": 745,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 487242,
+    "imdb": "tt7167602",
+    "title": "Suicide Squad: Hell to Pay",
+    "date": "2018-03-23",
+    "status": "Released",
+    "companies": [
+     "DC Entertainment",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.101,
+    "votes": 745,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "constantine-city-of-demons-2018",
+   "title": "Constantine: City of Demons",
+   "year": 2018,
+   "kind": "movie",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 539517,
+     "title": "Constantine: City of Demons - The Movie",
+     "date": "2018-10-04",
+     "votes": 694,
+     "exact": false
+    }
+   ]
+  },
+  {
+   "id": "the-death-of-superman-2018",
+   "title": "The Death of Superman",
+   "year": 2018,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 487670,
+     "title": "The Death of Superman",
+     "date": "2019-01-13",
+     "votes": 667,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 487670,
+    "imdb": "tt7167658",
+    "title": "The Death of Superman",
+    "date": "2019-01-13",
+    "status": "Released",
+    "companies": [
+     "DC Entertainment",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.456,
+    "votes": 667,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "reign-of-the-supermen-2019",
+   "title": "Reign of the Supermen",
+   "year": 2019,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 487672,
+     "title": "Reign of the Supermen",
+     "date": "2019-01-13",
+     "votes": 727,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 487672,
+    "imdb": "tt7167686",
+    "title": "Reign of the Supermen",
+    "date": "2019-01-13",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.997,
+    "votes": 727,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-hush-2019",
+   "title": "Batman: Hush",
+   "year": 2019,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 537056,
+     "title": "Batman: Hush",
+     "date": "2019-07-19",
+     "votes": 1004,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 537056,
+    "imdb": "tt8752440",
+    "title": "Batman: Hush",
+    "date": "2019-07-19",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.2,
+    "votes": 1004,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "wonder-woman-bloodlines-2019",
+   "title": "Wonder Woman: Bloodlines",
+   "year": 2019,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 537055,
+     "title": "Wonder Woman: Bloodlines",
+     "date": "2019-10-04",
+     "votes": 536,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 537055,
+    "imdb": "tt8752498",
+    "title": "Wonder Woman: Bloodlines",
+    "date": "2019-10-04",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.86,
+    "votes": 536,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-dark-apokolips-war-2020",
+   "title": "Justice League Dark: Apokolips War",
+   "year": 2020,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 618344,
+     "title": "Justice League Dark: Apokolips War",
+     "date": "2020-05-05",
+     "votes": 1651,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 618344,
+    "imdb": "tt11079148",
+    "title": "Justice League Dark: Apokolips War",
+    "date": "2020-05-05",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.19,
+    "votes": 1651,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "constantine-the-house-of-mystery-2022",
+   "title": "Constantine: The House of Mystery",
+   "year": 2022,
+   "kind": "movie",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 791348,
+     "title": "DC Showcase - Constantine: The House of Mystery",
+     "date": "2022-05-02",
+     "votes": 199,
+     "exact": false
+    }
+   ]
+  },
+  {
+   "id": "justice-society-world-war-ii-2021",
+   "title": "Justice Society: World War II",
+   "year": 2021,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 736069,
+     "title": "Justice Society: World War II",
+     "date": "2021-04-27",
+     "votes": 623,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 736069,
+    "imdb": "tt13804084",
+    "title": "Justice Society: World War II",
+    "date": "2021-04-27",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.372,
+    "votes": 623,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-man-of-tomorrow-2020",
+   "title": "Superman: Man of Tomorrow",
+   "year": 2020,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 618354,
+     "title": "Superman: Man of Tomorrow",
+     "date": "2020-08-23",
+     "votes": 522,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 618354,
+    "imdb": "tt11079116",
+    "title": "Superman: Man of Tomorrow",
+    "date": "2020-08-23",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.047,
+    "votes": 522,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-the-long-halloween-part-one-2021",
+   "title": "Batman: The Long Halloween, Part One",
+   "year": 2021,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 736073,
+     "title": "Batman: The Long Halloween, Part One",
+     "date": "2021-06-21",
+     "votes": 741,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 736073,
+    "imdb": "tt14324650",
+    "title": "Batman: The Long Halloween, Part One",
+    "date": "2021-06-21",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.4,
+    "votes": 741,
+    "arTitle": "باتمان: الهالوين الطويل، الجزء الأول",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-the-long-halloween-part-two-2021",
+   "title": "Batman: The Long Halloween, Part Two",
+   "year": 2021,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 736074,
+     "title": "Batman: The Long Halloween, Part Two",
+     "date": "2021-07-26",
+     "votes": 609,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 736074,
+    "imdb": "tt14402926",
+    "title": "Batman: The Long Halloween, Part Two",
+    "date": "2021-07-26",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.4,
+    "votes": 609,
+    "arTitle": "باتمان: الهالوين الطويل، الجزء الثاني",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "green-lantern-beware-my-power-2022",
+   "title": "Green Lantern: Beware My Power",
+   "year": 2022,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 887357,
+     "title": "Green Lantern: Beware My Power",
+     "date": "2022-07-26",
+     "votes": 289,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 887357,
+    "imdb": "tt20192230",
+    "title": "Green Lantern: Beware My Power",
+    "date": "2022-07-26",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.837,
+    "votes": 289,
+    "arTitle": "المصباح الأخضر: احذر قوتي",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "legion-of-super-heroes-2023",
+   "title": "Legion of Super-Heroes",
+   "year": 2023,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1003580,
+     "title": "Legion of Super-Heroes",
+     "date": "2023-02-07",
+     "votes": 236,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 1003580,
+    "imdb": "tt22769820",
+    "title": "Legion of Super-Heroes",
+    "date": "2023-02-07",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.379,
+    "votes": 236,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-warworld-2023",
+   "title": "Justice League: Warworld",
+   "year": 2023,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1003581,
+     "title": "Justice League: Warworld",
+     "date": "2023-07-25",
+     "votes": 320,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 1003581,
+    "imdb": "tt27687527",
+    "title": "Justice League: Warworld",
+    "date": "2023-07-25",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 320,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-crisis-on-infinite-earths-part-one-2024",
+   "title": "Justice League: Crisis on Infinite Earths – Part One",
+   "year": 2024,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1155089,
+     "title": "Justice League: Crisis on Infinite Earths Part One",
+     "date": "2024-01-08",
+     "votes": 444,
+     "exact": true
+    },
+    {
+     "tmdb": 1209290,
+     "title": "Justice League: Crisis on Infinite Earths Part Three",
+     "date": "2024-07-15",
+     "votes": 359,
+     "exact": false
+    },
+    {
+     "tmdb": 1209288,
+     "title": "Justice League: Crisis on Infinite Earths Part Two",
+     "date": "2024-04-22",
+     "votes": 314,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 1155089,
+    "imdb": "tt29195117",
+    "title": "Justice League: Crisis on Infinite Earths Part One",
+    "date": "2024-01-08",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.218,
+    "votes": 444,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-crisis-on-infinite-earths-part-two-2024",
+   "title": "Justice League: Crisis on Infinite Earths – Part Two",
+   "year": 2024,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1209288,
+     "title": "Justice League: Crisis on Infinite Earths Part Two",
+     "date": "2024-04-22",
+     "votes": 314,
+     "exact": true
+    },
+    {
+     "tmdb": 1155089,
+     "title": "Justice League: Crisis on Infinite Earths Part One",
+     "date": "2024-01-08",
+     "votes": 444,
+     "exact": false
+    },
+    {
+     "tmdb": 1209290,
+     "title": "Justice League: Crisis on Infinite Earths Part Three",
+     "date": "2024-07-15",
+     "votes": 359,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 1209288,
+    "imdb": "tt30150907",
+    "title": "Justice League: Crisis on Infinite Earths Part Two",
+    "date": "2024-04-22",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.713,
+    "votes": 314,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-crisis-on-infinite-earths-part-three-2024",
+   "title": "Justice League: Crisis on Infinite Earths – Part Three",
+   "year": 2024,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1209290,
+     "title": "Justice League: Crisis on Infinite Earths Part Three",
+     "date": "2024-07-15",
+     "votes": 359,
+     "exact": true
+    },
+    {
+     "tmdb": 1155089,
+     "title": "Justice League: Crisis on Infinite Earths Part One",
+     "date": "2024-01-08",
+     "votes": 444,
+     "exact": false
+    },
+    {
+     "tmdb": 1209288,
+     "title": "Justice League: Crisis on Infinite Earths Part Two",
+     "date": "2024-04-22",
+     "votes": 314,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 1209290,
+    "imdb": "tt30150917",
+    "title": "Justice League: Crisis on Infinite Earths Part Three",
+    "date": "2024-07-15",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.148,
+    "votes": 359,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "harley-quinn-2019",
+   "title": "Harley Quinn",
+   "year": 2019,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 74440,
+     "title": "Harley Quinn",
+     "date": "2019-11-29",
+     "votes": 1201,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 74440,
+    "imdb": "tt7658402",
+    "tvdb": 365677,
+    "title": "Harley Quinn",
+    "date": "2019-11-29",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation",
+     "Yes, Norman Productions",
+     "Ehsugadee",
+     "Delicious Non-Sequitur",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.276,
+    "votes": 1201,
+    "seasons": 5,
+    "episodes": 57,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "kite-man-hell-yeah-2024",
+   "title": "Kite Man: Hell Yeah!",
+   "year": 2024,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 200753,
+     "title": "Kite Man: Hell Yeah!",
+     "date": "2024-07-18",
+     "votes": 46,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 200753,
+    "imdb": "tt19853518",
+    "tvdb": 419498,
+    "title": "Kite Man: Hell Yeah!",
+    "date": "2024-07-18",
+    "status": "Canceled",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC Entertainment",
+     "Yes, Norman Productions",
+     "Delicious Non-Sequitur",
+     "Lorey Stories",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 46,
+    "seasons": 1,
+    "episodes": 10,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "superman-fleischer-cartoons-1941",
+   "title": "Superman (Fleischer cartoons)",
+   "year": 1941,
+   "kind": "tv",
+   "status": "not-found",
+   "candidates": [],
+   "otherKindCandidates": [
+    {
+     "tmdb": 342605,
+     "title": "Max Fleischer's Superman 1941-1942",
+     "date": "1941-09-26"
+    }
+   ]
+  },
+  {
+   "id": "adventures-of-captain-marvel-1941",
+   "title": "Adventures of Captain Marvel",
+   "year": 1941,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 61020,
+     "title": "Adventures of Captain Marvel",
+     "date": "1941-03-28",
+     "votes": 31,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 61020,
+    "imdb": "tt0033317",
+    "title": "Adventures of Captain Marvel",
+    "date": "1941-03-28",
+    "status": "Released",
+    "companies": [
+     "Republic Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.4,
+    "votes": 31,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "batman-1943",
+   "title": "Batman",
+   "year": 1943,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 125249,
+     "title": "Batman",
+     "date": "1943-07-16",
+     "votes": 135,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 125249,
+    "imdb": "tt0035665",
+    "title": "Batman",
+    "date": "1943-07-16",
+    "status": "Released",
+    "companies": [
+     "Columbia Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.2,
+    "votes": 135,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "superman-1948",
+   "title": "Superman",
+   "year": 1948,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 126712,
+     "title": "Superman",
+     "date": "1948-07-15",
+     "votes": 32,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 126712,
+    "imdb": "tt0040852",
+    "title": "Superman",
+    "date": "1948-07-15",
+    "status": "Released",
+    "companies": [
+     "Sam Katzman Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.203,
+    "votes": 32,
+    "arTitle": null,
+    "arOverview": false
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "superman-and-the-mole-men-1951",
+   "title": "Superman and the Mole Men",
+   "year": 1951,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 41800,
+     "title": "Superman and the Mole Men",
+     "date": "1951-11-23",
+     "votes": 81,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 41800,
+    "imdb": "tt0044091",
+    "title": "Superman and the Mole Men",
+    "date": "1951-11-23",
+    "status": "Released",
+    "companies": [
+     "Lippert Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.34,
+    "votes": 81,
+    "arTitle": null,
+    "arOverview": false
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "adventures-of-superman-1952",
+   "title": "Adventures of Superman",
+   "year": 1952,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 12662,
+     "title": "Adventures of Superman",
+     "date": "1952-09-19",
+     "votes": 65,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 12662,
+    "imdb": "tt0044231",
+    "tvdb": 77403,
+    "title": "Adventures of Superman",
+    "date": "1952-09-19",
+    "status": "Ended",
+    "companies": [
+     "Motion Pictures for Television",
+     "National Comics Publications"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.638,
+    "votes": 65,
+    "seasons": 6,
+    "episodes": 104,
+    "arTitle": null,
+    "arOverview": false
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "batman-1966",
+   "title": "Batman",
+   "year": 1966,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 2287,
+     "title": "Batman",
+     "date": "1966-01-12",
+     "votes": 629,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 2287,
+    "imdb": "tt0059968",
+    "tvdb": 77871,
+    "title": "Batman",
+    "date": "1966-01-12",
+    "status": "Canceled",
+    "companies": [
+     "20th Century Fox",
+     "Greenway Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.292,
+    "votes": 629,
+    "seasons": 3,
+    "episodes": 120,
+    "arTitle": "باتمان",
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "super-friends-1973",
+   "title": "Super Friends",
+   "year": 1973,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 936,
+     "title": "Super Friends",
+     "date": "1973-09-08",
+     "votes": 167,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 936,
+    "imdb": "tt0069641",
+    "tvdb": 254222,
+    "title": "Super Friends",
+    "date": "1973-09-08",
+    "status": "Ended",
+    "companies": [
+     "Eric Porter Studios",
+     "Hanna-Barbera Cartoons"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.8,
+    "votes": 167,
+    "seasons": 9,
+    "episodes": 109,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "wonder-woman-1975",
+   "title": "Wonder Woman",
+   "year": 1975,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 4331,
+     "title": "Wonder Woman",
+     "date": "1975-11-07",
+     "votes": 505,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 4331,
+    "imdb": "tt0074074",
+    "tvdb": 71228,
+    "title": "Wonder Woman",
+    "date": "1975-11-07",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Television",
+     "Bruce Lansbury Productions",
+     "Douglas S. Cramer Company"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.016,
+    "votes": 505,
+    "seasons": 3,
+    "episodes": 60,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "swamp-thing-1982",
+   "title": "Swamp Thing",
+   "year": 1982,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 17918,
+     "title": "Swamp Thing",
+     "date": "1982-02-19",
+     "votes": 504,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 17918,
+    "imdb": "tt0084745",
+    "title": "Swamp Thing",
+    "date": "1982-02-19",
+    "status": "Released",
+    "companies": [
+     "Melniker-Uslan Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.419,
+    "votes": 504,
+    "arTitle": null,
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "steel-1997",
+   "title": "Steel",
+   "year": 1997,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 8854,
+     "title": "Steel",
+     "date": "1997-08-15",
+     "votes": 299,
+     "exact": true
+    },
+    {
+     "tmdb": 158097,
+     "title": "Danielle Steel's Zoya",
+     "date": "1997-07-26",
+     "votes": 17,
+     "exact": false
+    },
+    {
+     "tmdb": 30733,
+     "title": "Rod Steele 0014: You Only Live Until You Die",
+     "date": "1997-01-05",
+     "votes": 13,
+     "exact": false
+    },
+    {
+     "tmdb": 12821,
+     "title": "Steel Sharks",
+     "date": "1997-10-10",
+     "votes": 14,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 8854,
+    "imdb": "tt0120207",
+    "title": "Steel",
+    "date": "1997-08-15",
+    "status": "Released",
+    "companies": [
+     "Quincy Jones-David Salzman Entertainment",
+     "Warner Bros. Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 4.247,
+    "votes": 299,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "road-to-perdition-2002",
+   "title": "Road to Perdition",
+   "year": 2002,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 4147,
+     "title": "Road to Perdition",
+     "date": "2002-07-12",
+     "votes": 4187,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 4147,
+    "imdb": "tt0257044",
+    "title": "Road to Perdition",
+    "date": "2002-07-12",
+    "status": "Released",
+    "companies": [
+     "DreamWorks Pictures",
+     "20th Century Fox",
+     "The Zanuck Company"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.366,
+    "votes": 4187,
+    "arTitle": "الطريق إلى الهلاك",
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "catwoman-2004",
+   "title": "Catwoman",
+   "year": 2004,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 314,
+     "title": "Catwoman",
+     "date": "2004-07-22",
+     "votes": 3748,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 314,
+    "imdb": "tt0327554",
+    "title": "Catwoman",
+    "date": "2004-07-22",
+    "status": "Released",
+    "companies": [
+     "Village Roadshow Pictures",
+     "Di Novi Pictures",
+     "Frantic Films",
+     "Maple Shade Films",
+     "Catwoman Films",
+     "Warner Bros. Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 4.636,
+    "votes": 3748,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "constantine-2005",
+   "title": "Constantine",
+   "year": 2005,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 561,
+     "title": "Constantine",
+     "date": "2005-02-08",
+     "votes": 8710,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 561,
+    "imdb": "tt0360486",
+    "title": "Constantine",
+    "date": "2005-02-08",
+    "status": "Released",
+    "companies": [
+     "Village Roadshow Pictures",
+     "Lonely Film Productions",
+     "The Donners' Company",
+     "Batfilm Productions",
+     "Weed Road Pictures",
+     "Warner Bros. Pictures",
+     "3 Arts Entertainment",
+     "DC Vertigo"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.218,
+    "votes": 8710,
+    "arTitle": "قسطنطين",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "a-history-of-violence-2005",
+   "title": "A History of Violence",
+   "year": 2005,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 59,
+     "title": "A History of Violence",
+     "date": "2005-09-23",
+     "votes": 3955,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 59,
+    "imdb": "tt0399146",
+    "title": "A History of Violence",
+    "date": "2005-09-23",
+    "status": "Released",
+    "companies": [
+     "New Line Cinema",
+     "BenderSpink",
+     "Media I! Filmproduktion München & Company"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.162,
+    "votes": 3955,
+    "arTitle": null,
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "v-for-vendetta-2005",
+   "title": "V for Vendetta",
+   "year": 2005,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 752,
+     "title": "V for Vendetta",
+     "date": "2006-02-23",
+     "votes": 16159,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 752,
+    "imdb": "tt0434409",
+    "title": "V for Vendetta",
+    "date": "2006-02-23",
+    "status": "Released",
+    "companies": [
+     "Virtual Studios",
+     "Anarchos Productions",
+     "Silver Pictures",
+     "Fünfte Babelsberg Film",
+     "Warner Bros. Productions",
+     "DC Vertigo"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.898,
+    "votes": 16159,
+    "arTitle": "(في) للثأر",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "watchmen-2009",
+   "title": "Watchmen",
+   "year": 2009,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 13183,
+     "title": "Watchmen",
+     "date": "2009-03-04",
+     "votes": 10395,
+     "exact": true
+    },
+    {
+     "tmdb": 16440,
+     "title": "Tales of the Black Freighter",
+     "date": "2009-03-24",
+     "votes": 229,
+     "exact": false
+    },
+    {
+     "tmdb": 41207,
+     "title": "Under the Hood",
+     "date": "2009-03-24",
+     "votes": 51,
+     "exact": false
+    },
+    {
+     "tmdb": 1692289,
+     "title": "Story Within a Story: The Books of Watchmen",
+     "date": "2009-11-03",
+     "votes": 0,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 13183,
+    "imdb": "tt0409459",
+    "title": "Watchmen",
+    "date": "2009-03-04",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Paramount Pictures",
+     "Legendary Pictures",
+     "DC",
+     "Lawrence Gordon Productions",
+     "Lloyd Levin Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.352,
+    "votes": 10395,
+    "arTitle": "مراقبون",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-losers-2010",
+   "title": "The Losers",
+   "year": 2010,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 34813,
+     "title": "The Losers",
+     "date": "2010-04-23",
+     "votes": 2079,
+     "exact": true
+    },
+    {
+     "tmdb": 610593,
+     "title": "The Loser's Club",
+     "date": "2001-11-15",
+     "votes": 3,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 34813,
+    "imdb": "tt0480255",
+    "title": "The Losers",
+    "date": "2010-04-23",
+    "status": "Released",
+    "companies": [
+     "Dark Castle Entertainment",
+     "Weed Road Pictures",
+     "Warner Bros. Pictures",
+     "DC Vertigo"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.3,
+    "votes": 2079,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "red-2010",
+   "title": "Red",
+   "year": 2010,
+   "kind": "movie",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 39514,
+     "title": "RED",
+     "date": "2010-10-13",
+     "votes": 7395,
+     "exact": true
+    },
+    {
+     "tmdb": 960550,
+     "title": "Red",
+     "date": "2010-01-01",
+     "votes": 0,
+     "exact": true
+    },
+    {
+     "tmdb": 210835,
+     "title": "Red",
+     "date": "2010-05-08",
+     "votes": 1,
+     "exact": true
+    },
+    {
+     "tmdb": 1774350,
+     "title": "Red",
+     "date": "2010-06-18",
+     "votes": 0,
+     "exact": true
+    }
+   ]
+  },
+  {
+   "id": "jonah-hex-2010",
+   "title": "Jonah Hex",
+   "year": 2010,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 20533,
+     "title": "Jonah Hex",
+     "date": "2010-06-18",
+     "votes": 1604,
+     "exact": true
+    },
+    {
+     "tmdb": 41988,
+     "title": "DC Showcase: Jonah Hex",
+     "date": "2010-07-27",
+     "votes": 191,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 20533,
+    "imdb": "tt1075747",
+    "title": "Jonah Hex",
+    "date": "2010-06-18",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Pictures",
+     "Legendary Pictures",
+     "Weed Road Pictures",
+     "Mad Chance",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5,
+    "votes": 1604,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "green-lantern-2011",
+   "title": "Green Lantern",
+   "year": 2011,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 44912,
+     "title": "Green Lantern",
+     "date": "2011-06-14",
+     "votes": 7954,
+     "exact": true
+    },
+    {
+     "tmdb": 40805,
+     "title": "The Green Hornet",
+     "date": "2011-01-12",
+     "votes": 3612,
+     "exact": false
+    },
+    {
+     "tmdb": 65291,
+     "title": "Green Lantern: Emerald Knights",
+     "date": "2011-06-07",
+     "votes": 575,
+     "exact": false
+    },
+    {
+     "tmdb": 1018148,
+     "title": "Only the Bravest: Tales of the Green Lantern Corps",
+     "date": "2011-06-07",
+     "votes": 0,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 44912,
+    "imdb": "tt1133985",
+    "title": "Green Lantern",
+    "date": "2011-06-14",
+    "status": "Released",
+    "companies": [
+     "De Line Pictures",
+     "Warner Bros. Pictures",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.204,
+    "votes": 7954,
+    "arTitle": "الفانوس الأخضر",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-flash-1990",
+   "title": "The Flash",
+   "year": 1990,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 236,
+     "title": "The Flash",
+     "date": "1990-09-20",
+     "votes": 534,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 236,
+    "imdb": "tt0098798",
+    "tvdb": 78650,
+    "title": "The Flash",
+    "date": "1990-09-20",
+    "status": "Canceled",
+    "companies": [
+     "Warner Bros. Television",
+     "Pet Fly Productions"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.439,
+    "votes": 534,
+    "seasons": 1,
+    "episodes": 22,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "lois-and-clark-the-new-adventures-of-superman-1993",
+   "title": "Lois & Clark: The New Adventures of Superman",
+   "year": 1993,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 4515,
+     "title": "Lois & Clark: The New Adventures of Superman",
+     "date": "1993-09-12",
+     "votes": 521,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 4515,
+    "imdb": "tt0106057",
+    "tvdb": 72468,
+    "title": "Lois & Clark: The New Adventures of Superman",
+    "date": "1993-09-12",
+    "status": "Canceled",
+    "companies": [],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.905,
+    "votes": 521,
+    "seasons": 4,
+    "episodes": 87,
+    "arTitle": null,
+    "arOverview": false
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "smallville-2001",
+   "title": "Smallville",
+   "year": 2001,
+   "kind": "tv",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 4604,
+     "title": "Smallville",
+     "date": "2001-10-16",
+     "votes": 4661,
+     "exact": true
+    },
+    {
+     "tmdb": 341403,
+     "title": "smallville",
+     "date": "2001-01-07",
+     "votes": 0,
+     "exact": true
+    }
+   ]
+  },
+  {
+   "id": "gotham-2014",
+   "title": "Gotham",
+   "year": 2014,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 60708,
+     "title": "Gotham",
+     "date": "2014-09-22",
+     "votes": 3840,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 60708,
+    "imdb": "tt3749900",
+    "tvdb": 274431,
+    "title": "Gotham",
+    "date": "2014-09-22",
+    "status": "Ended",
+    "companies": [
+     "DC Entertainment",
+     "Primrose Hill Productions",
+     "Warner Bros. Television",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.595,
+    "votes": 3840,
+    "seasons": 5,
+    "episodes": 100,
+    "arTitle": "قوثام",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "izombie-2015",
+   "title": "iZombie",
+   "year": 2015,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 60866,
+     "title": "iZombie",
+     "date": "2015-03-17",
+     "votes": 2987,
+     "exact": true
+    },
+    {
+     "tmdb": 62049,
+     "title": "I Survived a Zombie Apocalypse",
+     "date": "2015-02-15",
+     "votes": 10,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 60866,
+    "imdb": "tt3501584",
+    "tvdb": 281470,
+    "title": "iZombie",
+    "date": "2015-03-17",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Television",
+     "Spondoolie Productions",
+     "DC Vertigo"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.788,
+    "votes": 2987,
+    "seasons": 5,
+    "episodes": 71,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "lucifer-2016",
+   "title": "Lucifer",
+   "year": 2016,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 63174,
+     "title": "Lucifer",
+     "date": "2016-01-25",
+     "votes": 15777,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 63174,
+    "imdb": "tt4052886",
+    "tvdb": 295685,
+    "title": "Lucifer",
+    "date": "2016-01-25",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Television",
+     "DC Entertainment",
+     "Jerry Bruckheimer Television",
+     "DC Vertigo"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.428,
+    "votes": 15777,
+    "seasons": 6,
+    "episodes": 93,
+    "arTitle": "لوسيفر",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "preacher-2016",
+   "title": "Preacher",
+   "year": 2016,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 64230,
+     "title": "Preacher",
+     "date": "2016-05-22",
+     "votes": 1380,
+     "exact": true
+    },
+    {
+     "tmdb": 66004,
+     "title": "Preachers of Atlanta",
+     "date": "2016-02-03",
+     "votes": 1,
+     "exact": false
+    },
+    {
+     "tmdb": 337315,
+     "title": "Talking Preacher",
+     "date": "2016-05-29",
+     "votes": 0,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 64230,
+    "imdb": "tt5016504",
+    "tvdb": 300472,
+    "title": "Preacher",
+    "date": "2016-05-22",
+    "status": "Ended",
+    "companies": [
+     "Point Grey Pictures",
+     "Short Drive Entertainment",
+     "Original Film",
+     "Kickstart Entertainment",
+     "Nightsky Productions",
+     "AMC Studios",
+     "Sony Pictures Television"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.43,
+    "votes": 1380,
+    "seasons": 4,
+    "episodes": 43,
+    "arTitle": "الواعظ",
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "krypton-2018",
+   "title": "Krypton",
+   "year": 2018,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 71340,
+     "title": "Krypton",
+     "date": "2018-03-21",
+     "votes": 516,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 71340,
+    "imdb": "tt4276624",
+    "tvdb": 328599,
+    "title": "Krypton",
+    "date": "2018-03-21",
+    "status": "Canceled",
+    "companies": [
+     "Warner Horizon Television",
+     "DC Entertainment",
+     "Phantom Four",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.1,
+    "votes": 516,
+    "seasons": 2,
+    "episodes": 20,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "swamp-thing-2019",
+   "title": "Swamp Thing",
+   "year": 2019,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 79240,
+     "title": "Swamp Thing",
+     "date": "2019-05-31",
+     "votes": 1094,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 79240,
+    "imdb": "tt8362852",
+    "tvdb": 361735,
+    "title": "Swamp Thing",
+    "date": "2019-05-31",
+    "status": "Canceled",
+    "companies": [
+     "Atomic Monster",
+     "Warner Bros. Television",
+     "Big Shoe Productions",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.413,
+    "votes": 1094,
+    "seasons": 1,
+    "episodes": 10,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "pennyworth-2019",
+   "title": "Pennyworth",
+   "year": 2019,
+   "kind": "tv",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 79588,
+     "title": "Pennyworth: The Origin of Batman's Butler",
+     "date": "2019-07-28",
+     "votes": 400,
+     "exact": false
+    }
+   ]
+  },
+  {
+   "id": "watchmen-2019",
+   "title": "Watchmen",
+   "year": 2019,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 79788,
+     "title": "Watchmen",
+     "date": "2019-10-20",
+     "votes": 1725,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 79788,
+    "imdb": "tt7049682",
+    "tvdb": 360733,
+    "title": "Watchmen",
+    "date": "2019-10-20",
+    "status": "Ended",
+    "companies": [
+     "White Rabbit",
+     "Warner Bros. Television",
+     "Paramount Television Studios",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.622,
+    "votes": 1725,
+    "seasons": 1,
+    "episodes": 9,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "sweet-tooth-2021",
+   "title": "Sweet Tooth",
+   "year": 2021,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 103768,
+     "title": "Sweet Tooth",
+     "date": "2021-06-04",
+     "votes": 1683,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 103768,
+    "imdb": "tt12809988",
+    "tvdb": 355837,
+    "title": "Sweet Tooth",
+    "date": "2021-06-04",
+    "status": "Ended",
+    "companies": [
+     "Team Downey",
+     "Nightshade",
+     "Warner Bros. Television",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.735,
+    "votes": 1683,
+    "seasons": 3,
+    "episodes": 24,
+    "arTitle": "سويت توث: الفتى صاحب القرنين",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "naomi-2022",
+   "title": "Naomi",
+   "year": 2022,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 125474,
+     "title": "Naomi",
+     "date": "2022-01-11",
+     "votes": 115,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 125474,
+    "imdb": "tt13624900",
+    "tvdb": 403412,
+    "title": "Naomi",
+    "date": "2022-01-11",
+    "status": "Canceled",
+    "companies": [
+     "ARRAY Filmworks",
+     "Warner Bros. Television",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.9,
+    "votes": 115,
+    "seasons": 1,
+    "episodes": 13,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "gotham-knights-2023",
+   "title": "Gotham Knights",
+   "year": 2023,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 195868,
+     "title": "Gotham Knights",
+     "date": "2023-03-14",
+     "votes": 178,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 195868,
+    "imdb": "tt16418896",
+    "tvdb": 420061,
+    "title": "Gotham Knights",
+    "date": "2023-03-14",
+    "status": "Canceled",
+    "companies": [
+     "Berlanti Productions",
+     "DC Entertainment",
+     "Warner Bros. Television"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 178,
+    "seasons": 1,
+    "episodes": 13,
+    "arTitle": "فرسان جوثام",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "bodies-2023",
+   "title": "Bodies",
+   "year": 2023,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 233629,
+     "title": "Bodies",
+     "date": "2023-10-19",
+     "votes": 614,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 233629,
+    "imdb": "tt18347622",
+    "tvdb": 417257,
+    "title": "Bodies",
+    "date": "2023-10-19",
+    "status": "Ended",
+    "companies": [
+     "Moonage Pictures"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.094,
+    "votes": 614,
+    "seasons": 1,
+    "episodes": 8,
+    "arTitle": "الجثث",
+    "arOverview": true
+   },
+   "flag": "شركة الإنتاج لا تشير لـDC — تحقق"
+  },
+  {
+   "id": "teen-titans-2003",
+   "title": "Teen Titans",
+   "year": 2003,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 604,
+     "title": "Teen Titans",
+     "date": "2003-07-19",
+     "votes": 1376,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 604,
+    "imdb": "tt0343314",
+    "tvdb": 71503,
+    "title": "Teen Titans",
+    "date": "2003-07-19",
+    "status": "Ended",
+    "companies": [
+     "DC",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.351,
+    "votes": 1376,
+    "seasons": 5,
+    "episodes": 65,
+    "arTitle": "تين تايتنز",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-batman-2004",
+   "title": "The Batman",
+   "year": 2004,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 2022,
+     "title": "The Batman",
+     "date": "2004-09-11",
+     "votes": 516,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 2022,
+    "imdb": "tt0398417",
+    "tvdb": 73180,
+    "title": "The Batman",
+    "date": "2004-09-11",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8,
+    "votes": 516,
+    "seasons": 5,
+    "episodes": 65,
+    "arTitle": "باتمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-the-brave-and-the-bold-2008",
+   "title": "Batman: The Brave and the Bold",
+   "year": 2008,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 15804,
+     "title": "Batman: The Brave and the Bold",
+     "date": "2008-11-14",
+     "votes": 295,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 15804,
+    "imdb": "tt1213218",
+    "tvdb": 82824,
+    "title": "Batman: The Brave and the Bold",
+    "date": "2008-11-14",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.6,
+    "votes": 295,
+    "seasons": 3,
+    "episodes": 64,
+    "arTitle": "باتمان الجرأة والشجاعة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "young-justice-2010",
+   "title": "Young Justice",
+   "year": 2010,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 33217,
+     "title": "Young Justice",
+     "date": "2010-11-26",
+     "votes": 1266,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 33217,
+    "imdb": "tt1641384",
+    "tvdb": 192061,
+    "title": "Young Justice",
+    "date": "2010-11-26",
+    "status": "Canceled",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC Entertainment",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.382,
+    "votes": 1266,
+    "seasons": 4,
+    "episodes": 98,
+    "arTitle": "شباب العدالة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "green-lantern-the-animated-series-2011",
+   "title": "Green Lantern: The Animated Series",
+   "year": 2011,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 40351,
+     "title": "Green Lantern: The Animated Series",
+     "date": "2011-11-11",
+     "votes": 231,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 40351,
+    "imdb": "tt1724587",
+    "tvdb": 251807,
+    "title": "Green Lantern: The Animated Series",
+    "date": "2011-11-11",
+    "status": "Canceled",
+    "companies": [
+     "DC Entertainment",
+     "Warner Bros. Animation",
+     "Reel FX Creative Studios"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.8,
+    "votes": 231,
+    "seasons": 1,
+    "episodes": 26,
+    "arTitle": "غرين لانتر",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "teen-titans-go-2013",
+   "title": "Teen Titans Go!",
+   "year": 2013,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 45140,
+     "title": "Teen Titans Go!",
+     "date": "2013-04-23",
+     "votes": 744,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 45140,
+    "imdb": "tt2771780",
+    "tvdb": 266775,
+    "title": "Teen Titans Go!",
+    "date": "2013-04-23",
+    "status": "Returning Series",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC Entertainment",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.39,
+    "votes": 744,
+    "seasons": 9,
+    "episodes": 454,
+    "arTitle": "تين تايتنز غو!",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-action-2016",
+   "title": "Justice League Action",
+   "year": 2016,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 68837,
+     "title": "Justice League Action",
+     "date": "2016-12-16",
+     "votes": 95,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 68837,
+    "imdb": "tt5419200",
+    "tvdb": 312818,
+    "title": "Justice League Action",
+    "date": "2016-12-16",
+    "status": "Ended",
+    "companies": [
+     "DC Entertainment",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.205,
+    "votes": 95,
+    "seasons": 1,
+    "episodes": 52,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "dc-super-hero-girls-2019",
+   "title": "DC Super Hero Girls",
+   "year": 2019,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 87491,
+     "title": "DC Super Hero Girls",
+     "date": "2019-03-08",
+     "votes": 187,
+     "exact": true
+    },
+    {
+     "tmdb": 232618,
+     "title": "DC Super Hero Girls: Super Shorts",
+     "date": "2019-01-17",
+     "votes": 5,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 87491,
+    "imdb": "tt9628244",
+    "tvdb": 359619,
+    "title": "DC Super Hero Girls",
+    "date": "2019-03-08",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Animation",
+     "Jam Filled Entertainment",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.9,
+    "votes": 187,
+    "seasons": 2,
+    "episodes": 78,
+    "arTitle": "ثانوية سوبر غيرلز",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "my-adventures-with-superman-2023",
+   "title": "My Adventures with Superman",
+   "year": 2023,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 125928,
+     "title": "My Adventures with Superman",
+     "date": "2023-07-07",
+     "votes": 283,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 125928,
+    "imdb": "tt14681924",
+    "tvdb": 403172,
+    "title": "My Adventures with Superman",
+    "date": "2023-07-07",
+    "status": "Returning Series",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC",
+     "DC Studios"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 8.1,
+    "votes": 283,
+    "seasons": 3,
+    "episodes": 30,
+    "arTitle": "مغامراتي مع سوبرمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "suicide-squad-isekai-2024",
+   "title": "Suicide Squad Isekai",
+   "year": 2024,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 229926,
+     "title": "Suicide Squad Isekai",
+     "date": "2024-06-27",
+     "votes": 121,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 229926,
+    "imdb": "tt28279848",
+    "tvdb": 436846,
+    "title": "Suicide Squad Isekai",
+    "date": "2024-06-27",
+    "status": "Ended",
+    "companies": [
+     "Warner Bros. Japan",
+     "WIT STUDIO",
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.2,
+    "votes": 121,
+    "seasons": 1,
+    "episodes": 10,
+    "arTitle": "Isekai Suicide Squad",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-caped-crusader-2024",
+   "title": "Batman: Caped Crusader",
+   "year": 2024,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 125909,
+     "title": "Batman: Caped Crusader",
+     "date": "2024-08-01",
+     "votes": 297,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 125909,
+    "imdb": "tt14681596",
+    "tvdb": 403170,
+    "title": "Batman: Caped Crusader",
+    "date": "2024-08-01",
+    "status": "Returning Series",
+    "companies": [
+     "Warner Bros. Animation",
+     "Bad Robot",
+     "6th & Idaho Motion Picture Company",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.298,
+    "votes": 297,
+    "seasons": 2,
+    "episodes": 20,
+    "arTitle": "الرجل الوطواط، المحارب ذو الرداء",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "bat-fam-2025",
+   "title": "Bat-Fam",
+   "year": 2025,
+   "kind": "tv",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 225361,
+     "title": "BAT-FAM",
+     "date": "2025-11-10",
+     "votes": 17,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 225361,
+    "imdb": "tt27621333",
+    "tvdb": 440811,
+    "title": "BAT-FAM",
+    "date": "2025-11-10",
+    "status": "Returning Series",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 4.2,
+    "votes": 17,
+    "seasons": 1,
+    "episodes": 10,
+    "arTitle": "عائلة بات",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-doomsday-2007",
+   "title": "Superman: Doomsday",
+   "year": 2007,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 13640,
+     "title": "Superman: Doomsday",
+     "date": "2007-11-20",
+     "votes": 725,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 13640,
+    "imdb": "tt0934706",
+    "title": "Superman: Doomsday",
+    "date": "2007-11-20",
+    "status": "Released",
+    "companies": [
+     "DC",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.73,
+    "votes": 725,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-the-new-frontier-2008",
+   "title": "Justice League: The New Frontier",
+   "year": 2008,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 14011,
+     "title": "Justice League: The New Frontier",
+     "date": "2008-02-26",
+     "votes": 581,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 14011,
+    "imdb": "tt0902272",
+    "title": "Justice League: The New Frontier",
+    "date": "2008-02-26",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC",
+     "Warner Premiere"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.83,
+    "votes": 581,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-gotham-knight-2008",
+   "title": "Batman: Gotham Knight",
+   "year": 2008,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 13851,
+     "title": "Batman: Gotham Knight",
+     "date": "2008-07-08",
+     "votes": 806,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 13851,
+    "imdb": "tt1117563",
+    "title": "Batman: Gotham Knight",
+    "date": "2008-07-08",
+    "status": "Released",
+    "companies": [
+     "DC",
+     "BeeTrain",
+     "Warner Bros. Animation",
+     "Madhouse",
+     "Production I.G",
+     "STUDIO4℃",
+     "Warner Bros. Japan"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 806,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "wonder-woman-2009",
+   "title": "Wonder Woman",
+   "year": 2009,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 15359,
+     "title": "Wonder Woman",
+     "date": "2009-03-03",
+     "votes": 646,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 15359,
+    "imdb": "tt1186373",
+    "title": "Wonder Woman",
+    "date": "2009-03-03",
+    "status": "Released",
+    "companies": [
+     "DC",
+     "Warner Bros. Animation",
+     "Warner Premiere"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.188,
+    "votes": 646,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "green-lantern-first-flight-2009",
+   "title": "Green Lantern: First Flight",
+   "year": 2009,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 17445,
+     "title": "Green Lantern: First Flight",
+     "date": "2009-07-28",
+     "votes": 529,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 17445,
+    "imdb": "tt1384590",
+    "title": "Green Lantern: First Flight",
+    "date": "2009-07-28",
+    "status": "Released",
+    "companies": [
+     "DC",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.945,
+    "votes": 529,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-batman-public-enemies-2009",
+   "title": "Superman/Batman: Public Enemies",
+   "year": 2009,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 22855,
+     "title": "Superman/Batman: Public Enemies",
+     "date": "2009-09-29",
+     "votes": 750,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 22855,
+    "imdb": "tt1398941",
+    "title": "Superman/Batman: Public Enemies",
+    "date": "2009-09-29",
+    "status": "Released",
+    "companies": [
+     "Warner Premiere",
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.091,
+    "votes": 750,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-crisis-on-two-earths-2010",
+   "title": "Justice League: Crisis on Two Earths",
+   "year": 2010,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 30061,
+     "title": "Justice League: Crisis on Two Earths",
+     "date": "2010-02-23",
+     "votes": 807,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 30061,
+    "imdb": "tt1494772",
+    "title": "Justice League: Crisis on Two Earths",
+    "date": "2010-02-23",
+    "status": "Released",
+    "companies": [
+     "Warner Premiere",
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.292,
+    "votes": 807,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-under-the-red-hood-2010",
+   "title": "Batman: Under the Red Hood",
+   "year": 2010,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 40662,
+     "title": "Batman: Under the Red Hood",
+     "date": "2010-07-27",
+     "votes": 1807,
+     "exact": true
+    },
+    {
+     "tmdb": 536861,
+     "title": "A First Look at Batman: Under the Red Hood",
+     "date": "2010-02-23",
+     "votes": 4,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 40662,
+    "imdb": "tt1569923",
+    "title": "Batman: Under the Red Hood",
+    "date": "2010-07-27",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC",
+     "Warner Premiere"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.8,
+    "votes": 1807,
+    "arTitle": "باتمان: تحت القلنسوة الحمراء",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-batman-apocalypse-2010",
+   "title": "Superman/Batman: Apocalypse",
+   "year": 2010,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 45162,
+     "title": "Superman/Batman: Apocalypse",
+     "date": "2010-09-28",
+     "votes": 805,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 45162,
+    "imdb": "tt1673430",
+    "title": "Superman/Batman: Apocalypse",
+    "date": "2010-09-28",
+    "status": "Released",
+    "companies": [
+     "Warner Premiere",
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.159,
+    "votes": 805,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "all-star-superman-2011",
+   "title": "All-Star Superman",
+   "year": 2011,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 56590,
+     "title": "All Star Superman",
+     "date": "2011-01-01",
+     "votes": 585,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 56590,
+    "imdb": "tt1699114",
+    "title": "All Star Superman",
+    "date": "2011-01-01",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.9,
+    "votes": 585,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "green-lantern-emerald-knights-2011",
+   "title": "Green Lantern: Emerald Knights",
+   "year": 2011,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 65291,
+     "title": "Green Lantern: Emerald Knights",
+     "date": "2011-06-07",
+     "votes": 575,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 65291,
+    "imdb": "tt1683043",
+    "title": "Green Lantern: Emerald Knights",
+    "date": "2011-06-07",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "Warner Premiere",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.646,
+    "votes": 575,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-year-one-2011",
+   "title": "Batman: Year One",
+   "year": 2011,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 69735,
+     "title": "Batman: Year One",
+     "date": "2011-09-27",
+     "votes": 1096,
+     "exact": true
+    },
+    {
+     "tmdb": 704327,
+     "title": "Batman Year One: A Conversation with DC Comics",
+     "date": "2011-10-11",
+     "votes": 0,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 69735,
+    "imdb": "tt1672723",
+    "title": "Batman: Year One",
+    "date": "2011-09-27",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "Warner Premiere",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.3,
+    "votes": 1096,
+    "arTitle": "الرجل الوطواط - السنة الأولى",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "justice-league-doom-2012",
+   "title": "Justice League: Doom",
+   "year": 2012,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 76589,
+     "title": "Justice League: Doom",
+     "date": "2012-02-28",
+     "votes": 966,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 76589,
+    "imdb": "tt2027128",
+    "title": "Justice League: Doom",
+    "date": "2012-02-28",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "Warner Premiere",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.418,
+    "votes": 966,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-vs-the-elite-2012",
+   "title": "Superman vs. The Elite",
+   "year": 2012,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 103269,
+     "title": "Superman vs. The Elite",
+     "date": "2012-06-12",
+     "votes": 467,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 103269,
+    "imdb": "tt2224455",
+    "title": "Superman vs. The Elite",
+    "date": "2012-06-12",
+    "status": "Released",
+    "companies": [
+     "Warner Premiere",
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.914,
+    "votes": 467,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-the-dark-knight-returns-part-1-2012",
+   "title": "Batman: The Dark Knight Returns – Part 1",
+   "year": 2012,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 123025,
+     "title": "Batman: The Dark Knight Returns, Part 1",
+     "date": "2012-09-25",
+     "votes": 1768,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 123025,
+    "imdb": "tt2313197",
+    "title": "Batman: The Dark Knight Returns, Part 1",
+    "date": "2012-09-25",
+    "status": "Released",
+    "companies": [
+     "Warner Premiere",
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.7,
+    "votes": 1768,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-the-dark-knight-returns-part-2-2013",
+   "title": "Batman: The Dark Knight Returns – Part 2",
+   "year": 2013,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 142061,
+     "title": "Batman: The Dark Knight Returns, Part 2",
+     "date": "2013-01-03",
+     "votes": 1656,
+     "exact": true
+    },
+    {
+     "tmdb": 472027,
+     "title": "Batman: The Dark Knight Returns",
+     "date": "2013-10-08",
+     "votes": 172,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 142061,
+    "imdb": "tt2166834",
+    "title": "Batman: The Dark Knight Returns, Part 2",
+    "date": "2013-01-03",
+    "status": "Released",
+    "companies": [
+     "Warner Premiere",
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.9,
+    "votes": 1656,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-unbound-2013",
+   "title": "Superman: Unbound",
+   "year": 2013,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 166076,
+     "title": "Superman: Unbound",
+     "date": "2013-04-23",
+     "votes": 482,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 166076,
+    "imdb": "tt2617456",
+    "title": "Superman: Unbound",
+    "date": "2013-04-23",
+    "status": "Released",
+    "companies": [
+     "Warner Premiere",
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.595,
+    "votes": 482,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-assault-on-arkham-2014",
+   "title": "Batman: Assault on Arkham",
+   "year": 2014,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 242643,
+     "title": "Batman: Assault on Arkham",
+     "date": "2014-08-12",
+     "votes": 1227,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 242643,
+    "imdb": "tt3139086",
+    "title": "Batman: Assault on Arkham",
+    "date": "2014-08-12",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.3,
+    "votes": 1227,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "justice-league-gods-and-monsters-2015",
+   "title": "Justice League: Gods and Monsters",
+   "year": 2015,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 323027,
+     "title": "Justice League: Gods and Monsters",
+     "date": "2015-06-18",
+     "votes": 641,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 323027,
+    "imdb": "tt4324302",
+    "title": "Justice League: Gods and Monsters",
+    "date": "2015-06-18",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.093,
+    "votes": 641,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-the-killing-joke-2016",
+   "title": "Batman: The Killing Joke",
+   "year": 2016,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 382322,
+     "title": "Batman: The Killing Joke",
+     "date": "2016-07-24",
+     "votes": 1999,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 382322,
+    "imdb": "tt4853102",
+    "title": "Batman: The Killing Joke",
+    "date": "2016-07-24",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.6,
+    "votes": 1999,
+    "arTitle": "باتمان: النكتة القاتلة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "the-lego-batman-movie-2017",
+   "title": "The Lego Batman Movie",
+   "year": 2017,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 324849,
+     "title": "The Lego Batman Movie",
+     "date": "2017-02-08",
+     "votes": 5658,
+     "exact": true
+    },
+    {
+     "tmdb": 548888,
+     "title": "One Brick at a Time: Making the LEGO Batman Movie",
+     "date": "2017-06-19",
+     "votes": 7,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 324849,
+    "imdb": "tt4116284",
+    "title": "The Lego Batman Movie",
+    "date": "2017-02-08",
+    "status": "Released",
+    "companies": [
+     "Lin Pictures",
+     "Animal Logic",
+     "DC Entertainment",
+     "Lord Miller",
+     "Warner Bros. Pictures",
+     "Warner Animation Group",
+     "RatPac Entertainment",
+     "The LEGO Group"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.266,
+    "votes": 5658,
+    "arTitle": "فيلم الليجو باتمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-and-harley-quinn-2017",
+   "title": "Batman and Harley Quinn",
+   "year": 2017,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 408648,
+     "title": "Batman and Harley Quinn",
+     "date": "2017-07-21",
+     "votes": 685,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 408648,
+    "imdb": "tt6556890",
+    "title": "Batman and Harley Quinn",
+    "date": "2017-07-21",
+    "status": "Released",
+    "companies": [
+     "DC Entertainment",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.2,
+    "votes": 685,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-gotham-by-gaslight-2018",
+   "title": "Batman: Gotham by Gaslight",
+   "year": 2018,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 471474,
+     "title": "Batman: Gotham by Gaslight",
+     "date": "2018-01-12",
+     "votes": 788,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 471474,
+    "imdb": "tt7167630",
+    "title": "Batman: Gotham by Gaslight",
+    "date": "2018-01-12",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 788,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "batman-ninja-2018",
+   "title": "Batman Ninja",
+   "year": 2018,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 485942,
+     "title": "Batman Ninja",
+     "date": "2018-03-24",
+     "votes": 1109,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 485942,
+    "imdb": "tt7451284",
+    "title": "Batman Ninja",
+    "date": "2018-03-24",
+    "status": "Released",
+    "companies": [
+     "Kamikaze Douga",
+     "DC Entertainment",
+     "Warner Bros. Japan",
+     "YAMATOWORKS",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.874,
+    "votes": 1110,
+    "arTitle": "النينجا باتمان",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "teen-titans-go-to-the-movies-2018",
+   "title": "Teen Titans Go! To the Movies",
+   "year": 2018,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 474395,
+     "title": "Teen Titans Go! To the Movies",
+     "date": "2018-07-27",
+     "votes": 1209,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 474395,
+    "imdb": "tt7424200",
+    "title": "Teen Titans Go! To the Movies",
+    "date": "2018-07-27",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.151,
+    "votes": 1209,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-vs-teenage-mutant-ninja-turtles-2019",
+   "title": "Batman vs. Teenage Mutant Ninja Turtles",
+   "year": 2019,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 581997,
+     "title": "Batman vs Teenage Mutant Ninja Turtles",
+     "date": "2019-03-31",
+     "votes": 581,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 581997,
+    "imdb": "tt9775360",
+    "title": "Batman vs Teenage Mutant Ninja Turtles",
+    "date": "2019-03-31",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC",
+     "Nickelodeon"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.2,
+    "votes": 581,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "superman-red-son-2020",
+   "title": "Superman: Red Son",
+   "year": 2020,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 618355,
+     "title": "Superman: Red Son",
+     "date": "2020-02-24",
+     "votes": 931,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 618355,
+    "imdb": "tt10985510",
+    "title": "Superman: Red Son",
+    "date": "2020-02-24",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.052,
+    "votes": 931,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-soul-of-the-dragon-2021",
+   "title": "Batman: Soul of the Dragon",
+   "year": 2021,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 732450,
+     "title": "Batman: Soul of the Dragon",
+     "date": "2021-01-12",
+     "votes": 388,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 732450,
+    "imdb": "tt12885852",
+    "title": "Batman: Soul of the Dragon",
+    "date": "2021-01-12",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 388,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "injustice-2021",
+   "title": "Injustice",
+   "year": 2021,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 831405,
+     "title": "Injustice",
+     "date": "2021-10-09",
+     "votes": 886,
+     "exact": true
+    },
+    {
+     "tmdb": 800590,
+     "title": "Injustice System",
+     "date": "2021-02-25",
+     "votes": 0,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 831405,
+    "imdb": "tt5012504",
+    "title": "Injustice",
+    "date": "2021-10-09",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.334,
+    "votes": 886,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "catwoman-hunted-2022",
+   "title": "Catwoman: Hunted",
+   "year": 2022,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 862491,
+     "title": "Catwoman: Hunted",
+     "date": "2022-02-07",
+     "votes": 136,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 862491,
+    "imdb": "tt15248702",
+    "title": "Catwoman: Hunted",
+    "date": "2022-02-07",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 5.765,
+    "votes": 136,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "dc-league-of-super-pets-2022",
+   "title": "DC League of Super-Pets",
+   "year": 2022,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 539681,
+     "title": "DC League of Super-Pets",
+     "date": "2022-07-27",
+     "votes": 1805,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 539681,
+    "imdb": "tt8912936",
+    "title": "DC League of Super-Pets",
+    "date": "2022-07-27",
+    "status": "Released",
+    "companies": [
+     "Warner Animation Group",
+     "Seven Bucks Productions",
+     "Animal Logic",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.131,
+    "votes": 1805,
+    "arTitle": "تحالف دي سي للحيوانات الخارقة",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-and-superman-battle-of-the-super-sons-2022",
+   "title": "Batman and Superman: Battle of the Super Sons",
+   "year": 2022,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 886396,
+     "title": "Batman and Superman: Battle of the Super Sons",
+     "date": "2022-10-17",
+     "votes": 375,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 886396,
+    "imdb": "tt21197740",
+    "title": "Batman and Superman: Battle of the Super Sons",
+    "date": "2022-10-17",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.7,
+    "votes": 375,
+    "arTitle": "باتمان وسوبرمان: معركة الأبناء الخارقين",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-the-doom-that-came-to-gotham-2023",
+   "title": "Batman: The Doom That Came to Gotham",
+   "year": 2023,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1003579,
+     "title": "Batman: The Doom That Came to Gotham",
+     "date": "2023-03-10",
+     "votes": 284,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 1003579,
+    "imdb": "tt24223450",
+    "title": "Batman: The Doom That Came to Gotham",
+    "date": "2023-03-10",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 284,
+    "arTitle": "باتمان: الموت الذي جاء إلى جوثام",
+    "arOverview": true
+   }
+  },
+  {
+   "id": "merry-little-batman-2023",
+   "title": "Merry Little Batman",
+   "year": 2023,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 870358,
+     "title": "Merry Little Batman",
+     "date": "2023-12-08",
+     "votes": 185,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 870358,
+    "imdb": "tt15352516",
+    "title": "Merry Little Batman",
+    "date": "2023-12-08",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.6,
+    "votes": 185,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "watchmen-chapter-i-2024",
+   "title": "Watchmen: Chapter I",
+   "year": 2024,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1155058,
+     "title": "Watchmen: Chapter I",
+     "date": "2024-08-12",
+     "votes": 260,
+     "exact": true
+    },
+    {
+     "tmdb": 1299652,
+     "title": "Watchmen: Chapter II",
+     "date": "2024-11-25",
+     "votes": 191,
+     "exact": false
+    }
+   ],
+   "match": {
+    "tmdb": 1155058,
+    "imdb": "tt32627540",
+    "title": "Watchmen: Chapter I",
+    "date": "2024-08-12",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "Paramount Pictures",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.419,
+    "votes": 260,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "watchmen-chapter-ii-2024",
+   "title": "Watchmen: Chapter II",
+   "year": 2024,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1299652,
+     "title": "Watchmen: Chapter II",
+     "date": "2024-11-25",
+     "votes": 191,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 1299652,
+    "imdb": "tt32627545",
+    "title": "Watchmen: Chapter II",
+    "date": "2024-11-25",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "Paramount Pictures",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.312,
+    "votes": 191,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "batman-ninja-vs-yakuza-league-2025",
+   "title": "Batman Ninja vs. Yakuza League",
+   "year": 2025,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 1297763,
+     "title": "Batman Ninja vs. Yakuza League",
+     "date": "2025-03-17",
+     "votes": 259,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 1297763,
+    "imdb": "tt32508210",
+    "title": "Batman Ninja vs. Yakuza League",
+    "date": "2025-03-17",
+    "status": "Released",
+    "companies": [
+     "Kamikaze Douga",
+     "Warner Bros. Japan",
+     "DC",
+     "Warner Bros. Animation"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 6.7,
+    "votes": 259,
+    "arTitle": null,
+    "arOverview": true
+   }
+  },
+  {
+   "id": "aztec-batman-clash-of-empires-2025",
+   "title": "Aztec Batman: Clash of Empires",
+   "year": 2025,
+   "kind": "movie",
+   "status": "confident",
+   "candidates": [
+    {
+     "tmdb": 987400,
+     "title": "Aztec Batman: Clash of Empires",
+     "date": "2025-09-18",
+     "votes": 171,
+     "exact": true
+    }
+   ],
+   "match": {
+    "tmdb": 987400,
+    "imdb": "tt21110654",
+    "title": "Aztec Batman: Clash of Empires",
+    "date": "2025-09-18",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "Ánima Estudios",
+     "Chatrone",
+     "Particular Crowd",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.616,
+    "votes": 172,
+    "arTitle": null,
+    "arOverview": false
+   }
+  },
+  {
+   "id": "batman-knightfall-part-1-2026",
+   "title": "Batman: Knightfall – Part 1",
+   "year": 2026,
+   "kind": "movie",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 1560520,
+     "title": "Batman: Knightfall Part 1: Knightfall",
+     "date": "2026-06-23",
+     "votes": 507,
+     "exact": false
+    }
+   ]
+  },
+  {
+   "id": "batman-knightfall-part-2-2026",
+   "title": "Batman: Knightfall – Part 2",
+   "year": 2026,
+   "kind": "movie",
+   "status": "review",
+   "candidates": [
+    {
+     "tmdb": 1389765,
+     "title": "Batman: Knightfall Part 2: Knightquest",
+     "date": "2026-12-15",
+     "votes": 0,
+     "exact": false
+    }
+   ]
+  }
+ ]
+}
