@@ -37,7 +37,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check(`${label}: لا عناصر متراكبة`, lap === 0, String(lap)); };
 
   await page.goto(url); await page.waitForSelector('.card');
-  check('تحميل البطاقات: 197 بطاقة في 19 عالماً', await page.locator('.card').count() === 197 && await page.locator('section.uni').count() === 19);
+  check('تحميل البطاقات: 200 بطاقة في 19 عالماً', await page.locator('.card').count() === 200 && await page.locator('section.uni').count() === 19);
   await overflow('البطاقات'); await snap('1-cards');
   const small = await page.evaluate(() => [...document.querySelectorAll('button,a,select,input,summary')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 40 || r.width < 40) && !e.closest('.foot,.canon,[hidden]'); }).map(e => (e.textContent || e.id).trim().slice(0, 20)));
   check('أهداف اللمس ≥ 40px', small.length === 0, small.slice(0, 5).join(' | '));

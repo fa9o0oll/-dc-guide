@@ -1340,7 +1340,7 @@
   {
     "universe": "dcu",
     "work": "mister-miracle-tba",
-    "position": 11,
+    "position": 12,
     "label": "قادم",
     "note": "مسلسل أنميشن للكبار عن سكوت فري (Scott Free) وزوجته بيغ باردا (Big Barda). أكّد جيمس غان أنه من أحداث عالم DCU نفسه.",
     "upcoming": {
@@ -1351,7 +1351,7 @@
   {
     "universe": "dcu",
     "work": "wonder-woman-tba",
-    "position": 12,
+    "position": 13,
     "label": "قيد التطوير",
     "note": "فيلم جديد لووندر وومان داخل عالم DCU. ما زال في مرحلة الكتابة، ومصيره لم يُحسم بعد تغيّر إدارة DC Studios.",
     "upcoming": {
@@ -1362,7 +1362,7 @@
   {
     "universe": "dcu",
     "work": "the-brave-and-the-bold-tba",
-    "position": 13,
+    "position": 14,
     "label": "قيد التطوير",
     "note": "فيلم باتمان وروبن (داميان واين) الخاص بعالم DCU، ولا علاقة له بأفلام مات ريفز. أُعلن في يناير 2023 ولم يبدأ تصويره، واستمراره غير مؤكد.",
     "upcoming": {
@@ -1373,7 +1373,7 @@
   {
     "universe": "dcu",
     "work": "swamp-thing-tba",
-    "position": 14,
+    "position": 15,
     "label": "قيد التطوير",
     "note": "فيلم رعب عن سوامب ثينغ (Swamp Thing) من إخراج جيمس مانغولد. أُعلن ضمن خطة DCU الأولى، ولا جديد مؤكداً عنه.",
     "upcoming": {
@@ -1456,6 +1456,39 @@
     "upcoming": {
       "stage": "production",
       "source": "https://www.comicsbeat.com/nycc-25-warner-bros-animation-dc-announce-batman-knightfall"
+    }
+  },
+  {
+    "universe": "dcu",
+    "work": "the-people-v-gorilla-grodd-tba",
+    "position": 11,
+    "label": "قادم",
+    "note": "كوميديا في قالب وثائقي جرائم ساخر من ثماني حلقات: جيمي أولسن، مصوّر ديلي بلانيت، يعيد فتح قضية الغوريلا غرود. من أحداث عالم DCU، وبطاقم فيلم Superman نفسه.",
+    "upcoming": {
+      "stage": "production",
+      "source": "https://press.wbd.com/us/media-release/hbo-max-orders-new-comedy-series-people-v-gorilla-grodd"
+    }
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "absolute-batman-tba",
+    "position": 17,
+    "label": "قادم",
+    "note": "باتمان بنسخة مختلفة: بطل من الطبقة العاملة بلا ثروة واين. مقتبس من سلسلة Absolute Batman، وأُعلن في يونيو 2026، وليس من أحداث عالم DCU.",
+    "upcoming": {
+      "stage": "development",
+      "source": "https://comicbookmovie.com/dc-studios/dc-studios-announces-absolute-batman-joker-laugh-riot-and-krypto-tv-shows-at-annecy-a228500"
+    }
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "joker-laugh-riot-tba",
+    "position": 18,
+    "label": "قادم",
+    "note": "بعد مقتل باتمان، يطارد الجوكر القاتل في عالم غوثام السفلي. أُعلن في يونيو 2026، وهو قصة مستقلة عن عالم DCU.",
+    "upcoming": {
+      "stage": "development",
+      "source": "https://comicbookmovie.com/dc-studios/dc-studios-announces-absolute-batman-joker-laugh-riot-and-krypto-tv-shows-at-annecy-a228500"
     }
   }
 ]

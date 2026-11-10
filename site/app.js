@@ -130,7 +130,7 @@ function uniHead(u, all) {
 function card(p) {
   const w = D.works.get(p.work), st = statusOf(p), soon = isSoon(w), v = verdict(w.tmdbRating);
   const meta = [w.date ? w.date.slice(0, 4) : w.year, TYPE[w.kind + '|' + w.medium],
-    !w.seasons ? (w.runtime ? w.runtime + ' دقيقة' : '') : p.season ? `الموسم ${p.season} · ${seasonTotal(w, p.season)} حلقة` : `${(w.seasons || []).length} مواسم · ${w.episodeCount || 0} حلقة`].filter(Boolean).join(' · ');
+    !w.seasons ? (w.runtime ? w.runtime + ' دقيقة' : '') : p.season ? `الموسم ${p.season} · ${seasonTotal(w, p.season)} حلقة` : w.episodeCount ? `${(w.seasons || []).length} مواسم · ${w.episodeCount} حلقة` : ''].filter(Boolean).join(' · ');
   const tot = w.seasons ? seasonTotal(w, p.season) : 0, dn = tot ? seasonDone(w.id, p.season) : 0;
   return `<article class="card" id="${domId('c', p)}" data-k="${esc(sKey(p))}">
     <button class="poster" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} aria-label="تفاصيل ${esc(w.title)}">${posterTag(w)}</button>
@@ -280,14 +280,14 @@ async function openWork(id, season, from) {
   await openSheet(ltr(w.title), `<div class="hero" ${w.backdrop ? `style="background-image:url('${img(w.backdrop, 'w780')}')"` : ''}></div>
     <div class="dw"><div class="dw-top"><button class="poster" data-act="light" data-src="${img(w.poster, 'w780')}" aria-label="تكبير البوستر">${posterTag(w)}</button>
       <div><h3>${ltr(w.title)}</h3>
-      <div class="meta">${esc([TYPE[w.kind + '|' + w.medium], w.date ? fmtDate(w.date) : w.year, w.runtime ? w.runtime + ' دقيقة' : '', w.seasons ? `${w.seasons.length} مواسم · ${w.episodeCount} حلقة` : ''].filter(Boolean).join(' · '))}</div>
+      <div class="meta">${esc([TYPE[w.kind + '|' + w.medium], w.date ? fmtDate(w.date) : w.year, w.runtime ? w.runtime + ' دقيقة' : '', w.episodeCount ? `${w.seasons.length} مواسم · ${w.episodeCount} حلقة` : ''].filter(Boolean).join(' · '))}</div>
       ${soon && w.date ? `<div class="tags"><span class="tag soon">قادم بعد ${daysLeft(w)} يوماً</span></div>` : ''}</div></div>
     ${w.overviewAr ? `<p class="ov">${esc(w.overviewAr)}</p>` : w.overviewEn ? `<div><span class="lbl">النبذة بالإنجليزية (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(w.overviewEn)}</p></div>` : ''}
     <div class="actions">${places.map(p => `<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">البطاقة في ${esc(uniOf(p.universe).name)}${p.season ? `، الموسم ${p.season}` : ''}</button>`).join('')}</div>
     ${rateBlock(w)}
     ${nextBlock(w)}
-    ${w.kind === 'series' && w.seasons?.length ? `<div class="seasons" id="seasonTabs">${w.seasons.map(s => `<button data-act="season" data-id="${id}" data-season="${s.n}">الموسم ${s.n}</button>`).join('')}</div><div id="eps" class="dw" style="padding:0"><p class="empty">جارٍ تحميل الحلقات…</p></div>` : ''}</div>`, 'work', { uni, from: from?.querySelector('img') });
-  if (w.kind === 'series' && w.seasons?.length) showSeason(id, w.seasons.some(s => s.n === season) ? season : w.seasons[0].n);
+    ${w.kind === 'series' && w.episodeCount ? `<div class="seasons" id="seasonTabs">${w.seasons.map(s => `<button data-act="season" data-id="${id}" data-season="${s.n}">الموسم ${s.n}</button>`).join('')}</div><div id="eps" class="dw" style="padding:0"><p class="empty">جارٍ تحميل الحلقات…</p></div>` : ''}</div>`, 'work', { uni, from: from?.querySelector('img') });
+  if (w.kind === 'series' && w.episodeCount) showSeason(id, w.seasons.some(s => s.n === season) ? season : w.seasons[0].n);
 }
 async function showSeason(id, n) {
   $$('#seasonTabs button').forEach(b => b.classList.toggle('on', +b.dataset.season === n));

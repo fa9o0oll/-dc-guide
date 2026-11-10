@@ -3775,5 +3775,44 @@
     },
     "idsVerified": true,
     "announced": true
+  },
+  {
+    "id": "the-people-v-gorilla-grodd-tba",
+    "title": "The People v. Gorilla Grodd",
+    "year": null,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt37738867",
+      "tmdb": 332083
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "absolute-batman-tba",
+    "title": "Absolute Batman",
+    "year": null,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt43619274",
+      "tmdb": 326416
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "joker-laugh-riot-tba",
+    "title": "Joker: Laugh Riot",
+    "year": null,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt43619110",
+      "tmdb": 326421
+    },
+    "idsVerified": true,
+    "announced": true
   }
 ]
