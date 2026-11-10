@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-10T12:30:21.054Z",
+ "generatedAt": "2026-11-10T12:42:16.357Z",
  "companies": [
   [
    184898,
@@ -26,143 +26,8 @@
    "DC Vertigo"
   ]
  ],
- "count": 14,
+ "count": 5,
  "rows": [
-  {
-   "kind": "movie",
-   "tmdb": 1523140,
-   "imdb": "tt37833661",
-   "title": "Man of Tomorrow",
-   "date": "2027-07-07",
-   "status": "Post Production",
-   "dc": true,
-   "companies": [
-    "DC Studios",
-    "Troll Court Entertainment",
-    "The Safran Company"
-   ],
-   "genres": [
-    "Action",
-    "Science Fiction",
-    "Adventure"
-   ],
-   "poster": true,
-   "popularity": 4,
-   "via": "company",
-   "overview": "Superman and Lex Luthor find themselves forced to work together—to a certain degree—against a much, much bigger threat when Brainiac sets his sights on Earth."
-  },
-  {
-   "kind": "movie",
-   "tmdb": 806704,
-   "imdb": "tt19850008",
-   "title": "The Batman: Part II",
-   "date": "2028-02-17",
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "6th & Idaho Motion Picture Company",
-    "DC Studios",
-    "Dylan Clark Productions"
-   ],
-   "genres": [
-    "Mystery",
-    "Drama",
-    "Crime"
-   ],
-   "poster": true,
-   "popularity": 6,
-   "via": "company",
-   "overview": "Sequel to the 2022 film The Batman."
-  },
-  {
-   "kind": "movie",
-   "tmdb": 1364797,
-   "imdb": "tt33549695",
-   "title": "Dynamic Duo",
-   "date": "2028-09-21",
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "DC Studios",
-    "6th & Idaho Motion Picture Company",
-    "Swaybox Studios",
-    "Warner Bros. Pictures Animation"
-   ],
-   "genres": [
-    "Animation",
-    "Action",
-    "Adventure",
-    "Crime"
-   ],
-   "poster": true,
-   "popularity": 2,
-   "via": "company",
-   "overview": "Follow the early days of Dick Grayson and Jason Todd and explore how their friendship becomes tested by their diverging ideas for what their future should be."
-  },
-  {
-   "kind": "movie",
-   "tmdb": 1081004,
-   "imdb": "tt26545566",
-   "title": "The Brave and the Bold",
-   "date": null,
-   "status": "Rumored",
-   "dc": true,
-   "companies": [
-    "DC Studios",
-    "Double Dream"
-   ],
-   "genres": [
-    "Crime",
-    "Action"
-   ],
-   "poster": false,
-   "popularity": 1,
-   "via": "name:The Brave and the Bold",
-   "overview": "The story of Damian Wayne, who was raised as a little murderer and assassin, and Batman's son that he didn’t know existed for the first eight to ten years of hi"
-  },
-  {
-   "kind": "movie",
-   "tmdb": 1495964,
-   "imdb": "tt37257255",
-   "title": "Untitled Wonder Woman Film",
-   "date": null,
-   "status": "Planned",
-   "dc": true,
-   "companies": [
-    "DC Studios",
-    "Troll Court Entertainment",
-    "The Safran Company",
-    "Domain Entertainment"
-   ],
-   "genres": [
-    "Fantasy",
-    "Action",
-    "Adventure"
-   ],
-   "poster": false,
-   "popularity": 1,
-   "via": "name:Wonder Woman",
-   "overview": "A Wonder Woman film set in the DC Universe (DCU). Plot TBA."
-  },
-  {
-   "kind": "movie",
-   "tmdb": 1797314,
-   "imdb": "tt26545725",
-   "title": "Swamp Thing",
-   "date": null,
-   "status": "Rumored",
-   "dc": true,
-   "companies": [
-    "DC Studios"
-   ],
-   "genres": [
-    "Fantasy"
-   ],
-   "poster": false,
-   "popularity": 0,
-   "via": "name:Swamp Thing",
-   "overview": "A film set in the DC Universe (DCU). Plot TBA."
-  },
   {
    "kind": "tv",
    "tmdb": 41246,
@@ -186,132 +51,6 @@
    "overview": "It's the modern day, and being Wonder Woman is complicated. Diana is leading a triple life - running a large corporation out of costume and fighting crime in co"
   },
   {
-   "kind": "tv",
-   "tmdb": 293696,
-   "imdb": "tt37274722",
-   "title": "Mister Miracle",
-   "date": null,
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "Warner Bros. Animation",
-    "DC Studios"
-   ],
-   "genres": [
-    "Animation",
-    "Sci-Fi & Fantasy",
-    "Drama"
-   ],
-   "poster": true,
-   "popularity": 1,
-   "via": "name:Mister Miracle",
-   "overview": "Scott Free is the world's greatest escape artist, known to the world as Mister Miracle, whose perfect life with his warrior wife Big Barda falls apart when thei"
-  },
-  {
-   "kind": "tv",
-   "tmdb": 285111,
-   "imdb": "tt37286909",
-   "title": "My Adventures with Green Lantern",
-   "date": null,
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "Warner Bros. Animation",
-    "DC Studios"
-   ],
-   "genres": [
-    "Animation",
-    "Sci-Fi & Fantasy"
-   ],
-   "poster": true,
-   "popularity": 1,
-   "via": "name:My Adventures with Green Lantern",
-   "overview": "High school student Jessica Cruz has her life upended when a Green Lantern Power Ring falls from the sky and chooses Cruz to be its champion. Things get even wo"
-  },
-  {
-   "kind": "movie",
-   "tmdb": 1389764,
-   "imdb": "tt38807533",
-   "title": "Batman: Knightfall Part 3: KnightsEnd",
-   "date": null,
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "Warner Bros. Animation",
-    "DC"
-   ],
-   "genres": [
-    "Animation",
-    "Action",
-    "Adventure"
-   ],
-   "poster": true,
-   "popularity": 2,
-   "via": "name:Batman: Knightfall",
-   "overview": "The third entry of the upcoming multi-part animated film adaptation of Batman: Knightfall."
-  },
-  {
-   "kind": "tv",
-   "tmdb": 285112,
-   "imdb": null,
-   "title": "Starfire!",
-   "date": null,
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "DC Studios",
-    "Warner Bros. Animation"
-   ],
-   "genres": [
-    "Animation"
-   ],
-   "poster": false,
-   "popularity": 0,
-   "via": "name:Starfire",
-   "overview": "Starfire uses an ancient spaceship she discovers on her home planet of Tamaran to escape and explore the stars. Along the way, she'll meet space biker Crush, pl"
-  },
-  {
-   "kind": "tv",
-   "tmdb": 285113,
-   "imdb": null,
-   "title": "DC Super Powers",
-   "date": null,
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "DC Studios",
-    "Warner Bros. Animation"
-   ],
-   "genres": [
-    "Animation"
-   ],
-   "poster": false,
-   "popularity": 0,
-   "via": "name:DC Super Powers",
-   "overview": "Set at the Alliance School for Heroes, new students Lightning, Flash, Plastic Man, Aquagirl, Green Lantern and Terra level up their powers under the supervision"
-  },
-  {
-   "kind": "tv",
-   "tmdb": 326417,
-   "imdb": "tt43619136",
-   "title": "Krypto",
-   "date": null,
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "DC Studios",
-    "Warner Bros. Animation"
-   ],
-   "genres": [
-    "Animation",
-    "Kids"
-   ],
-   "poster": true,
-   "popularity": 1,
-   "via": "name:Krypto",
-   "overview": "Follow Krypto as he tags along with a gang of misfit criminal wannabes who live down the block. They soon discover he's a ball of destructive, lovable energy wo"
-  },
-  {
    "kind": "movie",
    "tmdb": 1676088,
    "imdb": null,
@@ -327,6 +66,69 @@
    "popularity": 0,
    "via": "name:Static Shock",
    "overview": "Plot TBA."
+  },
+  {
+   "kind": "tv",
+   "tmdb": 332083,
+   "imdb": "tt37738867",
+   "title": "The People v. Gorilla Grodd",
+   "date": null,
+   "status": "In Production",
+   "dc": true,
+   "companies": [
+    "DC Studios",
+    "Warner Bros. Television"
+   ],
+   "genres": [
+    "Comedy"
+   ],
+   "poster": false,
+   "popularity": 3,
+   "via": "name:Gorilla Grodd",
+   "overview": "A superintelligent ape is convicted of murdering his father, the King of Gorilla City. In an eight-part \"true\" crime docuseries, the Daily Planet's Jimmy Olsen "
+  },
+  {
+   "kind": "tv",
+   "tmdb": 326421,
+   "imdb": "tt43619110",
+   "title": "Joker: Laugh Riot",
+   "date": null,
+   "status": "In Production",
+   "dc": true,
+   "companies": [
+    "DC Studios",
+    "Sola Entertainment",
+    "Warner Bros. Animation"
+   ],
+   "genres": [
+    "Animation",
+    "Crime"
+   ],
+   "poster": true,
+   "popularity": 1,
+   "via": "name:Laugh Riot",
+   "overview": "When Batman is murdered, the Joker launches a ruthless crusade through Gotham’s underworld to find the killer who took away his greatest adversary. But as his v"
+  },
+  {
+   "kind": "tv",
+   "tmdb": 326416,
+   "imdb": "tt43619274",
+   "title": "Absolute Batman",
+   "date": null,
+   "status": "In Production",
+   "dc": true,
+   "companies": [
+    "Warner Bros. Animation",
+    "DC Studios"
+   ],
+   "genres": [
+    "Animation",
+    "Action & Adventure"
+   ],
+   "poster": true,
+   "popularity": 1,
+   "via": "name:Absolute Batman",
+   "overview": "The Batman mythos is reinvented for a new generation of fans, reimagining the Dark Knight as a working-class hero up against impossible odds (and the most terri"
   }
  ]
 }
