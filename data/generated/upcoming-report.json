@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-10T12:42:16.357Z",
+ "generatedAt": "2026-11-10T12:48:46.746Z",
  "companies": [
   [
    184898,
@@ -26,7 +26,7 @@
    "DC Vertigo"
   ]
  ],
- "count": 5,
+ "count": 2,
  "rows": [
   {
    "kind": "tv",
@@ -66,69 +66,6 @@
    "popularity": 0,
    "via": "name:Static Shock",
    "overview": "Plot TBA."
-  },
-  {
-   "kind": "tv",
-   "tmdb": 332083,
-   "imdb": "tt37738867",
-   "title": "The People v. Gorilla Grodd",
-   "date": null,
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "DC Studios",
-    "Warner Bros. Television"
-   ],
-   "genres": [
-    "Comedy"
-   ],
-   "poster": false,
-   "popularity": 3,
-   "via": "name:Gorilla Grodd",
-   "overview": "A superintelligent ape is convicted of murdering his father, the King of Gorilla City. In an eight-part \"true\" crime docuseries, the Daily Planet's Jimmy Olsen "
-  },
-  {
-   "kind": "tv",
-   "tmdb": 326421,
-   "imdb": "tt43619110",
-   "title": "Joker: Laugh Riot",
-   "date": null,
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "DC Studios",
-    "Sola Entertainment",
-    "Warner Bros. Animation"
-   ],
-   "genres": [
-    "Animation",
-    "Crime"
-   ],
-   "poster": true,
-   "popularity": 1,
-   "via": "name:Laugh Riot",
-   "overview": "When Batman is murdered, the Joker launches a ruthless crusade through Gotham’s underworld to find the killer who took away his greatest adversary. But as his v"
-  },
-  {
-   "kind": "tv",
-   "tmdb": 326416,
-   "imdb": "tt43619274",
-   "title": "Absolute Batman",
-   "date": null,
-   "status": "In Production",
-   "dc": true,
-   "companies": [
-    "Warner Bros. Animation",
-    "DC Studios"
-   ],
-   "genres": [
-    "Animation",
-    "Action & Adventure"
-   ],
-   "poster": true,
-   "popularity": 1,
-   "via": "name:Absolute Batman",
-   "overview": "The Batman mythos is reinvented for a new generation of fans, reimagining the Dark Knight as a working-class hero up against impossible odds (and the most terri"
   }
  ]
 }
