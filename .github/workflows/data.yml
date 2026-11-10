@@ -24,10 +24,15 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: node scripts/tmdb-resolve.mjs
         continue-on-error: true
+      - name: Build site data
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: node scripts/build-site-data.mjs
+        continue-on-error: true
       - name: Commit generated data
         run: |
           git config user.name "dc-guide-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/generated
+          git add data/generated site/data
           git diff --cached --quiet || git commit -m "data: generated output [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"

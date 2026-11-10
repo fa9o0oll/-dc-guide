@@ -13,6 +13,7 @@ for (const w of W) {
   if (!['film', 'series'].includes(w.kind) || !['live', 'animation'].includes(w.medium)) errs.push('نوع غير صالح: ' + w.id);
   const k = w.title + '|' + w.year + '|' + w.kind; if (seenTY.has(k)) errs.push('عمل مكرر: ' + k); seenTY.set(k, 1);
   if (!w.idsVerified) warn.push('ids:' + w.id);
+  else if (!Number.isInteger(w.ids?.tmdb)) errs.push('معرّف موثّق بلا رقم TMDB: ' + w.id);
 }
 const posSeen = new Set(), placed = new Set();
 for (const p of P) {

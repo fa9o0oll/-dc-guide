@@ -6,11 +6,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt6334354",
+      "tmdb": 436969
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Suicide Squad",
       "rtCritics": "90%",
@@ -27,11 +26,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt13146488",
+      "tmdb": 110492
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Peacemaker",
       "rtCritics": "94%",
@@ -48,11 +46,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt9362930",
+      "tmdb": 565770
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Blue Beetle",
       "rtCritics": "78%",
@@ -69,11 +66,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt26545355",
+      "tmdb": 219543
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Creature Commandos",
       "rtCritics": "93%",
@@ -91,10 +87,9 @@
     "medium": "live",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 1061474
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman",
       "rtCritics": "83%",
@@ -111,11 +106,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt8814476",
+      "tmdb": 1081003
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Supergirl: Woman of Tomorrow",
       "rtCritics": "52%",
@@ -132,11 +126,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt26545992",
+      "tmdb": 95350
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Lanterns",
       "rtCritics": "92%",
@@ -153,11 +146,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt34890576",
+      "tmdb": 1400940
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Clayface",
       "rtCritics": "78%",
@@ -174,11 +166,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0451279",
+      "tmdb": 297762
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Wonder Woman",
       "rtCritics": "93%",
@@ -195,11 +186,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7126948",
+      "tmdb": 464052
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Wonder Woman 1984",
       "rtCritics": "58%",
@@ -216,11 +206,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0770828",
+      "tmdb": 49521
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Man of Steel",
       "rtCritics": "56%",
@@ -237,11 +226,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2975590",
+      "tmdb": 209112
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman v Superman: Dawn of Justice",
       "rtCritics": "29%",
@@ -258,11 +246,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1386697",
+      "tmdb": 297761
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Suicide Squad",
       "rtCritics": "26%",
@@ -279,11 +266,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt12361974",
+      "tmdb": 791373
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Zack Snyder's Justice League",
       "rtCritics": "72%",
@@ -300,11 +286,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0974015",
+      "tmdb": 141052
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League",
       "rtCritics": "39%",
@@ -321,11 +306,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1477834",
+      "tmdb": 297802
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Aquaman",
       "rtCritics": "65%",
@@ -342,11 +326,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0448115",
+      "tmdb": 287947
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Shazam!",
       "rtCritics": "90%",
@@ -364,10 +347,9 @@
     "medium": "live",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 495764
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Birds of Prey",
       "rtCritics": "78%",
@@ -384,11 +366,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt6443346",
+      "tmdb": 436270
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Black Adam",
       "rtCritics": "38%",
@@ -405,11 +386,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt10151854",
+      "tmdb": 594767
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Shazam! Fury of the Gods",
       "rtCritics": "49%",
@@ -426,11 +406,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0439572",
+      "tmdb": 298618
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Flash",
       "rtCritics": "63%",
@@ -447,11 +426,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt9663764",
+      "tmdb": 572802
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Aquaman and the Lost Kingdom",
       "rtCritics": "34%",
@@ -468,11 +446,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1877830",
+      "tmdb": 414906
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Batman",
       "rtCritics": "85%",
@@ -489,11 +466,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt15435876",
+      "tmdb": 194764
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Penguin",
       "rtCritics": "95%",
@@ -510,11 +486,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0372784",
+      "tmdb": 272
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman Begins",
       "rtCritics": "85%",
@@ -531,11 +506,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0468569",
+      "tmdb": 155
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Dark Knight",
       "rtCritics": "94%",
@@ -552,11 +526,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1345836",
+      "tmdb": 49026
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Dark Knight Rises",
       "rtCritics": "87%",
@@ -573,11 +546,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7286456",
+      "tmdb": 475557
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Joker",
       "rtCritics": "69%",
@@ -594,11 +566,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt11315808",
+      "tmdb": 889737
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Joker: Folie à Deux",
       "rtCritics": "32%",
@@ -615,11 +586,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0096895",
+      "tmdb": 268
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman (1989 film)",
       "rtCritics": "76%",
@@ -636,11 +606,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0103776",
+      "tmdb": 364
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman Returns",
       "rtCritics": "82%",
@@ -657,11 +626,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0112462",
+      "tmdb": 414
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman Forever",
       "rtCritics": "41%",
@@ -678,11 +646,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0118688",
+      "tmdb": 415
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman & Robin (film)",
       "rtCritics": "12%",
@@ -699,11 +666,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0078346",
+      "tmdb": 1924
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman (1978 film)",
       "rtCritics": "94%",
@@ -720,11 +686,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0081573",
+      "tmdb": 8536
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman II",
       "rtCritics": "88%",
@@ -741,11 +706,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0086393",
+      "tmdb": 9531
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman III",
       "rtCritics": "30%",
@@ -762,11 +726,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0088206",
+      "tmdb": 9651
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Supergirl (1984 film)",
       "rtCritics": "8%",
@@ -783,11 +746,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0094074",
+      "tmdb": 11411
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman IV: The Quest for Peace",
       "rtCritics": "10%",
@@ -804,11 +766,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0348150",
+      "tmdb": 1452
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman Returns",
       "rtCritics": "74%",
@@ -825,11 +786,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2193021",
+      "tmdb": 1412
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Arrow",
       "rtCritics": "86%",
@@ -846,11 +806,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt3107288",
+      "tmdb": 60735
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Flash",
       "rtCritics": "89%",
@@ -867,11 +826,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt3489184",
+      "tmdb": 60743
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Constantine",
       "rtCritics": "73%",
@@ -888,11 +846,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt4016454",
+      "tmdb": 62688
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Supergirl",
       "rtCritics": "88%",
@@ -909,11 +866,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt4532368",
+      "tmdb": 62643
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "DC's Legends of Tomorrow",
       "rtCritics": "89%",
@@ -930,11 +886,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt6045840",
+      "tmdb": 71663
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Black Lightning",
       "rtCritics": "92%",
@@ -951,11 +906,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt8712204",
+      "tmdb": 89247
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batwoman",
       "rtCritics": "83%",
@@ -967,16 +921,15 @@
   },
   {
     "id": "stargirl-2020",
-    "title": "Stargirl",
+    "title": "DC's Stargirl",
     "year": 2020,
     "kind": "series",
     "medium": "live",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 80986
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Stargirl",
       "rtCritics": "94%",
@@ -993,11 +946,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt11192306",
+      "tmdb": 95057
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman & Lois",
       "rtCritics": "88%",
@@ -1014,11 +966,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1043813",
+      "tmdb": 75450
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Titans",
       "rtCritics": "85%",
@@ -1035,11 +986,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt8416494",
+      "tmdb": 79501
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Doom Patrol",
       "rtCritics": "97%",
@@ -1056,11 +1006,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1751634",
+      "tmdb": 90802
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Sandman",
       "rtCritics": "88%",
@@ -1077,11 +1026,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt15358446",
+      "tmdb": 132750
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Dead Boy Detectives",
       "rtCritics": "92%",
@@ -1098,11 +1046,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0103359",
+      "tmdb": 2098
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: The Animated Series",
       "rtCritics": "100%",
@@ -1119,11 +1066,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0106364",
+      "tmdb": 14919
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Mask of the Phantasm",
       "rtCritics": "83%",
@@ -1140,11 +1086,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0143127",
+      "tmdb": 15805
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman & Mr. Freeze: SubZero",
       "rtCritics": "92%",
@@ -1161,11 +1106,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0115378",
+      "tmdb": 4303
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman: The Animated Series",
       "rtCritics": "96%",
@@ -1182,11 +1126,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0118266",
+      "tmdb": 4625
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The New Batman Adventures",
       "rtCritics": "100%",
@@ -1203,11 +1146,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0346578",
+      "tmdb": 21683
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Mystery of the Batwoman",
       "rtCritics": "67%",
@@ -1224,11 +1166,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0247729",
+      "tmdb": 1487
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Static Shock",
       "rtCritics": "90%",
@@ -1245,11 +1186,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0275137",
+      "tmdb": 1618
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League (TV series)",
       "rtCritics": "96%",
@@ -1266,11 +1206,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt6025022",
+      "tmdb": 84200
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League Unlimited",
       "rtCritics": "100%",
@@ -1287,11 +1226,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt8752474",
+      "tmdb": 537059
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League vs. the Fatal Five",
       "rtCritics": "100%",
@@ -1308,11 +1246,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0147746",
+      "tmdb": 513
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman Beyond",
       "rtCritics": "100%",
@@ -1329,11 +1266,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0233298",
+      "tmdb": 16234
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman Beyond: Return of the Joker",
       "rtCritics": "88%",
@@ -1350,11 +1286,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2820466",
+      "tmdb": 183011
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: The Flashpoint Paradox",
       "rtCritics": "100%",
@@ -1371,11 +1306,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt3060952",
+      "tmdb": 217993
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: War",
       "rtCritics": "50%",
@@ -1392,11 +1326,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt3139072",
+      "tmdb": 251519
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Son of Batman",
       "rtCritics": "64%",
@@ -1413,11 +1346,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt3878542",
+      "tmdb": 297556
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: Throne of Atlantis",
       "rtCritics": "63%",
@@ -1434,11 +1366,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt4324274",
+      "tmdb": 321528
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman vs. Robin",
       "rtCritics": "100%",
@@ -1455,11 +1386,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt4870838",
+      "tmdb": 366924
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Bad Blood",
       "rtCritics": "100%",
@@ -1476,11 +1406,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt5091548",
+      "tmdb": 379291
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League vs. Teen Titans",
       "rtCritics": "80%",
@@ -1497,11 +1426,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2494376",
+      "tmdb": 408220
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League Dark (film)",
       "rtCritics": "79%",
@@ -1518,11 +1446,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt6315800",
+      "tmdb": 408647
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Teen Titans: The Judas Contract",
       "rtCritics": "83%",
@@ -1539,11 +1466,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7167602",
+      "tmdb": 487242
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Suicide Squad: Hell to Pay",
       "rtCritics": "88%",
@@ -1561,10 +1487,9 @@
     "medium": "animation",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 539517
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Constantine: City of Demons",
       "rtCritics": "90%",
@@ -1581,11 +1506,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7167658",
+      "tmdb": 487670
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Death of Superman (film)",
       "rtCritics": "93%",
@@ -1602,11 +1526,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7167686",
+      "tmdb": 487672
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Reign of the Supermen (film)",
       "rtCritics": "93%",
@@ -1623,11 +1546,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt8752440",
+      "tmdb": 537056
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Hush (film)",
       "rtCritics": "88%",
@@ -1644,11 +1566,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt8752498",
+      "tmdb": 537055
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Wonder Woman: Bloodlines",
       "rtCritics": "89%",
@@ -1665,11 +1586,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt11079148",
+      "tmdb": 618344
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League Dark: Apokolips War",
       "rtCritics": "100%",
@@ -1687,10 +1607,9 @@
     "medium": "animation",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 791348
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Constantine: The House of Mystery",
       "rtCritics": "80%",
@@ -1707,11 +1626,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt13804084",
+      "tmdb": 736069
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice Society: World War II",
       "rtCritics": "76%",
@@ -1728,11 +1646,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt11079116",
+      "tmdb": 618354
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman: Man of Tomorrow",
       "rtCritics": "93%",
@@ -1749,11 +1666,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt14324650",
+      "tmdb": 736073
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: The Long Halloween (film)",
       "rtCritics": "100%",
@@ -1770,11 +1686,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt14402926",
+      "tmdb": 736074
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: The Long Halloween, Part Two",
       "rtCritics": "100%",
@@ -1791,11 +1706,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt20192230",
+      "tmdb": 887357
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Green Lantern: Beware My Power",
       "rtCritics": "56%",
@@ -1812,11 +1726,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt22769820",
+      "tmdb": 1003580
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Legion of Super-Heroes (film)",
       "rtCritics": "60%",
@@ -1833,11 +1746,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt27687527",
+      "tmdb": 1003581
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: Warworld",
       "rtCritics": "43%",
@@ -1854,11 +1766,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt29195117",
+      "tmdb": 1155089
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: Crisis on Infinite Earths",
       "rtCritics": "88%",
@@ -1875,11 +1786,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt30150907",
+      "tmdb": 1209288
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: Crisis on Infinite Earths – Part Two",
       "rtCritics": "14%",
@@ -1896,11 +1806,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt30150917",
+      "tmdb": 1209290
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: Crisis on Infinite Earths – Part Three",
       "rtCritics": "20%",
@@ -1917,11 +1826,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7658402",
+      "tmdb": 74440
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Harley Quinn (TV series)",
       "rtCritics": "96%",
@@ -1938,11 +1846,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt19853518",
+      "tmdb": 200753
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Kite Man: Hell Yeah!",
       "rtCritics": "85%",
@@ -1960,10 +1867,10 @@
     "medium": "animation",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 342605,
+      "tmdbKind": "movie"
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman (1940s cartoons)",
       "rtCritics": "100%",
@@ -1980,11 +1887,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0033317",
+      "tmdb": 61020
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Adventures of Captain Marvel",
       "rtCritics": "90%",
@@ -2001,11 +1907,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0035665",
+      "tmdb": 125249
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman (serial)",
       "rtCritics": "75%",
@@ -2022,11 +1927,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0040852",
+      "tmdb": 126712
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman (1948 serial)",
       "rtCritics": "80%",
@@ -2043,11 +1947,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0044091",
+      "tmdb": 41800
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman and the Mole Men",
       "rtCritics": "70%",
@@ -2064,11 +1967,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0044231",
+      "tmdb": 12662
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Adventures of Superman (TV series)",
       "rtCritics": "85%",
@@ -2085,11 +1987,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0059968",
+      "tmdb": 2287
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman (TV series)",
       "rtCritics": "80%",
@@ -2106,11 +2007,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0069641",
+      "tmdb": 936
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Super Friends",
       "rtCritics": "80%",
@@ -2127,11 +2027,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0074074",
+      "tmdb": 4331
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Wonder Woman (TV series)",
       "rtCritics": "85%",
@@ -2148,11 +2047,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0084745",
+      "tmdb": 17918
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Swamp Thing (film)",
       "rtCritics": "62%",
@@ -2169,11 +2067,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0120207",
+      "tmdb": 8854
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Steel (1997 film)",
       "rtCritics": "12%",
@@ -2190,11 +2087,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0257044",
+      "tmdb": 4147
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Road to Perdition",
       "rtCritics": "82%",
@@ -2211,11 +2107,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0327554",
+      "tmdb": 314
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Catwoman (film)",
       "rtCritics": "8%",
@@ -2232,11 +2127,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0360486",
+      "tmdb": 561
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Constantine (film)",
       "rtCritics": "46%",
@@ -2253,11 +2147,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0399146",
+      "tmdb": 59
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "A History of Violence",
       "rtCritics": "88%",
@@ -2274,11 +2167,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0434409",
+      "tmdb": 752
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "V for Vendetta (film)",
       "rtCritics": "73%",
@@ -2295,11 +2187,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0409459",
+      "tmdb": 13183
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Watchmen (film)",
       "rtCritics": "65%",
@@ -2316,11 +2207,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0480255",
+      "tmdb": 34813
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Losers (film)",
       "rtCritics": "48%",
@@ -2338,10 +2228,9 @@
     "medium": "live",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 39514
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Red (2010 film)",
       "rtCritics": "72%",
@@ -2358,11 +2247,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1075747",
+      "tmdb": 20533
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Jonah Hex (film)",
       "rtCritics": "12%",
@@ -2379,11 +2267,10 @@
     "kind": "film",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1133985",
+      "tmdb": 44912
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Green Lantern (film)",
       "rtCritics": "25%",
@@ -2400,11 +2287,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0098798",
+      "tmdb": 236
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Flash (1990 TV series)",
       "rtCritics": "84%",
@@ -2421,11 +2307,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0106057",
+      "tmdb": 4515
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Lois & Clark: The New Adventures of Superman",
       "rtCritics": "81%",
@@ -2443,10 +2328,9 @@
     "medium": "live",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 4604
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Smallville",
       "rtCritics": "78%",
@@ -2463,11 +2347,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt3749900",
+      "tmdb": 60708
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Gotham (TV series)",
       "rtCritics": "77%",
@@ -2484,11 +2367,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt3501584",
+      "tmdb": 60866
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "iZombie",
       "rtCritics": "92%",
@@ -2505,11 +2387,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt4052886",
+      "tmdb": 63174
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Lucifer (TV series)",
       "rtCritics": "87%",
@@ -2526,11 +2407,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt5016504",
+      "tmdb": 64230
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Preacher (TV series)",
       "rtCritics": "89%",
@@ -2547,11 +2427,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt4276624",
+      "tmdb": 71340
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Krypton (TV series)",
       "rtCritics": "80%",
@@ -2568,11 +2447,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt8362852",
+      "tmdb": 79240
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Swamp Thing (2019 TV series)",
       "rtCritics": "92%",
@@ -2590,10 +2468,9 @@
     "medium": "live",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 79588
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Pennyworth (TV series)",
       "rtCritics": "73%",
@@ -2610,11 +2487,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7049682",
+      "tmdb": 79788
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Watchmen (TV series)",
       "rtCritics": "96%",
@@ -2631,11 +2507,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt12809988",
+      "tmdb": 103768
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Sweet Tooth (TV series)",
       "rtCritics": "93%",
@@ -2652,11 +2527,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt13624900",
+      "tmdb": 125474
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Naomi (TV series)",
       "rtCritics": "89%",
@@ -2673,11 +2547,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt16418896",
+      "tmdb": 195868
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Gotham Knights (TV series)",
       "rtCritics": "22%",
@@ -2694,11 +2567,10 @@
     "kind": "series",
     "medium": "live",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt18347622",
+      "tmdb": 233629
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Bodies (2023 TV series)",
       "rtCritics": "82%",
@@ -2715,11 +2587,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0343314",
+      "tmdb": 604
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Teen Titans (TV series)",
       "rtCritics": "97%",
@@ -2736,11 +2607,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0398417",
+      "tmdb": 2022
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Batman (TV series)",
       "rtCritics": "88%",
@@ -2757,11 +2627,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1213218",
+      "tmdb": 15804
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: The Brave and the Bold",
       "rtCritics": "95%",
@@ -2778,11 +2647,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1641384",
+      "tmdb": 33217
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Young Justice (TV series)",
       "rtCritics": "96%",
@@ -2799,11 +2667,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1724587",
+      "tmdb": 40351
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Green Lantern: The Animated Series",
       "rtCritics": "95%",
@@ -2820,11 +2687,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2771780",
+      "tmdb": 45140
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Teen Titans Go!",
       "rtCritics": "75%",
@@ -2841,11 +2707,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt5419200",
+      "tmdb": 68837
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League Action",
       "rtCritics": "100%",
@@ -2862,11 +2727,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt9628244",
+      "tmdb": 87491
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "DC Super Hero Girls (TV series)",
       "rtCritics": "85%",
@@ -2883,11 +2747,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt14681924",
+      "tmdb": 125928
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "My Adventures with Superman",
       "rtCritics": "98%",
@@ -2904,11 +2767,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt28279848",
+      "tmdb": 229926
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Suicide Squad Isekai",
       "rtCritics": "62%",
@@ -2925,11 +2787,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt14681596",
+      "tmdb": 125909
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Caped Crusader",
       "rtCritics": "95%",
@@ -2946,11 +2807,10 @@
     "kind": "series",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt27621333",
+      "tmdb": 225361
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Bat-Fam",
       "rtCritics": "80%",
@@ -2967,11 +2827,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0934706",
+      "tmdb": 13640
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman: Doomsday",
       "rtCritics": "57%",
@@ -2988,11 +2847,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt0902272",
+      "tmdb": 14011
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: The New Frontier",
       "rtCritics": "72%",
@@ -3009,11 +2867,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1117563",
+      "tmdb": 13851
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Gotham Knight",
       "rtCritics": "78%",
@@ -3030,11 +2887,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1186373",
+      "tmdb": 15359
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Wonder Woman (2009 film)",
       "rtCritics": "86%",
@@ -3051,11 +2907,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1384590",
+      "tmdb": 17445
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Green Lantern: First Flight",
       "rtCritics": "64%",
@@ -3072,11 +2927,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1398941",
+      "tmdb": 22855
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman/Batman: Public Enemies",
       "rtCritics": "70%",
@@ -3093,11 +2947,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1494772",
+      "tmdb": 30061
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: Crisis on Two Earths",
       "rtCritics": "75%",
@@ -3114,11 +2967,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1569923",
+      "tmdb": 40662
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Under the Red Hood",
       "rtCritics": "100%",
@@ -3135,11 +2987,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1673430",
+      "tmdb": 45162
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman/Batman: Apocalypse",
       "rtCritics": "63%",
@@ -3156,11 +3007,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1699114",
+      "tmdb": 56590
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "All-Star Superman (film)",
       "rtCritics": "82%",
@@ -3177,11 +3027,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1683043",
+      "tmdb": 65291
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Green Lantern: Emerald Knights",
       "rtCritics": "82%",
@@ -3198,11 +3047,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt1672723",
+      "tmdb": 69735
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Year One (film)",
       "rtCritics": "88%",
@@ -3219,11 +3067,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2027128",
+      "tmdb": 76589
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: Doom",
       "rtCritics": "100%",
@@ -3240,11 +3087,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2224455",
+      "tmdb": 103269
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman vs. The Elite",
       "rtCritics": "80%",
@@ -3261,11 +3107,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2313197",
+      "tmdb": 123025
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: The Dark Knight Returns (film)",
       "rtCritics": "100%",
@@ -3282,11 +3127,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2166834",
+      "tmdb": 142061
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: The Dark Knight Returns – Part 2",
       "rtCritics": "100%",
@@ -3303,11 +3147,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt2617456",
+      "tmdb": 166076
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman: Unbound",
       "rtCritics": "86%",
@@ -3324,11 +3167,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt3139086",
+      "tmdb": 242643
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Assault on Arkham",
       "rtCritics": "76%",
@@ -3345,11 +3187,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt4324302",
+      "tmdb": 323027
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Justice League: Gods and Monsters",
       "rtCritics": "88%",
@@ -3366,11 +3207,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt4853102",
+      "tmdb": 382322
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: The Killing Joke (film)",
       "rtCritics": "36%",
@@ -3387,11 +3227,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt4116284",
+      "tmdb": 324849
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "The Lego Batman Movie",
       "rtCritics": "89%",
@@ -3408,11 +3247,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt6556890",
+      "tmdb": 408648
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman and Harley Quinn",
       "rtCritics": "50%",
@@ -3429,11 +3267,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7167630",
+      "tmdb": 471474
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Gotham by Gaslight",
       "rtCritics": "73%",
@@ -3450,11 +3287,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7451284",
+      "tmdb": 485942
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman Ninja",
       "rtCritics": "82%",
@@ -3471,11 +3307,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt7424200",
+      "tmdb": 474395
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Teen Titans Go! To the Movies",
       "rtCritics": "92%",
@@ -3492,11 +3327,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt9775360",
+      "tmdb": 581997
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman vs. Teenage Mutant Ninja Turtles",
       "rtCritics": "100%",
@@ -3513,11 +3347,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt10985510",
+      "tmdb": 618355
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Superman: Red Son (film)",
       "rtCritics": "89%",
@@ -3534,11 +3367,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt12885852",
+      "tmdb": 732450
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Soul of the Dragon",
       "rtCritics": "93%",
@@ -3555,11 +3387,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt5012504",
+      "tmdb": 831405
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Injustice (2021 film)",
       "rtCritics": "60%",
@@ -3576,11 +3407,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt15248702",
+      "tmdb": 862491
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Catwoman: Hunted",
       "rtCritics": "67%",
@@ -3597,11 +3427,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt8912936",
+      "tmdb": 539681
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "DC League of Super-Pets",
       "rtCritics": "72%",
@@ -3618,11 +3447,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt21197740",
+      "tmdb": 886396
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman and Superman: Battle of the Super Sons",
       "rtCritics": "100%",
@@ -3639,11 +3467,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt24223450",
+      "tmdb": 1003579
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: The Doom That Came to Gotham (film)",
       "rtCritics": "75%",
@@ -3660,11 +3487,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt15352516",
+      "tmdb": 870358
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Merry Little Batman",
       "rtCritics": "97%",
@@ -3681,11 +3507,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt32627540",
+      "tmdb": 1155058
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Watchmen: Chapter I",
       "rtCritics": "91%",
@@ -3702,11 +3527,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt32627545",
+      "tmdb": 1299652
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Watchmen: Chapter II",
       "rtCritics": "75%",
@@ -3723,11 +3547,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt32508210",
+      "tmdb": 1297763
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman Ninja vs. Yakuza League",
       "rtCritics": "85%",
@@ -3744,11 +3567,10 @@
     "kind": "film",
     "medium": "animation",
     "ids": {
-      "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "imdb": "tt21110654",
+      "tmdb": 987400
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Aztec Batman: Clash of Empires",
       "rtCritics": "78%",
@@ -3760,16 +3582,15 @@
   },
   {
     "id": "batman-knightfall-part-1-2026",
-    "title": "Batman: Knightfall – Part 1",
+    "title": "Batman: Knightfall Part 1: Knightfall",
     "year": 2026,
     "kind": "film",
     "medium": "animation",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 1560520
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Knightfall",
       "rtCritics": "82%",
@@ -3781,16 +3602,15 @@
   },
   {
     "id": "batman-knightfall-part-2-2026",
-    "title": "Batman: Knightfall – Part 2",
+    "title": "Batman: Knightfall Part 2: Knightquest",
     "year": 2026,
     "kind": "film",
     "medium": "animation",
     "ids": {
       "imdb": null,
-      "tmdb": null,
-      "tvmaze": null
+      "tmdb": 1389765
     },
-    "idsVerified": false,
+    "idsVerified": true,
     "legacy": {
       "wikiTitle": "Batman: Knightfall – Part 2",
       "rtCritics": "80%",
