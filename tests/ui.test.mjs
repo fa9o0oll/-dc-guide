@@ -26,9 +26,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   const tap = sel => mobile ? page.locator(sel).first().tap() : page.locator(sel).first().click();
   const snap = async n => { if (shots) await page.screenshot({ path: `${shots}/${name}-${n}.png` }); };
   const overflow = async label => { await page.waitForTimeout(350); const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
-      out: [...document.querySelectorAll('body *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > innerWidth + 1 || r.left < -1) && !e.closest('.unibar,.seasons,.tools,.atmo,[hidden]'); }).length }));
+      out: [...document.querySelectorAll('body *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > innerWidth + 1 || r.left < -1) && !e.closest('.unibar,.seasons,.tools,.atmo,.tile,[hidden]'); }).length }));
     check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw && o.out === 0, `عرض الصفحة ${o.sw}/${o.iw}، عناصر خارجة ${o.out}`);
-    const spill = await page.evaluate(() => [...document.querySelectorAll('.card,.step,.row,.node,.ep,.rates a,.status button,.tag,.top button,.unibar button,.facts')].filter(e => e.getBoundingClientRect().width > 0 && (e.scrollWidth > e.clientWidth + 2 || e.scrollHeight > e.clientHeight + 2)).map(e => e.className + ':' + e.textContent.trim().slice(0, 18)));
+    const spill = await page.evaluate(() => [...document.querySelectorAll('.card,.step,.row,.node,.ep,.rates a,.status button,.tag,.top button,.unibar button,.facts,.tile-text,.hit,.dock')].filter(e => e.getBoundingClientRect().width > 0 && (e.scrollWidth > e.clientWidth + 2 || e.scrollHeight > e.clientHeight + 2)).map(e => e.className + ':' + e.textContent.trim().slice(0, 18)));
     check(`${label}: لا محتوى يخرج من إطاره`, spill.length === 0, spill.slice(0, 4).join(' | '));
     const lap = await page.evaluate(() => { const b = [...document.querySelectorAll('.card,.step,.node,.ep')].map(e => e.getBoundingClientRect()).filter(r => r.width); let n = 0; for (let i = 1; i < b.length; i++) if (b[i].top < b[i - 1].bottom - 1 && b[i].left < b[i - 1].right - 1 && b[i].right > b[i - 1].left + 1 && b[i].top >= b[i - 1].top + 1) n++; return n; });
     check(`${label}: لا عناصر متراكبة`, lap === 0, String(lap)); };
@@ -58,10 +58,26 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await overflow('نافذة المسلسل'); await snap('3-series');
   await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });
   check('تقدم الحلقات يظهر على البطاقة', (await page.textContent('#c-dcu-peacemaker-2022-s2')).includes('الحلقات: 1 من 8'));
+  // الفهرس متاح بعد النزول في الصفحة، وفيه كل العوالم
+  await page.evaluate(() => scrollTo(0, 6000)); await page.waitForTimeout(200);
+  check('زر الفهرس ظاهر بعد النزول في الصفحة', await page.evaluate(() => { const r = document.querySelector('.dock-index').getBoundingClientRect(); return r.top >= 0 && r.bottom <= 60 && r.width > 40; }));
+  await tap('.dock-index'); await page.waitForSelector('.tile');
+  check('الفهرس يعرض 19 عالماً في مجموعتين', await page.locator('.tile').count() === 19 && await page.locator('.idx h3').count() === 2);
+  await page.waitForTimeout(600);
+  if (!mobile) check('البطاقة المنبثقة في وسط الشاشة', await page.evaluate(() => { const r = document.querySelector('#sheet').getBoundingClientRect(); return Math.abs((r.left + r.right) / 2 - innerWidth / 2) < 4 && Math.abs((r.top + r.bottom) / 2 - innerHeight / 2) < 4; }));
+  await overflow('الفهرس'); await snap('8-index');
+  await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });
   // البطاقة ← الخط الزمني ← البطاقة
   await tap('#c-dceu-man-of-steel-2013 [data-act=goto]'); await page.waitForSelector('#t-dceu-man-of-steel-2013');
   check('الانتقال من البطاقة إلى موقعها في الخط الزمني', await page.evaluate(() => { const r = document.querySelector('#t-dceu-man-of-steel-2013').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; }));
+  const before = parseInt((await page.textContent('#u-dceu .prog')).replace(/\D+/, ''));
+  await tap('#t-dceu-man-of-steel-2013 [data-act=status]'); await page.waitForTimeout(700);
+  check('تعليم المشاهدة في الخط الزمني يغيّر شكل العمل ويحدّث العدّاد', await page.evaluate(n => document.querySelector('#t-dceu-man-of-steel-2013').classList.contains('done') && parseInt(document.querySelector('#u-dceu .prog').textContent.replace(/\D+/, '')) === n + 1 && JSON.parse(localStorage.getItem('dcg.progress')).works['man-of-steel-2013'] === 'watched', before));
   await overflow('الخط الزمني'); await snap('4-timeline');
+  await tap('#t-dceu-man-of-steel-2013 .node-main'); await page.waitForSelector('#sheet:not([hidden])');
+  check('الضغط على العمل في الخط الزمني يفتح معلوماته وفيها زر البطاقة', (await page.textContent('#sheetTitle')).includes('Man of Steel') && await page.locator('#sheet [data-act=goto]').count() >= 1);
+  await page.waitForTimeout(600); await snap('9-modal');
+  await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });
   await tap('#t-dceu-man-of-steel-2013 [data-act=goto]'); await page.waitForSelector('#c-dceu-man-of-steel-2013');
   check('العودة من الخط الزمني إلى البطاقة', await page.evaluate(() => { const r = document.querySelector('#c-dceu-man-of-steel-2013').getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }));
   // آروفيرس

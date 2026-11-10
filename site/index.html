@@ -24,14 +24,17 @@
     <button data-act="view" data-view="arrow">ترتيب آروفيرس</button>
   </nav>
   <div class="tools">
-    <button data-act="jump">فهرس وبحث</button>
     <button data-act="shield" id="shieldBtn">درع الحرق</button>
     <button data-act="tonight">ماذا أشاهد؟</button>
     <button data-act="backup">سجلّي</button>
     <button data-act="guide">الدليل</button>
   </div>
 </header>
-<div class="unibar" id="unibar" role="tablist" aria-label="العوالم"></div>
+<div class="dock" id="dock">
+  <button class="dock-index" data-act="jump">الفهرس</button>
+  <div class="unibar" id="unibar" aria-label="العوالم"></div>
+  <div class="dock-here" id="dockHere" hidden><span>ترتيب مشاهدة آروفيرس</span><button data-act="view" data-view="cards">البطاقات</button><button data-act="view" data-view="timeline">الخط الزمني</button></div>
+</div>
 <div class="filters" id="filters">
   <input id="q" type="search" placeholder="ابحث باسم العمل…" aria-label="بحث">
   <select id="fType" aria-label="النوع"><option value="">كل الأنواع</option><option value="film">أفلام</option><option value="series">مسلسلات</option><option value="live">واقعي</option><option value="animation">أنميشن</option></select>
