@@ -35,7 +35,7 @@ jobs:
           git config user.name "dc-guide-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/generated site/data
-          git diff --cached --quiet || git commit -m "data: daily refresh [skip ci]"
+          git diff --cached --quiet || git commit -m "data: daily refresh"
           git push origin "HEAD:${GITHUB_REF_NAME}"
       - name: Stamp build id (cache busting; not committed)
         if: github.ref == 'refs/heads/main'
