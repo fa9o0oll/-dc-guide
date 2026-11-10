@@ -3619,5 +3619,161 @@
       "tier": "g",
       "ratingsVerified": false
     }
+  },
+  {
+    "id": "man-of-tomorrow-2027",
+    "title": "Man of Tomorrow",
+    "year": 2027,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt37833661",
+      "tmdb": 1523140
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "wonder-woman-tba",
+    "title": "Wonder Woman",
+    "year": null,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt37257255",
+      "tmdb": 1495964
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "the-batman-part-ii-2028",
+    "title": "The Batman: Part II",
+    "year": 2028,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt19850008",
+      "tmdb": 806704
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "dynamic-duo-2028",
+    "title": "Dynamic Duo",
+    "year": 2028,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt33549695",
+      "tmdb": 1364797
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "batman-knightfall-part-3-tba",
+    "title": "Batman: Knightfall Part 3: KnightsEnd",
+    "year": null,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt38807533",
+      "tmdb": 1389764
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "mister-miracle-tba",
+    "title": "Mister Miracle",
+    "year": null,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt37274722",
+      "tmdb": 293696
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "my-adventures-with-green-lantern-tba",
+    "title": "My Adventures with Green Lantern",
+    "year": null,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt37286909",
+      "tmdb": 285111
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "krypto-tba",
+    "title": "Krypto",
+    "year": null,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt43619136",
+      "tmdb": 326417
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "starfire-tba",
+    "title": "Starfire!",
+    "year": null,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": 285112
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "dc-super-powers-tba",
+    "title": "DC Super Powers",
+    "year": null,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": null,
+      "tmdb": 285113
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "the-brave-and-the-bold-tba",
+    "title": "The Brave and the Bold",
+    "year": null,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt26545566",
+      "tmdb": 1081004
+    },
+    "idsVerified": true,
+    "announced": true
+  },
+  {
+    "id": "swamp-thing-tba",
+    "title": "Swamp Thing",
+    "year": null,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt26545725",
+      "tmdb": 1797314
+    },
+    "idsVerified": true,
+    "announced": true
   }
 ]

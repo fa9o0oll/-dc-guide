@@ -38,6 +38,7 @@ async function boot() {
 
 // ---------- مساعدات
 const img = (path, size) => path ? D.base + size + path : '';
+const STAGE = { production: 'قيد الإنتاج، وتاريخ الصدور لم يُحدَّد بعد', development: 'قيد التطوير، وموعده لم يُحدَّد بعد' };
 const isSoon = w => !w.date || w.date > TODAY;
 const daysLeft = w => Math.ceil((new Date(w.date) - new Date(TODAY)) / 864e5);
 const sKey = p => p.season ? `${p.work}#${p.season}` : p.work;
@@ -134,14 +135,15 @@ function card(p) {
   return `<article class="card" id="${domId('c', p)}" data-k="${esc(sKey(p))}">
     <button class="poster" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} aria-label="تفاصيل ${esc(w.title)}">${posterTag(w)}</button>
     <div>
-      <div class="ord">${uniOf(p.universe).serial ? 'الترتيب: ' : ''}${esc(p.label)}</div>
+      <div class="ord">${uniOf(p.universe).serial && !soon ? 'الترتيب: ' : ''}${esc(p.label)}</div>
       <h3>${ltr(w.title + (p.season ? `: Season ${p.season}` : ''))}</h3>
       <div class="meta">${esc(meta)}</div>
-      <div class="tags">${soon ? '<span class="tag soon">قادم</span>' : v ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${nextTag(w)}</div>
+      <div class="tags">${soon ? (p.upcoming?.stage === 'development' ? '<span class="tag soon">معلن</span>' : '<span class="tag soon">قادم</span>') : v ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${nextTag(w)}</div>
       <p class="note">${esc(p.note)}</p>
     </div>
-    ${soon ? `<div class="count wide">${w.date ? `<b>${daysLeft(w)}</b><span>يوماً على الصدور<br><small>${fmtDate(w.date)}</small></span>` : '<span>معلن، وتاريخ الصدور لم يُحدَّد بعد</span>'}</div>` : ''}
+    ${soon ? `<div class="count wide">${w.date ? `<b>${daysLeft(w)}</b><span>يوماً على الصدور<br><small>${fmtDate(w.date)}</small></span>` : `<span>${STAGE[p.upcoming?.stage] || STAGE.production}</span>`}${p.upcoming?.source ? `<a class="src" href="${esc(p.upcoming.source)}" target="_blank" rel="noopener">المصدر</a>` : ''}</div>` : ''}
     ${nextBlock(w, 'wide')}
+    ${avLine(p, 'wide')}
     ${p.canon ? `<div class="canon wide">يظهر في عالمين: ${esc(p.canon.note)} <a href="${esc(p.canon.source)}" target="_blank" rel="noopener">المصدر</a></div>` : ''}
     ${p.spoiler ? (store.shield ? `<details class="vault wide"><summary>معلومة ارتباط فيها حرق. اضغط للكشف</summary><p>${esc(p.spoiler)}</p></details>` : `<p class="note wide">${esc(p.spoiler)}</p>`) : ''}
     ${rateBlock(w)}
@@ -166,10 +168,12 @@ function node(p, i, list) {
       <span class="thumb">${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w154')}" alt="">` : ''}<i class="seen" aria-hidden="true">✓</i></span>
       <span class="node-text"><span class="n">${esc(p.label)}${soon ? (w.date ? ` · قادم بعد ${daysLeft(w)} يوماً` : ' · قادم') : ''}</span>
         <span class="t">${ltr(w.title + (p.season ? `: Season ${p.season}` : ''))}</span>
-        <span class="meta">${esc([w.date ? w.date.slice(0, 4) : w.year, TYPE[w.kind + '|' + w.medium]].join(' · '))}</span>
-        ${around.length ? `<span class="meta">${around.map(([k, t]) => `${k}: ${ltr(t)}`).join(' · ')}</span>` : ''}</span></button>
+        <span class="meta">${esc([w.date ? w.date.slice(0, 4) : w.year, TYPE[w.kind + '|' + w.medium]].filter(Boolean).join(' · '))}</span>
+        ${around.length ? `<span class="meta">${around.map(([k, t]) => `${k}: ${ltr(t)}`).join(' · ')}</span>` : ''}${avStart(p) ? `<span class="meta">يبدأ في الخطوة ${avStart(p).n} من ترتيب المشاهدة</span>` : ''}</span></button>
     <div class="go">${soon ? '' : `<button data-act="status" data-s="watched" aria-pressed="${done}">${done ? '✓ شاهدته' : 'علّمه مشاهَد'}</button>`}<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}">البطاقة</button></div></div>`;
 }
+const avStart = p => { if (p.universe !== 'arrow' || !D.arrow) return null; return D.arrow.steps.find(s => (s.blocks || []).some(b => b.work === p.work && (!p.season || b.season === p.season)) || (s.parts || []).some(q => q.work === p.work && (!p.season || q.season === p.season))) || null; };
+const avLine = (p, cls = '') => { const st = avStart(p); return st ? `<div class="canon ${cls}">في ترتيب المشاهدة: يبدأ في الخطوة ${st.n} (${esc(st.title)}). <button data-act="avgo" data-step="${st.id}">افتح الخطوة</button></div>` : ''; };
 const tlNote = u => u.id === 'arrow' ? '<p class="tl-note">المسلسلات هنا مرتبة حسب سنة بدايتها فقط. المشاهدة الفعلية متداخلة بين مواسمها وحلقاتها. <button data-act="view" data-view="arrow">افتح ترتيب المشاهدة بالحلقات</button></p>' : '';
 function renderTimeline() {
   const secs = sections();
@@ -188,10 +192,11 @@ function renderArrow() {
   const done = a.steps.reduce((n, s) => n + (s.blocks || []).reduce((m, b) => m + rangeDone(b), 0) + (s.parts || []).filter(p => epDone(p.work, p.season, p.episode)).length, 0);
   $('#main').innerHTML = `<section class="uni" data-uni="arrow" style="${themeVars('arrow')}">
     <div class="av-intro"><h2>ترتيب مشاهدة ${ltr('Arrowverse')}</h2>
-      <ul><li>${a.steps.length} خطوة تغطي ${a.totalEpisodes} حلقة من 7 مسلسلات. كل حلقة موجودة مرة واحدة فقط.</li>
+      <ul><li>${a.steps.length} خطوة تغطي ${a.totalEpisodes} حلقة من ${a.showCount} مسلسلات. كل حلقة موجودة مرة واحدة فقط.</li>
       <li>اتبع الخطوات بالترتيب، وداخل كل خطوة اتبع الأسطر من الأعلى للأسفل.</li>
       <li>الخطوات البرتقالية حلقات تقاطع: قصة واحدة موزعة على أكثر من مسلسل، وتُشاهد بترتيب الأجزاء.</li>
-      <li>الترتيب مبني على تواريخ العرض الفعلية وعناوين الحلقات الرسمية.</li></ul>
+      <li>الترتيب مبني على تواريخ العرض الفعلية وعناوين الحلقات الرسمية.</li>
+      <li>${a.sideShows.map(x => `${ltr(x.show)} يبدأ في الخطوة ${x.firstStep}`).join('، و')}. يدوران في أرضين مستقلتين عن أرض بقية المسلسلات، ومكانهما في الخطوات حسب تاريخ عرضهما. ${a.sideShows.map(x => `<a href="${esc(x.source)}" target="_blank" rel="noopener">مصدر ${ltr(x.show)}</a>`).join(' · ')}</li></ul>
       <span class="lbl">تقدّمك: ${done} من ${a.totalEpisodes} حلقة</span><div class="bar"><i style="width:${Math.round(done / a.totalEpisodes * 100)}%"></i></div></div>
     <div class="steps">${a.steps.map(s => s.kind === 'crossover' ? `<div class="step cross" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)} <span class="en">${ltr(s.titleEn)}</span></h3><span class="tag soon">${s.parts.filter(p => !p.tieIn).length} أجزاء بالترتيب</span><span class="meta">${esc(s.label)}</span></div>
         ${s.parts.map(p => { const d = epDone(p.work, p.season, p.episode); return `<div class="row ${d ? 'done' : ''} ${p.tieIn ? 'tie' : ''}" style="--show:${SHOW_COLORS[p.work]}"><span class="k">${p.tieIn ? '＋' : p.part}</span>
@@ -202,16 +207,9 @@ function renderArrow() {
       : `<div class="step" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)}</h3>${s.title !== s.label ? `<span class="meta">${esc(s.label)}</span>` : ''}</div>
         ${s.blocks.map((b, i) => { const dn = rangeDone(b), full = dn === b.count; return `<div class="row ${full ? 'done' : ''}" style="--show:${SHOW_COLORS[b.work]}"><span class="k">${i + 1}</span>
           <span class="show">${ltr(b.show)}</span>
-          <span class="what">الموسم ${b.season}: ${b.whole ? 'كامل' : `من الحلقة ${b.from} إلى الحلقة ${b.to}`}<small>${b.count} حلقة · شاهدت ${dn}</small></span>
+          <span class="what">الموسم ${b.season}: ${b.whole ? 'كامل' : `من الحلقة ${b.from} إلى الحلقة ${b.to}`}<small>${b.count} حلقة · شاهدت ${dn}${b.side ? ' · أرض مستقلة: لا يتقاطع مع المسلسلات الأخرى' : ''}</small></span>
           <span class="btns"><button data-act="avblock" data-id="${b.work}" data-season="${b.season}" data-from="${b.from}" data-to="${b.to}">${full ? '✓ مكتملة' : 'علّمها مشاهدة'}</button><button data-act="open" data-id="${b.work}" data-season="${b.season}">الحلقات</button></span>
           ${b.links.map(l => `<span class="link">الحلقة ${l.episode}${l.toEpisode ? ' إلى ' + l.toEpisode : ''}: ${esc(l.note)}</span>`).join('')}</div>`; }).join('')}</div>`).join('')}</div>
-    <div class="av-intro steps"><h2>مسلسلان خارج الترتيب</h2>
-      <ul><li>ليسا من الخطوات أعلاه. كل واحد منهما يدور في أرض مستقلة عن أرض بقية المسلسلات.</li>
-      <li>لا ترتيب مشاهدة بينهما وبين غيرهما: كل مسلسل يُشاهد لحاله من موسمه الأول إلى الأخير.</li>
-      <li>مشاهدتهما اختيارية. لا يلزمان لفهم آروفيرس، ولا يلزم آروفيرس لفهمهما.</li></ul>
-      ${a.sideWorlds.map(x => { const w = D.works.get(x.work); return `<div class="row"><span class="k">◆</span><span class="show">${ltr(w.title)}</span>
-        <span class="what">${esc(x.note)}${x.source ? ` <a href="${esc(x.source)}" target="_blank" rel="noopener">المصدر</a>` : ''}<small>${w.seasons ? `${w.seasons.length} مواسم، ${w.episodeCount} حلقة · ` : ''}أنسب وقت: أي وقت بعد الخطوة ${x.afterStep} (أزمة الأراضي اللانهائية)</small></span>
-        <span class="btns"><button data-act="open" data-id="${w.id}">الحلقات</button></span></div>`; }).join('')}</div>
   </section>`;
 }
 
@@ -392,6 +390,7 @@ document.addEventListener('click', ev => {
     case 'reveal': b.classList.remove('blur'); b.removeAttribute('data-act'); b.nextElementSibling?.remove(); break;
     case 'avpart': setEp(id, season, +d.ep, !epDone(id, season, +d.ep)); save(); render(true); break;
     case 'avblock': { let all = true; for (let e = +d.from; e <= +d.to; e++) all &&= epDone(id, season, e); for (let e = +d.from; e <= +d.to; e++) setEp(id, season, e, !all); save(); render(true); break; }
+    case 'avgo': { if (ui.sheet) closeSheet(); ui.view = 'arrow'; render(); const t = document.getElementById(d.step); if (t) { t.scrollIntoView({ block: 'start', behavior: 'instant' }); t.classList.add('flash'); setTimeout(() => t.classList.remove('flash'), 1700); } break; }
     case 'jump': openJump(); break;
     case 'backup': openBackup(); break;
     case 'bkcopy': navigator.clipboard?.writeText($('#bk').value).then(() => toast('تم النسخ'), () => { $('#bk').select(); toast('حدّد النص وانسخه يدوياً'); }); break;

@@ -35,7 +35,7 @@ for (const [w, list] of Object.entries(eps)) for (const s of [...new Set(list.ma
   const l = list.filter(x => x.s === s && x.date); if (!l.length) continue;
   seasons.push({ w, s, list: l, start: l[0].date, end: l.at(-1).date, year: bYear(l[0].date) });
 }
-const range = (w, s, l) => ({ work: w, show: cfg.shows[w], season: s, from: l[0].e, to: l.at(-1).e, count: l.length, firstAired: l[0].date, lastAired: l.at(-1).date,
+const range = (w, s, l) => ({ work: w, show: cfg.shows[w], ...(cfg.sideShows?.[w] ? { side: true } : {}), season: s, from: l[0].e, to: l.at(-1).e, count: l.length, firstAired: l[0].date, lastAired: l.at(-1).date,
   whole: l.length === eps[w].filter(x => x.s === s).length,
   links: cfg.links.filter(k => k.at[0] === w && k.at[1] === s && l.some(x => x.e === k.at[2])).map(k => ({ episode: k.at[2], ...(k.to ? { toEpisode: k.to } : {}), note: k.note })) });
 const byStart = (a, b) => a.firstAired.localeCompare(b.firstAired);
@@ -72,6 +72,10 @@ for (const o of cfg.order || []) { const A = locate(o.before), B = locate(o.afte
   else if (A.i === B.i && A.b > B.b && B.b >= 0) { const bl = steps[A.i].blocks; bl.splice(B.b, 0, bl.splice(A.b, 1)[0]); } }
 for (const o of cfg.order || []) { const A = locate(o.before), B = locate(o.after); if (A && B && (A.i > B.i || (A.i === B.i && B.b >= 0 && A.b > B.b))) errs.push('تعذّر تحقيق الارتباط: ' + o.why); }
 
+// المسلسلات المستقلة يجب أن تبدأ بعد أزمة الأراضي اللانهائية (تحقق من تواريخ العرض الفعلية)
+const crisisIdx = steps.findIndex(s => s.crossover === 'crisis-on-infinite-earths');
+for (const w of Object.keys(cfg.sideShows || {})) { const i = steps.findIndex(s => (s.blocks || []).some(b => b.work === w)); if (i <= crisisIdx) errs.push(`مسلسل مستقل يبدأ قبل الأزمة أو معها: ${w}`); }
+
 // فحص التغطية: كل حلقة مرة واحدة بالضبط
 const seen = new Map();
 const mark = (w, s, e) => seen.set(key(w, s, e), (seen.get(key(w, s, e)) || 0) + 1);
@@ -82,5 +86,5 @@ if (seen.size !== total) errs.push(`تغطية: ${seen.size} مدرجة مقاب
 
 if (errs.length) { console.error('❌ ترتيب آروفيرس:\n- ' + errs.slice(0, 30).join('\n- ')); process.exit(1); }
 steps.forEach((s, i) => s.n = i + 1);
-fs.writeFileSync(new URL('site/data/arrowverse.json', root), JSON.stringify({ generatedAt: new Date().toISOString(), totalEpisodes: total, steps, sideWorlds: cfg.sideWorlds.map(x => ({ ...x, afterStep: steps.find(s => s.crossover === 'crisis-on-infinite-earths')?.n })) }) + '\n');
+fs.writeFileSync(new URL('site/data/arrowverse.json', root), JSON.stringify({ generatedAt: new Date().toISOString(), totalEpisodes: total, showCount: Object.keys(eps).length, steps, sideShows: Object.entries(cfg.sideShows || {}).map(([work, x]) => ({ work, show: cfg.shows[work], ...x, firstStep: steps.find(s => (s.blocks || []).some(b => b.work === work))?.n })) }) + '\n');
 console.log(`✅ آروفيرس: ${steps.length} خطوة تغطي ${total} حلقة من ${Object.keys(eps).length} مسلسلات، بلا نقص ولا تكرار`);

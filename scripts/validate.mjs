@@ -8,7 +8,7 @@ if (uIds.size !== U.length) errs.push('معرّف عالم مكرر');
 if (wById.size !== W.length) errs.push('معرّف عمل مكرر');
 const seenTY = new Map();
 for (const w of W) {
-  if (!/^[a-z0-9-]+-\d{4}$/.test(w.id)) errs.push('معرّف غير صالح: ' + w.id);
+  if (!/^[a-z0-9-]+-(\d{4}|tba)$/.test(w.id)) errs.push('معرّف غير صالح: ' + w.id);
   if (!w.title || /\((film|TV series|serial|\d{4} film)\)$/.test(w.title)) errs.push('عنوان فيه لاحقة ويكيبيديا: ' + w.title);
   if (!['film', 'series'].includes(w.kind) || !['live', 'animation'].includes(w.medium)) errs.push('نوع غير صالح: ' + w.id);
   const k = w.title + '|' + w.year + '|' + w.kind; if (seenTY.has(k)) errs.push('عمل مكرر: ' + k); seenTY.set(k, 1);
@@ -22,6 +22,7 @@ for (const p of P) {
   const k = p.universe + '#' + p.position; if (posSeen.has(k)) errs.push('ترتيب مكرر: ' + k); posSeen.add(k);
   const pk = p.universe + '|' + p.work + '|' + (p.season ?? ''); if (placed.has(pk)) errs.push('إدراج مكرر في نفس العالم: ' + pk); placed.add(pk);
   if (p.season && wById.get(p.work)?.kind !== 'series') errs.push('موسم لعمل ليس مسلسلاً: ' + p.work);
+  if (p.upcoming && (!['production', 'development'].includes(p.upcoming.stage) || !/^https:\/\//.test(p.upcoming.source))) errs.push('عمل قادم بلا مرحلة أو مصدر: ' + p.work);
   if (p.canon && !/^https:\/\//.test(p.canon.source)) errs.push('حالة اعتماد بلا مصدر: ' + p.work);
 }
 for (const u of U) { const n = P.filter(p => p.universe === u.id).map(p => p.position).sort((a, b) => a - b);

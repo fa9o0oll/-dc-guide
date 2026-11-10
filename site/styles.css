@@ -367,3 +367,6 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 .season-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
 .ep.future{border-style:dashed}
 .next-note{font-size:.84rem;color:var(--dim)}
+
+.canon button{min-height:36px;padding:4px 10px;font-size:.78rem;margin-inline-start:4px}
+.count .src{margin-inline-start:auto;flex:none;font-size:.85rem;min-height:40px;min-width:40px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center}

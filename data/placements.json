@@ -1325,5 +1325,137 @@
     "label": "منفرد",
     "note": "الجزء الثاني (2026): الفصل المكمل لملحمة Knightfall والصراع على حماية غوثام.",
     "spoiler": "يتناول فترة تولي جان بول فالي (أزرائيل) عباءة الوطواط ورحلة تعافي بروس واين."
+  },
+  {
+    "universe": "dcu",
+    "work": "man-of-tomorrow-2027",
+    "position": 10,
+    "label": "قادم",
+    "note": "الفصل التالي من قصة سوبرمان بعد فيلم Superman: سوبرمان وليكس لوثر أمام خطر أكبر منهما، برينياك (Brainiac).",
+    "upcoming": {
+      "stage": "production",
+      "source": "https://www.gamesradar.com/upcoming-dc-movies/"
+    }
+  },
+  {
+    "universe": "dcu",
+    "work": "mister-miracle-tba",
+    "position": 11,
+    "label": "قادم",
+    "note": "مسلسل أنميشن للكبار عن سكوت فري (Scott Free) وزوجته بيغ باردا (Big Barda). أكّد جيمس غان أنه من أحداث عالم DCU نفسه.",
+    "upcoming": {
+      "stage": "production",
+      "source": "https://www.gamesradar.com/entertainment/dc-tv-shows/darkseid-is-officially-on-the-way-to-dcu-as-james-gunn-confirms-upcoming-mister-miracle-show-is-canon/"
+    }
+  },
+  {
+    "universe": "dcu",
+    "work": "wonder-woman-tba",
+    "position": 12,
+    "label": "قيد التطوير",
+    "note": "فيلم جديد لووندر وومان داخل عالم DCU. ما زال في مرحلة الكتابة، ومصيره لم يُحسم بعد تغيّر إدارة DC Studios.",
+    "upcoming": {
+      "stage": "development",
+      "source": "https://www.gamesradar.com/upcoming-dc-movies/"
+    }
+  },
+  {
+    "universe": "dcu",
+    "work": "the-brave-and-the-bold-tba",
+    "position": 13,
+    "label": "قيد التطوير",
+    "note": "فيلم باتمان وروبن (داميان واين) الخاص بعالم DCU، ولا علاقة له بأفلام مات ريفز. أُعلن في يناير 2023 ولم يبدأ تصويره، واستمراره غير مؤكد.",
+    "upcoming": {
+      "stage": "development",
+      "source": "https://www.gamesradar.com/upcoming-dc-movies/"
+    }
+  },
+  {
+    "universe": "dcu",
+    "work": "swamp-thing-tba",
+    "position": 14,
+    "label": "قيد التطوير",
+    "note": "فيلم رعب عن سوامب ثينغ (Swamp Thing) من إخراج جيمس مانغولد. أُعلن ضمن خطة DCU الأولى، ولا جديد مؤكداً عنه.",
+    "upcoming": {
+      "stage": "development",
+      "source": "https://www.gamesradar.com/upcoming-dc-movies/"
+    }
+  },
+  {
+    "universe": "reeves",
+    "work": "the-batman-part-ii-2028",
+    "position": 3,
+    "label": "قادم",
+    "note": "تتمة فيلم The Batman. تأجّل من أكتوبر 2027 إلى فبراير 2028.",
+    "upcoming": {
+      "stage": "production",
+      "source": "https://www.gamesradar.com/upcoming-dc-movies/"
+    }
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "my-adventures-with-green-lantern-tba",
+    "position": 13,
+    "label": "قادم",
+    "note": "جيسيكا كروز (Jessica Cruz) طالبة ثانوية يختارها خاتم غرين لانترن. أكّد منتجه أنه يدور في الخط الزمني نفسه لمسلسل My Adventures with Superman.",
+    "upcoming": {
+      "stage": "production",
+      "source": "https://www.superherohype.com/news/593900-my-adventures-with-superman-green-lantern-universe-jake-wyatt-stoked"
+    }
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "krypto-tba",
+    "position": 14,
+    "label": "قادم",
+    "note": "مسلسل للصغار عن كريبتو (Krypto) كلب سوبرمان. أُعلن في مهرجان أنسي في يونيو 2026، وليس من أحداث عالم DCU.",
+    "upcoming": {
+      "stage": "development",
+      "source": "https://comicbookmovie.com/dc-studios/dc-studios-announces-absolute-batman-joker-laugh-riot-and-krypto-tv-shows-at-annecy-a228500"
+    }
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "starfire-tba",
+    "position": 15,
+    "label": "قادم",
+    "note": "مغامرات ستارفاير (Starfire) في الفضاء بعد هروبها من كوكبها تاماران. مسلسل للصغار مستقل عن عالم DCU.",
+    "upcoming": {
+      "stage": "production",
+      "source": "https://comicbookmovie.com/dc-studios/new-details-and-logos-for-green-lantern-starfire-and-dc-super-powers-krypto-shorts-set-in-dcu-also-coming-a216456"
+    }
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "dc-super-powers-tba",
+    "position": 16,
+    "label": "قادم",
+    "note": "طلاب جدد في مدرسة للأبطال يطوّرون قواهم تحت إشراف المدير مارشن مانهنتر (Martian Manhunter). مسلسل للصغار.",
+    "upcoming": {
+      "stage": "production",
+      "source": "https://comicbookmovie.com/dc-studios/new-details-and-logos-for-green-lantern-starfire-and-dc-super-powers-krypto-shorts-set-in-dcu-also-coming-a216456"
+    }
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "dynamic-duo-2028",
+    "position": 41,
+    "label": "قادم",
+    "note": "بدايات ديك غرايسون وجيسون تود، وصداقة يختبرها اختلاف نظرتيهما للمستقبل. فيلم أنميشن بتقنية الدمى، ولم يُعلن رسمياً انتماؤه لأي عالم. تأجّل من يونيو إلى سبتمبر 2028.",
+    "upcoming": {
+      "stage": "production",
+      "source": "https://comicbookmovie.com/batman/batman-animated/dynamic-duo-release-date-delayed-as-boardwalk-empires-steve-buscemi-lands-villainous-role-a230051"
+    }
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-knightfall-part-3-tba",
+    "position": 42,
+    "label": "قادم",
+    "note": "الجزء الثالث والأخير من ثلاثية Knightfall، ويُشاهد بعد الجزأين الأول والثاني.",
+    "upcoming": {
+      "stage": "production",
+      "source": "https://www.comicsbeat.com/nycc-25-warner-bros-animation-dc-announce-batman-knightfall"
+    }
   }
 ]

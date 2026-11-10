@@ -24,5 +24,5 @@ export const THEMES = {
 // لون يميّز كل مسلسل في ترتيب آروفيرس، ليُعرف المسلسل من أول نظرة
 export const SHOW_COLORS = {
   'arrow-2012': '#37d683', 'the-flash-2014': '#ff5a4a', 'constantine-2014': '#e0a83c', 'supergirl-2015': '#57abff',
-  'dc-s-legends-of-tomorrow-2016': '#f1e3b0', 'black-lightning-2018': '#ffe14a', 'batwoman-2019': '#d6325a',
+  'dc-s-legends-of-tomorrow-2016': '#f1e3b0', 'black-lightning-2018': '#ffe14a', 'batwoman-2019': '#d6325a', 'stargirl-2020': '#ffb347', 'superman-and-lois-2021': '#c9d6ff',
 };

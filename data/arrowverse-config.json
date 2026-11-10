@@ -6,20 +6,10 @@
     "supergirl-2015": "Supergirl",
     "dc-s-legends-of-tomorrow-2016": "Legends of Tomorrow",
     "black-lightning-2018": "Black Lightning",
-    "batwoman-2019": "Batwoman"
+    "batwoman-2019": "Batwoman",
+    "stargirl-2020": "DC's Stargirl",
+    "superman-and-lois-2021": "Superman & Lois"
   },
-  "sideWorlds": [
-    {
-      "work": "stargirl-2020",
-      "note": "تدور أحداثه في أرض أخرى (Earth-2) غير أرض المسلسلات الرئيسية، ولا يتقاطع معها في ترتيب المشاهدة.",
-      "source": "https://www.denofgeek.com/us/tv/dc-entertainment/285339/crisis-on-infinite-earths-ending-explained-new-dc-multiverse"
-    },
-    {
-      "work": "superman-and-lois-2021",
-      "note": "أوضح المسلسل في ختام موسمه الثاني أنه يدور في أرض مختلفة عن أرض بقية المسلسلات، فقصته مستقلة.",
-      "source": "https://www.denofgeek.com/tv/superman-lois-place-in-the-arrowverse-revealed/"
-    }
-  ],
   "crossovers": [
     {
       "id": "flash-vs-arrow",
@@ -277,5 +267,15 @@
       ],
       "why": "حلقة Duet تكمل من نهاية حلقة Supergirl"
     }
-  ]
+  ],
+  "sideShows": {
+    "stargirl-2020": {
+      "note": "تدور أحداثه في أرض أخرى (Earth-2) غير أرض المسلسلات الرئيسية، ولا يتقاطع معها في ترتيب المشاهدة.",
+      "source": "https://www.denofgeek.com/us/tv/dc-entertainment/285339/crisis-on-infinite-earths-ending-explained-new-dc-multiverse"
+    },
+    "superman-and-lois-2021": {
+      "note": "أوضح المسلسل في ختام موسمه الثاني أنه يدور في أرض مختلفة عن أرض بقية المسلسلات، فقصته مستقلة.",
+      "source": "https://www.denofgeek.com/tv/superman-lois-place-in-the-arrowverse-revealed/"
+    }
+  }
 }

@@ -10,7 +10,7 @@ const today = new Date().toISOString().slice(0, 10);
 const NAMED = ['Man of Tomorrow', 'The Batman Part II', 'The Brave and the Bold', 'Dynamic Duo', 'Swamp Thing', 'Wonder Woman', 'Booster Gold', 'Waller', 'Paradise Lost',
   'The Authority', 'Sgt. Rock', 'Teen Titans', 'Bane and Deathstroke', 'Mister Miracle', 'My Adventures with Green Lantern', 'Starfire', 'Batman: Knightfall', 'Constantine 2',
   'Jimmy Olsen', 'DC Super Powers', 'Blue Beetle', 'Lobo', 'Deathstroke', 'Batgirl', 'Justice League', 'Green Lantern', 'Supergirl', 'Clayface', 'Krypto', 'Harley Quinn', 'Batman Caped Crusader',
-  'Creature Commandos', 'Peacemaker', 'Lanterns', 'The Penguin', 'Joker', 'Zatanna', 'Black Canary', 'Nightwing', 'Robin', 'Arkham', 'Superman', 'Batman', 'Aquaman', 'Shazam', 'Flash', 'Titans', 'Watchmen', 'Sandman', 'Static Shock', 'Milestone', 'Scooby-Doo Krypto', 'Bat-Fam', 'Mr. Terrific', 'Metamorpho', 'Hawkgirl', 'Guy Gardner', 'Kingdom Come', 'All-Star Superman'];
+  'Creature Commandos', 'Peacemaker', 'Lanterns', 'The Penguin', 'Joker', 'Zatanna', 'Black Canary', 'Nightwing', 'Robin', 'Arkham', 'Superman', 'Batman', 'Aquaman', 'Shazam', 'Flash', 'Titans', 'Watchmen', 'Sandman', 'Static Shock', 'Milestone', 'Scooby-Doo Krypto', 'Bat-Fam', 'Mr. Terrific', 'Metamorpho', 'Hawkgirl', 'Guy Gardner', 'Kingdom Come', 'All-Star Superman', 'Gorilla Grodd', 'Absolute Batman', 'Laugh Riot'];
 const companies = new Map();
 for (const q of ['DC Studios', 'DC Entertainment', 'DC Films', 'DC Comics', 'DC Vertigo', 'DC Universe']) for (const c of (await tmdb('/search/company', { query: q })).results || []) if (/^DC\b/i.test(c.name)) companies.set(c.id, c.name);
 const ids = [...companies.keys()].join('|');

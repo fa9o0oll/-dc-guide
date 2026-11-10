@@ -37,11 +37,12 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check(`${label}: لا عناصر متراكبة`, lap === 0, String(lap)); };
 
   await page.goto(url); await page.waitForSelector('.card');
-  check('تحميل البطاقات: 185 بطاقة في 19 عالماً', await page.locator('.card').count() === 185 && await page.locator('section.uni').count() === 19);
+  check('تحميل البطاقات: 197 بطاقة في 19 عالماً', await page.locator('.card').count() === 197 && await page.locator('section.uni').count() === 19);
   await overflow('البطاقات'); await snap('1-cards');
   const small = await page.evaluate(() => [...document.querySelectorAll('button,a,select,input,summary')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 40 || r.width < 40) && !e.closest('.foot,.canon,[hidden]'); }).map(e => (e.textContent || e.id).trim().slice(0, 20)));
   check('أهداف اللمس ≥ 40px', small.length === 0, small.slice(0, 5).join(' | '));
   check('عمل في عالمين له سجل واحد', await page.evaluate(() => document.querySelectorAll('[data-k="the-suicide-squad-2021"]').length === 2));
+  check('أعمال معلنة في آخر عالمها: بتاريخ أو بلا تاريخ', await page.evaluate(() => { const c = [...document.querySelectorAll('#u-dcu .card')], soon = c.map(x => !!x.querySelector('.tag.soon') && !x.querySelector('.status')), first = soon.indexOf(true); return first > 0 && soon.slice(first).every(Boolean) && c[first].id === 'c-dcu-man-of-tomorrow-2027' && document.querySelector('#c-dcu-wonder-woman-tba .count').textContent.includes('قيد التطوير') && !!document.querySelector('#c-dcu-wonder-woman-tba .count a.src[href^="https://"]'); }));
   check('عمل قادم بعدّاد تنازلي', await page.locator('#c-anim_mv_st-batman-knightfall-part-2-2026 .count b').count() === 1);
   check('حلقة قادمة: عدّاد تنازلي ووسم «يُعرض الآن»', (await page.textContent('#c-dcu-lanterns-2026 .count b')).trim() === '5' && (await page.textContent('#c-dcu-lanterns-2026 .tags')).includes('يُعرض الآن'));
   check('موسم معلن بلا موعد يظهر على البطاقة', (await page.textContent('#c-dcu-creature-commandos-2024 .count')).includes('الموسم 2 معلن'));
@@ -88,8 +89,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await tap('#t-dceu-man-of-steel-2013 [data-act=goto]'); await page.waitForSelector('#c-dceu-man-of-steel-2013');
   check('العودة من الخط الزمني إلى البطاقة', await page.evaluate(() => { const r = document.querySelector('#c-dceu-man-of-steel-2013').getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }));
   // آروفيرس
+  await page.evaluate(() => document.querySelector('#unibar [data-uni=arrow]').click()); await page.waitForSelector('#c-arrow-stargirl-2020');
+  check('بطاقة المسلسل في آروفيرس تذكر الخطوة التي يبدأ فيها', (await page.textContent('#c-arrow-stargirl-2020 .canon')).includes('يبدأ في الخطوة') && (await page.textContent('#c-arrow-arrow-2012 .canon')).includes('الخطوة 1 '));
+  await tap('#c-arrow-stargirl-2020 [data-act=avgo]'); await page.waitForSelector('.step.flash');
+  check('زر «افتح الخطوة» يوصل للخطوة الصحيحة', (await page.textContent('.step.flash')).includes("DC's Stargirl"));
+  await page.evaluate(() => document.querySelector('#unibar [data-uni=all]')?.click());
   await tap('.views [data-view=arrow]'); await page.waitForSelector('.step');
-  check('ترتيب آروفيرس: 23 خطوة و6 تقاطعات', await page.locator('.step').count() === 23 && await page.locator('.step.cross').count() === 6);
+  check('ترتيب آروفيرس: 24 خطوة و6 تقاطعات، وفيه المسلسلان المستقلان بعد الأزمة', await page.locator('.step').count() === 24 && await page.locator('.step.cross').count() === 6 && await page.evaluate(() => { const steps = [...document.querySelectorAll('.step')], crisis = steps.findIndex(s => s.id === 'av-2019-x'), has = t => steps.findIndex(s => s.textContent.includes(t)); return has("DC's Stargirl") > crisis && has('Superman & Lois') > has("DC's Stargirl"); }));
   await tap('#av-2014-a [data-act=avblock]'); check('تعليم مجموعة حلقات', (await page.textContent('#av-2014-a .row')).includes('شاهدت 7'));
   await overflow('آروفيرس'); await page.locator('#av-2014-a').scrollIntoViewIfNeeded(); await snap('5-arrowverse');
   await page.locator('#av-2019-x').scrollIntoViewIfNeeded(); await snap('6-crossover');
