@@ -1,0 +1,17 @@
+{
+ "generatedAt": "2026-11-10T07:18:41.782Z",
+ "total": 181,
+ "enriched": 181,
+ "pending": 0,
+ "errors": 0,
+ "withPoster": 181,
+ "withBackdrop": 181,
+ "withImdbId": 180,
+ "withRtLink": 166,
+ "withArabicOverview": 151,
+ "withArabicTitle": 92,
+ "series": 57,
+ "episodes": 3517,
+ "arabicEpisodeOverviews": 425,
+ "problems": []
+}

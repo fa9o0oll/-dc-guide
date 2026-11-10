@@ -1,17 +1,17 @@
 {
  "ok": true,
- "generatedAt": "2026-11-10T07:16:40.440Z",
+ "generatedAt": "2026-11-10T07:18:21.389Z",
  "total": 181,
- "confident": 170,
- "review": 10,
+ "confident": 173,
+ "review": 7,
  "notFound": 1,
  "errors": 0,
  "ofConfident": {
-  "withImdbId": 170,
-  "withPoster": 170,
-  "withBackdrop": 170,
-  "withArabicOverview": 144,
-  "withArabicTitle": 87,
+  "withImdbId": 173,
+  "withPoster": 173,
+  "withBackdrop": 173,
+  "withArabicOverview": 145,
+  "withArabicTitle": 88,
   "flagged": 14
  },
  "rows": [
@@ -1592,7 +1592,7 @@
      "tmdb": 1452,
      "title": "Superman Returns",
      "date": "2006-06-28",
-     "votes": 4770,
+     "votes": 4772,
      "exact": true
     },
     {
@@ -1906,19 +1906,41 @@
   },
   {
    "id": "stargirl-2020",
-   "title": "Stargirl",
+   "title": "DC's Stargirl",
    "year": 2020,
    "kind": "tv",
-   "status": "review",
+   "status": "confident",
    "candidates": [
     {
      "tmdb": 80986,
      "title": "DC's Stargirl",
      "date": "2020-05-18",
      "votes": 1203,
-     "exact": false
+     "exact": true
     }
-   ]
+   ],
+   "match": {
+    "tmdb": 80986,
+    "imdb": "tt8722888",
+    "tvdb": 361868,
+    "title": "DC's Stargirl",
+    "date": "2020-05-18",
+    "status": "Canceled",
+    "companies": [
+     "Mad Ghost Productions",
+     "Berlanti Productions",
+     "Warner Bros. Television",
+     "DC Entertainment"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 7.658,
+    "votes": 1203,
+    "seasons": 3,
+    "episodes": 39,
+    "arTitle": null,
+    "arOverview": false
+   }
   },
   {
    "id": "superman-and-lois-2021",
@@ -6635,35 +6657,69 @@
   },
   {
    "id": "batman-knightfall-part-1-2026",
-   "title": "Batman: Knightfall – Part 1",
+   "title": "Batman: Knightfall Part 1: Knightfall",
    "year": 2026,
    "kind": "movie",
-   "status": "review",
+   "status": "confident",
    "candidates": [
     {
      "tmdb": 1560520,
      "title": "Batman: Knightfall Part 1: Knightfall",
      "date": "2026-06-23",
      "votes": 507,
-     "exact": false
+     "exact": true
     }
-   ]
+   ],
+   "match": {
+    "tmdb": 1560520,
+    "imdb": "tt32333324",
+    "title": "Batman: Knightfall Part 1: Knightfall",
+    "date": "2026-06-23",
+    "status": "Released",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 9.1,
+    "votes": 506,
+    "arTitle": "باتمان: سقوط الفارس الجزء ١: سقوط الفارس",
+    "arOverview": true
+   }
   },
   {
    "id": "batman-knightfall-part-2-2026",
-   "title": "Batman: Knightfall – Part 2",
+   "title": "Batman: Knightfall Part 2: Knightquest",
    "year": 2026,
    "kind": "movie",
-   "status": "review",
+   "status": "confident",
    "candidates": [
     {
      "tmdb": 1389765,
      "title": "Batman: Knightfall Part 2: Knightquest",
      "date": "2026-12-15",
      "votes": 0,
-     "exact": false
+     "exact": true
     }
-   ]
+   ],
+   "match": {
+    "tmdb": 1389765,
+    "imdb": "tt38807532",
+    "title": "Batman: Knightfall Part 2: Knightquest",
+    "date": "2026-12-15",
+    "status": "In Production",
+    "companies": [
+     "Warner Bros. Animation",
+     "DC"
+    ],
+    "poster": true,
+    "backdrop": true,
+    "rating": 0,
+    "votes": 0,
+    "arTitle": null,
+    "arOverview": false
+   }
   }
  ]
 }
