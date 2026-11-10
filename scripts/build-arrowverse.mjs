@@ -82,5 +82,5 @@ if (seen.size !== total) errs.push(`تغطية: ${seen.size} مدرجة مقاب
 
 if (errs.length) { console.error('❌ ترتيب آروفيرس:\n- ' + errs.slice(0, 30).join('\n- ')); process.exit(1); }
 steps.forEach((s, i) => s.n = i + 1);
-fs.writeFileSync(new URL('site/data/arrowverse.json', root), JSON.stringify({ generatedAt: new Date().toISOString(), totalEpisodes: total, steps, sideWorlds: cfg.sideWorlds }) + '\n');
+fs.writeFileSync(new URL('site/data/arrowverse.json', root), JSON.stringify({ generatedAt: new Date().toISOString(), totalEpisodes: total, steps, sideWorlds: cfg.sideWorlds.map(x => ({ ...x, afterStep: steps.find(s => s.crossover === 'crisis-on-infinite-earths')?.n })) }) + '\n');
 console.log(`✅ آروفيرس: ${steps.length} خطوة تغطي ${total} حلقة من ${Object.keys(eps).length} مسلسلات، بلا نقص ولا تكرار`);

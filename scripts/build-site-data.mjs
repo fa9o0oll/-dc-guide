@@ -38,7 +38,7 @@ async function buildWork(w) {
         const arName = (a.name || '').trim(), arOv = (a.overview || '').trim();
         return { n: e.episode_number, name: e.name || null, nameAr: arName && arName !== e.name && /[؀-ۿ]/.test(arName) && !/^الحلقة\s*\d+$/.test(arName) ? arName : null,
           date: e.air_date || null, runtime: e.runtime || null, still: e.still_path || null,
-          rating: e.vote_count >= 5 ? Math.round(e.vote_average * 10) / 10 : null,
+          rating: e.vote_count >= 1 ? Math.round(e.vote_average * 10) / 10 : null, votes: e.vote_count || 0,
           overviewEn: (e.overview || '').trim() || null, overviewAr: /[؀-ۿ]/.test(arOv) ? arOv : null }; }) };
     }));
     write(new URL(w.id + '.json', epDir), { id: w.id, tmdb: d.id, seasons: full });

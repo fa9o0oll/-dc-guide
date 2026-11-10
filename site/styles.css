@@ -359,3 +359,11 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 .uni{scroll-margin-top:112px}
 :is(.card,.node,.step){scroll-margin-top:124px}
 @media (max-width:700px){.controls{padding-block:6px;gap:8px}.controls button{min-height:40px;padding-inline:11px}}
+
+/* ===== تقييم الحلقة على صورتها، وشريط الموسم، والحلقات القادمة ===== */
+.epthumb{position:relative;display:block;align-self:start}
+.eprate{position:absolute;inset-block-end:6px;inset-inline-start:6px;background:rgba(0,0,0,.82);color:#fff;font-family:var(--display);font-size:1.05rem;line-height:1;padding:5px 9px 4px;border-radius:4px;border-inline-start:3px solid var(--c1)}
+.eprate.low{opacity:.75;border-inline-start-style:dashed}
+.season-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.ep.future{border-style:dashed}
+.next-note{font-size:.84rem;color:var(--dim)}

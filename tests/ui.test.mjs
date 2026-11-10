@@ -23,6 +23,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.route(/image\.tmdb\.org/, r => { const u = r.request().url(), seed = [...u].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7);
     const wide = /\/(w300|w1280)\//.test(u) || (/\/w780\//.test(u) && r.request().resourceType() !== 'image');
     return r.fulfill({ contentType: 'image/svg+xml', body: wide ? ph(640, 360, seed) : ph(342, 513, seed) }); });
+  // بيانات مُعدَّلة للاختبار فقط: مسلسل له حلقة قادمة بعد 5 أيام
+  await page.route(/data\/catalog\.json/, async r => { const res = await r.fetch(), j = await res.json(), w = j.works.find(x => x.id === 'lanterns-2026');
+    w.nextEpisode = { season: 1, episode: 9, date: new Date(Date.now() + 5 * 864e5).toISOString().slice(0, 10) }; return r.fulfill({ response: res, json: j }); });
   const tap = sel => mobile ? page.locator(sel).first().tap() : page.locator(sel).first().click();
   const snap = async n => { if (shots) await page.screenshot({ path: `${shots}/${name}-${n}.png` }); };
   const overflow = async label => { await page.waitForTimeout(350); const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
@@ -40,6 +43,8 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('أهداف اللمس ≥ 40px', small.length === 0, small.slice(0, 5).join(' | '));
   check('عمل في عالمين له سجل واحد', await page.evaluate(() => document.querySelectorAll('[data-k="the-suicide-squad-2021"]').length === 2));
   check('عمل قادم بعدّاد تنازلي', await page.locator('#c-anim_mv_st-batman-knightfall-part-2-2026 .count b').count() === 1);
+  check('حلقة قادمة: عدّاد تنازلي ووسم «يُعرض الآن»', (await page.textContent('#c-dcu-lanterns-2026 .count b')).trim() === '5' && (await page.textContent('#c-dcu-lanterns-2026 .tags')).includes('يُعرض الآن'));
+  check('موسم معلن بلا موعد يظهر على البطاقة', (await page.textContent('#c-dcu-creature-commandos-2024 .count')).includes('الموسم 2 معلن'));
   // حالة المشاهدة تنعكس في العالمين
   await tap('#c-dcu-the-suicide-squad-2021 [data-s=watched]');
   check('«شاهدته» تنعكس على نفس العمل في العالم الآخر', await page.getAttribute('#c-dceu-the-suicide-squad-2021 [data-s=watched]', 'aria-pressed') === 'true');
@@ -54,6 +59,8 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await tap('#c-dcu-peacemaker-2022-s2 [data-act=open]'); await page.waitForSelector('.ep');
   check('نافذة المسلسل تفتح على الموسم الصحيح', (await page.textContent('#seasonTabs .on')).includes('2') && await page.locator('.ep').count() === 8);
   check('درع الحرق يموّه ملخصات غير المشاهَد', await page.locator('.ep .ov.blur').count() > 0);
+  check('تقييم الحلقات ظاهر على صورها مع متوسط الموسم', await page.locator('.ep .eprate').count() >= 6 && (await page.textContent('.season-bar')).includes('متوسط تقييم الموسم'));
+  check('ملخصات الحلقات بترجمتنا العربية', await page.locator('.ep .ov.en').count() === 0 && (await page.textContent('.ep .ov')).includes('جاستس غانغ'));
   await tap('.ep [data-act=ep]'); check('تعليم حلقة', await page.locator('.ep.done').count() === 1);
   await overflow('نافذة المسلسل'); await snap('3-series');
   await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });

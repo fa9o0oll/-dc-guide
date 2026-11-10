@@ -50,6 +50,23 @@ const seasonDone = (id, s) => Object.keys(store.eps[id] || {}).filter(k => !s ||
 const tmdbUrl = w => `https://www.themoviedb.org/${w.seasons ? 'tv' : 'movie'}/${w.tmdb}`;
 const themeVars = id => { const t = THEMES[id]; return `--bg:${t.bg};--c1:${t.c1};--c2:${t.c2}`; };
 const rateBlock = w => `<div class="rates wide">${w.tmdbRating != null ? `<a class="gauge" style="--v:${Math.round(w.tmdbRating * 10)}" href="${tmdbUrl(w)}" target="_blank" rel="noopener" aria-label="تقييم TMDB ${w.tmdbRating} من 10">${w.tmdbRating}</a><span class="src"><b>تقييم ${ltr('TMDB')}</b>${(w.tmdbVotes || 0).toLocaleString('en')} صوتاً</span>` : ''}<span class="ext">${w.imdb ? `<a href="https://www.imdb.com/title/${w.imdb}/" target="_blank" rel="noopener">${ltr('IMDb')}</a>` : ''}${w.rt ? `<a href="https://www.rottentomatoes.com/${w.rt}" target="_blank" rel="noopener">${ltr('Rotten Tomatoes')}</a>` : ''}</span></div>`;
+const daysTo = d => Math.ceil((new Date(d) - new Date(TODAY)) / 864e5);
+// ما القادم لمسلسل صادر: حلقة بموعد، موسم بموعد، موسم معلن بلا موعد، أو مستمر بلا إعلان
+function nextInfo(w) {
+  if (!w.seasons || isSoon(w)) return null;
+  if (w.nextEpisode?.date && w.nextEpisode.date >= TODAY) return { kind: 'episode', ...w.nextEpisode };
+  const fut = w.seasons.find(x => x.date && x.date > TODAY); if (fut) return { kind: 'season', season: fut.n, date: fut.date };
+  const ann = w.seasons.find(x => !x.date); if (ann) return { kind: 'announced', season: ann.n };
+  return w.status === 'Returning Series' ? { kind: 'returning' } : null;
+}
+function nextBlock(w, cls = '') {
+  const n = nextInfo(w); if (!n) return '';
+  if (n.kind === 'returning') return `<p class="next-note ${cls}">المسلسل مستمر، ولم يُعلن موعد حلقات جديدة بعد.</p>`;
+  if (n.kind === 'announced') return `<div class="count ${cls}"><span>الموسم ${n.season} معلن، وموعد عرضه لم يُحدَّد بعد</span></div>`;
+  const d = daysTo(n.date), what = n.kind === 'episode' ? `الحلقة القادمة: الموسم ${n.season}، الحلقة ${n.episode}` : `بداية الموسم ${n.season}`;
+  return `<div class="count ${cls}"><b>${d <= 0 ? 'اليوم' : d}</b><span>${d <= 0 ? what : `${d === 1 ? 'يوم واحد' : 'يوماً'} على ${what}`}<br><small>${fmtDate(n.date)}</small></span></div>`;
+}
+const nextTag = w => { const k = nextInfo(w)?.kind; return k === 'episode' ? '<span class="tag soon">يُعرض الآن</span>' : k === 'season' || k === 'announced' ? '<span class="tag soon">موسم قادم</span>' : ''; };
 const verdict = r => r == null ? null : r >= 7.5 ? ['ممتاز', '#35d07f'] : r >= 6.8 ? ['جيد', '#57abff'] : r >= 6 ? ['متوسط', '#f2b84b'] : ['ضعيف', '#ef5d57'];
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); }
 const posterTag = (w, size = 'w342') => w.poster
@@ -83,7 +100,7 @@ function visible(p) {
   if (ui.uni !== 'all' && p.universe !== ui.uni) return false;
   if (q && !(w.title.toLowerCase().includes(q) || (w.titleAr || '').includes(q))) return false;
   if (t && w.kind !== t && w.medium !== t) return false;
-  if (s === 'upcoming') return isSoon(w);
+  if (s === 'upcoming') return isSoon(w) || ['episode', 'season', 'announced'].includes(nextInfo(w)?.kind);
   if (s === 'none') return !statusOf(p) && !isSoon(w);
   if (s) return statusOf(p) === s;
   return true;
@@ -120,10 +137,11 @@ function card(p) {
       <div class="ord">${uniOf(p.universe).serial ? 'الترتيب: ' : ''}${esc(p.label)}</div>
       <h3>${ltr(w.title + (p.season ? `: Season ${p.season}` : ''))}</h3>
       <div class="meta">${esc(meta)}</div>
-      <div class="tags">${soon ? '<span class="tag soon">قادم</span>' : v ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}</div>
+      <div class="tags">${soon ? '<span class="tag soon">قادم</span>' : v ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${nextTag(w)}</div>
       <p class="note">${esc(p.note)}</p>
     </div>
     ${soon ? `<div class="count wide">${w.date ? `<b>${daysLeft(w)}</b><span>يوماً على الصدور<br><small>${fmtDate(w.date)}</small></span>` : '<span>معلن، وتاريخ الصدور لم يُحدَّد بعد</span>'}</div>` : ''}
+    ${nextBlock(w, 'wide')}
     ${p.canon ? `<div class="canon wide">يظهر في عالمين: ${esc(p.canon.note)} <a href="${esc(p.canon.source)}" target="_blank" rel="noopener">المصدر</a></div>` : ''}
     ${p.spoiler ? (store.shield ? `<details class="vault wide"><summary>معلومة ارتباط فيها حرق. اضغط للكشف</summary><p>${esc(p.spoiler)}</p></details>` : `<p class="note wide">${esc(p.spoiler)}</p>`) : ''}
     ${rateBlock(w)}
@@ -187,7 +205,13 @@ function renderArrow() {
           <span class="what">الموسم ${b.season}: ${b.whole ? 'كامل' : `من الحلقة ${b.from} إلى الحلقة ${b.to}`}<small>${b.count} حلقة · شاهدت ${dn}</small></span>
           <span class="btns"><button data-act="avblock" data-id="${b.work}" data-season="${b.season}" data-from="${b.from}" data-to="${b.to}">${full ? '✓ مكتملة' : 'علّمها مشاهدة'}</button><button data-act="open" data-id="${b.work}" data-season="${b.season}">الحلقات</button></span>
           ${b.links.map(l => `<span class="link">الحلقة ${l.episode}${l.toEpisode ? ' إلى ' + l.toEpisode : ''}: ${esc(l.note)}</span>`).join('')}</div>`; }).join('')}</div>`).join('')}</div>
-    <div class="av-intro steps"><h2>عوالم جانبية</h2>${a.sideWorlds.map(x => { const w = D.works.get(x.work); return `<div class="row"><span class="k">◆</span><span class="show">${ltr(w.title)}</span><span class="what">${esc(x.note)}${x.source ? ` <a href="${esc(x.source)}" target="_blank" rel="noopener">المصدر</a>` : ''}</span><span class="btns"><button data-act="open" data-id="${w.id}">الحلقات</button></span></div>`; }).join('')}</div>
+    <div class="av-intro steps"><h2>مسلسلان خارج الترتيب</h2>
+      <ul><li>ليسا من الخطوات أعلاه. كل واحد منهما يدور في أرض مستقلة عن أرض بقية المسلسلات.</li>
+      <li>لا ترتيب مشاهدة بينهما وبين غيرهما: كل مسلسل يُشاهد لحاله من موسمه الأول إلى الأخير.</li>
+      <li>مشاهدتهما اختيارية. لا يلزمان لفهم آروفيرس، ولا يلزم آروفيرس لفهمهما.</li></ul>
+      ${a.sideWorlds.map(x => { const w = D.works.get(x.work); return `<div class="row"><span class="k">◆</span><span class="show">${ltr(w.title)}</span>
+        <span class="what">${esc(x.note)}${x.source ? ` <a href="${esc(x.source)}" target="_blank" rel="noopener">المصدر</a>` : ''}<small>${w.seasons ? `${w.seasons.length} مواسم، ${w.episodeCount} حلقة · ` : ''}أنسب وقت: أي وقت بعد الخطوة ${x.afterStep} (أزمة الأراضي اللانهائية)</small></span>
+        <span class="btns"><button data-act="open" data-id="${w.id}">الحلقات</button></span></div>`; }).join('')}</div>
   </section>`;
 }
 
@@ -261,8 +285,9 @@ async function openWork(id, season, from) {
       <div class="meta">${esc([TYPE[w.kind + '|' + w.medium], w.date ? fmtDate(w.date) : w.year, w.runtime ? w.runtime + ' دقيقة' : '', w.seasons ? `${w.seasons.length} مواسم · ${w.episodeCount} حلقة` : ''].filter(Boolean).join(' · '))}</div>
       ${soon && w.date ? `<div class="tags"><span class="tag soon">قادم بعد ${daysLeft(w)} يوماً</span></div>` : ''}</div></div>
     ${w.overviewAr ? `<p class="ov">${esc(w.overviewAr)}</p>` : w.overviewEn ? `<div><span class="lbl">النبذة بالإنجليزية (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(w.overviewEn)}</p></div>` : ''}
-    <div class="actions">${places.map(p => `<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">البطاقة في ${esc(uniOf(p.universe).name)}</button>`).join('')}</div>
+    <div class="actions">${places.map(p => `<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">البطاقة في ${esc(uniOf(p.universe).name)}${p.season ? `، الموسم ${p.season}` : ''}</button>`).join('')}</div>
     ${rateBlock(w)}
+    ${nextBlock(w)}
     ${w.kind === 'series' && w.seasons?.length ? `<div class="seasons" id="seasonTabs">${w.seasons.map(s => `<button data-act="season" data-id="${id}" data-season="${s.n}">الموسم ${s.n}</button>`).join('')}</div><div id="eps" class="dw" style="padding:0"><p class="empty">جارٍ تحميل الحلقات…</p></div>` : ''}</div>`, 'work', { uni, from: from?.querySelector('img') });
   if (w.kind === 'series' && w.seasons?.length) showSeason(id, w.seasons.some(s => s.n === season) ? season : w.seasons[0].n);
 }
@@ -274,11 +299,15 @@ async function showSeason(id, n) {
   catch { box.innerHTML = '<p class="empty">تعذّر تحميل الحلقات. تحقق من الاتصال وحاول مرة ثانية.</p>'; return; }
   const s = D.episodes.get(id).seasons.find(x => x.n === n); if (!s || !box.isConnected) return;
   const all = s.episodes.every(e => epDone(id, n, e.n));
-  box.innerHTML = `<div class="actions"><button data-act="seasonall" data-id="${id}" data-season="${n}">${all ? 'إلغاء تعليم الموسم' : 'علّم الموسم كاملاً كمشاهد'}</button></div>` +
-    s.episodes.map(e => { const d = epDone(id, n, e.n), fut = !e.date || e.date > TODAY, ov = e.overviewAr || e.overviewEn;
-      return `<div class="ep ${d ? 'done' : ''}">${e.still ? `<img loading="lazy" src="${img(e.still, 'w300')}" alt="">` : '<span class="ph"></span>'}
+  const rated = s.episodes.filter(e => e.rating != null && (e.votes ?? 5) >= 5), avg = rated.length ? Math.round(rated.reduce((x, e) => x + e.rating, 0) / rated.length * 10) / 10 : null;
+  box.innerHTML = `<div class="season-bar"><span class="lbl">${avg != null ? `متوسط تقييم الموسم ${avg} من 10 (${rated.length} حلقة مقيّمة على ${ltr('TMDB')})` : 'لا يوجد تقييم كافٍ لحلقات هذا الموسم بعد'}</span>
+      <button data-act="seasonall" data-id="${id}" data-season="${n}">${all ? 'إلغاء تعليم الموسم' : 'علّم الموسم كاملاً كمشاهد'}</button></div>` +
+    s.episodes.map(e => { const d = epDone(id, n, e.n), fut = !e.date || e.date > TODAY, ov = e.overviewAr || e.overviewEn, few = (e.votes ?? 5) < 5;
+      const when = fut ? (e.date ? `تُعرض بعد ${daysTo(e.date)} يوماً، ${fmtDate(e.date)}` : 'لم يُحدَّد موعد عرضها') : fmtDate(e.date);
+      return `<div class="ep ${d ? 'done' : ''} ${fut ? 'future' : ''}"><span class="epthumb">${e.still ? `<img loading="lazy" src="${img(e.still, 'w300')}" alt="">` : '<span class="ph"></span>'}
+          ${e.rating != null && !fut ? `<span class="eprate ${few ? 'low' : ''}" title="${few ? 'عدد الأصوات قليل' : 'تقييم TMDB'}">${e.rating.toFixed(1)}</span>` : ''}</span>
         <div><h4>الحلقة ${e.n}${e.name ? ltr(e.name) : ''}</h4>${e.nameAr ? `<div class="ar-title">${esc(e.nameAr)}</div>` : ''}
-          <div class="meta">${esc([fut ? (e.date ? 'تُعرض ' + fmtDate(e.date) : 'لم تُعرض') : fmtDate(e.date), e.runtime ? e.runtime + ' د' : '', e.rating != null ? `التقييم ${e.rating} من 10` : ''].filter(Boolean).join(' · '))}</div></div>
+          <div class="meta">${esc([when, e.runtime ? e.runtime + ' د' : '', fut ? '' : e.rating == null ? 'بلا تقييم بعد' : few ? 'تقييم بأصوات قليلة' : ''].filter(Boolean).join(' · '))}</div></div>
         ${ov ? `<div style="grid-column:1/-1">${e.overviewAr ? '' : '<span class="lbl">الملخص بالإنجليزية (الترجمة العربية قيد الإعداد)</span>'}
           <p class="ov ${e.overviewAr ? '' : 'en'} ${store.shield && !d ? 'blur' : ''}" ${store.shield && !d ? 'data-act="reveal" title="اضغط للكشف"' : ''}>${esc(ov)}</p>
           ${store.shield && !d ? '<span class="lbl">الملخص مخفي لتفادي الحرق. اضغط عليه للكشف</span>' : ''}</div>` : ''}
