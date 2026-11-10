@@ -1,0 +1,280 @@
+{
+  "shows": {
+    "arrow-2012": "Arrow",
+    "the-flash-2014": "The Flash",
+    "constantine-2014": "Constantine",
+    "supergirl-2015": "Supergirl",
+    "dc-s-legends-of-tomorrow-2016": "Legends of Tomorrow",
+    "black-lightning-2018": "Black Lightning",
+    "batwoman-2019": "Batwoman"
+  },
+  "sideWorlds": [
+    {
+      "work": "stargirl-2020",
+      "note": "يدور في أرض موازية مستقلة عن أحداث المسلسلات الرئيسية. يُشاهد كاملاً في أي وقت بعد «أزمة الأراضي اللانهائية»."
+    },
+    {
+      "work": "superman-and-lois-2021",
+      "note": "أكّد المسلسل في ختام موسمه الثاني أنه يدور في أرض مختلفة عن أرض بقية المسلسلات. يُشاهد كاملاً ومستقلاً؛ والأفضل بعد «أزمة الأراضي اللانهائية».",
+      "source": "https://www.denofgeek.com/tv/superman-lois-place-in-the-arrowverse-revealed/"
+    }
+  ],
+  "crossovers": [
+    {
+      "id": "flash-vs-arrow",
+      "name": "Flash vs. Arrow",
+      "nameAr": "فلاش ضد آرو",
+      "titleMatch": "Flash vs\\. Arrow|Brave and the Bold",
+      "parts": [
+        [
+          "the-flash-2014",
+          1,
+          8
+        ],
+        [
+          "arrow-2012",
+          3,
+          8
+        ]
+      ]
+    },
+    {
+      "id": "heroes-join-forces",
+      "name": "Heroes Join Forces",
+      "nameAr": "اتحاد الأبطال",
+      "titleMatch": "Legends of (Today|Yesterday)",
+      "parts": [
+        [
+          "the-flash-2014",
+          2,
+          8
+        ],
+        [
+          "arrow-2012",
+          4,
+          8
+        ]
+      ]
+    },
+    {
+      "id": "invasion",
+      "name": "Invasion!",
+      "nameAr": "الغزو",
+      "titleMatch": "Medusa|Invasion!",
+      "parts": [
+        [
+          "supergirl-2015",
+          2,
+          8,
+          "الحلقة عادية من موسم سوبرغيرل، ومشهدها الأخير فقط هو بداية التقاطع."
+        ],
+        [
+          "the-flash-2014",
+          3,
+          8
+        ],
+        [
+          "arrow-2012",
+          5,
+          8
+        ],
+        [
+          "dc-s-legends-of-tomorrow-2016",
+          2,
+          7
+        ]
+      ]
+    },
+    {
+      "id": "crisis-on-earth-x",
+      "name": "Crisis on Earth-X",
+      "nameAr": "أزمة الأرض إكس",
+      "titleMatch": "Crisis on Earth-X",
+      "parts": [
+        [
+          "supergirl-2015",
+          3,
+          8
+        ],
+        [
+          "arrow-2012",
+          6,
+          8
+        ],
+        [
+          "the-flash-2014",
+          4,
+          8
+        ],
+        [
+          "dc-s-legends-of-tomorrow-2016",
+          3,
+          8
+        ]
+      ]
+    },
+    {
+      "id": "elseworlds",
+      "name": "Elseworlds",
+      "nameAr": "العوالم الأخرى",
+      "titleMatch": "Elseworlds",
+      "parts": [
+        [
+          "the-flash-2014",
+          5,
+          9
+        ],
+        [
+          "arrow-2012",
+          7,
+          9
+        ],
+        [
+          "supergirl-2015",
+          4,
+          9
+        ]
+      ]
+    },
+    {
+      "id": "crisis-on-infinite-earths",
+      "name": "Crisis on Infinite Earths",
+      "nameAr": "أزمة الأراضي اللانهائية",
+      "titleMatch": "Crisis on Infinite Earths",
+      "parts": [
+        [
+          "supergirl-2015",
+          5,
+          9
+        ],
+        [
+          "batwoman-2019",
+          1,
+          9
+        ],
+        [
+          "the-flash-2014",
+          6,
+          9
+        ],
+        [
+          "arrow-2012",
+          8,
+          8
+        ],
+        [
+          "dc-s-legends-of-tomorrow-2016",
+          5,
+          1
+        ]
+      ],
+      "tieIns": [
+        [
+          "black-lightning-2018",
+          3,
+          9,
+          "حلقة مرتبطة بالأزمة من مسلسل Black Lightning؛ تُشاهد قبل الجزء الثالث.",
+          "Earth Crisis"
+        ]
+      ]
+    }
+  ],
+  "links": [
+    {
+      "at": [
+        "arrow-2012",
+        2,
+        8
+      ],
+      "to": 9,
+      "note": "الحلقتان 8 و9 تقدّمان الشخصية التي ينطلق بها مسلسل The Flash لاحقاً."
+    },
+    {
+      "at": [
+        "arrow-2012",
+        4,
+        5
+      ],
+      "note": "يظهر فيها ضيف من مسلسل Constantine؛ شاهد Constantine كاملاً قبلها.",
+      "titleMatch": "Haunted"
+    },
+    {
+      "at": [
+        "supergirl-2015",
+        1,
+        18
+      ],
+      "note": "حلقة تقاطع مع The Flash (Worlds Finest)، ولذلك يأتي هذا الموسم هنا بعد حلقات The Flash.",
+      "titleMatch": "Worlds Finest"
+    },
+    {
+      "at": [
+        "supergirl-2015",
+        2,
+        16
+      ],
+      "note": "مشهدها الأخير يكمل مباشرة في The Flash الموسم 3 الحلقة 17 (Duet). شاهد هذه قبل تلك.",
+      "titleMatch": "Star-Crossed"
+    },
+    {
+      "at": [
+        "the-flash-2014",
+        3,
+        17
+      ],
+      "note": "حلقة تقاطع موسيقية مع Supergirl (Duet)؛ تبدأ من نهاية Supergirl الموسم 2 الحلقة 16.",
+      "titleMatch": "Duet"
+    },
+    {
+      "at": [
+        "the-flash-2014",
+        8,
+        1
+      ],
+      "to": 5,
+      "note": "حدث Armageddon: خمس حلقات متتالية من The Flash بضيوف من المسلسلات الأخرى.",
+      "titleMatch": "Armageddon"
+    }
+  ],
+  "order": [
+    {
+      "before": [
+        "constantine-2014",
+        1,
+        13
+      ],
+      "after": [
+        "arrow-2012",
+        4,
+        5
+      ],
+      "why": "ضيف من Constantine يظهر في Arrow"
+    },
+    {
+      "before": [
+        "the-flash-2014",
+        2,
+        17
+      ],
+      "after": [
+        "supergirl-2015",
+        1,
+        18
+      ],
+      "why": "حلقة Worlds Finest"
+    },
+    {
+      "before": [
+        "supergirl-2015",
+        2,
+        16
+      ],
+      "after": [
+        "the-flash-2014",
+        3,
+        17
+      ],
+      "why": "حلقة Duet تكمل من نهاية حلقة Supergirl"
+    }
+  ]
+}

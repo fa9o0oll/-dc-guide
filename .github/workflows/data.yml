@@ -1,13 +1,17 @@
-name: data
+name: build-and-deploy
 on:
   push:
     branches: [main, 'claude/**']
-    paths: ['data/*.json', 'scripts/**', '.github/workflows/data.yml']
+    paths: ['data/*.json', 'scripts/**', 'site/**', '!site/data/**', '.github/workflows/data.yml']
+  schedule:
+    - cron: '17 3 * * *'   # يومياً 06:17 بتوقيت الرياض
   workflow_dispatch:
 permissions:
   contents: write
+  pages: write
+  id-token: write
 concurrency:
-  group: data-${{ github.ref }}
+  group: build-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -19,20 +23,31 @@ jobs:
           node-version: 22
       - name: Validate catalog
         run: node scripts/validate.mjs
-      - name: Resolve works against TMDB
-        env:
-          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-        run: node scripts/tmdb-resolve.mjs
-        continue-on-error: true
-      - name: Build site data
+      - name: Pull live data from TMDB
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: node scripts/build-site-data.mjs
-        continue-on-error: true
+      - name: Build base + Arrowverse order (fails on any gap)
+        run: node scripts/build-base.mjs && node scripts/build-arrowverse.mjs
       - name: Commit generated data
         run: |
           git config user.name "dc-guide-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/generated site/data
-          git diff --cached --quiet || git commit -m "data: generated output [skip ci]"
+          git diff --cached --quiet || git commit -m "data: daily refresh [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
+      - name: Upload site
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

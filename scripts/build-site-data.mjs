@@ -60,6 +60,11 @@ try {
   for (const b of (await res.json()).results.bindings) { const e = by.get(b.imdb.value) || {}; if (b.rt && !e.rt) e.rt = b.rt.value; if (b.mc && !e.mc) e.mc = b.mc.value; by.set(b.imdb.value, e); }
   for (const r of rows) { const e = by.get(r.imdb); if (e?.rt && /^(m|tv)\//.test(e.rt)) r.rt = e.rt; if (e?.mc) r.mc = e.mc; }
 } catch (e) { problems.push('روابط التقييم من ويكي‌داتا: ' + e.message); }
+// معرّف TVMaze لكل مسلسل (لنقل سجل الحلقات من النسخة القديمة)
+for (const r of rows.filter(r => r.seasons && r.imdb)) {
+  try { const res = await fetch('https://api.tvmaze.com/lookup/shows?imdb=' + r.imdb); if (res.ok) r.tvmaze = (await res.json()).id; } catch {}
+  await new Promise(z => setTimeout(z, 600));
+}
 const cfg = await tmdb('/configuration');
 write(new URL('catalog.json', outDir), { generatedAt: new Date().toISOString(), imageBase: cfg.images.secure_base_url, works: rows });
 const ok = rows.filter(r => r.tmdb), series = ok.filter(r => r.seasons);

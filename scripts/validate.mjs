@@ -1,7 +1,7 @@
 // فحص سلامة البيانات — يفشل (exit 1) عند أي خلل. يُشغَّل قبل كل نشر.
 import fs from 'node:fs';
 const rd = f => JSON.parse(fs.readFileSync(new URL('../data/' + f, import.meta.url)));
-const [U, W, P, A, B, M] = ['universes', 'works', 'placements', 'arrowverse-order', 'bridges', 'legacy-id-map'].map(f => rd(f + '.json'));
+const [U, W, P, B, M] = ['universes', 'works', 'placements', 'bridges', 'legacy-id-map'].map(f => rd(f + '.json'));
 const errs = [], warn = [];
 const uIds = new Set(U.map(u => u.id)), wById = new Map(W.map(w => [w.id, w]));
 if (uIds.size !== U.length) errs.push('معرّف عالم مكرر');
@@ -32,8 +32,7 @@ for (const w of multi) if (!P.some(p => p.work === w.id && p.canon)) errs.push('
 for (const b of B) { if (!wById.has(b.from) || !wById.has(b.to)) errs.push('جسر يشير لعمل غير موجود: ' + b.label); if (!uIds.has(b.toUniverse)) errs.push('جسر لعالم غير معروف'); }
 for (const [k, v] of Object.entries(M)) if (!wById.has(v.work)) errs.push('خريطة قديمة تشير لعمل مفقود: ' + k);
 if (Object.keys(M).length !== 185) errs.push('خريطة المعرّفات القديمة ناقصة');
-A.forEach(a => { if (!a.steps.length) errs.push('مرحلة بلا خطوات: ' + a.id); });
 console.log(`أعمال ${W.length} | إدراجات ${P.length} | عوالم ${U.length} | أعمال في أكثر من عالم: ${multi.map(w => w.id).join(', ')}`);
-console.log(`بانتظار التوثيق: معرّفات ${warn.length}/${W.length} | مراحل آروفيرس ${A.filter(a => !a.verified).length}/${A.length}`);
+console.log(`بانتظار التوثيق: معرّفات ${warn.length}/${W.length}`);
 if (errs.length) { console.error('❌ أخطاء:\n- ' + [...new Set(errs)].join('\n- ')); process.exit(1); }
 console.log('✅ البيانات سليمة بنيوياً');
