@@ -27,6 +27,11 @@ jobs:
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: node scripts/build-site-data.mjs
+      - name: Report announced DC titles missing from the catalog
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: node scripts/tmdb-discover.mjs
+        continue-on-error: true
       - name: Build base + Arrowverse order + apply our Arabic translations (fails on any gap)
         run: node scripts/build-base.mjs && node scripts/build-arrowverse.mjs && node scripts/apply-translations.mjs
       - name: Commit generated data
