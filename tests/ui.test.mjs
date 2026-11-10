@@ -26,7 +26,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   const tap = sel => mobile ? page.locator(sel).first().tap() : page.locator(sel).first().click();
   const snap = async n => { if (shots) await page.screenshot({ path: `${shots}/${name}-${n}.png` }); };
   const overflow = async label => { await page.waitForTimeout(350); const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
-      out: [...document.querySelectorAll('body *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > innerWidth + 1 || r.left < -1) && !e.closest('.unibar,.seasons,.tools,.atmo,.tile,[hidden]'); }).length }));
+      out: [...document.querySelectorAll('body *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > innerWidth + 1 || r.left < -1) && !e.closest('.unibar,.seasons,.controls,.atmo,.tile,[hidden]'); }).length }));
     check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw && o.out === 0, `عرض الصفحة ${o.sw}/${o.iw}، عناصر خارجة ${o.out}`);
     const spill = await page.evaluate(() => [...document.querySelectorAll('.card,.step,.row,.node,.ep,.rates a,.status button,.tag,.top button,.unibar button,.facts,.tile-text,.hit,.dock')].filter(e => e.getBoundingClientRect().width > 0 && (e.scrollWidth > e.clientWidth + 2 || e.scrollHeight > e.clientHeight + 2)).map(e => e.className + ':' + e.textContent.trim().slice(0, 18)));
     check(`${label}: لا محتوى يخرج من إطاره`, spill.length === 0, spill.slice(0, 4).join(' | '));
@@ -60,7 +60,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('تقدم الحلقات يظهر على البطاقة', (await page.textContent('#c-dcu-peacemaker-2022-s2')).includes('الحلقات: 1 من 8'));
   // الفهرس متاح بعد النزول في الصفحة، وفيه كل العوالم
   await page.evaluate(() => scrollTo(0, 6000)); await page.waitForTimeout(200);
-  check('زر الفهرس ظاهر بعد النزول في الصفحة', await page.evaluate(() => { const r = document.querySelector('.dock-index').getBoundingClientRect(); return r.top >= 0 && r.bottom <= 60 && r.width > 40; }));
+  check('زر الفهرس وطرق العرض والأدوات ظاهرة بعد النزول في الصفحة', await page.evaluate(m => ['.dock-index', '.views [data-view=timeline]', '#shieldBtn'].every(s => { const r = document.querySelector(s).getBoundingClientRect(); return r.top >= 0 && r.bottom <= 125 && r.width > 40 && (r.left >= 0 || (m && s === '#shieldBtn')); }), mobile), await page.evaluate(() => 'ارتفاع الشريط ' + Math.round(document.querySelector('.stick').getBoundingClientRect().height)));
   await tap('.dock-index'); await page.waitForSelector('.tile');
   check('الفهرس يعرض 19 عالماً في مجموعتين', await page.locator('.tile').count() === 19 && await page.locator('.idx h3').count() === 2);
   await page.waitForTimeout(600);
