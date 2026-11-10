@@ -232,11 +232,15 @@ function openSheet(title, html, tag, o = {}) {
     sh.hidden = false; $('#backdrop').hidden = false; document.body.style.overflow = 'hidden'; };
   if (!was) history.pushState({ sheet: 1 }, '');
   ui.sheet = tag || 'x';
-  if (was || !document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) { paint(false); $('#sheet .close').focus(); return Promise.resolve(); }
+  if (was || !document.startViewTransition || document.visibilityState !== 'visible' || matchMedia('(prefers-reduced-motion: reduce)').matches) { paint(false); $('#sheet .close').focus(); return Promise.resolve(); }
+  // شبكة أمان: لو تأخر المتصفح في بدء الانتقال، تُرسم البطاقة مباشرة ولا تبقى معلّقة
+  let painted = false;
+  const once = vt => { if (painted) return false; painted = true; if (src) src.style.viewTransitionName = ''; paint(vt); return true; };
   if (src) src.style.viewTransitionName = 'poster';
-  const vt = document.startViewTransition(() => { if (src) src.style.viewTransitionName = ''; paint(true); const dst = src && $('#sheet .dw-top .poster'); if (dst) dst.style.viewTransitionName = 'poster'; });
-  vt.finished.finally(() => { const dst = $('#sheet .dw-top .poster'); if (dst) dst.style.viewTransitionName = ''; });
-  return vt.updateCallbackDone.then(() => $('#sheet .close').focus(), () => {});
+  const late = new Promise(r => setTimeout(() => { once(false); r(); }, 450));
+  const vt = document.startViewTransition(() => { if (!once(true)) return; const dst = src && $('#sheet .dw-top .poster'); if (dst) dst.style.viewTransitionName = 'poster'; });
+  vt.finished.catch(() => {}).finally(() => { const dst = $('#sheet .dw-top .poster'); if (dst) dst.style.viewTransitionName = ''; });
+  return Promise.race([vt.updateCallbackDone.catch(() => {}), late]).then(() => $('#sheet .close')?.focus());
 }
 function closeSheet(fromPop) {
   if (!ui.sheet) return;
