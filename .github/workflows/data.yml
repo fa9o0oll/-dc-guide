@@ -2,7 +2,7 @@ name: build-and-deploy
 on:
   push:
     branches: [main, 'claude/**']
-    paths: ['data/*.json', 'scripts/**', 'site/**', '!site/data/**', '.github/workflows/data.yml']
+    paths: ['data/**', '!data/generated/**', 'scripts/**', 'site/**', '!site/data/**', '.github/workflows/data.yml']
   schedule:
     - cron: '17 3 * * *'   # يومياً 06:17 بتوقيت الرياض
   workflow_dispatch:
