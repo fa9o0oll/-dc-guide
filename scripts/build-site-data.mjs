@@ -36,7 +36,7 @@ async function buildWork(w) {
       const arBy = new Map((ar?.episodes || []).map(e => [e.episode_number, e]));
       return { n: s.season_number, episodes: (en?.episodes || []).map(e => { const a = arBy.get(e.episode_number) || {};
         const arName = (a.name || '').trim(), arOv = (a.overview || '').trim();
-        return { n: e.episode_number, name: e.name || null, nameAr: arName && arName !== e.name && /[؀-ۿ]/.test(arName) ? arName : null,
+        return { n: e.episode_number, name: e.name || null, nameAr: arName && arName !== e.name && /[؀-ۿ]/.test(arName) && !/^الحلقة\s*\d+$/.test(arName) ? arName : null,
           date: e.air_date || null, runtime: e.runtime || null, still: e.still_path || null,
           rating: e.vote_count >= 5 ? Math.round(e.vote_average * 10) / 10 : null,
           overviewEn: (e.overview || '').trim() || null, overviewAr: /[؀-ۿ]/.test(arOv) ? arOv : null }; }) };
