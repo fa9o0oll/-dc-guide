@@ -37,6 +37,9 @@ jobs:
           git add data/generated site/data
           git diff --cached --quiet || git commit -m "data: daily refresh [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
+      - name: Stamp build id (cache busting; not committed)
+        if: github.ref == 'refs/heads/main'
+        run: sed -i "s/__BUILD__/${GITHUB_RUN_ID}/g" site/index.html site/app.js
       - name: Upload site
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3

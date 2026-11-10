@@ -1,5 +1,6 @@
 // دليل عوالم DC — الواجهة. البيانات كلها من site/data/ (تُبنى آلياً)، ولا توجد بيانات أعمال مكتوبة هنا.
-import { THEMES, SHOW_COLORS } from './themes.js';
+import { THEMES, SHOW_COLORS } from './themes.js?v=__BUILD__';
+const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -20,7 +21,7 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } c
 // ---------- البيانات
 const D = { universes: [], works: new Map(), placements: [], bridges: [], legacyMap: {}, base: '', arrow: null, episodes: new Map() };
 const ui = { view: 'cards', uni: 'all', sheet: null };
-const getJSON = async u => { const r = await fetch(u); if (!r.ok) throw new Error(u + ' → ' + r.status); return r.json(); };
+const getJSON = async u => { const r = await fetch(u + '?v=' + BUILD); if (!r.ok) throw new Error(u + ' → ' + r.status); return r.json(); };
 
 async function boot() {
   try {
@@ -239,6 +240,7 @@ function openSheet(title, html, tag, o = {}) {
   if (src) src.style.viewTransitionName = 'poster';
   const late = new Promise(r => setTimeout(() => { once(false); r(); }, 450));
   const vt = document.startViewTransition(() => { if (!once(true)) return; const dst = src && $('#sheet .dw-top .poster'); if (dst) dst.style.viewTransitionName = 'poster'; });
+  vt.ready.catch(() => {});
   vt.finished.catch(() => {}).finally(() => { const dst = $('#sheet .dw-top .poster'); if (dst) dst.style.viewTransitionName = ''; });
   return Promise.race([vt.updateCallbackDone.catch(() => {}), late]).then(() => $('#sheet .close')?.focus());
 }
