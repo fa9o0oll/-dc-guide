@@ -250,6 +250,8 @@ function reveal(still) {
   rio = new IntersectionObserver(es => { let i = 0; for (const e of es) if (e.isIntersecting) { const t = e.target;
     t.style.setProperty('--d', Math.min(i++, 5) * 45 + 'ms'); t.classList.add('shown', 'enter'); rio.unobserve(t); } }, { rootMargin: '0px 0px -4% 0px' });
   els.forEach(e => rio.observe(e));
+  // شبكة أمان: لو تأخر المراقب لأي سبب، لا يبقى عنصر ظاهر على الشاشة مخفياً
+  clearTimeout(reveal.t); reveal.t = setTimeout(() => { for (const e of els) { if (e.classList.contains('shown') || !e.isConnected) continue; const r = e.getBoundingClientRect(); if (r.top < innerHeight && r.bottom > 0) e.classList.add('shown'); } }, 1500);
 }
 const flash = el => { el.classList.add('shown', 'flash'); setTimeout(() => el.classList.remove('flash'), 1700);
   if (!reduce.matches) { const c = getComputedStyle(el).getPropertyValue('--c1'); el.animate([{ boxShadow: `0 0 0 3px ${c}` }, { boxShadow: `0 0 0 3px ${c}`, offset: .55 }, { boxShadow: '0 0 0 0 transparent' }], { duration: 1700, easing: 'ease-out' }); } };
@@ -301,8 +303,9 @@ function openSheet(title, html, tag, o = {}) {
       const g = Object.assign(document.createElement('img'), { src: src.currentSrc || src.src, className: 'ghost', alt: '' });
       g.style.cssText = `left:${b.left}px;top:${b.top}px;width:${b.width}px;height:${b.height}px;--c1:${getComputedStyle(sh).getPropertyValue('--c1')}`;
       document.body.append(g); dst.style.visibility = 'hidden';
-      g.animate({ transform: [`translate(${a.left - b.left}px,${a.top - b.top}px) scale(${a.width / b.width},${a.height / b.height})`, 'none'] }, { duration: 400, easing: 'cubic-bezier(.2,.8,.2,1)' })
-        .finished.catch(() => {}).finally(() => { dst.style.visibility = ''; g.remove(); });
+      const land = () => { dst.style.visibility = ''; g.remove(); };
+      g.animate({ transform: [`translate(${a.left - b.left}px,${a.top - b.top}px) scale(${a.width / b.width},${a.height / b.height})`, 'none'] }, { duration: 400, easing: 'cubic-bezier(.2,.8,.2,1)' }).finished.then(land, land);
+      setTimeout(land, 700); // لا يتعلق البوستر لو توقفت الإطارات
     }
   }
   $('#sheet .close').focus({ preventScroll: true });
@@ -316,7 +319,8 @@ function closeSheet(fromPop) {
   if (reduce.matches) done();
   else { const mine = closing = [bd.animate({ opacity: [1, 0] }, { duration: 190, easing: 'ease-in', fill: 'forwards' }),
       sh.animate(phone.matches ? { transform: [cur, 'translateY(100%)'] } : { transform: ['none', 'translateY(14px) scale(.97)'], opacity: [1, 0] }, { duration: 190, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' })];
-    mine[1].finished.then(() => { if (closing !== mine) return; closing = null; done(); mine.forEach(a => a.cancel()); }, () => {}); }
+    const fin = () => { if (closing !== mine) return; closing = null; done(); mine.forEach(a => a.cancel()); };
+    mine[1].finished.then(fin, () => {}); setTimeout(fin, 400); } // المؤقت يضمن الإغلاق حتى لو توقفت الإطارات
   if (!fromPop && history.state?.sheet) { ui.skipPop = true; history.back(); }
 }
 addEventListener('popstate', () => { if (ui.skipPop) { ui.skipPop = false; return; } if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return; } closeSheet(true); });
