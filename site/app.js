@@ -69,11 +69,12 @@ const tmdbUrl = w => `https://www.themoviedb.org/${w.seasons || w.kind === 'seri
 const themeVars = id => { const t = THEMES[id]; return `--bg:${t.bg};--c1:${t.c1};--c2:${t.c2}`; };
 // التقييم معلومة فمكانه مع العنوان؛ والرابطان الخارجيان فعلان فمكانهما مع الأزرار، وكلٌّ منهما يقول ما ستجده هناك
 const gaugeRow = w => w.tmdbRating != null ? `<a class="gauge" style="--v:${Math.round(w.tmdbRating * 10)}" href="${tmdbUrl(w)}" target="_blank" rel="noopener" aria-label="تقييم TMDB ${w.tmdbRating} من 10">${w.tmdbRating}</a><span class="src"><b>تقييم ${ltr('TMDB')}</b>${cnt(w.tmdbVotes || 0, 'vote')}</span>` : '';
-// Letterboxd للأفلام فقط (لا يستورد المسلسلات)، وTrakt للاثنين. كلاهما يُفتح برقم العمل في TMDB ويحوّل إلى صفحته هناك
+// Letterboxd للأفلام فقط (لا يستورد المسلسلات) ويُفتح برقم TMDB. Trakt للاثنين ويُفتح برقم IMDb:
+// رابط البحث برقم TMDB صار يحوّل إلى التطبيق الجديد app.trakt.tv ويعطي 404
 const isTv = w => !!w.seasons || w.kind === 'series';
 const xlinks = w => { const a = (href, what, name) => `<a href="${href}" target="_blank" rel="noopener"><small>${what}</small>${ic('ext')}<b>${ltr(name)}</b></a>`;
   const list = [w.imdb && a(`https://www.imdb.com/title/${w.imdb}/`, 'تقييم الجمهور', 'IMDb'), w.rt && a(`https://www.rottentomatoes.com/${w.rt}`, 'آراء النقاد', 'Rotten Tomatoes'),
-    w.tmdb && !isTv(w) && a(`https://letterboxd.com/tmdb/${w.tmdb}`, 'مراجعات وقوائم', 'Letterboxd'), w.tmdb && a(`https://trakt.tv/search/tmdb/${w.tmdb}?id_type=${isTv(w) ? 'show' : 'movie'}`, 'تتبّع المشاهدة', 'Trakt')].filter(Boolean);
+    w.tmdb && !isTv(w) && a(`https://letterboxd.com/tmdb/${w.tmdb}`, 'مراجعات وقوائم', 'Letterboxd'), w.imdb && a(`https://trakt.tv/${isTv(w) ? 'shows' : 'movies'}/${w.imdb}`, 'تتبّع المشاهدة', 'Trakt')].filter(Boolean);
   return list.length ? `<div class="xlinks">${list.join('')}</div>` : ''; };
 const rateBlock = w => { const v = isSoon(w) ? null : verdict(w.tmdbRating); return `<div class="rates wide">${gaugeRow(w)}${v && w.tmdbRating != null ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${xlinks(w)}</div>`; };
 const daysTo = d => Math.ceil((new Date(d) - new Date(TODAY)) / 864e5);
