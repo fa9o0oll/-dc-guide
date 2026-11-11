@@ -67,7 +67,11 @@ const seasonTotal = (w, s) => (w.seasons || []).filter(x => !s || x.n === s).red
 const seasonDone = (id, s) => Object.keys(store.eps[id] || {}).filter(k => !s || k.startsWith(s + '-')).length;
 const tmdbUrl = w => `https://www.themoviedb.org/${w.seasons ? 'tv' : 'movie'}/${w.tmdb}`;
 const themeVars = id => { const t = THEMES[id]; return `--bg:${t.bg};--c1:${t.c1};--c2:${t.c2}`; };
-const rateBlock = w => `<div class="rates wide">${w.tmdbRating != null ? `<a class="gauge" style="--v:${Math.round(w.tmdbRating * 10)}" href="${tmdbUrl(w)}" target="_blank" rel="noopener" aria-label="تقييم TMDB ${w.tmdbRating} من 10">${w.tmdbRating}</a><span class="src"><b>تقييم ${ltr('TMDB')}</b>${cnt(w.tmdbVotes || 0, 'vote')}</span>` : ''}${w.imdb || w.rt ? `<span class="ext">${w.imdb ? `<a href="https://www.imdb.com/title/${w.imdb}/" target="_blank" rel="noopener">${ltr('IMDb')}${ic('ext')}</a>` : ''}${w.rt ? `<a href="https://www.rottentomatoes.com/${w.rt}" target="_blank" rel="noopener">${ltr('Rotten Tomatoes')}${ic('ext')}</a>` : ''}</span>` : ''}</div>`;
+// التقييم معلومة فمكانه مع العنوان؛ والرابطان الخارجيان فعلان فمكانهما مع الأزرار، وكلٌّ منهما يقول ما ستجده هناك
+const gaugeRow = w => w.tmdbRating != null ? `<a class="gauge" style="--v:${Math.round(w.tmdbRating * 10)}" href="${tmdbUrl(w)}" target="_blank" rel="noopener" aria-label="تقييم TMDB ${w.tmdbRating} من 10">${w.tmdbRating}</a><span class="src"><b>تقييم ${ltr('TMDB')}</b>${cnt(w.tmdbVotes || 0, 'vote')}</span>` : '';
+const xlinks = w => { const a = (href, what, name) => `<a href="${href}" target="_blank" rel="noopener"><small>${what}</small>${ic('ext')}<b>${ltr(name)}</b></a>`;
+  return w.imdb || w.rt ? `<div class="xlinks">${w.imdb ? a(`https://www.imdb.com/title/${w.imdb}/`, 'تقييم الجمهور', 'IMDb') : ''}${w.rt ? a(`https://www.rottentomatoes.com/${w.rt}`, 'آراء النقاد', 'Rotten Tomatoes') : ''}</div>` : ''; };
+const rateBlock = w => { const v = isSoon(w) ? null : verdict(w.tmdbRating); return `<div class="rates wide">${gaugeRow(w)}${v && w.tmdbRating != null ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${xlinks(w)}</div>`; };
 const daysTo = d => Math.ceil((new Date(d) - new Date(TODAY)) / 864e5);
 // ما القادم لمسلسل صادر: حلقة بموعد، موسم بموعد، موسم معلن بلا موعد، أو مستمر بلا إعلان
 function nextInfo(w) {
@@ -158,14 +162,15 @@ function card(p) {
       <h3>${ltr(w.title + (p.season ? `: Season ${p.season}` : ''))}</h3>
       ${meta}
       <div class="tags">${soon ? (p.upcoming?.stage === 'development' ? '<span class="tag soon">معلن</span>' : '<span class="tag soon">قادم</span>') : v ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${nextTag(w)}</div>
-      <p class="note">${esc(p.note)}</p>
+      ${w.tmdbRating != null ? `<div class="rates">${gaugeRow(w)}</div>` : ''}
     </div></div>
+    <div class="cbody"><p class="note">${esc(p.note)}</p>
     ${soon ? `<div class="count wide">${w.date ? `${countdown(daysLeft(w), 'الصدور')}<br><small>${fmtDate(w.date)}</small></span>` : `<span>${STAGE[p.upcoming?.stage] || STAGE.production}</span>`}${p.upcoming?.source ? `<a class="src" href="${esc(p.upcoming.source)}" target="_blank" rel="noopener">المصدر</a>` : ''}</div>` : ''}
     ${nextBlock(w, 'wide')}
     ${avLine(p, 'wide')}
     ${p.canon ? `<div class="canon wide">يظهر في عالمين: ${esc(p.canon.note)} <a href="${esc(p.canon.source)}" target="_blank" rel="noopener">المصدر</a></div>` : ''}
-    ${p.spoiler ? (store.shield ? `<details class="vault wide"><summary>${ic('lock')}<span>معلومة ارتباط فيها حرق</span><b>اكشفها</b></summary><p>${esc(p.spoiler)}</p></details>` : `<p class="note wide">${esc(p.spoiler)}</p>`) : ''}
-    <div class="cfoot">${rateBlock(w)}${soon ? '' : `<div class="status wide">${Object.entries(STATUS).map(([k, l]) => `<button data-act="status" data-s="${k}" aria-pressed="${st === k}">${ic(STATUS_IC[k])}<span>${l}</span></button>`).join('')}</div>`}
+    ${p.spoiler ? (store.shield ? `<details class="vault wide"><summary>${ic('lock')}<span>معلومة ارتباط فيها حرق</span><b>اكشفها</b></summary><p>${esc(p.spoiler)}</p></details>` : `<p class="note wide">${esc(p.spoiler)}</p>`) : ''}</div>
+    <div class="cfoot">${xlinks(w)}${soon ? '' : `<div class="status wide">${Object.entries(STATUS).map(([k, l]) => `<button data-act="status" data-s="${k}" aria-pressed="${st === k}">${ic(STATUS_IC[k])}<span>${l}</span></button>`).join('')}</div>`}
     <div class="actions wide"><button class="cta" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} ${tot ? `style="--p:${Math.round(dn / tot * 100)}%"` : ''}>${w.seasons?.length ? `${ic('eps')}<span>الحلقات</span>${tot ? `<span class="epprog" title="شاهدت ${dn} من ${tot}"><bdi>${dn}/${tot}</bdi></span>` : ''}` : '<span>التفاصيل</span>'}</button>
       <button class="alt" data-act="goto" data-to="t" data-target="${domId('t', p)}" data-uni="${p.universe}" aria-label="موقعه في الخط الزمني">${ic('line')}<span>الخط الزمني</span></button></div></div>
   </article>`;

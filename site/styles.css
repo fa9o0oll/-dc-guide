@@ -127,15 +127,17 @@ main:focus{outline:none}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,350px),1fr));gap:18px;margin-top:8px}
 /* تحت 1000px (ومنها شاشة الفولد الداخلية) يكفي 270px للعمود، فتظهر البطاقات في عمودين */
 @media (max-width:1000px){.grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:14px}}
-/* رأس البطاقة (بوستر ونص) ثم الفقرات، وذيلها (الحالة والأزرار) يلتصق بأسفلها فتتحاذى أزرار البطاقات المتجاورة */
+/* البطاقة سطح واحد بثلاث مناطق: الرأس (بوستر وعنوان)، النص، ثم التقييم والحالة والأزرار.
+   المناطق تتشارك صفوف الشبكة (subgrid) مع البطاقات المجاورة، فيبدأ النص والتقييم والأزرار من نفس الخط في كل صف، ولا يتجمع الفراغ في مكان واحد */
 .chead{display:grid;grid-template-columns:clamp(96px,30%,128px) minmax(0,1fr);gap:12px 16px;align-items:start}
-/* الذيل لوح ملتصق بأسفل البطاقة: التقييم ثم الحالة ثم الأزرار. المساحة الزائدة تبقى مع النص فوقه لا في وسط الأزرار */
-.cfoot{margin:auto -14px -14px;padding:12px 14px 16px;display:grid;gap:12px;background:color-mix(in srgb,var(--bg) 86%,#000);border-top:1px solid var(--hair);border-radius:0 0 9px 9px}
-/* بيانات العمل: كل معلومة قطعة لا تنكسر، وبينها معيّن صغير بلون العالم */
+.cbody{display:grid;gap:10px;align-content:start}
+.cbody .note{margin-top:0}
+.cfoot{container-type:inline-size;display:grid;gap:12px;align-content:end}
 .bits{display:flex;flex-wrap:wrap;gap:0 9px}
 .bits span{white-space:nowrap}
 .bits span+span::before{content:"";display:inline-block;width:4px;height:4px;margin-inline-end:9px;vertical-align:.18em;transform:rotate(45deg);background:var(--c1);opacity:.85}
-.card{container-type:inline-size;display:flex;flex-direction:column;gap:12px;background:color-mix(in srgb,var(--bg) 62%,rgba(255,255,255,.07));border:1px solid var(--hair);border-radius:10px;padding:14px;scroll-margin-top:70px}
+.card{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:subgrid;grid-row:span 3;row-gap:12px;background:color-mix(in srgb,var(--bg) 62%,rgba(255,255,255,.07));border:1px solid var(--hair);border-radius:10px;padding:14px;scroll-margin-top:70px}
+@supports not (grid-template-rows:subgrid){.card{display:flex;flex-direction:column;gap:12px}.cfoot{margin-top:auto}}
 .poster{position:relative;border:0;padding:0;border-radius:4px;overflow:hidden;aspect-ratio:2/3;background:#1b2130;min-height:0;align-self:start;width:100%;box-shadow:-6px 6px 0 var(--c1)}
 .poster img{width:100%;height:100%;object-fit:cover}
 .poster .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:8px;font-size:.75rem;color:var(--dim)}
@@ -156,15 +158,20 @@ main:focus{outline:none}
 .vault summary::-webkit-details-marker{display:none}
 .vault p{padding:0 12px 10px}
 .canon{font-size:.8rem;color:var(--dim);border-inline-start:3px solid var(--c2);padding-inline-start:10px}
-/* التقييم شريط واحد: المقياس ومصدره، ثم روابط المواقع الخارجية كنص لا كصناديق */
-.rates{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.045)}
+/* التقييم: المقياس ومصدره والحكم في سطر، وتحته رابطان خارجيان بوصف ما في كل موقع */
+.rates{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .gauge{--v:0;flex:none;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;text-decoration:none;color:var(--ink);font-family:var(--display);font-size:1.15rem;background:radial-gradient(closest-side,color-mix(in srgb,var(--bg) 80%,#000) 78%,transparent 80%),conic-gradient(var(--c1) calc(var(--v) * 1%),rgba(255,255,255,.16) 0)}
 .rates .src{font-size:.74rem;color:var(--dim);line-height:1.3}
 .rates .src b{display:block;color:var(--ink);font-size:.84rem}
-.rates .ext{margin-inline-start:auto;display:flex}
-.rates .ext a{text-decoration:none;font-size:.8rem;font-weight:600;color:var(--ink);min-height:42px;padding:0 12px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
-.rates .ext a+a{border-inline-start:1px solid var(--hair)}
-.rates .ext .ic{width:14px;height:14px;color:var(--c1)}
+.rates>.tag{margin-inline-start:auto}
+.rates .xlinks{flex:1 1 100%}
+.chead>div{display:flex;flex-direction:column;align-self:stretch;min-width:0}
+.chead .rates{margin-top:auto;padding-top:10px;flex-wrap:nowrap}
+.xlinks{display:flex;gap:8px}
+.xlinks a{flex:1 1 auto;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:1px 8px;min-height:52px;padding:7px 12px;border-radius:10px;text-decoration:none;color:var(--ink);border:1px solid color-mix(in srgb,var(--c1) 26%,rgba(255,255,255,.1));background:color-mix(in srgb,var(--c1) 10%,rgba(255,255,255,.05))}
+.xlinks small{font-size:.7rem;color:var(--dim);line-height:1.2;white-space:nowrap}
+.xlinks .ic{width:15px;height:15px;color:var(--c1)}
+.xlinks b{grid-column:1/-1;font-size:.84rem;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* الحالة: سكة غائرة بأربع خانات، أيقونة فوق الاسم، والمختارة تمتلئ بلونها */
 .status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--bg) 50%,#000);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
 .status button{flex-direction:column;gap:2px;border:0;border-radius:10px;padding:7px 2px 6px;min-width:0;min-height:54px;background:transparent;font-size:.74rem;color:var(--dim)}
@@ -266,7 +273,7 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 .toast{position:fixed;z-index:70;bottom:calc(20px + env(safe-area-inset-bottom));inset-inline:0;margin-inline:auto;width:max-content;max-width:90vw;background:#0b0b0b;border:1px solid var(--c1);border-radius:8px;padding:10px 16px;font-weight:600;font-size:.9rem}
 .foot{padding:20px var(--pad) 40px;border-top:1px solid var(--hair);color:var(--dim);font-size:.8rem;text-align:center}
 
-@media (hover:hover){button:hover{border-color:var(--c1)}.rates .ext a:hover{color:var(--c1)}.status button:hover{background:rgba(255,255,255,.07)}.status button[aria-pressed=true]:hover{background:var(--tone)}}
+@media (hover:hover){button:hover{border-color:var(--c1)}.xlinks a:hover{border-color:var(--c1)}.status button:hover{background:rgba(255,255,255,.07)}.status button[aria-pressed=true]:hover{background:var(--tone)}}
 @media (pointer:coarse){button{min-height:44px}}
 @media (max-width:760px){
   .row{grid-template-columns:22px minmax(0,1fr)}
@@ -275,13 +282,9 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 }
 @media (max-width:560px){
   .filters{grid-template-columns:repeat(2,minmax(0,1fr))}.filters input{grid-column:1/-1}
-  .rates .ext{flex:0 0 calc(100% + 20px);margin:0 -10px -8px;border-top:1px solid var(--hair)}.rates .ext a{flex:1;justify-content:center}
   .ep{grid-template-columns:108px minmax(0,1fr)}
 }
 /* تفاصيل البطاقة تتبع عرض البطاقة نفسها لا عرض الشاشة */
-@container (max-width:400px){
-  .rates .ext{flex:0 0 calc(100% + 20px);margin:0 -10px -8px;border-top:1px solid var(--hair)}.rates .ext a{flex:1;justify-content:center}
-}
 @container (max-width:268px){.actions .alt{width:46px;padding:0}.actions .alt span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 /* النقش لا يمرّ خلف نص الافتتاحية */
@@ -395,8 +398,8 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 /* ===== الحركة: transform و opacity فقط، حتى تبقى على كرت الشاشة ولا تعيد رسم الصفحة ===== */
 .sheet-open body{overflow:hidden}
 .sheet-open .motif::before,.sheet-open .motif::after{animation-play-state:paused}
-button,.rates .ext a{transition:transform .14s ease,background-color .2s ease,border-color .2s ease,color .2s ease,box-shadow .14s ease}
-button:active,.rates .ext a:active{transform:scale(.96)}
+button,.xlinks a{transition:transform .14s ease,background-color .2s ease,border-color .2s ease,color .2s ease,box-shadow .14s ease}
+button:active,.xlinks a:active{transform:scale(.96)}
 :is(.poster,.node-main,.tile,.hit):active{transform:scale(.98)}
 .logo,.dock-index,.views button.on{transition:background-color .9s ease,box-shadow .9s ease,transform .14s ease}
 .status button[aria-pressed=true]{animation:pick .34s cubic-bezier(.2,.9,.3,1.4)}
