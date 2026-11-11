@@ -69,7 +69,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await tap('.ep [data-act=ep]'); check('تعليم حلقة', await page.locator('.ep.done').count() === 1);
   await overflow('نافذة المسلسل'); await snap('3-series');
   await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });
-  check('تقدم الحلقات يظهر على البطاقة', (await page.textContent('#c-dcu-peacemaker-2022-s2')).includes('الحلقات: 1 من 8'));
+  check('تقدم الحلقات يظهر على البطاقة', (await page.textContent('#c-dcu-peacemaker-2022-s2 .epprog')).trim() === '1/8');
   // الفهرس متاح بعد النزول في الصفحة، وفيه كل العوالم
   await page.evaluate(() => scrollTo(0, 6000)); await page.waitForTimeout(200);
   check('زر الفهرس وطرق العرض والأدوات ظاهرة بعد النزول في الصفحة', await page.evaluate(m => ['.dock-index', '.views [data-view=timeline]', '#shieldBtn'].every(s => { const r = document.querySelector(s).getBoundingClientRect(); return r.top >= 0 && r.bottom <= 125 && r.width > 40 && (r.left >= 0 || (m && s === '#shieldBtn')); }), mobile), await page.evaluate(() => 'ارتفاع الشريط ' + Math.round(document.querySelector('.stick').getBoundingClientRect().height)));
@@ -122,7 +122,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.locator('.ep [data-act=ep]').nth(2).evaluate(b => b.click()); await page.waitForTimeout(150);
   check('تعليم حلقة لا يعيد رسم القائمة ولا يغيّر ارتفاع النافذة', await page.evaluate(() => window.__main) === 0 && Math.abs(h0 - await page.evaluate(() => document.querySelector('#sheet').getBoundingClientRect().height)) < 1 && await page.locator('.ep.done').count() >= 1);
   await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });
-  check('البطاقة تعكس تقدم الحلقات بلا إعادة بناء', await page.evaluate(() => window.__main) === 0 && /الحلقات: [1-9]/.test(await page.textContent('#c-dcu-peacemaker-2022-s1 .epprog')));
+  check('البطاقة تعكس تقدم الحلقات بلا إعادة بناء', await page.evaluate(() => window.__main) === 0 && /^[1-9]\/8$/.test((await page.textContent('#c-dcu-peacemaker-2022-s1 .epprog')).trim()));
   if (phone) { const box = await page.locator('.sheet-head h2').boundingBox().catch(() => null);
     await tap('#c-nolan-the-dark-knight-2008 .poster'); await page.waitForSelector('#sheet:not([hidden])'); await page.waitForTimeout(450);
     const r = await page.evaluate(() => { const b = document.querySelector('.sheet-head').getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + 14 }; });
