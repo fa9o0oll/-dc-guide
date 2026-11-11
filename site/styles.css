@@ -18,7 +18,14 @@
 html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.65;min-height:100vh;overflow-wrap:anywhere}
 button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer;border:1px solid var(--hair);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:600;font-size:.86rem;min-height:42px}
+/* الأزرار ثلاثة أدوار: عادي بلمسة من لون العالم، رئيسي (.cta) بلون العالم كاملاً، وتبديل (.tick و.status) يمتلئ حين يُفعَّل */
+button{cursor:pointer;border:1px solid color-mix(in srgb,var(--c1) 26%,rgba(255,255,255,.1));background:color-mix(in srgb,var(--c1) 10%,rgba(255,255,255,.05));border-radius:10px;padding:8px 14px;font-weight:600;font-size:.86rem;min-height:42px}
+.ic{width:1.2em;height:1.2em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+:is(.status,.actions,.tools,.go,.btns,.foot2) button{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.tools .ic{color:var(--c1)}
+.tick .ic{color:var(--dim)}
+.tick[aria-pressed=true]{background:var(--ok);color:#0b0b0b;border-color:transparent}
+.tick[aria-pressed=true] .ic{color:inherit}
 :is(button,a,input,select,summary):focus-visible{outline:2px solid var(--c1);outline-offset:2px}
 a{color:var(--c1)}
 bdi[dir=ltr]{unicode-bidi:isolate}
@@ -119,7 +126,10 @@ main:focus{outline:none}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,350px),1fr));gap:18px;margin-top:8px}
 /* تحت 1000px (ومنها شاشة الفولد الداخلية) يكفي 270px للعمود، فتظهر البطاقات في عمودين */
 @media (max-width:1000px){.grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:14px}}
-.card{container-type:inline-size;display:grid;grid-template-columns:clamp(96px,30%,128px) minmax(0,1fr);gap:12px 16px;align-content:start;background:color-mix(in srgb,var(--bg) 62%,rgba(255,255,255,.07));border:1px solid var(--hair);border-radius:10px;padding:14px;scroll-margin-top:70px}
+/* رأس البطاقة (بوستر ونص) ثم الفقرات، وذيلها (الحالة والأزرار) يلتصق بأسفلها فتتحاذى أزرار البطاقات المتجاورة */
+.chead{display:grid;grid-template-columns:clamp(96px,30%,128px) minmax(0,1fr);gap:12px 16px;align-items:start}
+.cfoot{margin-top:auto;display:grid;gap:12px}
+.card{container-type:inline-size;display:flex;flex-direction:column;gap:12px;background:color-mix(in srgb,var(--bg) 62%,rgba(255,255,255,.07));border:1px solid var(--hair);border-radius:10px;padding:14px;scroll-margin-top:70px}
 .poster{position:relative;border:0;padding:0;border-radius:4px;overflow:hidden;aspect-ratio:2/3;background:#1b2130;min-height:0;align-self:start;width:100%;box-shadow:-6px 6px 0 var(--c1)}
 .poster img{width:100%;height:100%;object-fit:cover}
 .poster .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:8px;font-size:.75rem;color:var(--dim)}
@@ -132,27 +142,36 @@ main:focus{outline:none}
 .tag.soon{color:var(--c2)}
 .note{font-size:.88rem;color:#e6dfd2;margin-top:8px}
 .wide{grid-column:1/-1}
-.vault{border:1px dashed color-mix(in srgb,var(--c2) 70%,transparent);border-radius:8px;font-size:.85rem}
-.vault summary{cursor:pointer;padding:8px 12px;min-height:44px;display:flex;align-items:center;color:var(--c2);font-weight:600;list-style:none}
+.vault{border-radius:12px;font-size:.85rem;background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--c2) 10%,transparent) 0 10px,transparent 10px 20px),rgba(255,255,255,.035);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c2) 38%,transparent)}
+.vault summary{cursor:pointer;padding:8px 12px;min-height:46px;display:flex;align-items:center;gap:8px;font-weight:600;list-style:none}
+.vault summary .ic{color:var(--c2)}
+.vault summary b{margin-inline-start:auto;flex:none;font-size:.76rem;color:var(--c2);border:1px solid currentColor;border-radius:999px;padding:1px 10px}
+.vault[open] summary b{display:none}
 .vault summary::-webkit-details-marker{display:none}
 .vault p{padding:0 12px 10px}
 .canon{font-size:.8rem;color:var(--dim);border-inline-start:3px solid var(--c2);padding-inline-start:10px}
-.rates{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+/* التقييم شريط واحد: المقياس ومصدره، ثم روابط المواقع الخارجية كنص لا كصناديق */
+.rates{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.045)}
 .gauge{--v:0;flex:none;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;text-decoration:none;color:var(--ink);font-family:var(--display);font-size:1.15rem;background:radial-gradient(closest-side,color-mix(in srgb,var(--bg) 80%,#000) 78%,transparent 80%),conic-gradient(var(--c1) calc(var(--v) * 1%),rgba(255,255,255,.16) 0)}
 .rates .src{font-size:.74rem;color:var(--dim);line-height:1.3}
 .rates .src b{display:block;color:var(--ink);font-size:.84rem}
-.rates .ext{margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap}
-.rates .ext a{text-decoration:none;border:1px solid var(--hair);border-radius:8px;padding:6px 12px;font-size:.8rem;font-weight:600;color:var(--ink);min-height:42px;display:flex;align-items:center;white-space:nowrap;background:var(--surface)}
-.status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--hair);border-radius:8px;overflow:hidden}
-.status button{border:0;border-radius:0;padding:6px 2px;font-size:.8rem;min-width:0;background:transparent;border-inline-start:1px solid var(--hair)}
-.status button:first-child{border-inline-start:0}
-.status button[aria-pressed=true]{color:#0b0b0b}
-.status button[aria-pressed=true][data-s=watched]{background:var(--ok)}
-.status button[aria-pressed=true][data-s=watching]{background:var(--watching)}
-.status button[aria-pressed=true][data-s=list]{background:var(--listed)}
-.status button[aria-pressed=true][data-s=skip]{background:var(--skip)}
-.actions{display:flex;flex-wrap:wrap;gap:8px}
-.actions button{flex:1 1 130px}
+.rates .ext{margin-inline-start:auto;display:flex}
+.rates .ext a{text-decoration:none;font-size:.8rem;font-weight:600;color:var(--ink);min-height:42px;padding:0 12px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.rates .ext a+a{border-inline-start:1px solid var(--hair)}
+.rates .ext .ic{width:14px;height:14px;color:var(--c1)}
+/* الحالة: سكة غائرة بأربع خانات، أيقونة فوق الاسم، والمختارة تمتلئ بلونها */
+.status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--bg) 50%,#000);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.status button{flex-direction:column;gap:2px;border:0;border-radius:10px;padding:7px 2px 6px;min-width:0;min-height:54px;background:transparent;font-size:.74rem;color:var(--dim)}
+.status .ic{width:20px;height:20px;color:var(--tone)}
+.status [data-s=watched]{--tone:var(--ok)}.status [data-s=watching]{--tone:var(--watching)}.status [data-s=list]{--tone:var(--listed)}.status [data-s=skip]{--tone:var(--skip)}
+.status button[aria-pressed=true]{background:var(--tone);color:#0b0b0b;box-shadow:0 5px 14px -6px var(--tone)}
+.status button[aria-pressed=true] .ic{color:inherit}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.actions button{flex:1 1 130px;min-height:46px}
+/* الزر الرئيسي: لوح بلون العالم وظل مائل كظل البوستر، ينضغط نحو ظله */
+.actions .cta{flex:1 1 0;border:0;background:var(--c1);color:#0b0b0b;font-weight:700;font-size:.92rem;box-shadow:-4px 4px 0 color-mix(in srgb,var(--c1) 42%,#000)}
+.actions .cta:active{transform:translate(-3px,3px);box-shadow:-1px 1px 0 color-mix(in srgb,var(--c1) 42%,#000)}
+.actions .alt{flex:none;white-space:nowrap}
 .count{display:flex;align-items:center;gap:12px;border-inline-start:4px solid var(--c2);padding:4px 12px;background:var(--surface)}
 .count b{font-family:var(--display);font-weight:400;font-size:2.6rem;color:var(--c2);line-height:1}
 .count small{color:var(--dim)}
@@ -238,7 +257,7 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 .toast{position:fixed;z-index:70;bottom:calc(20px + env(safe-area-inset-bottom));inset-inline:0;margin-inline:auto;width:max-content;max-width:90vw;background:#0b0b0b;border:1px solid var(--c1);border-radius:8px;padding:10px 16px;font-weight:600;font-size:.9rem}
 .foot{padding:20px var(--pad) 40px;border-top:1px solid var(--hair);color:var(--dim);font-size:.8rem;text-align:center}
 
-@media (hover:hover){button:hover,.rates .ext a:hover{border-color:var(--c1)}}
+@media (hover:hover){button:hover{border-color:var(--c1)}.rates .ext a:hover{color:var(--c1)}.status button:hover{background:rgba(255,255,255,.07)}.status button[aria-pressed=true]:hover{background:var(--tone)}}
 @media (pointer:coarse){button{min-height:44px}}
 @media (max-width:760px){
   .row{grid-template-columns:22px minmax(0,1fr)}
@@ -247,15 +266,14 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 }
 @media (max-width:560px){
   .filters{grid-template-columns:repeat(2,minmax(0,1fr))}.filters input{grid-column:1/-1}
-  .rates .ext{margin-inline-start:0;flex:1 1 100%}.rates .ext a{flex:1;justify-content:center}
+  .rates .ext{flex:0 0 calc(100% + 20px);margin:0 -10px -8px;border-top:1px solid var(--hair)}.rates .ext a{flex:1;justify-content:center}
   .ep{grid-template-columns:108px minmax(0,1fr)}
 }
 /* تفاصيل البطاقة تتبع عرض البطاقة نفسها لا عرض الشاشة */
 @container (max-width:400px){
-  .status{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .status button:nth-child(3){border-inline-start:0}.status button:nth-child(n+3){border-top:1px solid var(--hair)}
-  .rates .ext{margin-inline-start:0;flex:1 1 100%}.rates .ext a{flex:1;justify-content:center}
+  .rates .ext{flex:0 0 calc(100% + 20px);margin:0 -10px -8px;border-top:1px solid var(--hair)}.rates .ext a{flex:1;justify-content:center}
 }
+@container (max-width:268px){.actions .alt{width:46px;padding:0}.actions .alt span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 /* النقش لا يمرّ خلف نص الافتتاحية */
 .opener.m-bolts .motif::before{inset:0 42% 26% 0}
@@ -368,8 +386,8 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 /* ===== الحركة: transform و opacity فقط، حتى تبقى على كرت الشاشة ولا تعيد رسم الصفحة ===== */
 .sheet-open body{overflow:hidden}
 .sheet-open .motif::before,.sheet-open .motif::after{animation-play-state:paused}
-button,.rates .ext a{transition:transform .14s ease,background-color .2s ease,border-color .2s ease,color .2s ease}
-:is(button,.rates .ext a):active{transform:scale(.96)}
+button,.rates .ext a{transition:transform .14s ease,background-color .2s ease,border-color .2s ease,color .2s ease,box-shadow .14s ease}
+button:active,.rates .ext a:active{transform:scale(.96)}
 :is(.poster,.node-main,.tile,.hit):active{transform:scale(.98)}
 .logo,.dock-index,.views button.on{transition:background-color .9s ease,box-shadow .9s ease,transform .14s ease}
 .status button[aria-pressed=true]{animation:pick .34s cubic-bezier(.2,.9,.3,1.4)}
