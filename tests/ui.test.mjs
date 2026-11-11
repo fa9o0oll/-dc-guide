@@ -130,6 +130,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
       h.setPointerCapture = () => {}; ev('pointerdown', 0); ev('pointermove', 80); ev('pointermove', 190); ev('pointerup', 190); }, r);
     await page.waitForSelector('#sheet', { state: 'hidden' }); check('سحب رأس النافذة للأسفل يغلقها', await page.isHidden('#backdrop')); }
   check('كل البطاقات الظاهرة مرئية بعد الدخول', await page.evaluate(() => [...document.querySelectorAll('#main .card')].filter(c => { const r = c.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }).every(c => getComputedStyle(c).opacity === '1')));
+  check('روابط المواقع: فيلم له Letterboxd وTrakt، ومسلسل له Trakt فقط', await page.evaluate(() => { const h = id => [...document.querySelectorAll(`#${id} .xlinks a`)].map(x => x.href);
+    const f = h('c-nolan-the-dark-knight-2008'), t = h('c-dcu-peacemaker-2022-s1');
+    return f.includes('https://letterboxd.com/tmdb/155') && f.includes('https://trakt.tv/search/tmdb/155?id_type=movie') && t.includes('https://trakt.tv/search/tmdb/110492?id_type=show') && !t.some(u => u.includes('letterboxd')); }));
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3).join(' | '));
   await ctx.close();
 }

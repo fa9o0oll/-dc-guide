@@ -164,11 +164,13 @@ main:focus{outline:none}
 .rates .src{font-size:.74rem;color:var(--dim);line-height:1.3}
 .rates .src b{display:block;color:var(--ink);font-size:.84rem}
 .rates>.tag{margin-inline-start:auto}
-.rates .xlinks{flex:1 1 100%}
+.rates .xlinks{flex:1 1 100%;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
 .chead>div{display:flex;flex-direction:column;align-self:stretch;min-width:0}
 .chead .rates{margin-top:auto;padding-top:10px;flex-wrap:nowrap}
-.xlinks{display:flex;gap:8px}
-.xlinks a{flex:1 1 auto;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:1px 8px;min-height:52px;padding:7px 12px;border-radius:10px;text-decoration:none;color:var(--ink);border:1px solid color-mix(in srgb,var(--c1) 26%,rgba(255,255,255,.1));background:color-mix(in srgb,var(--c1) 10%,rgba(255,255,255,.05))}
+/* روابط المواقع: شبكة بعمودين في البطاقة، وإن كان العدد فردياً تمتد الأخيرة على العرض كله */
+.xlinks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.cfoot .xlinks a:last-child:nth-child(odd){grid-column:1/-1}
+.xlinks a{min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:1px 8px;min-height:50px;padding:6px 12px;border-radius:10px;text-decoration:none;color:var(--ink);border:1px solid color-mix(in srgb,var(--c1) 26%,rgba(255,255,255,.1));background:color-mix(in srgb,var(--c1) 10%,rgba(255,255,255,.05))}
 .xlinks small{font-size:.7rem;color:var(--dim);line-height:1.2;white-space:nowrap}
 .xlinks .ic{width:15px;height:15px;color:var(--c1)}
 .xlinks b{grid-column:1/-1;font-size:.84rem;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -285,6 +287,7 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
   .ep{grid-template-columns:108px minmax(0,1fr)}
 }
 /* تفاصيل البطاقة تتبع عرض البطاقة نفسها لا عرض الشاشة */
+@container (max-width:290px){.xlinks a{padding-inline:9px}.xlinks b{font-size:.76rem}}
 @container (max-width:268px){.actions .alt{width:46px;padding:0}.actions .alt span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 /* النقش لا يمرّ خلف نص الافتتاحية */
