@@ -1,4 +1,5 @@
-// اختبار الواجهة في متصفح حقيقي على مقاسين: كمبيوتر (ماوس) وجوال (لمس).
+// اختبار الواجهة في متصفح حقيقي: كمبيوتر (ماوس)، جوال (لمس)، وشاشتا Galaxy Z Fold6 الخارجية والداخلية.
+// مقاسا الفولد محسوبان من الدقة الرسمية (968×2376 و1856×2160) على كثافة 2.625، ومعهما أضيق عرض ممكن مع تكبير العرض (÷3).
 // التشغيل: node tests/ui.test.mjs [مجلد اللقطات]   — يفشل بخروج 1 عند أي خلل.
 import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright'); // يُحل من التثبيت العام عبر NODE_PATH
@@ -15,7 +16,8 @@ const fails = []; const check = (name, ok, extra = '') => { console.log((ok ? ' 
 const legacy = Buffer.from(JSON.stringify({ trackerState: { w_2: 'watched', w_6: 'watching', w_21: 'watched', w_30: 'watched', w_45: 'watchlist' }, epState: {} })).toString('base64');
 
 const browser = await chromium.launch();
-for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }, false], ['mobile', { width: 390, height: 844 }, true]]) {
+for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }, false], ['mobile', { width: 390, height: 844 }, true], ['fold-cover', { width: 369, height: 905 }, true], ['fold-cover-zoom', { width: 323, height: 792 }, true], ['fold-main', { width: 707, height: 823 }, true], ['fold-main-zoom', { width: 619, height: 720 }, true], ['fold-main-landscape', { width: 823, height: 707 }, true]]) {
+  const phone = viewport.width <= 560;
   console.log(`\n== ${name} ${viewport.width}×${viewport.height}`);
   const ctx = await browser.newContext({ viewport, isMobile: mobile, hasTouch: mobile, deviceScaleFactor: shots ? 2 : 1, locale: 'ar-SA' });
   const page = await ctx.newPage(); const errs = [];
@@ -26,11 +28,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   // بيانات مُعدَّلة للاختبار فقط: مسلسل له حلقة قادمة بعد 5 أيام
   await page.route(/data\/catalog\.json/, async r => { const res = await r.fetch(), j = await res.json(), w = j.works.find(x => x.id === 'lanterns-2026');
     w.nextEpisode = { season: 1, episode: 9, date: new Date(Date.now() + 5 * 864e5).toISOString().slice(0, 10) }; return r.fulfill({ response: res, json: j }); });
-  const tap = sel => mobile ? page.locator(sel).first().tap() : page.locator(sel).first().click();
+  // العنصر الذي دخل الشاشة للتو يتحرك نصف ثانية؛ ننتظر استقراره قبل الضغط كما يفعل المستخدم
+  const settle = l => l.evaluate(async el => { await new Promise(r => setTimeout(r, 80)); const host = el.closest('.card,.node,.step'); if (host) await Promise.all(host.getAnimations().map(a => a.finished.catch(() => {}))); });
+  const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); await settle(l); return mobile ? l.tap() : l.click(); };
   const snap = async n => { if (shots) await page.screenshot({ path: `${shots}/${name}-${n}.png` }); };
-  const overflow = async label => { await page.waitForTimeout(350); const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
-      out: [...document.querySelectorAll('body *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > innerWidth + 1 || r.left < -1) && !e.closest('.unibar,.seasons,.controls,.atmo,.tile,[hidden]'); }).length }));
-    check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw && o.out === 0, `عرض الصفحة ${o.sw}/${o.iw}، عناصر خارجة ${o.out}`);
+  const overflow = async label => { await page.waitForTimeout(600); const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
+      out: [...document.querySelectorAll('body *')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.right > innerWidth + 1 || r.left < -1) && !e.closest('.unibar,.seasons,.controls,.atmo,.tile,.opener-img,[hidden]'); }).map(e => e.tagName + '.' + e.className) }));
+    check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw && o.out.length === 0, `عرض الصفحة ${o.sw}/${o.iw}، عناصر خارجة ${o.out.length} ${o.out.slice(0, 3).join(' ')}`);
     const spill = await page.evaluate(() => [...document.querySelectorAll('.card,.step,.row,.node,.ep,.rates a,.status button,.tag,.top button,.unibar button,.facts,.tile-text,.hit,.dock')].filter(e => e.getBoundingClientRect().width > 0 && (e.scrollWidth > e.clientWidth + 2 || e.scrollHeight > e.clientHeight + 2)).map(e => e.className + ':' + e.textContent.trim().slice(0, 18)));
     check(`${label}: لا محتوى يخرج من إطاره`, spill.length === 0, spill.slice(0, 4).join(' | '));
     const lap = await page.evaluate(() => { const b = [...document.querySelectorAll('.card,.step,.node,.ep')].map(e => e.getBoundingClientRect()).filter(r => r.width); let n = 0; for (let i = 1; i < b.length; i++) if (b[i].top < b[i - 1].bottom - 1 && b[i].left < b[i - 1].right - 1 && b[i].right > b[i - 1].left + 1 && b[i].top >= b[i - 1].top + 1) n++; return n; });
@@ -55,9 +59,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await overflow('نافذة الفيلم'); await snap('2-film');
   await tap('#sheet [data-act=light]'); await page.waitForSelector('#lightbox:not([hidden])');
   await page.goBack(); check('الرجوع يغلق البوستر المكبّر فقط', await page.isHidden('#lightbox') && await page.isVisible('#sheet'));
-  await page.goBack(); check('الرجوع يغلق النافذة', await page.isHidden('#sheet'));
+  await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' }); check('الرجوع يغلق النافذة', await page.isHidden('#sheet'));
   // نافذة مسلسل + حلقات
-  await tap('#c-dcu-peacemaker-2022-s2 [data-act=open]'); await page.waitForSelector('.ep');
+  await tap('#c-dcu-peacemaker-2022-s2 [data-act=open]'); await page.waitForSelector('.ep:not(.skel)');
   check('نافذة المسلسل تفتح على الموسم الصحيح', (await page.textContent('#seasonTabs .on')).includes('2') && await page.locator('.ep').count() === 8);
   check('درع الحرق يموّه ملخصات غير المشاهَد', await page.locator('.ep .ov.blur').count() > 0);
   check('تقييم الحلقات ظاهر على صورها مع متوسط الموسم', await page.locator('.ep .eprate').count() >= 6 && (await page.textContent('.season-bar')).includes('متوسط تقييم الموسم'));
@@ -72,7 +76,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await tap('.dock-index'); await page.waitForSelector('.tile');
   check('الفهرس يعرض 19 عالماً في مجموعتين', await page.locator('.tile').count() === 19 && await page.locator('.idx h3').count() === 2);
   await page.waitForTimeout(600);
-  if (!mobile) check('البطاقة المنبثقة في وسط الشاشة', await page.evaluate(() => { const r = document.querySelector('#sheet').getBoundingClientRect(); return Math.abs((r.left + r.right) / 2 - innerWidth / 2) < 4 && Math.abs((r.top + r.bottom) / 2 - innerHeight / 2) < 4; }));
+  if (!phone) check('البطاقة المنبثقة في وسط الشاشة', await page.evaluate(() => { const r = document.querySelector('#sheet').getBoundingClientRect(); return Math.abs((r.left + r.right) / 2 - innerWidth / 2) < 4 && Math.abs((r.top + r.bottom) / 2 - innerHeight / 2) < 4; }));
   await overflow('الفهرس'); await snap('8-index');
   await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });
   // البطاقة ← الخط الزمني ← البطاقة
@@ -96,7 +100,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.evaluate(() => document.querySelector('#unibar [data-uni=all]')?.click());
   await tap('.views [data-view=arrow]'); await page.waitForSelector('.step');
   check('ترتيب آروفيرس: 24 خطوة و6 تقاطعات، وفيه المسلسلان المستقلان بعد الأزمة', await page.locator('.step').count() === 24 && await page.locator('.step.cross').count() === 6 && await page.evaluate(() => { const steps = [...document.querySelectorAll('.step')], crisis = steps.findIndex(s => s.id === 'av-2019-x'), has = t => steps.findIndex(s => s.textContent.includes(t)); return has("DC's Stargirl") > crisis && has('Superman & Lois') > has("DC's Stargirl"); }));
-  await tap('#av-2014-a [data-act=avblock]'); check('تعليم مجموعة حلقات', (await page.textContent('#av-2014-a .row')).includes('شاهدت 7'));
+  await tap('#av-2014-a [data-act=avblock]'); check('تعليم مجموعة حلقات', (await page.textContent('#av-2014-a .row')).includes('شاهدت 7'), (await page.textContent('#av-2014-a .row')).slice(0, 90));
   await overflow('آروفيرس'); await page.locator('#av-2014-a').scrollIntoViewIfNeeded(); await snap('5-arrowverse');
   await page.locator('#av-2019-x').scrollIntoViewIfNeeded(); await snap('6-crossover');
   // الفهرس والبحث
@@ -109,9 +113,26 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('استيراد سجل النسخة القديمة', st['peacemaker-2022#1'] === 'watched' && st['peacemaker-2022#2'] === 'watching' && st['the-dark-knight-2008'] === 'watched' && st['the-flash-2014'] === 'list');
   await page.reload(); await page.waitForSelector('.card');
   check('السجل محفوظ بعد إعادة التحميل', await page.getAttribute('#c-nolan-the-dark-knight-2008 [data-s=watched]', 'aria-pressed') === 'true');
+  // السلاسة: الأفعال المتكررة تغيّر العنصر في مكانه ولا تعيد بناء الصفحة
+  await page.evaluate(() => { window.__main = 0; new MutationObserver(m => { for (const x of m) if (x.target.id === 'main') window.__main++; }).observe(document.querySelector('#main'), { childList: true }); });
+  await tap('#c-nolan-the-dark-knight-rises-2012 [data-s=watched]');
+  check('تغيير الحالة لا يعيد بناء الصفحة', await page.evaluate(() => window.__main) === 0 && await page.getAttribute('#c-nolan-the-dark-knight-rises-2012 [data-s=watched]', 'aria-pressed') === 'true');
+  await tap('#c-dcu-peacemaker-2022-s1 [data-act=open]'); await page.waitForSelector('.ep:not(.skel)'); await page.waitForTimeout(450);
+  const h0 = await page.evaluate(() => document.querySelector('#sheet').getBoundingClientRect().height);
+  await page.locator('.ep [data-act=ep]').nth(2).evaluate(b => b.click()); await page.waitForTimeout(150);
+  check('تعليم حلقة لا يعيد رسم القائمة ولا يغيّر ارتفاع النافذة', await page.evaluate(() => window.__main) === 0 && Math.abs(h0 - await page.evaluate(() => document.querySelector('#sheet').getBoundingClientRect().height)) < 1 && await page.locator('.ep.done').count() >= 1);
+  await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });
+  check('البطاقة تعكس تقدم الحلقات بلا إعادة بناء', await page.evaluate(() => window.__main) === 0 && /الحلقات: [1-9]/.test(await page.textContent('#c-dcu-peacemaker-2022-s1 .epprog')));
+  if (phone) { const box = await page.locator('.sheet-head h2').boundingBox().catch(() => null);
+    await tap('#c-nolan-the-dark-knight-2008 .poster'); await page.waitForSelector('#sheet:not([hidden])'); await page.waitForTimeout(450);
+    const r = await page.evaluate(() => { const b = document.querySelector('.sheet-head').getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + 14 }; });
+    await page.evaluate(({ x, y }) => { const h = document.querySelector('.sheet-head'), ev = (t, dy, ts) => h.dispatchEvent(new PointerEvent(t, { clientX: x, clientY: y + dy, pointerId: 7, bubbles: true }));
+      h.setPointerCapture = () => {}; ev('pointerdown', 0); ev('pointermove', 80); ev('pointermove', 190); ev('pointerup', 190); }, r);
+    await page.waitForSelector('#sheet', { state: 'hidden' }); check('سحب رأس النافذة للأسفل يغلقها', await page.isHidden('#backdrop')); }
+  check('كل البطاقات الظاهرة مرئية بعد الدخول', await page.evaluate(() => [...document.querySelectorAll('#main .card')].filter(c => { const r = c.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }).every(c => getComputedStyle(c).opacity === '1')));
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3).join(' | '));
   await ctx.close();
 }
 await browser.close(); server.close();
-console.log(fails.length ? `\n❌ فشل ${fails.length}: ${fails.join(' ؛ ')}` : '\n✅ كل الفحوص نجحت على المقاسين');
+console.log(fails.length ? `\n❌ فشل ${fails.length}: ${fails.join(' ؛ ')}` : '\n✅ كل الفحوص نجحت على كل المقاسات');
 process.exit(fails.length ? 1 : 0);

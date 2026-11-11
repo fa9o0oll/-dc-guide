@@ -9,6 +9,9 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const TYPE = { 'film|live': 'فيلم واقعي', 'film|animation': 'فيلم أنميشن', 'series|live': 'مسلسل واقعي', 'series|animation': 'مسلسل أنميشن' };
 const STATUS = { watched: '✓ شاهدته', watching: '▶ أشاهده', list: '+ قائمتي', skip: '✕ تجاوز' };
 const LEGACY_STATUS = { watched: 'watched', watching: 'watching', watchlist: 'list', skipped: 'skip' };
+const reduce = matchMedia('(prefers-reduced-motion: reduce)'), phone = matchMedia('(max-width:560px)');
+const root = document.documentElement;
+root.classList.toggle('anim', !reduce.matches);
 const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 
 // ---------- التخزين (مفتاح واحد ثابت؛ أي تغيير مستقبلي يكون بترقية v داخل البيانات لا بتغيير المفتاح)
@@ -70,8 +73,8 @@ function nextBlock(w, cls = '') {
 const nextTag = w => { const k = nextInfo(w)?.kind; return k === 'episode' ? '<span class="tag soon">يُعرض الآن</span>' : k === 'season' || k === 'announced' ? '<span class="tag soon">موسم قادم</span>' : ''; };
 const verdict = r => r == null ? null : r >= 7.5 ? ['ممتاز', '#35d07f'] : r >= 6.8 ? ['جيد', '#57abff'] : r >= 6 ? ['متوسط', '#f2b84b'] : ['ضعيف', '#ef5d57'];
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); }
-const posterTag = (w, size = 'w342') => w.poster
-  ? `<img loading="lazy" decoding="async" src="${img(w.poster, size)}" ${size === 'w342' ? `srcset="${img(w.poster, 'w342')} 1x, ${img(w.poster, 'w500')} 2x"` : ''} alt="بوستر ${esc(w.title)}">`
+const posterTag = w => w.poster
+  ? `<img loading="lazy" decoding="async" src="${img(w.poster, 'w342')}" srcset="${img(w.poster, 'w185')} 185w, ${img(w.poster, 'w342')} 342w, ${img(w.poster, 'w500')} 500w" sizes="128px" alt="بوستر ${esc(w.title)}">`
   : `<span class="ph">${esc(w.title)}</span>`;
 
 function stats() {
@@ -118,7 +121,7 @@ function sections() {
 function uniHead(u, all) {
   const rel = all.filter(p => !isSoon(D.works.get(p.work))), done = rel.filter(p => statusOf(p) === 'watched').length;
   const t = THEMES[u.id], key = D.works.get(t.key);
-  return `<header class="opener m-${t.motif}">${key?.backdrop ? `<div class="opener-img" style="background-image:url('${img(key.backdrop, 'w1280')}')"></div>` : ''}<div class="motif"></div>
+  return `<header class="opener m-${t.motif}">${key?.backdrop ? `<img class="opener-img" loading="lazy" decoding="async" src="${img(key.backdrop, 'w780')}" srcset="${img(key.backdrop, 'w780')} 780w, ${img(key.backdrop, 'w1280')} 1280w" sizes="(max-width:560px) 60vw, 100vw" alt="">` : ''}<div class="motif"></div>
     <h2>${esc(u.name)}</h2>
     <p class="en">${ltr(u.nameEn)}</p>
     <p class="desc">${esc(u.description)}</p>
@@ -147,7 +150,7 @@ function card(p) {
     ${p.canon ? `<div class="canon wide">يظهر في عالمين: ${esc(p.canon.note)} <a href="${esc(p.canon.source)}" target="_blank" rel="noopener">المصدر</a></div>` : ''}
     ${p.spoiler ? (store.shield ? `<details class="vault wide"><summary>معلومة ارتباط فيها حرق. اضغط للكشف</summary><p>${esc(p.spoiler)}</p></details>` : `<p class="note wide">${esc(p.spoiler)}</p>`) : ''}
     ${rateBlock(w)}
-    ${tot ? `<div class="wide"><span class="lbl">الحلقات: ${dn} من ${tot}</span><div class="bar"><i style="width:${Math.round(dn / tot * 100)}%"></i></div></div>` : ''}
+    ${tot ? `<div class="wide epprog"><span class="lbl">الحلقات: ${dn} من ${tot}</span><div class="bar"><i style="width:${Math.round(dn / tot * 100)}%"></i></div></div>` : ''}
     ${soon ? '' : `<div class="status wide">${Object.entries(STATUS).map(([k, l]) => `<button data-act="status" data-s="${k}" aria-pressed="${st === k}">${l}</button>`).join('')}</div>`}
     <div class="actions wide"><button data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''}>${w.seasons?.length ? 'المواسم والحلقات' : 'التفاصيل'}</button>
       <button data-act="goto" data-to="t" data-target="${domId('t', p)}" data-uni="${p.universe}">موقعه في الخط الزمني</button></div>
@@ -180,6 +183,19 @@ function renderTimeline() {
   $('#main').innerHTML = secs.length ? secs.map(({ u, all, list }) => `<section class="uni" id="u-${u.id}" data-uni="${u.id}" style="${themeVars(u.id)}">${uniHead(u, all)}${tlNote(u)}<div class="tl">${list.map(node).join('')}</div></section>`).join('')
     : '<p class="empty">لا توجد أعمال تطابق البحث أو التصفية الحالية.</p>';
 }
+// تغيير الحالة أو تعليم حلقة يحدّث العناصر المعنية في مكانها: لا إعادة رسم للصفحة ولا إعادة تحميل للصور
+function syncStatus(k) {
+  const st = store.works[k] || '';
+  for (const el of $$('#main [data-k]')) { if (el.dataset.k !== k) continue;
+    if (el.classList.contains('node')) { const on = st === 'watched', sb = $('[data-act=status]', el); el.classList.toggle('done', on); if (sb) { sb.setAttribute('aria-pressed', on); sb.textContent = on ? '✓ شاهدته' : 'علّمه مشاهَد'; } }
+    else $$('.status button', el).forEach(x => x.setAttribute('aria-pressed', x.dataset.s === st)); }
+}
+function syncEps(id) {
+  const w = D.works.get(id);
+  for (const el of $$('#main .card')) { const [wid, sn] = el.dataset.k.split('#'); if (wid !== id) continue;
+    const s = sn ? +sn : undefined, tot = seasonTotal(w, s), dn = seasonDone(id, s), box = $('.epprog', el); if (!box || !tot) continue;
+    $('.lbl', box).textContent = `الحلقات: ${dn} من ${tot}`; $('.bar i', box).style.width = Math.round(dn / tot * 100) + '%'; }
+}
 function refreshProgress() {
   for (const sec of $$('section.uni[id]')) { const rel = D.placements.filter(p => p.universe === sec.dataset.uni && !isSoon(D.works.get(p.work))), done = rel.filter(p => statusOf(p) === 'watched').length;
     const li = $('.prog', sec), bar = $('.opener .bar i', sec); if (li) li.textContent = `شاهدت ${done} من ${rel.length}`; if (bar) bar.style.width = (rel.length ? Math.round(done / rel.length * 100) : 0) + '%'; }
@@ -187,9 +203,13 @@ function refreshProgress() {
 
 // ---------- ترتيب آروفيرس
 const rangeDone = b => { let n = 0; for (let e = b.from; e <= b.to; e++) n += epDone(b.work, b.season, e); return n; };
+const avDone = () => D.arrow.steps.reduce((n, s) => n + (s.blocks || []).reduce((m, b) => m + rangeDone(b), 0) + (s.parts || []).filter(p => epDone(p.work, p.season, p.episode)).length, 0);
+function avRefresh(stepEl) { // يعيد رسم خطوة واحدة ويحدّث عدّاد التقدم
+  const a = D.arrow, st = a.steps.find(x => x.id === stepEl.id); if (st) stepEl.outerHTML = stepHTML(st, true);
+  const done = avDone(), lbl = $('#avLbl'), bar = $('#avBar'); if (lbl) lbl.textContent = `تقدّمك: ${done} من ${a.totalEpisodes} حلقة`; if (bar) bar.style.width = Math.round(done / a.totalEpisodes * 100) + '%';
+}
 function renderArrow() {
-  const a = D.arrow;
-  const done = a.steps.reduce((n, s) => n + (s.blocks || []).reduce((m, b) => m + rangeDone(b), 0) + (s.parts || []).filter(p => epDone(p.work, p.season, p.episode)).length, 0);
+  const a = D.arrow, done = avDone();
   $('#main').innerHTML = `<section class="uni" data-uni="arrow" style="${themeVars('arrow')}">
     <div class="av-intro"><h2>ترتيب مشاهدة ${ltr('Arrowverse')}</h2>
       <ul><li>${a.steps.length} خطوة تغطي ${a.totalEpisodes} حلقة من ${a.showCount} مسلسلات. كل حلقة موجودة مرة واحدة فقط.</li>
@@ -197,28 +217,42 @@ function renderArrow() {
       <li>الخطوات البرتقالية حلقات تقاطع: قصة واحدة موزعة على أكثر من مسلسل، وتُشاهد بترتيب الأجزاء.</li>
       <li>الترتيب مبني على تواريخ العرض الفعلية وعناوين الحلقات الرسمية.</li>
       <li>${a.sideShows.map(x => `${ltr(x.show)} يبدأ في الخطوة ${x.firstStep}`).join('، و')}. يدوران في أرضين مستقلتين عن أرض بقية المسلسلات، ومكانهما في الخطوات حسب تاريخ عرضهما. ${a.sideShows.map(x => `<a href="${esc(x.source)}" target="_blank" rel="noopener">مصدر ${ltr(x.show)}</a>`).join(' · ')}</li></ul>
-      <span class="lbl">تقدّمك: ${done} من ${a.totalEpisodes} حلقة</span><div class="bar"><i style="width:${Math.round(done / a.totalEpisodes * 100)}%"></i></div></div>
-    <div class="steps">${a.steps.map(s => s.kind === 'crossover' ? `<div class="step cross" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)} <span class="en">${ltr(s.titleEn)}</span></h3><span class="tag soon">${s.parts.filter(p => !p.tieIn).length} أجزاء بالترتيب</span><span class="meta">${esc(s.label)}</span></div>
+      <span class="lbl" id="avLbl">تقدّمك: ${done} من ${a.totalEpisodes} حلقة</span><div class="bar"><i id="avBar" style="width:${Math.round(done / a.totalEpisodes * 100)}%"></i></div></div>
+    <div class="steps">${a.steps.map(s => stepHTML(s)).join('')}</div>
+  </section>`;
+}
+const stepHTML = (s, shown) => s.kind === 'crossover' ? `<div class="step cross${shown ? ' shown' : ''}" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)} <span class="en">${ltr(s.titleEn)}</span></h3><span class="tag soon">${s.parts.filter(p => !p.tieIn).length} أجزاء بالترتيب</span><span class="meta">${esc(s.label)}</span></div>
         ${s.parts.map(p => { const d = epDone(p.work, p.season, p.episode); return `<div class="row ${d ? 'done' : ''} ${p.tieIn ? 'tie' : ''}" style="--show:${SHOW_COLORS[p.work]}"><span class="k">${p.tieIn ? '＋' : p.part}</span>
           <span class="show">${ltr(p.show)}<span class="epname">${ltr(p.name || '')}</span></span>
           <span class="what">${p.tieIn ? 'حلقة مرتبطة' : `الجزء ${p.part}`}: الموسم ${p.season}، الحلقة ${p.episode}<small>${fmtDate(p.aired)}</small></span>
           <span class="btns"><button data-act="avpart" data-id="${p.work}" data-season="${p.season}" data-ep="${p.episode}">${d ? '✓ شاهدتها' : 'علّمها مشاهدة'}</button><button data-act="open" data-id="${p.work}" data-season="${p.season}">افتح الموسم</button></span>
           ${p.note ? `<span class="link">${esc(p.note)}</span>` : ''}</div>`; }).join('')}</div>`
-      : `<div class="step" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)}</h3>${s.title !== s.label ? `<span class="meta">${esc(s.label)}</span>` : ''}</div>
+      : `<div class="step${shown ? ' shown' : ''}" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)}</h3>${s.title !== s.label ? `<span class="meta">${esc(s.label)}</span>` : ''}</div>
         ${s.blocks.map((b, i) => { const dn = rangeDone(b), full = dn === b.count; return `<div class="row ${full ? 'done' : ''}" style="--show:${SHOW_COLORS[b.work]}"><span class="k">${i + 1}</span>
           <span class="show">${ltr(b.show)}</span>
           <span class="what">الموسم ${b.season}: ${b.whole ? 'كامل' : `من الحلقة ${b.from} إلى الحلقة ${b.to}`}<small>${b.count} حلقة · شاهدت ${dn}${b.side ? ' · أرض مستقلة: لا يتقاطع مع المسلسلات الأخرى' : ''}</small></span>
           <span class="btns"><button data-act="avblock" data-id="${b.work}" data-season="${b.season}" data-from="${b.from}" data-to="${b.to}">${full ? '✓ مكتملة' : 'علّمها مشاهدة'}</button><button data-act="open" data-id="${b.work}" data-season="${b.season}">الحلقات</button></span>
-          ${b.links.map(l => `<span class="link">الحلقة ${l.episode}${l.toEpisode ? ' إلى ' + l.toEpisode : ''}: ${esc(l.note)}</span>`).join('')}</div>`; }).join('')}</div>`).join('')}</div>
-  </section>`;
-}
+          ${b.links.map(l => `<span class="link">الحلقة ${l.episode}${l.toEpisode ? ' إلى ' + l.toEpisode : ''}: ${esc(l.note)}</span>`).join('')}</div>`; }).join('')}</div>`;
+
 
 function render(keepScroll) {
   const y = scrollY;
   ({ cards: renderCards, timeline: renderTimeline, arrow: renderArrow })[ui.view]();
-  syncNav(); stats(); watchTheme();
+  syncNav(); stats(); watchTheme(); reveal(keepScroll);
   if (keepScroll) scrollTo(0, y);
 }
+// دخول العناصر: كل عنصر يظهر مرة واحدة حين يصل الشاشة (حركة transform/opacity فقط، ثم تُرفع عنه)
+let rio;
+function reveal(still) {
+  rio?.disconnect();
+  const els = $$('#main :is(.card,.node,.step,.opener)');
+  if (still || reduce.matches) { els.forEach(e => e.classList.add('shown')); return; }
+  rio = new IntersectionObserver(es => { let i = 0; for (const e of es) if (e.isIntersecting) { const t = e.target;
+    t.style.setProperty('--d', Math.min(i++, 5) * 45 + 'ms'); t.classList.add('shown', 'enter'); rio.unobserve(t); } }, { rootMargin: '0px 0px -4% 0px' });
+  els.forEach(e => rio.observe(e));
+}
+const flash = el => { el.classList.add('shown', 'flash'); setTimeout(() => el.classList.remove('flash'), 1700);
+  if (!reduce.matches) { const c = getComputedStyle(el).getPropertyValue('--c1'); el.animate([{ boxShadow: `0 0 0 3px ${c}` }, { boxShadow: `0 0 0 3px ${c}`, offset: .55 }, { boxShadow: '0 0 0 0 transparent' }], { duration: 1700, easing: 'ease-out' }); } };
 // طبقة الجو: مشهدان يتبادلان التلاشي؛ العالم الظاهر وسط الشاشة هو الذي يحدد المشهد والألوان
 let io, sceneI = 0, sceneUni = '';
 function setScene(id) {
@@ -243,41 +277,64 @@ function goTo(view, uni, targetId) {
   $('#q').value = ''; $('#fType').value = ''; $('#fStatus').value = '';
   render();
   const t = targetId && document.getElementById(targetId);
-  if (t) { t.scrollIntoView({ block: 'center', behavior: 'instant' }); t.classList.add('flash'); setTimeout(() => t.classList.remove('flash'), 1700); }
+  if (t) { t.scrollIntoView({ block: 'center', behavior: 'instant' }); flash(t); }
   else scrollTo(0, 0);
 }
 
-// ---------- البطاقة المنبثقة. مع متصفح يدعم View Transitions ينتقل البوستر المضغوط من مكانه إلى داخل البطاقة.
+// ---------- البطاقة المنبثقة. الحركة كلها transform/opacity على طبقتها الخاصة: لا لقطة للصفحة ولا إعادة رسم لما خلفها.
+let closing = null;
+const EASE = 'cubic-bezier(.2,.85,.25,1)';
 function openSheet(title, html, tag, o = {}) {
-  const sh = $('#sheet'), was = ui.sheet, src = o.from;
-  const paint = vt => { $('#sheetTitle').innerHTML = title; $('#sheetBody').innerHTML = html; $('#sheetBody').scrollTop = 0;
-    sh.className = 'sheet' + (o.wide ? ' wide' : '') + (vt ? '' : ' no-vt'); sh.style.cssText = o.uni && THEMES[o.uni] ? themeVars(o.uni) : '';
-    sh.hidden = false; $('#backdrop').hidden = false; document.body.style.overflow = 'hidden'; };
+  const sh = $('#sheet'), bd = $('#backdrop'), was = ui.sheet;
+  if (closing) { closing.forEach(a => a.cancel()); closing = null; }
+  $('#sheetTitle').innerHTML = title; $('#sheetBody').innerHTML = html; $('#sheetBody').scrollTop = 0;
+  sh.className = 'sheet' + (o.wide ? ' wide' : '') + (o.tall ? ' tall' : ''); sh.style.cssText = o.uni && THEMES[o.uni] ? themeVars(o.uni) : '';
+  sh.hidden = false; bd.hidden = false; root.classList.add('sheet-open');
   if (!was) history.pushState({ sheet: 1 }, '');
   ui.sheet = tag || 'x';
-  if (was || !document.startViewTransition || document.visibilityState !== 'visible' || matchMedia('(prefers-reduced-motion: reduce)').matches) { paint(false); $('#sheet .close').focus(); return Promise.resolve(); }
-  // شبكة أمان: لو تأخر المتصفح في بدء الانتقال، تُرسم البطاقة مباشرة ولا تبقى معلّقة
-  let painted = false;
-  const once = vt => { if (painted) return false; painted = true; if (src) src.style.viewTransitionName = ''; paint(vt); return true; };
-  if (src) src.style.viewTransitionName = 'poster';
-  const late = new Promise(r => setTimeout(() => { once(false); r(); }, 450));
-  const vt = document.startViewTransition(() => { if (!once(true)) return; const dst = src && $('#sheet .dw-top .poster'); if (dst) dst.style.viewTransitionName = 'poster'; });
-  vt.ready.catch(() => {});
-  vt.finished.catch(() => {}).finally(() => { const dst = $('#sheet .dw-top .poster'); if (dst) dst.style.viewTransitionName = ''; });
-  return Promise.race([vt.updateCallbackDone.catch(() => {}), late]).then(() => $('#sheet .close')?.focus());
+  if (!was && !reduce.matches) {
+    // موضعا البوستر يُقاسان قبل بدء الحركة، ثم يطير البوستر من البطاقة إلى مكانه في النافذة
+    const src = o.from, dst = src && $('.dw-top .poster', sh), a = src?.getBoundingClientRect(), b = dst?.getBoundingClientRect();
+    bd.animate({ opacity: [0, 1] }, { duration: 220, easing: 'ease-out' });
+    sh.animate(phone.matches ? { transform: ['translateY(100%)', 'none'] } : { transform: ['translateY(20px) scale(.96)', 'none'], opacity: [0, 1] }, { duration: phone.matches ? 360 : 280, easing: EASE });
+    if (dst && a.width && a.bottom > 0 && a.top < innerHeight) {
+      const g = Object.assign(document.createElement('img'), { src: src.currentSrc || src.src, className: 'ghost', alt: '' });
+      g.style.cssText = `left:${b.left}px;top:${b.top}px;width:${b.width}px;height:${b.height}px;--c1:${getComputedStyle(sh).getPropertyValue('--c1')}`;
+      document.body.append(g); dst.style.visibility = 'hidden';
+      g.animate({ transform: [`translate(${a.left - b.left}px,${a.top - b.top}px) scale(${a.width / b.width},${a.height / b.height})`, 'none'] }, { duration: 400, easing: 'cubic-bezier(.2,.8,.2,1)' })
+        .finished.catch(() => {}).finally(() => { dst.style.visibility = ''; g.remove(); });
+    }
+  }
+  $('#sheet .close').focus({ preventScroll: true });
 }
 function closeSheet(fromPop) {
   if (!ui.sheet) return;
-  ui.sheet = null; $('#sheet').hidden = true; $('#backdrop').hidden = true; document.body.style.overflow = '';
-  if (!fromPop && history.state?.sheet) history.back();
+  ui.sheet = null;
+  const sh = $('#sheet'), bd = $('#backdrop'), cur = sh.style.transform || 'none';
+  const done = () => { sh.hidden = true; bd.hidden = true; sh.style.transform = ''; root.classList.remove('sheet-open'); $$('.ghost').forEach(g => g.remove());
+    if (ui.dirty) { ui.dirty = false; if (ui.view === 'arrow') render(true); } };
+  if (reduce.matches) done();
+  else { const mine = closing = [bd.animate({ opacity: [1, 0] }, { duration: 190, easing: 'ease-in', fill: 'forwards' }),
+      sh.animate(phone.matches ? { transform: [cur, 'translateY(100%)'] } : { transform: ['none', 'translateY(14px) scale(.97)'], opacity: [1, 0] }, { duration: 190, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' })];
+    mine[1].finished.then(() => { if (closing !== mine) return; closing = null; done(); mine.forEach(a => a.cancel()); }, () => {}); }
+  if (!fromPop && history.state?.sheet) { ui.skipPop = true; history.back(); }
 }
-addEventListener('popstate', () => { if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return; } closeSheet(true); });
+addEventListener('popstate', () => { if (ui.skipPop) { ui.skipPop = false; return; } if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return; } closeSheet(true); });
+// الجوال: سحب رأس النافذة للأسفل يغلقها، والنافذة تتبع الإصبع
+{ const sh = $('#sheet'), head = $('.sheet-head'); let drag = null;
+  head.addEventListener('pointerdown', e => { if (!phone.matches || e.target.closest('button') || closing) return; drag = { y: e.clientY, t: e.timeStamp, dy: 0 }; head.setPointerCapture(e.pointerId); });
+  head.addEventListener('pointermove', e => { if (!drag) return; drag.dy = Math.max(0, e.clientY - drag.y); sh.style.transform = `translateY(${drag.dy}px)`; });
+  const end = e => { if (!drag) return; const d = drag, v = d.dy / Math.max(1, e.timeStamp - d.t); drag = null;
+    if (d.dy > 110 || (d.dy > 28 && v > .55)) return closeSheet();
+    sh.style.transform = ''; if (d.dy && !reduce.matches) sh.animate({ transform: [`translateY(${d.dy}px)`, 'none'] }, { duration: 240, easing: EASE }); };
+  head.addEventListener('pointerup', end); head.addEventListener('pointercancel', end); }
 
-async function openWork(id, season, from) {
+function openWork(id, season, from) {
   const w = D.works.get(id), soon = isSoon(w);
   const places = D.placements.filter(p => p.work === id);
   const uni = from?.closest('section.uni')?.dataset.uni || (places.find(p => p.universe === ui.uni) || places[0]).universe;
-  await openSheet(ltr(w.title), `<div class="hero" ${w.backdrop ? `style="background-image:url('${img(w.backdrop, 'w780')}')"` : ''}></div>
+  const series = w.kind === 'series' && w.episodeCount;
+  openSheet(ltr(w.title), `<div class="hero">${w.backdrop ? `<img decoding="async" src="${img(w.backdrop, 'w780')}" alt="">` : ''}</div>
     <div class="dw"><div class="dw-top"><button class="poster" data-act="light" data-src="${img(w.poster, 'w780')}" aria-label="تكبير البوستر">${posterTag(w)}</button>
       <div><h3>${ltr(w.title)}</h3>
       <div class="meta">${esc([TYPE[w.kind + '|' + w.medium], w.date ? fmtDate(w.date) : w.year, w.runtime ? w.runtime + ' دقيقة' : '', w.episodeCount ? `${w.seasons.length} مواسم · ${w.episodeCount} حلقة` : ''].filter(Boolean).join(' · '))}</div>
@@ -286,8 +343,8 @@ async function openWork(id, season, from) {
     <div class="actions">${places.map(p => `<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">البطاقة في ${esc(uniOf(p.universe).name)}${p.season ? `، الموسم ${p.season}` : ''}</button>`).join('')}</div>
     ${rateBlock(w)}
     ${nextBlock(w)}
-    ${w.kind === 'series' && w.episodeCount ? `<div class="seasons" id="seasonTabs">${w.seasons.map(s => `<button data-act="season" data-id="${id}" data-season="${s.n}">الموسم ${s.n}</button>`).join('')}</div><div id="eps" class="dw" style="padding:0"><p class="empty">جارٍ تحميل الحلقات…</p></div>` : ''}</div>`, 'work', { uni, from: from?.querySelector('img') });
-  if (w.kind === 'series' && w.episodeCount) showSeason(id, w.seasons.some(s => s.n === season) ? season : w.seasons[0].n);
+    ${series ? `<div class="seasons" id="seasonTabs">${w.seasons.map(s => `<button data-act="season" data-id="${id}" data-season="${s.n}">الموسم ${s.n}</button>`).join('')}</div><div id="eps" class="dw" style="padding:0" aria-busy="true">${'<div class="ep skel"><span class="epthumb"><span class="ph"></span></span><div><i></i><i></i></div></div>'.repeat(4)}</div>` : ''}</div>`, 'work', { uni, tall: series, from: from?.querySelector('img') });
+  if (series) showSeason(id, w.seasons.some(s => s.n === season) ? season : w.seasons[0].n);
 }
 async function showSeason(id, n) {
   $$('#seasonTabs button').forEach(b => b.classList.toggle('on', +b.dataset.season === n));
@@ -296,13 +353,14 @@ async function showSeason(id, n) {
   try { if (!D.episodes.has(id)) D.episodes.set(id, await getJSON(`data/episodes/${id}.json`)); }
   catch { box.innerHTML = '<p class="empty">تعذّر تحميل الحلقات. تحقق من الاتصال وحاول مرة ثانية.</p>'; return; }
   const s = D.episodes.get(id).seasons.find(x => x.n === n); if (!s || !box.isConnected) return;
+  box.removeAttribute('aria-busy');
   const all = s.episodes.every(e => epDone(id, n, e.n));
   const rated = s.episodes.filter(e => e.rating != null && (e.votes ?? 5) >= 5), avg = rated.length ? Math.round(rated.reduce((x, e) => x + e.rating, 0) / rated.length * 10) / 10 : null;
   box.innerHTML = `<div class="season-bar"><span class="lbl">${avg != null ? `متوسط تقييم الموسم ${avg} من 10 (${rated.length} حلقة مقيّمة على ${ltr('TMDB')})` : 'لا يوجد تقييم كافٍ لحلقات هذا الموسم بعد'}</span>
       <button data-act="seasonall" data-id="${id}" data-season="${n}">${all ? 'إلغاء تعليم الموسم' : 'علّم الموسم كاملاً كمشاهد'}</button></div>` +
     s.episodes.map(e => { const d = epDone(id, n, e.n), fut = !e.date || e.date > TODAY, ov = e.overviewAr || e.overviewEn, few = (e.votes ?? 5) < 5;
       const when = fut ? (e.date ? `تُعرض بعد ${daysTo(e.date)} يوماً، ${fmtDate(e.date)}` : 'لم يُحدَّد موعد عرضها') : fmtDate(e.date);
-      return `<div class="ep ${d ? 'done' : ''} ${fut ? 'future' : ''}"><span class="epthumb">${e.still ? `<img loading="lazy" src="${img(e.still, 'w300')}" alt="">` : '<span class="ph"></span>'}
+      return `<div class="ep ${d ? 'done' : ''} ${fut ? 'future' : ''}"><span class="epthumb">${e.still ? `<img loading="lazy" decoding="async" src="${img(e.still, 'w300')}" alt="">` : '<span class="ph"></span>'}
           ${e.rating != null && !fut ? `<span class="eprate ${few ? 'low' : ''}" title="${few ? 'عدد الأصوات قليل' : 'تقييم TMDB'}">${e.rating.toFixed(1)}</span>` : ''}</span>
         <div><h4>الحلقة ${e.n}${e.name ? ltr(e.name) : ''}</h4>${e.nameAr ? `<div class="ar-title">${esc(e.nameAr)}</div>` : ''}
           <div class="meta">${esc([when, e.runtime ? e.runtime + ' د' : '', fut ? '' : e.rating == null ? 'بلا تقييم بعد' : few ? 'تقييم بأصوات قليلة' : ''].filter(Boolean).join(' · '))}</div></div>
@@ -311,15 +369,16 @@ async function showSeason(id, n) {
           ${store.shield && !d ? '<span class="lbl">الملخص مخفي لتفادي الحرق. اضغط عليه للكشف</span>' : ''}</div>` : ''}
         <div class="foot2"><span></span>${fut ? '' : `<button data-act="ep" data-id="${id}" data-season="${n}" data-ep="${e.n}">${d ? '✓ شاهدتها' : 'علّمها مشاهدة'}</button>`}</div></div>`; }).join('');
 }
+const unblur = ov => { ov.classList.remove('blur'); ov.removeAttribute('data-act'); ov.removeAttribute('title'); ov.nextElementSibling?.remove(); };
 function setEp(id, s, e, on) { const o = store.eps[id] ||= {}; if (on) o[`${s}-${e}`] = 1; else delete o[`${s}-${e}`]; if (!Object.keys(o).length) delete store.eps[id]; }
 
 // ---------- الفهرس، السجل، الدليل
-async function openJump() {
+function openJump() {
   const tile = u => { const t = THEMES[u.id], key = D.works.get(t.key), all = D.placements.filter(p => p.universe === u.id), rel = all.filter(p => !isSoon(D.works.get(p.work))), done = rel.filter(p => statusOf(p) === 'watched').length;
     return `<button class="tile m-${t.motif} ${ui.uni === u.id ? 'on' : ''}" data-act="uni" data-uni="${u.id}" style="${themeVars(u.id)}">${key?.backdrop ? `<img loading="lazy" src="${img(key.backdrop, 'w780')}" alt="">` : ''}<span class="motif"></span>
       <span class="tile-text"><span class="tile-name">${esc(u.name)}</span><span class="tile-en">${ltr(u.nameEn)}</span><span class="tile-meta">عدد الأعمال ${all.length} · شاهدت ${done}</span><span class="bar"><i style="width:${rel.length ? Math.round(done / rel.length * 100) : 0}%"></i></span></span></button>`; };
   const group = (title, list) => list.length ? `<h3>${title}</h3><div class="tiles">${list.map(tile).join('')}</div>` : '';
-  await openSheet('الفهرس', `<div class="idx"><input id="jq" type="search" placeholder="ابحث عن عمل أو عالم…" aria-label="بحث في الفهرس">
+  openSheet('الفهرس', `<div class="idx"><input id="jq" type="search" placeholder="ابحث عن عمل أو عالم…" aria-label="بحث في الفهرس">
     <div class="idx-row">${[['cards', 'البطاقات'], ['timeline', 'الخط الزمني'], ['arrow', 'ترتيب آروفيرس']].map(([v, l]) => `<button data-act="view" data-view="${v}" class="${ui.view === v ? 'on' : ''}">${l}</button>`).join('')}
       <button data-act="uni" data-uni="all" class="${ui.uni === 'all' && ui.view !== 'arrow' ? 'on' : ''}">كل العوالم</button></div>
     <div id="jres"></div><div id="jhome"></div>
@@ -379,18 +438,19 @@ document.addEventListener('click', ev => {
     case 'season': showSeason(id, season); break;
     case 'close': closeSheet(); break;
     case 'shield': if (ui.sheet) closeSheet(); store.shield = !store.shield; save(); syncShield(); render(true); toast(store.shield ? 'درع الحرق مفعّل' : 'درع الحرق متوقف'); break;
-    case 'status': { const host = b.closest('[data-k]'), k = host.dataset.k; if (store.works[k] === d.s) delete store.works[k]; else store.works[k] = d.s; save();
-      if (!host.classList.contains('node')) { render(true); break; }
-      const on = store.works[k] === 'watched'; // في الخط الزمني يتغيّر العنصر في مكانه حتى يظهر الانتقال
-      for (const n of $$('.node')) if (n.dataset.k === k) { n.classList.toggle('done', on); const sb = $('[data-act=status]', n); sb.setAttribute('aria-pressed', on); sb.textContent = on ? '✓ شاهدته' : 'علّمه مشاهَد'; }
-      stats(); refreshProgress(); break; }
+    case 'status': { const k = b.closest('[data-k]').dataset.k; if (store.works[k] === d.s) delete store.works[k]; else store.works[k] = d.s; save();
+      if ($('#fStatus').value) { render(true); break; } // مع تصفية الحالة قد يخرج العمل من القائمة نفسها
+      syncStatus(k); stats(); refreshProgress(); break; }
     case 'goto': { const force = d.force; if (ui.sheet) closeSheet(); if (force) ui.uni = d.uni; setTimeout(() => goTo(d.to === 't' ? 'timeline' : 'cards', d.uni, d.target), force ? 60 : 0); break; }
-    case 'ep': setEp(id, season, +d.ep, !epDone(id, season, +d.ep)); save(); showSeason(id, season); stats(); ui.dirty = true; break;
-    case 'seasonall': { const s = D.episodes.get(id).seasons.find(x => x.n === season), on = !s.episodes.every(e => epDone(id, season, e.n)); s.episodes.filter(e => e.date && e.date <= TODAY).forEach(e => setEp(id, season, e.n, on)); save(); showSeason(id, season); stats(); ui.dirty = true; break; }
-    case 'reveal': b.classList.remove('blur'); b.removeAttribute('data-act'); b.nextElementSibling?.remove(); break;
-    case 'avpart': setEp(id, season, +d.ep, !epDone(id, season, +d.ep)); save(); render(true); break;
-    case 'avblock': { let all = true; for (let e = +d.from; e <= +d.to; e++) all &&= epDone(id, season, e); for (let e = +d.from; e <= +d.to; e++) setEp(id, season, e, !all); save(); render(true); break; }
-    case 'avgo': { if (ui.sheet) closeSheet(); ui.view = 'arrow'; render(); const t = document.getElementById(d.step); if (t) { t.scrollIntoView({ block: 'start', behavior: 'instant' }); t.classList.add('flash'); setTimeout(() => t.classList.remove('flash'), 1700); } break; }
+    case 'ep': { const on = !epDone(id, season, +d.ep), row = b.closest('.ep'), ov = $('.ov.blur', row); setEp(id, season, +d.ep, on); save();
+      row.classList.toggle('done', on); b.textContent = on ? '✓ شاهدتها' : 'علّمها مشاهدة'; if (on && ov) unblur(ov);
+      const sa = $('#eps [data-act=seasonall]'), s = D.episodes.get(id).seasons.find(x => x.n === season); if (sa) sa.textContent = s.episodes.every(e => epDone(id, season, e.n)) ? 'إلغاء تعليم الموسم' : 'علّم الموسم كاملاً كمشاهد';
+      stats(); syncEps(id); ui.dirty = true; break; }
+    case 'seasonall': { const s = D.episodes.get(id).seasons.find(x => x.n === season), on = !s.episodes.every(e => epDone(id, season, e.n)); s.episodes.filter(e => e.date && e.date <= TODAY).forEach(e => setEp(id, season, e.n, on)); save(); showSeason(id, season); stats(); syncEps(id); ui.dirty = true; break; }
+    case 'reveal': unblur(b); break;
+    case 'avpart': setEp(id, season, +d.ep, !epDone(id, season, +d.ep)); save(); avRefresh(b.closest('.step')); stats(); break;
+    case 'avblock': { let all = true; for (let e = +d.from; e <= +d.to; e++) all &&= epDone(id, season, e); for (let e = +d.from; e <= +d.to; e++) setEp(id, season, e, !all); save(); avRefresh(b.closest('.step')); stats(); break; }
+    case 'avgo': { if (ui.sheet) closeSheet(); ui.view = 'arrow'; render(); const t = document.getElementById(d.step); if (t) { t.scrollIntoView({ block: 'start', behavior: 'instant' }); flash(t); } break; }
     case 'jump': openJump(); break;
     case 'backup': openBackup(); break;
     case 'bkcopy': navigator.clipboard?.writeText($('#bk').value).then(() => toast('تم النسخ'), () => { $('#bk').select(); toast('حدّد النص وانسخه يدوياً'); }); break;
@@ -401,14 +461,13 @@ document.addEventListener('click', ev => {
     case 'lightclose': history.back(); break;
   }
 });
-// إغلاق النافذة يعيد رسم الصفحة إذا تغيّر سجل الحلقات
-new MutationObserver(() => { if ($('#sheet').hidden && ui.dirty) { ui.dirty = false; render(true); } }).observe($('#sheet'), { attributes: true, attributeFilter: ['hidden'] });
 addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('#lightbox').hidden) history.back(); else closeSheet(); } });
 let qt; ['input', 'change'].forEach(t => $('#filters').addEventListener(t, () => { clearTimeout(qt); qt = setTimeout(() => render(), 150); }));
 // ميلان البوستر المكبَّر مع حركة المؤشر أو الإصبع
 $('#lightbox').addEventListener('pointermove', e => { const r = $('#lightImg').getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
   $('#lightImg').style.transform = `rotateY(${(x * 22).toFixed(1)}deg) rotateX(${(-y * 22).toFixed(1)}deg) scale(1.02)`; });
 $('#lightbox').addEventListener('pointerleave', () => $('#lightImg').style.transform = '');
+document.addEventListener('load', e => { if (e.target.tagName === 'IMG') e.target.classList.add('in'); }, true);
 document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && !t.dataset.failed) { t.dataset.failed = 1; t.style.visibility = 'hidden'; } }, true);
 
 boot();
