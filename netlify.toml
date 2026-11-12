@@ -15,3 +15,10 @@
   to = "https://daftar-fb.firebaseapp.com/__/auth/:splat"
   status = 200
   force = true
+
+# صفحة الدخول تطلب إعداد المشروع من /__/firebase/init.json على النطاق نفسه، فنمرّره أيضاً (بيانات عامة، لا أسرار)
+[[redirects]]
+  from = "/__/firebase/*"
+  to = "https://daftar-fb.firebaseapp.com/__/firebase/:splat"
+  status = 200
+  force = true
