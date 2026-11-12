@@ -31,10 +31,6 @@
    "note": "«Dumbo» بلا سنة: أُدرجت نسخة 2019 الحيّة. البديل فيلم الرسوم الأصلي (1941)."
   },
   {
-   "line": "Taxi Driver | 2021 | tv",
-   "note": "«taxi driver series»: فيلم Taxi Driver (1976) مدرج وحده وليس له سلسلة. أُدرج المسلسل الكوري Taxi Driver احتمالاً."
-  },
-  {
    "line": "The Mummy | 1999",
    "note": "«the mummy series»: أُدرجت سلسلة 1999 (بريندان فريزر)."
   },
@@ -53,13 +49,13 @@
  ],
  "seriesWithoutCollection": [],
  "counts": {
-  "lines": 484,
+  "lines": 483,
   "films": 593,
-  "tv": 7,
+  "tv": 6,
   "added": 0,
   "collections": 91,
-  "withProviders": 367,
-  "arabicOverviews": 545,
+  "withProviders": 366,
+  "arabicOverviews": 544,
   "ourArabic": 0,
   "noPoster": 4
  }
