@@ -1,4 +1,42 @@
 {
+ "28": {
+  "name": "28 Days Later",
+  "note": "بترتيب الصدور. 28 Weeks Later يكمل الأحداث بشخصيات جديدة. 28 Years Later بداية ثلاثية جديدة، وThe Bone Temple جزؤها الثاني. الجزء الثالث اعتُمد إنتاجه في ديسمبر 2025 ولا موعد له.",
+  "order": [
+   {
+    "m": 170,
+    "rec": "watch"
+   },
+   {
+    "m": 1562,
+    "rec": "optional",
+    "note": "شخصيات جديدة"
+   },
+   {
+    "m": 1100988,
+    "rec": "watch",
+    "note": "بداية الثلاثية الجديدة"
+   },
+   {
+    "m": 1272837,
+    "rec": "watch"
+   },
+   {
+    "m": 1273002,
+    "rec": "soon"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/28_Days_Later_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1565"
+   }
+  ]
+ },
  "hellboy": {
   "name": "Hellboy",
   "note": "فيلما غييرمو ديل تورو (2004 و2008) قصة واحدة متصلة وهما الأعلى تقييماً. نسختا 2019 و2024 محاولتان لإعادة تشغيل السلسلة من الصفر، كل واحدة منفصلة عن الأخرى وتقييمهما أضعف بوضوح.",
@@ -31,6 +69,10 @@
    {
     "name": "Hellboy Wiki",
     "url": "https://hellboy.fandom.com/wiki/Hellboy_(2019_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/17235"
    }
   ]
  },
@@ -76,6 +118,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/The_Mummy_(franchise)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1733"
    }
   ]
  },
@@ -124,6 +170,10 @@
    {
     "name": "Planet of the Apes Wiki",
     "url": "https://planetoftheapes.fandom.com/wiki/Kingdom_of_the_Planet_of_the_Apes"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/173710"
    }
   ]
  },
@@ -160,6 +210,10 @@
    {
     "name": "Marvel.com",
     "url": "https://www.marvel.com/movies/the-fantastic-four-first-steps"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/9744"
    }
   ]
  },
@@ -197,6 +251,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/House_Party_(2023_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/159600"
    }
   ]
  },
@@ -218,6 +276,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/The_Grinch_(film)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/How_the_Grinch_Stole_Christmas_(2000_film)"
    }
   ]
  },
@@ -239,6 +301,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Dumbo_(2019_film)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Dumbo_(1941_film)"
    }
   ]
  },
@@ -266,6 +332,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Pinocchio_(2022_live-action_film)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Guillermo_del_Toro%27s_Pinocchio"
    }
   ]
  },
@@ -382,6 +452,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Ash_vs_Evil_Dead"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1960"
    }
   ]
  },
@@ -436,6 +510,10 @@
    {
     "name": "Terminator Wiki",
     "url": "https://terminator.fandom.com/wiki/Terminator:_The_Sarah_Connor_Chronicles"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/528"
    }
   ]
  },
@@ -475,6 +553,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/The_Purge"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/256322"
    }
   ]
  },
@@ -517,6 +599,10 @@
    {
     "name": "Bourne Wiki",
     "url": "https://bourne.fandom.com/wiki/Treadstone_(TV_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/31562"
    }
   ]
  },
@@ -551,6 +637,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Has_Fallen_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/386534"
    }
   ]
  },
@@ -572,6 +662,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/The_Gentlemen_(2024_TV_series)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Gentlemen_(2019_film)"
    }
   ]
  },
@@ -598,6 +692,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Teenage_Mutant_Ninja_Turtles:_Mutant_Mayhem"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1156855"
    }
   ]
  },
@@ -653,6 +751,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Blade_Runner_2099"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/422837"
    }
   ]
  },
@@ -679,6 +781,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/12_Monkeys"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/12_Monkeys_(TV_series)"
    }
   ]
  },
@@ -712,6 +818,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Bates_Motel_(TV_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/119674"
    }
   ]
  },
@@ -733,6 +843,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Gomorrah_(TV_series)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Gomorrah_(film)"
    }
   ]
  },
@@ -766,6 +880,10 @@
    {
     "name": "Men in Black Wiki",
     "url": "https://meninblack.fandom.com/wiki/Men_in_Black:_The_Series"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/86055"
    }
   ]
  },
@@ -787,6 +905,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Doctor_Sleep_(2019_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/530064"
    }
   ]
  },
@@ -839,6 +961,10 @@
    {
     "name": "Xenopedia",
     "url": "https://avp.fandom.com/wiki/Prey_(film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/399"
    }
   ]
  },
@@ -877,6 +1003,10 @@
    {
     "name": "Mad Max Wiki",
     "url": "https://madmax.fandom.com/wiki/Furiosa:_A_Mad_Max_Saga"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/8945"
    }
   ]
  },
@@ -912,6 +1042,10 @@
    {
     "name": "Rocky Wiki",
     "url": "https://rocky.fandom.com/wiki/Creed_II"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/553717"
    }
   ]
  },
@@ -938,6 +1072,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/The_King%27s_Man"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/391860"
    }
   ]
  },
@@ -1010,6 +1148,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Harry_Potter_(TV_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1241"
    }
   ]
  },
@@ -1031,6 +1173,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Papillon_(2017_film)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Papillon_(1973_film)"
    }
   ]
  },
@@ -1052,6 +1198,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/A_Man_Called_Otto"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/A_Man_Called_Ove_(film)"
    }
   ]
  },
@@ -1073,6 +1223,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/The_Departed"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Infernal_Affairs"
    }
   ]
  },
@@ -1094,6 +1248,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Laal_Singh_Chaddha"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Forrest_Gump"
    }
   ]
  },
@@ -1104,6 +1262,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/The_Hunger_Games_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1701563"
    }
   ],
   "order": [
@@ -1143,6 +1305,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Incredibles_2"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/468222"
    }
   ],
   "order": [
@@ -1168,6 +1334,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/John_Rambo_(film)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Rambo_(franchise)"
    }
   ],
   "order": [
@@ -1201,7 +1371,7 @@
  },
  "heat": {
   "name": "Heat",
-  "note": "Heat مكتمل وحده. Heat 2 معلن ولم يُحدَّد موعده.",
+  "note": "Heat مكتمل وحده. Heat 2 يحكي ما قبل أحداثه وما بعدها معاً. تصويره مقرر في نوفمبر 2026، ولا موعد لصدوره.",
   "order": [
    {
     "f": "Heat",
@@ -1212,11 +1382,21 @@
     "m": 1047807,
     "rec": "soon"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Heat_2_(film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1048282"
+   }
   ]
  },
  "fnaf": {
   "name": "Five Nights at Freddy's",
-  "note": "الجزء الثاني يكمل الأول، والثالث معلن بلا موعد.",
+  "note": "الجزء الثاني يدور بعد الأول بسنة ونصف ويكمل قصته. الثالث مدرج في TMDB بلا موعد، وWikipedia لا تذكر عنه تفاصيل.",
   "order": [
    {
     "f": "Five Nights at Freddy's",
@@ -1231,11 +1411,21 @@
     "m": 1721637,
     "rec": "soon"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Five_Nights_at_Freddy%27s_2_(film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1240438"
+   }
   ]
  },
  "mortal-kombat": {
   "name": "Mortal Kombat",
-  "note": "Mortal Kombat II يكمل فيلم 2021، فالأول قبله. هذه السلسلة بداية جديدة لا علاقة لها بفيلمي التسعينات.",
+  "note": "Mortal Kombat II يكمل فيلم 2021، فالأول قبله. فيلم 2021 بداية جديدة للسلسلة بعد فيلمي التسعينات. الجزء الثالث يُكتب ولم يُعتمد إنتاجه بعد.",
   "order": [
    {
     "m": 460465,
@@ -1250,11 +1440,21 @@
     "m": 1561021,
     "rec": "soon"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Mortal_Kombat_II_(film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/931431"
+   }
   ]
  },
  "wild-robot": {
   "name": "The Wild Robot",
-  "note": "الفيلم مكتمل وحده. الجزء الثاني معلن بلا موعد.",
+  "note": "الفيلم مكتمل وحده. The Wild Robot Escapes أُعلن في مارس 2026 عن الكتاب الثاني، ولا موعد له.",
   "order": [
    {
     "f": "The Wild Robot",
@@ -1263,6 +1463,16 @@
    {
     "m": 1370190,
     "rec": "soon"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Wild_Robot"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1370345"
    }
   ]
  },
@@ -1285,6 +1495,16 @@
     "rec": "watch",
     "note": "الخاتمة"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Dark_Knight_trilogy"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/263"
+   }
   ]
  },
  "saw": {
@@ -1294,6 +1514,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Saw_(franchise)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/656"
    }
   ],
   "order": [
@@ -1301,15 +1525,15 @@
     "all": 656,
     "watchFrom": 7,
     "set": {
-     "951491": {
-      "note": "أحداثه بين الأول والثاني"
+     "298250": {
+      "note": "بعد موت جيغسو بعشر سنوات"
      },
      "602734": {
       "rec": "skip",
       "note": "قصة جانبية بقاتل مقلِّد"
      },
-     "298250": {
-      "note": "بعد موت جيغسو بعشر سنوات"
+     "951491": {
+      "note": "أحداثه بين الأول والثاني"
      }
     }
    }
@@ -1322,6 +1546,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Fear_Street_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/790370"
    }
   ],
   "order": [
@@ -1349,6 +1577,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Transformers_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/8650"
    }
   ],
   "order": [
@@ -1392,6 +1624,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Ghostbusters_(franchise)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/2980"
    }
   ],
   "order": [
@@ -1422,6 +1658,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/The_First_Omen"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/10919"
    }
   ],
   "order": [
@@ -1456,6 +1696,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Candyman_(2021_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/98580"
    }
   ],
   "order": [
@@ -1489,6 +1733,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Never_Say_Never_Again"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/645"
    }
   ],
   "order": [
@@ -1496,16 +1744,16 @@
     "all": 645,
     "watchFrom": 7,
     "set": {
-     "36670": {
-      "rec": "skip",
-      "note": "خارج السلسلة الرسمية"
+     "10764": {
+      "note": "يكمل Casino Royale مباشرة"
      },
      "36557": {
       "rec": "watch",
       "note": "بداية قصة كريغ"
      },
-     "10764": {
-      "note": "يكمل Casino Royale مباشرة"
+     "36670": {
+      "rec": "skip",
+      "note": "خارج السلسلة الرسمية"
      },
      "206647": {
       "note": "من قصة كريغ"
@@ -1534,6 +1782,16 @@
      }
     }
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Mission:_Impossible_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/87359"
+   }
   ]
  },
  "lion-king": {
@@ -1543,6 +1801,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Mufasa:_The_Lion_King"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/762512"
    }
   ],
   "order": [
@@ -1564,6 +1826,10 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Bird_Box_Barcelona"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/731067"
    }
   ],
   "order": [
@@ -1578,37 +1844,9 @@
    }
   ]
  },
- "28": {
-  "name": "28 Days Later",
-  "note": "بترتيب الصدور. 28 Weeks Later قصة أخرى في الوباء نفسه. 28 Years Later بداية ثلاثية جديدة، وThe Bone Temple جزؤها الثاني.",
-  "order": [
-   {
-    "m": 170,
-    "rec": "watch"
-   },
-   {
-    "m": 1562,
-    "rec": "optional",
-    "note": "قصة أخرى"
-   },
-   {
-    "m": 1100988,
-    "rec": "watch",
-    "note": "بداية الثلاثية الجديدة"
-   },
-   {
-    "m": 1272837,
-    "rec": "watch"
-   },
-   {
-    "m": 1273002,
-    "rec": "soon"
-   }
-  ]
- },
  "kill-bill": {
   "name": "Kill Bill",
-  "note": "فيلم واحد صدر في جزأين، يُشاهدان متتاليين.",
+  "note": "فيلم واحد صدر في جزأين، يُشاهدان متتاليين. The Whole Bloody Affair نسخة تجمعهما في فيلم واحد من 253 دقيقة، عُرضت في السينما في ديسمبر 2025، وهي بديل عن الجزأين لا إضافة.",
   "order": [
    {
     "m": 24,
@@ -1617,12 +1855,27 @@
    {
     "m": 393,
     "rec": "watch"
+   },
+   {
+    "m": 414419,
+    "rec": "optional",
+    "note": "النسخة الموحّدة، بديل عن الجزأين"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Kill_Bill:_The_Whole_Bloody_Affair"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/2883"
    }
   ]
  },
  "godzilla-minus": {
   "name": "Godzilla Minus One",
-  "note": "Godzilla Minus Zero يكمل Godzilla Minus One، فالأول قبله.",
+  "note": "Godzilla Minus Zero يكمل Godzilla Minus One وتدور أحداثه عام 1949، بعده بسنتين. فالأول قبله.",
   "order": [
    {
     "m": 940721,
@@ -1632,6 +1885,16 @@
    {
     "m": 1381071,
     "rec": "watch"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Godzilla_Minus_Zero"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1474814"
    }
   ]
  },
@@ -1648,11 +1911,21 @@
     "m": 1226863,
     "rec": "watch"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Super_Mario_Galaxy_Movie"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1434561"
+   }
   ]
  },
  "hitman": {
   "name": "The Hitman's Bodyguard",
-  "note": "الثاني يكمل الأول بالشخصيات نفسها، فالأول قبله.",
+  "note": "الثاني يكمل الأول بالأبطال أنفسهم، فالأول قبله. استقبال الثاني النقدي أضعف بوضوح.",
   "order": [
    {
     "m": 390043,
@@ -1663,11 +1936,21 @@
     "m": 522931,
     "rec": "watch"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Hitman%27s_Wife%27s_Bodyguard"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/608101"
+   }
   ]
  },
  "freaky-friday": {
   "name": "Freaky Friday",
-  "note": "Freakier Friday تكملة لفيلم 2003 بالشخصيات نفسها بعد سنوات، فالأول قبله.",
+  "note": "Freakier Friday تكملة لفيلم 2003 بالبطلتين نفسيهما بعد 22 سنة، فالأول قبله.",
   "order": [
    {
     "m": 10330,
@@ -1677,6 +1960,16 @@
    {
     "m": 1125257,
     "rec": "watch"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Freakier_Friday"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1125292"
    }
   ]
  },
@@ -1693,11 +1986,21 @@
     "rec": "watch",
     "note": "النصف الثاني"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Wicked:_For_Good"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/968080"
+   }
   ]
  },
  "gladiator": {
   "name": "Gladiator",
-  "note": "Gladiator مكتمل وحده وهو الأعلى تقييماً. Gladiator II تكملة بعد سنوات بتقييم أقل.",
+  "note": "Gladiator مكتمل وحده وهو الأعلى تقييماً. Gladiator II يدور بعده بنحو 16 سنة ويتبع لوسيوس، وتقييمه أقل. جزء ثالث قيد التطوير.",
   "order": [
    {
     "m": 98,
@@ -1711,11 +2014,21 @@
     "m": 1359289,
     "rec": "soon"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Gladiator_II"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1069584"
+   }
   ]
  },
  "raid": {
   "name": "The Raid",
-  "note": "The Raid 2 يبدأ من حيث انتهى الأول، وتقييمه أعلى منه بقليل.",
+  "note": "The Raid 2 يبدأ بعد ساعات من نهاية الأول، وتقييمه أعلى منه بقليل.",
   "order": [
    {
     "m": 94329,
@@ -1726,11 +2039,21 @@
     "rec": "watch",
     "note": "تكملة مباشرة"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Raid_2"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/257960"
+   }
   ]
  },
  "space-odyssey": {
   "name": "2001: A Space Odyssey",
-  "note": "2001 مكتمل وحده. 2010 تكملة من مخرج آخر تشرح ما تركه الأول غامضاً.",
+  "note": "2001 مكتمل وحده. 2010 تكملة من إخراج بيتر هايمز لا كوبريك، تشرح ما تركه الأول غامضاً، واستقبالها أضعف.",
   "order": [
    {
     "m": 62,
@@ -1740,11 +2063,21 @@
     "m": 4437,
     "rec": "optional"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/2010:_The_Year_We_Make_Contact"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/4438"
+   }
   ]
  },
  "m3gan": {
   "name": "M3GAN",
-  "note": "الأول مكتمل وحده، والثاني يكمل بعده.",
+  "note": "الأول مكتمل وحده. الثاني يدور بعده بسنتين وينتقل من الرعب إلى الأكشن والخيال العلمي.",
   "order": [
    {
     "m": 536554,
@@ -1753,6 +2086,16 @@
    {
     "m": 1071585,
     "rec": "optional"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/M3GAN_2.0"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1071588"
    }
   ]
  },
@@ -1773,11 +2116,21 @@
     "rec": "skip",
     "note": "ممثلون آخرون"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Dumb_and_Dumber_(franchise)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/96665"
+   }
   ]
  },
  "speed": {
   "name": "Speed",
-  "note": "Speed مكتمل وحده. الجزء الثاني بلا بطل الأول وتقييمه ضعيف.",
+  "note": "Speed مكتمل وحده. الجزء الثاني بلا كيانو ريفز واستقباله ضعيف جداً.",
   "order": [
    {
     "m": 1637,
@@ -1787,11 +2140,21 @@
     "m": 1639,
     "rec": "skip"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Speed_2:_Cruise_Control"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/43064"
+   }
   ]
  },
  "butterfly": {
   "name": "The Butterfly Effect",
-  "note": "الأول مكتمل وحده. الجزآن التاليان قصتان أخريان بالفكرة نفسها وتقييمهما ضعيف.",
+  "note": "الأول مكتمل وحده. الجزآن التاليان قصتان أخريان بالفكرة نفسها، صدرا مباشرة للفيديو وتقييمهما ضعيف.",
   "order": [
    {
     "m": 1954,
@@ -1805,11 +2168,21 @@
     "m": 16258,
     "rec": "skip"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Butterfly_Effect"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/52749"
+   }
   ]
  },
  "carlito": {
   "name": "Carlito's Way",
-  "note": "الفيلم مكتمل وحده. Rise to Power يحكي ما قبله بممثلين آخرين وتقييمه ضعيف.",
+  "note": "الفيلم مكتمل وحده. Rise to Power يحكي شباب كارليتو بممثلين آخرين، واستقباله ضعيف.",
   "order": [
    {
     "m": 6075,
@@ -1819,11 +2192,21 @@
     "m": 12261,
     "rec": "skip"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Carlito%27s_Way:_Rise_to_Power"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/625861"
+   }
   ]
  },
  "braveheart": {
   "name": "Braveheart",
-  "note": "Braveheart مكتمل وحده. Robert the Bruce فيلم لاحق عن إحدى شخصياته وتقييمه ضعيف.",
+  "note": "Braveheart مكتمل وحده. Robert the Bruce يكمل بعده ويعود فيه أنغوس ماكفادين بدوره نفسه، وتقييمه ضعيف.",
   "order": [
    {
     "m": 197,
@@ -1832,6 +2215,16 @@
    {
     "m": 532812,
     "rec": "skip"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Robert_the_Bruce_(film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1432360"
    }
   ]
  },
@@ -1846,6 +2239,16 @@
    {
     "m": 11712,
     "rec": "optional"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Sanjuro"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/627389"
    }
   ]
  },
@@ -1865,6 +2268,16 @@
     "m": 945729,
     "rec": "watch"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/A_Haunting_in_Venice"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/735384"
+   }
   ]
  },
  "streetdance": {
@@ -1879,11 +2292,21 @@
     "m": 85373,
     "rec": "watch"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/StreetDance_2"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/206559"
+   }
   ]
  },
  "oceans": {
   "name": "Ocean's",
-  "note": "الثلاثية بترتيب صدورها، والأول هو الأعلى تقييماً. Ocean's Eight فيلم فرعي بفريق آخر.",
+  "note": "الثلاثية بترتيب صدورها، والأول هو الأعلى تقييماً وهو ريميك لفيلم 1960. Ocean’s Eight فيلم فرعي بفريق آخر تقوده شقيقة داني أوشن. فيلم جديد يسبق الأحداث مجدول ليونيو 2027.",
   "order": [
    {
     "m": 161,
@@ -1901,6 +2324,26 @@
     "m": 402900,
     "rec": "optional",
     "note": "فيلم فرعي"
+   },
+   {
+    "m": 299,
+    "rec": "optional",
+    "note": "أصل 1960، قصة مستقلة"
+   },
+   {
+    "m": 1221973,
+    "rec": "soon",
+    "note": "ما قبل الأحداث"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ocean%27s_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/304"
    }
   ]
  },
@@ -1920,11 +2363,21 @@
     "m": 15338,
     "rec": "skip"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ace_Ventura"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/3167"
+   }
   ]
  },
  "city-slickers": {
   "name": "City Slickers",
-  "note": "الأول مكتمل وحده، والثاني أضعف تقييماً.",
+  "note": "الأول مكتمل وحده. الثاني بالأبطال أنفسهم واستقباله النقدي ضعيف.",
   "order": [
    {
     "m": 1406,
@@ -1934,11 +2387,21 @@
     "m": 11310,
     "rec": "optional"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/City_Slickers_II:_The_Legend_of_Curly%27s_Gold"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/150156"
+   }
   ]
  },
  "stomp": {
   "name": "Stomp the Yard",
-  "note": "الأول مكتمل وحده، والثاني قصة أخرى أضعف تقييماً.",
+  "note": "الأول مكتمل وحده. الثاني ببطل جديد، صدر مباشرة للفيديو وتقييمه ضعيف.",
   "order": [
    {
     "m": 1931,
@@ -1948,11 +2411,21 @@
     "m": 33473,
     "rec": "skip"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Stomp_the_Yard:_Homecoming"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/160727"
+   }
   ]
  },
  "social-network": {
   "name": "The Social Network",
-  "note": "The Social Network مكتمل وحده. The Social Reckoning (2026) تكملة مدرجة معه في مجموعة TMDB.",
+  "note": "The Social Network مكتمل وحده. The Social Reckoning (أكتوبر 2026) عمل مرافق من كتابة آرون سوركين وإخراجه، عن تسريبات فيسبوك عام 2021، وبممثل آخر في دور زوكربيرغ.",
   "order": [
    {
     "m": 37799,
@@ -1960,23 +2433,49 @@
    },
    {
     "m": 1281331,
-    "rec": "optional"
+    "rec": "optional",
+    "note": "عمل مرافق، قصة أخرى"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Social_Reckoning"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1504252"
    }
   ]
  },
  "ip-man": {
   "name": "Ip Man",
-  "note": "الأفلام الأربعة بترتيب صدورها تتابع حياة المعلّم نفسه.",
+  "note": "الأفلام الأربعة بترتيب صدورها تتابع حياة المعلّم نفسه. Master Z فيلم فرعي عن شخصية من الجزء الثالث، ولا يظهر فيه إيب مان إلا في لقطات قديمة. جزء خامس أُعلن عام 2023 بلا تفاصيل.",
   "order": [
    {
     "all": 70068,
     "rec": "watch"
+   },
+   {
+    "m": 450001,
+    "rec": "optional",
+    "note": "فيلم فرعي بعد الجزء الثالث"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ip_Man_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/70068"
    }
   ]
  },
  "millennium": {
   "name": "The Girl with the Dragon Tattoo",
-  "note": "The Girl in the Spider's Web يكمل بالشخصيات نفسها لكن بطاقم آخر ومخرج آخر، وتقييمه أقل. فيلم 2011 أعلى تقييماً ويُشاهد وحده.",
+  "note": "The Girl in the Spider’s Web يكمل فيلم 2011 بشخصياته، لكن بطاقم آخر ومخرج آخر، وتقييمه أقل. فيلم 2011 أعلى تقييماً ويُشاهد وحده. والفيلم السويدي (2009) هو الاقتباس الأول للرواية نفسها.",
   "order": [
    {
     "m": 65754,
@@ -1986,6 +2485,803 @@
    {
     "m": 446807,
     "rec": "watch"
+   },
+   {
+    "m": 15472,
+    "rec": "optional",
+    "note": "الاقتباس السويدي الأول"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Girl_in_the_Spider%27s_Web_(film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/575987"
+   }
+  ]
+ },
+ "harold-kumar": {
+  "name": "Harold & Kumar",
+  "note": "الفيلم الثاني يبدأ من حيث انتهى الأول مباشرة، والثالث يدور بعدهما بسبع سنوات. جزء رابع أُعلن في يونيو 2025 ولم يُحدَّد موعده.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Harold_%26_Kumar"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/30663"
+   }
+  ],
+  "order": [
+   {
+    "all": 30663,
+    "rec": "watch",
+    "set": {
+     "13335": {
+      "note": "يبدأ من نهاية الأول"
+     },
+     "55465": {
+      "note": "بعد سبع سنوات"
+     }
+    }
+   }
+  ]
+ },
+ "johnny-english": {
+  "name": "Johnny English",
+  "note": "كل فيلم مهمة جديدة للعميل نفسه، وتُشاهد بترتيب صدورها. الشخصية مبنية على جاسوس أخرق أدّاه روان أتكينسون في إعلانات تلفزيونية في التسعينات. جزء رابع أُعلن عام 2024 ولم يُحدَّد موعده، والمصادر متضاربة في حالته.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Johnny_English_(film_series)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Johnny_English"
+   },
+   {
+    "name": "Screen Daily",
+    "url": "https://www.screendaily.com/news/johnny-english-4-to-film-in-malta-and-uk-this-summer/5190280.article"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/86117"
+   }
+  ],
+  "order": [
+   {
+    "all": 86117,
+    "rec": "watch"
+   }
+  ]
+ },
+ "undisputed": {
+  "name": "Undisputed",
+  "note": "الفيلم الأول بطاقم مختلف (ويسلي سنايبس وفينغ رايمز). من الجزء الثاني تبدأ قصة المقاتل يوري بويكا (سكوت أدكنز) وتستمر حتى الرابع، وهذه الأجزاء أعلى تقييماً. يصح البدء من الثاني.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Undisputed_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/117777"
+   }
+  ],
+  "order": [
+   {
+    "m": 15070,
+    "rec": "optional",
+    "note": "طاقم آخر، يصح تجاوزه"
+   },
+   {
+    "m": 15255,
+    "rec": "watch",
+    "note": "أول ظهور لبويكا"
+   },
+   {
+    "m": 38234,
+    "rec": "watch"
+   },
+   {
+    "m": 348893,
+    "rec": "watch"
+   }
+  ]
+ },
+ "grown-ups": {
+  "name": "Grown Ups",
+  "note": "الجزء الثاني تكملة مباشرة تدور بعد الأول بثلاث سنوات، واستقباله النقدي ضعيف جداً. جزء ثالث قيد التطوير لدى Netflix ولا موعد له.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Grown_Ups_2"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/180546"
+   }
+  ],
+  "order": [
+   {
+    "m": 38365,
+    "rec": "watch"
+   },
+   {
+    "m": 109418,
+    "rec": "optional",
+    "note": "تكملة أضعف استقبالاً"
+   },
+   {
+    "m": 1566991,
+    "rec": "soon"
+   }
+  ]
+ },
+ "alice": {
+  "name": "Alice in Wonderland",
+  "note": "فيلم 2010 إعادة صنع حيّة لفيلم ديزني (1951)، وفيه تعود أليس إلى بلاد العجائب وهي في التاسعة عشرة. الجزء الثاني يكمله واستقباله أضعف. فيلم الرسوم يُشاهد مستقلاً.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Alice_Through_the_Looking_Glass_(2016_film)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Alice_in_Wonderland_(2010_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/261307"
+   }
+  ],
+  "order": [
+   {
+    "m": 12155,
+    "rec": "watch"
+   },
+   {
+    "m": 241259,
+    "rec": "optional",
+    "note": "تكملة أضعف استقبالاً"
+   },
+   {
+    "m": 12092,
+    "rec": "optional",
+    "note": "فيلم الرسوم الأصلي، مستقل"
+   }
+  ]
+ },
+ "pets": {
+  "name": "The Secret Life of Pets",
+  "note": "الجزء الثاني يكمل الأول بالشخصيات نفسها. جزء ثالث قيد التطوير منذ 2022 ولا موعد له.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Secret_Life_of_Pets_(franchise)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/427084"
+   }
+  ],
+  "order": [
+   {
+    "all": 427084,
+    "rec": "watch"
+   }
+  ]
+ },
+ "man-from-earth": {
+  "name": "The Man from Earth",
+  "note": "الفيلم الأول مكتمل وحده. Holocene تكملة بالبطل نفسه، وتقييمها في TMDB أقل بفارق كبير.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Man_from_Earth:_Holocene"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/464270"
+   }
+  ],
+  "order": [
+   {
+    "m": 13363,
+    "rec": "watch"
+   },
+   {
+    "m": 415312,
+    "rec": "optional",
+    "note": "تكملة أضعف تقييماً"
+   }
+  ]
+ },
+ "sicario": {
+  "name": "Sicario",
+  "note": "Sicario مكتمل وحده. Day of the Soldado قصة جديدة يعود فيها أليخاندرو ومات دون بطلة الأول، وتقييمه أقل بقليل. الجزء الثالث بعنوان Sicario: Capos قيد التطوير ولا موعد له.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Sicario:_Day_of_the_Soldado"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/496796"
+   }
+  ],
+  "order": [
+   {
+    "m": 273481,
+    "rec": "watch"
+   },
+   {
+    "m": 400535,
+    "rec": "watch",
+    "note": "قصة جديدة بلا بطلة الأول"
+   },
+   {
+    "m": 1786818,
+    "rec": "soon",
+    "note": "Sicario: Capos"
+   }
+  ]
+ },
+ "maleficent": {
+  "name": "Maleficent",
+  "note": "Maleficent يعيد حكاية Sleeping Beauty (1959) من زاوية الشريرة. Mistress of Evil تكملة تدور بعده بخمس سنوات. جزء ثالث قيد التطوير.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Maleficent:_Mistress_of_Evil"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/531331"
+   }
+  ],
+  "order": [
+   {
+    "m": 102651,
+    "rec": "watch"
+   },
+   {
+    "m": 420809,
+    "rec": "watch",
+    "note": "بعد خمس سنوات"
+   },
+   {
+    "m": 10882,
+    "rec": "optional",
+    "note": "كلاسيكية ديزني، الحكاية الأصل"
+   }
+  ]
+ },
+ "gintama": {
+  "name": "Gintama",
+  "note": "فيلمان حيّان مقتبسان من مانغا Gintama بالطاقم نفسه، والثاني يكمل الأول.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Gintama_(film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/551277"
+   }
+  ],
+  "order": [
+   {
+    "m": 432985,
+    "rec": "watch"
+   },
+   {
+    "m": 519176,
+    "rec": "watch",
+    "note": "تكملة"
+   }
+  ]
+ },
+ "witch": {
+  "name": "The Witch",
+  "note": "الجزء الثاني يكمل في العالم نفسه ببطلة جديدة هي توأم بطلة الأول، وتعود فيه بطلة الأول، فالأول قبله.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Witch:_Part_2._The_Other_One"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/619533"
+   }
+  ],
+  "order": [
+   {
+    "m": 530254,
+    "rec": "watch",
+    "note": "قبل الجزء الثاني"
+   },
+   {
+    "m": 615173,
+    "rec": "watch",
+    "note": "بطلة جديدة"
+   }
+  ]
+ },
+ "roundup": {
+  "name": "The Outlaws / The Roundup",
+  "note": "كل فيلم قضية مستقلة مأخوذة عن جريمة حقيقية، والرابط بينها المحقق ما سوك-دو. ترتيب الصدور أفضل لمتابعة فريقه. جزء خامس معلن بلا عنوان ولا موعد، وبطل السلسلة تحدّث عن ثمانية أفلام.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Roundup_(film_series)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/619802"
+   }
+  ],
+  "order": [
+   {
+    "all": 619802,
+    "rec": "watch"
+   }
+  ]
+ },
+ "terrifier": {
+  "name": "Terrifier",
+  "note": "من الجزء الثاني تتصل القصة: سيينا في مواجهة المهرّج آرت. الجزء الرابع قيد التطوير بلا موعد، وقال المخرج إنه الأخير. All Hallows’ Eve فيلم مختارات سبق السلسلة وفيه أول ظهور طويل للمهرّج.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Terrifier_(franchise)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/727761"
+   }
+  ],
+  "order": [
+   {
+    "all": 727761,
+    "rec": "watch"
+   },
+   {
+    "m": 231001,
+    "rec": "optional",
+    "note": "فيلم مختارات سبق السلسلة"
+   }
+  ]
+ },
+ "cold-pursuit": {
+  "name": "Cold Pursuit",
+  "note": "ريميك أمريكي للفيلم النرويجي In Order of Disappearance، من المخرج نفسه هانس بيتر مولاند. تقييماهما في TMDB متقاربان. جزء ثانٍ أُعلن عن تطويره عام 2021 ولا جديد عنه.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Cold_Pursuit"
+   },
+   {
+    "name": "Film Stories",
+    "url": "https://filmstories.co.uk/news/cold-pursuit-2-and-gunpowder-milkshake-2-on-the-way/"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/848380"
+   }
+  ],
+  "order": [
+   {
+    "m": 438650,
+    "rec": "watch"
+   },
+   {
+    "m": 252822,
+    "rec": "optional",
+    "note": "الفيلم النرويجي الأصلي"
+   },
+   {
+    "m": 848379,
+    "rec": "soon",
+    "note": "أُعلن عام 2021، لا جديد"
+   }
+  ]
+ },
+ "files": {
+  "name": "The Files Trilogy",
+  "note": "ثلاثية للمخرج فيفيك أغنيهوتري عن أحداث من تاريخ الهند الحديث. كل فيلم عن حدث مختلف، فلا يلزم بينها ترتيب.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Bengal_Files"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/900844"
+   }
+  ],
+  "order": [
+   {
+    "m": 594673,
+    "rec": "watch"
+   },
+   {
+    "m": 900783,
+    "rec": "optional"
+   },
+   {
+    "m": 900838,
+    "rec": "optional",
+    "note": "ختام الثلاثية"
+   }
+  ]
+ },
+ "wind-river": {
+  "name": "Wind River",
+  "note": "الفيلم مكتمل وحده. هو ثالث «ثلاثية الحدود» التي كتبها تايلور شيريدان بعد Sicario وHell or High Water، وهي ثلاث قصص مستقلة يجمعها الموضوع. التكملة Wind River: The Next Chapter صُوِّرت عام 2023 دون شيريدان، ولا موعد لها.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Wind_River_(film)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Wind_River:_The_Next_Chapter"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1046516"
+   }
+  ],
+  "order": [
+   {
+    "m": 395834,
+    "rec": "watch"
+   },
+   {
+    "m": 338766,
+    "rec": "optional",
+    "note": "من ثلاثية الحدود، قصة مستقلة"
+   },
+   {
+    "m": 1046509,
+    "rec": "soon",
+    "note": "The Next Chapter، بلا شيريدان"
+   }
+  ]
+ },
+ "twister": {
+  "name": "Twister",
+  "note": "Twisters تكملة مستقلة بشخصيات جديدة، فلا يلزم فيلم 1996 قبله.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Twisters_(film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1062948"
+   }
+  ],
+  "order": [
+   {
+    "m": 718821,
+    "rec": "watch"
+   },
+   {
+    "m": 664,
+    "rec": "optional",
+    "note": "الفيلم الأصلي، قصة أخرى"
+   }
+  ]
+ },
+ "violent-night": {
+  "name": "Violent Night",
+  "note": "الجزء الثاني تكملة يعود فيها ديفيد هاربر. موعده الأمريكي 4 ديسمبر 2026 بحسب Wikipedia، وTMDB يسجّل 2 ديسمبر، والعدّاد هنا على تاريخ TMDB.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Violent_Night_2"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1078456"
+   }
+  ],
+  "order": [
+   {
+    "m": 899112,
+    "rec": "watch"
+   },
+   {
+    "m": 1078446,
+    "rec": "soon"
+   }
+  ]
+ },
+ "horizon": {
+  "name": "Horizon: An American Saga",
+  "note": "ملحمة من أربعة فصول تحكي قصة واحدة. لم يُطرح للجمهور إلا الفصل الأول. الفصل الثاني عُرض في مهرجانَين فقط وطرحه مؤجَّل بلا موعد، والثالث متوقف والرابع قيد التطوير. فالقصة غير مكتملة حتى الآن.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Horizon:_An_American_Saga"
+   },
+   {
+    "name": "Film Stories",
+    "url": "https://filmstories.co.uk/news/horizon-an-american-saga-chapter-2-wont-be-getting-a-release-in-2026/"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1126640"
+   }
+  ],
+  "order": [
+   {
+    "m": 932086,
+    "rec": "watch"
+   },
+   {
+    "m": 1120368,
+    "rec": "soon",
+    "note": "عُرض في مهرجانات فقط"
+   },
+   {
+    "m": 1303552,
+    "rec": "soon",
+    "note": "تصويره متوقف"
+   },
+   {
+    "m": 1303553,
+    "rec": "soon"
+   }
+  ]
+ },
+ "talk-to-me": {
+  "name": "Talk to Me",
+  "note": "الفيلم مكتمل وحده. التكملة Talk 2 Me أُعلنت في أغسطس 2023 وما زالت قيد التطوير بلا موعد.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Talk_to_Me_(2022_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1162328"
+   }
+  ],
+  "order": [
+   {
+    "m": 1008042,
+    "rec": "watch"
+   },
+   {
+    "m": 1162320,
+    "rec": "soon"
+   }
+  ]
+ },
+ "thanksgiving": {
+  "name": "Thanksgiving",
+  "note": "الفيلم وُلد من إعلان ساخر صنعه إيلاي روث ضمن مشروع Grindhouse عام 2007. الجزء الثاني تأجّل إنتاجه ولا موعد له.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Thanksgiving_(2023_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1211888"
+   }
+  ],
+  "order": [
+   {
+    "m": 1071215,
+    "rec": "watch"
+   },
+   {
+    "m": 1211876,
+    "rec": "soon"
+   }
+  ]
+ },
+ "happy-gilmore": {
+  "name": "Happy Gilmore",
+  "note": "الجزء الثاني يدور بعد الأول بنحو 29 سنة ويعتمد كثيراً على شخصياته، فالأول قبله.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Happy_Gilmore_2"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1263259"
+   }
+  ],
+  "order": [
+   {
+    "m": 9614,
+    "rec": "watch",
+    "note": "قبل الجزء الثاني"
+   },
+   {
+    "m": 1263256,
+    "rec": "watch"
+   }
+  ]
+ },
+ "ready-or-not": {
+  "name": "Ready or Not",
+  "note": "الجزء الثاني يبدأ مباشرة بعد نهاية الأول بالبطلة نفسها، فالأول قبله.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ready_or_Not_2:_Here_I_Come"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1267164"
+   }
+  ],
+  "order": [
+   {
+    "m": 567609,
+    "rec": "watch",
+    "note": "قبل الجزء الثاني"
+   },
+   {
+    "m": 1266127,
+    "rec": "watch"
+   }
+  ]
+ },
+ "wonka": {
+  "name": "Willy Wonka",
+  "note": "Wonka يحكي شباب ويلي ونكا، ومخرجه يعدّه رفيقاً لفيلم 1971، فيُشاهد قبله أو بعده. فيلم 2005 اقتباس آخر مستقل للكتاب نفسه. جزء ثانٍ من Wonka قيد التطوير.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Wonka_(film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1393821"
+   }
+  ],
+  "order": [
+   {
+    "m": 252,
+    "rec": "watch",
+    "note": "الاقتباس الأول"
+   },
+   {
+    "m": 787699,
+    "rec": "watch",
+    "note": "شباب ونكا"
+   },
+   {
+    "m": 118,
+    "rec": "watch",
+    "note": "اقتباس آخر مستقل"
+   },
+   {
+    "m": 1385209,
+    "rec": "soon"
+   }
+  ]
+ },
+ "promare": {
+  "name": "Promare",
+  "note": "الفيلم مكتمل وحده. Side: Galo وSide: Lio قصيران يحكيان ما قبله، وعُرضا مرافقَين لعروضه.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Promare"
+   },
+   {
+    "name": "MyAnimeList",
+    "url": "https://myanimelist.net/anime/39991"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1420678"
+   }
+  ],
+  "order": [
+   {
+    "m": 553600,
+    "rec": "watch"
+   },
+   {
+    "m": 629014,
+    "rec": "optional",
+    "note": "قصير عمّا قبل الفيلم"
+   },
+   {
+    "m": 631193,
+    "rec": "optional",
+    "note": "قصير عمّا قبل الفيلم"
+   }
+  ]
+ },
+ "weapons": {
+  "name": "Weapons",
+  "note": "الفيلم مكتمل وحده. Gladys فيلم عمّا قبل أحداثه أُعلن في أبريل 2026. موعده 8 سبتمبر 2028 بحسب Wikipedia، وTMDB يسجّل 7 سبتمبر.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Weapons_(2025_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1531466"
+   }
+  ],
+  "order": [
+   {
+    "m": 1078605,
+    "rec": "watch"
+   },
+   {
+    "m": 1529266,
+    "rec": "soon",
+    "note": "ما قبل الأحداث"
+   }
+  ]
+ },
+ "longlegs": {
+  "name": "Longlegs",
+  "note": "فيلم جديد في عالم Longlegs أُعلن في أبريل 2026 من المخرج نفسه وبعودة نيكولاس كيج، ومجدول ليناير 2028. TMDB يسمّيه Hexagram، وWikipedia لا تذكر له عنواناً بعد.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Longlegs"
+   },
+   {
+    "name": "TheWrap",
+    "url": "https://www.thewrap.com/industry-news/business/paramount-longlegs-release-date/"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1679129"
+   }
+  ],
+  "order": [
+   {
+    "m": 1226578,
+    "rec": "watch"
+   },
+   {
+    "m": 1671441,
+    "rec": "soon"
+   }
+  ]
+ },
+ "michael": {
+  "name": "Michael",
+  "note": "الفيلم يغطي حياة مايكل جاكسون من الستينات حتى جولة Bad عام 1988. جزء ثانٍ أُعلن في مايو 2026 ومتوقع أواخر 2027 أو مطلع 2028.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Michael_(2026_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/collection/1687197"
+   }
+  ],
+  "order": [
+   {
+    "m": 936075,
+    "rec": "watch"
+   },
+   {
+    "m": 1685097,
+    "rec": "soon"
    }
   ]
  }
