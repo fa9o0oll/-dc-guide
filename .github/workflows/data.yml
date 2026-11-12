@@ -51,6 +51,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/generated site/dc/data site/fate/data site/films/data
           git diff --cached --quiet || git commit -m "data: daily refresh"
+          # إن وصل إلى الفرع إيداع جديد أثناء البناء (ملف توثيق مثلاً) يُدمج قبل الدفع بدل أن يُرفض
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
       - name: Stamp build id (cache busting; not committed)
         if: github.ref == 'refs/heads/main'
