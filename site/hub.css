@@ -15,6 +15,14 @@ body{min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;background:
 .hub-top{padding:22px var(--pad) 16px}
 .hub-top h1{font-size:clamp(1.3rem,2.4vw,1.7rem);font-weight:600}
 .hub-top p{color:#a9a498;font-size:.95rem;max-width:60ch}
+.hub-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:6px 16px}
+.hub-top h1,.hub-top p{grid-column:1}
+.hub-top .syncb{grid-column:2;grid-row:1/3;min-height:44px;padding:6px 16px;border:1px solid #3a372f;border-radius:999px;background:none;color:#cfc9bb;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer}
+.hub-top .syncb::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;margin-inline-end:8px;opacity:.6}
+.hub-top .syncb[data-sync-state=on]{color:#86d6b6;border-color:#2f5a4b}
+.hub-top .syncb[data-sync-state=err]{color:#ff8f7a;border-color:#6a352c}
+.hub-top .syncb:focus-visible{outline:2px solid #ffc23d;outline-offset:2px}
+@media (max-width:560px){.hub-top .syncb{grid-column:1;grid-row:auto;justify-self:start;margin-top:6px}}
 .hub-foot{padding:12px var(--pad) 18px;font-size:.78rem;color:#8d887d}
 .hub-foot a{color:inherit}
 /* الأبواب: ثلاثة أعمدة طويلة على الشاشات العريضة (ومنها شاشة الفولد الداخلية)، وصفوف على الجوال */

@@ -203,6 +203,9 @@ dialog::backdrop{background:rgba(6,4,2,.72)}
 .cd span{display:grid;justify-items:center;min-width:64px;padding:8px 6px;border-radius:10px;background:var(--card);color:var(--mute);font-size:.8rem}
 .cd b{font-family:var(--display);font-weight:700;font-size:1.6rem;line-height:1.2;color:var(--acc2);font-variant-numeric:tabular-nums}
 .chip bdi{opacity:.7;margin-inline-start:4px}
+.foot .syncb{margin-top:10px;min-height:44px;padding:6px 16px;border:1px solid var(--line);border-radius:999px;color:var(--dim);font-weight:600;font-size:.86rem}
+.foot .syncb[data-sync-state=on]{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.foot .syncb[data-sync-state=err]{color:#ff8f7a}
 .foot{padding:18px var(--pad) 26px;color:var(--mute);font-size:.8rem;border-top:1px solid var(--line)}
 .load{padding:60px var(--pad);text-align:center;color:var(--mute)}
 

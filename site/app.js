@@ -1,6 +1,7 @@
 // واجهة الأدلة (دي سي، Fate…). الدليل يُحدَّد من data-guide في الصفحة، وبياناته من مجلد data المجاور لها (تُبنى آلياً).
 import { GUIDES } from './guides.js?v=__BUILD__';
 import { shell } from './shell.js?v=__BUILD__';
+import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
 const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
 const G = GUIDES[document.documentElement.dataset.guide] || GUIDES.dc;
 const { THEMES, SHOW_COLORS = {} } = await import(`./themes-${G.id}.js?v=${BUILD}`);
@@ -29,7 +30,7 @@ const KEY = G.key;
 const blank = () => ({ v: 1, works: {}, eps: {}, shield: true });
 let store = blank();
 try { const raw = JSON.parse(localStorage.getItem(KEY) || 'null'); if (raw && raw.v === 1) store = { ...blank(), ...raw }; } catch {}
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch { toast('تعذّر الحفظ في هذا المتصفح'); } };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch { toast('تعذّر الحفظ في هذا المتصفح'); } syncTouch(G.id); };
 
 // ---------- البيانات
 const D = { universes: [], works: new Map(), placements: [], bridges: [], legacyMap: {}, base: '', arrow: null, order: null, mal: {}, episodes: new Map() };
@@ -48,6 +49,9 @@ async function boot() {
     $('#main').innerHTML = `<p class="empty">تعذّر تحميل البيانات. حدّث الصفحة، وإذا استمر الخطأ فالسبب: ${esc(e.message)}</p>`; return;
   }
   renderUnibar(); syncShield(); render(); liftVeil();
+  // تغيير وصل من جهاز آخر وكُتب في السجل المحلي: نعيد قراءته ونرسم في المكان نفسه
+  initSync(id => { if (id !== G.id) return; try { const raw = JSON.parse(localStorage.getItem(KEY)); if (raw?.v === 1) store = { ...blank(), ...raw }; } catch {}
+    render(true); stats(); const tab = $('#seasonTabs .on'); if (tab) showSeason(tab.dataset.id, +tab.dataset.season); });
 }
 // كشف ستار الدخول: دي سي يُسحب جانباً كلوحة قصة مصورة، وFate يتلاشى مع حلقة استدعاء تتسع
 function liftVeil() {
@@ -484,7 +488,9 @@ function openJump() {
 }
 const encode = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 function openBackup() {
-  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px"><p>سجلك محفوظ في هذا المتصفح فقط. انسخ الكود واحتفظ به، والصقه في أي جهاز أو متصفح آخر لاسترجاع السجل.</p>
+  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px"><p>فعّل المزامنة ليصل سجلك إلى كل أجهزتك تلقائياً، في لحظته.</p>
+    <div class="actions"><button data-sync-open><span data-sync-label>${syncLabel()}</span></button></div>
+    <h4>نسخة يدوية</h4><p>الكود التالي هو سجلك كاملاً. احتفظ به نسخةً احتياطية، أو الصقه في جهاز آخر لاسترجاع السجل.</p>
     <textarea id="bk" aria-label="كود السجل">${encode(store)}</textarea>
     <div class="actions"><button data-act="bkcopy">نسخ الكود</button><button data-act="bkimport">استيراد الكود الملصوق</button></div>
     ${G.legacyImport ? '<h4>النقل من النسخة القديمة</h4><p>افتح موقعك القديم واضغط «نسخ احتياطي» وانسخ الكود، ثم الصقه هنا واضغط «استيراد الكود الملصوق». يتحوّل تلقائياً إلى النظام الجديد.</p>' : ''}</div>`, 'backup');

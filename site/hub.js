@@ -1,16 +1,19 @@
 // الواجهة الرئيسية: تجلب صورة كل دليل وعدد أعماله، وتقرأ سجل المشاهدة المحفوظ في المتصفح لتعرض التقدم.
+import { initSync } from './sync.js?v=__BUILD__';
 const BUILD = '__BUILD__';
 const works = (n) => { const m = n % 100; return n === 1 ? 'عمل واحد' : n === 2 ? 'عملين' : `${n} ${n === 0 || (m >= 3 && m <= 10) ? 'أعمال' : m >= 11 ? 'عملاً' : 'عمل'}`; };
 const films = (n) => { const m = n % 100; return n === 1 ? 'فيلم واحد' : n === 2 ? 'فيلمين' : `${n} ${m >= 3 && m <= 10 ? 'أفلام' : m >= 11 ? 'فيلماً' : 'فيلم'}`; };
+const stat = door => { if (!door.dataset.total) return; let seen = 0; try { const pr = JSON.parse(localStorage.getItem(door.dataset.key) || '{}'); seen = Object.values(pr.works || pr.films || {}).filter(v => v === 'watched').length; } catch {}
+  door.querySelector('[data-stat]').textContent = seen ? `شاهدت ${seen} من ${door.dataset.total}` : door.dataset.total; };
+// المزامنة تبدأ قبل تحميل الصور، وكل تغيير يصل من جهاز آخر يحدّث عدّاد بابه
+initSync(id => { const door = document.querySelector(`.door[data-guide="${id}"]`); if (door) stat(door); });
 for (const door of document.querySelectorAll('.door[data-key]')) {
   try {
     const cat = await (await fetch(`${door.dataset.guide}/data/${door.dataset.file || 'catalog.json'}?v=${BUILD}`)).json(), items = cat.works || cat.films, isFilms = !cat.works;
     const art = items.find(w => w.id === door.dataset.art) || items.find(w => w.backdrop);
     if (art?.backdrop) { const img = new Image(); img.decoding = 'async'; img.alt = ''; img.src = cat.imageBase + (innerWidth * devicePixelRatio > 1000 ? 'w1280' : 'w780') + art.backdrop;
       img.onload = () => img.classList.add('in'); door.querySelector('.art').append(img); }
-    let seen = 0; try { const pr = JSON.parse(localStorage.getItem(door.dataset.key) || '{}'); seen = Object.values(pr.works || pr.films || {}).filter(v => v === 'watched').length; } catch {}
-    const total = isFilms ? films(items.length) : works(items.length);
-    door.querySelector('[data-stat]').textContent = seen ? `شاهدت ${seen} من ${total}` : total;
+    door.dataset.total = isFilms ? films(items.length) : works(items.length); stat(door);
   } catch { door.querySelector('[data-stat]').textContent = ''; }
 }
 
