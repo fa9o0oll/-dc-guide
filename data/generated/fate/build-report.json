@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-12T06:10:32.200Z",
+ "generatedAt": "2026-11-12T06:16:03.040Z",
  "total": 28,
  "enriched": 28,
  "pending": 0,
@@ -14,9 +14,8 @@
  "episodes": 329,
  "arabicEpisodeOverviews": 4,
  "problems": [
-  "MAL 22297: fetch failed (ETIMEDOUT)",
-  "MAL 28701: fetch failed (ETIMEDOUT)",
-  "MAL 25537: fetch failed (ETIMEDOUT)",
-  "MAL: توقف السحب بعد 3 إخفاقات متتالية"
+  "MAL 22297: Jikan: fetch failed (ETIMEDOUT) | page: MAL page: no rating data",
+  "MAL 28701: Jikan: fetch failed (ETIMEDOUT) | page: MAL page: no rating data",
+  "MAL: المصدران غير متاحين من هذا المشغّل، تبقى القيم السابقة"
  ]
 }

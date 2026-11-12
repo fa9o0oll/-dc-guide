@@ -1,0 +1,126 @@
+{
+ "guesses": [
+  {
+   "line": "Terrifier | 2016",
+   "chosen": {
+    "id": 420634,
+    "title": "Terrifier",
+    "date": "2018-01-25",
+    "votes": 3149
+   },
+   "others": []
+  },
+  {
+   "line": "Ready or Not 2: Here I Come | 2026",
+   "chosen": {
+    "id": 1266127,
+    "title": "Ready or Not: Here I Come",
+    "date": "2026-03-19",
+    "votes": 1808
+   },
+   "others": []
+  },
+  {
+   "line": "The Hunt for Gollum | 2009",
+   "chosen": {
+    "id": 1090869,
+    "title": "The Lord of the Rings: The Hunt for Gollum",
+    "date": "2027-12-15",
+    "votes": 0
+   },
+   "others": []
+  },
+  {
+   "line": "The Tiger: An Old Hunter's Tale | 2015",
+   "chosen": {
+    "id": 363093,
+    "title": "The Tiger",
+    "date": "2015-12-16",
+    "votes": 301
+   },
+   "others": []
+  },
+  {
+   "line": "A Silent Voice | 2016",
+   "chosen": {
+    "id": 378064,
+    "title": "A Silent Voice: The Movie",
+    "date": "2016-09-17",
+    "votes": 4770
+   },
+   "others": [
+    {
+     "id": 1171702,
+     "title": "A Silent Voice",
+     "date": "2017-01-01",
+     "votes": 2
+    },
+    {
+     "id": 74340,
+     "title": "Amazing Grace and Chuck",
+     "date": "1987-05-22",
+     "votes": 20
+    }
+   ]
+  }
+ ],
+ "missing": [],
+ "ask": [
+  {
+   "line": "Rise of the Planet of the Apes | 2011",
+   "note": "«planet of the apes series»: أُدرجت السلسلة الحديثة (2011 وما بعده). السلسلة الأصلية (1968) تظهر في ترتيب السلسلة."
+  },
+  {
+   "line": "You Can See Everything | 2026",
+   "note": "«You Can See Everything (2026) series»: لم أتعرّف على العمل المقصود."
+  },
+  {
+   "line": "The Grinch | 2018",
+   "note": "«The grinch» بلا سنة: أُدرج فيلم الرسوم 2018. البديل فيلم جيم كاري (2000)."
+  },
+  {
+   "line": "Hellboy | 2004",
+   "note": "«Hellboy» بلا سنة: أُدرج فيلم 2004. نسختا 2019 و2024 تظهران في ترتيب السلسلة."
+  },
+  {
+   "line": "Pinocchio | 2022",
+   "note": "«pinocchio 2022»: في 2022 فيلمان بهذا الاسم. أُدرج فيلم غييرمو ديل تورو، والبديل نسخة ديزني الحيّة."
+  },
+  {
+   "line": "Dumbo | 2019",
+   "note": "«Dumbo» بلا سنة: أُدرجت نسخة 2019 الحيّة. البديل فيلم الرسوم الأصلي (1941)."
+  },
+  {
+   "line": "Taxi Driver | 2021 | tv",
+   "note": "«taxi driver series»: فيلم Taxi Driver (1976) مدرج وحده وليس له سلسلة. أُدرج المسلسل الكوري Taxi Driver احتمالاً."
+  },
+  {
+   "line": "The Mummy | 1999",
+   "note": "«the mummy series»: أُدرجت سلسلة 1999 (بريندان فريزر)."
+  },
+  {
+   "line": "Fantastic Four | 2005",
+   "note": "«fantastic four series»: أُدرج فيلما 2005 و2007. نسخة 2015 وفيلم 2025 يظهران في ترتيب السلسلة."
+  },
+  {
+   "line": "The Out-Laws | 2023",
+   "note": "«the outlaws movie 2023»: أُدرج فيلم نتفليكس The Out-Laws (2023). إن قصدت الفيلم الكوري فهو The Outlaws (2017)، وجزؤه الثاني The Roundup مدرج."
+  },
+  {
+   "line": "House Party | 1990",
+   "note": "«house party» بلا سنة: أُدرج الفيلم الأصلي 1990. البديل نسخة 2023."
+  }
+ ],
+ "seriesWithoutCollection": [],
+ "counts": {
+  "lines": 484,
+  "films": 593,
+  "tv": 7,
+  "added": 0,
+  "collections": 91,
+  "withProviders": 367,
+  "arabicOverviews": 545,
+  "ourArabic": 0,
+  "noPoster": 4
+ }
+}
