@@ -22,11 +22,11 @@ jobs:
         with:
           node-version: 22
       - name: Validate catalog
-        run: node scripts/validate.mjs
+        run: node scripts/validate.mjs && node scripts/validate.mjs fate
       - name: Pull live data from TMDB
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-        run: node scripts/build-site-data.mjs
+        run: node scripts/build-site-data.mjs && node scripts/build-site-data.mjs fate
       - name: Report announced DC titles missing from the catalog
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
@@ -38,7 +38,7 @@ jobs:
         run: node scripts/tmdb-lookup.mjs
         continue-on-error: true
       - name: Build base + Arrowverse order + apply our Arabic translations (fails on any gap)
-        run: node scripts/build-base.mjs && node scripts/build-arrowverse.mjs && node scripts/apply-translations.mjs
+        run: node scripts/build-base.mjs && node scripts/build-arrowverse.mjs && node scripts/apply-translations.mjs && node scripts/build-base.mjs fate && node scripts/apply-translations.mjs fate
       - name: Commit generated data
         if: github.ref == 'refs/heads/main'   # فروع العمل تُبنى للتحقق فقط ولا يُكتب عليها
         run: |

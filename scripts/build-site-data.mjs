@@ -40,6 +40,11 @@ async function buildWork(w) {
           rating: e.vote_count >= 1 ? Math.round(e.vote_average * 10) / 10 : null, votes: e.vote_count || 0,
           overviewEn: (e.overview || '').trim() || null, overviewAr: /[؀-ۿ]/.test(arOv) ? arOv : null }; }) };
     }));
+    // الحلقات الخاصة (الموسم 0 في TMDB) تُضاف آخر الملف للأعمال الموسومة specials، ولا تدخل في عدد الحلقات
+    if (w.specials && (d.seasons || []).some(s => s.season_number === 0)) { const sp = await tmdb(`/tv/${d.id}/season/0`, { language: 'en-US' }).catch(() => null);
+      const eps = (sp?.episodes || []).map(e => ({ n: e.episode_number, name: e.name || null, nameAr: null, date: e.air_date || null, runtime: e.runtime || null, still: e.still_path || null,
+        rating: e.vote_count >= 1 ? Math.round(e.vote_average * 10) / 10 : null, votes: e.vote_count || 0, overviewEn: (e.overview || '').trim() || null, overviewAr: null }));
+      if (eps.length) { full.push({ n: 0, episodes: eps }); o.specials = eps.length; } }
     write(new URL(w.id + '.json', epDir), { id: w.id, tmdb: d.id, seasons: full });
     o.arabicEpisodeOverviews = full.flatMap(s => s.episodes).filter(e => e.overviewAr).length;
   }
@@ -48,7 +53,7 @@ async function buildWork(w) {
 
 const rows = await Promise.all(works.map(w => buildWork(w).catch(e => { problems.push(`${w.id}: ${e.message}`); return { id: w.id, error: true }; })));
 // روابط صفحات التقييم الدقيقة (روتن توميتوز/ميتاكريتيك) من ويكي‌داتا عبر معرّف IMDb
-try {
+if (guide === 'dc') try {
   const ids = rows.map(r => r.imdb).filter(Boolean);
   const q = `SELECT ?imdb ?rt ?mc WHERE { VALUES ?imdb { ${ids.map(i => `"${i}"`).join(' ')} } ?item wdt:P345 ?imdb. OPTIONAL { ?item wdt:P1258 ?rt } OPTIONAL { ?item wdt:P1712 ?mc } }`;
   const res = await fetch('https://query.wikidata.org/sparql', { method: 'POST',
@@ -60,9 +65,22 @@ try {
   for (const r of rows) { const e = by.get(r.imdb); if (e?.rt && /^(m|tv)\//.test(e.rt)) r.rt = e.rt; if (e?.mc) r.mc = e.mc; }
 } catch (e) { problems.push('روابط التقييم من ويكي‌داتا: ' + e.message); }
 // معرّف TVMaze لكل مسلسل (لنقل سجل الحلقات من النسخة القديمة)
-for (const r of rows.filter(r => r.seasons && r.imdb)) {
+for (const r of guide === 'dc' ? rows.filter(r => r.seasons && r.imdb) : []) {
   try { const res = await fetch('https://api.tvmaze.com/lookup/shows?imdb=' + r.imdb); if (res.ok) r.tvmaze = (await res.json()).id; } catch {}
   await new Promise(z => setTimeout(z, 600));
+}
+// تقييمات MyAnimeList لكل إدراج له رقم MAL (عبر Jikan، بلا مفتاح). عند تعذّر السحب تبقى القيم السابقة.
+const malIds = [...new Set(rdSrc('placements.json').map(p => p.mal).filter(Boolean))];
+if (malIds.length) {
+  const prevPath = new URL('mal.json', outDir), prev = fs.existsSync(prevPath) ? JSON.parse(fs.readFileSync(prevPath)).anime || {} : {}, anime = {};
+  for (const id of malIds) {
+    try { const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`, { headers: { 'User-Agent': 'watch-guide-build/1.0 (https://github.com/fa9o0oll/-dc-guide)' } });
+      if (!res.ok) throw new Error('Jikan ' + res.status);
+      const a = (await res.json()).data; anime[id] = { score: a.score ?? null, votes: a.scored_by ?? 0, rank: a.rank ?? null, episodes: a.episodes ?? null, type: a.type ?? null, title: a.title ?? null };
+    } catch (e) { if (prev[id]) anime[id] = prev[id]; problems.push(`MAL ${id}: ${e.message}`); }
+    await new Promise(z => setTimeout(z, 1100));
+  }
+  write(prevPath, { generatedAt: new Date().toISOString(), anime });
 }
 const cfg = await tmdb('/configuration');
 write(new URL('catalog.json', outDir), { generatedAt: new Date().toISOString(), imageBase: cfg.images.secure_base_url, works: rows });

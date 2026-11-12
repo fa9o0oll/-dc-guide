@@ -1,0 +1,139 @@
+{
+ "intro": "السؤال الأشهر في Fate: من أين أبدأ؟ هذه ثلاث إجابات للخط الأساسي (حرب الكأس في فويوكي)، وكل واحدة معها سببها ومصدرها.",
+ "outro": "بقية الخطوط (Grand Order وPrisma Illya وApocrypha وstrange Fake وLast Encore) قصص مستقلة: ترتيب كل خط مكتوب على بطاقاته في صفحة البطاقات.",
+ "paths": [
+  {
+   "id": "start",
+   "name": "الموصى به لمن يبدأ",
+   "why": "المسارات أولاً ثم ما قبل القصة، حتى لا يحرق Fate/Zero مفاجآتها.",
+   "source": "https://lr.eu.psf.lt/r/fatestaynight/comments/df8rvo/rfatestaynights_official_viewing_order_guide_v2",
+   "sourceName": "دليل مجتمع r/fatestaynight",
+   "steps": [
+    {
+     "work": "fate-stay-night-unlimited-blade-works-2014",
+     "season": 1,
+     "note": "ابدأ بالحلقة 0 (Prologue) من تبويب «خاصة»."
+    },
+    {
+     "work": "fate-stay-night-unlimited-blade-works-2014",
+     "season": 2,
+     "note": "بعدها النهاية البديلة Sunny Day، اختيارية."
+    },
+    {
+     "work": "fate-stay-night-heavens-feel-i-presage-flower-2017"
+    },
+    {
+     "work": "fate-stay-night-heavens-feel-ii-lost-butterfly-2019"
+    },
+    {
+     "work": "fate-stay-night-heavens-feel-iii-spring-song-2020"
+    },
+    {
+     "work": "fate-zero-2011",
+     "season": 1
+    },
+    {
+     "work": "fate-zero-2011",
+     "season": 2
+    },
+    {
+     "work": "lord-el-melloi-ii-case-files-2019",
+     "note": "تكملة لشخصية من Fate/Zero."
+    },
+    {
+     "work": "todays-menu-for-the-emiya-family-2018",
+     "note": "استراحة خفيفة بعد الخط الأساسي.",
+     "optional": true
+    }
+   ]
+  },
+  {
+   "id": "release",
+   "name": "ترتيب الصدور",
+   "why": "كما شاهده الجمهور أول مرة. يبدأ بالاقتباس الأقدم ويضع Fate/Zero قبل المسارين الأحدث.",
+   "source": "https://www.thepopverse.com/fate-anime-watch-order-how-to-stay-night-grand-order-chronological-release",
+   "sourceName": "Popverse",
+   "steps": [
+    {
+     "work": "fate-stay-night-2006"
+    },
+    {
+     "work": "fate-stay-night-unlimited-blade-works-2010",
+     "optional": true,
+     "note": "تغني عنه النسخة التلفزيونية."
+    },
+    {
+     "work": "fate-zero-2011",
+     "season": 1
+    },
+    {
+     "work": "fate-zero-2011",
+     "season": 2
+    },
+    {
+     "work": "fate-stay-night-unlimited-blade-works-2014",
+     "season": 1
+    },
+    {
+     "work": "fate-stay-night-unlimited-blade-works-2014",
+     "season": 2
+    },
+    {
+     "work": "fate-stay-night-heavens-feel-i-presage-flower-2017"
+    },
+    {
+     "work": "fate-stay-night-heavens-feel-ii-lost-butterfly-2019"
+    },
+    {
+     "work": "fate-stay-night-heavens-feel-iii-spring-song-2020"
+    },
+    {
+     "work": "lord-el-melloi-ii-case-files-2019"
+    }
+   ]
+  },
+  {
+   "id": "chrono",
+   "name": "ترتيب أحداث القصة",
+   "why": "من الأقدم زمنياً. المسارات الثلاثة ليست متتابعة: كل واحد منها نسخة مختلفة من الحرب نفسها. لا يُنصح به لأول مشاهدة.",
+   "source": "https://www.thepopverse.com/fate-anime-watch-order-how-to-stay-night-grand-order-chronological-release",
+   "sourceName": "Popverse",
+   "steps": [
+    {
+     "work": "fate-zero-2011",
+     "season": 1
+    },
+    {
+     "work": "fate-zero-2011",
+     "season": 2
+    },
+    {
+     "work": "lord-el-melloi-ii-case-files-2019"
+    },
+    {
+     "work": "fate-stay-night-2006",
+     "note": "المسار الأول."
+    },
+    {
+     "work": "fate-stay-night-unlimited-blade-works-2014",
+     "season": 1,
+     "note": "المسار الثاني."
+    },
+    {
+     "work": "fate-stay-night-unlimited-blade-works-2014",
+     "season": 2
+    },
+    {
+     "work": "fate-stay-night-heavens-feel-i-presage-flower-2017",
+     "note": "المسار الثالث."
+    },
+    {
+     "work": "fate-stay-night-heavens-feel-ii-lost-butterfly-2019"
+    },
+    {
+     "work": "fate-stay-night-heavens-feel-iii-spring-song-2020"
+    }
+   ]
+  }
+ ]
+}

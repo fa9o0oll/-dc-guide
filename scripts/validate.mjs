@@ -1,7 +1,7 @@
 // فحص سلامة البيانات — يفشل (exit 1) عند أي خلل. يُشغَّل قبل كل نشر.
-import fs from 'node:fs';
-const rd = f => JSON.parse(fs.readFileSync(new URL('../data/' + f, import.meta.url)));
-const [U, W, P, B, M] = ['universes', 'works', 'placements', 'bridges', 'legacy-id-map'].map(f => rd(f + '.json'));
+import { guide, rdSrc } from './lib-guide.mjs';
+const [U, W, P] = ['universes', 'works', 'placements'].map(f => rdSrc(f + '.json'));
+const B = rdSrc('bridges.json', []), M = rdSrc('legacy-id-map.json', {}), O = rdSrc('order.json', null);
 const errs = [], warn = [];
 const uIds = new Set(U.map(u => u.id)), wById = new Map(W.map(w => [w.id, w]));
 if (uIds.size !== U.length) errs.push('معرّف عالم مكرر');
@@ -24,6 +24,8 @@ for (const p of P) {
   if (p.season && wById.get(p.work)?.kind !== 'series') errs.push('موسم لعمل ليس مسلسلاً: ' + p.work);
   if (p.upcoming && (!['production', 'development'].includes(p.upcoming.stage) || !/^https:\/\//.test(p.upcoming.source))) errs.push('عمل قادم بلا مرحلة أو مصدر: ' + p.work);
   if (p.canon && !/^https:\/\//.test(p.canon.source)) errs.push('حالة اعتماد بلا مصدر: ' + p.work);
+  if (p.order && !/^https:\/\//.test(p.order.source)) errs.push('ملاحظة ترتيب بلا مصدر: ' + p.work);
+  for (const k of ['mal', 'simkl']) if (p[k] != null && !Number.isInteger(p[k])) errs.push(`رقم ${k} غير صالح: ` + p.work);
 }
 for (const u of U) { const n = P.filter(p => p.universe === u.id).map(p => p.position).sort((a, b) => a - b);
   if (!n.length) errs.push('عالم بلا أعمال: ' + u.id); n.forEach((v, i) => { if (v !== i + 1) errs.push('فجوة في ترتيب: ' + u.id); }); }
@@ -32,7 +34,10 @@ const multi = W.filter(w => new Set(P.filter(p => p.work === w.id).map(p => p.un
 for (const w of multi) if (!P.some(p => p.work === w.id && p.canon)) errs.push('عمل في عالمين بلا توثيق: ' + w.id);
 for (const b of B) { if (!wById.has(b.from) || !wById.has(b.to)) errs.push('جسر يشير لعمل غير موجود: ' + b.label); if (!uIds.has(b.toUniverse)) errs.push('جسر لعالم غير معروف'); }
 for (const [k, v] of Object.entries(M)) if (!wById.has(v.work)) errs.push('خريطة قديمة تشير لعمل مفقود: ' + k);
-if (Object.keys(M).length !== 185) errs.push('خريطة المعرّفات القديمة ناقصة');
+if (guide === 'dc' && Object.keys(M).length !== 185) errs.push('خريطة المعرّفات القديمة ناقصة');
+// ترتيبات المشاهدة (إن وُجدت): كل خطوة تشير لإدراج موجود، ولكل ترتيب مصدر
+for (const path of O?.paths || []) { if (!/^https:\/\//.test(path.source)) errs.push('ترتيب مشاهدة بلا مصدر: ' + path.id);
+  for (const st of path.steps) if (!P.some(p => p.work === st.work && (p.season ?? null) === (st.season ?? null))) errs.push(`ترتيب ${path.id} يشير لإدراج غير موجود: ${st.work} ${st.season ?? ''}`); }
 console.log(`أعمال ${W.length} | إدراجات ${P.length} | عوالم ${U.length} | أعمال في أكثر من عالم: ${multi.map(w => w.id).join(', ')}`);
 console.log(`بانتظار التوثيق: معرّفات ${warn.length}/${W.length}`);
 if (errs.length) { console.error('❌ أخطاء:\n- ' + [...new Set(errs)].join('\n- ')); process.exit(1); }

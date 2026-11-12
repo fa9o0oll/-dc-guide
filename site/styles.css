@@ -444,3 +444,66 @@ img.in{opacity:1}
 .top .home .ic{color:var(--c1)}
 .top a.logo{text-decoration:none}
 @media (hover:hover){.top .home:hover{color:var(--ink);border-color:var(--c1)}}
+
+/* ===== مشترك: ترتيب المشاهدة كمسارات، وتقييم بخانتين عشريتين ===== */
+.gauge.fine{font-size:1.02rem}
+.av-intro>p{font-size:.94rem;color:#e6dfd2;max-width:70ch}
+.paths{margin-top:14px;padding-bottom:0}
+.paths button{min-height:44px;padding-inline:16px}
+.av-intro .why{margin-top:12px;padding-inline-start:12px;border-inline-start:3px solid var(--c2);color:var(--ink)}
+.av-intro .why a{color:var(--c1);white-space:nowrap}
+
+/* ===== دليل Fate: هوية مستقلة عن دي سي =====
+   دي سي: خط سميك وظلال مائلة صلبة كصفحات القصص المصورة.
+   Fate: خط رقعة كالمخطوطات، إطارات ذهبية رفيعة مزدوجة، بوسترات بقوس علوي كنوافذ الكاتدرائيات، وزوايا مشطوفة كحدّ السيف. */
+@font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/aref-ruqaa-arabic-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
+@font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/aref-ruqaa-latin-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
+[data-guide=fate]{--display:Ruqaa,"Plex",Tahoma,serif;--cut:polygon(9px 0,calc(100% - 9px) 0,100% 9px,100% calc(100% - 9px),calc(100% - 9px) 100%,9px 100%,0 calc(100% - 9px),0 9px)}
+[data-guide=fate] :is(.brand h1,.opener h2,.av-intro h2,.dock-index,.logo,.gauge,.count b,.tile-name){font-weight:700}
+[data-guide=fate] .opener h2{font-size:clamp(2.1rem,5.6vw,4.2rem);line-height:1.3;max-width:20ch}
+[data-guide=fate] .opener .en{letter-spacing:.02em}
+/* الشعار: ختم مشطوف بدل الدائرة */
+[data-guide=fate] .logo{border-radius:0;box-shadow:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);width:52px;height:52px;font-size:1.3rem}
+/* البطاقة: إطار مزدوج رفيع بلا ظل صلب */
+[data-guide=fate] .card{border-radius:3px;border-color:color-mix(in srgb,var(--c1) 34%,transparent);outline:1px solid color-mix(in srgb,var(--c1) 16%,transparent);outline-offset:-6px;padding:18px;background:linear-gradient(180deg,color-mix(in srgb,var(--c1) 7%,transparent),transparent 34%),color-mix(in srgb,var(--bg) 70%,rgba(255,255,255,.05))}
+[data-guide=fate] .node{border-radius:3px;border-color:color-mix(in srgb,var(--c1) 26%,transparent)}
+/* البوستر: قوس علوي وحلقة ذهبية */
+[data-guide=fate] .card .poster,[data-guide=fate] .dw-top .poster{border-radius:999px 999px 3px 3px/74px 74px 3px 3px;box-shadow:0 0 0 1px var(--bg),0 0 0 2px color-mix(in srgb,var(--c1) 70%,transparent)}
+[data-guide=fate] .ghost{border-radius:999px 999px 3px 3px/74px 74px 3px 3px;box-shadow:0 0 0 2px color-mix(in srgb,var(--c1) 70%,transparent)}
+/* الأزرار: زوايا مشطوفة */
+[data-guide=fate] button,[data-guide=fate] .xlinks a,[data-guide=fate] .top .home{border-radius:2px}
+[data-guide=fate] .actions .cta{clip-path:var(--cut);box-shadow:none;border-radius:0;letter-spacing:.01em}
+[data-guide=fate] .actions .cta:active{transform:scale(.97);box-shadow:none}
+[data-guide=fate] .status{border-radius:0;clip-path:var(--cut);padding:5px}
+[data-guide=fate] .status button{border-radius:0}
+[data-guide=fate] .status button[aria-pressed=true]{clip-path:var(--cut);box-shadow:none}
+[data-guide=fate] .views{border-radius:2px}
+[data-guide=fate] .tag{border-radius:0}
+[data-guide=fate] .vault{border-radius:2px}
+[data-guide=fate] .sheet{border-radius:4px;box-shadow:0 0 0 1px var(--bg),0 0 0 3px color-mix(in srgb,var(--c1) 45%,transparent),0 40px 120px rgba(0,0,0,.8)}
+@media (max-width:560px){[data-guide=fate] .sheet,[data-guide=fate] .sheet.wide{border-radius:4px 4px 0 0;box-shadow:0 -20px 60px rgba(0,0,0,.6)}}
+[data-guide=fate] .bits span+span::before{transform:none;width:1px;height:.8em;vertical-align:-.08em;opacity:.6}
+[data-guide=fate] .opener{min-height:clamp(320px,58vh,580px)}
+[data-guide=fate] .opener .facts li::marker{content:"✦  ";color:var(--c1)}
+/* نقش دائرة الاستدعاء: حلقات وعلامات تدور ببطء (أشكال هندسية عامة) */
+.m-circle .motif::before{inset:auto auto -34vmin -30vmin;width:120vmin;height:120vmin;border-radius:50%;opacity:.5;
+  background:repeating-conic-gradient(color-mix(in srgb,var(--c1) 70%,transparent) 0 .6deg,transparent .6deg 10deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 30%,#000 30.4% 31%,transparent 31.4% 43%,#000 43.4% 46%,transparent 46.4% 57%,#000 57.4% 58%,transparent 58.4% 66%,#000 66.4% 70%,transparent 70.4%);
+  mask:radial-gradient(circle,transparent 0 30%,#000 30.4% 31%,transparent 31.4% 43%,#000 43.4% 46%,transparent 46.4% 57%,#000 57.4% 58%,transparent 58.4% 66%,#000 66.4% 70%,transparent 70.4%);
+  animation:spin 160s linear infinite}
+.m-circle .motif::after{background:radial-gradient(46% 40% at 82% 18%,color-mix(in srgb,var(--c2) 30%,transparent),transparent 70%),radial-gradient(60% 46% at 10% 100%,color-mix(in srgb,var(--c1) 20%,transparent),transparent 70%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.opener.m-circle .motif::before{inset:auto auto -60% -18%;width:min(86vw,720px);height:min(86vw,720px)}
+
+/* ===== ستار الدخول من الواجهة الرئيسية: يستقبل القادم بلون الدليل واسمه (نفس آخر مشهد في الواجهة) ثم ينكشف بطريقة كل دليل ===== */
+.veil{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:0 6vw;text-align:center;background:#07183a;color:#fff;animation:veil-out .5s 7s forwards}
+.veil strong{font-family:var(--display);font-weight:400;font-size:clamp(2.2rem,7vw,4.6rem);line-height:1.3}
+[data-guide=dc] .veil{box-shadow:44px 0 0 #ffc23d,88px 0 0 #1c3f8f}
+[data-guide=fate] .veil{background:#12060a;color:#f7efe0}
+[data-guide=fate] .veil strong{font-weight:700}
+[data-guide=fate] .veil::before{content:"";position:absolute;inset:0;margin:auto;width:38vmin;height:38vmin;border-radius:50%;border:2px solid #e6b65c;box-shadow:0 0 0 10px rgba(230,182,92,.12),inset 0 0 0 14px rgba(230,182,92,.1);opacity:0}
+[data-guide=fate] .veil.lift::before{animation:veil-ring .85s cubic-bezier(.2,.7,.2,1) forwards}
+.veil.lift strong{animation:veil-title .5s ease-in forwards}
+@keyframes veil-ring{0%{opacity:0;transform:scale(.4)}30%{opacity:1}100%{opacity:0;transform:scale(5)}}
+@keyframes veil-title{to{opacity:0;transform:scale(1.08)}}
+@keyframes veil-out{to{opacity:0;visibility:hidden}}

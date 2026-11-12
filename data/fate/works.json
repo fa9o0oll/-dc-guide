@@ -1,0 +1,351 @@
+[
+ {
+  "id": "fate-stay-night-unlimited-blade-works-2014",
+  "title": "Fate/stay night [Unlimited Blade Works]",
+  "year": 2014,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 61415,
+   "imdb": "tt3621796"
+  },
+  "idsVerified": true,
+  "specials": true
+ },
+ {
+  "id": "fate-stay-night-heavens-feel-i-presage-flower-2017",
+  "title": "Fate/stay night: Heaven's Feel I. Presage Flower",
+  "year": 2017,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 283984,
+   "imdb": "tt4054952"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-stay-night-heavens-feel-ii-lost-butterfly-2019",
+  "title": "Fate/stay night: Heaven's Feel II. Lost Butterfly",
+  "year": 2019,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 390634,
+   "imdb": "tt8091892"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-stay-night-heavens-feel-iii-spring-song-2020",
+  "title": "Fate/stay night: Heaven's Feel III. Spring Song",
+  "year": 2020,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 390635,
+   "imdb": "tt8092118"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-zero-2011",
+  "title": "Fate/Zero",
+  "year": 2011,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 45845,
+   "imdb": "tt2051178"
+  },
+  "idsVerified": true,
+  "specials": true
+ },
+ {
+  "id": "lord-el-melloi-ii-case-files-2019",
+  "title": "Lord El-Melloi II's Case Files {Rail Zeppelin} Grace note",
+  "year": 2019,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 85368,
+   "imdb": "tt9573854"
+  },
+  "idsVerified": true,
+  "specials": true
+ },
+ {
+  "id": "fate-stay-night-2006",
+  "title": "Fate/stay night",
+  "year": 2006,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 37858,
+   "imdb": "tt0774809"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-stay-night-unlimited-blade-works-2010",
+  "title": "Fate/stay night: Unlimited Blade Works",
+  "year": 2010,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 46304,
+   "imdb": "tt1587156"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-grand-order-first-order-2016",
+  "title": "Fate/Grand Order -First Order-",
+  "year": 2016,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 428142,
+   "imdb": "tt6213810"
+  },
+  "idsVerified": true,
+  "format": "فيلم تلفزيوني"
+ },
+ {
+  "id": "fate-grand-order-camelot-wandering-agateram-2020",
+  "title": "Fate/Grand Order the Movie: Divine Realm of the Round Table: Camelot 1 Wandering; Agateram",
+  "year": 2020,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 637202,
+   "imdb": "tt9534948"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-grand-order-camelot-paladin-agateram-2021",
+  "title": "Fate/Grand Order the Movie: Divine Realm of the Round Table: Camelot 2 Paladin; Agateram",
+  "year": 2021,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 637462,
+   "imdb": "tt13997358"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-grand-order-babylonia-2019",
+  "title": "Fate/Grand Order Absolute Demonic Front: Babylonia",
+  "year": 2019,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 90677,
+   "imdb": "tt9525238"
+  },
+  "idsVerified": true,
+  "specials": true
+ },
+ {
+  "id": "fate-grand-order-solomon-2021",
+  "title": "Fate/Grand Order Final Singularity – Grand Temple of Time: Solomon",
+  "year": 2021,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 829920,
+   "imdb": "tt12007484"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-grand-order-moonlight-lostroom-2017",
+  "title": "Fate/Grand Order: Moonlight/Lostroom",
+  "year": 2017,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 900497,
+   "imdb": "tt12589360"
+  },
+  "idsVerified": true,
+  "format": "حلقة خاصة"
+ },
+ {
+  "id": "fate-kaleid-liner-prisma-illya-2013",
+  "title": "Fate/kaleid liner Prisma☆Illya",
+  "year": 2013,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 63576,
+   "imdb": "tt2904426"
+  },
+  "idsVerified": true,
+  "specials": true
+ },
+ {
+  "id": "fate-kaleid-liner-prisma-illya-vow-in-the-snow-2017",
+  "title": "Fate/kaleid liner Prisma☆Illya: Vow in the Snow",
+  "year": 2017,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 461083,
+   "imdb": "tt7283066"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-kaleid-liner-prisma-illya-prisma-phantasm-2019",
+  "title": "Fate/kaleid liner Prisma☆Illya: Prisma☆Phantasm",
+  "year": 2019,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 658436,
+   "imdb": "tt10388584"
+  },
+  "idsVerified": true,
+  "format": "أوفا"
+ },
+ {
+  "id": "fate-kaleid-liner-prisma-illya-licht-nameless-girl-2021",
+  "title": "Fate/kaleid liner Prisma☆Illya: Licht Nameless Girl",
+  "year": 2021,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 843243,
+   "imdb": "tt12367916"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-apocrypha-2017",
+  "title": "Fate/Apocrypha",
+  "year": 2017,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 72304,
+   "imdb": "tt6424454"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-strange-fake-whispers-of-dawn-2023",
+  "title": "Fate/strange Fake -Whispers of Dawn-",
+  "year": 2023,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 1145612,
+   "imdb": "tt22264336"
+  },
+  "idsVerified": true,
+  "format": "حلقة خاصة"
+ },
+ {
+  "id": "fate-strange-fake-2024",
+  "title": "Fate/strange Fake",
+  "year": 2024,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 229858,
+   "imdb": "tt32864316"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fate-extra-last-encore-2018",
+  "title": "Fate/Extra Last Encore",
+  "year": 2018,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 76123,
+   "imdb": "tt7940468"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "todays-menu-for-the-emiya-family-2018",
+  "title": "Today's Menu for the Emiya Family",
+  "year": 2018,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 76047,
+   "imdb": "tt7954970"
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "carnival-phantasm-2011",
+  "title": "Carnival Phantasm",
+  "year": 2011,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 43295,
+   "imdb": "tt2076817"
+  },
+  "idsVerified": true,
+  "specials": true
+ },
+ {
+  "id": "fate-grand-carnival-2021",
+  "title": "Fate/Grand Carnival",
+  "year": 2021,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 132848,
+   "imdb": "tt13749554"
+  },
+  "idsVerified": true,
+  "format": "أوفا"
+ },
+ {
+  "id": "fate-grand-order-fujimaru-ritsuka-doesnt-get-it-2023",
+  "title": "Fate/Grand Order: Fujimaru Ritsuka Doesn't Get It",
+  "year": 2023,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 219816,
+   "imdb": "tt33038878"
+  },
+  "idsVerified": true,
+  "format": "حلقات قصيرة"
+ },
+ {
+  "id": "learning-with-manga-fate-grand-order-2018",
+  "title": "Learning with Manga! Fate/Grand Order",
+  "year": 2018,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 1052374
+  },
+  "idsVerified": true,
+  "format": "حلقة خاصة"
+ },
+ {
+  "id": "fate-prototype-2011",
+  "title": "Fate/Prototype",
+  "year": 2011,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "tmdb": 415547,
+   "imdb": "tt8047180"
+  },
+  "idsVerified": true,
+  "format": "أوفا"
+ }
+]
