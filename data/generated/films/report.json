@@ -1,69 +1,5 @@
 {
- "guesses": [
-  {
-   "line": "Terrifier | 2016",
-   "chosen": {
-    "id": 420634,
-    "title": "Terrifier",
-    "date": "2018-01-25",
-    "votes": 3149
-   },
-   "others": []
-  },
-  {
-   "line": "Ready or Not 2: Here I Come | 2026",
-   "chosen": {
-    "id": 1266127,
-    "title": "Ready or Not: Here I Come",
-    "date": "2026-03-19",
-    "votes": 1808
-   },
-   "others": []
-  },
-  {
-   "line": "The Hunt for Gollum | 2009",
-   "chosen": {
-    "id": 1090869,
-    "title": "The Lord of the Rings: The Hunt for Gollum",
-    "date": "2027-12-15",
-    "votes": 0
-   },
-   "others": []
-  },
-  {
-   "line": "The Tiger: An Old Hunter's Tale | 2015",
-   "chosen": {
-    "id": 363093,
-    "title": "The Tiger",
-    "date": "2015-12-16",
-    "votes": 301
-   },
-   "others": []
-  },
-  {
-   "line": "A Silent Voice | 2016",
-   "chosen": {
-    "id": 378064,
-    "title": "A Silent Voice: The Movie",
-    "date": "2016-09-17",
-    "votes": 4770
-   },
-   "others": [
-    {
-     "id": 1171702,
-     "title": "A Silent Voice",
-     "date": "2017-01-01",
-     "votes": 2
-    },
-    {
-     "id": 74340,
-     "title": "Amazing Grace and Chuck",
-     "date": "1987-05-22",
-     "votes": 20
-    }
-   ]
-  }
- ],
+ "guesses": [],
  "missing": [],
  "ask": [
   {
@@ -71,12 +7,16 @@
    "note": "«planet of the apes series»: أُدرجت السلسلة الحديثة (2011 وما بعده). السلسلة الأصلية (1968) تظهر في ترتيب السلسلة."
   },
   {
-   "line": "You Can See Everything | 2026",
-   "note": "«You Can See Everything (2026) series»: لم أتعرّف على العمل المقصود."
-  },
-  {
    "line": "The Grinch | 2018",
    "note": "«The grinch» بلا سنة: أُدرج فيلم الرسوم 2018. البديل فيلم جيم كاري (2000)."
+  },
+  {
+   "line": "Men of War | 2025",
+   "note": "«Men of War 2025»: المطابق في TMDB فيلم وثائقي صدر 2024 (إخراج بيلي كوربن). تأكد أنه المقصود."
+  },
+  {
+   "line": "The Hunt for Gollum | 2009",
+   "note": "«The Hunt For Gollum 2009»: فيلم المعجبين القصير (2009) غير موجود في TMDB، فأُدرج الفيلم الرسمي القادم بنفس الاسم (2027)."
   },
   {
    "line": "Hellboy | 2004",
