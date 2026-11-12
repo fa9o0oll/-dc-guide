@@ -47,8 +47,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('أهداف اللمس ≥ 40px', small.length === 0, small.slice(0, 5).join(' | '));
   check('عمل في عالمين له سجل واحد', await page.evaluate(() => document.querySelectorAll('[data-k="the-suicide-squad-2021"]').length === 2));
   check('أعمال معلنة في آخر عالمها: بتاريخ أو بلا تاريخ', await page.evaluate(() => { const c = [...document.querySelectorAll('#u-dcu .card')], soon = c.map(x => !!x.querySelector('.tag.soon') && !x.querySelector('.status')), first = soon.indexOf(true); return first > 0 && soon.slice(first).every(Boolean) && c[first].id === 'c-dcu-man-of-tomorrow-2027' && document.querySelector('#c-dcu-wonder-woman-tba .count').textContent.includes('قيد التطوير') && !!document.querySelector('#c-dcu-wonder-woman-tba .count a.src[href^="https://"]'); }));
-  check('عمل قادم بعدّاد تنازلي', await page.locator('#c-anim_mv_st-batman-knightfall-part-2-2026 .count b').count() === 1);
-  check('حلقة قادمة: عدّاد تنازلي حي ووسم «يُعرض الآن»', ['4', '5'].includes((await page.textContent('#c-dcu-lanterns-2026 .count b')).trim()) && /^\d\d:\d\d:\d\d$/.test((await page.textContent('#c-dcu-lanterns-2026 .count .clk')).trim()) && (await page.textContent('#c-dcu-lanterns-2026 .tags')).includes('يُعرض الآن'));
+  check('عمل قادم بعدّاد تنازلي بأربع خانات', await page.locator('#c-anim_mv_st-batman-knightfall-part-2-2026 .count .seg').count() === 4);
+  { const sg = await page.$$eval('#c-dcu-lanterns-2026 .count .seg', e => e.map(x => [x.querySelector('b').textContent, x.querySelector('i').textContent]));
+    check('حلقة قادمة: عدّاد حي بخانات يوم وساعة ودقيقة وثانية، ووسم «يُعرض الآن»', sg.length === 4 && ['4', '5'].includes(sg[0][0]) && sg[0][1] === 'يوم' && sg.slice(1).every(([n]) => /^\d\d$/.test(n)) && sg[3][1] === 'ثانية' && (await page.textContent('#c-dcu-lanterns-2026 .tags')).includes('يُعرض الآن'), JSON.stringify(sg));
+    const s0 = await page.textContent('#c-dcu-lanterns-2026 .seg:last-child b'); await page.waitForTimeout(1100); check('العدّاد يتحرك كل ثانية', s0 !== await page.textContent('#c-dcu-lanterns-2026 .seg:last-child b'));
+    // لا رقم ينكسر على سطرين ولا خانة تتجاوز حدود العدّاد، في كل العدّادات الظاهرة
+    check('أرقام العدّادات على سطر واحد وداخل حدودها', await page.evaluate(() => [...document.querySelectorAll('.count')].filter(c => c.offsetParent).every(c => { const r = c.getBoundingClientRect();
+      return [...c.querySelectorAll('.seg b')].every(b => { const q = b.getBoundingClientRect(), lh = parseFloat(getComputedStyle(b).lineHeight); return q.height <= lh * 1.3 && q.left >= r.left - 1 && q.right <= r.right + 1; }); }))); }
   check('موسم معلن بلا موعد يظهر على البطاقة', (await page.textContent('#c-dcu-creature-commandos-2024 .count')).includes('الموسم 2 معلن'));
   // حالة المشاهدة تنعكس في العالمين
   await tap('#c-dcu-the-suicide-squad-2021 [data-s=watched]');

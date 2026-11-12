@@ -1,6 +1,8 @@
 // واجهة الأدلة (دي سي، Fate…). الدليل يُحدَّد من data-guide في الصفحة، وبياناته من مجلد data المجاور لها (تُبنى آلياً).
 import { GUIDES } from './guides.js?v=__BUILD__';
 import { shell } from './shell.js?v=__BUILD__';
+import { ar } from './bidi.js?v=__BUILD__';
+import { segs } from './count.js?v=__BUILD__';
 import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
 const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
 const G = GUIDES[document.documentElement.dataset.guide] || GUIDES.dc;
@@ -74,14 +76,12 @@ const NOUN = { ep: ['حلقة', 'حلقتان', 'حلقتين', 'حلقات', '�
   part: ['جزء', 'جزءان', 'جزءين', 'أجزاء', 'جزءاً', 'واحد'], step: ['خطوة', 'خطوتان', 'خطوتين', 'خطوات', 'خطوة', 'واحدة'], show: ['مسلسل', 'مسلسلان', 'مسلسلين', 'مسلسلات', 'مسلسلاً', 'واحد'] };
 const unit = (n, k) => { const f = NOUN[k], m = n % 100; return n === 0 || (m >= 3 && m <= 10) ? f[3] : m >= 11 ? f[4] : f[0]; };
 const cnt = (n, k, obl) => { const f = NOUN[k]; return n === 1 ? `${f[0]} ${f[5]}` : n === 2 ? f[obl ? 2 : 1] : `${n.toLocaleString('en')} ${unit(n, k)}`; };
-// العدّاد: رقم كبير ثم المعدود، و«يوم واحد» و«يومان» بلا رقم
-const countdown = (d, what) => d <= 0 ? `<b>اليوم</b><span>${what}` : d === 1 ? `<b>يوم</b><span>واحد على ${what}` : d === 2 ? `<b>يومان</b><span>على ${what}` : `<b>${d}</b><span>${unit(d, 'day')} على ${what}`;
 const bits = a => a.filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
 const daysLeft = w => Math.ceil((new Date(w.date) - new Date(TODAY)) / 864e5);
-// العدّاد الحي: أيام كاملة ثم ساعة:دقيقة:ثانية حتى منتصف ليل يوم الصدور بتوقيت الجهاز. يتحدث كل ثانية (انظر المؤقت في آخر الملف).
-const liveCount = (date, what) => { const ms = new Date(date + 'T00:00:00') - Date.now(), d = Math.floor(ms / 864e5), p = n => String(n).padStart(2, '0');
-  const clk = ms > 0 ? `${p(Math.floor(ms / 36e5) % 24)}:${p(Math.floor(ms / 6e4) % 60)}:${p(Math.floor(ms / 1e3) % 60)}` : '';
-  return (ms <= 0 ? `<b>اليوم</b><span>${what}` : d < 1 ? `<b dir="ltr">${clk}</b><span>على ${what}` : `${countdown(d, what)} <bdi dir="ltr" class="clk">${clk}</bdi>`) + `<br><small>${fmtDate(date)}</small></span>`; };
+// العدّاد الحي: اسم المعدود، ثم خانات الأيام والساعات والدقائق والثواني، ثم التاريخ. يتحدث كل ثانية (انظر المؤقت تحته).
+const liveCount = (date, what) => { const sg = segs(date);
+  return sg ? `<span class="lbl">باقٍ على ${what}</span><span class="segs">${sg}</span><small>${fmtDate(date)}</small>`
+    : `<span class="lbl"><b class="now">اليوم</b> ${what}</span><small>${fmtDate(date)}</small>`; };
 const liveBox = (date, what, cls, extra = '') => `<div class="count ${cls}" data-until="${date}" data-what="${esc(what)}"><span class="cd">${liveCount(date, what)}</span>${extra}</div>`;
 setInterval(() => { if (document.hidden) return; for (const el of document.querySelectorAll('.count[data-until] > .cd')) el.innerHTML = liveCount(el.parentNode.dataset.until, el.parentNode.dataset.what); }, 1000);
 const sKey = p => p.season ? `${p.work}#${p.season}` : p.work;
@@ -196,7 +196,7 @@ function uniHead(u, all) {
   return `<header class="opener m-${t.motif}">${key?.backdrop ? `<img class="opener-img" loading="lazy" decoding="async" src="${img(key.backdrop, 'w780')}" srcset="${img(key.backdrop, 'w780')} 780w, ${img(key.backdrop, 'w1280')} 1280w" sizes="(max-width:560px) 60vw, 100vw" alt="">` : ''}<div class="motif"></div>
     <h2>${esc(u.name)}</h2>
     <p class="en">${ltr(u.nameEn)}</p>
-    <p class="desc">${esc(u.description)}</p>
+    <p class="desc">${ar(u.description)}</p>
     <ul class="facts"><li>${esc(u.status)}</li><li>${u.serial ? 'يُشاهد بالترتيب' : 'أعمال منفردة، بأي ترتيب'}</li><li class="prog">شاهدت ${done} من ${rel.length}</li>${u.id === 'arrow' ? '<li class="act"><button data-act="view" data-view="arrow">ترتيب المشاهدة بالمواسم والحلقات</button></li>' : ''}</ul>
     <div class="bar"><i style="width:${rel.length ? Math.round(done / rel.length * 100) : 0}%"></i></div></header>`;
 }
@@ -218,12 +218,12 @@ function card(p) {
       <div class="tags">${soon ? (p.upcoming?.stage === 'development' ? '<span class="tag soon">معلن</span>' : '<span class="tag soon">قادم</span>') : v ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${nextTag(w)}</div>
       ${rating(w, p) ? `<div class="rates">${gaugeRow(w, p)}</div>` : ''}
     </div></div>
-    <div class="cbody"><p class="note">${esc(p.note)}</p>
+    <div class="cbody"><p class="note">${ar(p.note)}</p>
     ${soon ? (src => w.date ? liveBox(w.date, 'الصدور', 'wide', src) : `<div class="count wide"><span>${STAGE[p.upcoming?.stage] || STAGE.production}</span>${src}</div>`)(p.upcoming?.source ? `<a class="src" href="${esc(p.upcoming.source)}" target="_blank" rel="noopener">المصدر</a>` : '') : ''}
     ${nextBlock(w, 'wide')}
     ${avLine(p, 'wide')}
-    ${p.order ? `<p class="canon wide">${esc(p.order.note)} <a href="${esc(p.order.source)}" target="_blank" rel="noopener">المصدر</a></p>` : ''}${p.news ? `<p class="canon wide"><b>قادم:</b> ${esc(p.news.note)} ${p.news.sources.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener">المصدر${p.news.sources.length > 1 ? ' ' + (i + 1) : ''}</a>`).join(' ')}</p>` : ''}
-    ${p.canon ? `<div class="canon wide">يظهر في عالمين: ${esc(p.canon.note)} <a href="${esc(p.canon.source)}" target="_blank" rel="noopener">المصدر</a></div>` : ''}
+    ${p.order ? `<p class="canon wide">${ar(p.order.note)} <a href="${esc(p.order.source)}" target="_blank" rel="noopener">المصدر</a></p>` : ''}${p.news ? `<p class="canon wide"><b>قادم:</b> ${ar(p.news.note)} ${p.news.sources.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener">المصدر${p.news.sources.length > 1 ? ' ' + (i + 1) : ''}</a>`).join(' ')}</p>` : ''}
+    ${p.canon ? `<div class="canon wide">يظهر في عالمين: ${ar(p.canon.note)} <a href="${esc(p.canon.source)}" target="_blank" rel="noopener">المصدر</a></div>` : ''}
     ${p.spoiler ? (store.shield ? `<details class="vault wide"><summary>${ic('lock')}<span>معلومة ارتباط فيها حرق</span><b>اكشفها</b></summary><p>${esc(p.spoiler)}</p></details>` : `<p class="note wide">${esc(p.spoiler)}</p>`) : ''}</div>
     <div class="cfoot">${xlinks(w, p)}${soon ? '' : `<div class="status wide">${Object.entries(STATUS).map(([k, l]) => `<button data-act="status" data-s="${k}" aria-pressed="${st === k}">${ic(STATUS_IC[k])}<span>${l}</span></button>`).join('')}</div>`}
     <div class="actions wide"><button class="cta" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} ${tot ? `style="--p:${Math.round(dn / tot * 100)}%"` : ''}>${w.seasons?.length ? `${ic('eps')}<span>الحلقات</span>${tot ? `<span class="epprog" title="شاهدت ${dn} من ${tot}"><bdi>${dn}/${tot}</bdi></span>` : ''}` : '<span>التفاصيل</span>'}</button>
@@ -246,7 +246,7 @@ function node(p, i, list, step) {
       <span class="node-text"><span class="n">${step ? `الخطوة ${i + 1}${step.optional ? ' (اختيارية)' : ''}` : esc(p.label)}${soon ? (w.date ? ` · قادم بعد ${cnt(daysLeft(w), 'day', true)}` : ' · قادم') : ''}</span>
         <span class="t">${ltr(titleOf(p))}</span>
         <span class="meta">${esc([yearOf(w, p), typeOf(w)].filter(Boolean).join(' · '))}</span>
-        ${around.length ? `<span class="meta">${around.map(([k, t]) => `${k}: ${ltr(t)}`).join(' · ')}</span>` : ''}${avStart(p) ? `<span class="meta">يبدأ في الخطوة ${avStart(p).n} من ترتيب المشاهدة</span>` : ''}${step?.note ? `<span class="meta">${esc(step.note)}</span>` : ''}</span></button>
+        ${around.length ? `<span class="meta">${around.map(([k, t]) => `${k}: ${ltr(t)}`).join(' · ')}</span>` : ''}${avStart(p) ? `<span class="meta">يبدأ في الخطوة ${avStart(p).n} من ترتيب المشاهدة</span>` : ''}${step?.note ? `<span class="meta">${ar(step.note)}</span>` : ''}</span></button>
     <div class="go">${soon ? '' : `<button class="tick" data-act="status" data-s="watched" aria-pressed="${done}">${tick(done, 'شاهدته', 'علّمه كمشاهَد')}</button>`}<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}">البطاقة</button></div></div>`;
 }
 const avStart = p => { if (p.universe !== 'arrow' || !D.arrow) return null; return D.arrow.steps.find(s => (s.blocks || []).some(b => b.work === p.work && (!p.season || b.season === p.season)) || (s.parts || []).some(q => q.work === p.work && (!p.season || q.season === p.season))) || null; };
@@ -290,37 +290,45 @@ function renderPaths() {
     <div class="av-intro"><h2>${esc(G.order.here)}</h2>
       <p>${esc(o.intro || '')}</p>
       <div class="seasons paths" role="tablist">${o.paths.map(x => `<button data-act="path" data-path="${x.id}" class="${x === cur ? 'on' : ''}" role="tab" aria-selected="${x === cur}">${esc(x.name)}</button>`).join('')}</div>
-      <p class="why">${esc(cur.why)} <a href="${esc(cur.source)}" target="_blank" rel="noopener">المصدر: ${ltr(cur.sourceName)}</a></p></div>
+      <p class="why">${ar(cur.why)} <a href="${esc(cur.source)}" target="_blank" rel="noopener">المصدر: ${ltr(cur.sourceName)}</a></p></div>
     <div class="tl">${cur.steps.map((st, i, all) => node(find(st), i, all, st)).join('')}</div>
     ${o.outro ? `<p class="tl-note">${esc(o.outro)}</p>` : ''}
   </section>`;
 }
 function renderArrow() {
   if (G.order?.kind === 'paths') return renderPaths();
-  const a = D.arrow, done = avDone();
+  const a = D.arrow, done = avDone(), t = THEMES.arrow, key = D.works.get(t.key);
+  // افتتاحية بصورة العالم نفسها كما في البطاقات، ثم شرح الترتيب تحتها
   $('#main').innerHTML = `<section class="uni" data-uni="arrow" style="${themeVars('arrow')}">
-    <div class="av-intro"><h2>ترتيب مشاهدة ${ltr('Arrowverse')}</h2>
-      <ul><li>${cnt(a.steps.length, 'step')} تغطي ${cnt(a.totalEpisodes, 'ep', true)} من ${cnt(a.showCount, 'show', true)}. كل حلقة موجودة مرة واحدة فقط.</li>
+    <header class="opener av-hero m-${t.motif}">${key?.backdrop ? `<img class="opener-img" decoding="async" src="${img(key.backdrop, 'w780')}" srcset="${img(key.backdrop, 'w780')} 780w, ${img(key.backdrop, 'w1280')} 1280w" sizes="(max-width:560px) 60vw, 100vw" alt="">` : ''}<div class="motif"></div>
+      <h2>ترتيب مشاهدة ${ltr('Arrowverse')}</h2>
+      <p class="desc">${cnt(a.steps.length, 'step')} تغطي ${cnt(a.totalEpisodes, 'ep', true)} من ${cnt(a.showCount, 'show', true)}. كل حلقة موجودة مرة واحدة فقط.</p>
+      <span class="lbl" id="avLbl">تقدّمك: ${done} من ${cnt(a.totalEpisodes, 'ep', true)}</span><div class="bar"><i id="avBar" style="width:${Math.round(done / a.totalEpisodes * 100)}%"></i></div></header>
+    <div class="av-intro">
+      <ul>
       <li>اتبع الخطوات بالترتيب، وداخل كل خطوة اتبع الأسطر من الأعلى إلى الأسفل.</li>
       <li>الخطوات البرتقالية حلقات تقاطع: قصة واحدة موزعة على أكثر من مسلسل، وتُشاهد بترتيب الأجزاء.</li>
       <li>الترتيب مبني على تواريخ العرض الفعلية وعناوين الحلقات الرسمية.</li>
       <li>${a.sideShows.map(x => `${ltr(x.show)} يبدأ في الخطوة ${x.firstStep}`).join('، و')}. يدوران في أرضين مستقلتين عن أرض بقية المسلسلات، ومكانهما في الخطوات حسب تاريخ عرضهما. ${a.sideShows.map(x => `<a href="${esc(x.source)}" target="_blank" rel="noopener">مصدر ${ltr(x.show)}</a>`).join(' · ')}</li></ul>
-      <span class="lbl" id="avLbl">تقدّمك: ${done} من ${cnt(a.totalEpisodes, 'ep', true)}</span><div class="bar"><i id="avBar" style="width:${Math.round(done / a.totalEpisodes * 100)}%"></i></div></div>
+</div>
     <div class="steps">${a.steps.map(s => stepHTML(s)).join('')}</div>
   </section>`;
 }
+// صورة الموسم (أو المسلسل إن لم تكن للموسم صورة) في أول كل سطر من ترتيب آروفيرس
+const avThumb = (id, season) => { const w = D.works.get(id), p = w?.seasons?.find(x => x.n === season)?.poster || w?.poster;
+  return `<span class="thumb av-th">${p ? `<img loading="lazy" decoding="async" src="${img(p, 'w154')}" srcset="${img(p, 'w92')} 92w, ${img(p, 'w154')} 154w" sizes="48px" alt="">` : ''}</span>`; };
 const stepHTML = (s, shown) => s.kind === 'crossover' ? `<div class="step cross${shown ? ' shown' : ''}" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)} <span class="en">${ltr(s.titleEn)}</span></h3><span class="tag soon">${cnt(s.parts.filter(p => !p.tieIn).length, 'part')} بالترتيب</span><span class="meta">${esc(s.label)}</span></div>
-        ${s.parts.map(p => { const d = epDone(p.work, p.season, p.episode); return `<div class="row ${d ? 'done' : ''} ${p.tieIn ? 'tie' : ''}" style="--show:${SHOW_COLORS[p.work]}"><span class="k">${p.tieIn ? '＋' : p.part}</span>
+        ${s.parts.map(p => { const d = epDone(p.work, p.season, p.episode); return `<div class="row ${d ? 'done' : ''} ${p.tieIn ? 'tie' : ''}" style="--show:${SHOW_COLORS[p.work]}"><span class="k">${p.tieIn ? '＋' : p.part}</span>${avThumb(p.work, p.season)}
           <span class="show">${ltr(p.show)}<span class="epname">${ltr(p.name || '')}</span></span>
           <span class="what">${p.tieIn ? 'حلقة مرتبطة' : `الجزء ${p.part}`}: الموسم ${p.season}، الحلقة ${p.episode}<small>${fmtDate(p.aired)}</small></span>
           <span class="btns"><button class="tick" aria-pressed="${!!d}" data-act="avpart" data-id="${p.work}" data-season="${p.season}" data-ep="${p.episode}">${tick(d, 'شاهدتها', 'علّمها كمشاهَدة')}</button><button data-act="open" data-id="${p.work}" data-season="${p.season}">افتح الموسم</button></span>
-          ${p.note ? `<span class="link">${esc(p.note)}</span>` : ''}</div>`; }).join('')}</div>`
+          ${p.note ? `<span class="link">${ar(p.note)}</span>` : ''}</div>`; }).join('')}</div>`
       : `<div class="step${shown ? ' shown' : ''}" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)}</h3>${s.title !== s.label ? `<span class="meta">${esc(s.label)}</span>` : ''}</div>
-        ${s.blocks.map((b, i) => { const dn = rangeDone(b), full = dn === b.count; return `<div class="row ${full ? 'done' : ''}" style="--show:${SHOW_COLORS[b.work]}"><span class="k">${i + 1}</span>
+        ${s.blocks.map((b, i) => { const dn = rangeDone(b), full = dn === b.count; return `<div class="row ${full ? 'done' : ''}" style="--show:${SHOW_COLORS[b.work]}"><span class="k">${i + 1}</span>${avThumb(b.work, b.season)}
           <span class="show">${ltr(b.show)}</span>
           <span class="what">الموسم ${b.season}: ${b.whole ? 'كامل' : `من الحلقة ${b.from} إلى الحلقة ${b.to}`}<small>${cnt(b.count, 'ep')} · شاهدت ${dn}${b.side ? ' · أرض مستقلة: لا يتقاطع مع المسلسلات الأخرى' : ''}</small></span>
           <span class="btns"><button class="tick" aria-pressed="${!!full}" data-act="avblock" data-id="${b.work}" data-season="${b.season}" data-from="${b.from}" data-to="${b.to}">${tick(full, 'مكتملة', 'علّمها كمشاهَدة')}</button><button data-act="open" data-id="${b.work}" data-season="${b.season}">الحلقات</button></span>
-          ${b.links.map(l => `<span class="link">الحلقة ${l.episode}${l.toEpisode ? ' إلى ' + l.toEpisode : ''}: ${esc(l.note)}</span>`).join('')}</div>`; }).join('')}</div>`;
+          ${b.links.map(l => `<span class="link">الحلقة ${l.episode}${l.toEpisode ? ' إلى ' + l.toEpisode : ''}: ${ar(l.note)}</span>`).join('')}</div>`; }).join('')}</div>`;
 
 
 function render(keepScroll) {
@@ -432,7 +440,7 @@ function openWork(id, season, from) {
       <div><h3>${ltr(w.title)}</h3>
       <div class="meta bits">${bits([typeOf(w), w.date ? fmtDate(w.date) : w.year, w.runtime ? cnt(w.runtime, 'min') : '', ...(w.episodeCount ? [cnt(w.seasons.length, 'season'), cnt(w.episodeCount, 'ep')] : [])])}</div>
       ${soon && w.date ? `<div class="tags"><span class="tag soon">قادم بعد ${cnt(daysLeft(w), 'day', true)}</span></div>` : ''}</div></div>
-    ${w.overviewAr ? `<p class="ov">${esc(w.overviewAr)}</p>` : w.overviewEn ? `<div><span class="lbl">النبذة بالإنجليزية (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(w.overviewEn)}</p></div>` : ''}
+    ${w.overviewAr ? `<p class="ov">${ar(w.overviewAr)}</p>` : w.overviewEn ? `<div><span class="lbl">النبذة بالإنجليزية (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(w.overviewEn)}</p></div>` : ''}
     <div class="actions">${places.map(p => `<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">البطاقة في ${esc(uniOf(p.universe).name)}${p.season ? `، الموسم ${p.season}` : ''}</button>`).join('')}</div>
     ${rateBlock(w, pl)}
     ${nextBlock(w)}
@@ -459,7 +467,7 @@ async function showSeason(id, n) {
         <div><h4>${n ? 'الحلقة' : 'خاصة'} ${e.n}${e.name ? ltr(e.name) : ''}</h4>${e.nameAr ? `<div class="ar-title">${esc(e.nameAr)}</div>` : ''}
           <div class="meta">${esc([when, e.runtime ? e.runtime + ' د' : '', fut ? '' : e.rating == null ? 'بلا تقييم بعد' : few ? 'تقييم بأصوات قليلة' : ''].filter(Boolean).join(' · '))}</div></div>
         ${ov ? `<div style="grid-column:1/-1">${e.overviewAr ? '' : '<span class="lbl">الملخص بالإنجليزية (الترجمة العربية قيد الإعداد)</span>'}
-          <p class="ov ${e.overviewAr ? '' : 'en'} ${store.shield && !d ? 'blur' : ''}" ${store.shield && !d ? 'data-act="reveal" title="اضغط للكشف"' : ''}>${esc(ov)}</p>
+          <p class="ov ${e.overviewAr ? '' : 'en'} ${store.shield && !d ? 'blur' : ''}" ${store.shield && !d ? 'data-act="reveal" title="اضغط للكشف"' : ''}>${ar(ov)}</p>
           ${store.shield && !d ? '<span class="lbl">الملخص مخفي لتفادي الحرق. اضغط عليه للكشف</span>' : ''}</div>` : ''}
         <div class="foot2"><span></span>${fut ? '' : `<button class="tick" aria-pressed="${!!d}" data-act="ep" data-id="${id}" data-season="${n}" data-ep="${e.n}">${tick(d, 'شاهدتها', 'علّمها كمشاهَدة')}</button>`}</div></div>`; }).join('');
 }
