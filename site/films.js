@@ -16,7 +16,7 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 
 // عدّ عربي: 1 فيلم واحد، 2 فيلمان، 3 إلى 10 أفلام، 11 فأكثر فيلماً
 const count = (n, [one, two, few, many, sing]) => { const m = n % 100; return n === 1 ? one : n === 2 ? two : m >= 3 && m <= 10 ? `${n} ${few}` : m >= 11 ? `${n} ${many}` : `${n} ${sing}`; };
-const nFilms = n => count(n, ['فيلم واحد', 'فيلمان', 'أفلام', 'فيلماً', 'فيلم']), nParts = n => count(n, ['جزء واحد', 'جزآن', 'أجزاء', 'جزءاً', 'جزء']);
+const nFilms = n => count(n, ['فيلم واحد', 'فيلمان', 'أفلام', 'فيلماً', 'فيلم']), nParts = n => count(n, ['جزء واحد', 'جزءان', 'أجزاء', 'جزءاً', 'جزء']);
 const rt = m => !m ? '' : m < 60 ? `${m}د` : `${Math.floor(m / 60)}س${m % 60 ? ` ${m % 60}د` : ''}`;
 const today = new Date().toISOString().slice(0, 10);
 const unreleased = f => f.kind === 'movie' && (!f.date || f.date > today);
@@ -52,7 +52,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <label>اسم الفيلم وسنته في سطر واحد<input id="add-q" dir="auto" placeholder="Heat 1995" autocomplete="off" required></label>
   <label id="add-pass-wrap">كلمة السر (تُطلب مرة واحدة على هذا الجهاز)<input id="add-pass" type="password" autocomplete="current-password"></label>
   <button class="btn pri" type="submit">ابحث عنه</button><p class="msg" id="add-msg" aria-live="polite"></p><div class="cands" id="cands"></div>
-  <p class="hint">الفيلم يظهر هنا فوراً، ويصل بقية أجهزتك خلال دقائق. معلومات سلسلته تُجلب آلياً من <bdi dir="ltr">TMDB</bdi>.</p></form></dialog>
+  <p class="hint">الفيلم يظهر هنا فوراً، ويصل إلى بقية أجهزتك خلال دقائق. معلومات سلسلته تُجلب آلياً من <bdi dir="ltr">TMDB</bdi>.</p></form></dialog>
 <div class="toast" id="toast" role="status"></div>`);
 
 const toast = (t, undo) => { const el = $('#toast'); el.textContent = t; if (undo) { const b = Object.assign(document.createElement('button'), { textContent: 'تراجع', onclick: () => { el.classList.remove('on', 'act'); el.textContent = ''; undo(); } }); el.append(b); }
@@ -156,13 +156,13 @@ function orderHTML(f) { const g = groupOf(f);
 <p class="note">${g.curated ? `الترتيب والتوصيات من إعداد الدليل، مبنية على ترابط القصة وتقييم <bdi dir="ltr">TMDB</bdi> الظاهر بجانب كل عمل${g.sources?.length ? `. المصادر: ${g.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener"><bdi dir="ltr">${esc(x.name)}</bdi></a>`).join('، ')}` : ''}.` : 'الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط. لم يُراجَع يدوياً بعد.'}</p></section>`; }
 function whereSec(f) { const p = f.prov, g = (t, ids) => ids.length ? `<div class="wgroup"><b>${t}</b><div class="wlist">${ids.map(id => `<a href="${esc(p.link || '#')}" target="_blank" rel="noopener">${D.prov[id]?.logo ? `<img alt="" src="${IMG}w92${D.prov[id].logo}">` : ''}${esc(D.prov[id]?.name || id)}</a>`).join('')}</div></div>` : '';
   const body = p ? g('باشتراك', p.stream) + g('مجاناً', p.free) + g('إيجار', p.rent) + g('شراء', p.buy) : '';
-  return `<section class="sec"><h3>أين تشاهده في السعودية</h3>${body || `<p>${unreleased(f) ? 'لم يصدر بعد.' : 'لا يتوفر على منصات السعودية حالياً حسب بيانات <bdi dir="ltr">JustWatch</bdi>.'}</p>`}${body ? '<p class="note">الأزرار تفتح صفحة أماكن العرض على <bdi dir="ltr">TMDB</bdi>، ومنها إلى المنصة. البيانات من <bdi dir="ltr">JustWatch</bdi> وتتحدث يومياً.</p>' : ''}</section>`; }
+  return `<section class="sec"><h3>أين تشاهده في السعودية</h3>${body || `<p>${unreleased(f) ? 'لم يصدر بعد.' : 'غير متاح على منصات السعودية حالياً حسب بيانات <bdi dir="ltr">JustWatch</bdi>.'}</p>`}${body ? '<p class="note">الأزرار تفتح صفحة أماكن العرض على <bdi dir="ltr">TMDB</bdi>، ومنها إلى المنصة. البيانات من <bdi dir="ltr">JustWatch</bdi> وتتحدث يومياً.</p>' : ''}</section>`; }
 function linksSec(f) { const ua = navigator.userAgent, ww = /android/i.test(ua) ? 'https://play.google.com/store/apps/details?id=com.whattawatch' : /iphone|ipad|ipod/i.test(ua) ? 'https://apps.apple.com/app/id6444618445' : 'https://whattawatch.com/';
   const a = (href, name, sub) => `<a href="${href}" target="_blank" rel="noopener"><b>${name}</b><small>${sub}</small></a>`;
   return `<section class="sec"><h3>صفحته في المواقع</h3><div class="links">${f.imdb ? a(`https://www.imdb.com/title/${f.imdb}/`, 'IMDb', 'التقييم والطاقم') : ''}${f.kind === 'movie' ? a(`https://letterboxd.com/tmdb/${f.tmdb}`, 'Letterboxd', 'المراجعات والقوائم') : ''}${a(`https://www.themoviedb.org/${f.kind}/${f.tmdb}`, 'TMDB', 'مصدر البيانات')}
 <a href="${ww}" target="_blank" rel="noopener" data-act="ww" data-t="${esc(f.title)}"><b>WhattaWatch</b><small>يفتح التطبيق وينسخ اسم الفيلم للبحث</small></a></div></section>`; }
 async function sheetHTML(f) { const m = (await D.moreReady)?.[f.id] || {}, s = st(f.id), un = unreleased(f);
-  const ov = m.overviewAr ? `<p>${esc(m.overviewAr)}</p>${m.arSource === 'guide' ? '' : '<p class="note">نبذة <bdi dir="ltr">TMDB</bdi> العربية كما هي، لم نراجعها بعد.</p>'}` : m.overviewEn ? `<p dir="ltr" lang="en" style="text-align:left">${esc(m.overviewEn)}</p><p class="note">النبذة بالإنجليزية، والترجمة قيد الإعداد.</p>` : '<p>لا نبذة متوفرة.</p>';
+  const ov = m.overviewAr ? `<p>${esc(m.overviewAr)}</p>${m.arSource === 'guide' ? '' : '<p class="note">نبذة <bdi dir="ltr">TMDB</bdi> العربية كما هي، لم نراجعها بعد.</p>'}` : m.overviewEn ? `<p dir="ltr" lang="en" style="text-align:left">${esc(m.overviewEn)}</p><p class="note">النبذة بالإنجليزية، والترجمة قيد الإعداد.</p>` : '<p>لا توجد نبذة.</p>';
   return `<div class="sh-hero">${f.backdrop ? `<img alt="" src="${IMG}w780${f.backdrop}" srcset="${IMG}w780${f.backdrop} 780w, ${IMG}w1280${f.backdrop} 1280w" sizes="(max-width:880px) 100vw, 880px">` : ''}</div>
 <div class="sh-head"><div class="poster">${poster(f.poster, '170px')}</div><div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
 <p class="facts">${[f.kind === 'tv' ? 'مسلسل' : '', f.year ? `<bdi>${f.year}</bdi>` : '', rt(f.runtime), f.seasons ? count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم']) : '', f.cert ? `<bdi dir="ltr">${esc(f.cert)}</bdi>` : '', LANGS[f.lang] ? 'اللغة ' + LANGS[f.lang] : '', f.rating ? `<span class="rate">تقييم <bdi dir="ltr">TMDB ${f.rating.toFixed(1)}</bdi></span>` : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</p>

@@ -70,6 +70,14 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await overflow('نافذة المسلسل'); await snap('3-series');
   await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });
   check('تقدم الحلقات يظهر على البطاقة', (await page.textContent('#c-dcu-peacemaker-2022-s2 .epprog')).trim() === '1/8');
+  // «شاهدته» على موسم فيه حلقات غير معلّمة: يسأل بالعدد ولا يعلّم شيئاً من نفسه
+  await tap('#c-dcu-peacemaker-2022-s2 [data-s=watched]'); await page.waitForSelector('#toast.ask:not([hidden])');
+  check('«شاهدته» على موسم يسأل عن الحلقات الباقية بعددها', (await page.textContent('#toast')).includes('7 حلقات') && (await page.textContent('#c-dcu-peacemaker-2022-s2 .epprog')).trim() === '1/8');
+  await overflow('سؤال الحلقات الباقية'); await snap('3b-ask');
+  await tap('#toast [data-act=askno]'); check('«اتركها» لا يغيّر سجل الحلقات', await page.isHidden('#toast') && (await page.textContent('#c-dcu-peacemaker-2022-s2 .epprog')).trim() === '1/8' && await page.getAttribute('#c-dcu-peacemaker-2022-s2 [data-s=watched]', 'aria-pressed') === 'true');
+  await tap('#c-dcu-peacemaker-2022-s2 [data-s=watched]'); await tap('#c-dcu-peacemaker-2022-s2 [data-s=watched]'); await page.waitForSelector('#toast.ask:not([hidden])');
+  await tap('#toast [data-act=askyes]'); check('«علّمها كلها» يعلّم حلقات الموسم ويحدّث البطاقة', (await page.textContent('#c-dcu-peacemaker-2022-s2 .epprog')).trim() === '8/8' && (await page.textContent('#toast')).includes('7 حلقات') && !(await page.evaluate(() => document.querySelector('#toast').classList.contains('ask'))));
+  check('سجل الحلقات بالصيغة نفسها', await page.evaluate(() => { const s = JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => /progress|dcg/i.test(k)))); return s.v === 1 && Object.keys(s.eps['peacemaker-2022']).filter(k => k.startsWith('2-')).length === 8 && s.works['peacemaker-2022#2'] === 'watched'; }));
   // الفهرس متاح بعد النزول في الصفحة، وفيه كل العوالم
   await page.evaluate(() => scrollTo(0, 6000)); await page.waitForTimeout(200);
   check('زر الفهرس وطرق العرض والأدوات ظاهرة بعد النزول في الصفحة', await page.evaluate(m => ['.dock-index', '.views [data-view=timeline]', '#shieldBtn'].every(s => { const r = document.querySelector(s).getBoundingClientRect(); return r.top >= 0 && r.bottom <= 125 && r.width > 40 && (r.left >= 0 || (m && s === '#shieldBtn')); }), mobile), await page.evaluate(() => 'ارتفاع الشريط ' + Math.round(document.querySelector('.stick').getBoundingClientRect().height)));

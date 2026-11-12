@@ -67,7 +67,7 @@ const isSoon = w => !w.date || w.date > TODAY;
 // [مفرد، مثنى مرفوع، مثنى منصوب أو مجرور، جمع، مفرد منصوب، واحد/واحدة]
 const NOUN = { ep: ['حلقة', 'حلقتان', 'حلقتين', 'حلقات', 'حلقة', 'واحدة'], season: ['موسم', 'موسمان', 'موسمين', 'مواسم', 'موسماً', 'واحد'], day: ['يوم', 'يومان', 'يومين', 'أيام', 'يوماً', 'واحد'],
   min: ['دقيقة', 'دقيقتان', 'دقيقتين', 'دقائق', 'دقيقة', 'واحدة'], vote: ['صوت', 'صوتان', 'صوتين', 'أصوات', 'صوتاً', 'واحد'], work: ['عمل', 'عملان', 'عملين', 'أعمال', 'عملاً', 'واحد'],
-  part: ['جزء', 'جزءان', 'جزأين', 'أجزاء', 'جزءاً', 'واحد'], step: ['خطوة', 'خطوتان', 'خطوتين', 'خطوات', 'خطوة', 'واحدة'], show: ['مسلسل', 'مسلسلان', 'مسلسلين', 'مسلسلات', 'مسلسلاً', 'واحد'] };
+  part: ['جزء', 'جزءان', 'جزءين', 'أجزاء', 'جزءاً', 'واحد'], step: ['خطوة', 'خطوتان', 'خطوتين', 'خطوات', 'خطوة', 'واحدة'], show: ['مسلسل', 'مسلسلان', 'مسلسلين', 'مسلسلات', 'مسلسلاً', 'واحد'] };
 const unit = (n, k) => { const f = NOUN[k], m = n % 100; return n === 0 || (m >= 3 && m <= 10) ? f[3] : m >= 11 ? f[4] : f[0]; };
 const cnt = (n, k, obl) => { const f = NOUN[k]; return n === 1 ? `${f[0]} ${f[5]}` : n === 2 ? f[obl ? 2 : 1] : `${n.toLocaleString('en')} ${unit(n, k)}`; };
 // العدّاد: رقم كبير ثم المعدود، و«يوم واحد» و«يومان» بلا رقم
@@ -126,11 +126,25 @@ function nextBlock(w, cls = '') {
 }
 const nextTag = w => { const k = nextInfo(w)?.kind; return k === 'episode' ? '<span class="tag soon">يُعرض الآن</span>' : k === 'season' || k === 'announced' ? '<span class="tag soon">موسم قادم</span>' : ''; };
 const verdict = r => r == null ? null : r >= 7.5 ? ['ممتاز', '#35d07f'] : r >= 6.8 ? ['جيد', '#57abff'] : r >= 6 ? ['متوسط', '#f2b84b'] : ['ضعيف', '#ef5d57'];
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); }
+function toast(msg) { const t = $('#toast'); t.classList.remove('ask'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); }
 const posterTag = w => w.poster
   ? `<img loading="lazy" decoding="async" src="${img(w.poster, 'w342')}" srcset="${img(w.poster, 'w185')} 185w, ${img(w.poster, 'w342')} 342w, ${img(w.poster, 'w500')} 500w" sizes="128px" alt="بوستر ${esc(w.title)}">`
   : `<span class="ph">${esc(w.title)}</span>`;
 
+// سؤال بزرّين في مكان الإشعار. يبقى حتى يُجاب أو تمضي 20 ثانية، وتجاهله مثل «لا»: لا يتغيّر شيء.
+function ask(msg, yes, no, fn) { const t = $('#toast'); clearTimeout(toast.t); ask.fn = fn; t.classList.add('ask');
+  t.innerHTML = `<span>${msg}</span><span class="ask-btns"><button data-act="askyes">${yes}</button><button data-act="askno">${no}</button></span>`; t.hidden = false; toast.t = setTimeout(() => { t.hidden = true; ask.fn = null; }, 20000); }
+// «شاهدته» على مسلسل أو موسم لا يعلّم حلقاته من نفسه، فقد تكون تُركت حلقات عن قصد: نذكر عدد ما بقي ونسأل.
+// الحلقات الخاصة وما لم يُعرض بعد خارج العدّ. الرفض أو التجاهل لا يمسّ سجل الحلقات.
+async function offerEps(k) { const [id, sn] = k.split('#'), w = D.works.get(id), season = sn ? +sn : 0; if (!w?.seasons?.length) return;
+  try { if (!D.episodes.has(id)) D.episodes.set(id, await getJSON(`data/episodes/${id}.json`)); } catch { return; }
+  if (store.works[k] !== 'watched') return;
+  const left = D.episodes.get(id).seasons.filter(s => s.n && (!season || s.n === season)).flatMap(s => s.episodes.filter(e => e.date && e.date <= TODAY && !epDone(id, s.n, e.n)).map(e => [s.n, e.n])), n = left.length; if (!n) return;
+  const scope = season || w.seasons.length === 1 ? 'هذا الموسم' : 'هذا المسلسل';
+  ask(`بقيت ${cnt(n, 'ep')} من ${scope} بلا علامة مشاهدة. ${n === 1 ? 'هل تعلّمها؟' : n === 2 ? 'هل تعلّمهما؟' : 'هل تعلّمها كلها؟'}`, n === 1 ? 'علّمها' : n === 2 ? 'علّمهما' : 'علّمها كلها', n === 2 ? 'اتركهما' : 'اتركها', () => {
+    for (const [s, e] of left) setEp(id, s, e, true); save(); stats(); syncEps(id);
+    const sa = $('#eps [data-act=seasonall]'); if (sa?.dataset.id === id) showSeason(id, +sa.dataset.season);
+    toast(`عُلّمت ${cnt(n, 'ep')}`); }); }
 function stats() {
   const released = [...D.works.values()].filter(w => !isSoon(w)).length;
   const watched = new Set(Object.entries(store.works).filter(([, s]) => s === 'watched').map(([k]) => k.split('#')[0])).size;
@@ -229,7 +243,7 @@ function node(p, i, list, step) {
         <span class="t">${ltr(titleOf(p))}</span>
         <span class="meta">${esc([yearOf(w, p), typeOf(w)].filter(Boolean).join(' · '))}</span>
         ${around.length ? `<span class="meta">${around.map(([k, t]) => `${k}: ${ltr(t)}`).join(' · ')}</span>` : ''}${avStart(p) ? `<span class="meta">يبدأ في الخطوة ${avStart(p).n} من ترتيب المشاهدة</span>` : ''}${step?.note ? `<span class="meta">${esc(step.note)}</span>` : ''}</span></button>
-    <div class="go">${soon ? '' : `<button class="tick" data-act="status" data-s="watched" aria-pressed="${done}">${tick(done, 'شاهدته', 'علّمه مشاهَد')}</button>`}<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}">البطاقة</button></div></div>`;
+    <div class="go">${soon ? '' : `<button class="tick" data-act="status" data-s="watched" aria-pressed="${done}">${tick(done, 'شاهدته', 'علّمه مشاهَداً')}</button>`}<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}">البطاقة</button></div></div>`;
 }
 const avStart = p => { if (p.universe !== 'arrow' || !D.arrow) return null; return D.arrow.steps.find(s => (s.blocks || []).some(b => b.work === p.work && (!p.season || b.season === p.season)) || (s.parts || []).some(q => q.work === p.work && (!p.season || q.season === p.season))) || null; };
 const avLine = (p, cls = '') => { const st = avStart(p); return st ? `<div class="canon ${cls}">في ترتيب المشاهدة: يبدأ في الخطوة ${st.n} (${esc(st.title)}). <button data-act="avgo" data-step="${st.id}">افتح الخطوة</button></div>` : ''; };
@@ -243,7 +257,7 @@ function renderTimeline() {
 function syncStatus(k) {
   const st = store.works[k] || '';
   for (const el of $$('#main [data-k]')) { if (el.dataset.k !== k) continue;
-    if (el.classList.contains('node')) { const on = st === 'watched', sb = $('[data-act=status]', el); el.classList.toggle('done', on); if (sb) { sb.setAttribute('aria-pressed', on); sb.innerHTML = tick(on, 'شاهدته', 'علّمه مشاهَد'); } }
+    if (el.classList.contains('node')) { const on = st === 'watched', sb = $('[data-act=status]', el); el.classList.toggle('done', on); if (sb) { sb.setAttribute('aria-pressed', on); sb.innerHTML = tick(on, 'شاهدته', 'علّمه مشاهَداً'); } }
     else $$('.status button', el).forEach(x => x.setAttribute('aria-pressed', x.dataset.s === st)); }
 }
 function syncEps(id) {
@@ -283,7 +297,7 @@ function renderArrow() {
   $('#main').innerHTML = `<section class="uni" data-uni="arrow" style="${themeVars('arrow')}">
     <div class="av-intro"><h2>ترتيب مشاهدة ${ltr('Arrowverse')}</h2>
       <ul><li>${cnt(a.steps.length, 'step')} تغطي ${cnt(a.totalEpisodes, 'ep', true)} من ${cnt(a.showCount, 'show', true)}. كل حلقة موجودة مرة واحدة فقط.</li>
-      <li>اتبع الخطوات بالترتيب، وداخل كل خطوة اتبع الأسطر من الأعلى للأسفل.</li>
+      <li>اتبع الخطوات بالترتيب، وداخل كل خطوة اتبع الأسطر من الأعلى إلى الأسفل.</li>
       <li>الخطوات البرتقالية حلقات تقاطع: قصة واحدة موزعة على أكثر من مسلسل، وتُشاهد بترتيب الأجزاء.</li>
       <li>الترتيب مبني على تواريخ العرض الفعلية وعناوين الحلقات الرسمية.</li>
       <li>${a.sideShows.map(x => `${ltr(x.show)} يبدأ في الخطوة ${x.firstStep}`).join('، و')}. يدوران في أرضين مستقلتين عن أرض بقية المسلسلات، ومكانهما في الخطوات حسب تاريخ عرضهما. ${a.sideShows.map(x => `<a href="${esc(x.source)}" target="_blank" rel="noopener">مصدر ${ltr(x.show)}</a>`).join(' · ')}</li></ul>
@@ -295,13 +309,13 @@ const stepHTML = (s, shown) => s.kind === 'crossover' ? `<div class="step cross$
         ${s.parts.map(p => { const d = epDone(p.work, p.season, p.episode); return `<div class="row ${d ? 'done' : ''} ${p.tieIn ? 'tie' : ''}" style="--show:${SHOW_COLORS[p.work]}"><span class="k">${p.tieIn ? '＋' : p.part}</span>
           <span class="show">${ltr(p.show)}<span class="epname">${ltr(p.name || '')}</span></span>
           <span class="what">${p.tieIn ? 'حلقة مرتبطة' : `الجزء ${p.part}`}: الموسم ${p.season}، الحلقة ${p.episode}<small>${fmtDate(p.aired)}</small></span>
-          <span class="btns"><button class="tick" aria-pressed="${!!d}" data-act="avpart" data-id="${p.work}" data-season="${p.season}" data-ep="${p.episode}">${tick(d, 'شاهدتها', 'علّمها مشاهدة')}</button><button data-act="open" data-id="${p.work}" data-season="${p.season}">افتح الموسم</button></span>
+          <span class="btns"><button class="tick" aria-pressed="${!!d}" data-act="avpart" data-id="${p.work}" data-season="${p.season}" data-ep="${p.episode}">${tick(d, 'شاهدتها', 'علّمها مشاهَدة')}</button><button data-act="open" data-id="${p.work}" data-season="${p.season}">افتح الموسم</button></span>
           ${p.note ? `<span class="link">${esc(p.note)}</span>` : ''}</div>`; }).join('')}</div>`
       : `<div class="step${shown ? ' shown' : ''}" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)}</h3>${s.title !== s.label ? `<span class="meta">${esc(s.label)}</span>` : ''}</div>
         ${s.blocks.map((b, i) => { const dn = rangeDone(b), full = dn === b.count; return `<div class="row ${full ? 'done' : ''}" style="--show:${SHOW_COLORS[b.work]}"><span class="k">${i + 1}</span>
           <span class="show">${ltr(b.show)}</span>
           <span class="what">الموسم ${b.season}: ${b.whole ? 'كامل' : `من الحلقة ${b.from} إلى الحلقة ${b.to}`}<small>${cnt(b.count, 'ep')} · شاهدت ${dn}${b.side ? ' · أرض مستقلة: لا يتقاطع مع المسلسلات الأخرى' : ''}</small></span>
-          <span class="btns"><button class="tick" aria-pressed="${!!full}" data-act="avblock" data-id="${b.work}" data-season="${b.season}" data-from="${b.from}" data-to="${b.to}">${tick(full, 'مكتملة', 'علّمها مشاهدة')}</button><button data-act="open" data-id="${b.work}" data-season="${b.season}">الحلقات</button></span>
+          <span class="btns"><button class="tick" aria-pressed="${!!full}" data-act="avblock" data-id="${b.work}" data-season="${b.season}" data-from="${b.from}" data-to="${b.to}">${tick(full, 'مكتملة', 'علّمها مشاهَدة')}</button><button data-act="open" data-id="${b.work}" data-season="${b.season}">الحلقات</button></span>
           ${b.links.map(l => `<span class="link">الحلقة ${l.episode}${l.toEpisode ? ' إلى ' + l.toEpisode : ''}: ${esc(l.note)}</span>`).join('')}</div>`; }).join('')}</div>`;
 
 
@@ -426,14 +440,14 @@ async function showSeason(id, n) {
   $('#seasonTabs .on')?.scrollIntoView({ block: 'nearest', inline: 'center' });
   const box = $('#eps');
   try { if (!D.episodes.has(id)) D.episodes.set(id, await getJSON(`data/episodes/${id}.json`)); }
-  catch { box.innerHTML = '<p class="empty">تعذّر تحميل الحلقات. تحقق من الاتصال وحاول مرة ثانية.</p>'; return; }
+  catch { box.innerHTML = '<p class="empty">تعذّر تحميل الحلقات. تحقق من الاتصال وحاول مرة أخرى.</p>'; return; }
   const s = D.episodes.get(id).seasons.find(x => x.n === n); if (!s || !box.isConnected) return;
   box.removeAttribute('aria-busy');
   if (G.malScore && n) { const pl = D.placements.find(p => p.work === id && p.season === n), r = $('#sheet .rates'); if (pl && r) r.outerHTML = rateBlock(D.works.get(id), pl); } // لكل موسم صفحته وتقييمه
   const all = s.episodes.every(e => epDone(id, n, e.n));
   const rated = s.episodes.filter(e => e.rating != null && (e.votes ?? 5) >= 5), avg = rated.length ? Math.round(rated.reduce((x, e) => x + e.rating, 0) / rated.length * 10) / 10 : null;
   box.innerHTML = `<div class="season-bar"><span class="lbl">${!n ? 'حلقات خاصة خارج ترقيم المواسم. ملاحظة كل بطاقة تذكر متى تُشاهد المهم منها.' : avg != null ? `متوسط تقييم الموسم ${avg} من 10 على ${ltr('TMDB')}، محسوب من ${cnt(rated.length, 'ep', true)}` : 'لا يوجد تقييم كافٍ لحلقات هذا الموسم بعد'}</span>
-      ${n ? `<button data-act="seasonall" data-id="${id}" data-season="${n}">${all ? 'إلغاء تعليم الموسم' : 'علّم الموسم كاملاً كمشاهد'}</button>` : ''}</div>` +
+      ${n ? `<button data-act="seasonall" data-id="${id}" data-season="${n}">${all ? 'ألغِ تعليم حلقات الموسم' : 'علّم حلقات الموسم كلها'}</button>` : ''}</div>` +
     s.episodes.map(e => { const d = epDone(id, n, e.n), fut = !e.date || e.date > TODAY, ov = e.overviewAr || e.overviewEn, few = (e.votes ?? 5) < 5;
       const when = fut ? (e.date ? `تُعرض بعد ${cnt(daysTo(e.date), 'day', true)}، ${fmtDate(e.date)}` : 'لم يُحدَّد موعد عرضها') : fmtDate(e.date);
       return `<div class="ep ${d ? 'done' : ''} ${fut ? 'future' : ''}"><span class="epthumb">${e.still ? `<img loading="lazy" decoding="async" src="${img(e.still, 'w300')}" alt="">` : '<span class="ph"></span>'}
@@ -443,7 +457,7 @@ async function showSeason(id, n) {
         ${ov ? `<div style="grid-column:1/-1">${e.overviewAr ? '' : '<span class="lbl">الملخص بالإنجليزية (الترجمة العربية قيد الإعداد)</span>'}
           <p class="ov ${e.overviewAr ? '' : 'en'} ${store.shield && !d ? 'blur' : ''}" ${store.shield && !d ? 'data-act="reveal" title="اضغط للكشف"' : ''}>${esc(ov)}</p>
           ${store.shield && !d ? '<span class="lbl">الملخص مخفي لتفادي الحرق. اضغط عليه للكشف</span>' : ''}</div>` : ''}
-        <div class="foot2"><span></span>${fut ? '' : `<button class="tick" aria-pressed="${!!d}" data-act="ep" data-id="${id}" data-season="${n}" data-ep="${e.n}">${tick(d, 'شاهدتها', 'علّمها مشاهدة')}</button>`}</div></div>`; }).join('');
+        <div class="foot2"><span></span>${fut ? '' : `<button class="tick" aria-pressed="${!!d}" data-act="ep" data-id="${id}" data-season="${n}" data-ep="${e.n}">${tick(d, 'شاهدتها', 'علّمها مشاهَدة')}</button>`}</div></div>`; }).join('');
 }
 const unblur = ov => { ov.classList.remove('blur'); ov.removeAttribute('data-act'); ov.removeAttribute('title'); ov.nextElementSibling?.remove(); };
 function setEp(id, s, e, on) { const o = store.eps[id] ||= {}; if (on) o[`${s}-${e}`] = 1; else delete o[`${s}-${e}`]; if (!Object.keys(o).length) delete store.eps[id]; }
@@ -470,10 +484,10 @@ function openJump() {
 }
 const encode = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 function openBackup() {
-  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px"><p>سجلك محفوظ في هذا المتصفح فقط. انسخ الكود واحتفظ به، والصقه في أي جهاز أو متصفح ثاني لاسترجاع السجل.</p>
+  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px"><p>سجلك محفوظ في هذا المتصفح فقط. انسخ الكود واحتفظ به، والصقه في أي جهاز أو متصفح آخر لاسترجاع السجل.</p>
     <textarea id="bk" aria-label="كود السجل">${encode(store)}</textarea>
     <div class="actions"><button data-act="bkcopy">نسخ الكود</button><button data-act="bkimport">استيراد الكود الملصوق</button></div>
-    ${G.legacyImport ? '<h4>النقل من النسخة القديمة</h4><p>افتح موقعك القديم، اضغط «نسخ احتياطي» وانسخ الكود، ثم الصقه هنا واضغط استيراد. يتحول تلقائياً للنظام الجديد.</p>' : ''}</div>`, 'backup');
+    ${G.legacyImport ? '<h4>النقل من النسخة القديمة</h4><p>افتح موقعك القديم واضغط «نسخ احتياطي» وانسخ الكود، ثم الصقه هنا واضغط «استيراد الكود الملصوق». يتحوّل تلقائياً إلى النظام الجديد.</p>' : ''}</div>`, 'backup');
 }
 function importCode() {
   let raw; try { raw = JSON.parse(decodeURIComponent(escape(atob($('#bk').value.trim())))); } catch { return toast('الكود غير صالح'); }
@@ -508,14 +522,17 @@ document.addEventListener('click', ev => {
     case 'close': closeSheet(); break;
     case 'shield': if (ui.sheet) closeSheet(); store.shield = !store.shield; save(); syncShield(); render(true); toast(store.shield ? 'درع الحرق مفعّل' : 'درع الحرق متوقف'); break;
     case 'status': { const k = b.closest('[data-k]').dataset.k; if (store.works[k] === d.s) delete store.works[k]; else store.works[k] = d.s; save();
+      if (store.works[k] === 'watched') offerEps(k); else if (ask.fn) { ask.fn = null; $('#toast').hidden = true; }
       if ($('#fStatus').value) { render(true); break; } // مع تصفية الحالة قد يخرج العمل من القائمة نفسها
       syncStatus(k); stats(); refreshProgress(); break; }
     case 'goto': { const force = d.force; if (ui.sheet) closeSheet(); if (force) ui.uni = d.uni; setTimeout(() => goTo(d.to === 't' ? 'timeline' : 'cards', d.uni, d.target), force ? 60 : 0); break; }
     case 'ep': { const on = !epDone(id, season, +d.ep), row = b.closest('.ep'), ov = $('.ov.blur', row); setEp(id, season, +d.ep, on); save();
-      row.classList.toggle('done', on); b.innerHTML = tick(on, 'شاهدتها', 'علّمها مشاهدة'); b.setAttribute('aria-pressed', on); if (on && ov) unblur(ov);
-      const sa = $('#eps [data-act=seasonall]'), s = D.episodes.get(id).seasons.find(x => x.n === season); if (sa) sa.textContent = s.episodes.every(e => epDone(id, season, e.n)) ? 'إلغاء تعليم الموسم' : 'علّم الموسم كاملاً كمشاهد';
+      row.classList.toggle('done', on); b.innerHTML = tick(on, 'شاهدتها', 'علّمها مشاهَدة'); b.setAttribute('aria-pressed', on); if (on && ov) unblur(ov);
+      const sa = $('#eps [data-act=seasonall]'), s = D.episodes.get(id).seasons.find(x => x.n === season); if (sa) sa.textContent = s.episodes.every(e => epDone(id, season, e.n)) ? 'ألغِ تعليم حلقات الموسم' : 'علّم حلقات الموسم كلها';
       stats(); syncEps(id); ui.dirty = true; break; }
     case 'seasonall': { const s = D.episodes.get(id).seasons.find(x => x.n === season), on = !s.episodes.every(e => epDone(id, season, e.n)); s.episodes.filter(e => e.date && e.date <= TODAY).forEach(e => setEp(id, season, e.n, on)); save(); showSeason(id, season); stats(); syncEps(id); ui.dirty = true; break; }
+    case 'askyes': { const fn = ask.fn; ask.fn = null; $('#toast').hidden = true; fn?.(); break; }
+    case 'askno': ask.fn = null; $('#toast').hidden = true; break;
     case 'reveal': unblur(b); break;
     case 'avpart': setEp(id, season, +d.ep, !epDone(id, season, +d.ep)); save(); avRefresh(b.closest('.step')); stats(); break;
     case 'avblock': { let all = true; for (let e = +d.from; e <= +d.to; e++) all &&= epDone(id, season, e); for (let e = +d.from; e <= +d.to; e++) setEp(id, season, e, !all); save(); avRefresh(b.closest('.step')); stats(); break; }
