@@ -1,0 +1,488 @@
+# قائمة الأفلام بعد تنظيف القائمة الأصلية (list-original.txt): إزالة المكرر، تصحيح الإملاء والسنوات، وفكّ سطور السلاسل.
+# الصيغة: العنوان | السنة | النوع | ملاحظة
+#   النوع فارغ = فيلم واحد. series = الفيلم المذكور وكل أفلام سلسلته في TMDB. tv = مسلسل لا فيلم.
+#   الملاحظة تبدأ بعلامة ؟ إن كان السطر الأصلي يحتمل أكثر من عمل ويحتاج تأكيد صاحب القائمة.
+Saw | 2004 | series
+Ballerina | 2023
+Oldboy | 2003
+Stomp the Yard | 2007
+Aladdin | 2019
+First Man | 2018
+Alita: Battle Angel | 2019
+Good Will Hunting | 1997
+Ip Man | 2008 | series
+28 Days Later | 2002 | series
+The Mauritanian | 2021
+The Truman Show | 1998
+The Hunt | 2012
+The Shadow's Edge | 2025
+The Hunger Games | 2012 | series
+Speed | 1994
+All Quiet on the Western Front | 2022
+Arrival | 2016
+Mortal Kombat II | 2026
+Mission: Impossible | 1996 | series
+The Purge | 2013 | series
+Alice in Wonderland | 2010 | series
+Gomorrah | 2008
+Sexy Beast | 2000
+City of God | 2002
+Athena | 2022
+Eastern Promises | 2007
+Door Lock | 2018
+12 Angry Men | 1957
+Kingsman: The Golden Circle | 2017
+The Father | 2020
+Taxi Driver | 1976
+The Super Mario Galaxy Movie | 2026
+The Bourne Identity | 2002 | series
+Papillon | 2017
+Triangle of Sadness | 2022
+StreetDance 2 | 2012
+Harry Potter and the Philosopher's Stone | 2001 | series
+Spartacus | 1960
+Gladiator | 2000
+Rome | 2005 | tv
+Troy | 2004
+Goodfellas | 1990
+Dr. No | 1962 | series
+Fury | 2014
+Men in Black | 1997 | series
+Johnny English | 2003 | series
+Dumb and Dumber | 1994
+Dumb and Dumber To | 2014
+Rise of the Planet of the Apes | 2011 | series | ؟ «planet of the apes series»: أُدرجت السلسلة الحديثة (2011 وما بعده). السلسلة الأصلية (1968) تظهر في ترتيب السلسلة.
+The Curious Case of Benjamin Button | 2008
+The Gentlemen | 2019
+Maleficent | 2014
+Maleficent: Mistress of Evil | 2019
+Pig | 2021
+Upgrade | 2018
+The Girl in the Spider's Web | 2018
+Instant Family | 2018
+Snow White | 2025
+Ran | 1985
+Sicario | 2015 | series
+Boyhood | 2014
+The Nice Guys | 2016
+The Green Mile | 1999
+House of Gucci | 2021
+The King's Man | 2021
+Undisputed | 2002 | series
+A Star Is Born | 2018
+Coyote vs. Acme | 2026
+Happy Gilmore | 1996
+Happy Gilmore 2 | 2025
+Rushmore | 1998
+Obsession | 2025
+Candyman | 2021
+Network | 1976
+The Dark Knight Rises | 2012
+The Departed | 2006
+The Disaster Artist | 2017
+Bad Times at the El Royale | 2018
+Fermat's Room | 2007
+Drawing Closer | 2024
+The Verdict | 1982
+I Am Sam | 2001
+The Machinist | 2004
+Harold & Kumar Go to White Castle | 2004 | series
+Idiocracy | 2006
+The Social Network | 2010
+Foxcatcher | 2014
+The Last Boy Scout | 1991
+The Witch: Part 1. The Subversion | 2018
+The Witch: Part 2. The Other One | 2022
+Dark City | 1998
+Shutter Island | 2010
+Rental Family | 2025
+Chevalier | 2022
+Furiosa: A Mad Max Saga | 2024
+The Iron Claw | 2023
+Wind River | 2017
+Carry-On | 2024
+Gangs of New York | 2002
+Before the Devil Knows You're Dead | 2007
+Blood & Gold | 2023
+The Machine | 2023
+Kandahar | 2023
+You Can See Everything | 2026 | | ؟ «You Can See Everything (2026) series»: لم أتعرّف على العمل المقصود.
+I Saw the Devil | 2010
+The Raid | 2011
+There Will Be Blood | 2007
+Midnight | 2021
+The Glass Castle | 2017
+Haunted Mansion | 2023
+The Little Mermaid | 2023
+Green Book | 2018
+Incendies | 2010
+The Lion King | 2019
+Reminiscence | 2021
+Deep Cover | 2025
+Mufasa: The Lion King | 2024
+Wild Tales | 2014
+Mickey 17 | 2025
+Creed II | 2018
+Sound of Freedom | 2023
+The Gangster, the Cop, the Devil | 2019
+Send Help | 2026
+Shark: The Beginning | 2021
+Weapons | 2025
+The Man from Earth | 2007
+The Man from Earth: Holocene | 2017
+Ready or Not | 2019
+Ready or Not 2: Here I Come | 2026
+The Lobster | 2015
+The Shining | 1980
+Horizon: An American Saga - Chapter 1 | 2024
+Harakiri | 1962
+One Battle After Another | 2025
+Hancock | 2008
+The Martian | 2015
+The Babadook | 2014
+Just Mercy | 2019
+The Secret in Their Eyes | 2009
+The Killer | 2023
+Snatch | 2000
+Exit 8 | 2025
+Three Billboards Outside Ebbing, Missouri | 2017
+Gone with the Wind | 1939
+The Gorge | 2025
+Willy Wonka & the Chocolate Factory | 1971
+Charlie and the Chocolate Factory | 2005
+Wonka | 2023
+Fair Game | 2010
+Hachi: A Dog's Tale | 2009
+The Beguiled | 2017
+Palmer | 2021
+The Man from Nowhere | 2010
+Anatomy of a Fall | 2023
+Below Zero | 2021
+A Haunting in Venice | 2023
+Michael | 2026
+The Grinch | 2018 | | ؟ «The grinch» بلا سنة: أُدرج فيلم الرسوم 2018. البديل فيلم جيم كاري (2000).
+Together | 2025
+The Tashkent Files | 2019
+Unbreakable | 2000
+Split | 2016
+Glass | 2019
+Django Unchained | 2012
+Freakier Friday | 2025
+Playdate | 2025
+Roofman | 2025
+2012 | 2009
+My Little Loves | 1974
+Good Luck, Have Fun, Don't Die | 2025
+Full Metal Jacket | 1987
+Forgotten | 2017
+Prisoners | 2013
+tick, tick... BOOM! | 2021
+Late Night with the Devil | 2023
+Eternal Sunshine of the Spotless Mind | 2004
+Digger | 2026
+The Substance | 2024
+Jojo Rabbit | 2019
+Harriet | 2019
+No Country for Old Men | 2007
+On the Rocks | 2020
+Ma Rainey's Black Bottom | 2020
+Contagion | 2011
+Fences | 2016
+Jungle Cruise | 2021
+The Odyssey | 2026
+The Banshees of Inisherin | 2022
+Grown Ups | 2010
+Grown Ups 2 | 2013
+Twelve Monkeys | 1995
+The Land of Happiness | 2024
+Censor | 2021
+Yojimbo | 1961
+Cold Pursuit | 2019
+Hillbilly Elegy | 2020
+Gifted | 2017
+Demolition Man | 1993
+Godzilla Minus Zero | 2026
+Last Night in Soho | 2021
+The Virgin Suicides | 1999
+Civil War | 2024
+Slumdog Millionaire | 2008
+The Tomorrow War | 2021
+The Perks of Being a Wallflower | 2012
+Serpico | 1973
+Amadeus | 1984
+Mystic River | 2003
+Seven Samurai | 1954
+Transformers | 2007 | series
+The Negotiation | 2018
+Memories of Murder | 2003
+Napoleon | 2023
+Casablanca | 1942
+The Usual Suspects | 1995
+Hitman's Wife's Bodyguard | 2021
+Detachment | 2011
+A Complete Unknown | 2024
+Verity | 2026
+Black Swan | 2010
+Fear Street: 1666 | 2021
+Traffic | 2000
+Ocean's Eleven | 2001
+Ocean's Twelve | 2004
+Ocean's Thirteen | 2007
+The Roundup | 2022
+Monkey Man | 2024
+Odd Thomas | 2013
+One Flew Over the Cuckoo's Nest | 1975
+Where the Crawdads Sing | 2022
+Blink Twice | 2024
+Rear Window | 1954
+The Furious | 2025
+The Fall Guy | 2024
+A Taxi Driver | 2017
+The Fetus | 2025
+Men of War | 2025
+Strange Harvest | 2025
+Eyes Wide Shut | 1999
+K-PAX | 2001
+Talk to Me | 2022
+Still Alice | 2014
+American Made | 2017
+The Green Knight | 2021
+Wicked | 2024
+Boy Kills World | 2023
+The Hunt for Gollum | 2009
+Somewhere | 2010
+The Empty Man | 2020
+The Monkey | 2025
+Women Talking | 2022
+The Midnight Sky | 2020
+Reign Over Me | 2007
+RRR | 2022
+The Fabelmans | 2022
+Juror #2 | 2024
+The Shape of Water | 2017
+2001: A Space Odyssey | 1968
+Red One | 2024
+Promising Young Woman | 2020
+Lost in Translation | 2003
+Babylon | 2022
+Fractured | 2019
+I'm Thinking of Ending Things | 2020
+The First Omen | 2024
+Terrifier | 2016 | series
+Dunkirk | 2017
+The Art of Racing in the Rain | 2019
+Reservoir Dogs | 1992
+Inglourious Basterds | 2009
+Up in the Air | 2009
+The Wild Robot | 2024
+The Beauty Inside | 2015
+Nosferatu | 2024
+Possessor | 2020
+Polytechnique | 2009
+Boss Level | 2020
+Behind Her Eyes | 2021 | tv
+White Men Can't Jump | 1992
+Dog Day Afternoon | 1975
+Moonlight | 2016
+The White Tiger | 2021
+It's a Wonderful Life | 1946
+Bad Education | 2019
+Caddo Lake | 2024
+Bridge to Terabithia | 2007
+The Yellow Sea | 2010
+A Clockwork Orange | 1971
+La La Land | 2016
+The Terminal | 2004
+Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb | 1964
+Monica | 2022
+Crater | 2023
+Sound of Metal | 2019
+Five Nights at Freddy's | 2023
+Raging Bull | 1980
+Saturday Night | 2024
+The Big Lebowski | 1998
+Wolfs | 2024
+Marie Antoinette | 2006
+10 Cloverfield Lane | 2016
+Brothers | 2024
+Assassin Club | 2023
+Teenage Mutant Ninja Turtles: Mutant Mayhem | 2023
+Never Rarely Sometimes Always | 2020
+Bohemian Rhapsody | 2018
+Isle of Dogs | 2018
+Midnight Runners | 2017
+Argentina, 1985 | 2022
+The Big Short | 2015
+Memoir of a Murderer | 2017
+Mirai | 2018
+Blue Eye Samurai | 2023 | tv
+City Slickers | 1991
+A Man Called Otto | 2022
+Ray | 2004
+Psycho | 1960
+Wolf Mountain | 2022
+Vertigo | 1958
+Death's Roulette | 2023
+Barry Lyndon | 1975
+Hypnotic | 2023
+The Color Purple | 1985
+Ace Ventura: Pet Detective | 1994
+The Rip | 2026
+Vedaa | 2024
+Hustle & Flow | 2005
+Hellboy | 2004 | | ؟ «Hellboy» بلا سنة: أُدرج فيلم 2004. نسختا 2019 و2024 تظهران في ترتيب السلسلة.
+American Fiction | 2023
+Abigail | 2024
+What Is a Woman? | 2022
+The Northman | 2022
+Paths of Glory | 1957
+The Greatest Showman | 2017
+Longlegs | 2024
+The Unbearable Weight of Massive Talent | 2022
+The Grand Budapest Hotel | 2014
+Life Is Beautiful | 1997
+The Trial of the Chicago 7 | 2020
+Killer's Kiss | 1955
+Tár | 2022
+A Woman Under the Influence | 1974
+Enemy | 2013
+Lolita | 1962
+The Promised Land | 2023
+The Tiger: An Old Hunter's Tale | 2015
+Marriage Story | 2019
+The Menu | 2022
+Killers of the Flower Moon | 2023
+Annihilation | 2018
+The Killing | 1956
+The King of Staten Island | 2020
+Dallas Buyers Club | 2013
+IF | 2024
+Pinocchio | 2022 | | ؟ «pinocchio 2022»: في 2022 فيلمان بهذا الاسم. أُدرج فيلم غييرمو ديل تورو، والبديل نسخة ديزني الحيّة.
+The Shawshank Redemption | 1994
+Johnny & Clyde | 2023
+One Ranger | 2023
+Ex Machina | 2014
+The Ministry of Ungentlemanly Warfare | 2024
+Incredibles 2 | 2018
+Solace | 2015
+STILL: A Michael J. Fox Movie | 2023
+Kill Bill: Vol. 1 | 2003 | series
+Love, Death & Robots | 2019 | tv
+Casino | 1995
+Tetris | 2023
+Thanksgiving | 2023
+Triple Frontier | 2019
+Emancipation | 2022
+Silenced | 2011
+Aftersun | 2022
+Violent Night | 2022
+The Whale | 2022
+Dumbo | 2019 | | ؟ «Dumbo» بلا سنة: أُدرجت نسخة 2019 الحيّة. البديل فيلم الرسوم الأصلي (1941).
+Twisters | 2024
+Tenacious D in The Pick of Destiny | 2006
+Promare | 2019
+Taxi Driver | 2021 | tv | ؟ «taxi driver series»: فيلم Taxi Driver (1976) مدرج وحده وليس له سلسلة. أُدرج المسلسل الكوري Taxi Driver احتمالاً.
+Rush | 2013
+Blade Runner 2049 | 2017
+Us | 2019
+Beautiful Boy | 2018
+Greyhound | 2020
+The Secret Life of Pets | 2016 | series
+Fighting with My Family | 2019
+Copshop | 2021
+Braveheart | 1995
+Detainment | 2018
+Sunshine | 2007
+Unhinged | 2020
+Heretic | 2024
+Onward | 2020
+Léon: The Professional | 1994
+The Highwaymen | 2019
+Predestination | 2014
+Good Time | 2017
+Hitch | 2005
+Ferris Bueller's Day Off | 1986
+I Am Mother | 2019
+Bird Box Barcelona | 2023
+Deadwood: The Movie | 2019
+Night School | 2018
+Gintama | 2017
+Ghostbusters: Frozen Empire | 2024
+Predator | 1987 | series
+Heat | 1995
+Unstoppable | 2018
+Shirley | 2020
+Da 5 Bloods | 2020
+12 Years a Slave | 2013
+Clark | 2022 | tv
+Everything Everywhere All at Once | 2022
+District 9 | 2009
+King of New York | 1990
+M3GAN | 2022
+The Card Counter | 2021
+The Invitation | 2022
+The Mummy | 1999 | series | ؟ «the mummy series»: أُدرجت سلسلة 1999 (بريندان فريزر).
+Phone Booth | 2003
+Bugsy | 1991
+Carlito's Way | 1993
+Searching | 2018
+Missing | 2023
+Man on Fire | 2004
+The Book of Eli | 2010
+The Butterfly Effect | 2004
+The Invisible Man | 2020
+Captain Fantastic | 2016
+Sing Sing | 2023
+The Throne | 2015
+Fantastic Four | 2005 | series | ؟ «fantastic four series»: أُدرج فيلما 2005 و2007. نسخة 2015 وفيلم 2025 يظهران في ترتيب السلسلة.
+Flightplan | 2005
+Open Grave | 2013
+Slumberland | 2022
+Case 39 | 2009
+Dinner for Schmucks | 2010
+Crazy, Stupid, Love. | 2011
+About Time | 2013
+Dungeons & Dragons: Honor Among Thieves | 2023
+Tomorrowland | 2015
+Speak No Evil | 2022
+The Pale Blue Eye | 2022
+Funny Games | 1997
+Evil Dead Rise | 2023
+Laal Singh Chaddha | 2022
+Spirited Away | 2001
+We're the Millers | 2013
+Road to Perdition | 2002
+A Silent Voice | 2016
+Miller's Crossing | 1990
+Dream Scenario | 2023
+Midnight in Paris | 2011
+The Long Good Friday | 1980
+Dances with Wolves | 1990
+They Cloned Tyrone | 2023
+The Terminator | 1984 | series
+Argo | 2012
+First Blood | 1982 | series
+Before I Wake | 2016
+Decision to Leave | 2022
+Swiss Army Man | 2016
+The Insider | 1999
+Olympus Has Fallen | 2013 | series
+Banshee | 2013 | tv
+A Bronx Tale | 1993
+Judy | 2019
+The Out-Laws | 2023 | | ؟ «the outlaws movie 2023»: أُدرج فيلم نتفليكس The Out-Laws (2023). إن قصدت الفيلم الكوري فهو The Outlaws (2017)، وجزؤه الثاني The Roundup مدرج.
+The Last Samurai | 2003
+Crash | 2004
+Scarface | 1983
+The Vast of Night | 2019
+The 40 Year Old Virgin | 2005
+Hot Fuzz | 2007
+The Marksman | 2021
+Malcolm & Marie | 2021
+The Pursuit of Happyness | 2006
+Babyteeth | 2019
+Seven Pounds | 2008
+Forrest Gump | 1994
+Elvis | 2022
+Hidden Strike | 2023
+House Party | 1990 | | ؟ «house party» بلا سنة: أُدرج الفيلم الأصلي 1990. البديل نسخة 2023.

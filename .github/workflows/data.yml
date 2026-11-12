@@ -27,6 +27,10 @@ jobs:
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: node scripts/build-site-data.mjs && node scripts/build-site-data.mjs fate
+      - name: Build the films list (match in TMDB, details, where to watch, collections)
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: node scripts/build-films.mjs
       - name: Report announced DC titles missing from the catalog
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
@@ -44,7 +48,7 @@ jobs:
         run: |
           git config user.name "dc-guide-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/generated site/dc/data site/fate/data
+          git add data/generated site/dc/data site/fate/data site/films/data
           git diff --cached --quiet || git commit -m "data: daily refresh"
           git push origin "HEAD:${GITHUB_REF_NAME}"
       - name: Stamp build id (cache busting; not committed)

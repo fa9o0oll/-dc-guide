@@ -76,12 +76,22 @@ for (const r of guide === 'dc' ? rows.filter(r => r.seasons && r.imdb) : []) {
 const malIds = [...new Set(rdSrc('placements.json').map(p => p.mal).filter(Boolean))];
 if (malIds.length) {
   const prevPath = new URL('mal.json', outDir), prev = fs.existsSync(prevPath) ? JSON.parse(fs.readFileSync(prevPath)).anime || {} : {}, anime = {};
+  const UA = { 'User-Agent': 'watch-guide-build/1.0 (https://github.com/fa9o0oll/-dc-guide)' };
+  // المصدر الأول Jikan. إن تعذّر الوصول إليه من المشغّل تُقرأ بيانات التقييم المنشورة في صفحة العمل نفسها (JSON-LD).
+  const viaJikan = async id => { const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`, { headers: UA, signal: AbortSignal.timeout(15000) }); if (!res.ok) throw new Error('Jikan ' + res.status);
+    const a = (await res.json()).data; return { score: a.score ?? null, votes: a.scored_by ?? 0 }; };
+  const viaPage = async id => { const res = await fetch(`https://myanimelist.net/anime/${id}`, { headers: { ...UA, Accept: 'text/html' }, signal: AbortSignal.timeout(15000) }); if (!res.ok) throw new Error('MAL page ' + res.status);
+    const m = /"ratingValue":\s*"?([\d.]+)"?[\s\S]{0,200}?"ratingCount":\s*"?(\d+)"?/.exec(await res.text()); if (!m) throw new Error('MAL page: no rating data'); return { score: +m[1], votes: +m[2] }; };
+  let jikanDown = 0, pageDown = 0;
   for (const id of malIds) {
-    try { const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`, { headers: { 'User-Agent': 'watch-guide-build/1.0 (https://github.com/fa9o0oll/-dc-guide)' }, signal: AbortSignal.timeout(20000) });
-      if (!res.ok) throw new Error('Jikan ' + res.status);
-      const a = (await res.json()).data; anime[id] = { score: a.score ?? null, votes: a.scored_by ?? 0, rank: a.rank ?? null, episodes: a.episodes ?? null, type: a.type ?? null, title: a.title ?? null };
-    } catch (e) { if (prev[id]) anime[id] = prev[id]; problems.push(`MAL ${id}: ${e.message}${e.cause ? ' (' + (e.cause.code || e.cause.message) + ')' : ''}`); if (Object.keys(anime).length === 0 && problems.filter(x => x.startsWith('MAL')).length >= 3) { problems.push('MAL: توقف السحب بعد 3 إخفاقات متتالية'); break; } }
-    await new Promise(z => setTimeout(z, 1100));
+    let got = null; const errs = [];
+    for (const [name, fn, down] of [['Jikan', viaJikan, () => jikanDown >= 2], ['page', viaPage, () => pageDown >= 2]]) {
+      if (got || down()) continue;
+      try { got = await fn(id); } catch (e) { errs.push(`${name}: ${e.message}${e.cause ? ' (' + (e.cause.code || e.cause.message) + ')' : ''}`); name === 'Jikan' ? jikanDown++ : pageDown++; }
+    }
+    if (got) anime[id] = got; else { if (prev[id]) anime[id] = prev[id]; if (errs.length) problems.push(`MAL ${id}: ${errs.join(' | ')}`); }
+    if (jikanDown >= 2 && pageDown >= 2 && !Object.keys(anime).length) { problems.push('MAL: المصدران غير متاحين من هذا المشغّل، تبقى القيم السابقة'); break; }
+    await new Promise(z => setTimeout(z, 1200));
   }
   write(prevPath, { generatedAt: new Date().toISOString(), anime });
 }
