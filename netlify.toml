@@ -7,3 +7,11 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# صفحات الدخول بحساب قوقل تُخدَم من نطاق الموقع نفسه (وكيل شفاف، لا تحويل)، حتى لا يعتمد الدخول على تخزين الطرف الثالث
+# الذي تحجبه بعض المتصفحات (Brave مثلاً). هو نفس إعداد الدفتر. المرجع: firebase.google.com/docs/auth/web/redirect-best-practices (الخيار 3)
+[[redirects]]
+  from = "/__/auth/*"
+  to = "https://daftar-fb.firebaseapp.com/__/auth/:splat"
+  status = 200
+  force = true
