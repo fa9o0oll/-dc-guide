@@ -2,470 +2,104 @@
 "top": 2,
 "queries": [
 {
-"q": "Dumbo",
-"kind": "movie",
-"top": 2,
-"year": 1941
-},
-{
-"q": "How the Grinch Stole Christmas",
-"kind": "movie",
-"top": 2,
-"year": 2000
-},
-{
-"q": "Pinocchio",
-"kind": "movie",
-"top": 2,
-"year": 2022
-},
-{
-"q": "Pinocchio",
-"kind": "movie",
-"top": 2,
-"year": 1940
-},
-{
-"q": "Hellboy",
-"kind": "movie",
-"top": 2,
-"year": 2019
-},
-{
-"q": "Hellboy: The Crooked Man",
-"kind": "movie",
-"top": 2,
-"year": 2024
-},
-{
-"q": "Hellboy II: The Golden Army",
-"kind": "movie",
-"top": 2,
-"year": 2008
-},
-{
-"q": "The Mummy",
-"kind": "movie",
-"top": 2,
-"year": 2017
-},
-{
-"q": "The Mummy",
-"kind": "movie",
-"top": 2,
-"year": 1932
-},
-{
-"q": "The Scorpion King",
-"kind": "movie",
-"top": 2,
-"year": 2002
-},
-{
-"q": "Fantastic Four",
-"kind": "movie",
-"top": 2,
-"year": 2015
-},
-{
-"q": "The Fantastic Four: First Steps",
-"kind": "movie",
-"top": 2,
-"year": 2025
-},
-{
-"q": "Planet of the Apes",
-"kind": "movie",
-"top": 2,
-"year": 1968
-},
-{
-"q": "Planet of the Apes",
-"kind": "movie",
-"top": 2,
-"year": 2001
-},
-{
-"q": "House Party",
-"kind": "movie",
-"top": 2,
-"year": 2023
-},
-{
-"q": "The Outlaws",
-"kind": "movie",
-"top": 2,
-"year": 2017
-},
-{
-"q": "The Roundup: No Way Out",
-"kind": "movie",
-"top": 2,
-"year": 2023
-},
-{
-"q": "The Hunt for Gollum",
+"q": "The Hunger Games: Sunrise on the Reaping",
 "kind": "movie",
 "top": 2
 },
 {
-"q": "Men of War",
+"q": "Teenage Mutant Ninja Turtles: Mutant Mayhem 2",
 "kind": "movie",
 "top": 2
 },
 {
-"q": "Evil Dead",
+"q": "Incredibles 3",
 "kind": "movie",
-"top": 2,
-"year": 2013
+"top": 2
 },
 {
-"q": "The Evil Dead",
+"q": "Heat 2",
 "kind": "movie",
-"top": 2,
-"year": 1981
+"top": 2
 },
 {
-"q": "Blade Runner",
+"q": "Evil Dead Burn",
 "kind": "movie",
-"top": 2,
-"year": 1982
+"top": 2
 },
 {
-"q": "Blade Runner: Black Out 2022",
+"q": "Evil Dead Wrath",
 "kind": "movie",
-"top": 2,
-"year": 2017
+"top": 2
 },
 {
-"q": "2036: Nexus Dawn",
+"q": "John Rambo",
 "kind": "movie",
-"top": 2,
-"year": 2017
+"top": 2
 },
 {
-"q": "2048: Nowhere to Run",
+"q": "Five Nights at Freddy's 3",
 "kind": "movie",
-"top": 2,
-"year": 2017
+"top": 2
 },
 {
-"q": "Doctor Sleep",
+"q": "Mortal Kombat III",
 "kind": "movie",
-"top": 2,
-"year": 2019
+"top": 2
 },
 {
-"q": "Mad Max: Fury Road",
+"q": "Creed IV",
 "kind": "movie",
-"top": 2,
-"year": 2015
+"top": 2
 },
 {
-"q": "Rocky",
+"q": "The Wild Robot 2",
 "kind": "movie",
-"top": 2,
-"year": 1976
+"top": 2
 },
 {
-"q": "Creed",
+"q": "Avatar: Fire and Ash",
 "kind": "movie",
-"top": 2,
-"year": 2015
+"top": 2
 },
 {
-"q": "The Omen",
-"kind": "movie",
-"top": 2,
-"year": 1976
-},
-{
-"q": "Candyman",
-"kind": "movie",
-"top": 2,
-"year": 1992
-},
-{
-"q": "Godzilla Minus One",
-"kind": "movie",
-"top": 2,
-"year": 2023
-},
-{
-"q": "Mortal Kombat",
-"kind": "movie",
-"top": 2,
-"year": 2021
-},
-{
-"q": "The Super Mario Bros. Movie",
-"kind": "movie",
-"top": 2,
-"year": 2023
-},
-{
-"q": "Fantastic Beasts and Where to Find Them",
-"kind": "movie",
-"top": 2,
-"year": 2016
-},
-{
-"q": "Alien vs. Predator",
-"kind": "movie",
-"top": 2,
-"year": 2004
-},
-{
-"q": "Predator: Killer of Killers",
-"kind": "movie",
-"top": 2,
-"year": 2025
-},
-{
-"q": "Kingsman: The Secret Service",
-"kind": "movie",
-"top": 2,
-"year": 2015
-},
-{
-"q": "Cloverfield",
-"kind": "movie",
-"top": 2,
-"year": 2008
-},
-{
-"q": "Twister",
-"kind": "movie",
-"top": 2,
-"year": 1996
-},
-{
-"q": "Freaky Friday",
-"kind": "movie",
-"top": 2,
-"year": 2003
-},
-{
-"q": "Bird Box",
-"kind": "movie",
-"top": 2,
-"year": 2018
-},
-{
-"q": "The Hitman's Bodyguard",
-"kind": "movie",
-"top": 2,
-"year": 2017
-},
-{
-"q": "The Incredibles",
-"kind": "movie",
-"top": 2,
-"year": 2004
-},
-{
-"q": "Wicked: For Good",
-"kind": "movie",
-"top": 2,
-"year": 2025
-},
-{
-"q": "Ocean's Eight",
-"kind": "movie",
-"top": 2,
-"year": 2018
-},
-{
-"q": "City of Men",
-"kind": "movie",
-"top": 2,
-"year": 2007
-},
-{
-"q": "La Jetée",
-"kind": "movie",
-"top": 2,
-"year": 1962
-},
-{
-"q": "Infernal Affairs",
-"kind": "movie",
-"top": 2,
-"year": 2002
-},
-{
-"q": "Papillon",
-"kind": "movie",
-"top": 2,
-"year": 1973
-},
-{
-"q": "A Man Called Ove",
-"kind": "movie",
-"top": 2,
-"year": 2015
-},
-{
-"q": "Ghostbusters",
-"kind": "movie",
-"top": 2,
-"year": 1984
-},
-{
-"q": "Fear Street: 1994",
-"kind": "movie",
-"top": 2,
-"year": 2021
-},
-{
-"q": "M3GAN 2.0",
-"kind": "movie",
-"top": 2,
-"year": 2025
-},
-{
-"q": "Five Nights at Freddy's 2",
-"kind": "movie",
-"top": 2,
-"year": 2025
-},
-{
-"q": "The Raid 2",
-"kind": "movie",
-"top": 2,
-"year": 2014
-},
-{
-"q": "Transformers One",
-"kind": "movie",
-"top": 2,
-"year": 2024
-},
-{
-"q": "Bumblebee",
-"kind": "movie",
-"top": 2,
-"year": 2018
-},
-{
-"q": "Ash vs Evil Dead",
+"q": "Blade Runner 2099",
 "kind": "tv",
-"top": 2,
-"year": 2015
+"top": 2
 },
 {
-"q": "Terminator: The Sarah Connor Chronicles",
+"q": "Harry Potter",
 "kind": "tv",
-"top": 2,
-"year": 2008
+"top": 2
 },
 {
-"q": "Terminator Zero",
+"q": "Fate/kaleid liner Prisma Illya Finale",
 "kind": "tv",
-"top": 2,
-"year": 2024
+"top": 2
 },
 {
-"q": "The Purge",
+"q": "Fate/kaleid liner Prisma Illya",
 "kind": "tv",
-"top": 2,
-"year": 2018
+"top": 2
 },
 {
-"q": "Treadstone",
+"q": "Fate/strange Fake",
 "kind": "tv",
-"top": 2,
-"year": 2019
+"top": 2
 },
 {
-"q": "Paris Has Fallen",
-"kind": "tv",
-"top": 2,
-"year": 2024
+"q": "The Super Mario Galaxy Movie",
+"kind": "movie",
+"top": 2
 },
 {
-"q": "The Gentlemen",
-"kind": "tv",
-"top": 2,
-"year": 2024
+"q": "Godzilla Minus Zero",
+"kind": "movie",
+"top": 2
 },
 {
-"q": "Deadwood",
-"kind": "tv",
-"top": 2,
-"year": 2004
-},
-{
-"q": "City of God: The Fight Rages On",
-"kind": "tv",
-"top": 2,
-"year": 2024
-},
-{
-"q": "City of Men",
-"kind": "tv",
-"top": 2,
-"year": 2002
-},
-{
-"q": "Tales of the Teenage Mutant Ninja Turtles",
-"kind": "tv",
-"top": 2,
-"year": 2024
-},
-{
-"q": "Blade Runner: Black Lotus",
-"kind": "tv",
-"top": 2,
-"year": 2021
-},
-{
-"q": "12 Monkeys",
-"kind": "tv",
-"top": 2,
-"year": 2015
-},
-{
-"q": "Bates Motel",
-"kind": "tv",
-"top": 2,
-"year": 2013
-},
-{
-"q": "Gomorrah",
-"kind": "tv",
-"top": 2,
-"year": 2014
-},
-{
-"q": "Planet of the Apes",
-"kind": "tv",
-"top": 2,
-"year": 1974
-},
-{
-"q": "Men in Black: The Series",
-"kind": "tv",
-"top": 2,
-"year": 1997
-},
-{
-"q": "Gintama",
-"kind": "tv",
-"top": 2,
-"year": 2006
-},
-{
-"q": "Snatch",
-"kind": "tv",
-"top": 2,
-"year": 2017
-},
-{
-"q": "Alien: Earth",
-"kind": "tv",
-"top": 2,
-"year": 2025
+"q": "28 Years Later: The Bone Temple",
+"kind": "movie",
+"top": 2
 }
 ]
 }
