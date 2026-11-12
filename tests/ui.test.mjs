@@ -48,7 +48,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('عمل في عالمين له سجل واحد', await page.evaluate(() => document.querySelectorAll('[data-k="the-suicide-squad-2021"]').length === 2));
   check('أعمال معلنة في آخر عالمها: بتاريخ أو بلا تاريخ', await page.evaluate(() => { const c = [...document.querySelectorAll('#u-dcu .card')], soon = c.map(x => !!x.querySelector('.tag.soon') && !x.querySelector('.status')), first = soon.indexOf(true); return first > 0 && soon.slice(first).every(Boolean) && c[first].id === 'c-dcu-man-of-tomorrow-2027' && document.querySelector('#c-dcu-wonder-woman-tba .count').textContent.includes('قيد التطوير') && !!document.querySelector('#c-dcu-wonder-woman-tba .count a.src[href^="https://"]'); }));
   check('عمل قادم بعدّاد تنازلي', await page.locator('#c-anim_mv_st-batman-knightfall-part-2-2026 .count b').count() === 1);
-  check('حلقة قادمة: عدّاد تنازلي ووسم «يُعرض الآن»', (await page.textContent('#c-dcu-lanterns-2026 .count b')).trim() === '5' && (await page.textContent('#c-dcu-lanterns-2026 .tags')).includes('يُعرض الآن'));
+  check('حلقة قادمة: عدّاد تنازلي حي ووسم «يُعرض الآن»', ['4', '5'].includes((await page.textContent('#c-dcu-lanterns-2026 .count b')).trim()) && /^\d\d:\d\d:\d\d$/.test((await page.textContent('#c-dcu-lanterns-2026 .count .clk')).trim()) && (await page.textContent('#c-dcu-lanterns-2026 .tags')).includes('يُعرض الآن'));
   check('موسم معلن بلا موعد يظهر على البطاقة', (await page.textContent('#c-dcu-creature-commandos-2024 .count')).includes('الموسم 2 معلن'));
   // حالة المشاهدة تنعكس في العالمين
   await tap('#c-dcu-the-suicide-squad-2021 [data-s=watched]');

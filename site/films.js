@@ -20,6 +20,12 @@ const nFilms = n => count(n, ['فيلم واحد', 'فيلمان', 'أفلام',
 const rt = m => !m ? '' : m < 60 ? `${m}د` : `${Math.floor(m / 60)}س${m % 60 ? ` ${m % 60}د` : ''}`;
 const today = new Date().toISOString().slice(0, 10);
 const unreleased = f => f.kind === 'movie' && (!f.date || f.date > today);
+const daysTo = d => Math.ceil((new Date(d + 'T00:00:00') - Date.now()) / 864e5);
+const nDays = n => count(n, ['يوم واحد', 'يومان', 'أيام', 'يوماً', 'يوم']);
+// عدّاد حي حتى منتصف ليل يوم الصدور بتوقيت الجهاز
+const cdHTML = date => { const ms = new Date(date + 'T00:00:00') - Date.now(); if (ms <= 0) return '<b>صدر اليوم</b>'; const u = (n, l) => `<span><b>${n}</b>${l}</span>`;
+  return u(Math.floor(ms / 864e5), 'يوم') + u(Math.floor(ms / 36e5) % 24, 'ساعة') + u(Math.floor(ms / 6e4) % 60, 'دقيقة') + u(Math.floor(ms / 1e3) % 60, 'ثانية'); };
+setInterval(() => { if (!document.hidden) for (const el of document.querySelectorAll('.cd[data-until]')) el.innerHTML = cdHTML(el.dataset.until); }, 1000);
 const poster = (p, sizes) => p ? `<img loading="lazy" decoding="async" alt="" src="${IMG}w342${p}" srcset="${IMG}w185${p} 185w, ${IMG}w342${p} 342w, ${IMG}w500${p} 500w" sizes="${sizes}">` : '';
 
 const D = { films: [], byId: new Map(), byTmdb: new Map(), more: null, cols: {}, prov: {}, fr: {}, fx: {}, frOf: new Map(), recOf: new Map(), part: new Map() };
@@ -27,7 +33,7 @@ let P = { films: {} };
 try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {}
 const save = () => { try { P.at = Date.now(); localStorage.setItem(KEY, JSON.stringify(P)); } catch {} };
 const st = id => P.films[id] || '';
-const ui = { q: '', status: 'all', genre: '', decade: '', prov: '', sort: 'list', view: 'grid', series: false };
+const ui = { q: '', status: 'todo', genre: '', decade: '', prov: '', sort: 'list', view: 'grid', series: false };
 
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <header class="top"><a class="home" href="../" aria-label="كل الأدلة">${ic('home')}<span>كل الأدلة</span></a><h1>قائمة أفلامي</h1>
@@ -49,7 +55,8 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <p class="hint">الفيلم يظهر هنا فوراً، ويصل بقية أجهزتك خلال دقائق. معلومات سلسلته تُجلب آلياً من <bdi dir="ltr">TMDB</bdi>.</p></form></dialog>
 <div class="toast" id="toast" role="status"></div>`);
 
-const toast = (t) => { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2600); };
+const toast = (t, undo) => { const el = $('#toast'); el.textContent = t; if (undo) { const b = Object.assign(document.createElement('button'), { textContent: 'تراجع', onclick: () => { el.classList.remove('on', 'act'); el.textContent = ''; undo(); } }); el.append(b); }
+  el.classList.toggle('act', !!undo); el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => { el.classList.remove('on', 'act'); setTimeout(() => { if (!el.classList.contains('on')) el.textContent = ''; }, 300); }, undo ? 5000 : 2600); };
 const get = (f) => fetch(`data/${f}?v=${BUILD}`).then(r => { if (!r.ok) throw new Error(f); return r.json(); });
 
 function register(f, heavy) { if (D.byId.has(f.id)) return; D.films.push(f); D.byId.set(f.id, f); if (f.kind === 'movie') D.byTmdb.set(f.tmdb, f); if (heavy) (D.more ||= {})[f.id] = heavy; }
@@ -64,7 +71,7 @@ function whereHTML(f) { const p = f.prov; if (!p) return '';
 function partTag(f) { const r = D.recOf.get(f.id); if (r && r !== 'watch') return `<span class="tag">${r === 'skip' ? 'تجاوزه' : 'اختياري'}</span>`; const c = f.col && D.cols[f.col]; if (!c || c.parts.length < 2) return ''; const i = c.parts.findIndex(p => p.tmdb === f.tmdb); return i < 0 ? '' : `<span class="tag"><bdi dir="ltr">${i + 1}/${c.parts.length}</bdi></span>`; }
 function card(f) { const s = st(f.id), un = unreleased(f);
   return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}">
-<button class="poster" data-act="open" aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${f.fresh ? '<span class="tag new">جديد</span>' : f.kind === 'tv' ? '<span class="tag">مسلسل</span>' : un ? '<span class="tag">لم يصدر</span>' : partTag(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
+<button class="poster" data-act="open" aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${f.fresh ? '<span class="tag new">جديد</span>' : f.kind === 'tv' ? '<span class="tag">مسلسل</span>' : un ? `<span class="tag">${f.date ? 'بعد ' + nDays(daysTo(f.date)) : 'لم يُعلن موعده'}</span>` : partTag(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
 <div class="stub"><h3>${esc(f.title)}</h3><p class="meta">${f.year ? `<bdi>${f.year}</bdi>` : '<span>بلا موعد</span>'}${f.rating ? `<span class="rate"><bdi dir="ltr">${f.rating.toFixed(1)}</bdi></span>` : ''}${f.runtime ? `<span>${rt(f.runtime)}</span>` : f.seasons ? `<span>${count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم'])}</span>` : ''}</p>
 <button class="seen" data-act="seen" aria-pressed="${s === 'watched'}" aria-label="شاهدته: ${esc(f.title)}">${ic('check')}</button><div class="where">${whereHTML(f)}</div></div></article>`; }
 
@@ -73,7 +80,7 @@ const SORTS = { list: ['ترتيب قائمتي', (a, b) => a.ord - b.ord], new:
   rate: ['الأعلى تقييماً', (a, b) => (b.votes >= 50 ? b.rating || 0 : 0) - (a.votes >= 50 ? a.rating || 0 : 0)], short: ['الأقصر مدة', (a, b) => (a.runtime || 9999) - (b.runtime || 9999)], az: ['أبجدياً', (a, b) => a.title.localeCompare(b.title, 'en')] };
 const hay = f => f._h ??= [f.title, f.orig, f.year, ...(D.more?.[f.id]?.directors || []), D.more?.[f.id]?.titleAr, f.col && D.cols[f.col]?.name, D.fr[D.frOf.get(f.id)]?.name].filter(Boolean).join(' ').toLowerCase();
 function match(f) { const s = st(f.id);
-  if (ui.status === 'todo' ? s === 'watched' : ui.status !== 'all' && s !== ui.status) return false;
+  if (ui.status === 'soon' ? !unreleased(f) : ui.status === 'todo' ? s === 'watched' && !ui.q : ui.status !== 'all' && s !== ui.status) return false;
   if (ui.genre && !f.genres.includes(+ui.genre)) return false;
   if (ui.decade && Math.floor((f.year || 0) / 10) * 10 !== +ui.decade) return false;
   if (ui.prov && !(ui.prov === 'any' ? f.prov && (f.prov.stream.length || f.prov.free.length) : f.prov && [...f.prov.stream, ...f.prov.free].includes(+ui.prov))) return false;
@@ -85,20 +92,23 @@ function chipsHTML() { const c = (k, v, t) => `<button class="chip" data-act="st
   const provs = {}; for (const f of D.films) for (const id of new Set([...(f.prov?.stream || []), ...(f.prov?.free || [])])) provs[id] = (provs[id] || 0) + 1;
   const genres = {}; for (const f of D.films) for (const g of f.genres) genres[g] = (genres[g] || 0) + 1;
   const decades = [...new Set(D.films.map(f => Math.floor((f.year || 0) / 10) * 10).filter(Boolean))].sort((a, b) => b - a);
-  return c('status', 'all', 'الكل') + c('status', 'todo', 'لم أشاهده') + c('status', 'next', 'التالي') + c('status', 'watched', 'شاهدته')
+  const nSeen = D.films.filter(f => st(f.id) === 'watched').length;
+  return c('status', 'todo', 'لم أشاهده') + c('status', 'next', 'التالي') + c('status', 'watched', `شاهدته${nSeen ? ` <bdi>${nSeen}</bdi>` : ''}`) + c('status', 'all', 'الكل مع ما شاهدته') + (D.films.some(unreleased) ? c('status', 'soon', 'لم يصدر بعد') : '')
     + sel('prov', 'أين يُعرض', [['any', 'متاح باشتراك أو مجاناً'], ...Object.entries(provs).sort((a, b) => b[1] - a[1]).map(([id]) => [id, D.prov[id]?.name || id])])
     + sel('genre', 'النوع', Object.entries(genres).sort((a, b) => b[1] - a[1]).map(([g]) => [g, GENRES[g] || g]))
     + sel('decade', 'العقد', decades.map(d => [d, `${d} – ${d + 9}`]))
     + `<button class="chip" data-act="only-series" aria-pressed="${ui.series}">ضمن سلسلة</button>`
     + `<select class="pick on" data-k="sort" aria-label="الترتيب">${Object.entries(SORTS).map(([k, [t]]) => `<option value="${k}"${ui.sort === k ? ' selected' : ''}>${t}</option>`).join('')}</select>`; }
-const filtered = () => ui.status !== 'all' || ui.genre || ui.decade || ui.prov || ui.series || ui.q;
+const filtered = () => ui.status !== 'todo' || ui.genre || ui.decade || ui.prov || ui.series || ui.q;
 function apply(resort) { const grid = $('#grid');
   if (resort) { const sorted = [...D.films].sort(SORTS[ui.sort][1]), frag = document.createDocumentFragment(); for (const f of sorted) { const el = document.getElementById('f-' + f.id); if (el) frag.append(el); } grid.append(frag); }
   let shown = 0; for (const f of D.films) { const el = document.getElementById('f-' + f.id); if (!el) continue; const ok = match(f); el.hidden = !ok; if (ok) shown++; }
   let empty = $('.empty', grid); if (!shown && !empty) grid.insertAdjacentHTML('beforeend', '<p class="empty">لا شيء يطابق هذه التصفية. جرّب إزالة أحد الشروط.</p>'); else if (shown && empty) empty.remove();
-  $('#count').innerHTML = ui.view === 'series' ? '' : filtered() ? `يظهر ${shown} من ${D.films.length} <button data-act="reset">أزل التصفية</button>` : '';
-  const seen = D.films.filter(f => st(f.id) === 'watched').length, tv = D.films.filter(f => f.kind === 'tv').length, mv = D.films.length - tv;
-  $('#tally').textContent = `${nFilms(mv)}${tv ? ` و${count(tv, ['مسلسل واحد', 'مسلسلان', 'مسلسلات', 'مسلسلاً', 'مسلسل'])}` : ''}${seen ? ` · شاهدت ${seen}` : ''}`; }
+  const hid = D.films.filter(f => st(f.id) === 'watched').length;
+  $('#count').innerHTML = ui.view === 'series' ? '' : filtered() ? `يظهر ${shown} من ${D.films.length} <button data-act="reset">${ui.status === 'all' && !(ui.genre || ui.decade || ui.prov || ui.series || ui.q) ? 'أخفِ ما شاهدته' : 'أزل التصفية'}</button>` : hid ? `ما شاهدته مخفي (${hid}) <button data-act="show-all">أظهر الكل</button>` : '';
+  const seen = hid, tv = D.films.filter(f => f.kind === 'tv').length, mv = D.films.length - tv;
+  $('#tally').textContent = `${nFilms(mv)}${tv ? ` و${count(tv, ['مسلسل واحد', 'مسلسلان', 'مسلسلات', 'مسلسلاً', 'مسلسل'])}` : ''}${seen ? ` · شاهدت ${seen} · بقي ${D.films.length - seen}` : ''}`;
+  const wc = $('[data-act=status][data-v=watched]'); if (wc) wc.innerHTML = `شاهدته${seen ? ` <bdi>${seen}</bdi>` : ''}`; }
 function renderGrid() { $('#grid').innerHTML = [...D.films].sort(SORTS[ui.sort][1]).map(card).join(''); $('#chips').innerHTML = chipsHTML(); apply(false); }
 
 // ---------- اقتراح الليلة ----------
@@ -158,7 +168,7 @@ async function sheetHTML(f) { const m = (await D.moreReady)?.[f.id] || {}, s = s
 <div class="tags">${f.genres.map(g => GENRES[g] ? `<span>${GENRES[g]}</span>` : '').join('')}</div></div></div>
 <div class="sh-acts"><button class="btn sec" data-act="set" data-v="watched" aria-pressed="${s === 'watched'}">${ic('check')}شاهدته</button><button class="btn sec nx" data-act="set" data-v="next" aria-pressed="${s === 'next'}">${ic('mark')}التالي في المشاهدة</button></div>
 ${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''}${f.src === 'added' ? '<section class="sec"><p class="ask">أُضيف بزر «أضف فيلماً»: معلوماته آلية من <bdi dir="ltr">TMDB</bdi> ولم تُراجَع يدوياً.</p></section>' : ''}
-<section class="sec"><h3>القصة</h3>${ov}</section>${un && f.date ? `<section class="sec"><p class="ask">موعد صدوره <bdi>${f.date}</bdi>.</p></section>` : ''}
+<section class="sec"><h3>القصة</h3>${ov}</section>${un ? `<section class="sec"><h3>موعد الصدور</h3>${f.date ? `<div class="cd" data-until="${f.date}" aria-label="الوقت الباقي على الصدور">${cdHTML(f.date)}</div><p class="note">يصدر في <bdi>${new Date(f.date + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' })}</bdi> حسب <bdi dir="ltr">TMDB</bdi>، والموعد قابل للتغيير.</p>` : '<p>معلن، ولم يُحدَّد موعد صدوره بعد.</p>'}</section>` : ''}
 ${whereSec(f)}${orderHTML(f)}
 ${(m.directors?.length || m.cast?.length) ? `<section class="sec"><h3>الطاقم</h3><p class="people">${m.directors?.length ? `<b>${f.kind === 'tv' ? 'صنّاع المسلسل' : 'الإخراج'}:</b> <bdi dir="ltr">${m.directors.map(esc).join(', ')}</bdi><br>` : ''}${m.cast?.length ? `<b>التمثيل:</b> <bdi dir="ltr">${m.cast.map(esc).join(', ')}</bdi>` : ''}</p></section>` : ''}
 ${linksSec(f)}`; }
@@ -177,7 +187,7 @@ function setStatus(id, v) { const cur = st(id); if (cur === v) delete P.films[id
   const el = document.getElementById('f-' + id); if (el) { el.classList.add('stamping'); el.classList.toggle('watched', st(id) === 'watched'); el.classList.toggle('next', st(id) === 'next'); $('.seen', el).setAttribute('aria-pressed', st(id) === 'watched'); setTimeout(() => el.classList.remove('stamping'), 400); }
   if (openId === id) $$('.sh-acts [data-act=set]').forEach(b => b.setAttribute('aria-pressed', st(id) === b.dataset.v));
   if (ui.view === 'series') $('#series').innerHTML = seriesHTML();
-  apply(false); }
+  const f = D.byId.get(id); if (el && !el.hidden && f && !match(f) && !calm) { el.classList.add('leaving'); setTimeout(() => { el.classList.remove('leaving'); apply(false); }, 850); } else apply(false); }
 
 // ---------- أضف فيلماً ----------
 const pass = () => { try { return localStorage.getItem(PASS) || ''; } catch { return ''; } };
@@ -209,13 +219,14 @@ function adopt(r, draw) { if (!r?.film || D.byId.has(r.film.id)) return false; c
 // ---------- الأحداث ----------
 document.addEventListener('click', e => { const t = e.target.closest('[data-act]'); if (!t) return; const act = t.dataset.act, id = t.dataset.id || t.closest('[data-id]')?.dataset.id;
   if (act === 'open') openFilm(id);
-  else if (act === 'seen') { setStatus(id, 'watched'); if (st(id) === 'watched') toast('خُتمت التذكرة: شوهد'); }
+  else if (act === 'seen') { setStatus(id, 'watched'); if (st(id) === 'watched') toast(ui.status === 'todo' && !ui.q ? 'شوهد، وانتقل إلى «شاهدته»' : 'خُتمت التذكرة: شوهد', () => setStatus(id, 'watched')); }
   else if (act === 'set') setStatus(openId, t.dataset.v);
   else if (act === 'close') closeFilm();
   else if (act === 'close-add') addDlg.close();
   else if (act === 'status') { ui.status = t.dataset.v; $$('[data-act=status]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === ui.status)); apply(false); }
   else if (act === 'only-series') { ui.series = !ui.series; t.setAttribute('aria-pressed', ui.series); apply(false); }
-  else if (act === 'reset') { Object.assign(ui, { q: '', status: 'all', genre: '', decade: '', prov: '', series: false }); $('#q').value = ''; $('#chips').innerHTML = chipsHTML(); apply(false); }
+  else if (act === 'show-all') { ui.status = 'all'; $('#chips').innerHTML = chipsHTML(); apply(false); }
+  else if (act === 'reset') { Object.assign(ui, { q: '', status: 'todo', genre: '', decade: '', prov: '', series: false }); $('#q').value = ''; $('#chips').innerHTML = chipsHTML(); apply(false); }
   else if (act === 'view') setView(t.dataset.v);
   else if (act === 'reroll') reroll(false);
   else if (act === 'open-tonight') openFilm(tonightId);

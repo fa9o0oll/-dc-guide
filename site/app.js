@@ -74,6 +74,12 @@ const cnt = (n, k, obl) => { const f = NOUN[k]; return n === 1 ? `${f[0]} ${f[5]
 const countdown = (d, what) => d <= 0 ? `<b>اليوم</b><span>${what}` : d === 1 ? `<b>يوم</b><span>واحد على ${what}` : d === 2 ? `<b>يومان</b><span>على ${what}` : `<b>${d}</b><span>${unit(d, 'day')} على ${what}`;
 const bits = a => a.filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
 const daysLeft = w => Math.ceil((new Date(w.date) - new Date(TODAY)) / 864e5);
+// العدّاد الحي: أيام كاملة ثم ساعة:دقيقة:ثانية حتى منتصف ليل يوم الصدور بتوقيت الجهاز. يتحدث كل ثانية (انظر المؤقت في آخر الملف).
+const liveCount = (date, what) => { const ms = new Date(date + 'T00:00:00') - Date.now(), d = Math.floor(ms / 864e5), p = n => String(n).padStart(2, '0');
+  const clk = ms > 0 ? `${p(Math.floor(ms / 36e5) % 24)}:${p(Math.floor(ms / 6e4) % 60)}:${p(Math.floor(ms / 1e3) % 60)}` : '';
+  return (ms <= 0 ? `<b>اليوم</b><span>${what}` : d < 1 ? `<b dir="ltr">${clk}</b><span>على ${what}` : `${countdown(d, what)} <bdi dir="ltr" class="clk">${clk}</bdi>`) + `<br><small>${fmtDate(date)}</small></span>`; };
+const liveBox = (date, what, cls, extra = '') => `<div class="count ${cls}" data-until="${date}" data-what="${esc(what)}"><span class="cd">${liveCount(date, what)}</span>${extra}</div>`;
+setInterval(() => { if (document.hidden) return; for (const el of document.querySelectorAll('.count[data-until] > .cd')) el.innerHTML = liveCount(el.parentNode.dataset.until, el.parentNode.dataset.what); }, 1000);
 const sKey = p => p.season ? `${p.work}#${p.season}` : p.work;
 const statusOf = p => store.works[sKey(p)] || '';
 const domId = (pre, p) => `${pre}-${p.universe}-${p.work}${p.season ? '-s' + p.season : ''}`;
@@ -116,7 +122,7 @@ function nextBlock(w, cls = '') {
   if (n.kind === 'returning') return `<p class="next-note ${cls}">المسلسل مستمر، ولم يُعلن موعد حلقات جديدة بعد.</p>`;
   if (n.kind === 'announced') return `<div class="count ${cls}"><span>الموسم ${n.season} معلن، وموعد عرضه لم يُحدَّد بعد</span></div>`;
   const d = daysTo(n.date), what = n.kind === 'episode' ? `الحلقة القادمة: الموسم ${n.season}، الحلقة ${n.episode}` : `بداية الموسم ${n.season}`;
-  return `<div class="count ${cls}">${countdown(d, what)}<br><small>${fmtDate(n.date)}</small></span></div>`;
+  return liveBox(n.date, what, cls);
 }
 const nextTag = w => { const k = nextInfo(w)?.kind; return k === 'episode' ? '<span class="tag soon">يُعرض الآن</span>' : k === 'season' || k === 'announced' ? '<span class="tag soon">موسم قادم</span>' : ''; };
 const verdict = r => r == null ? null : r >= 7.5 ? ['ممتاز', '#35d07f'] : r >= 6.8 ? ['جيد', '#57abff'] : r >= 6 ? ['متوسط', '#f2b84b'] : ['ضعيف', '#ef5d57'];
@@ -195,7 +201,7 @@ function card(p) {
       ${rating(w, p) ? `<div class="rates">${gaugeRow(w, p)}</div>` : ''}
     </div></div>
     <div class="cbody"><p class="note">${esc(p.note)}</p>
-    ${soon ? `<div class="count wide">${w.date ? `${countdown(daysLeft(w), 'الصدور')}<br><small>${fmtDate(w.date)}</small></span>` : `<span>${STAGE[p.upcoming?.stage] || STAGE.production}</span>`}${p.upcoming?.source ? `<a class="src" href="${esc(p.upcoming.source)}" target="_blank" rel="noopener">المصدر</a>` : ''}</div>` : ''}
+    ${soon ? (src => w.date ? liveBox(w.date, 'الصدور', 'wide', src) : `<div class="count wide"><span>${STAGE[p.upcoming?.stage] || STAGE.production}</span>${src}</div>`)(p.upcoming?.source ? `<a class="src" href="${esc(p.upcoming.source)}" target="_blank" rel="noopener">المصدر</a>` : '') : ''}
     ${nextBlock(w, 'wide')}
     ${avLine(p, 'wide')}
     ${p.order ? `<p class="canon wide">${esc(p.order.note)} <a href="${esc(p.order.source)}" target="_blank" rel="noopener">المصدر</a></p>` : ''}

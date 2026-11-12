@@ -193,6 +193,9 @@ main:focus{outline:none}
 .count{display:flex;align-items:center;gap:12px;border-inline-start:4px solid var(--c2);padding:4px 12px;background:var(--surface)}
 .count b{font-family:var(--display);font-weight:400;font-size:2.6rem;color:var(--c2);line-height:1}
 .count small{color:var(--dim)}
+.count .cd{display:contents}
+.count .clk{font-variant-numeric:tabular-nums;color:var(--c2);font-weight:600;margin-inline-start:6px}
+.count b[dir=ltr]{font-variant-numeric:tabular-nums}
 .lbl{font-size:.76rem;color:var(--dim);font-weight:600}
 
 /* ---------- الخط الزمني */

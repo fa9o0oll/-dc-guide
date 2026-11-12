@@ -67,7 +67,16 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await page.waitForTimeout(400); await page.evaluate(() => { location.hash = '#m218'; }); await page.waitForSelector('#sheet[open] .order .rc'); await page.waitForTimeout(300);
   check('الأفلام: سلسلة مراجَعة تعرض التوصيات والمسلسل المرتبط بتقييمه', await page.evaluate(() => { const o = document.querySelector('#sheet .order'), t = o.textContent; return o.querySelectorAll('.rc.watch').length >= 2 && o.querySelectorAll('.rc.skip').length >= 1 && t.includes('Sarah Connor') && t.includes('مسلسل') && /\d\.\d/.test(t) && document.querySelector('#sheet .order + .note').textContent.includes('توصيات'); }));
   await fits('الأفلام: نافذة سلسلة مراجَعة'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
-  await tap('[data-act=reset]'); await tap('[data-v=series]'); await page.waitForSelector('.fr'); check('الأفلام: عرض السلاسل مرقّم', await page.locator('.fr').count() > 20 && (await page.textContent('.fr .part .n')).trim() === '1'); await fits('الأفلام: السلاسل');
+  await tap('[data-act=reset]'); await page.waitForTimeout(300);
+  check('الأفلام: ما شاهدته يختفي من القائمة ويُذكر عدده', await page.evaluate(id => document.getElementById('f-' + id).hidden && document.querySelector('#count').textContent.includes('مخفي') && document.querySelector('#tally').textContent.includes('بقي'), inCol.id));
+  await tap('[data-act=show-all]'); await page.waitForTimeout(250);
+  check('الأفلام: «أظهر الكل» يعيده مختوماً', await page.evaluate(id => { const el = document.getElementById('f-' + id); return !el.hidden && el.classList.contains('watched') && document.querySelector('[data-v=all]').getAttribute('aria-pressed') === 'true'; }, inCol.id));
+  await tap('[data-act=reset]'); await page.waitForTimeout(250);
+  const other = FL.find(f => f.id !== inCol.id && f.kind === 'movie' && f.poster); await tap(`#f-${other.id} .seen`); await page.waitForTimeout(1300);
+  check('الأفلام: التعليم من القائمة يُخرج التذكرة منها مع زر تراجع', await page.evaluate(id => document.getElementById('f-' + id).hidden && !!document.querySelector('#toast.act button'), other.id));
+  await page.evaluate(() => document.querySelector('#toast button').click()); await page.waitForTimeout(300);
+  check('الأفلام: التراجع يعيدها', await page.evaluate(id => !document.getElementById('f-' + id).hidden && !JSON.parse(localStorage.getItem('filmsg.progress')).films[id], other.id));
+  await tap('[data-v=series]'); await page.waitForSelector('.fr'); check('الأفلام: عرض السلاسل مرقّم', await page.locator('.fr').count() > 20 && (await page.textContent('.fr .part .n')).trim() === '1'); await fits('الأفلام: السلاسل');
   await tap('[data-v=grid]'); await tap('[data-act=add]'); await page.waitForSelector('#add[open]'); await page.fill('#add-q', 'test film 1999'); await page.fill('#add-pass', 'bad'); await tap('#add-form [type=submit]'); await page.waitForTimeout(300);
   check('الأفلام: كلمة سر خاطئة تُرفض برسالة', (await page.textContent('#add-msg')).includes('كلمة السر'));
   await page.fill('#add-pass', 'pw'); await tap('#add-form [type=submit]'); await page.waitForSelector('.cand'); check('الأفلام: الإضافة تعرض المرشح وسلسلته قبل الحفظ', (await page.textContent('.cand')).includes('Test Saga'));
