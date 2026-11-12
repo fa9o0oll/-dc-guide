@@ -80,7 +80,13 @@ export async function processFranchises(raw, get) {
   const items = {}, extras = {}, problems = [];
   for (const [key, fr] of Object.entries(raw)) {
     const order = [];
-    for (const st of fr.order || []) { const s = { ...st };
+    // { all: رقم مجموعة, rec | watchFrom, set } يُدرج كل أجزاء المجموعة بترتيب صدورها. watchFrom يعطي «شاهده» لما تقييمه في TMDB يساويه أو يزيد و«اختياري» لما دونه، وما لم يصدر «قادم». set يخصّص جزءاً بعينه.
+    const today = new Date().toISOString().slice(0, 10), steps = [];
+    for (const st of fr.order || []) { if (!st.all) { steps.push(st); continue; }
+      const col = await get.collection(st.all); if (!col) { problems.push(`${key}: المجموعة ${st.all} غير موجودة`); continue; }
+      for (const p of col.parts) { const o = st.set?.[p.tmdb] || {};
+        steps.push({ m: p.tmdb, rec: o.rec || (!p.date || p.date > today ? 'soon' : st.watchFrom ? (p.rating >= st.watchFrom ? 'watch' : 'optional') : st.rec), ...(o.note ? { note: o.note } : {}) }); } }
+    for (const st of steps) { const s = { ...st };
       try {
         if (s.c) { const col = await get.collection(s.c), part = col?.parts.find(p => norm(p.title) === norm(s.title)); if (!part) throw new Error(`«${s.title}» ليس في المجموعة ${s.c}`); s.m = part.tmdb; delete s.c; delete s.title; }
         if (s.f) { const id = get.byTitle(s.f, s.y); if (!id) throw new Error(`«${s.f}» ليس في القائمة`); s.m = id; delete s.f; delete s.y; }

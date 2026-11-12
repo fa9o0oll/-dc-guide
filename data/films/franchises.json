@@ -1265,5 +1265,728 @@
     "rec": "soon"
    }
   ]
+ },
+ "dark-knight": {
+  "name": "The Dark Knight Trilogy",
+  "note": "ثلاثية كريستوفر نولان قصة واحدة متصلة، وThe Dark Knight Rises خاتمتها. يلزم قبله الفيلمان الأولان بالترتيب.",
+  "order": [
+   {
+    "m": 272,
+    "rec": "watch",
+    "note": "البداية"
+   },
+   {
+    "m": 155,
+    "rec": "watch",
+    "note": "الأعلى تقييماً"
+   },
+   {
+    "m": 49026,
+    "rec": "watch",
+    "note": "الخاتمة"
+   }
+  ]
+ },
+ "saw": {
+  "name": "Saw",
+  "note": "القصة متصلة من الفيلم الأول إلى Saw 3D، فتُشاهد بترتيب الصدور، وأحداث الثالث والرابع متزامنة. Saw X تدور أحداثه بين الأول والثاني لكنه صُنع لمن يعرف السلسلة. Spiral قصة قاتل مقلِّد بعد موت جيغسو. علامة «شاهده» هنا على ما تقييمه 7 فأعلى في TMDB، والأول والعاشر هما الأعلى.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Saw_(franchise)"
+   }
+  ],
+  "order": [
+   {
+    "all": 656,
+    "watchFrom": 7,
+    "set": {
+     "951491": {
+      "note": "أحداثه بين الأول والثاني"
+     },
+     "602734": {
+      "rec": "skip",
+      "note": "قصة جانبية بقاتل مقلِّد"
+     },
+     "298250": {
+      "note": "بعد موت جيغسو بعشر سنوات"
+     }
+    }
+   }
+  ]
+ },
+ "fear-street": {
+  "name": "Fear Street",
+  "note": "الأفلام الثلاثة ثلاثية واحدة مترابطة صدرت في ثلاثة أسابيع متتالية: 1994 ثم 1978 ثم 1666. كل جزء يعود إلى زمن أقدم ليكشف أصل اللعنة، فلا يُشاهد 1666 قبل الاثنين الأولين.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Fear_Street_(film_series)"
+   }
+  ],
+  "order": [
+   {
+    "m": 591273,
+    "rec": "watch",
+    "note": "الجزء الأول"
+   },
+   {
+    "m": 591274,
+    "rec": "watch",
+    "note": "الجزء الثاني"
+   },
+   {
+    "m": 591275,
+    "rec": "watch",
+    "note": "الخاتمة"
+   }
+  ]
+ },
+ "transformers": {
+  "name": "Transformers",
+  "note": "أفلام مايكل باي الخمسة بترتيب صدورها، وتقييمها ينزل بعد الأول. Bumblebee فيلم فرعي تدور أحداثه في الثمانينات، وRise of the Beasts يكمل بعده. Transformers One فيلم رسوم وهو الأعلى تقييماً.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Transformers_(film_series)"
+   }
+  ],
+  "order": [
+   {
+    "m": 1858,
+    "rec": "watch"
+   },
+   {
+    "m": 8373,
+    "rec": "optional"
+   },
+   {
+    "m": 38356,
+    "rec": "optional"
+   },
+   {
+    "m": 91314,
+    "rec": "optional"
+   },
+   {
+    "m": 335988,
+    "rec": "optional",
+    "note": "الأضعف استقبالاً"
+   },
+   {
+    "m": 424783,
+    "rec": "optional",
+    "note": "فيلم فرعي، أحداثه في الثمانينات"
+   },
+   {
+    "m": 698687,
+    "rec": "optional",
+    "note": "فيلم رسوم، الأعلى تقييماً"
+   }
+  ]
+ },
+ "ghostbusters": {
+  "name": "Ghostbusters",
+  "note": "Frozen Empire يكمل Afterlife مباشرة، وAfterlife تكملة للفيلمين الأصليين بعد 32 سنة. فيلم 2016 ريبوت بعالم مستقل وليس من هذا الخط.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ghostbusters_(franchise)"
+   }
+  ],
+  "order": [
+   {
+    "m": 620,
+    "rec": "watch",
+    "note": "الأصل"
+   },
+   {
+    "m": 2978,
+    "rec": "optional"
+   },
+   {
+    "m": 425909,
+    "rec": "watch",
+    "note": "قبل Frozen Empire"
+   },
+   {
+    "m": 967847,
+    "rec": "watch"
+   }
+  ]
+ },
+ "omen": {
+  "name": "The Omen",
+  "note": "The First Omen يحكي ما قبل The Omen (1976) وينتهي عند بدايته. يُشاهد وحده، أو يليه الأصل وهو الأعلى تقييماً. الأجزاء التالية تنزل تقييماً.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_First_Omen"
+   }
+  ],
+  "order": [
+   {
+    "m": 437342,
+    "rec": "watch",
+    "note": "ما قبل الأصل"
+   },
+   {
+    "m": 794,
+    "rec": "watch",
+    "note": "الأصل"
+   },
+   {
+    "m": 10766,
+    "rec": "optional"
+   },
+   {
+    "m": 10768,
+    "rec": "skip"
+   },
+   {
+    "m": 17792,
+    "rec": "skip"
+   }
+  ]
+ },
+ "candyman": {
+  "name": "Candyman",
+  "note": "فيلم 2021 تكملة مباشرة لفيلم 1992، فالأصل قبله. الجزآن الثاني والثالث ضعيفا التقييم ولا يعتمد عليهما.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Candyman_(2021_film)"
+   }
+  ],
+  "order": [
+   {
+    "m": 9529,
+    "rec": "watch",
+    "note": "قبل فيلم 2021"
+   },
+   {
+    "m": 10824,
+    "rec": "skip"
+   },
+   {
+    "m": 12485,
+    "rec": "skip"
+   },
+   {
+    "m": 565028,
+    "rec": "watch"
+   }
+  ]
+ },
+ "bond": {
+  "name": "James Bond",
+  "note": "أفلام دانيال كريغ الخمسة، من Casino Royale إلى No Time to Die، بداية جديدة وقصة واحدة متصلة، فتُشاهد بترتيبها. ما قبلها يمكن مشاهدته بأي ترتيب. Never Say Never Again خارج السلسلة الرسمية، وهو اقتباس ثانٍ لقصة Thunderball. علامة «شاهده» هنا على ما تقييمه 7 فأعلى في TMDB.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/James_Bond_in_film"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Never_Say_Never_Again"
+   }
+  ],
+  "order": [
+   {
+    "all": 645,
+    "watchFrom": 7,
+    "set": {
+     "36670": {
+      "rec": "skip",
+      "note": "خارج السلسلة الرسمية"
+     },
+     "36557": {
+      "rec": "watch",
+      "note": "بداية قصة كريغ"
+     },
+     "10764": {
+      "note": "يكمل Casino Royale مباشرة"
+     },
+     "206647": {
+      "note": "من قصة كريغ"
+     },
+     "370172": {
+      "rec": "watch",
+      "note": "خاتمة قصة كريغ"
+     }
+    }
+   }
+  ]
+ },
+ "mission-impossible": {
+  "name": "Mission: Impossible",
+  "note": "كل فيلم مهمة مستقلة، وترتيب الصدور أفضل لتطوّر الشخصيات، خصوصاً من الجزء الثالث. Dead Reckoning وThe Final Reckoning قصة واحدة في جزأين. علامة «شاهده» هنا على ما تقييمه 7 فأعلى في TMDB.",
+  "order": [
+   {
+    "all": 87359,
+    "watchFrom": 7,
+    "set": {
+     "575264": {
+      "note": "الجزء الأول من الخاتمة"
+     },
+     "575265": {
+      "note": "الجزء الثاني من الخاتمة"
+     }
+    }
+   }
+  ]
+ },
+ "lion-king": {
+  "name": "The Lion King",
+  "note": "Mufasa يحكي نشأة موفاسا، وتُروى القصة داخل إطار يدور بعد فيلم 2019، فهو بعده في المشاهدة. وفيلم 2019 نفسه إعادة صنع لفيلم الرسوم الكلاسيكي (1994).",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Mufasa:_The_Lion_King"
+   }
+  ],
+  "order": [
+   {
+    "m": 420818,
+    "rec": "watch"
+   },
+   {
+    "m": 762509,
+    "rec": "watch",
+    "note": "قصة النشأة"
+   }
+  ]
+ },
+ "bird-box": {
+  "name": "Bird Box",
+  "note": "Bird Box Barcelona فيلم فرعي بشخصيات جديدة في الكارثة نفسها، ولا يكمل قصة الفيلم الأول. يُشاهد وحده.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Bird_Box_Barcelona"
+   }
+  ],
+  "order": [
+   {
+    "m": 405774,
+    "rec": "optional",
+    "note": "الفيلم الأصلي، قصة أخرى"
+   },
+   {
+    "m": 805320,
+    "rec": "watch"
+   }
+  ]
+ },
+ "28": {
+  "name": "28 Days Later",
+  "note": "بترتيب الصدور. 28 Weeks Later قصة أخرى في الوباء نفسه. 28 Years Later بداية ثلاثية جديدة، وThe Bone Temple جزؤها الثاني.",
+  "order": [
+   {
+    "m": 170,
+    "rec": "watch"
+   },
+   {
+    "m": 1562,
+    "rec": "optional",
+    "note": "قصة أخرى"
+   },
+   {
+    "m": 1100988,
+    "rec": "watch",
+    "note": "بداية الثلاثية الجديدة"
+   },
+   {
+    "m": 1272837,
+    "rec": "watch"
+   },
+   {
+    "m": 1273002,
+    "rec": "soon"
+   }
+  ]
+ },
+ "kill-bill": {
+  "name": "Kill Bill",
+  "note": "فيلم واحد صدر في جزأين، يُشاهدان متتاليين.",
+  "order": [
+   {
+    "m": 24,
+    "rec": "watch"
+   },
+   {
+    "m": 393,
+    "rec": "watch"
+   }
+  ]
+ },
+ "godzilla-minus": {
+  "name": "Godzilla Minus One",
+  "note": "Godzilla Minus Zero يكمل Godzilla Minus One، فالأول قبله.",
+  "order": [
+   {
+    "m": 940721,
+    "rec": "watch",
+    "note": "قبل Minus Zero"
+   },
+   {
+    "m": 1381071,
+    "rec": "watch"
+   }
+  ]
+ },
+ "mario": {
+  "name": "The Super Mario Bros.",
+  "note": "The Super Mario Galaxy Movie يكمل The Super Mario Bros. Movie، فالأول قبله.",
+  "order": [
+   {
+    "m": 502356,
+    "rec": "watch",
+    "note": "قبل Galaxy"
+   },
+   {
+    "m": 1226863,
+    "rec": "watch"
+   }
+  ]
+ },
+ "hitman": {
+  "name": "The Hitman's Bodyguard",
+  "note": "الثاني يكمل الأول بالشخصيات نفسها، فالأول قبله.",
+  "order": [
+   {
+    "m": 390043,
+    "rec": "watch",
+    "note": "قبل الثاني"
+   },
+   {
+    "m": 522931,
+    "rec": "watch"
+   }
+  ]
+ },
+ "freaky-friday": {
+  "name": "Freaky Friday",
+  "note": "Freakier Friday تكملة لفيلم 2003 بالشخصيات نفسها بعد سنوات، فالأول قبله.",
+  "order": [
+   {
+    "m": 10330,
+    "rec": "watch",
+    "note": "قبل Freakier Friday"
+   },
+   {
+    "m": 1125257,
+    "rec": "watch"
+   }
+  ]
+ },
+ "wicked": {
+  "name": "Wicked",
+  "note": "قصة واحدة في فيلمين: Wicked نصفها الأول، وWicked: For Good نصفها الثاني.",
+  "order": [
+   {
+    "m": 402431,
+    "rec": "watch"
+   },
+   {
+    "m": 967941,
+    "rec": "watch",
+    "note": "النصف الثاني"
+   }
+  ]
+ },
+ "gladiator": {
+  "name": "Gladiator",
+  "note": "Gladiator مكتمل وحده وهو الأعلى تقييماً. Gladiator II تكملة بعد سنوات بتقييم أقل.",
+  "order": [
+   {
+    "m": 98,
+    "rec": "watch"
+   },
+   {
+    "m": 558449,
+    "rec": "optional"
+   },
+   {
+    "m": 1359289,
+    "rec": "soon"
+   }
+  ]
+ },
+ "raid": {
+  "name": "The Raid",
+  "note": "The Raid 2 يبدأ من حيث انتهى الأول، وتقييمه أعلى منه بقليل.",
+  "order": [
+   {
+    "m": 94329,
+    "rec": "watch"
+   },
+   {
+    "m": 180299,
+    "rec": "watch",
+    "note": "تكملة مباشرة"
+   }
+  ]
+ },
+ "space-odyssey": {
+  "name": "2001: A Space Odyssey",
+  "note": "2001 مكتمل وحده. 2010 تكملة من مخرج آخر تشرح ما تركه الأول غامضاً.",
+  "order": [
+   {
+    "m": 62,
+    "rec": "watch"
+   },
+   {
+    "m": 4437,
+    "rec": "optional"
+   }
+  ]
+ },
+ "m3gan": {
+  "name": "M3GAN",
+  "note": "الأول مكتمل وحده، والثاني يكمل بعده.",
+  "order": [
+   {
+    "m": 536554,
+    "rec": "watch"
+   },
+   {
+    "m": 1071585,
+    "rec": "optional"
+   }
+  ]
+ },
+ "dumb": {
+  "name": "Dumb and Dumber",
+  "note": "الأول هو الأعلى تقييماً. Dumb and Dumber To يعود بالبطلين بعد عشرين سنة. Dumb and Dumberer يحكي ما قبل الأول بممثلين آخرين وتقييمه ضعيف.",
+  "order": [
+   {
+    "m": 8467,
+    "rec": "watch"
+   },
+   {
+    "m": 100042,
+    "rec": "optional"
+   },
+   {
+    "m": 10152,
+    "rec": "skip",
+    "note": "ممثلون آخرون"
+   }
+  ]
+ },
+ "speed": {
+  "name": "Speed",
+  "note": "Speed مكتمل وحده. الجزء الثاني بلا بطل الأول وتقييمه ضعيف.",
+  "order": [
+   {
+    "m": 1637,
+    "rec": "watch"
+   },
+   {
+    "m": 1639,
+    "rec": "skip"
+   }
+  ]
+ },
+ "butterfly": {
+  "name": "The Butterfly Effect",
+  "note": "الأول مكتمل وحده. الجزآن التاليان قصتان أخريان بالفكرة نفسها وتقييمهما ضعيف.",
+  "order": [
+   {
+    "m": 1954,
+    "rec": "watch"
+   },
+   {
+    "m": 14620,
+    "rec": "skip"
+   },
+   {
+    "m": 16258,
+    "rec": "skip"
+   }
+  ]
+ },
+ "carlito": {
+  "name": "Carlito's Way",
+  "note": "الفيلم مكتمل وحده. Rise to Power يحكي ما قبله بممثلين آخرين وتقييمه ضعيف.",
+  "order": [
+   {
+    "m": 6075,
+    "rec": "watch"
+   },
+   {
+    "m": 12261,
+    "rec": "skip"
+   }
+  ]
+ },
+ "braveheart": {
+  "name": "Braveheart",
+  "note": "Braveheart مكتمل وحده. Robert the Bruce فيلم لاحق عن إحدى شخصياته وتقييمه ضعيف.",
+  "order": [
+   {
+    "m": 197,
+    "rec": "watch"
+   },
+   {
+    "m": 532812,
+    "rec": "skip"
+   }
+  ]
+ },
+ "yojimbo": {
+  "name": "Yojimbo",
+  "note": "Yojimbo مكتمل وحده. Sanjuro مغامرة أخرى مستقلة للشخصية نفسها، وتقييمه قريب منه.",
+  "order": [
+   {
+    "m": 11878,
+    "rec": "watch"
+   },
+   {
+    "m": 11712,
+    "rec": "optional"
+   }
+  ]
+ },
+ "poirot": {
+  "name": "Hercule Poirot",
+  "note": "ثلاث قضايا مستقلة للمحقق نفسه، لا يلزم بينها ترتيب.",
+  "order": [
+   {
+    "m": 392044,
+    "rec": "optional"
+   },
+   {
+    "m": 505026,
+    "rec": "optional"
+   },
+   {
+    "m": 945729,
+    "rec": "watch"
+   }
+  ]
+ },
+ "streetdance": {
+  "name": "StreetDance",
+  "note": "StreetDance 2 قصة جديدة بشخصيات جديدة، فلا يلزم الأول قبله.",
+  "order": [
+   {
+    "m": 41592,
+    "rec": "optional"
+   },
+   {
+    "m": 85373,
+    "rec": "watch"
+   }
+  ]
+ },
+ "oceans": {
+  "name": "Ocean's",
+  "note": "الثلاثية بترتيب صدورها، والأول هو الأعلى تقييماً. Ocean's Eight فيلم فرعي بفريق آخر.",
+  "order": [
+   {
+    "m": 161,
+    "rec": "watch"
+   },
+   {
+    "m": 163,
+    "rec": "optional"
+   },
+   {
+    "m": 298,
+    "rec": "optional"
+   },
+   {
+    "m": 402900,
+    "rec": "optional",
+    "note": "فيلم فرعي"
+   }
+  ]
+ },
+ "ace-ventura": {
+  "name": "Ace Ventura",
+  "note": "الفيلمان الأولان مغامرتان منفصلتان. الثالث بلا جيم كاري وتقييمه ضعيف جداً.",
+  "order": [
+   {
+    "m": 3049,
+    "rec": "watch"
+   },
+   {
+    "m": 9273,
+    "rec": "optional"
+   },
+   {
+    "m": 15338,
+    "rec": "skip"
+   }
+  ]
+ },
+ "city-slickers": {
+  "name": "City Slickers",
+  "note": "الأول مكتمل وحده، والثاني أضعف تقييماً.",
+  "order": [
+   {
+    "m": 1406,
+    "rec": "watch"
+   },
+   {
+    "m": 11310,
+    "rec": "optional"
+   }
+  ]
+ },
+ "stomp": {
+  "name": "Stomp the Yard",
+  "note": "الأول مكتمل وحده، والثاني قصة أخرى أضعف تقييماً.",
+  "order": [
+   {
+    "m": 1931,
+    "rec": "watch"
+   },
+   {
+    "m": 33473,
+    "rec": "skip"
+   }
+  ]
+ },
+ "social-network": {
+  "name": "The Social Network",
+  "note": "The Social Network مكتمل وحده. The Social Reckoning (2026) تكملة مدرجة معه في مجموعة TMDB.",
+  "order": [
+   {
+    "m": 37799,
+    "rec": "watch"
+   },
+   {
+    "m": 1281331,
+    "rec": "optional"
+   }
+  ]
+ },
+ "ip-man": {
+  "name": "Ip Man",
+  "note": "الأفلام الأربعة بترتيب صدورها تتابع حياة المعلّم نفسه.",
+  "order": [
+   {
+    "all": 70068,
+    "rec": "watch"
+   }
+  ]
+ },
+ "millennium": {
+  "name": "The Girl with the Dragon Tattoo",
+  "note": "The Girl in the Spider's Web يكمل بالشخصيات نفسها لكن بطاقم آخر ومخرج آخر، وتقييمه أقل. فيلم 2011 أعلى تقييماً ويُشاهد وحده.",
+  "order": [
+   {
+    "m": 65754,
+    "rec": "optional",
+    "note": "الأعلى تقييماً"
+   },
+   {
+    "m": 446807,
+    "rec": "watch"
+   }
+  ]
  }
 }
