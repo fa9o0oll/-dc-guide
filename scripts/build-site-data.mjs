@@ -77,7 +77,7 @@ if (malIds.length) {
     try { const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`, { headers: { 'User-Agent': 'watch-guide-build/1.0 (https://github.com/fa9o0oll/-dc-guide)' } });
       if (!res.ok) throw new Error('Jikan ' + res.status);
       const a = (await res.json()).data; anime[id] = { score: a.score ?? null, votes: a.scored_by ?? 0, rank: a.rank ?? null, episodes: a.episodes ?? null, type: a.type ?? null, title: a.title ?? null };
-    } catch (e) { if (prev[id]) anime[id] = prev[id]; problems.push(`MAL ${id}: ${e.message}`); }
+    } catch (e) { if (prev[id]) anime[id] = prev[id]; problems.push(`MAL ${id}: ${e.message}${e.cause ? ' (' + (e.cause.code || e.cause.message) + ')' : ''}`); if (Object.keys(anime).length === 0 && problems.filter(x => x.startsWith('MAL')).length >= 3) { problems.push('MAL: توقف السحب بعد 3 إخفاقات متتالية'); break; } }
     await new Promise(z => setTimeout(z, 1100));
   }
   write(prevPath, { generatedAt: new Date().toISOString(), anime });
