@@ -9,8 +9,8 @@ const root = new URL('../', import.meta.url), SRC = new URL('data/films/', root)
 const rd = (u, fb) => fs.existsSync(u) ? JSON.parse(fs.readFileSync(u)) : fb;
 for (const d of [OUT, GEN]) fs.mkdirSync(d, { recursive: true });
 
-const lines = fs.readFileSync(new URL('list.txt', SRC), 'utf8').split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#')).map(l => {
-  const [title, year, type = '', note = ''] = l.split('|').map(x => x.trim()); return { key: `${title} | ${year}${type === 'tv' ? ' | tv' : ''}`, title, year: +year || null, type, note: note.replace(/^؟\s*/, ''), ask: note.startsWith('؟') }; });
+const lines = fs.readFileSync(new URL('list.txt', SRC), 'utf8').split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#')).map((l, i) => {
+  const [title, year, type = '', note = ''] = l.split('|').map(x => x.trim()); return { ord: (i + 1) * 100, key: `${title} | ${year}${type === 'tv' ? ' | tv' : ''}`, title, year: +year || null, type, note: note.replace(/^؟\s*/, ''), ask: note.startsWith('؟') }; });
 const pins = rd(new URL('pins.json', SRC), {}), added = rd(new URL('added.json', SRC), []), removed = new Set(rd(new URL('removed.json', SRC), []));
 const prevResolved = rd(new URL('resolved.json', GEN), {}), resolved = {}, report = { guesses: [], missing: [], ask: [], seriesWithoutCollection: [] };
 
@@ -32,24 +32,24 @@ const load = async (kind, id, meta) => { const fid = (kind === 'tv' ? 't' : 'm')
   const slot = {}; films.set(fid, slot);
   try { Object.assign(slot, shape(kind, await tmdb(detailPath(kind, id), detailParams(kind)), providers), meta); } catch (e) { films.delete(fid); report.missing.push(`${kind} ${id}: ${e.message}`); return null; }
   return slot; };
-await Promise.all(lines.map(l => resolved[l.key] && load(resolved[l.key].kind, resolved[l.key].id, { src: 'list', ...(l.ask ? { ask: l.note } : {}), ...(resolved[l.key].how === 'guess' ? { unsure: true } : {}) })));
-await Promise.all(added.map(a => load(a.kind === 'tv' ? 'tv' : 'movie', a.tmdb, { src: 'added', addedAt: a.at || null })));
+await Promise.all(lines.map(l => resolved[l.key] && load(resolved[l.key].kind, resolved[l.key].id, { src: 'list', ord: l.ord, ...(l.ask ? { ask: l.note } : {}), ...(resolved[l.key].how === 'guess' ? { unsure: true } : {}) })));
+await Promise.all(added.map((a, i) => load(a.kind === 'tv' ? 'tv' : 'movie', a.tmdb, { src: 'added', ord: 1e6 + i, addedAt: a.at || null })));
 const loadCol = async id => { if (collections[id]) return collections[id]; return collections[id] = tmdb('/collection/' + id, { language: 'en-US' }).then(shapeCollection).catch(() => null); };
 await Promise.all([...films.values()].filter(f => f.col).map(f => loadCol(f.col)));
 for (const id of Object.keys(collections)) { collections[id] = await collections[id]; if (!collections[id]) delete collections[id]; }
 for (const l of lines.filter(l => l.type === 'series')) { const f = resolved[l.key] && films.get('m' + resolved[l.key].id), c = f?.col && collections[f.col];
   if (!c) { report.seriesWithoutCollection.push(l.key); continue; }
-  await Promise.all(c.parts.map(p => load('movie', p.tmdb, { src: 'list', via: l.key }))); }
+  await Promise.all(c.parts.map((p, i) => load('movie', p.tmdb, { src: 'list', ord: l.ord + i + 1, via: l.key }))); }
 for (const l of lines.filter(l => l.ask)) report.ask.push({ line: l.key, note: l.note });
 
 // 3) ترجماتنا العربية للنبذات تتقدم على ترجمة TMDB
 const tr = rd(new URL('translations.json', SRC), {});
 const list = [...films.values()].filter(f => f.id && !removed.has(f.id));
 for (const f of list) if (tr[f.id]) { f.overviewAr = tr[f.id]; f.arSource = 'guide'; }
-list.sort((a, b) => a.title.localeCompare(b.title, 'en'));
+list.sort((a, b) => (a.ord ?? 9e9) - (b.ord ?? 9e9) || a.title.localeCompare(b.title, 'en'));
 
 // 4) الكتابة: films.json للبطاقات، more.json للتفاصيل التي تُحمَّل عند الحاجة
-const heavy = ['overviewEn', 'overviewAr', 'cast', 'backdrop', 'countries', 'arSource'];
+const heavy = ['overviewEn', 'overviewAr', 'cast', 'countries', 'arSource', 'titleAr', 'directors'];
 const light = list.map(f => Object.fromEntries(Object.entries(f).filter(([k]) => !heavy.includes(k))));
 const more = Object.fromEntries(list.map(f => [f.id, Object.fromEntries(heavy.filter(k => f[k] !== undefined).map(k => [k, f[k]]))]));
 const inList = new Set(list.filter(f => f.kind === 'movie').map(f => f.tmdb));

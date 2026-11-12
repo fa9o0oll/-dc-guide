@@ -2,3 +2,8 @@
 [build]
   publish = "site"
   command = 'V=${COMMIT_REF:-$(date +%s)}; sed -i "s/__BUILD__/$V/g" site/index.html site/*/index.html site/*.js'
+
+# دالة «أضف فيلماً» (/api/add-film). تقرأ TMDB_API_KEY و GH_TOKEN و ADD_FILM_PASSWORD من متغيرات الموقع في Netlify.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

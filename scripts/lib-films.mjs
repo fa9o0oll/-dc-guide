@@ -7,7 +7,7 @@ const isYear = s => /^(18|19|20)\d\d$/.test(s) && +s <= new Date().getFullYear()
 // «the hunt (2012)» أو «2012 the hunt» أو «the hunt ٢٠١٢» → { title, year }. عنوان هو نفسه رقم سنة («2012») يبقى عنواناً.
 export function parseLine(raw) {
   let s = String(raw || '').replace(/[٠-٩۰-۹]/g, d => AR_DIGITS[d]).replace(/[()\[\]{}"“”«»]/g, ' ').replace(/\s+/g, ' ').trim();
-  s = s.replace(/\b(movie|film|فيلم|فلم)\b/gi, ' ').replace(/\s+/g, ' ').trim();
+  s = s.replace(/\b(movie|film)\b/gi, ' ').replace(/(^|\s)(فيلم|فلم|سنة|عام)(?=\s|$)/g, ' ').replace(/\s+/g, ' ').trim();
   const t = s.split(' '); let year = null;
   if (t.length > 1 && isYear(t[t.length - 1])) year = +t.pop();
   else if (t.length > 1 && isYear(t[0]) && !t.slice(1).some(x => /^\d+$/.test(x))) year = +t.shift();

@@ -1,14 +1,16 @@
 // الواجهة الرئيسية: تجلب صورة كل دليل وعدد أعماله، وتقرأ سجل المشاهدة المحفوظ في المتصفح لتعرض التقدم.
 const BUILD = '__BUILD__';
 const works = (n) => { const m = n % 100; return n === 1 ? 'عمل واحد' : n === 2 ? 'عملين' : `${n} ${n === 0 || (m >= 3 && m <= 10) ? 'أعمال' : m >= 11 ? 'عملاً' : 'عمل'}`; };
+const films = (n) => { const m = n % 100; return n === 1 ? 'فيلم واحد' : n === 2 ? 'فيلمين' : `${n} ${m >= 3 && m <= 10 ? 'أفلام' : m >= 11 ? 'فيلماً' : 'فيلم'}`; };
 for (const door of document.querySelectorAll('.door[data-key]')) {
   try {
-    const cat = await (await fetch(`${door.dataset.guide}/data/catalog.json?v=${BUILD}`)).json();
-    const art = cat.works.find(w => w.id === door.dataset.art);
+    const cat = await (await fetch(`${door.dataset.guide}/data/${door.dataset.file || 'catalog.json'}?v=${BUILD}`)).json(), items = cat.works || cat.films, isFilms = !cat.works;
+    const art = items.find(w => w.id === door.dataset.art) || items.find(w => w.backdrop);
     if (art?.backdrop) { const img = new Image(); img.decoding = 'async'; img.alt = ''; img.src = cat.imageBase + (innerWidth * devicePixelRatio > 1000 ? 'w1280' : 'w780') + art.backdrop;
       img.onload = () => img.classList.add('in'); door.querySelector('.art').append(img); }
-    let seen = 0; try { seen = Object.values(JSON.parse(localStorage.getItem(door.dataset.key) || '{}').works || {}).filter(v => v === 'watched').length; } catch {}
-    door.querySelector('[data-stat]').textContent = seen ? `شاهدت ${seen} من ${works(cat.works.length)}` : works(cat.works.length);
+    let seen = 0; try { const pr = JSON.parse(localStorage.getItem(door.dataset.key) || '{}'); seen = Object.values(pr.works || pr.films || {}).filter(v => v === 'watched').length; } catch {}
+    const total = isFilms ? films(items.length) : works(items.length);
+    door.querySelector('[data-stat]').textContent = seen ? `شاهدت ${seen} من ${total}` : total;
   } catch { door.querySelector('[data-stat]').textContent = ''; }
 }
 

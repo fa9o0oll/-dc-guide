@@ -106,7 +106,7 @@ Before the Devil Knows You're Dead | 2007
 Blood & Gold | 2023
 The Machine | 2023
 Kandahar | 2023
-You Can See Everything | 2026 | | ؟ «You Can See Everything (2026) series»: لم أتعرّف على العمل المقصود.
+You Can See Everything | 2026
 I Saw the Devil | 2010
 The Raid | 2011
 There Will Be Blood | 2007
@@ -239,7 +239,7 @@ The Furious | 2025
 The Fall Guy | 2024
 A Taxi Driver | 2017
 The Fetus | 2025
-Men of War | 2025
+Men of War | 2025 | | ؟ «Men of War 2025»: المطابق في TMDB فيلم وثائقي صدر 2024 (إخراج بيلي كوربن). تأكد أنه المقصود.
 Strange Harvest | 2025
 Eyes Wide Shut | 1999
 K-PAX | 2001
@@ -249,7 +249,7 @@ American Made | 2017
 The Green Knight | 2021
 Wicked | 2024
 Boy Kills World | 2023
-The Hunt for Gollum | 2009
+The Hunt for Gollum | 2009 | | ؟ «The Hunt For Gollum 2009»: فيلم المعجبين القصير (2009) غير موجود في TMDB، فأُدرج الفيلم الرسمي القادم بنفس الاسم (2027).
 Somewhere | 2010
 The Empty Man | 2020
 The Monkey | 2025
