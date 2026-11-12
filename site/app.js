@@ -1,12 +1,17 @@
-// دليل عوالم DC — الواجهة. البيانات كلها من site/data/ (تُبنى آلياً)، ولا توجد بيانات أعمال مكتوبة هنا.
-import { THEMES, SHOW_COLORS } from './themes.js?v=__BUILD__';
+// واجهة الأدلة (دي سي، Fate…). الدليل يُحدَّد من data-guide في الصفحة، وبياناته من مجلد data المجاور لها (تُبنى آلياً).
+import { GUIDES } from './guides.js?v=__BUILD__';
+import { shell } from './shell.js?v=__BUILD__';
 const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
+const G = GUIDES[document.documentElement.dataset.guide] || GUIDES.dc;
+const { THEMES, SHOW_COLORS = {} } = await import(`./themes-${G.id}.js?v=${BUILD}`);
+document.body.insertAdjacentHTML('afterbegin', shell(G));
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const ltr = s => `<bdi dir="ltr">${esc(s)}</bdi>`;
 const TODAY = new Date().toISOString().slice(0, 10);
-const TYPE = { 'film|live': 'فيلم واقعي', 'film|animation': 'فيلم أنميشن', 'series|live': 'مسلسل واقعي', 'series|animation': 'مسلسل أنميشن' };
+const typeOf = w => w.format || G.types[w.kind + '|' + w.medium] || '';
+const titleOf = p => p.title || D.works.get(p.work).title + (p.season ? `: Season ${p.season}` : '');
 const STATUS = { watched: 'شاهدته', watching: 'أشاهده', list: 'قائمتي', skip: 'تجاوز' };
 const STATUS_IC = { watched: 'check', watching: 'play', list: 'mark', skip: 'skip' };
 // الأيقونات مرسومة في index.html (رموز SVG) لا حروفاً نصية
@@ -19,23 +24,23 @@ root.classList.toggle('anim', !reduce.matches);
 const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 
 // ---------- التخزين (مفتاح واحد ثابت؛ أي تغيير مستقبلي يكون بترقية v داخل البيانات لا بتغيير المفتاح)
-const KEY = 'dcg.progress';
+const KEY = G.key;
 const blank = () => ({ v: 1, works: {}, eps: {}, shield: true });
 let store = blank();
 try { const raw = JSON.parse(localStorage.getItem(KEY) || 'null'); if (raw && raw.v === 1) store = { ...blank(), ...raw }; } catch {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch { toast('تعذّر الحفظ في هذا المتصفح'); } };
 
 // ---------- البيانات
-const D = { universes: [], works: new Map(), placements: [], bridges: [], legacyMap: {}, base: '', arrow: null, episodes: new Map() };
+const D = { universes: [], works: new Map(), placements: [], bridges: [], legacyMap: {}, base: '', arrow: null, order: null, mal: {}, episodes: new Map() };
 const ui = { view: 'cards', uni: 'all', sheet: null };
 const getJSON = async u => { const r = await fetch(u + '?v=' + BUILD); if (!r.ok) throw new Error(u + ' → ' + r.status); return r.json(); };
 
 async function boot() {
   try {
-    const [base, cat, arrow] = await Promise.all([getJSON('data/base.json'), getJSON('data/catalog.json'), getJSON('data/arrowverse.json')]);
+    const [base, cat, arrow, mal] = await Promise.all([getJSON('data/base.json'), getJSON('data/catalog.json'), G.order?.kind === 'arrow' ? getJSON(G.order.file) : null, G.malScore ? getJSON('data/mal.json').catch(() => ({})) : {}]);
     const extra = new Map(cat.works.map(w => [w.id, w]));
     for (const w of base.works) D.works.set(w.id, { ...w, ...(extra.get(w.id) || {}) });
-    Object.assign(D, { universes: base.universes, placements: base.placements, bridges: base.bridges, legacyMap: base.legacyMap, base: cat.imageBase, arrow });
+    Object.assign(D, { universes: base.universes, placements: base.placements, bridges: base.bridges || [], legacyMap: base.legacyMap || {}, base: cat.imageBase, arrow, order: base.order, mal: mal.anime || {} });
     $('#builtAt').textContent = 'آخر تحديث للبيانات: ' + fmtDate(cat.generatedAt.slice(0, 10));
   } catch (e) {
     $('#main').innerHTML = `<p class="empty">تعذّر تحميل البيانات. حدّث الصفحة، وإذا استمر الخطأ فالسبب: ${esc(e.message)}</p>`; return;
@@ -110,7 +115,7 @@ function syncShield() { const b = $('#shieldBtn'); b.innerHTML = ic('shield') + 
 
 // ---------- شريط العوالم
 function renderUnibar() {
-  $('#unibar').innerHTML = `<button data-act="uni" data-uni="all">كل العوالم</button>` +
+  $('#unibar').innerHTML = `<button data-act="uni" data-uni="all">${G.allLabel}</button>` +
     D.universes.map(u => `<button data-act="uni" data-uni="${u.id}">${esc(u.name)}</button>`).join('');
 }
 function syncNav() {
@@ -156,7 +161,7 @@ function uniHead(u, all) {
 function card(p) {
   const w = D.works.get(p.work), st = statusOf(p), soon = isSoon(w), v = verdict(w.tmdbRating);
   // سطران مقصودان: السنة والنوع، ثم المدة أو المواسم والحلقات
-  const meta = [bits([w.date ? w.date.slice(0, 4) : w.year, TYPE[w.kind + '|' + w.medium]]),
+  const meta = [bits([w.date ? w.date.slice(0, 4) : w.year, typeOf(w)]),
     bits(!w.seasons ? [w.runtime ? cnt(w.runtime, 'min') : ''] : p.season ? [`الموسم ${p.season}`, cnt(seasonTotal(w, p.season), 'ep')] : w.episodeCount ? [cnt((w.seasons || []).length, 'season'), cnt(w.episodeCount, 'ep')] : [])]
     .filter(Boolean).map(x => `<div class="meta bits">${x}</div>`).join('');
   const tot = w.seasons ? seasonTotal(w, p.season) : 0, dn = tot ? seasonDone(w.id, p.season) : 0;
@@ -164,7 +169,7 @@ function card(p) {
     <div class="chead"><button class="poster" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} aria-label="تفاصيل ${esc(w.title)}">${posterTag(w)}</button>
     <div>
       <div class="ord">${uniOf(p.universe).serial && !soon ? 'الترتيب: ' : ''}${esc(p.label)}</div>
-      <h3>${ltr(w.title + (p.season ? `: Season ${p.season}` : ''))}</h3>
+      <h3>${ltr(titleOf(p))}</h3>
       ${meta}
       <div class="tags">${soon ? (p.upcoming?.stage === 'development' ? '<span class="tag soon">معلن</span>' : '<span class="tag soon">قادم</span>') : v ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${nextTag(w)}</div>
       ${w.tmdbRating != null ? `<div class="rates">${gaugeRow(w)}</div>` : ''}
@@ -194,8 +199,8 @@ function node(p, i, list) {
     <button class="node-main" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} aria-label="تفاصيل ${esc(w.title)}">
       <span class="thumb">${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w154')}" alt="">` : ''}<i class="seen" aria-hidden="true">✓</i></span>
       <span class="node-text"><span class="n">${esc(p.label)}${soon ? (w.date ? ` · قادم بعد ${cnt(daysLeft(w), 'day', true)}` : ' · قادم') : ''}</span>
-        <span class="t">${ltr(w.title + (p.season ? `: Season ${p.season}` : ''))}</span>
-        <span class="meta">${esc([w.date ? w.date.slice(0, 4) : w.year, TYPE[w.kind + '|' + w.medium]].filter(Boolean).join(' · '))}</span>
+        <span class="t">${ltr(titleOf(p))}</span>
+        <span class="meta">${esc([w.date ? w.date.slice(0, 4) : w.year, typeOf(w)].filter(Boolean).join(' · '))}</span>
         ${around.length ? `<span class="meta">${around.map(([k, t]) => `${k}: ${ltr(t)}`).join(' · ')}</span>` : ''}${avStart(p) ? `<span class="meta">يبدأ في الخطوة ${avStart(p).n} من ترتيب المشاهدة</span>` : ''}</span></button>
     <div class="go">${soon ? '' : `<button class="tick" data-act="status" data-s="watched" aria-pressed="${done}">${tick(done, 'شاهدته', 'علّمه مشاهَد')}</button>`}<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}">البطاقة</button></div></div>`;
 }
@@ -296,7 +301,7 @@ function watchTheme() {
   io?.disconnect(); $$('#unibar .near').forEach(b => b.classList.remove('near'));
   io = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) setScene(e.target.dataset.uni); }, { rootMargin: '-35% 0px -55% 0px' });
   $$('.uni').forEach(s => io.observe(s));
-  sceneUni = ''; setScene($('.uni')?.dataset.uni || 'dcu');
+  sceneUni = ''; setScene($('.uni')?.dataset.uni || G.first);
 }
 function goTo(view, uni, targetId) {
   ui.view = view; if (ui.uni !== 'all' && uni) ui.uni = uni;
@@ -365,7 +370,7 @@ function openWork(id, season, from) {
   openSheet(ltr(w.title), `<div class="hero">${w.backdrop ? `<img decoding="async" src="${img(w.backdrop, 'w780')}" alt="">` : ''}</div>
     <div class="dw"><div class="dw-top"><button class="poster" data-act="light" data-src="${img(w.poster, 'w780')}" aria-label="تكبير البوستر">${posterTag(w)}</button>
       <div><h3>${ltr(w.title)}</h3>
-      <div class="meta bits">${bits([TYPE[w.kind + '|' + w.medium], w.date ? fmtDate(w.date) : w.year, w.runtime ? cnt(w.runtime, 'min') : '', ...(w.episodeCount ? [cnt(w.seasons.length, 'season'), cnt(w.episodeCount, 'ep')] : [])])}</div>
+      <div class="meta bits">${bits([typeOf(w), w.date ? fmtDate(w.date) : w.year, w.runtime ? cnt(w.runtime, 'min') : '', ...(w.episodeCount ? [cnt(w.seasons.length, 'season'), cnt(w.episodeCount, 'ep')] : [])])}</div>
       ${soon && w.date ? `<div class="tags"><span class="tag soon">قادم بعد ${cnt(daysLeft(w), 'day', true)}</span></div>` : ''}</div></div>
     ${w.overviewAr ? `<p class="ov">${esc(w.overviewAr)}</p>` : w.overviewEn ? `<div><span class="lbl">النبذة بالإنجليزية (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(w.overviewEn)}</p></div>` : ''}
     <div class="actions">${places.map(p => `<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">البطاقة في ${esc(uniOf(p.universe).name)}${p.season ? `، الموسم ${p.season}` : ''}</button>`).join('')}</div>
@@ -407,16 +412,16 @@ function openJump() {
       <span class="tile-text"><span class="tile-name">${esc(u.name)}</span><span class="tile-en">${ltr(u.nameEn)}</span><span class="tile-meta">عدد الأعمال ${all.length} · شاهدت ${done}</span><span class="bar"><i style="width:${rel.length ? Math.round(done / rel.length * 100) : 0}%"></i></span></span></button>`; };
   const group = (title, list) => list.length ? `<h3>${title}</h3><div class="tiles">${list.map(tile).join('')}</div>` : '';
   openSheet('الفهرس', `<div class="idx"><input id="jq" type="search" placeholder="ابحث عن عمل أو عالم…" aria-label="بحث في الفهرس">
-    <div class="idx-row">${[['cards', 'البطاقات'], ['timeline', 'الخط الزمني'], ['arrow', 'ترتيب آروفيرس']].map(([v, l]) => `<button data-act="view" data-view="${v}" class="${ui.view === v ? 'on' : ''}">${l}</button>`).join('')}
-      <button data-act="uni" data-uni="all" class="${ui.uni === 'all' && ui.view !== 'arrow' ? 'on' : ''}">كل العوالم</button></div>
+    <div class="idx-row">${[['cards', 'البطاقات'], ['timeline', 'الخط الزمني'], ...(G.order ? [['arrow', G.order.label]] : [])].map(([v, l]) => `<button data-act="view" data-view="${v}" class="${ui.view === v ? 'on' : ''}">${l}</button>`).join('')}
+      <button data-act="uni" data-uni="all" class="${ui.uni === 'all' && ui.view !== 'arrow' ? 'on' : ''}">${G.allLabel}</button></div>
     <div id="jres"></div><div id="jhome"></div>
     <div class="idx-row tools2"><button data-act="shield">${store.shield ? 'درع الحرق: مفعّل' : 'درع الحرق: متوقف'}</button><button data-act="tonight">ماذا أشاهد؟</button><button data-act="backup">سجلّي</button><button data-act="guide">الدليل</button></div></div>`, 'jump', { wide: true, uni: sceneUni });
   const mark = { watched: '✓', watching: '▶', list: '+', skip: '✕' };
   const draw = () => { const q = $('#jq').value.trim().toLowerCase();
     const us = D.universes.filter(u => !q || u.name.includes(q) || u.nameEn.toLowerCase().includes(q));
     const ws = q ? D.placements.filter(p => { const w = D.works.get(p.work); return w.title.toLowerCase().includes(q) || (w.titleAr || '').includes(q); }).slice(0, 40) : [];
-    $('#jres').innerHTML = ws.length ? `<h3>أعمال</h3><div class="hits">${ws.map(p => { const w = D.works.get(p.work), t = THEMES[p.universe]; return `<button class="hit" style="--c1:${t.c1}" data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w92')}" alt="">` : '<span class="ph"></span>'}<span class="hit-text"><span class="t">${ltr(w.title + (p.season ? `: Season ${p.season}` : ''))}</span><small>${esc(uniOf(p.universe).name)}</small></span><span class="hit-mark">${mark[statusOf(p)] || ''}</span></button>`; }).join('')}</div>` : q && !us.length ? '<p class="empty">لا يوجد عمل أو عالم بهذا الاسم.</p>' : '';
-    $('#jhome').innerHTML = group('عوالم متسلسلة', us.filter(u => u.serial)) + group('أعمال منفردة', us.filter(u => !u.serial)); };
+    $('#jres').innerHTML = ws.length ? `<h3>أعمال</h3><div class="hits">${ws.map(p => { const w = D.works.get(p.work), t = THEMES[p.universe]; return `<button class="hit" style="--c1:${t.c1}" data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w92')}" alt="">` : '<span class="ph"></span>'}<span class="hit-text"><span class="t">${ltr(titleOf(p))}</span><small>${esc(uniOf(p.universe).name)}</small></span><span class="hit-mark">${mark[statusOf(p)] || ''}</span></button>`; }).join('')}</div>` : q && !us.length ? '<p class="empty">لا يوجد عمل أو عالم بهذا الاسم.</p>' : '';
+    $('#jhome').innerHTML = group(G.groups[0], us.filter(u => u.serial)) + group(G.groups[1], us.filter(u => !u.serial)); };
   $('#jq').addEventListener('input', draw); draw();
   if (matchMedia('(hover:hover)').matches) $('#jq').focus();
 }
@@ -425,7 +430,7 @@ function openBackup() {
   openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px"><p>سجلك محفوظ في هذا المتصفح فقط. انسخ الكود واحتفظ به، والصقه في أي جهاز أو متصفح ثاني لاسترجاع السجل.</p>
     <textarea id="bk" aria-label="كود السجل">${encode(store)}</textarea>
     <div class="actions"><button data-act="bkcopy">نسخ الكود</button><button data-act="bkimport">استيراد الكود الملصوق</button></div>
-    <h4>النقل من النسخة القديمة</h4><p>افتح موقعك القديم، اضغط «نسخ احتياطي» وانسخ الكود، ثم الصقه هنا واضغط استيراد. يتحول تلقائياً للنظام الجديد.</p></div>`, 'backup');
+    ${G.legacyImport ? '<h4>النقل من النسخة القديمة</h4><p>افتح موقعك القديم، اضغط «نسخ احتياطي» وانسخ الكود، ثم الصقه هنا واضغط استيراد. يتحول تلقائياً للنظام الجديد.</p>' : ''}</div>`, 'backup');
 }
 function importCode() {
   let raw; try { raw = JSON.parse(decodeURIComponent(escape(atob($('#bk').value.trim())))); } catch { return toast('الكود غير صالح'); }
@@ -438,15 +443,7 @@ function importCode() {
   else return toast('الكود غير معروف');
   save(); closeSheet(); syncShield(); render(); toast(`تم الاستيراد: ${cnt(works, 'work')} و${cnt(eps, 'ep')}`);
 }
-function openGuide() {
-  openSheet('دليل الاستخدام', `<div class="dw guide" style="padding-top:14px">
-    <h4>العوالم</h4><p>كل عالم قصة مستقلة. العالم «المتسلسل» يُشاهد بالترتيب المكتوب على كل بطاقة (ترتيب أحداث القصة لا تاريخ الصدور). الأعمال «المنفردة» تُشاهد بأي ترتيب.</p>
-    <h4>طرق العرض</h4><ul><li><b>البطاقات:</b> كل التفاصيل والتقييم وحالة المشاهدة.</li><li><b>الخط الزمني:</b> نظرة سريعة على التسلسل، مع ما قبل كل عمل وما بعده.</li><li><b>ترتيب آروفيرس:</b> أي موسم وأي حلقة تشاهد أولاً بين المسلسلات المتداخلة.</li></ul>
-    <h4>درع الحرق</h4><p>وهو مفعّل، تبقى معلومات الارتباط الحساسة مقفولة، وملخصات الحلقات التي لم تشاهدها مموّهة حتى تضغط عليها.</p>
-    <h4>التقييمات</h4><p>الرقم الظاهر هو تقييم ${ltr('TMDB')} ويتحدث يومياً. أزرار ${ltr('IMDb')} و${ltr('Rotten Tomatoes')} تفتح صفحة العمل نفسها هناك.</p>
-    <h4>الأعمال القادمة</h4><p>تظهر آخر عالمها مع عدّاد الأيام، وتنتقل لمكانها تلقائياً يوم صدورها.</p>
-    <h4>عمل في عالمين</h4><p>بعض الأعمال أُنتجت في عالم ثم اعتُمدت رسمياً في عالم آخر. تظهر في العالمين بسجل مشاهدة واحد، ومعها مصدر الاعتماد.</p></div>`, 'guide');
-}
+function openGuide() { openSheet('دليل الاستخدام', `<div class="dw guide" style="padding-top:14px">${G.help}</div>`, 'guide'); }
 function tonight() {
   const seen = new Set();
   const pick = D.placements.map(p => ({ p, w: D.works.get(p.work) })).filter(({ p, w }) => !isSoon(w) && !statusOf(p) && w.tmdbRating != null && !seen.has(w.id) && seen.add(w.id))

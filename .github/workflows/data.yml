@@ -2,7 +2,7 @@ name: build-and-deploy
 on:
   push:
     branches: [main, 'claude/**']
-    paths: ['data/**', '!data/generated/**', 'scripts/**', 'site/**', '!site/data/**', '.github/workflows/data.yml']
+    paths: ['data/**', '!data/generated/**', 'scripts/**', 'site/**', '!site/*/data/**', '.github/workflows/data.yml']
   schedule:
     - cron: '17 3 * * *'   # يومياً 06:17 بتوقيت الرياض
   workflow_dispatch:
@@ -44,12 +44,12 @@ jobs:
         run: |
           git config user.name "dc-guide-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/generated site/data
+          git add data/generated site/dc/data site/fate/data
           git diff --cached --quiet || git commit -m "data: daily refresh"
           git push origin "HEAD:${GITHUB_REF_NAME}"
       - name: Stamp build id (cache busting; not committed)
         if: github.ref == 'refs/heads/main'
-        run: sed -i "s/__BUILD__/${GITHUB_RUN_ID}/g" site/index.html site/app.js
+        run: sed -i "s/__BUILD__/${GITHUB_RUN_ID}/g" site/index.html site/*/index.html site/*.js
       - name: Upload site
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3

@@ -5,7 +5,7 @@ const root = new URL('../', import.meta.url);
 const rd = p => JSON.parse(fs.readFileSync(new URL(p, root)));
 const cfg = rd('data/arrowverse-config.json');
 const eps = {}; // work -> [{s,e,date,name}]
-for (const id of Object.keys(cfg.shows)) eps[id] = rd(`site/data/episodes/${id}.json`).seasons.flatMap(s => s.episodes.map(e => ({ s: s.n, e: e.n, date: e.date, name: e.name })));
+for (const id of Object.keys(cfg.shows)) eps[id] = rd(`site/dc/data/episodes/${id}.json`).seasons.flatMap(s => s.episodes.map(e => ({ s: s.n, e: e.n, date: e.date, name: e.name })));
 const errs = [];
 const find = (w, s, e) => eps[w]?.find(x => x.s === s && x.e === e);
 const key = (w, s, e) => `${w}|${s}|${e}`;
@@ -86,5 +86,5 @@ if (seen.size !== total) errs.push(`تغطية: ${seen.size} مدرجة مقاب
 
 if (errs.length) { console.error('❌ ترتيب آروفيرس:\n- ' + errs.slice(0, 30).join('\n- ')); process.exit(1); }
 steps.forEach((s, i) => s.n = i + 1);
-fs.writeFileSync(new URL('site/data/arrowverse.json', root), JSON.stringify({ generatedAt: new Date().toISOString(), totalEpisodes: total, showCount: Object.keys(eps).length, steps, sideShows: Object.entries(cfg.sideShows || {}).map(([work, x]) => ({ work, show: cfg.shows[work], ...x, firstStep: steps.find(s => (s.blocks || []).some(b => b.work === work))?.n })) }) + '\n');
+fs.writeFileSync(new URL('site/dc/data/arrowverse.json', root), JSON.stringify({ generatedAt: new Date().toISOString(), totalEpisodes: total, showCount: Object.keys(eps).length, steps, sideShows: Object.entries(cfg.sideShows || {}).map(([work, x]) => ({ work, show: cfg.shows[work], ...x, firstStep: steps.find(s => (s.blocks || []).some(b => b.work === work))?.n })) }) + '\n');
 console.log(`✅ آروفيرس: ${steps.length} خطوة تغطي ${total} حلقة من ${Object.keys(eps).length} مسلسلات، بلا نقص ولا تكرار`);

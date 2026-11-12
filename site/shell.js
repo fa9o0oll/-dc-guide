@@ -1,19 +1,5 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>دليل عوالم DC</title>
-<meta name="description" content="دليل عربي تفاعلي لكل أفلام ومسلسلات DC حسب العالم وترتيب المشاهدة.">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#07183a">
-<link rel="preconnect" href="https://image.tmdb.org">
-<link rel="preload" href="fonts/lalezar-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=__BUILD__">
-</head>
-<body>
-<svg hidden aria-hidden="true"><defs>
+// الهيكل المشترك لكل دليل: الأيقونات، الترويسة، أشرطة التنقل، النافذة المنبثقة. يُحقن مرة واحدة قبل تشغيل الواجهة.
+export const shell = G => `<svg hidden aria-hidden="true"><defs>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
 <symbol id="i-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/></symbol>
 <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" stroke-width="1.6" d="M8.5 6v12l10-6z"/></symbol>
@@ -26,21 +12,23 @@
 <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5l7 2.8v5.2c0 4.3-2.9 7.3-7 9-4.1-1.7-7-4.7-7-9V6.3z"/></symbol>
 <symbol id="i-pick" viewBox="0 0 24 24"><path d="M4 7.5h3c2 0 3.2 1.2 4.5 4.5s2.5 4.5 4.5 4.5h4M4 16.5h3c1.1 0 1.9-.4 2.7-1.3M20 7.5h-4c-1.1 0-1.9.4-2.7 1.3M17.5 5L20 7.5 17.5 10M17.5 14l2.5 2.5-2.5 2.5"/></symbol>
 <symbol id="i-log" viewBox="0 0 24 24"><path d="M6.5 4h11v16h-11zM9.5 8.5h5M9.5 12h5M9.5 15.5h3"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7M6.5 9.5V20h11V9.5"/></symbol>
 <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 6c2.8-1.1 5.4-.9 8 .7 2.6-1.6 5.2-1.8 8-.7v12.5c-2.8-1.1-5.4-.9-8 .7-2.6-1.6-5.2-1.8-8-.7zM12 6.7v12.5"/></symbol>
 </defs></svg>
 <div class="atmo" aria-hidden="true"><div class="scene"><div class="scene-img"></div><div class="motif"></div></div><div class="scene"><div class="scene-img"></div><div class="motif"></div></div></div>
 <header class="top" id="top">
   <div class="brand">
-    <span class="logo" aria-hidden="true">DC</span>
-    <div><h1>دليل عوالم DC</h1><p id="statsLine">جارٍ التحميل…</p></div>
+    <a class="logo" href="../" aria-label="الواجهة الرئيسية">${G.logo}</a>
+    <div><h1>${G.name}</h1><p id="statsLine">جارٍ التحميل…</p></div>
   </div>
+  <a class="home" href="../"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span>كل الأدلة</span></a>
 </header>
 <div class="stick" id="stick">
 <div class="controls">
   <nav class="views" aria-label="طرق العرض">
     <button data-act="view" data-view="cards" class="on">البطاقات</button>
     <button data-act="view" data-view="timeline">الخط الزمني</button>
-    <button data-act="view" data-view="arrow">ترتيب آروفيرس</button>
+    ${G.order ? `<button data-act="view" data-view="arrow">${G.order.label}</button>` : ''}
   </nav>
   <div class="tools">
     <button data-act="shield" id="shieldBtn">درع الحرق</button>
@@ -51,18 +39,18 @@
 </div>
 <div class="dock" id="dock">
   <button class="dock-index" data-act="jump">الفهرس</button>
-  <div class="unibar" id="unibar" aria-label="العوالم"></div>
-  <div class="dock-here" id="dockHere" hidden><span>ترتيب مشاهدة آروفيرس</span></div>
+  <div class="unibar" id="unibar" aria-label="${G.barLabel}"></div>
+  <div class="dock-here" id="dockHere" hidden><span>${G.order?.here || ''}</span></div>
 </div>
 </div>
 <div class="filters" id="filters">
   <input id="q" type="search" placeholder="ابحث باسم العمل…" aria-label="بحث">
-  <select id="fType" aria-label="النوع"><option value="">كل الأنواع</option><option value="film">أفلام</option><option value="series">مسلسلات</option><option value="live">واقعي</option><option value="animation">أنميشن</option></select>
+  <select id="fType" aria-label="النوع">${G.typeFilter.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>
   <select id="fStatus" aria-label="حالة المشاهدة"><option value="">كل الحالات</option><option value="none">لم أشاهده</option><option value="watched">شاهدته</option><option value="watching">أشاهده</option><option value="list">قائمتي</option><option value="skip">تجاوزته</option><option value="upcoming">قادم</option></select>
 </div>
 <main id="main" tabindex="-1"></main>
 <footer class="foot">
-  <p>البوسترات وبيانات الأعمال والحلقات من <a href="https://www.themoviedb.org/" target="_blank" rel="noopener"><bdi dir="ltr">TMDB</bdi></a>. <bdi dir="ltr">This product uses the TMDB API but is not endorsed or certified by TMDB.</bdi></p>
+  <p>${G.credit}</p>
   <p id="builtAt"></p>
 </footer>
 <div class="sheet-backdrop" id="backdrop" hidden></div>
@@ -71,7 +59,4 @@
   <div class="sheet-body" id="sheetBody"></div>
 </aside>
 <div class="lightbox" id="lightbox" hidden><img alt="" id="lightImg"><button class="close" data-act="lightclose" aria-label="إغلاق">✕</button></div>
-<div class="toast" id="toast" role="status" hidden></div>
-<script type="module" src="app.js?v=__BUILD__"></script>
-</body>
-</html>
+<div class="toast" id="toast" role="status" hidden></div>`;

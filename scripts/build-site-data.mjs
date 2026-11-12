@@ -2,10 +2,9 @@
 // المصدر الوحيد للحقائق المتغيرة (بوستر، تواريخ، مواسم، حلقات، تقييم TMDB). ما لا يتوفر يُترك فارغاً ولا يُخمَّن.
 import fs from 'node:fs';
 import { tmdb, hasKey } from './lib-tmdb.mjs';
-const root = new URL('../', import.meta.url);
-const rd = f => JSON.parse(fs.readFileSync(new URL('data/' + f, root)));
-const works = rd('works.json');
-const outDir = new URL('site/data/', root), epDir = new URL('site/data/episodes/', root);
+import { guide, root, rdSrc, OUT, GEN } from './lib-guide.mjs';
+const works = rdSrc('works.json');
+const outDir = OUT, epDir = new URL('episodes/', OUT);
 fs.mkdirSync(epDir, { recursive: true });
 const write = (u, d) => fs.writeFileSync(u, JSON.stringify(d) + '\n');
 if (!hasKey()) { console.error('missing TMDB_API_KEY'); process.exit(1); }
@@ -72,7 +71,7 @@ const summary = { generatedAt: new Date().toISOString(), total: rows.length, enr
   withPoster: ok.filter(r => r.poster).length, withBackdrop: ok.filter(r => r.backdrop).length, withImdbId: ok.filter(r => r.imdb).length, withRtLink: ok.filter(r => r.rt).length,
   withArabicOverview: ok.filter(r => r.overviewAr).length, withArabicTitle: ok.filter(r => r.titleAr).length,
   series: series.length, episodes: series.reduce((a, r) => a + r.episodeCount, 0), arabicEpisodeOverviews: series.reduce((a, r) => a + (r.arabicEpisodeOverviews || 0), 0), problems };
-fs.mkdirSync(new URL('data/generated/', root), { recursive: true });
-fs.writeFileSync(new URL('data/generated/build-report.json', root), JSON.stringify(summary, null, 1) + '\n');
+fs.mkdirSync(GEN, { recursive: true });
+fs.writeFileSync(new URL('build-report.json', GEN), JSON.stringify(summary, null, 1) + '\n');
 console.log(JSON.stringify(summary, null, 1));
 if (summary.errors) process.exit(1);

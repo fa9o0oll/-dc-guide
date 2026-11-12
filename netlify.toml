@@ -1,4 +1,4 @@
 # إعدادات النشر على Netlify: يُنشر مجلد site كما هو بعد ختم رقم النشر في روابط الملفات (حتى لا تُعرض نسخة قديمة).
 [build]
   publish = "site"
-  command = 'V=${COMMIT_REF:-$(date +%s)}; sed -i "s/__BUILD__/$V/g" site/index.html site/app.js'
+  command = 'V=${COMMIT_REF:-$(date +%s)}; sed -i "s/__BUILD__/$V/g" site/index.html site/*/index.html site/*.js'

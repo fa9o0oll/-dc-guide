@@ -8,7 +8,7 @@ const siteDir = path.resolve(new URL('../site', import.meta.url).pathname), shot
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json' };
 const server = http.createServer((q, r) => { const f = path.join(siteDir, decodeURIComponent(q.url.split('?')[0]).replace(/\/$/, '/index.html'));
   fs.readFile(f, (e, b) => e ? (r.writeHead(404), r.end()) : (r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'text/plain' }), r.end(b))); }).listen(0);
-const url = `http://127.0.0.1:${server.address().port}/`;
+const url = `http://127.0.0.1:${server.address().port}/dc/`;
 const hues = [8, 28, 205, 262, 150, 340, 45, 190];
 const ph = (w, h, seed) => { const a = hues[seed % 8], b = hues[(seed * 3 + 2) % 8];
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${a} 70% 46%)"/><stop offset=".55" stop-color="hsl(${b} 55% 22%)"/><stop offset="1" stop-color="#05070c"/></linearGradient><radialGradient id="s" cx=".3" cy=".3" r=".5"><stop offset="0" stop-color="hsl(${a} 90% 78%)" stop-opacity=".85"/><stop offset="1" stop-color="hsl(${a} 90% 60%)" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><rect width="100%" height="100%" fill="url(#s)"/><path d="M0 ${h} L${w * .2} ${h * .55} L${w * .34} ${h * .7} L${w * .52} ${h * .38} L${w * .7} ${h * .66} L${w * .86} ${h * .5} L${w} ${h * .72} V${h}z" fill="#04060b" opacity=".8"/></svg>`; };
@@ -16,7 +16,7 @@ const fails = []; const check = (name, ok, extra = '') => { console.log((ok ? ' 
 const legacy = Buffer.from(JSON.stringify({ trackerState: { w_2: 'watched', w_6: 'watching', w_21: 'watched', w_30: 'watched', w_45: 'watchlist' }, epState: {} })).toString('base64');
 
 const browser = await chromium.launch();
-for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }, false], ['mobile', { width: 390, height: 844 }, true], ['fold-cover', { width: 369, height: 905 }, true], ['fold-cover-zoom', { width: 323, height: 792 }, true], ['fold-main', { width: 707, height: 823 }, true], ['fold-main-zoom', { width: 619, height: 720 }, true], ['fold-main-landscape', { width: 823, height: 707 }, true]]) {
+for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }, false], ['mobile', { width: 390, height: 844 }, true], ['fold-cover', { width: 369, height: 905 }, true], ['fold-cover-zoom', { width: 323, height: 792 }, true], ['fold-main', { width: 707, height: 823 }, true], ['fold-main-zoom', { width: 619, height: 720 }, true], ['fold-main-landscape', { width: 823, height: 707 }, true]].filter(x => !process.env.SIZES || process.env.SIZES.split(',').includes(x[0]))) {
   const phone = viewport.width <= 560;
   console.log(`\n== ${name} ${viewport.width}×${viewport.height}`);
   const ctx = await browser.newContext({ viewport, isMobile: mobile, hasTouch: mobile, deviceScaleFactor: shots ? 2 : 1, locale: 'ar-SA' });

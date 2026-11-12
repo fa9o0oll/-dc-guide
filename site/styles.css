@@ -438,3 +438,9 @@ img.in{opacity:1}
   .scene-img{filter:blur(14px) saturate(1.2)}
   .atmo::after{mix-blend-mode:normal;opacity:.045}
 }
+
+/* رابط العودة للواجهة الرئيسية */
+.top .home{margin-inline-start:auto;display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 12px;border-radius:10px;text-decoration:none;font-size:.84rem;font-weight:600;color:var(--dim);border:1px solid var(--hair)}
+.top .home .ic{color:var(--c1)}
+.top a.logo{text-decoration:none}
+@media (hover:hover){.top .home:hover{color:var(--ink);border-color:var(--c1)}}
