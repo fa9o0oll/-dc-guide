@@ -3,60 +3,22 @@
  "missing": [],
  "ask": [
   {
-   "line": "Rise of the Planet of the Apes | 2011",
-   "note": "«planet of the apes series»: أُدرجت السلسلة الحديثة (2011 وما بعده). السلسلة الأصلية (1968) تظهر في ترتيب السلسلة."
-  },
-  {
-   "line": "The Grinch | 2018",
-   "note": "«The grinch» بلا سنة: أُدرج فيلم الرسوم 2018. البديل فيلم جيم كاري (2000)."
-  },
-  {
-   "line": "Men of War | 2025",
-   "note": "«Men of War 2025»: المطابق في TMDB فيلم وثائقي صدر 2024 (إخراج بيلي كوربن). تأكد أنه المقصود."
-  },
-  {
    "line": "The Hunt for Gollum | 2009",
-   "note": "«The Hunt For Gollum 2009»: فيلم المعجبين القصير (2009) غير موجود في TMDB، فأُدرج الفيلم الرسمي القادم بنفس الاسم (2027)."
-  },
-  {
-   "line": "Hellboy | 2004",
-   "note": "«Hellboy» بلا سنة: أُدرج فيلم 2004. نسختا 2019 و2024 تظهران في ترتيب السلسلة."
-  },
-  {
-   "line": "Pinocchio | 2022",
-   "note": "«pinocchio 2022»: في 2022 فيلمان بهذا الاسم. أُدرج فيلم غييرمو ديل تورو، والبديل نسخة ديزني الحيّة."
-  },
-  {
-   "line": "Dumbo | 2019",
-   "note": "«Dumbo» بلا سنة: أُدرجت نسخة 2019 الحيّة. البديل فيلم الرسوم الأصلي (1941)."
-  },
-  {
-   "line": "The Mummy | 1999",
-   "note": "«the mummy series»: أُدرجت سلسلة 1999 (بريندان فريزر)."
-  },
-  {
-   "line": "Fantastic Four | 2005",
-   "note": "«fantastic four series»: أُدرج فيلما 2005 و2007. نسخة 2015 وفيلم 2025 يظهران في ترتيب السلسلة."
-  },
-  {
-   "line": "The Out-Laws | 2023",
-   "note": "«the outlaws movie 2023»: أُدرج فيلم نتفليكس The Out-Laws (2023). إن قصدت الفيلم الكوري فهو The Outlaws (2017)، وجزؤه الثاني The Roundup مدرج."
-  },
-  {
-   "line": "House Party | 1990",
-   "note": "«house party» بلا سنة: أُدرج الفيلم الأصلي 1990. البديل نسخة 2023."
+   "note": "فيلم المعجبين القصير (2009) غير موجود في TMDB، فالمدرج هو الفيلم الرسمي القادم بالاسم نفسه (2027)."
   }
  ],
  "seriesWithoutCollection": [],
+ "franchiseProblems": [],
  "counts": {
-  "lines": 483,
-  "films": 593,
+  "lines": 484,
+  "films": 598,
   "tv": 6,
   "added": 0,
   "collections": 91,
-  "withProviders": 366,
-  "arabicOverviews": 544,
+  "franchises": 32,
+  "withProviders": 368,
+  "arabicOverviews": 548,
   "ourArabic": 0,
-  "noPoster": 4
+  "noPoster": 5
  }
 }

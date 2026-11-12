@@ -1774,11 +1774,6 @@
   "kind": "movie",
   "how": "sure"
  },
- "Pinocchio | 2022": {
-  "id": 532639,
-  "kind": "movie",
-  "how": "sure"
- },
  "The Shawshank Redemption | 1994": {
   "id": 278,
   "kind": "movie",
@@ -1874,10 +1869,10 @@
   "kind": "movie",
   "how": "sure"
  },
- "Dumbo | 2019": {
-  "id": 329996,
+ "Dumbo | 1941": {
+  "id": 11360,
   "kind": "movie",
-  "how": "sure"
+  "how": "pin"
  },
  "Twisters | 2024": {
   "id": 718821,
@@ -2154,6 +2149,11 @@
   "kind": "movie",
   "how": "sure"
  },
+ "The Fantastic 4: First Steps | 2025": {
+  "id": 617126,
+  "kind": "movie",
+  "how": "pin"
+ },
  "Fantastic Four | 2005": {
   "id": 9738,
   "kind": "movie",
@@ -2334,10 +2334,10 @@
   "kind": "movie",
   "how": "sure"
  },
- "The Out-Laws | 2023": {
-  "id": 921636,
+ "The Outlaws | 2017": {
+  "id": 479718,
   "kind": "movie",
-  "how": "sure"
+  "how": "pin"
  },
  "The Last Samurai | 2003": {
   "id": 616,
@@ -2411,6 +2411,11 @@
  },
  "House Party | 1990": {
   "id": 16094,
+  "kind": "movie",
+  "how": "sure"
+ },
+ "Guillermo del Toro's Pinocchio | 2022": {
+  "id": 555604,
   "kind": "movie",
   "how": "sure"
  }
