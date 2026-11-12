@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-12T08:10:43.026Z",
+ "generatedAt": "2026-11-12T08:59:42.544Z",
  "total": 28,
  "enriched": 28,
  "pending": 0,
@@ -13,9 +13,5 @@
  "series": 13,
  "episodes": 329,
  "arabicEpisodeOverviews": 4,
- "problems": [
-  "MAL 22297: Jikan: fetch failed (ETIMEDOUT)",
-  "MAL 28701: Jikan: fetch failed (ETIMEDOUT)",
-  "MAL: لا مصدر متاح الآن (Jikan)، تبقى القيم السابقة"
- ]
+ "problems": []
 }
