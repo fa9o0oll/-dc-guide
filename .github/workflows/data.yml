@@ -26,6 +26,7 @@ jobs:
       - name: Pull live data from TMDB
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          MAL_CLIENT_ID: ${{ secrets.MAL_CLIENT_ID }}   # اختياري: مفتاح واجهة MyAnimeList الرسمية لتقييمات الأنمي
         run: node scripts/build-site-data.mjs && node scripts/build-site-data.mjs fate
       - name: Build the films list (match in TMDB, details, where to watch, collections)
         env:
