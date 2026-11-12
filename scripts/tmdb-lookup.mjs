@@ -5,7 +5,7 @@ import { tmdb, hasKey } from './lib-tmdb.mjs';
 if (!hasKey()) { console.error('missing TMDB_API_KEY'); process.exit(0); }
 const dir = new URL('../data/lookup/', import.meta.url);
 const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.json')) : [];
-const brief = c => ({ id: c.id, name: c.title || c.name, orig: c.original_title || c.original_name, date: c.release_date || c.first_air_date || null, votes: c.vote_count, lang: c.original_language });
+const brief = c => ({ id: c.id, name: c.title || c.name, orig: c.original_title || c.original_name, date: c.release_date || c.first_air_date || null, rating: c.vote_average, votes: c.vote_count, lang: c.original_language });
 for (const f of files) {
   const { queries = [], top = 6 } = JSON.parse(fs.readFileSync(new URL(f, dir)));
   for (const q of queries) {
