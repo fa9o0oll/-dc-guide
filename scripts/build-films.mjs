@@ -61,7 +61,7 @@ write(new URL('collections.json', OUT), usedCols);
 write(new URL('providers.json', OUT), providers);
 const fr = await processFranchises(rd(new URL('franchises.json', SRC), {}), {
   listed: (kind, id) => list.some(f => f.kind === kind && f.tmdb === id), byTitle: (t, y) => list.find(f => f.kind === 'movie' && f.title === t && (!y || f.year === y))?.tmdb || null,
-  movie: id => { for (const c of Object.values(collections)) { const p = c?.parts?.find(p => p.tmdb === id); if (p) return { title: p.title, year: p.year, poster: p.poster, rating: p.rating }; } return tmdb('/movie/' + id, { language: 'en-US' }).then(basicMovie).catch(() => null); },
+  movie: id => { for (const c of Object.values(collections)) { const p = c?.parts?.find(p => p.tmdb === id); if (p) return { title: p.title, date: p.date, year: p.year, poster: p.poster, rating: p.rating }; } return tmdb('/movie/' + id, { language: 'en-US' }).then(basicMovie).catch(() => null); },
   tv: id => tmdb('/tv/' + id, { language: 'en-US' }).then(basicTv).catch(() => null), collection: async id => (collections[id] = await loadCol(id)) });
 write(new URL('franchises.json', OUT), { items: fr.items, extras: fr.extras });
 report.franchiseProblems = fr.problems;

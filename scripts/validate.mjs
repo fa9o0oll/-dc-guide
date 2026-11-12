@@ -22,6 +22,7 @@ for (const p of P) {
   const k = p.universe + '#' + p.position; if (posSeen.has(k)) errs.push('ترتيب مكرر: ' + k); posSeen.add(k);
   const pk = p.universe + '|' + p.work + '|' + (p.season ?? ''); if (placed.has(pk)) errs.push('إدراج مكرر في نفس العالم: ' + pk); placed.add(pk);
   if (p.season && wById.get(p.work)?.kind !== 'series') errs.push('موسم لعمل ليس مسلسلاً: ' + p.work);
+  if (p.news && (!p.news.note || !Array.isArray(p.news.sources) || !p.news.sources.length || p.news.sources.some(u => !/^https:\/\//.test(u)))) errs.push('خبر قادم بلا نص أو مصدر: ' + p.work);
   if (p.upcoming && (!['production', 'development'].includes(p.upcoming.stage) || !/^https:\/\//.test(p.upcoming.source))) errs.push('عمل قادم بلا مرحلة أو مصدر: ' + p.work);
   if (p.canon && !/^https:\/\//.test(p.canon.source)) errs.push('حالة اعتماد بلا مصدر: ' + p.work);
   if (p.order && !/^https:\/\//.test(p.order.source)) errs.push('ملاحظة ترتيب بلا مصدر: ' + p.work);

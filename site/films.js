@@ -68,7 +68,7 @@ function whereHTML(f) { const p = f.prov; if (!p) return '';
   const s = [...new Set([...p.stream, ...p.free])];
   if (s.length) return s.slice(0, 4).map(id => D.prov[id]?.logo ? `<img loading="lazy" alt="${esc(D.prov[id].name)}" title="${esc(D.prov[id].name)}" src="${IMG}w92${D.prov[id].logo}">` : '').join('') + (s.length > 4 ? `<span>+${s.length - 4}</span>` : '');
   return p.rent.length || p.buy.length ? '<span>إيجار أو شراء</span>' : ''; }
-function partTag(f) { const r = D.recOf.get(f.id); if (r && r !== 'watch') return `<span class="tag">${r === 'skip' ? 'تجاوزه' : 'اختياري'}</span>`; const c = f.col && D.cols[f.col]; if (!c || c.parts.length < 2) return ''; const i = c.parts.findIndex(p => p.tmdb === f.tmdb); return i < 0 ? '' : `<span class="tag"><bdi dir="ltr">${i + 1}/${c.parts.length}</bdi></span>`; }
+function partTag(f) { const r = D.recOf.get(f.id); if (r === 'skip' || r === 'optional') return `<span class="tag">${r === 'skip' ? 'تجاوزه' : 'اختياري'}</span>`; const c = f.col && D.cols[f.col]; if (!c || c.parts.length < 2) return ''; const i = c.parts.findIndex(p => p.tmdb === f.tmdb); return i < 0 ? '' : `<span class="tag"><bdi dir="ltr">${i + 1}/${c.parts.length}</bdi></span>`; }
 function card(f) { const s = st(f.id), un = unreleased(f);
   return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}">
 <button class="poster" data-act="open" aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${f.fresh ? '<span class="tag new">جديد</span>' : f.kind === 'tv' ? '<span class="tag">مسلسل</span>' : un ? `<span class="tag">${f.date ? 'بعد ' + nDays(daysTo(f.date)) : 'لم يُعلن موعده'}</span>` : partTag(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
@@ -125,7 +125,8 @@ function reroll(first) { const ok = f => f.backdrop && f.kind === 'movie' && !un
 
 // ---------- السلاسل ----------
 // مجموعة العرض: سلسلة مراجَعة يدوياً (ترتيب وتوصيات ومسلسلات مرتبطة) أو مجموعة TMDB كما هي (أفلام فقط بترتيب الصدور)
-const REC = { watch: 'شاهده', optional: 'اختياري', skip: 'تجاوزه' };
+const REC = { watch: 'شاهده', optional: 'اختياري', skip: 'تجاوزه', soon: 'قادم' };
+const whenOf = o => o.date && o.date > today ? 'بعد ' + nDays(daysTo(o.date)) : o.year || 'لم يُعلن موعده';
 const groupOf = f => { const k = D.frOf.get(f.id); if (k) return { key: k, curated: true, ...D.fr[k] }; const c = f.col && D.cols[f.col]; return c && c.parts.length > 1 ? { key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })) } : null; };
 const listedOf = s => s.m ? D.byTmdb.get(s.m) : s.t ? D.byId.get('t' + s.t) : null;
 const infoOf = s => listedOf(s) || (s.m ? D.fx['m' + s.m] || D.part.get(s.m) : s.t ? D.fx['t' + s.t] : s) || {};
@@ -138,7 +139,7 @@ function seriesHTML() { const gs = groups().filter(g => !ui.q || g.name.toLowerC
   return gs.map(g => { const mine = g.order.map(listedOf).filter(Boolean), seen = mine.filter(f => st(f.id) === 'watched').length;
     return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${count(g.order.length, ['عمل واحد', 'عملان', 'أعمال', 'عملاً', 'عمل'])}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ' · بتوصيات الدليل' : ''}</span></header>${g.note ? `<p class="fr-note">${esc(g.note)}</p>` : ''}<div class="reel">${
       g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}" data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
-<span class="p">${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, o.year || 'بلا موعد', f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
+<span class="p">${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
 function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); $('#grid').hidden = v !== 'grid'; $('#series').hidden = v !== 'series'; $('#chips').hidden = v !== 'grid';
   if (v === 'series') $('#series').innerHTML = seriesHTML(); apply(false); }
 
@@ -149,7 +150,7 @@ function orderHTML(f) { const g = groupOf(f);
   if (!g) return `<section class="sec"><h3>السلسلة وترتيب المشاهدة</h3><p>${f.kind === 'tv' ? 'مسلسل، لا سلسلة أفلام مسجّلة له.' : 'فيلم مستقل: لا أجزاء أخرى مسجّلة له في <bdi dir="ltr">TMDB</bdi>.'}</p></section>`;
   const row = s => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = l?.id === f.id, k = kindOf(s);
     return `<li class="${[here ? 'here' : '', w ? 'watched' : '', s.rec ? 'r-' + s.rec : ''].join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k)}</span>
-<span class="t"><b>${esc(o.title || '')}</b><small>${[k, o.year || 'لم يُعلن موعده', o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? esc(s.note) : ''].filter(Boolean).join(' · ')}</small></span>
+<span class="t"><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? esc(s.note) : ''].filter(Boolean).join(' · ')}</small></span>
 <span class="st">${s.rec ? `<i class="rc ${s.rec}">${REC[s.rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}" data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'أضف'} ${esc(o.title || '')}"></button>`}</li>`; };
   return `<section class="sec"><h3>ترتيب المشاهدة: <bdi dir="ltr">${esc(g.name)}</bdi></h3>${g.note ? `<p>${esc(g.note)}</p>` : ''}<ol class="order">${g.order.map(row).join('')}</ol>
 <p class="note">${g.curated ? `الترتيب والتوصيات من إعداد الدليل، مبنية على ترابط القصة وتقييم <bdi dir="ltr">TMDB</bdi> الظاهر بجانب كل عمل${g.sources?.length ? `. المصادر: ${g.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener"><bdi dir="ltr">${esc(x.name)}</bdi></a>`).join('، ')}` : ''}.` : 'الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط. لم يُراجَع يدوياً بعد.'}</p></section>`; }

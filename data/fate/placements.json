@@ -229,7 +229,14 @@
   "label": "7",
   "note": "يكمل القصة من حيث توقف الموسم الرابع.",
   "mal": 42030,
-  "simkl": 1349953
+  "simkl": 1349953,
+  "news": {
+   "note": "أُعلن موسم خامس وأخير بعنوان Fate/kaleid liner PRISMA ILLYA FINALE، يُعرض عام 2027 ولم يُحدَّد يومه بعد.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Fate/kaleid_liner_Prisma_Illya",
+    "https://www.livechart.me/franchises/20"
+   ]
+  }
  },
  {
   "universe": "apocrypha",
@@ -256,7 +263,14 @@
   "label": "2",
   "note": "الحرب المزيّفة تبدأ فعلاً، وتظهر أطراف لم يحسب لها أحد حساباً. يفضَّل مشاهدته بعد الخط الأساسي لأن فيه شخصيات وإشارات منه.",
   "mal": 55830,
-  "simkl": 2200822
+  "simkl": 2200822,
+  "news": {
+   "note": "انتهى عرض الموسم في مارس 2026 وأُعلنت بعده تكملة، ولم يُحدَّد موعدها بعد.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Fate/strange_Fake",
+    "https://www.livechart.me/franchises/20"
+   ]
+  }
  },
  {
   "universe": "extra",

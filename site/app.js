@@ -204,7 +204,7 @@ function card(p) {
     ${soon ? (src => w.date ? liveBox(w.date, 'الصدور', 'wide', src) : `<div class="count wide"><span>${STAGE[p.upcoming?.stage] || STAGE.production}</span>${src}</div>`)(p.upcoming?.source ? `<a class="src" href="${esc(p.upcoming.source)}" target="_blank" rel="noopener">المصدر</a>` : '') : ''}
     ${nextBlock(w, 'wide')}
     ${avLine(p, 'wide')}
-    ${p.order ? `<p class="canon wide">${esc(p.order.note)} <a href="${esc(p.order.source)}" target="_blank" rel="noopener">المصدر</a></p>` : ''}
+    ${p.order ? `<p class="canon wide">${esc(p.order.note)} <a href="${esc(p.order.source)}" target="_blank" rel="noopener">المصدر</a></p>` : ''}${p.news ? `<p class="canon wide"><b>قادم:</b> ${esc(p.news.note)} ${p.news.sources.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener">المصدر${p.news.sources.length > 1 ? ' ' + (i + 1) : ''}</a>`).join(' ')}</p>` : ''}
     ${p.canon ? `<div class="canon wide">يظهر في عالمين: ${esc(p.canon.note)} <a href="${esc(p.canon.source)}" target="_blank" rel="noopener">المصدر</a></div>` : ''}
     ${p.spoiler ? (store.shield ? `<details class="vault wide"><summary>${ic('lock')}<span>معلومة ارتباط فيها حرق</span><b>اكشفها</b></summary><p>${esc(p.spoiler)}</p></details>` : `<p class="note wide">${esc(p.spoiler)}</p>`) : ''}</div>
     <div class="cfoot">${xlinks(w, p)}${soon ? '' : `<div class="status wide">${Object.entries(STATUS).map(([k, l]) => `<button data-act="status" data-s="${k}" aria-pressed="${st === k}">${ic(STATUS_IC[k])}<span>${l}</span></button>`).join('')}</div>`}

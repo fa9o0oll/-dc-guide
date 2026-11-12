@@ -86,7 +86,7 @@ export async function processFranchises(raw, get) {
         if (s.f) { const id = get.byTitle(s.f, s.y); if (!id) throw new Error(`«${s.f}» ليس في القائمة`); s.m = id; delete s.f; delete s.y; }
         if (s.m && !get.listed('movie', s.m)) { const d = await get.movie(s.m); if (!d) throw new Error(`فيلم ${s.m} غير موجود`); extras['m' + s.m] = d; }
         if (s.t && !get.listed('tv', s.t)) { const d = await get.tv(s.t); if (!d) throw new Error(`مسلسل ${s.t} غير موجود`); extras['t' + s.t] = d; }
-        if (!['watch', 'optional', 'skip'].includes(s.rec)) throw new Error('توصية غير معروفة: ' + s.rec);
+        if (!['watch', 'optional', 'skip', 'soon'].includes(s.rec)) throw new Error('توصية غير معروفة: ' + s.rec);
         order.push(s);
       } catch (e) { problems.push(`${key}: ${e.message}`); }
     }
@@ -94,5 +94,5 @@ export async function processFranchises(raw, get) {
   }
   return { items, extras, problems };
 }
-export const basicMovie = d => ({ title: d.title, year: d.release_date ? +d.release_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null });
-export const basicTv = d => ({ title: d.name, year: d.first_air_date ? +d.first_air_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null, seasons: d.number_of_seasons || null, tv: true });
+export const basicMovie = d => ({ title: d.title, date: d.release_date || null, year: d.release_date ? +d.release_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null });
+export const basicTv = d => ({ title: d.name, date: d.first_air_date || null, year: d.first_air_date ? +d.first_air_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null, seasons: d.number_of_seasons || null, tv: true });

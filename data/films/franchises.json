@@ -332,7 +332,7 @@
  },
  "evil-dead": {
   "name": "Evil Dead",
-  "note": "Evil Dead Rise قصة مستقلة بشخصيات جديدة ويكفي وحده. الثلاثية الأصلية ثم مسلسل Ash vs Evil Dead قصة آش المتصلة. فيلم 2013 قصة أخرى مستقلة في العالم نفسه.",
+  "note": "Evil Dead Rise قصة مستقلة بشخصيات جديدة ويكفي وحده، ومثله Evil Dead Burn. الثلاثية الأصلية ثم مسلسل Ash vs Evil Dead قصة آش المتصلة. فيلم 2013 قصة أخرى مستقلة في العالم نفسه.",
   "order": [
    {
     "m": 764,
@@ -363,6 +363,15 @@
     "m": 713704,
     "rec": "watch",
     "note": "قصة مستقلة"
+   },
+   {
+    "m": 1212763,
+    "rec": "optional",
+    "note": "قصة مستقلة"
+   },
+   {
+    "m": 1280608,
+    "rec": "soon"
    }
   ],
   "sources": [
@@ -578,6 +587,11 @@
     "t": 231394,
     "rec": "optional",
     "note": "مسلسل يكمل بعد الفيلم"
+   },
+   {
+    "m": 1156621,
+    "rec": "soon",
+    "note": "الجزء الثاني"
    }
   ],
   "sources": [
@@ -619,6 +633,12 @@
    {
     "m": 335984,
     "rec": "watch"
+   },
+   {
+    "x": "tv",
+    "title": "Blade Runner 2099",
+    "rec": "soon",
+    "note": "مسلسل قصير يكمل بعد الفيلمين. موعده غير مؤكد: ويكيبيديا تذكر 2027 وTMDB يذكر نوفمبر 2026"
    }
   ],
   "sources": [
@@ -629,6 +649,10 @@
    {
     "name": "Blade Runner Wiki",
     "url": "https://bladerunner.fandom.com/wiki/Blade_Runner_Black_Out_2022"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Blade_Runner_2099"
    }
   ]
  },
@@ -967,6 +991,11 @@
     "c": 435259,
     "title": "Fantastic Beasts: The Secrets of Dumbledore",
     "rec": "skip"
+   },
+   {
+    "t": 224377,
+    "rec": "soon",
+    "note": "مسلسل يعيد اقتباس الكتب من الكتاب الأول، وليس تكملة للأفلام"
    }
   ],
   "sources": [
@@ -977,6 +1006,10 @@
    {
     "name": "Harry Potter Wiki",
     "url": "https://harrypotter.fandom.com/wiki/Fantastic_Beasts_(film_series)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Harry_Potter_(TV_series)"
    }
   ]
  },
@@ -1061,6 +1094,175 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Laal_Singh_Chaddha"
+   }
+  ]
+ },
+ "hunger-games": {
+  "name": "The Hunger Games",
+  "note": "الأفلام الأربعة الأولى قصة واحدة بترتيب صدورها. الفيلمان التاليان يعودان إلى ما قبلها: The Ballad of Songbirds & Snakes قبل الفيلم الأول بـ64 سنة، وSunrise on the Reaping قبله بـ24 سنة. يُشاهدان بعد الأربعة لأنهما مبنيان على معرفة القصة الأصلية.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Hunger_Games_(film_series)"
+   }
+  ],
+  "order": [
+   {
+    "f": "The Hunger Games",
+    "y": 2012,
+    "rec": "watch"
+   },
+   {
+    "f": "The Hunger Games: Catching Fire",
+    "rec": "watch"
+   },
+   {
+    "f": "The Hunger Games: Mockingjay - Part 1",
+    "rec": "watch"
+   },
+   {
+    "f": "The Hunger Games: Mockingjay - Part 2",
+    "rec": "watch"
+   },
+   {
+    "f": "The Hunger Games: The Ballad of Songbirds & Snakes",
+    "rec": "optional",
+    "note": "قبل القصة بـ64 سنة"
+   },
+   {
+    "m": 1300968,
+    "rec": "soon",
+    "note": "قبل القصة بـ24 سنة"
+   }
+  ]
+ },
+ "incredibles": {
+  "name": "The Incredibles",
+  "note": "Incredibles 2 يبدأ من اللحظة التي انتهى عندها الفيلم الأول، فالأول قبله. الجزء الثالث معلن.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Incredibles_2"
+   }
+  ],
+  "order": [
+   {
+    "m": 9806,
+    "rec": "watch",
+    "note": "قبل Incredibles 2"
+   },
+   {
+    "f": "Incredibles 2",
+    "rec": "watch"
+   },
+   {
+    "m": 1327821,
+    "rec": "soon"
+   }
+  ]
+ },
+ "rambo": {
+  "name": "Rambo",
+  "note": "First Blood هو الأعلى تقييماً وقصته مكتملة. الأجزاء التالية مغامرات منفصلة لنفس الشخصية بترتيب صدورها. John Rambo القادم يحكي نشأة الشخصية في حرب فيتنام، أي قبل First Blood.",
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/John_Rambo_(film)"
+   }
+  ],
+  "order": [
+   {
+    "f": "First Blood",
+    "rec": "watch"
+   },
+   {
+    "f": "Rambo: First Blood Part II",
+    "rec": "optional"
+   },
+   {
+    "f": "Rambo III",
+    "rec": "optional"
+   },
+   {
+    "f": "Rambo",
+    "y": 2008,
+    "rec": "optional"
+   },
+   {
+    "f": "Rambo: Last Blood",
+    "rec": "optional"
+   },
+   {
+    "m": 1150369,
+    "rec": "soon",
+    "note": "قصة النشأة، قبل First Blood"
+   }
+  ]
+ },
+ "heat": {
+  "name": "Heat",
+  "note": "Heat مكتمل وحده. Heat 2 معلن ولم يُحدَّد موعده.",
+  "order": [
+   {
+    "f": "Heat",
+    "y": 1995,
+    "rec": "watch"
+   },
+   {
+    "m": 1047807,
+    "rec": "soon"
+   }
+  ]
+ },
+ "fnaf": {
+  "name": "Five Nights at Freddy's",
+  "note": "الجزء الثاني يكمل الأول، والثالث معلن بلا موعد.",
+  "order": [
+   {
+    "f": "Five Nights at Freddy's",
+    "rec": "watch"
+   },
+   {
+    "m": 1228246,
+    "rec": "optional",
+    "note": "تكملة"
+   },
+   {
+    "m": 1721637,
+    "rec": "soon"
+   }
+  ]
+ },
+ "mortal-kombat": {
+  "name": "Mortal Kombat",
+  "note": "Mortal Kombat II يكمل فيلم 2021، فالأول قبله. هذه السلسلة بداية جديدة لا علاقة لها بفيلمي التسعينات.",
+  "order": [
+   {
+    "m": 460465,
+    "rec": "watch",
+    "note": "قبل Mortal Kombat II"
+   },
+   {
+    "f": "Mortal Kombat II",
+    "rec": "watch"
+   },
+   {
+    "m": 1561021,
+    "rec": "soon"
+   }
+  ]
+ },
+ "wild-robot": {
+  "name": "The Wild Robot",
+  "note": "الفيلم مكتمل وحده. الجزء الثاني معلن بلا موعد.",
+  "order": [
+   {
+    "f": "The Wild Robot",
+    "rec": "watch"
+   },
+   {
+    "m": 1370190,
+    "rec": "soon"
    }
   ]
  }
