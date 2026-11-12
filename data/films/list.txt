@@ -51,7 +51,7 @@ Men in Black | 1997 | series
 Johnny English | 2003 | series
 Dumb and Dumber | 1994
 Dumb and Dumber To | 2014
-Rise of the Planet of the Apes | 2011 | series | ؟ «planet of the apes series»: أُدرجت السلسلة الحديثة (2011 وما بعده). السلسلة الأصلية (1968) تظهر في ترتيب السلسلة.
+Rise of the Planet of the Apes | 2011 | series
 The Curious Case of Benjamin Button | 2008
 The Gentlemen | 2019
 Maleficent | 2014
@@ -160,7 +160,7 @@ Anatomy of a Fall | 2023
 Below Zero | 2021
 A Haunting in Venice | 2023
 Michael | 2026
-The Grinch | 2018 | | ؟ «The grinch» بلا سنة: أُدرج فيلم الرسوم 2018. البديل فيلم جيم كاري (2000).
+The Grinch | 2018
 Together | 2025
 The Tashkent Files | 2019
 Unbreakable | 2000
@@ -239,7 +239,7 @@ The Furious | 2025
 The Fall Guy | 2024
 A Taxi Driver | 2017
 The Fetus | 2025
-Men of War | 2025 | | ؟ «Men of War 2025»: المطابق في TMDB فيلم وثائقي صدر 2024 (إخراج بيلي كوربن). تأكد أنه المقصود.
+Men of War | 2025
 Strange Harvest | 2025
 Eyes Wide Shut | 1999
 K-PAX | 2001
@@ -249,7 +249,7 @@ American Made | 2017
 The Green Knight | 2021
 Wicked | 2024
 Boy Kills World | 2023
-The Hunt for Gollum | 2009 | | ؟ «The Hunt For Gollum 2009»: فيلم المعجبين القصير (2009) غير موجود في TMDB، فأُدرج الفيلم الرسمي القادم بنفس الاسم (2027).
+The Hunt for Gollum | 2009 | | ؟ فيلم المعجبين القصير (2009) غير موجود في TMDB، فالمدرج هو الفيلم الرسمي القادم بالاسم نفسه (2027).
 Somewhere | 2010
 The Empty Man | 2020
 The Monkey | 2025
@@ -330,7 +330,7 @@ Ace Ventura: Pet Detective | 1994
 The Rip | 2026
 Vedaa | 2024
 Hustle & Flow | 2005
-Hellboy | 2004 | | ؟ «Hellboy» بلا سنة: أُدرج فيلم 2004. نسختا 2019 و2024 تظهران في ترتيب السلسلة.
+Hellboy | 2004 | series
 American Fiction | 2023
 Abigail | 2024
 What Is a Woman? | 2022
@@ -357,7 +357,7 @@ The Killing | 1956
 The King of Staten Island | 2020
 Dallas Buyers Club | 2013
 IF | 2024
-Pinocchio | 2022 | | ؟ «pinocchio 2022»: في 2022 فيلمان بهذا الاسم. أُدرج فيلم غييرمو ديل تورو، والبديل نسخة ديزني الحيّة.
+Guillermo del Toro's Pinocchio | 2022
 The Shawshank Redemption | 1994
 Johnny & Clyde | 2023
 One Ranger | 2023
@@ -377,7 +377,7 @@ Silenced | 2011
 Aftersun | 2022
 Violent Night | 2022
 The Whale | 2022
-Dumbo | 2019 | | ؟ «Dumbo» بلا سنة: أُدرجت نسخة 2019 الحيّة. البديل فيلم الرسوم الأصلي (1941).
+Dumbo | 1941
 Twisters | 2024
 Tenacious D in The Pick of Destiny | 2006
 Promare | 2019
@@ -420,7 +420,7 @@ King of New York | 1990
 M3GAN | 2022
 The Card Counter | 2021
 The Invitation | 2022
-The Mummy | 1999 | series | ؟ «the mummy series»: أُدرجت سلسلة 1999 (بريندان فريزر).
+The Mummy | 1999 | series
 Phone Booth | 2003
 Bugsy | 1991
 Carlito's Way | 1993
@@ -433,7 +433,8 @@ The Invisible Man | 2020
 Captain Fantastic | 2016
 Sing Sing | 2023
 The Throne | 2015
-Fantastic Four | 2005 | series | ؟ «fantastic four series»: أُدرج فيلما 2005 و2007. نسخة 2015 وفيلم 2025 يظهران في ترتيب السلسلة.
+The Fantastic 4: First Steps | 2025
+Fantastic Four | 2005 | series
 Flightplan | 2005
 Open Grave | 2013
 Slumberland | 2022
@@ -469,7 +470,7 @@ Olympus Has Fallen | 2013 | series
 Banshee | 2013 | tv
 A Bronx Tale | 1993
 Judy | 2019
-The Out-Laws | 2023 | | ؟ «the outlaws movie 2023»: أُدرج فيلم نتفليكس The Out-Laws (2023). إن قصدت الفيلم الكوري فهو The Outlaws (2017)، وجزؤه الثاني The Roundup مدرج.
+The Outlaws | 2017 | series
 The Last Samurai | 2003
 Crash | 2004
 Scarface | 1983
@@ -484,4 +485,4 @@ Seven Pounds | 2008
 Forrest Gump | 1994
 Elvis | 2022
 Hidden Strike | 2023
-House Party | 1990 | | ؟ «house party» بلا سنة: أُدرج الفيلم الأصلي 1990. البديل نسخة 2023.
+House Party | 1990

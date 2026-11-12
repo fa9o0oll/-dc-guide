@@ -22,7 +22,7 @@ const today = new Date().toISOString().slice(0, 10);
 const unreleased = f => f.kind === 'movie' && (!f.date || f.date > today);
 const poster = (p, sizes) => p ? `<img loading="lazy" decoding="async" alt="" src="${IMG}w342${p}" srcset="${IMG}w185${p} 185w, ${IMG}w342${p} 342w, ${IMG}w500${p} 500w" sizes="${sizes}">` : '';
 
-const D = { films: [], byId: new Map(), byTmdb: new Map(), more: null, cols: {}, prov: {}, fr: {} };
+const D = { films: [], byId: new Map(), byTmdb: new Map(), more: null, cols: {}, prov: {}, fr: {}, fx: {}, frOf: new Map(), recOf: new Map(), part: new Map() };
 let P = { films: {} };
 try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {}
 const save = () => { try { P.at = Date.now(); localStorage.setItem(KEY, JSON.stringify(P)); } catch {} };
@@ -61,7 +61,7 @@ function whereHTML(f) { const p = f.prov; if (!p) return '';
   const s = [...new Set([...p.stream, ...p.free])];
   if (s.length) return s.slice(0, 4).map(id => D.prov[id]?.logo ? `<img loading="lazy" alt="${esc(D.prov[id].name)}" title="${esc(D.prov[id].name)}" src="${IMG}w92${D.prov[id].logo}">` : '').join('') + (s.length > 4 ? `<span>+${s.length - 4}</span>` : '');
   return p.rent.length || p.buy.length ? '<span>إيجار أو شراء</span>' : ''; }
-function partTag(f) { const c = f.col && D.cols[f.col]; if (!c || c.parts.length < 2) return ''; const i = c.parts.findIndex(p => p.tmdb === f.tmdb); return i < 0 ? '' : `<span class="tag"><bdi dir="ltr">${i + 1}/${c.parts.length}</bdi></span>`; }
+function partTag(f) { const r = D.recOf.get(f.id); if (r && r !== 'watch') return `<span class="tag">${r === 'skip' ? 'تجاوزه' : 'اختياري'}</span>`; const c = f.col && D.cols[f.col]; if (!c || c.parts.length < 2) return ''; const i = c.parts.findIndex(p => p.tmdb === f.tmdb); return i < 0 ? '' : `<span class="tag"><bdi dir="ltr">${i + 1}/${c.parts.length}</bdi></span>`; }
 function card(f) { const s = st(f.id), un = unreleased(f);
   return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}">
 <button class="poster" data-act="open" aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${f.fresh ? '<span class="tag new">جديد</span>' : f.kind === 'tv' ? '<span class="tag">مسلسل</span>' : un ? '<span class="tag">لم يصدر</span>' : partTag(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
@@ -71,13 +71,13 @@ function card(f) { const s = st(f.id), un = unreleased(f);
 // ---------- التصفية والترتيب ----------
 const SORTS = { list: ['ترتيب قائمتي', (a, b) => a.ord - b.ord], new: ['الأحدث صدوراً', (a, b) => (b.date || '0').localeCompare(a.date || '0')], old: ['الأقدم صدوراً', (a, b) => (a.date || '9').localeCompare(b.date || '9')],
   rate: ['الأعلى تقييماً', (a, b) => (b.votes >= 50 ? b.rating || 0 : 0) - (a.votes >= 50 ? a.rating || 0 : 0)], short: ['الأقصر مدة', (a, b) => (a.runtime || 9999) - (b.runtime || 9999)], az: ['أبجدياً', (a, b) => a.title.localeCompare(b.title, 'en')] };
-const hay = f => f._h ??= [f.title, f.orig, f.year, ...(D.more?.[f.id]?.directors || []), D.more?.[f.id]?.titleAr, f.col && D.cols[f.col]?.name].filter(Boolean).join(' ').toLowerCase();
+const hay = f => f._h ??= [f.title, f.orig, f.year, ...(D.more?.[f.id]?.directors || []), D.more?.[f.id]?.titleAr, f.col && D.cols[f.col]?.name, D.fr[D.frOf.get(f.id)]?.name].filter(Boolean).join(' ').toLowerCase();
 function match(f) { const s = st(f.id);
   if (ui.status === 'todo' ? s === 'watched' : ui.status !== 'all' && s !== ui.status) return false;
   if (ui.genre && !f.genres.includes(+ui.genre)) return false;
   if (ui.decade && Math.floor((f.year || 0) / 10) * 10 !== +ui.decade) return false;
   if (ui.prov && !(ui.prov === 'any' ? f.prov && (f.prov.stream.length || f.prov.free.length) : f.prov && [...f.prov.stream, ...f.prov.free].includes(+ui.prov))) return false;
-  if (ui.series && !(f.col && D.cols[f.col]?.parts.length > 1)) return false;
+  if (ui.series && !(D.frOf.has(f.id) || f.col && D.cols[f.col]?.parts.length > 1)) return false;
   if (ui.q && !ui.q.split(/\s+/).every(w => hay(f).includes(w))) return false;
   return true; }
 function chipsHTML() { const c = (k, v, t) => `<button class="chip" data-act="status" data-v="${v}" aria-pressed="${ui[k] === v}">${t}</button>`;
@@ -114,29 +114,35 @@ function reroll(first) { const ok = f => f.backdrop && f.kind === 'movie' && !un
   if (!first) { box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap'); } }
 
 // ---------- السلاسل ----------
-const orderOf = c => (D.fr['c' + c.id]?.order) || c.parts.map(p => ({ m: p.tmdb }));
-function seriesHTML() { const cols = Object.values(D.cols).filter(c => c.parts.length > 1 && c.parts.some(p => D.byTmdb.has(p.tmdb)) && (!ui.q || c.name.toLowerCase().includes(ui.q) || c.parts.some(p => p.title.toLowerCase().includes(ui.q))))
-    .sort((a, b) => a.name.localeCompare(b.name, 'en'));
-  if (!cols.length) return '<p class="empty">لا سلسلة تطابق البحث.</p>';
-  return cols.map(c => { const mine = c.parts.filter(p => D.byTmdb.has(p.tmdb)), seen = mine.filter(p => st('m' + p.tmdb) === 'watched').length;
-    return `<section class="fr"><header><h3 dir="ltr">${esc(c.name)}</h3><span>${nParts(c.parts.length)}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < c.parts.length ? ` · ${mine.length} في قائمتك` : ''}</span></header><div class="reel">${
-      c.parts.map((p, i) => { const f = D.byTmdb.get(p.tmdb); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}" data-q="${esc(p.title)}${p.year ? ' ' + p.year : ''}">
-<span class="p">${poster(p.poster, '118px')}<span class="n">${i + 1}</span></span><b>${esc(p.title)}</b><small>${p.year || 'بلا موعد'}${f ? '' : ' · خارج قائمتك'}</small></button>`; }).join('')}</div></section>`; }).join(''); }
+// مجموعة العرض: سلسلة مراجَعة يدوياً (ترتيب وتوصيات ومسلسلات مرتبطة) أو مجموعة TMDB كما هي (أفلام فقط بترتيب الصدور)
+const REC = { watch: 'شاهده', optional: 'اختياري', skip: 'تجاوزه' };
+const groupOf = f => { const k = D.frOf.get(f.id); if (k) return { key: k, curated: true, ...D.fr[k] }; const c = f.col && D.cols[f.col]; return c && c.parts.length > 1 ? { key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })) } : null; };
+const listedOf = s => s.m ? D.byTmdb.get(s.m) : s.t ? D.byId.get('t' + s.t) : null;
+const infoOf = s => listedOf(s) || (s.m ? D.fx['m' + s.m] || D.part.get(s.m) : s.t ? D.fx['t' + s.t] : s) || {};
+const kindOf = s => s.t ? 'مسلسل' : s.x ? XKIND[s.x] || '' : '';
+function groups() { const out = Object.entries(D.fr).map(([key, fr]) => ({ key, curated: true, ...fr }));
+  for (const c of Object.values(D.cols)) if (c.parts.length > 1 && c.parts.some(p => D.byTmdb.has(p.tmdb)) && !c.parts.some(p => D.frOf.has('m' + p.tmdb))) out.push({ key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })) });
+  return out.sort((a, b) => a.name.localeCompare(b.name, 'en')); }
+function seriesHTML() { const gs = groups().filter(g => !ui.q || g.name.toLowerCase().includes(ui.q) || g.order.some(s => (infoOf(s).title || '').toLowerCase().includes(ui.q)));
+  if (!gs.length) return '<p class="empty">لا سلسلة تطابق البحث.</p>';
+  return gs.map(g => { const mine = g.order.map(listedOf).filter(Boolean), seen = mine.filter(f => st(f.id) === 'watched').length;
+    return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${count(g.order.length, ['عمل واحد', 'عملان', 'أعمال', 'عملاً', 'عمل'])}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ' · بتوصيات الدليل' : ''}</span></header>${g.note ? `<p class="fr-note">${esc(g.note)}</p>` : ''}<div class="reel">${
+      g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}" data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
+<span class="p">${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, o.year || 'بلا موعد', f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
 function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); $('#grid').hidden = v !== 'grid'; $('#series').hidden = v !== 'series'; $('#chips').hidden = v !== 'grid';
   if (v === 'series') $('#series').innerHTML = seriesHTML(); apply(false); }
 
 // ---------- نافذة الفيلم ----------
 const sheet = $('#sheet'), addDlg = $('#add');
 let openId = null;
-function orderHTML(f) { const c = f.col && D.cols[f.col], fr = (c && D.fr['c' + c.id]) || D.fr[f.id];
-  if (!c && !fr) return `<section class="sec"><h3>السلسلة وترتيب المشاهدة</h3><p>${f.kind === 'tv' ? 'مسلسل، لا سلسلة أفلام مسجّلة له.' : 'فيلم مستقل: لا أجزاء أخرى مسجّلة له في <bdi dir="ltr">TMDB</bdi>.'}</p></section>`;
-  const steps = fr?.order || c.parts.map(p => ({ m: p.tmdb })), part = id => c?.parts.find(p => p.tmdb === id);
-  const row = s => { if (s.m) { const g = D.byTmdb.get(s.m), p = part(s.m) || g || {}, w = g && st(g.id) === 'watched', here = g?.id === f.id;
-      return `<li class="${here ? 'here ' : ''}${w ? 'watched' : ''}"><span class="th">${p.poster ? `<img loading="lazy" alt="" src="${IMG}w92${p.poster}">` : ''}</span><span class="t"><b>${esc(p.title || '')}</b><small>${p.year || 'لم يُعلن موعده'}${s.note ? ' · ' + esc(s.note) : ''}</small></span>
-<span class="st">${here ? 'هذا الفيلم' : w ? 'شاهدته' : g ? 'في قائمتك' : 'خارج قائمتك'}</span>${here ? '' : `<button class="go" data-act="${g ? 'open' : 'add-part'}" data-id="${g ? g.id : ''}" data-q="${esc(p.title || '')}${p.year ? ' ' + p.year : ''}" aria-label="${g ? 'افتح' : 'أضف'} ${esc(p.title || '')}"></button>`}</li>`; }
-    return `<li class="x"><span class="th">${XKIND[s.x] || ''}</span><span class="t"><b>${esc(s.title)}</b><small>${[s.year, s.note].filter(Boolean).map(esc).join(' · ')}</small></span><span class="st">${XKIND[s.x] || ''}</span>${s.url ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(s.title)}"></a>` : ''}</li>`; };
-  return `<section class="sec"><h3>ترتيب المشاهدة${c ? `: <bdi dir="ltr">${esc(fr?.name || c.name)}</bdi>` : ''}</h3>${fr?.note ? `<p>${esc(fr.note)}</p>` : ''}<ol class="order">${steps.map(row).join('')}</ol>
-<p class="note">${fr ? `ترتيب مراجَع يدوياً${fr.source ? `، <a href="${esc(fr.source)}" target="_blank" rel="noopener">المصدر</a>` : ''}.` : 'الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط. لم يُراجَع يدوياً بعد.'}</p></section>`; }
+function orderHTML(f) { const g = groupOf(f);
+  if (!g) return `<section class="sec"><h3>السلسلة وترتيب المشاهدة</h3><p>${f.kind === 'tv' ? 'مسلسل، لا سلسلة أفلام مسجّلة له.' : 'فيلم مستقل: لا أجزاء أخرى مسجّلة له في <bdi dir="ltr">TMDB</bdi>.'}</p></section>`;
+  const row = s => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = l?.id === f.id, k = kindOf(s);
+    return `<li class="${[here ? 'here' : '', w ? 'watched' : '', s.rec ? 'r-' + s.rec : ''].join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k)}</span>
+<span class="t"><b>${esc(o.title || '')}</b><small>${[k, o.year || 'لم يُعلن موعده', o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? esc(s.note) : ''].filter(Boolean).join(' · ')}</small></span>
+<span class="st">${s.rec ? `<i class="rc ${s.rec}">${REC[s.rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}" data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'أضف'} ${esc(o.title || '')}"></button>`}</li>`; };
+  return `<section class="sec"><h3>ترتيب المشاهدة: <bdi dir="ltr">${esc(g.name)}</bdi></h3>${g.note ? `<p>${esc(g.note)}</p>` : ''}<ol class="order">${g.order.map(row).join('')}</ol>
+<p class="note">${g.curated ? `الترتيب والتوصيات من إعداد الدليل، مبنية على ترابط القصة وتقييم <bdi dir="ltr">TMDB</bdi> الظاهر بجانب كل عمل${g.source ? `. <a href="${esc(g.source)}" target="_blank" rel="noopener">مصدر الترتيب</a>` : ''}.` : 'الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط. لم يُراجَع يدوياً بعد.'}</p></section>`; }
 function whereSec(f) { const p = f.prov, g = (t, ids) => ids.length ? `<div class="wgroup"><b>${t}</b><div class="wlist">${ids.map(id => `<a href="${esc(p.link || '#')}" target="_blank" rel="noopener">${D.prov[id]?.logo ? `<img alt="" src="${IMG}w92${D.prov[id].logo}">` : ''}${esc(D.prov[id]?.name || id)}</a>`).join('')}</div></div>` : '';
   const body = p ? g('باشتراك', p.stream) + g('مجاناً', p.free) + g('إيجار', p.rent) + g('شراء', p.buy) : '';
   return `<section class="sec"><h3>أين تشاهده في السعودية</h3>${body || `<p>${unreleased(f) ? 'لم يصدر بعد.' : 'لا يتوفر على منصات السعودية حالياً حسب بيانات <bdi dir="ltr">JustWatch</bdi>.'}</p>`}${body ? '<p class="note">الأزرار تفتح صفحة أماكن العرض على <bdi dir="ltr">TMDB</bdi>، ومنها إلى المنصة. البيانات من <bdi dir="ltr">JustWatch</bdi> وتتحدث يومياً.</p>' : ''}</section>`; }
@@ -161,7 +167,7 @@ async function openFilm(id, push = true) { const f = D.byId.get(id); if (!f) ret
     if (push) history.pushState({ film: id }, '', '#' + id); } else if (push) history.replaceState({ film: id }, '', '#' + id); }
 function closeFilm(fromPop) { if (!sheet.open) return; openId = null; const done = () => sheet.close();
   if (calm) done(); else { const a = sheet.animate({ opacity: [1, 0], transform: ['none', innerWidth <= 640 ? 'translateY(5%)' : 'scale(.98)'] }, { duration: 160, easing: 'ease-in' }); a.onfinish = done; setTimeout(done, 300); }
-  if (!fromPop && history.state?.film) history.back(); }
+  if (!fromPop && history.state?.film) history.back(); else if (!fromPop && location.hash) history.replaceState(null, '', location.pathname + location.search); }
 addEventListener('popstate', () => { const id = location.hash.slice(1); if (id && D.byId.has(id)) openFilm(id, false); else closeFilm(true); });
 sheet.addEventListener('cancel', e => { e.preventDefault(); closeFilm(); });
 sheet.addEventListener('click', e => { if (e.target === sheet) closeFilm(); });
@@ -197,7 +203,7 @@ async function addPick(btn) { const msg = $('#add-msg'); btn.disabled = true; bt
   } catch (err) { msg.textContent = err.message; btn.disabled = false; btn.textContent = 'أضفه'; } }
 // يُدخل فيلماً عاد من الخادم (أو محفوظاً بانتظار وصوله في البناء القادم) في القائمة المعروضة
 function adopt(r, draw) { if (!r?.film || D.byId.has(r.film.id)) return false; const [light, heavy] = split(r.film); light.fresh = true; light.ord = -Date.now(); Object.assign(D.prov, r.providers || {});
-  if (r.collection && !D.cols[r.collection.id]) D.cols[r.collection.id] = r.collection; register(light, heavy);
+  if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) D.part.set(p.tmdb, p); } register(light, heavy);
   if (draw) { $('#grid').insertAdjacentHTML('afterbegin', card(light)); $('#chips').innerHTML = chipsHTML(); apply(false); } return true; }
 
 // ---------- الأحداث ----------
@@ -224,7 +230,9 @@ let qt; $('#q').addEventListener('input', e => { clearTimeout(qt); qt = setTimeo
 const liftVeil = () => { const v = $('#veil'); if (!v || v.hidden) return; requestAnimationFrame(() => requestAnimationFrame(() => { v.classList.add('lift'); setTimeout(() => v.remove(), calm ? 0 : 900); })); };
 try {
   const [films, prov, cols, fr] = await Promise.all([get('films.json'), get('providers.json'), get('collections.json'), get('franchises.json').catch(() => ({}))]);
-  D.prov = prov; D.cols = cols; D.fr = fr; for (const f of films.films) register(f);
+  D.prov = prov; D.cols = cols; D.fr = fr.items || {}; D.fx = fr.extras || {}; for (const f of films.films) register(f);
+  for (const c of Object.values(cols)) for (const p of c.parts) D.part.set(p.tmdb, p);
+  for (const [k, g] of Object.entries(D.fr)) for (const st of g.order) { const id = st.m ? 'm' + st.m : st.t ? 't' + st.t : null; if (id) { D.frOf.set(id, k); D.recOf.set(id, st.rec); } }
   D.moreReady = get('more.json').then(m => { D.more = { ...m, ...(D.more || {}) }; for (const f of D.films) delete f._h; return D.more; }).catch(() => (D.more ||= {}));
   // ما أُضيف بالزر ولم يصل البناء بعد يبقى ظاهراً من الحفظ المحلي، ويُحذف منه عند وصوله
   try { const pend = JSON.parse(localStorage.getItem(PEND) || '[]'), keep = pend.filter(r => r?.film && !D.byId.has(r.film.id)); D.more ||= {}; keep.forEach(r => adopt(r, false)); localStorage.setItem(PEND, JSON.stringify(keep)); } catch {}

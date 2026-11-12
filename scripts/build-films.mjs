@@ -3,7 +3,7 @@
 // التثبيت اليدوي في data/films/pins.json يتقدم على المطابقة الآلية. ما لا يتطابق بثقة يُكتب في تقرير ولا يُخمَّن بصمت.
 import fs from 'node:fs';
 import { tmdb, hasKey } from './lib-tmdb.mjs';
-import { search, shape, shapeCollection, detailPath, detailParams, COUNTRY } from './lib-films.mjs';
+import { search, shape, shapeCollection, detailPath, detailParams, COUNTRY, processFranchises, basicMovie, basicTv } from './lib-films.mjs';
 if (!hasKey()) { console.error('missing TMDB_API_KEY'); process.exit(1); }
 const root = new URL('../', import.meta.url), SRC = new URL('data/films/', root), OUT = new URL('site/films/data/', root), GEN = new URL('data/generated/films/', root);
 const rd = (u, fb) => fs.existsSync(u) ? JSON.parse(fs.readFileSync(u)) : fb;
@@ -59,13 +59,19 @@ write(new URL('films.json', OUT), { generatedAt: new Date().toISOString(), count
 write(new URL('more.json', OUT), more);
 write(new URL('collections.json', OUT), usedCols);
 write(new URL('providers.json', OUT), providers);
-if (fs.existsSync(new URL('franchises.json', SRC))) fs.copyFileSync(new URL('franchises.json', SRC), new URL('franchises.json', OUT)); else write(new URL('franchises.json', OUT), {});
+const fr = await processFranchises(rd(new URL('franchises.json', SRC), {}), {
+  listed: (kind, id) => list.some(f => f.kind === kind && f.tmdb === id), byTitle: (t, y) => list.find(f => f.kind === 'movie' && f.title === t && (!y || f.year === y))?.tmdb || null,
+  movie: id => { for (const c of Object.values(collections)) { const p = c?.parts?.find(p => p.tmdb === id); if (p) return { title: p.title, year: p.year, poster: p.poster, rating: p.rating }; } return tmdb('/movie/' + id, { language: 'en-US' }).then(basicMovie).catch(() => null); },
+  tv: id => tmdb('/tv/' + id, { language: 'en-US' }).then(basicTv).catch(() => null), collection: async id => (collections[id] = await loadCol(id)) });
+write(new URL('franchises.json', OUT), { items: fr.items, extras: fr.extras });
+report.franchiseProblems = fr.problems;
 fs.writeFileSync(new URL('resolved.json', GEN), JSON.stringify(resolved, null, 1) + '\n');
 report.counts = { lines: lines.length, films: list.filter(f => f.kind === 'movie').length, tv: list.filter(f => f.kind === 'tv').length, added: list.filter(f => f.src === 'added').length,
-  collections: Object.keys(usedCols).length, withProviders: list.filter(f => f.prov && (f.prov.stream.length || f.prov.free.length || f.prov.rent.length || f.prov.buy.length)).length,
+  collections: Object.keys(usedCols).length, franchises: Object.keys(fr.items).length, withProviders: list.filter(f => f.prov && (f.prov.stream.length || f.prov.free.length || f.prov.rent.length || f.prov.buy.length)).length,
   arabicOverviews: list.filter(f => f.overviewAr).length, ourArabic: list.filter(f => f.arSource === 'guide').length, noPoster: list.filter(f => !f.poster).length };
 fs.writeFileSync(new URL('report.json', GEN), JSON.stringify(report, null, 1) + '\n');
 console.log('FILMS counts ' + JSON.stringify(report.counts));
 for (const g of report.guesses) console.log('FILMS guess ' + JSON.stringify(g));
 for (const m of report.missing) console.log('FILMS missing ' + m);
 for (const m of report.seriesWithoutCollection) console.log('FILMS series-without-collection ' + m);
+for (const m of fr.problems) console.log('FILMS franchise-problem ' + m);

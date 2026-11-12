@@ -72,3 +72,27 @@ export function shape(kind, d, providers = {}) {
 export const shapeCollection = c => ({ id: c.id, name: c.name.replace(/\s+Collection$/i, ''), poster: c.poster_path || null, backdrop: c.backdrop_path || null,
   parts: (c.parts || []).map(p => ({ tmdb: p.id, title: p.title, date: p.release_date || null, year: p.release_date ? +p.release_date.slice(0, 4) : null, poster: p.poster_path || null, rating: p.vote_count ? Math.round(p.vote_average * 10) / 10 : null }))
     .sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999')) });
+
+// السلاسل المراجَعة يدوياً (data/films/franchises.json): ترتيب مشاهدة يجمع أفلاماً من أكثر من مجموعة، ومسلسلات مرتبطة، وتوصية لكل عمل (watch | optional | skip).
+// صيغ الخطوة في المصدر: { m: رقم فيلم } · { t: رقم مسلسل } · { c: رقم مجموعة, title } يُحوَّل إلى m · { f: عنوان, y: سنة } فيلم من القائمة يُحوَّل إلى m · { x: نوع, title, year } لما لا صفحة له في TMDB.
+// get = { listed(kind, id), byTitle(title, year), movie(id), tv(id), collection(id) }. ما يتعذر حلّه يُحذف من الترتيب ويُكتب في problems.
+export async function processFranchises(raw, get) {
+  const items = {}, extras = {}, problems = [];
+  for (const [key, fr] of Object.entries(raw)) {
+    const order = [];
+    for (const st of fr.order || []) { const s = { ...st };
+      try {
+        if (s.c) { const col = await get.collection(s.c), part = col?.parts.find(p => norm(p.title) === norm(s.title)); if (!part) throw new Error(`«${s.title}» ليس في المجموعة ${s.c}`); s.m = part.tmdb; delete s.c; delete s.title; }
+        if (s.f) { const id = get.byTitle(s.f, s.y); if (!id) throw new Error(`«${s.f}» ليس في القائمة`); s.m = id; delete s.f; delete s.y; }
+        if (s.m && !get.listed('movie', s.m)) { const d = await get.movie(s.m); if (!d) throw new Error(`فيلم ${s.m} غير موجود`); extras['m' + s.m] = d; }
+        if (s.t && !get.listed('tv', s.t)) { const d = await get.tv(s.t); if (!d) throw new Error(`مسلسل ${s.t} غير موجود`); extras['t' + s.t] = d; }
+        if (!['watch', 'optional', 'skip'].includes(s.rec)) throw new Error('توصية غير معروفة: ' + s.rec);
+        order.push(s);
+      } catch (e) { problems.push(`${key}: ${e.message}`); }
+    }
+    if (order.length > 1) items[key] = { ...fr, order }; else problems.push(`${key}: أقل من عملين بعد الحل`);
+  }
+  return { items, extras, problems };
+}
+export const basicMovie = d => ({ title: d.title, year: d.release_date ? +d.release_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null });
+export const basicTv = d => ({ title: d.name, year: d.first_air_date ? +d.first_air_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null, seasons: d.number_of_seasons || null, tv: true });
