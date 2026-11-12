@@ -1,6 +1,9 @@
 // المرحلة ٢: يسحب بيانات كل عمل مثبَّت المعرّف من TMDB ويكتب ملفات الموقع في site/data/.
 // المصدر الوحيد للحقائق المتغيرة (بوستر، تواريخ، مواسم، حلقات، تقييم TMDB). ما لا يتوفر يُترك فارغاً ولا يُخمَّن.
 import fs from 'node:fs';
+import net from 'node:net';
+// مهلة محاولة الاتصال الافتراضية في Node ربع ثانية لكل عنوان، وهي أقصر من زمن الوصول إلى خوادم بعيدة من مشغّلات GitHub (ETIMEDOUT).
+net.setDefaultAutoSelectFamilyAttemptTimeout(5000);
 import { tmdb, hasKey } from './lib-tmdb.mjs';
 import { guide, root, rdSrc, OUT, GEN } from './lib-guide.mjs';
 const works = rdSrc('works.json');
@@ -74,7 +77,7 @@ const malIds = [...new Set(rdSrc('placements.json').map(p => p.mal).filter(Boole
 if (malIds.length) {
   const prevPath = new URL('mal.json', outDir), prev = fs.existsSync(prevPath) ? JSON.parse(fs.readFileSync(prevPath)).anime || {} : {}, anime = {};
   for (const id of malIds) {
-    try { const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`, { headers: { 'User-Agent': 'watch-guide-build/1.0 (https://github.com/fa9o0oll/-dc-guide)' } });
+    try { const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`, { headers: { 'User-Agent': 'watch-guide-build/1.0 (https://github.com/fa9o0oll/-dc-guide)' }, signal: AbortSignal.timeout(20000) });
       if (!res.ok) throw new Error('Jikan ' + res.status);
       const a = (await res.json()).data; anime[id] = { score: a.score ?? null, votes: a.scored_by ?? 0, rank: a.rank ?? null, episodes: a.episodes ?? null, type: a.type ?? null, title: a.title ?? null };
     } catch (e) { if (prev[id]) anime[id] = prev[id]; problems.push(`MAL ${id}: ${e.message}${e.cause ? ' (' + (e.cause.code || e.cause.message) + ')' : ''}`); if (Object.keys(anime).length === 0 && problems.filter(x => x.startsWith('MAL')).length >= 3) { problems.push('MAL: توقف السحب بعد 3 إخفاقات متتالية'); break; } }

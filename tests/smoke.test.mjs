@@ -31,7 +31,8 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   check('Fate: سجل منفصل عن دي سي والعودة للواجهة موجودة', await page.getAttribute('.top .home', 'href') === '../' && await page.title() === 'دليل عالم Fate');
   const first = P[0], sel = '#' + await page.locator('.card').first().getAttribute('id');
   check('Fate: زرّا MyAnimeList وSimkl بروابط الإدراج نفسه', await page.evaluate(([s, mal, simkl]) => { const h = [...document.querySelectorAll(`${s} .xlinks a`)].map(a => a.href); return h.includes(`https://myanimelist.net/anime/${mal}`) && h.includes(`https://simkl.com/anime/${simkl}`); }, [sel, first.mal, first.simkl]));
-  check('Fate: التقييم من MAL', (await page.textContent(sel + ' .rates .src')).includes('MAL'));
+  { const hasMal = !!JSON.parse(fs.readFileSync(path.join(siteDir, 'fate/data/mal.json'))).anime?.[first.mal]?.score, src = await page.textContent(sel + ' .rates .src');
+    check(hasMal ? 'Fate: التقييم من MAL' : 'Fate: تقييم MAL غير متوفر في البيانات، والمعروض TMDB باسمه', src.includes(hasMal ? 'MAL' : 'TMDB')); }
   await fits('Fate البطاقات');
   await tap(sel + ' [data-s=watched]'); check('Fate: تغيير الحالة يُحفظ في مفتاحه', await page.evaluate(() => Object.values(JSON.parse(localStorage.getItem('fateg.progress')).works).includes('watched')) && await page.evaluate(() => !(localStorage.getItem('dcg.progress') || '').includes('fate-')));
   await tap(sel + ' .cta'); await page.waitForSelector('.ep:not(.skel)'); await page.waitForTimeout(450);
