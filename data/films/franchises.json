@@ -22,6 +22,16 @@
     "rec": "skip",
     "note": "ريبوت ثانٍ منفصل"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Hellboy_(franchise)"
+   },
+   {
+    "name": "Hellboy Wiki",
+    "url": "https://hellboy.fandom.com/wiki/Hellboy_(2019_film)"
+   }
   ]
  },
  "mummy": {
@@ -49,7 +59,7 @@
    {
     "m": 1574840,
     "rec": "optional",
-    "note": "جزء رابع معلن"
+    "note": "جزء رابع معلن لعام 2027"
    },
    {
     "m": 15849,
@@ -60,6 +70,12 @@
     "m": 282035,
     "rec": "skip",
     "note": "ريبوت منفصل"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Mummy_(franchise)"
    }
   ]
  },
@@ -82,7 +98,7 @@
    {
     "m": 653346,
     "rec": "watch",
-    "note": "بعد أجيال من الثلاثية"
+    "note": "بعد الثلاثية بنحو 300 سنة"
    },
    {
     "m": 871,
@@ -99,16 +115,26 @@
     "rec": "skip",
     "note": "ريميك منفصل"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Planet_of_the_Apes"
+   },
+   {
+    "name": "Planet of the Apes Wiki",
+    "url": "https://planetoftheapes.fandom.com/wiki/Kingdom_of_the_Planet_of_the_Apes"
+   }
   ]
  },
  "fantastic-four": {
   "name": "Fantastic Four",
-  "note": "الأعلى تقييماً بفارق واضح هو First Steps (2025)، وهو بداية جديدة داخل عالم مارفل السينمائي لا تحتاج أي فيلم قبلها. فيلما 2005 و2007 سلسلة قديمة مستقلة بتقييم متوسط. نسخة 2015 الأضعف.",
+  "note": "الأعلى تقييماً بفارق واضح هو First Steps (2025): بداية جديدة داخل عالم مارفل السينمائي، تدور في عالم خاص بها ولا تحتاج أي فيلم قبلها، ونهايتها تمهّد لفيلم مارفل التالي. فيلما 2005 و2007 سلسلة قديمة مستقلة بتقييم متوسط. نسخة 2015 الأضعف.",
   "order": [
    {
     "m": 617126,
     "rec": "watch",
-    "note": "بداية جديدة مستقلة"
+    "note": "بداية جديدة"
    },
    {
     "m": 9738,
@@ -124,6 +150,16 @@
     "m": 166424,
     "rec": "skip",
     "note": "ريبوت منفصل"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Fantastic_Four:_First_Steps"
+   },
+   {
+    "name": "Marvel.com",
+    "url": "https://www.marvel.com/movies/the-fantastic-four-first-steps"
    }
   ]
  },
@@ -156,6 +192,12 @@
     "rec": "skip",
     "note": "ريميك"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/House_Party_(2023_film)"
+   }
   ]
  },
  "grinch": {
@@ -171,6 +213,12 @@
     "rec": "optional",
     "note": "النسخة الحيّة"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Grinch_(film)"
+   }
   ]
  },
  "dumbo": {
@@ -185,6 +233,12 @@
     "m": 329996,
     "rec": "optional",
     "note": "ريميك حيّ"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Dumbo_(2019_film)"
    }
   ]
  },
@@ -207,12 +261,17 @@
     "rec": "skip",
     "note": "ريميك ديزني الحيّ"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Pinocchio_(2022_live-action_film)"
+   }
   ]
  },
  "deadwood": {
   "name": "Deadwood",
   "note": "الفيلم خاتمة لمسلسل Deadwood وتدور أحداثه بعد نهايته بعشر سنوات. لا يُفهم دون المسلسل، فالمسلسل أولاً.",
-  "source": "https://en.wikipedia.org/wiki/Deadwood:_The_Movie",
   "order": [
    {
     "t": 1406,
@@ -224,12 +283,21 @@
     "rec": "watch",
     "note": "خاتمة المسلسل"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Deadwood:_The_Movie"
+   },
+   {
+    "name": "Deadwood Wiki",
+    "url": "https://deadwood.fandom.com/wiki/Deadwood:_The_Movie"
+   }
   ]
  },
  "city-of-god": {
   "name": "City of God",
   "note": "الفيلم يكفي وحده. من أراد المزيد: مسلسل City of Men وفيلمه من صنّاع الفيلم أنفسهم في الأجواء نفسها بشخصيات أخرى، ثم مسلسل 2024 وهو تكملة مباشرة للفيلم بعد نحو عشرين سنة.",
-  "source": "https://en.wikipedia.org/wiki/City_of_God:_The_Fight_Rages_On",
   "order": [
    {
     "m": 598,
@@ -243,19 +311,28 @@
    {
     "m": 7343,
     "rec": "optional",
-    "note": "فيلم يختم المسلسل الفرعي"
+    "note": "فيلم مبني على المسلسل الفرعي بشخصيتيه"
    },
    {
     "t": 223397,
     "rec": "optional",
     "note": "مسلسل يكمل قصة الفيلم"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/City_of_God:_The_Fight_Rages_On"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/City_of_Men"
+   }
   ]
  },
  "evil-dead": {
   "name": "Evil Dead",
   "note": "Evil Dead Rise قصة مستقلة بشخصيات جديدة ويكفي وحده. الثلاثية الأصلية ثم مسلسل Ash vs Evil Dead قصة آش المتصلة. فيلم 2013 قصة أخرى مستقلة في العالم نفسه.",
-  "source": "https://en.wikipedia.org/wiki/Evil_Dead",
   "order": [
    {
     "m": 764,
@@ -275,7 +352,7 @@
    {
     "t": 62264,
     "rec": "optional",
-    "note": "مسلسل يكمل قصة آش وقد كبر"
+    "note": "مسلسل من ثلاثة مواسم يكمل قصة آش بعد نحو ثلاثين سنة"
    },
    {
     "m": 109428,
@@ -287,12 +364,21 @@
     "rec": "watch",
     "note": "قصة مستقلة"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Evil_Dead"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ash_vs_Evil_Dead"
+   }
   ]
  },
  "terminator": {
   "name": "The Terminator",
   "note": "الفيلمان الأول والثاني هما الأعلى تقييماً وقصتهما مكتملة. Dark Fate تكملة مباشرة للثاني تتجاهل الأجزاء 3 و4 وGenisys، وهذه الثلاثة كل منها خط زمني منفصل بتقييم أضعف. المسلسل يكمل من بعد الفيلم الثاني في خط خاص به، والأنمي قصة مستقلة.",
-  "source": "https://en.wikipedia.org/wiki/Terminator_(franchise)",
   "order": [
    {
     "m": 218,
@@ -332,12 +418,21 @@
     "rec": "optional",
     "note": "أنمي بقصة مستقلة"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Terminator_(franchise)"
+   },
+   {
+    "name": "Terminator Wiki",
+    "url": "https://terminator.fandom.com/wiki/Terminator:_The_Sarah_Connor_Chronicles"
+   }
   ]
  },
  "purge": {
   "name": "The Purge",
   "note": "تُشاهد بترتيب الصدور. The First Purge يحكي أصل القصة، لكنه صدر رابعاً ومكانه الأنسب بعد الثلاثة الأولى. المسلسل قصص وشخصيات جديدة في العالم نفسه ولا تعتمد عليه الأفلام.",
-  "source": "https://en.wikipedia.org/wiki/The_Purge",
   "order": [
    {
     "m": 158015,
@@ -365,6 +460,12 @@
     "m": 602223,
     "rec": "watch",
     "note": "الأخير زمنياً"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Purge"
    }
   ]
  },
@@ -398,6 +499,16 @@
     "rec": "skip",
     "note": "مسلسل فرعي من موسم واحد"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Bourne_(franchise)"
+   },
+   {
+    "name": "Bourne Wiki",
+    "url": "https://bourne.fandom.com/wiki/Treadstone_(TV_series)"
+   }
   ]
  },
  "has-fallen": {
@@ -420,6 +531,17 @@
     "t": 232018,
     "rec": "optional",
     "note": "مسلسل فرعي: Paris Has Fallen"
+   },
+   {
+    "m": 762409,
+    "rec": "optional",
+    "note": "جزء رابع معلن"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Has_Fallen_(film_series)"
    }
   ]
  },
@@ -436,11 +558,17 @@
     "rec": "optional",
     "note": "مسلسل بقصة جديدة"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Gentlemen_(2024_TV_series)"
+   }
   ]
  },
  "tmnt": {
   "name": "TMNT: Mutant Mayhem",
-  "note": "الفيلم بداية جديدة مستقلة عن كل أفلام السلاحف السابقة. المسلسل يكمل من بعده مباشرة.",
+  "note": "الفيلم بداية جديدة مستقلة عن كل أفلام السلاحف السابقة. المسلسل يكمل من بعده ويمهّد للجزء الثاني المجدول لعام 2027.",
   "order": [
    {
     "m": 614930,
@@ -451,12 +579,17 @@
     "rec": "optional",
     "note": "مسلسل يكمل بعد الفيلم"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Teenage_Mutant_Ninja_Turtles:_Mutant_Mayhem"
+   }
   ]
  },
  "blade-runner": {
   "name": "Blade Runner",
   "note": "الفيلم الأول ضروري قبل 2049. الأفلام القصيرة الثلاثة صُنعت تمهيداً لـ2049 وتحكي ما جرى بين الفيلمين، ومجموعها نحو نصف ساعة. الأنمي قصة جانبية.",
-  "source": "https://en.wikipedia.org/wiki/Blade_Runner_(franchise)",
   "order": [
    {
     "m": 78,
@@ -487,6 +620,16 @@
     "m": 335984,
     "rec": "watch"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Blade_Runner_(franchise)"
+   },
+   {
+    "name": "Blade Runner Wiki",
+    "url": "https://bladerunner.fandom.com/wiki/Blade_Runner_Black_Out_2022"
+   }
   ]
  },
  "twelve-monkeys": {
@@ -506,6 +649,12 @@
     "t": 60948,
     "rec": "optional",
     "note": "مسلسل يعيد تخيّل القصة"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/12_Monkeys"
    }
   ]
  },
@@ -534,6 +683,12 @@
     "rec": "optional",
     "note": "مسلسل مستقل عمّا قبل الفيلم"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Bates_Motel_(TV_series)"
+   }
   ]
  },
  "gomorrah": {
@@ -549,11 +704,17 @@
     "rec": "optional",
     "note": "مسلسل مستقل من الكتاب نفسه"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Gomorrah_(TV_series)"
+   }
   ]
  },
  "mib": {
   "name": "Men in Black",
-  "note": "الثلاثية بترتيب صدورها. مسلسل الرسوم يكمل من بعد الفيلم الأول في خط خاص به.",
+  "note": "الثلاثية بترتيب صدورها. مسلسل الرسوم (أربعة مواسم) يكمل من بعد الفيلم الأول في خط زمني خاص به.",
   "order": [
    {
     "m": 607,
@@ -572,6 +733,16 @@
     "m": 41154,
     "rec": "watch"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Men_in_Black:_The_Series"
+   },
+   {
+    "name": "Men in Black Wiki",
+    "url": "https://meninblack.fandom.com/wiki/Men_in_Black:_The_Series"
+   }
   ]
  },
  "shining": {
@@ -586,6 +757,12 @@
     "m": 501170,
     "rec": "optional",
     "note": "تكملة بعد عقود"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Doctor_Sleep_(2019_film)"
    }
   ]
  },
@@ -629,11 +806,21 @@
     "rec": "skip",
     "note": "تقاطع جانبي"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Predator_(franchise)"
+   },
+   {
+    "name": "Xenopedia",
+    "url": "https://avp.fandom.com/wiki/Prey_(film)"
+   }
   ]
  },
  "mad-max": {
   "name": "Mad Max",
-  "note": "Furiosa يحكي ما قبل Fury Road وينتهي عند بدايته، فيُشاهدان متتاليين بهذا الترتيب أو بترتيب الصدور. الثلاثية القديمة قصص منفصلة لا يعتمد عليها الفيلمان.",
+  "note": "Furiosa يحكي ما قبل Fury Road، ومشهده الأخير يوصل إلى بدايته، فيُشاهدان متتاليين بهذا الترتيب أو بترتيب الصدور. الثلاثية القديمة قصص منفصلة لا يعتمد عليها الفيلمان.",
   "order": [
    {
     "m": 9659,
@@ -656,6 +843,16 @@
    {
     "m": 76341,
     "rec": "watch"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Furiosa:_A_Mad_Max_Saga"
+   },
+   {
+    "name": "Mad Max Wiki",
+    "url": "https://madmax.fandom.com/wiki/Furiosa:_A_Mad_Max_Saga"
    }
   ]
  },
@@ -682,6 +879,16 @@
     "m": 677179,
     "rec": "optional"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Creed_II"
+   },
+   {
+    "name": "Rocky Wiki",
+    "url": "https://rocky.fandom.com/wiki/Creed_II"
+   }
   ]
  },
  "kingsman": {
@@ -702,11 +909,17 @@
     "rec": "watch",
     "note": "قصة النشأة، مستقلة"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_King%27s_Man"
+   }
   ]
  },
  "harry-potter": {
   "name": "Harry Potter",
-  "note": "الأفلام الثمانية قصة واحدة بترتيب صدورها. ثلاثية Fantastic Beasts تسبقها زمنياً بعقود، وتقييمها ينزل جزءاً بعد جزء، وتُترك لما بعد الثمانية.",
+  "note": "الأفلام الثمانية قصة واحدة بترتيب صدورها. ثلاثية Fantastic Beasts من العالم نفسه، وأحداثها بين 1926 و1932، أي قبل قصة هاري بعقود. تقييمها ينزل جزءاً بعد جزء، وتُترك لما بعد الثمانية.",
   "order": [
    {
     "m": 671,
@@ -743,7 +956,7 @@
    {
     "m": 259316,
     "rec": "optional",
-    "note": "قبل القصة بعقود"
+    "note": "أحداثه عام 1926"
    },
    {
     "c": 435259,
@@ -755,11 +968,21 @@
     "title": "Fantastic Beasts: The Secrets of Dumbledore",
     "rec": "skip"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Fantastic_Beasts"
+   },
+   {
+    "name": "Harry Potter Wiki",
+    "url": "https://harrypotter.fandom.com/wiki/Fantastic_Beasts_(film_series)"
+   }
   ]
  },
  "papillon": {
   "name": "Papillon",
-  "note": "نسخة 2017 ريميك لفيلم 1973 المأخوذ عن الكتاب نفسه. الأصل أعلى تقييماً.",
+  "note": "نسخة 2017 مأخوذة عن كتابَي هنري شاريير، وتستند أيضاً إلى فيلم 1973. الأصل أعلى تقييماً.",
   "order": [
    {
     "m": 433498,
@@ -769,6 +992,12 @@
     "m": 5924,
     "rec": "optional",
     "note": "الفيلم الأصلي"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Papillon_(2017_film)"
    }
   ]
  },
@@ -785,6 +1014,12 @@
     "rec": "optional",
     "note": "الفيلم السويدي الأصلي"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/A_Man_Called_Otto"
+   }
   ]
  },
  "departed": {
@@ -800,6 +1035,12 @@
     "rec": "optional",
     "note": "الفيلم الأصلي"
    }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Departed"
+   }
   ]
  },
  "forrest-gump": {
@@ -814,6 +1055,12 @@
     "m": 601635,
     "rec": "optional",
     "note": "الريميك الهندي"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Laal_Singh_Chaddha"
    }
   ]
  }
