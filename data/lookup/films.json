@@ -1,0 +1,471 @@
+{
+"top": 2,
+"queries": [
+{
+"q": "Dumbo",
+"kind": "movie",
+"top": 2,
+"year": 1941
+},
+{
+"q": "How the Grinch Stole Christmas",
+"kind": "movie",
+"top": 2,
+"year": 2000
+},
+{
+"q": "Pinocchio",
+"kind": "movie",
+"top": 2,
+"year": 2022
+},
+{
+"q": "Pinocchio",
+"kind": "movie",
+"top": 2,
+"year": 1940
+},
+{
+"q": "Hellboy",
+"kind": "movie",
+"top": 2,
+"year": 2019
+},
+{
+"q": "Hellboy: The Crooked Man",
+"kind": "movie",
+"top": 2,
+"year": 2024
+},
+{
+"q": "Hellboy II: The Golden Army",
+"kind": "movie",
+"top": 2,
+"year": 2008
+},
+{
+"q": "The Mummy",
+"kind": "movie",
+"top": 2,
+"year": 2017
+},
+{
+"q": "The Mummy",
+"kind": "movie",
+"top": 2,
+"year": 1932
+},
+{
+"q": "The Scorpion King",
+"kind": "movie",
+"top": 2,
+"year": 2002
+},
+{
+"q": "Fantastic Four",
+"kind": "movie",
+"top": 2,
+"year": 2015
+},
+{
+"q": "The Fantastic Four: First Steps",
+"kind": "movie",
+"top": 2,
+"year": 2025
+},
+{
+"q": "Planet of the Apes",
+"kind": "movie",
+"top": 2,
+"year": 1968
+},
+{
+"q": "Planet of the Apes",
+"kind": "movie",
+"top": 2,
+"year": 2001
+},
+{
+"q": "House Party",
+"kind": "movie",
+"top": 2,
+"year": 2023
+},
+{
+"q": "The Outlaws",
+"kind": "movie",
+"top": 2,
+"year": 2017
+},
+{
+"q": "The Roundup: No Way Out",
+"kind": "movie",
+"top": 2,
+"year": 2023
+},
+{
+"q": "The Hunt for Gollum",
+"kind": "movie",
+"top": 2
+},
+{
+"q": "Men of War",
+"kind": "movie",
+"top": 2
+},
+{
+"q": "Evil Dead",
+"kind": "movie",
+"top": 2,
+"year": 2013
+},
+{
+"q": "The Evil Dead",
+"kind": "movie",
+"top": 2,
+"year": 1981
+},
+{
+"q": "Blade Runner",
+"kind": "movie",
+"top": 2,
+"year": 1982
+},
+{
+"q": "Blade Runner: Black Out 2022",
+"kind": "movie",
+"top": 2,
+"year": 2017
+},
+{
+"q": "2036: Nexus Dawn",
+"kind": "movie",
+"top": 2,
+"year": 2017
+},
+{
+"q": "2048: Nowhere to Run",
+"kind": "movie",
+"top": 2,
+"year": 2017
+},
+{
+"q": "Doctor Sleep",
+"kind": "movie",
+"top": 2,
+"year": 2019
+},
+{
+"q": "Mad Max: Fury Road",
+"kind": "movie",
+"top": 2,
+"year": 2015
+},
+{
+"q": "Rocky",
+"kind": "movie",
+"top": 2,
+"year": 1976
+},
+{
+"q": "Creed",
+"kind": "movie",
+"top": 2,
+"year": 2015
+},
+{
+"q": "The Omen",
+"kind": "movie",
+"top": 2,
+"year": 1976
+},
+{
+"q": "Candyman",
+"kind": "movie",
+"top": 2,
+"year": 1992
+},
+{
+"q": "Godzilla Minus One",
+"kind": "movie",
+"top": 2,
+"year": 2023
+},
+{
+"q": "Mortal Kombat",
+"kind": "movie",
+"top": 2,
+"year": 2021
+},
+{
+"q": "The Super Mario Bros. Movie",
+"kind": "movie",
+"top": 2,
+"year": 2023
+},
+{
+"q": "Fantastic Beasts and Where to Find Them",
+"kind": "movie",
+"top": 2,
+"year": 2016
+},
+{
+"q": "Alien vs. Predator",
+"kind": "movie",
+"top": 2,
+"year": 2004
+},
+{
+"q": "Predator: Killer of Killers",
+"kind": "movie",
+"top": 2,
+"year": 2025
+},
+{
+"q": "Kingsman: The Secret Service",
+"kind": "movie",
+"top": 2,
+"year": 2015
+},
+{
+"q": "Cloverfield",
+"kind": "movie",
+"top": 2,
+"year": 2008
+},
+{
+"q": "Twister",
+"kind": "movie",
+"top": 2,
+"year": 1996
+},
+{
+"q": "Freaky Friday",
+"kind": "movie",
+"top": 2,
+"year": 2003
+},
+{
+"q": "Bird Box",
+"kind": "movie",
+"top": 2,
+"year": 2018
+},
+{
+"q": "The Hitman's Bodyguard",
+"kind": "movie",
+"top": 2,
+"year": 2017
+},
+{
+"q": "The Incredibles",
+"kind": "movie",
+"top": 2,
+"year": 2004
+},
+{
+"q": "Wicked: For Good",
+"kind": "movie",
+"top": 2,
+"year": 2025
+},
+{
+"q": "Ocean's Eight",
+"kind": "movie",
+"top": 2,
+"year": 2018
+},
+{
+"q": "City of Men",
+"kind": "movie",
+"top": 2,
+"year": 2007
+},
+{
+"q": "La Jetée",
+"kind": "movie",
+"top": 2,
+"year": 1962
+},
+{
+"q": "Infernal Affairs",
+"kind": "movie",
+"top": 2,
+"year": 2002
+},
+{
+"q": "Papillon",
+"kind": "movie",
+"top": 2,
+"year": 1973
+},
+{
+"q": "A Man Called Ove",
+"kind": "movie",
+"top": 2,
+"year": 2015
+},
+{
+"q": "Ghostbusters",
+"kind": "movie",
+"top": 2,
+"year": 1984
+},
+{
+"q": "Fear Street: 1994",
+"kind": "movie",
+"top": 2,
+"year": 2021
+},
+{
+"q": "M3GAN 2.0",
+"kind": "movie",
+"top": 2,
+"year": 2025
+},
+{
+"q": "Five Nights at Freddy's 2",
+"kind": "movie",
+"top": 2,
+"year": 2025
+},
+{
+"q": "The Raid 2",
+"kind": "movie",
+"top": 2,
+"year": 2014
+},
+{
+"q": "Transformers One",
+"kind": "movie",
+"top": 2,
+"year": 2024
+},
+{
+"q": "Bumblebee",
+"kind": "movie",
+"top": 2,
+"year": 2018
+},
+{
+"q": "Ash vs Evil Dead",
+"kind": "tv",
+"top": 2,
+"year": 2015
+},
+{
+"q": "Terminator: The Sarah Connor Chronicles",
+"kind": "tv",
+"top": 2,
+"year": 2008
+},
+{
+"q": "Terminator Zero",
+"kind": "tv",
+"top": 2,
+"year": 2024
+},
+{
+"q": "The Purge",
+"kind": "tv",
+"top": 2,
+"year": 2018
+},
+{
+"q": "Treadstone",
+"kind": "tv",
+"top": 2,
+"year": 2019
+},
+{
+"q": "Paris Has Fallen",
+"kind": "tv",
+"top": 2,
+"year": 2024
+},
+{
+"q": "The Gentlemen",
+"kind": "tv",
+"top": 2,
+"year": 2024
+},
+{
+"q": "Deadwood",
+"kind": "tv",
+"top": 2,
+"year": 2004
+},
+{
+"q": "City of God: The Fight Rages On",
+"kind": "tv",
+"top": 2,
+"year": 2024
+},
+{
+"q": "City of Men",
+"kind": "tv",
+"top": 2,
+"year": 2002
+},
+{
+"q": "Tales of the Teenage Mutant Ninja Turtles",
+"kind": "tv",
+"top": 2,
+"year": 2024
+},
+{
+"q": "Blade Runner: Black Lotus",
+"kind": "tv",
+"top": 2,
+"year": 2021
+},
+{
+"q": "12 Monkeys",
+"kind": "tv",
+"top": 2,
+"year": 2015
+},
+{
+"q": "Bates Motel",
+"kind": "tv",
+"top": 2,
+"year": 2013
+},
+{
+"q": "Gomorrah",
+"kind": "tv",
+"top": 2,
+"year": 2014
+},
+{
+"q": "Planet of the Apes",
+"kind": "tv",
+"top": 2,
+"year": 1974
+},
+{
+"q": "Men in Black: The Series",
+"kind": "tv",
+"top": 2,
+"year": 1997
+},
+{
+"q": "Gintama",
+"kind": "tv",
+"top": 2,
+"year": 2006
+},
+{
+"q": "Snatch",
+"kind": "tv",
+"top": 2,
+"year": 2017
+},
+{
+"q": "Alien: Earth",
+"kind": "tv",
+"top": 2,
+"year": 2025
+}
+]
+}
