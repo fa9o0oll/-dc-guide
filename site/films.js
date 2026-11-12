@@ -36,7 +36,7 @@ const st = id => P.films[id] || '';
 const ui = { q: '', status: 'todo', genre: '', decade: '', prov: '', sort: 'list', view: 'grid', series: false };
 
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
-<header class="top"><a class="home" href="../" aria-label="كل الأدلة">${ic('home')}<span>كل الأدلة</span></a><h1>قائمة أفلامي</h1>
+<header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${ic('home')}<span>البوابات</span></a><h1>قائمة أفلامي</h1>
   <button class="btn pri add" data-act="add">${ic('plus')}<span>أضف فيلماً</span><span class="sr">أضف فيلماً</span></button><p class="tally" id="tally"></p></header>
 <section class="tonight" id="tonight" hidden><div class="bd"></div><p class="lbl">اقتراح الليلة</p><h2 dir="ltr"></h2><p class="meta"></p>
   <div class="acts"><button class="btn pri" data-act="open-tonight">افتح بطاقته</button><button class="btn sec" data-act="reroll">${ic('roll')}اقتراح آخر</button></div></section>

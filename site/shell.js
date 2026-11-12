@@ -18,10 +18,10 @@ export const shell = G => `<svg hidden aria-hidden="true"><defs>
 <div class="atmo" aria-hidden="true"><div class="scene"><div class="scene-img"></div><div class="motif"></div></div><div class="scene"><div class="scene-img"></div><div class="motif"></div></div></div>
 <header class="top" id="top">
   <div class="brand">
-    <a class="logo" href="../" aria-label="الواجهة الرئيسية">${G.logo}</a>
+    <a class="logo" href="../" aria-label="العودة إلى البوابات">${G.logo}</a>
     <div><h1>${G.name}</h1><p id="statsLine">جارٍ التحميل…</p></div>
   </div>
-  <a class="home" href="../"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span>كل الأدلة</span></a>
+  <a class="home" href="../"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span>البوابات</span></a>
 </header>
 <div class="stick" id="stick">
 <div class="controls">
