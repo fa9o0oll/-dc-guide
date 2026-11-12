@@ -10,15 +10,15 @@
  "seriesWithoutCollection": [],
  "franchiseProblems": [],
  "counts": {
-  "lines": 484,
-  "films": 598,
+  "lines": 494,
+  "films": 608,
   "tv": 6,
   "added": 0,
-  "collections": 91,
-  "franchises": 32,
+  "collections": 92,
+  "franchises": 39,
   "withProviders": 368,
-  "arabicOverviews": 548,
+  "arabicOverviews": 549,
   "ourArabic": 0,
-  "noPoster": 5
+  "noPoster": 8
  }
 }
