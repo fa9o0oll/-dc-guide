@@ -8,6 +8,9 @@ const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا ي�
 const G = GUIDES[document.documentElement.dataset.guide] || GUIDES.dc;
 const { THEMES, SHOW_COLORS = {} } = await import(`./themes-${G.id}.js?v=${BUILD}`);
 document.body.insertAdjacentHTML('afterbegin', shell(G));
+// حين تغيب الترويسة عن الشاشة ينتقل شعار الدليل إلى أول الشريط الثابت، زرّاً للعودة إلى البوابات، ويعود حين تظهر
+{ const st = document.getElementById('stick'), g = st.querySelector('.gate');
+  new IntersectionObserver(([e]) => { const on = !e.isIntersecting; st.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe(document.getElementById('top')); }
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

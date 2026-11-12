@@ -528,3 +528,16 @@ img.in{opacity:1}
 @keyframes veil-ring{0%{opacity:0;transform:scale(.4)}30%{opacity:1}100%{opacity:0;transform:scale(5)}}
 @keyframes veil-title{to{opacity:0;transform:scale(1.08)}}
 @keyframes veil-out{to{opacity:0;visibility:hidden}}
+
+/* زر البوابات في الشريط الثابت: شعار الدليل ينزل إليه حين تغيب الترويسة، وعليه شارة البيت */
+.gate{flex:none;display:inline-flex;align-items:center;gap:9px;max-width:0;margin-inline-end:-10px;opacity:0;overflow:hidden;pointer-events:none;color:var(--ink);text-decoration:none;font-weight:600;font-size:.84rem;white-space:nowrap;transform:translateY(-18px) scale(.6);transform-origin:right center;transition:max-width .5s cubic-bezier(.2,.8,.2,1),margin .5s cubic-bezier(.2,.8,.2,1),opacity .3s ease,transform .5s cubic-bezier(.34,1.4,.5,1)}
+.stick.docked .gate{max-width:180px;margin-inline-end:0;opacity:1;pointer-events:auto;transform:none}
+.gate-em{position:relative;flex:none;width:40px;height:40px;display:grid;place-items:center}
+.gate-logo{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--c1);color:#0b0b0b;font-family:var(--display);font-size:.9rem;line-height:1;box-shadow:-3px 3px 0 var(--c2);transition:background-color .9s ease,box-shadow .9s ease,transform .3s cubic-bezier(.34,1.4,.5,1)}
+.gate-home{position:absolute;inset-block-end:-3px;inset-inline-end:-4px;width:20px;height:20px;padding:3px;border-radius:50%;background:var(--bg);color:var(--c1);border:1px solid color-mix(in srgb,var(--c1) 60%,transparent);stroke-width:2.4}
+.gate-t{padding-inline-end:12px;border-inline-end:1px solid var(--hair);color:var(--dim)}
+.gate:focus-visible{outline:2px solid var(--c1);outline-offset:3px;border-radius:12px}
+@media (hover:hover){.gate:hover .gate-logo{transform:rotate(-10deg) scale(1.06)}.gate:hover .gate-t{color:var(--ink)}}
+@media (max-width:560px){.gate-t{display:none}.stick.docked .gate{max-width:48px}}
+@media (prefers-reduced-motion:reduce){.gate,.gate-logo{transition:none}}
+[data-guide=fate] .gate-logo{border-radius:0;box-shadow:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);width:40px;height:40px;font-size:1rem}

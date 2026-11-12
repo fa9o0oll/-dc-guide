@@ -42,6 +42,10 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
 
   await page.goto(url); await page.waitForSelector('.card');
   check('تحميل البطاقات: 200 بطاقة في 19 عالماً', await page.locator('.card').count() === 200 && await page.locator('section.uni').count() === 19);
+  { const g = () => page.evaluate(() => { const x = document.querySelector('#stick .gate'), r = x.getBoundingClientRect(), h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return { shown: getComputedStyle(x).opacity === '1' && r.width >= 40, hit: !!h?.closest('.gate'), tab: x.tabIndex, href: x.getAttribute('href') }; });
+    const g0 = await g(); await page.evaluate(() => scrollTo(0, 1600)); await page.waitForTimeout(800); const g1 = await g(); await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(700); const g2 = await g();
+    check('زر البوابات ينزل إلى الشريط الثابت عند النزول ويعود عند الصعود', !g0.shown && g0.tab === -1 && g1.shown && g1.hit && g1.tab === 0 && g1.href === '../' && !g2.shown, JSON.stringify([g0, g1, g2])); }
   await overflow('البطاقات'); await snap('1-cards');
   const small = await page.evaluate(() => [...document.querySelectorAll('button,a,select,input,summary')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 40 || r.width < 40) && !e.closest('.foot,.canon,[hidden]'); }).map(e => (e.textContent || e.id).trim().slice(0, 20)));
   check('أهداف اللمس ≥ 40px', small.length === 0, small.slice(0, 5).join(' | '));

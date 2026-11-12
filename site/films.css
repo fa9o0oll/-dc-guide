@@ -236,3 +236,16 @@ dialog::backdrop{background:rgba(6,4,2,.72)}
 .veil.lift strong{opacity:0;transform:scale(1.08)}
 @keyframes veil-out{to{opacity:0;visibility:hidden}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* زر البوابات في الشريط الثابت: ينزل إليه حين تغيب الترويسة */
+.gate{flex:none;display:inline-flex;align-items:center;gap:9px;max-width:0;margin-inline-end:-8px;opacity:0;overflow:hidden;pointer-events:none;color:var(--dim);text-decoration:none;font-weight:600;font-size:.86rem;white-space:nowrap;transform:translateY(-18px) scale(.6);transform-origin:right center;transition:max-width .5s var(--ease),margin .5s var(--ease),opacity .3s ease,transform .5s cubic-bezier(.34,1.4,.5,1)}
+.bar.docked .gate{max-width:170px;margin-inline-end:0;opacity:1;pointer-events:auto;transform:none}
+.gate-em{flex:none;width:44px;height:44px;display:grid;place-items:center}
+/* تذكرة صغيرة بحافتين مثقوبتين، كبطاقات القائمة */
+.gate-logo{width:40px;height:40px;display:grid;place-items:center;border-radius:8px;background:var(--acc);color:var(--on-acc);-webkit-mask:radial-gradient(circle 5px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 5px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 5px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 5px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;transition:transform .3s cubic-bezier(.34,1.4,.5,1)}
+.gate-logo .ic{width:20px;height:20px;stroke-width:2.2}
+.gate-t{padding-inline-end:12px;border-inline-end:1px solid var(--line)}
+.gate:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:10px}
+@media (hover:hover){.gate:hover .gate-logo{transform:rotate(-8deg) scale(1.06)}.gate:hover .gate-t{color:var(--ink)}}
+@media (max-width:560px){.gate-t{display:none}.bar.docked .gate{max-width:52px}}
+@media (prefers-reduced-motion:reduce){.gate,.gate-logo{transition:none}}

@@ -42,7 +42,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <button class="btn pri add" data-act="add">${ic('plus')}<span>أضف فيلماً</span><span class="sr">أضف فيلماً</span></button><p class="tally" id="tally"></p></header>
 <section class="tonight" id="tonight" hidden><div class="bd"></div><p class="lbl">اقتراح الليلة</p><h2 dir="ltr"></h2><p class="meta"></p>
   <div class="acts"><button class="btn pri" data-act="open-tonight">افتح بطاقته</button><button class="btn sec" data-act="reroll">${ic('roll')}اقتراح آخر</button></div></section>
-<nav class="bar" aria-label="البحث والتصفية"><div class="row"><label class="search">${ic('search')}<span class="sr">ابحث في القائمة</span><input id="q" type="search" placeholder="ابحث: فيلم، مخرج، سنة" autocomplete="off" enterkeyhint="search"></label>
+<nav class="bar" aria-label="البحث والتصفية"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em"><span class="gate-logo">${ic('home')}</span></span><span class="gate-t">البوابات</span></a><label class="search">${ic('search')}<span class="sr">ابحث في القائمة</span><input id="q" type="search" placeholder="ابحث: فيلم، مخرج، سنة" autocomplete="off" enterkeyhint="search"></label>
   <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الأفلام</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
   <div class="chips" id="chips"></div></nav>
 <p class="count" id="count" aria-live="polite"></p>
@@ -252,6 +252,8 @@ try {
   // ما أُضيف بالزر ولم يصل البناء بعد يبقى ظاهراً من الحفظ المحلي، ويُحذف منه عند وصوله
   try { const pend = JSON.parse(localStorage.getItem(PEND) || '[]'), keep = pend.filter(r => r?.film && !D.byId.has(r.film.id)); D.more ||= {}; keep.forEach(r => adopt(r, false)); localStorage.setItem(PEND, JSON.stringify(keep)); } catch {}
   renderGrid(); reroll(true); liftVeil();
+  // حين تغيب الترويسة ينزل زر البوابات إلى أول الشريط الثابت
+  { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }
   // تغيير وصل من جهاز آخر: نعيد قراءة السجل ونرسم
   initSync(id => { if (id !== 'films') return; try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {} renderGrid(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); });
   const h = location.hash.slice(1); if (h && D.byId.has(h)) openFilm(h, false);

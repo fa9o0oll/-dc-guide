@@ -25,6 +25,7 @@ export const shell = G => `<svg hidden aria-hidden="true"><defs>
 </header>
 <div class="stick" id="stick">
 <div class="controls">
+  <a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em"><span class="gate-logo">${G.logo}</span><svg class="ic gate-home" aria-hidden="true"><use href="#i-home"/></svg></span><span class="gate-t">البوابات</span></a>
   <nav class="views" aria-label="طرق العرض">
     <button data-act="view" data-view="cards" class="on">البطاقات</button>
     <button data-act="view" data-view="timeline">الخط الزمني</button>
