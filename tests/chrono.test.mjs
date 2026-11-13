@@ -150,6 +150,12 @@ const CM = [M('m9529', 'Candyman', '1992-10-16'), M('m9530', 'Candyman: Farewell
 r = chronoOrder(CM, { m565028: { ...W('It is a direct sequel to the 1992 film, and set between the films Candyman: Farewell to the Flesh (1995) and Candyman 3: Day of the Dead (1999).'), period: 1977, periodEnd: 1977, periodLabel: '1977' } });
 check('«بين» بلا زمن مذكور حين لا يُعرف زمن طرفيه', r.order.join() === 'm9529,m9530,m565028,m9531' && r.moved.m565028?.w === 'between' && r.moved.m565028.y == null && !r.moved.m565028.src.includes('wikidata'), r);
 
+// مسلسل سابق لامتياز كامل، وسنته في آخر جملة الزمن النسبي (Wikipedia: ‏1972) مقدَّمة على زمن Wikidata المخالف (1951)
+const F13 = [M('m4488', 'Friday the 13th', '1980-05-09'), M('m9725', 'Friday the 13th Part 2', '1981-04-30'), M('m10225', 'Jason X', '2002-04-26'), M('m13207', 'Friday the 13th', '2009-02-13'), M('t213562', 'Crystal Lake', '2026-10-15')];
+r = chronoOrder(F13, { t213562: { ...W('Crystal Lake is an American slasher television series developed by Brad Caleb Kane that serves as the prequel to the Friday the 13th franchise, set seven years before the original film, in 1972.'), period: 1951, periodEnd: 1951, kw: ['prequel', '1970s'] } }, { wide: true });
+check('Crystal Lake أول امتياز Friday the 13th، عام 1972 من Wikipedia لا 1951', r.order[0] === 't213562' && r.order.slice(1).join() === 'm4488,m9725,m10225,m13207' && r.moved.t213562?.y === 1972 && r.moved.t213562.src.sort().join() === 'tmdb,wikipedia', r);
+check('«set seven years before the original film, in 1972» زمنه 1972', parseSentence('It is set seven years before the original film, in 1972.').some(x => x.t === 'year' && x.y === 1972) && !parseSentence('The film is set to be released in theaters, in 2027.').some(x => x.t === 'year'));
+
 // الجلب: Wikidata ثم Wikipedia ثم TMDB، مع ذاكرة سابقة
 const asked = [], badAlias = [];
 // SPARQL يرفض «(MIN(?x) AS ?x)»: اسم النتيجة لا يكون متغيراً مستعملاً في الاستعلام

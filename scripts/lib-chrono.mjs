@@ -77,7 +77,9 @@ export function parseSentence(s) {
     else { const ys = yearsOf(seg); if (ys.length) y = Math.min(...ys); }
     if (y == null) for (const [re, yr] of ERAS) if (re.test(seg)) { y = yr; break; }
     if (y != null) out.push({ t: 'year', y });
-  } else for (const [re, yr] of ERAS) if (new RegExp('\\b(?:during|amid|in)\\s+(?:the\\s+)?' + re.source.replace(/^\\b/, ''), 'i').test(t)) { out.push({ t: 'year', y: yr }); break; }
+  // «set seven years before the original film, in 1972»: السنة في آخر جملة الزمن النسبي
+  } else if ((m = t.match(/\b(?:set|takes?\s+place)\b[^.;]{0,90}?,\s+in\s+(\d{4})\b(?!\s*[-–]\d)/i)) && !NOISE.test(m[0])) out.push({ t: 'year', y: +m[1] });
+  else for (const [re, yr] of ERAS) if (new RegExp('\\b(?:during|amid|in)\\s+(?:the\\s+)?' + re.source.replace(/^\\b/, ''), 'i').test(t)) { out.push({ t: 'year', y: yr }); break; }
   if (BREAK.test(t)) out.push({ t: 'break' });
   return out;
 }
