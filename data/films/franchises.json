@@ -2230,7 +2230,7 @@
  },
  "yojimbo": {
   "name": "Yojimbo",
-  "note": "Yojimbo مكتمل وحده. Sanjuro مغامرة أخرى مستقلة للشخصية نفسها، وتقييمه قريب منه.",
+  "note": "Yojimbo مكتمل وحده. Sanjuro مغامرة أخرى مستقلة للشخصية نفسها، وتقييمه قريب منه. وأعاد سيرجيو ليوني صنعه في الغرب الأمريكي باسم A Fistful of Dollars (1964).",
   "order": [
    {
     "m": 11878,
@@ -2249,6 +2249,10 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/collection/627389"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Dollars_Trilogy"
    }
   ]
  },
@@ -3282,6 +3286,40 @@
    {
     "m": 1685097,
     "rec": "soon"
+   }
+  ]
+ },
+ "dollars": {
+  "name": "Dollars Trilogy",
+  "note": "ثلاثية سيرجيو ليوني عن «الرجل بلا اسم» الذي يؤديه كلينت إيستوود. كل فيلم قصة مستقلة، والرابط بينها الشخصية والأجواء، وأحداثها مرتبة زمنياً بعكس صدورها. ترتيب الصدور هو المعتاد، والجزء الثالث هو الأعلى تقييماً. A Fistful of Dollars إعادة صنع شبه حرفية لفيلم كوروساوا Yojimbo (1961)، ورفعت عليه شركة Toho دعوى بسببها.",
+  "order": [
+   {
+    "m": 391,
+    "rec": "watch",
+    "note": "عن Yojimbo"
+   },
+   {
+    "m": 938,
+    "rec": "watch"
+   },
+   {
+    "m": 429,
+    "rec": "watch",
+    "note": "الأعلى تقييماً"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Dollars_Trilogy"
+   },
+   {
+    "name": "Flavorwire",
+    "url": "https://www.flavorwire.com/483644/how-kurosawas-yojimbo-became-leones-fistful-of-dollars"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/movie/391"
    }
   ]
  }
