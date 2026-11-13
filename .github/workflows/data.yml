@@ -35,7 +35,7 @@ jobs:
       - name: Build the worlds map for the films list (Wikidata + TMDB; keeps the previous file if Wikidata is unreachable)
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-        run: node scripts/build-worlds.mjs
+        run: WORLDS_DUMP=${{ github.ref != 'refs/heads/main' && '1' || '' }} node scripts/build-worlds.mjs
         continue-on-error: true
       - name: Keep the worlds map and its audit report (work branches only)
         if: github.ref != 'refs/heads/main'

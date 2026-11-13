@@ -46,6 +46,10 @@ report.counts = { works: focus.length, withItem: focus.length - report.noItem.le
   infoEntries: Object.keys(res.info).length, bytes: JSON.stringify(out).length, seconds: Math.round((Date.now() - t0) / 1000) };
 fs.writeFileSync(new URL('worlds-report.json', GEN), JSON.stringify(report, null, 1) + '\n');
 console.log('WORLDS counts ' + JSON.stringify(report.counts));
+// فروع العمل: نسخة مضغوطة من الناتج في السجل (تحميل الملفات من GitHub غير متاح لأدوات المراجعة)
+if (process.env.WORLDS_DUMP) { const zlib = await import('node:zlib');
+  for (const [name, data] of [['worlds', out], ['report', report]]) { const b64 = zlib.gzipSync(JSON.stringify(data)).toString('base64'), n = Math.ceil(b64.length / 6000);
+    for (let i = 0; i < n; i++) console.log(`WORLDSDUMP ${name} ${i + 1}/${n} ${b64.slice(i * 6000, (i + 1) * 6000)}`); } }
 for (const m of report.missing) console.log('WORLDS missing ' + JSON.stringify(m));
 for (const m of report.curatedGaps) console.log('WORLDS curated-gap ' + JSON.stringify(m));
 for (const m of report.collectionGaps) console.log('WORLDS collection-gap ' + JSON.stringify(m));
