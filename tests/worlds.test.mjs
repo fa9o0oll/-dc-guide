@@ -88,4 +88,22 @@ const tm = async p => { if (p === '/movie/938') return { title: 'For a Few Dolla
 const live = await worldsFor(['m391'], { tmdb: tm, opt: { fetchImpl: fakeFetch } });
 check('الجلب الكامل لعمل واحد (كما في الدالة) يعيد عالمه بمعلومات أعضائه', JSON.stringify(live.worlds.Q370180?.order) === '["m391","m938"]' && live.info.m938?.poster === '/f.jpg' && asked.length >= 4, { w: live.worlds, asked });
 
+// «مقتبس من» امتياز أفلام: مسلسل Crystal Lake (2026) «based on» امتياز Friday the 13th في Wikidata، فهو من أجزائه.
+// أما المقتبس من امتياز ألعاب (Mario) فمصدره لعبة، يبقى «مقتبساً عن» ولا يُضم
+{ const rel3 = [{ tk: 't213562', item: 'Q_CL', prop: 'ITEM' }, { tk: 't213562', item: 'Q_CL', prop: 'P144', o: 'Q_F13' }, { tk: 't213562', item: 'Q_CL', prop: 'P4969i', o: 'Q_F13' },
+    { tk: 'm1226863', item: 'Q_SMG', prop: 'ITEM' }, { tk: 'm1226863', item: 'Q_SMG', prop: 'P144', o: 'Q_MARIO' }];
+  const info3 = { Q_F13: { label: 'Friday the 13th', types: ['T_FF'], wiki: 'https://en.wikipedia.org/wiki/Friday_the_13th_(franchise)', prev: [], next: [], dir: [] },
+    Q_MARIO: { label: 'Mario', types: ['T_VGF'], prev: [], next: [], dir: [] } };
+  const mem3 = [{ g: 'Q_F13', prop: 'P8345', m: 'Q_F80', tm: 4488, date: '1980-05-09' }, { g: 'Q_F13', prop: 'P8345', m: 'Q_F81', tm: 9725, date: '1981-04-30' }, { g: 'Q_F13', prop: 'P179', m: 'Q_F09', tm: 13207, date: '2009-02-13' },
+    { g: 'Q_MARIO', prop: 'P8345', m: 'Q_SMB', tm: 502356, date: '2023-04-05' }, { g: 'Q_MARIO', prop: 'P8345', m: 'Q_SMB93', tm: 9607, date: '1993-05-28' }];
+  const basic3 = { t213562: { title: 'Crystal Lake', date: '2026-10-15', tv: true }, m4488: { title: 'Friday the 13th', date: '1980-05-09', votes: 4000 }, m9725: { title: 'Friday the 13th Part 2', date: '1981-04-30', votes: 2000 },
+    m13207: { title: 'Friday the 13th', date: '2009-02-13', votes: 2500 }, m1226863: { title: 'The Super Mario Galaxy Movie', date: '2026-04-01' }, m502356: { title: 'The Super Mario Bros. Movie', date: '2023-04-05', votes: 9000 }, m9607: { title: 'Super Mario Bros.', date: '1993-05-28', votes: 900 } };
+  const tn3 = { T_FF: 'film franchise', T_VGF: 'video game franchise' };
+  const r3 = assemble({ focus: ['t213562', 'm1226863'], rel: rel3, info: info3, mem: mem3.filter(m => m.g === 'Q_F13'), typeNames: tn3, basic: basic3 });
+  check('المقتبس من امتياز أفلام عضو فيه: Crystal Lake في عالم Friday the 13th، لا «مقتبس عن فيلم»', r3.works.t213562?.worlds?.join() === 'Q_F13' && r3.worlds.Q_F13?.order.join() === 'm4488,m9725,m13207,t213562'
+    && r3.worlds.Q_F13.kind === 'franchise' && !r3.works.t213562.src, r3);
+  check('المقتبس من امتياز ألعاب يبقى «مقتبساً عن لعبة»', !r3.works.m1226863?.worlds?.length && r3.works.m1226863?.src?.[0]?.kind === 'games', r3.works.m1226863);
+  const need3 = neededKeys({ focus: ['t213562'], rel: rel3, info: info3, mem: mem3.filter(m => m.g === 'Q_F13'), typeNames: tn3 });
+  check('أعضاء الامتياز تُجلب معلوماتهم', ['m4488', 'm9725', 'm13207'].every(k => need3.includes(k)), need3); }
+
 console.log(fails.length ? `\n❌ فشل ${fails.length}` : '\n✅ كل فحوص الخريطة نجحت'); process.exit(fails.length ? 1 : 0);

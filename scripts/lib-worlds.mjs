@@ -139,8 +139,12 @@ export const SOURCE_KIND = [[/manga|manhwa|light novel|webtoon/, 'manga'], [/com
   [/tabletop|role-playing game|board game|card game|toy line|toy/, 'toy'], [/musical/, 'musical'], [/teleplay|television play/, 'teleplay'], [/\bplay\b|stage play|(?<!soap )opera\b|drama work/, 'play'],
   [/epic poem|epic poetry|oral poetry|\bepic\b/, 'epic'], [/fairy tale|folk tale|folktale|legend|myth|poem/, 'tale'], [/short story|novella/, 'story'],
   [/novel sequence|novel series|book series/, 'novels'], [/\bnovel\b/, 'novel'], [/book|literary work|written work|memoir|biography/, 'book'],
-  [/article|essay|newspaper|magazine/, 'article'], [/song|album|single/, 'song'], [/television series|tv series|miniseries|television program/, 'tvshow'], [/film series|series of films|short film series/, 'films'], [/film/, 'film']];
+  [/article|essay|newspaper|magazine/, 'article'], [/song|album|single/, 'song'], [/television series|tv series|miniseries|television program/, 'tvshow'], [/film series|series of films|short film series|film franchise/, 'films'], [/film/, 'film']];
 const sourceKind = names => { const s = names.join(' ').toLowerCase(); if (NOT_SOURCE.test(s)) return null; for (const [re, k] of SOURCE_KIND) if (re.test(s)) return k; return null; };
+// «مقتبس من» امتياز أفلام أو سلسلة أفلام أو عالم مشترك (لا لعبة ولا رواية ولا قصص مصورة) يعني أن العمل جزء منه:
+// مسلسل Crystal Lake (2026) في Wikidata «based on» امتياز Friday the 13th، بلا «جزء من السلسلة»، فهو من أجزائه
+const BASED_GROUP = /film franchise|film series|series of films|media franchise|television franchise|fictional universe|shared universe|film trilogy|\btrilogy\b|\bsaga\b/i, NOT_BASED_GROUP = /game|novel|book|comic|manga|toy|literary|poem/i;
+export const basedGroup = names => names.some(n => BASED_GROUP.test(n)) && !names.some(n => NOT_BASED_GROUP.test(n));
 const ADULT = /\bxxx\b|porn|parody/i;
 // فهارس استوديو أو قوائم «أفضل الأفلام» تُكتب أحياناً كسلسلة في Wikidata
 const CATALOG = /feature films?\b|\bfilms$|\bstudios?\b|greatest|best films|top \d+/i;
@@ -176,7 +180,8 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
   for (const r of rel) { const w = W.get(r.tk) || W.set(r.tk, { q: r.item, groups: [], prev: [], next: [], based: [], derived: [], dir: [] }).get(r.tk);
     if (r.prop === 'P179' || r.prop === 'P1434' || r.prop === 'P8345') w.groups.push({ g: r.o, prop: r.prop, ord: r.ord || null });
     else if (r.prop === 'P155') w.prev.push(r.o); else if (r.prop === 'P156') w.next.push(r.o);
-    else if (r.prop === 'P144' || r.prop === 'P4969i') w.based.push(r.o); else if (r.prop === 'P144i' || r.prop === 'P4969') w.derived.push(r.o);
+    else if (r.prop === 'P144' || r.prop === 'P4969i') { w.based.push(r.o); if (!keyOfQ.get(r.o) && basedGroup(typeList(r.o)) && !w.groups.some(x => x.g === r.o)) w.groups.push({ g: r.o, prop: 'P144', ord: null }); }
+    else if (r.prop === 'P144i' || r.prop === 'P4969') w.derived.push(r.o);
     else if (r.prop === 'DIR') w.dir.push(r.o); }
 
   // المجموعات: أعضاؤها، نوعها، واستبعاد ما ليس عالماً
@@ -184,6 +189,8 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
   for (const r of mem) { const k = keyOfQ.get(r.m); if (!k) continue; const g = G.get(r.g) || G.set(r.g, new Map()).get(r.g), prev = g.get(k);
     const ord = r.prop === 'P179' && r.ord && /^\d+(\.\d+)?$/.test(r.ord) ? +r.ord : null;
     if (!prev) g.set(k, { k, ord, date: r.date }); else { if (ord != null && (prev.ord == null || ord < prev.ord)) prev.ord = ord; if (r.date && (!prev.date || r.date < prev.date)) prev.date = r.date; } }
+  // العمل المقتبس من امتياز عضو فيه (أعضاؤه الآخرون من «جزء من السلسلة» أو «امتياز» في Wikidata)
+  for (const [k, w] of W) for (const x of w.groups) if (x.prop === 'P144' && G.has(x.g) && !G.get(x.g).has(k)) G.get(x.g).set(k, { k, ord: null, date: null });
   const groupOk = new Map();
   for (const [g, ms] of G) { const names = typeList(g), size = [...ms.keys()].filter(k => !bad(k)).length;
     let why = null;
@@ -241,7 +248,7 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
     const relx = [], src = [], seen = new Set([k]), add = (t, r, via) => { if (t && !seen.has(t) && fine(t) && heard(t, relVotes)) { seen.add(t); relx.push(via ? { k: t, r, via } : { k: t, r }); } };
     for (const q of uniq(w.based)) add(keyOfQ.get(q), 'original');
     for (const q of uniq(w.derived)) add(keyOfQ.get(q), 'derived');
-    for (const q of uniq(w.based)) { if (keyOfQ.get(q)) continue;
+    for (const q of uniq(w.based)) { if (keyOfQ.get(q) || entry.worlds.includes(q)) continue;
       const kind = sourceKind(typeList(q)); if (!kind || !info[q]?.label) continue;
       src.push(JSON.parse(JSON.stringify({ q, label: info[q].label, kind, year: info[q].date ? +info[q].date.slice(0, 4) : undefined, wiki: info[q].wiki || undefined })));
       // اقتباس آخر من عالم العمل نفسه (أفلام بوند الأخرى عن روايات فليمنغ) مكانه الترتيب لا هنا
@@ -285,8 +292,10 @@ export async function worldsFor(focus, { tmdb, basicCache = {}, known = {}, opt,
   // جيران الجيران (ما قبل وما بعد) لمعرفة السلاسل المتتالية خارج القائمة
   const second = uniq(Object.values(info).flatMap(n => [...n.prev, ...n.next])).filter(q => !info[q]);
   if (second.length) Object.assign(info, await nodes(second, opt));
-  const mem = await members([...groupIds], opt); onStage('members', mem.length);
+  // أنواع العُقد قبل الأعضاء: ما اقتُبس منه العمل قد يكون امتيازاً يضمه (basedGroup)
   const typeIds = uniq(Object.values(info).flatMap(n => n.types)), typeNames = await labels(typeIds, opt); onStage('types', typeIds.length);
+  for (const r of rel) if ((r.prop === 'P144' || r.prop === 'P4969i') && info[r.o] && !info[r.o].tm && !info[r.o].tt && basedGroup((info[r.o].types || []).map(t => typeNames[t] || t))) groupIds.add(r.o);
+  const mem = await members([...groupIds], opt); onStage('members', mem.length);
   const srcQ = uniq(rel.filter(r => r.prop === 'P144' || r.prop === 'P4969i').map(r => r.o)).filter(q => info[q] && !info[q].tm && !info[q].tt && sourceKind((info[q].types || []).map(t => typeNames[t] || t)));
   const adapt = srcQ.length ? await adaptations(srcQ, opt) : []; onStage('adaptations', adapt.length);
   // known: معلومات أعمال القائمة نفسها (لا تُجلب ولا تُكتب في الناتج، لكنها تحدد الترتيب والتصفية)
