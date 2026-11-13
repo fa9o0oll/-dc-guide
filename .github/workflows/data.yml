@@ -37,6 +37,10 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: node scripts/tmdb-discover.mjs
         continue-on-error: true
+      - name: Probe Wikidata for the films list (work branches only; logs WDP lines)
+        if: github.ref != 'refs/heads/main'
+        run: node scripts/wd-probe.mjs
+        continue-on-error: true
       - name: Look up TMDB candidates for pending queries (data/lookup)
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
