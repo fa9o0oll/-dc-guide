@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-13T16:44:37.465Z",
+ "generatedAt": "2026-11-13T18:01:25.346Z",
  "counts": {
   "works": 623,
   "withEntry": 372,
@@ -11,12 +11,981 @@
   "uncurated": 0,
   "curatedGaps": 0,
   "collectionGaps": 0,
+  "chronoAgree": 27,
+  "chronoConflict": 0,
+  "chronoReviewed": 2,
+  "chronoMissed": 28,
+  "chronoAuto": 30,
   "infoEntries": 449,
-  "bytes": 174038,
-  "seconds": 180
+  "bytes": 197941,
+  "seconds": 66
  },
  "missing": [],
  "uncurated": [],
+ "chronoAudit": {
+  "agree": [
+   {
+    "cur": "mummy",
+    "view": "release",
+    "t": "The Scorpion King",
+    "w": "prequel",
+    "before": [
+     "The Mummy",
+     "The Mummy",
+     "The Mummy Returns",
+     "The Mummy: Tomb of the Dragon Emperor"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb",
+     "wikidata"
+    ]
+   },
+   {
+    "cur": "evil-dead",
+    "view": "release",
+    "t": "Evil Dead Wrath",
+    "w": "prequel",
+    "before": [
+     "The Evil Dead"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "purge",
+    "view": "release",
+    "t": "The First Purge",
+    "w": "prequel",
+    "before": [
+     "The Purge",
+     "The Purge: Anarchy",
+     "The Purge: Election Year",
+     "The Forever Purge"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "blade-runner",
+    "view": "either",
+    "t": "Blade Runner: Black Out 2022",
+    "w": "prequel",
+    "before": [
+     "Blade Runner 2049"
+    ],
+    "src": [
+     "wikipedia",
+     "title"
+    ]
+   },
+   {
+    "cur": "predator",
+    "view": "either",
+    "t": "Prey",
+    "w": "prequel",
+    "before": [
+     "Predator"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb",
+     "wikidata"
+    ]
+   },
+   {
+    "cur": "mad-max",
+    "view": "either",
+    "t": "Furiosa: A Mad Max Saga",
+    "w": "prequel",
+    "before": [
+     "Mad Max: Fury Road"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "kingsman",
+    "view": "release",
+    "t": "The King's Man",
+    "w": "prequel",
+    "before": [
+     "Kingsman: The Secret Service",
+     "Kingsman: The Golden Circle"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb",
+     "wikidata"
+    ]
+   },
+   {
+    "cur": "harry-potter",
+    "view": "release",
+    "t": "Fantastic Beasts and Where to Find Them",
+    "w": "prequel",
+    "before": [
+     "Harry Potter and the Philosopher's Stone",
+     "Harry Potter and the Chamber of Secrets",
+     "Harry Potter and the Prisoner of Azkaban",
+     "Harry Potter and the Goblet of Fire"
+    ],
+    "src": [
+     "wikipedia",
+     "wikidata",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "harry-potter",
+    "view": "release",
+    "t": "Fantastic Beasts: The Crimes of Grindelwald",
+    "w": "prequel",
+    "before": [
+     "Harry Potter and the Philosopher's Stone",
+     "Harry Potter and the Chamber of Secrets",
+     "Harry Potter and the Prisoner of Azkaban",
+     "Harry Potter and the Goblet of Fire"
+    ],
+    "src": [
+     "wikipedia",
+     "wikidata",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "harry-potter",
+    "view": "release",
+    "t": "Fantastic Beasts: The Secrets of Dumbledore",
+    "w": "prequel",
+    "before": [
+     "Harry Potter and the Philosopher's Stone",
+     "Harry Potter and the Chamber of Secrets",
+     "Harry Potter and the Prisoner of Azkaban",
+     "Harry Potter and the Goblet of Fire"
+    ],
+    "src": [
+     "wikipedia",
+     "wikidata",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "hunger-games",
+    "view": "release",
+    "t": "The Hunger Games: The Ballad of Songbirds & Snakes",
+    "w": "prequel",
+    "before": [
+     "The Hunger Games"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "hunger-games",
+    "view": "release",
+    "t": "The Hunger Games: Sunrise on the Reaping",
+    "w": "prequel",
+    "before": [
+     "The Hunger Games"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "rambo",
+    "view": "release",
+    "t": "John Rambo",
+    "w": "prequel",
+    "before": [
+     "First Blood"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "saw",
+    "view": "release",
+    "t": "Saw X",
+    "w": "between",
+    "before": [
+     "Saw",
+     "Saw II"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "fear-street",
+    "view": "release",
+    "t": "Fear Street: 1978",
+    "w": "year",
+    "before": [
+     "Fear Street: 1994"
+    ],
+    "src": [
+     "wikipedia",
+     "title",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "fear-street",
+    "view": "release",
+    "t": "Fear Street: 1666",
+    "w": "year",
+    "before": [
+     "Fear Street: 1994",
+     "Fear Street: 1978"
+    ],
+    "src": [
+     "title",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "omen",
+    "view": "either",
+    "t": "The First Omen",
+    "w": "prequel",
+    "before": [
+     "The Omen"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "lion-king",
+    "view": "release",
+    "t": "Mufasa: The Lion King",
+    "w": "prequel",
+    "before": [
+     "The Lion King"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "dumb",
+    "view": "release",
+    "t": "Dumb and Dumberer: When Harry Met Lloyd",
+    "w": "prequel",
+    "before": [
+     "Dumb and Dumber"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "carlito",
+    "view": "release",
+    "t": "Carlito's Way: Rise to Power",
+    "w": "prequel",
+    "before": [
+     "Carlito's Way"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "wonka",
+    "view": "either",
+    "t": "Wonka",
+    "w": "prequel",
+    "before": [
+     "Willy Wonka & the Chocolate Factory"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "weapons",
+    "view": "release",
+    "t": "Gladys",
+    "w": "prequel",
+    "before": [
+     "Weapons"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "middle-earth",
+    "view": "release",
+    "t": "The Hobbit: An Unexpected Journey",
+    "w": "prequel",
+    "before": [
+     "The Lord of the Rings: The Fellowship of the Ring",
+     "The Lord of the Rings: The Two Towers",
+     "The Lord of the Rings: The Return of the King"
+    ],
+    "src": [
+     "wikipedia"
+    ]
+   },
+   {
+    "cur": "middle-earth",
+    "view": "release",
+    "t": "The Hobbit: The Desolation of Smaug",
+    "w": "prequel",
+    "before": [
+     "The Lord of the Rings: The Fellowship of the Ring",
+     "The Lord of the Rings: The Two Towers",
+     "The Lord of the Rings: The Return of the King"
+    ],
+    "src": [
+     "wikipedia"
+    ]
+   },
+   {
+    "cur": "middle-earth",
+    "view": "release",
+    "t": "The Hobbit: The Battle of the Five Armies",
+    "w": "prequel",
+    "before": [
+     "The Lord of the Rings: The Fellowship of the Ring",
+     "The Lord of the Rings: The Two Towers",
+     "The Lord of the Rings: The Return of the King"
+    ],
+    "src": [
+     "wikipedia"
+    ]
+   },
+   {
+    "cur": "middle-earth",
+    "view": "release",
+    "t": "The Lord of the Rings: The War of the Rohirrim",
+    "w": "before",
+    "before": [
+     "The Lord of the Rings: The Fellowship of the Ring",
+     "The Lord of the Rings: The Two Towers",
+     "The Lord of the Rings: The Return of the King",
+     "The Hobbit: An Unexpected Journey"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   },
+   {
+    "cur": "little-mermaid",
+    "view": "release",
+    "t": "The Little Mermaid: Ariel's Beginning",
+    "w": "prequel",
+    "before": [
+     "The Little Mermaid"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb"
+    ]
+   }
+  ],
+  "conflict": [],
+  "reviewed": [
+   {
+    "cur": "predator",
+    "view": "either",
+    "t": "The Predator",
+    "w": "between",
+    "before": [
+     "Predator 2",
+     "Predators"
+    ],
+    "src": [
+     "wikipedia"
+    ]
+   },
+   {
+    "cur": "candyman",
+    "view": null,
+    "t": "Candyman",
+    "w": "between",
+    "before": [
+     "Candyman: Farewell to the Flesh",
+     "Candyman: Day of the Dead"
+    ],
+    "src": [
+     "wikipedia"
+    ]
+   }
+  ],
+  "missed": [
+   {
+    "cur": "mummy",
+    "t": "The Mummy"
+   },
+   {
+    "cur": "mummy",
+    "t": "The Mummy Returns"
+   },
+   {
+    "cur": "mummy",
+    "t": "The Mummy: Tomb of the Dragon Emperor"
+   },
+   {
+    "cur": "mummy",
+    "t": "The Mummy: Book of the Dead"
+   },
+   {
+    "cur": "apes",
+    "t": "Rise of the Planet of the Apes"
+   },
+   {
+    "cur": "apes",
+    "t": "Dawn of the Planet of the Apes"
+   },
+   {
+    "cur": "apes",
+    "t": "War for the Planet of the Apes"
+   },
+   {
+    "cur": "apes",
+    "t": "Kingdom of the Planet of the Apes"
+   },
+   {
+    "cur": "terminator",
+    "t": "Terminator: The Sarah Connor Chronicles"
+   },
+   {
+    "cur": "terminator",
+    "t": "Terminator: Dark Fate"
+   },
+   {
+    "cur": "purge",
+    "t": "The Purge"
+   },
+   {
+    "cur": "blade-runner",
+    "t": "Blade Runner: Black Lotus"
+   },
+   {
+    "cur": "predator",
+    "t": "Predator: Killer of Killers"
+   },
+   {
+    "cur": "transformers",
+    "t": "Transformers One"
+   },
+   {
+    "cur": "transformers",
+    "t": "Bumblebee"
+   },
+   {
+    "cur": "transformers",
+    "t": "Transformers: Rise of the Beasts"
+   },
+   {
+    "cur": "lion-king",
+    "t": "The Lion King"
+   },
+   {
+    "cur": "oceans",
+    "t": "Untitled Ocean's Prequel"
+   },
+   {
+    "cur": "oceans",
+    "t": "Ocean's Eleven"
+   },
+   {
+    "cur": "oceans",
+    "t": "Ocean's Twelve"
+   },
+   {
+    "cur": "oceans",
+    "t": "Ocean's Thirteen"
+   },
+   {
+    "cur": "oceans",
+    "t": "Ocean's Eight"
+   },
+   {
+    "cur": "wonka",
+    "t": "Wonka 2"
+   },
+   {
+    "cur": "dollars",
+    "t": "The Good, the Bad and the Ugly"
+   },
+   {
+    "cur": "dollars",
+    "t": "For a Few Dollars More"
+   },
+   {
+    "cur": "middle-earth",
+    "t": "The Lord of the Rings: The Rings of Power"
+   },
+   {
+    "cur": "middle-earth",
+    "t": "The Lord of the Rings: The Hunt for Gollum"
+   },
+   {
+    "cur": "little-mermaid",
+    "t": "The Little Mermaid"
+   }
+  ],
+  "auto": [
+   {
+    "group": "Saw",
+    "order": [
+     "Saw",
+     "Saw",
+     "Saw X",
+     "Saw II",
+     "Saw III",
+     "Saw IV",
+     "Saw V",
+     "Saw VI",
+     "Saw 3D",
+     "Jigsaw",
+     "Spiral: From the Book of Saw"
+    ],
+    "moved": [
+     "Saw X ← between Saw / Saw II [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "The Hunger Games",
+    "order": [
+     "The Hunger Games: The Ballad of Songbirds & Snakes",
+     "The Hunger Games: Sunrise on the Reaping",
+     "The Hunger Games",
+     "The Hunger Games: Catching Fire",
+     "The Hunger Games: Mockingjay - Part 1",
+     "The Hunger Games: Mockingjay - Part 2"
+    ],
+    "moved": [
+     "The Hunger Games: The Ballad of Songbirds & Snakes ← prequel The Hunger Games [wikipedia,tmdb]",
+     "The Hunger Games: Sunrise on the Reaping ← prequel The Hunger Games [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "The Purge",
+    "order": [
+     "The First Purge",
+     "The Purge",
+     "The Purge: Anarchy",
+     "The Purge: Election Year",
+     "The Forever Purge"
+    ],
+    "moved": [
+     "The First Purge ← prequel The Purge / The Purge: Anarchy / The Purge: Election Year / The Forever Purge [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "Kingsman",
+    "order": [
+     "The King's Man",
+     "Kingsman: The Secret Service",
+     "Kingsman: The Golden Circle"
+    ],
+    "moved": [
+     "The King's Man ← prequel Kingsman: The Secret Service / Kingsman: The Golden Circle [wikipedia,tmdb,wikidata]"
+    ]
+   },
+   {
+    "group": "Harry Potter universe",
+    "order": [
+     "Fantastic Beasts and Where to Find Them",
+     "Fantastic Beasts: The Crimes of Grindelwald",
+     "Fantastic Beasts: The Secrets of Dumbledore",
+     "Harry Potter and the Philosopher's Stone",
+     "Harry Potter and the Chamber of Secrets",
+     "Harry Potter and the Prisoner of Azkaban",
+     "Harry Potter and the Goblet of Fire",
+     "Harry Potter and the Order of the Phoenix",
+     "Harry Potter and the Half-Blood Prince",
+     "Harry Potter and the Deathly Hallows: Part 1",
+     "Harry Potter and the Deathly Hallows: Part 2",
+     "Potter Puppet Pals"
+    ],
+    "moved": [
+     "Fantastic Beasts and Where to Find Them ← prequel Harry Potter and the Philosopher's Stone / Harry Potter and the Chamber of Secrets / Harry Potter and the Prisoner of Azkaban / Harry Potter and the Goblet of Fire [wikipedia,wikidata,tmdb]",
+     "Fantastic Beasts: The Crimes of Grindelwald ← prequel Harry Potter and the Philosopher's Stone / Harry Potter and the Chamber of Secrets / Harry Potter and the Prisoner of Azkaban / Harry Potter and the Goblet of Fire [wikipedia,wikidata,tmdb]",
+     "Fantastic Beasts: The Secrets of Dumbledore ← prequel Harry Potter and the Philosopher's Stone / Harry Potter and the Chamber of Secrets / Harry Potter and the Prisoner of Azkaban / Harry Potter and the Goblet of Fire [wikipedia,wikidata,tmdb]"
+    ]
+   },
+   {
+    "group": "Wizarding World",
+    "order": [
+     "Fantastic Beasts and Where to Find Them",
+     "Fantastic Beasts: The Crimes of Grindelwald",
+     "Fantastic Beasts: The Secrets of Dumbledore",
+     "Harry Potter and the Philosopher's Stone",
+     "Harry Potter and the Chamber of Secrets",
+     "Harry Potter and the Prisoner of Azkaban",
+     "Harry Potter and the Goblet of Fire",
+     "Harry Potter and the Order of the Phoenix",
+     "Harry Potter and the Half-Blood Prince",
+     "Harry Potter and the Deathly Hallows: Part 1",
+     "Harry Potter and the Deathly Hallows: Part 2",
+     "Harry Potter"
+    ],
+    "moved": [
+     "Fantastic Beasts and Where to Find Them ← prequel Harry Potter and the Philosopher's Stone / Harry Potter and the Chamber of Secrets / Harry Potter and the Prisoner of Azkaban / Harry Potter and the Goblet of Fire [wikipedia,wikidata,tmdb]",
+     "Fantastic Beasts: The Crimes of Grindelwald ← prequel Harry Potter and the Philosopher's Stone / Harry Potter and the Chamber of Secrets / Harry Potter and the Prisoner of Azkaban / Harry Potter and the Goblet of Fire [wikipedia,wikidata,tmdb]",
+     "Fantastic Beasts: The Secrets of Dumbledore ← prequel Harry Potter and the Philosopher's Stone / Harry Potter and the Chamber of Secrets / Harry Potter and the Prisoner of Azkaban / Harry Potter and the Goblet of Fire [wikipedia,wikidata,tmdb]"
+    ]
+   },
+   {
+    "group": "Dumb and Dumber",
+    "order": [
+     "Dumb and Dumberer: When Harry Met Lloyd",
+     "Dumb and Dumber",
+     "Dumb and Dumber To"
+    ],
+    "moved": [
+     "Dumb and Dumberer: When Harry Met Lloyd ← prequel Dumb and Dumber [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "Mad Max",
+    "order": [
+     "Mad Max",
+     "Mad Max 2",
+     "Mad Max Beyond Thunderdome",
+     "Furiosa: A Mad Max Saga",
+     "Mad Max: Fury Road",
+     "Mad Max: The Wasteland"
+    ],
+    "moved": [
+     "Furiosa: A Mad Max Saga ← prequel Mad Max: Fury Road [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "The Little Mermaid universe",
+    "order": [
+     "The Little Mermaid: Ariel's Beginning",
+     "The Little Mermaid",
+     "The Little Mermaid",
+     "The Little Mermaid II: Return to the Sea",
+     "The Little Mermaid"
+    ],
+    "moved": [
+     "The Little Mermaid: Ariel's Beginning ← prequel The Little Mermaid [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "The Lion King",
+    "order": [
+     "The Lion King",
+     "Timon and Pumbaa",
+     "The Lion King II: Simba's Pride",
+     "The Lion King 1½",
+     "The Lion Guard",
+     "The Lion Guard: Return of the Roar",
+     "Mufasa: The Lion King",
+     "The Lion King"
+    ],
+    "moved": [
+     "Mufasa: The Lion King ← prequel The Lion King [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "Fear Street",
+    "order": [
+     "Fear Street: 1666",
+     "Fear Street: 1978",
+     "Fear Street: 1994"
+    ],
+    "moved": [
+     "Fear Street: 1978 ← year Fear Street: 1994 [wikipedia,title,tmdb]",
+     "Fear Street: 1666 ← year Fear Street: 1994 / Fear Street: 1978 [title,tmdb]"
+    ]
+   },
+   {
+    "group": "The Lord of the Rings",
+    "order": [
+     "The Lord of the Rings: The War of the Rohirrim",
+     "The Lord of the Rings: The Fellowship of the Ring",
+     "The Lord of the Rings: The Two Towers",
+     "The Lord of the Rings: The Return of the King",
+     "The Lord of the Rings: The Hunt for Gollum"
+    ],
+    "moved": [
+     "The Lord of the Rings: The War of the Rohirrim ← before The Lord of the Rings: The Fellowship of the Ring / The Lord of the Rings: The Two Towers / The Lord of the Rings: The Return of the King [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "The Omen",
+    "order": [
+     "The First Omen",
+     "The Omen",
+     "Damien - Omen II"
+    ],
+    "moved": [
+     "The First Omen ← prequel The Omen [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "Blade Runner",
+    "order": [
+     "Blade Runner",
+     "Blade Runner: Black Out 2022",
+     "2036: Nexus Dawn",
+     "2048: Nowhere to Run",
+     "Blade Runner 2049",
+     "Blade Runner: Black Lotus",
+     "Blade Runner 2099"
+    ],
+    "moved": [
+     "Blade Runner: Black Out 2022 ← prequel Blade Runner 2049 [wikipedia,title]"
+    ]
+   },
+   {
+    "group": "Predator",
+    "order": [
+     "Prey",
+     "Predator",
+     "Predator 2",
+     "AVP: Alien vs. Predator",
+     "Aliens vs Predator: Requiem",
+     "The Predator",
+     "Predators",
+     "Predator: Killer of Killers",
+     "Predator: Badlands"
+    ],
+    "moved": [
+     "The Predator ← between Predator 2 / Predators [wikipedia]",
+     "Prey ← prequel Predator [wikipedia,tmdb,wikidata]"
+    ]
+   },
+   {
+    "group": "The Mummy",
+    "order": [
+     "The Scorpion King 2: Rise of a Warrior",
+     "The Scorpion King",
+     "The Mummy",
+     "The Mummy's Hand",
+     "The Mummy's Tomb",
+     "The Mummy's Ghost",
+     "The Mummy's Curse",
+     "Abbott and Costello Meet the Mummy",
+     "The Mummy",
+     "The Curse of the Mummy's Tomb",
+     "The Mummy's Shroud",
+     "Blood from the Mummy's Tomb",
+     "The Mummy",
+     "The Mummy Returns",
+     "The Mummy: Tomb of the Dragon Emperor",
+     "The Scorpion King 3: Battle for Redemption",
+     "The Scorpion King 4: Quest for Power",
+     "The Mummy"
+    ],
+    "moved": [
+     "The Scorpion King ← prequel The Mummy / The Mummy's Hand / The Mummy's Tomb / The Mummy's Ghost [wikipedia,tmdb,wikidata]",
+     "The Scorpion King 2: Rise of a Warrior ← prequel The Scorpion King [wikipedia]"
+    ]
+   },
+   {
+    "group": "Evil Dead",
+    "order": [
+     "Within the Woods",
+     "Evil Dead Wrath",
+     "The Evil Dead",
+     "Evil Dead II",
+     "Army of Darkness",
+     "Evil Dead",
+     "Ash vs Evil Dead",
+     "Evil Dead Rise",
+     "Evil Dead Burn"
+    ],
+    "moved": [
+     "Evil Dead Wrath ← prequel The Evil Dead [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "Rambo",
+    "order": [
+     "John Rambo",
+     "First Blood",
+     "Rambo: First Blood Part II",
+     "Rambo III",
+     "Rambo",
+     "Rambo: Last Blood"
+    ],
+    "moved": [
+     "John Rambo ← prequel First Blood [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col Saw",
+    "order": [
+     "Saw",
+     "Saw X",
+     "Saw II",
+     "Saw III",
+     "Saw IV",
+     "Saw V",
+     "Saw VI",
+     "Saw 3D",
+     "Jigsaw",
+     "Spiral: From the Book of Saw",
+     "Untitled Saw Film"
+    ],
+    "moved": [
+     "Saw X ← between Saw / Saw II [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col The Purge",
+    "order": [
+     "The First Purge",
+     "The Purge",
+     "The Purge: Anarchy",
+     "The Purge: Election Year",
+     "The Forever Purge"
+    ],
+    "moved": [
+     "The First Purge ← prequel The Purge / The Purge: Anarchy / The Purge: Election Year / The Forever Purge [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col Kingsman",
+    "order": [
+     "The King's Man",
+     "Kingsman: The Secret Service",
+     "Kingsman: The Golden Circle"
+    ],
+    "moved": [
+     "The King's Man ← prequel Kingsman: The Secret Service / Kingsman: The Golden Circle [wikipedia,tmdb,wikidata]"
+    ]
+   },
+   {
+    "group": "col Dumb and Dumber",
+    "order": [
+     "Dumb and Dumberer: When Harry Met Lloyd",
+     "Dumb and Dumber",
+     "Dumb and Dumber To"
+    ],
+    "moved": [
+     "Dumb and Dumberer: When Harry Met Lloyd ← prequel Dumb and Dumber [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col Candyman",
+    "order": [
+     "Candyman",
+     "Candyman: Farewell to the Flesh",
+     "Candyman",
+     "Candyman: Day of the Dead"
+    ],
+    "moved": [
+     "Candyman ← between Candyman: Farewell to the Flesh / Candyman: Day of the Dead [wikipedia]"
+    ]
+   },
+   {
+    "group": "col Mad Max",
+    "order": [
+     "Mad Max",
+     "Mad Max 2",
+     "Mad Max Beyond Thunderdome",
+     "Furiosa: A Mad Max Saga",
+     "Mad Max: Fury Road",
+     "Mad Max: The Wasteland"
+    ],
+    "moved": [
+     "Furiosa: A Mad Max Saga ← prequel Mad Max: Fury Road [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col The Lion King (Reboot)",
+    "order": [
+     "Mufasa: The Lion King",
+     "The Lion King"
+    ],
+    "moved": [
+     "Mufasa: The Lion King ← prequel The Lion King [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col Weapons",
+    "order": [
+     "Gladys",
+     "Weapons"
+    ],
+    "moved": [
+     "Gladys ← prequel Weapons [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col Fear Street",
+    "order": [
+     "Fear Street: 1666",
+     "Fear Street: 1978",
+     "Fear Street: 1994"
+    ],
+    "moved": [
+     "Fear Street: 1978 ← year Fear Street: 1994 [wikipedia,title,tmdb]",
+     "Fear Street: 1666 ← year Fear Street: 1994 / Fear Street: 1978 [title,tmdb]"
+    ]
+   },
+   {
+    "group": "col The Omen",
+    "order": [
+     "The First Omen",
+     "The Omen",
+     "Damien - Omen II",
+     "The Final Conflict",
+     "Omen IV: The Awakening"
+    ],
+    "moved": [
+     "The First Omen ← prequel The Omen [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col Predator",
+    "order": [
+     "Prey",
+     "Predator",
+     "Predator 2",
+     "The Predator",
+     "Predators",
+     "Predator: Badlands"
+    ],
+    "moved": [
+     "The Predator ← between Predator 2 / Predators [wikipedia]",
+     "Prey ← prequel Predator [wikipedia,tmdb,wikidata]"
+    ]
+   },
+   {
+    "group": "col Carlito's Way",
+    "order": [
+     "Carlito's Way: Rise to Power",
+     "Carlito's Way"
+    ],
+    "moved": [
+     "Carlito's Way: Rise to Power ← prequel Carlito's Way [wikipedia,tmdb]"
+    ]
+   }
+  ]
+ },
  "curatedGaps": [],
  "collectionGaps": [],
  "related": [
@@ -609,8 +1578,8 @@
     "sibling:Untitled James Bond Film*"
    ],
    "src": [
-    "novels:James Bond",
-    "story:Quantum of Solace"
+    "story:Quantum of Solace",
+    "novels:James Bond"
    ]
   },
   {
@@ -1464,8 +2433,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "musical:Wicked",
     "novel:The Wonderful Wizard of Oz",
+    "musical:Wicked",
     "novel:Wicked"
    ]
   },
@@ -3558,21 +4527,21 @@
    ]
   },
   {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
-   "why": "catalog",
-   "size": 23,
-   "types": [
-    "animated film series"
-   ]
-  },
-  {
    "g": "Q2732470",
    "name": "list of Pixar films",
    "why": "list",
    "size": 28,
    "types": [
     "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
+   "why": "catalog",
+   "size": 23,
+   "types": [
+    "animated film series"
    ]
   }
  ],
