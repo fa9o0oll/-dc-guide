@@ -150,6 +150,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('روابط المواقع: فيلم له Letterboxd وTrakt، ومسلسل له Trakt فقط', await page.evaluate(() => { const h = id => [...document.querySelectorAll(`#${id} .xlinks a`)].map(x => x.href);
     const f = h('c-nolan-the-dark-knight-2008'), t = h('c-dcu-peacemaker-2022-s1');
     return f.includes('https://letterboxd.com/tmdb/155') && f.includes('https://trakt.tv/movies/tt0468569') && t.includes('https://trakt.tv/shows/tt13146488') && !t.some(u => u.includes('letterboxd')); }));
+  // رابط مباشر من قائمة الأفلام إلى بطاقة عمل في الدليل
+  await page.goto(url + '#w=the-dark-knight-rises-2012'); await page.waitForSelector('#sheet:not([hidden])'); await page.waitForTimeout(300);
+  check('رابط #w= يفتح بطاقة العمل ثم يُزال من العنوان', (await page.textContent('#sheetTitle')).includes('The Dark Knight Rises') && (await page.evaluate(() => location.hash)) === '');
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3).join(' | '));
   await ctx.close();
 }

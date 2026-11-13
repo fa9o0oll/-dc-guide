@@ -1,9 +1,11 @@
 // دالة «أضف فيلماً»: تبحث في TMDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي نتيجة للاطلاع (preview)، ثم تضيف المختار إلى data/films/added.json في المستودع،
-// فيعاد بناء القائمة ويظهر الفيلم على كل الأجهزة. محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
+// فيعاد بناء القائمة ويظهر الفيلم على كل الأجهزة. و worlds: سلسلة العمل وعالمه وأعماله المرتبطة من Wikidata (تطلبها الصفحة بعد فتح البطاقة، فلا تتأخر).
+// محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
 //   TMDB_API_KEY  مفتاح TMDB        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع        ADD_FILM_PASSWORD  كلمة السر
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { tmdb, hasKey } from '../../scripts/lib-tmdb.mjs';
 import { parseLine, search, shape, shapeCollection, detailPath, detailParams } from '../../scripts/lib-films.mjs';
+import { worldsFor } from '../../scripts/lib-worlds.mjs';
 
 const REPO = process.env.GH_REPO || 'fa9o0oll/-dc-guide', BRANCH = 'main', FILE = 'data/films/added.json';
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
@@ -53,6 +55,13 @@ export default async req => {
       if (b.action === 'preview') return json(200, { film, collection, providers });
       const at = new Date().toISOString(), state = await record({ tmdb: id, kind, title: film.title, year: film.year, at });
       return json(200, { state, film: { ...film, src: 'added', addedAt: at }, collection, providers });
+    }
+    // العالم: مهلة كلية تحت حد Netlify (٦٠ ثانية)، واستعلامات أقصر من البناء اليومي. الفشل لا يعطّل البطاقة: الصفحة تعرض ما لديها.
+    if (b.action === 'worlds') {
+      const kind = b.kind === 'tv' ? 'tv' : 'movie', id = +b.tmdb; if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
+      const key = (kind === 'tv' ? 't' : 'm') + id, budget = new Promise((_, no) => setTimeout(() => no(new Error('worlds timeout')), 45000));
+      const r = await Promise.race([worldsFor([key], { tmdb, opt: { timeout: 20000, tries: 2 } }), budget]);
+      return json(200, { key, worlds: r.worlds, works: r.works, info: r.info });
     }
     return json(400, { error: 'طلب غير معروف.' });
   } catch (e) {

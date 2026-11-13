@@ -30,7 +30,9 @@ const cdHTML = date => segs(date) || '<b class="now">صدر اليوم</b>';
 setInterval(() => { if (!document.hidden) for (const el of document.querySelectorAll('.cd[data-until]')) el.innerHTML = cdHTML(el.dataset.until); }, 1000);
 const poster = (p, sizes) => p ? `<img loading="lazy" decoding="async" alt="" src="${IMG}w342${p}" srcset="${IMG}w185${p} 185w, ${IMG}w342${p} 342w, ${IMG}w500${p} 500w" sizes="${sizes}">` : '';
 
-const D = { films: [], byId: new Map(), byTmdb: new Map(), more: null, cols: {}, prov: {}, fr: {}, fx: {}, frOf: new Map(), recOf: new Map(), part: new Map() };
+const D = { films: [], byId: new Map(), byTmdb: new Map(), more: null, cols: {}, prov: {}, fr: {}, fx: {}, frOf: new Map(), recOf: new Map(), part: new Map(),
+  // خريطة العوالم (worlds.json): العوالم وترتيبها، وعوالم كل عمل وأعماله المرتبطة، ومعلومات الأعمال خارج القائمة. wlive: البحث المباشر لعمل جديد
+  worlds: {}, wworks: {}, winfo: {}, memberOf: new Map(), wok: false, wlive: new Map(), wres: new Map() };
 let P = { films: {} };
 try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {}
 const save = () => { try { P.at = Date.now(); localStorage.setItem(KEY, JSON.stringify(P)); } catch {} syncTouch('films'); };
@@ -55,7 +57,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <label>اسم الفيلم وسنته في سطر واحد<input id="add-q" dir="auto" placeholder="Heat 1995" autocomplete="off" required></label>
   <label id="add-pass-wrap">كلمة السر (تُطلب مرة واحدة على هذا الجهاز)<input id="add-pass" type="password" autocomplete="current-password"></label>
   <button class="btn pri" type="submit">ابحث عنه</button><p class="msg" id="add-msg" aria-live="polite"></p><div class="cands" id="cands"></div>
-  <p class="hint">الفيلم يظهر هنا فوراً، ويصل إلى بقية أجهزتك خلال دقائق. معلومات سلسلته تُجلب آلياً من <bdi dir="ltr">TMDB</bdi>.</p></form></dialog>
+  <p class="hint">الفيلم يظهر هنا فوراً، ويصل إلى بقية أجهزتك خلال دقائق. سلسلته وعالمه وأعماله المرتبطة تُجلب آلياً من <bdi dir="ltr">TMDB</bdi> و<bdi dir="ltr">Wikidata</bdi>.</p></form></dialog>
 <div class="toast" id="toast" role="status"></div>`);
 
 const toast = (t, undo) => { const el = $('#toast'); el.textContent = t; if (undo) { const b = Object.assign(document.createElement('button'), { textContent: 'تراجع', onclick: () => { el.classList.remove('on', 'act'); el.textContent = ''; undo(); } }); el.append(b); }
@@ -81,13 +83,13 @@ function card(f) { const s = st(f.id), un = unreleased(f);
 // ---------- التصفية والترتيب ----------
 const SORTS = { list: ['ترتيب قائمتي', (a, b) => a.ord - b.ord], new: ['الأحدث صدوراً', (a, b) => (b.date || '0').localeCompare(a.date || '0')], old: ['الأقدم صدوراً', (a, b) => (a.date || '9').localeCompare(b.date || '9')],
   rate: ['الأعلى تقييماً', (a, b) => (b.votes >= 50 ? b.rating || 0 : 0) - (a.votes >= 50 ? a.rating || 0 : 0)], short: ['الأقصر مدة', (a, b) => (a.runtime || 9999) - (b.runtime || 9999)], az: ['أبجدياً', (a, b) => a.title.localeCompare(b.title, 'en')] };
-const hay = f => f._h ??= [f.title, f.orig, f.year, ...(D.more?.[f.id]?.directors || []), D.more?.[f.id]?.titleAr, f.col && D.cols[f.col]?.name, D.fr[D.frOf.get(f.id)]?.name].filter(Boolean).join(' ').toLowerCase();
+const hay = f => f._h ??= [f.title, f.orig, f.year, ...(D.more?.[f.id]?.directors || []), D.more?.[f.id]?.titleAr, f.col && D.cols[f.col]?.name, D.fr[D.frOf.get(f.id)]?.name, ...worldIds(f.id).map(id => D.worlds[id].name)].filter(Boolean).join(' ').toLowerCase();
 function match(f) { const s = st(f.id);
   if (ui.status === 'soon' ? !unreleased(f) : ui.status === 'todo' ? s === 'watched' && !ui.q : ui.status !== 'all' && s !== ui.status) return false;
   if (ui.genre && !f.genres.includes(+ui.genre)) return false;
   if (ui.decade && Math.floor((f.year || 0) / 10) * 10 !== +ui.decade) return false;
   if (ui.prov && !(ui.prov === 'any' ? f.prov && (f.prov.stream.length || f.prov.free.length) : f.prov && [...f.prov.stream, ...f.prov.free].includes(+ui.prov))) return false;
-  if (ui.series && !(D.frOf.has(f.id) || f.col && D.cols[f.col]?.parts.length > 1)) return false;
+  if (ui.series && !groupOf(f)) return false;
   if (ui.q && !ui.q.split(/\s+/).every(w => hay(f).includes(w))) return false;
   return true; }
 function chipsHTML() { const c = (k, v, t) => `<button class="chip" data-act="status" data-v="${v}" aria-pressed="${ui[k] === v}">${t}</button>`;
@@ -126,23 +128,49 @@ function reroll(first) { const ok = f => f.backdrop && f.kind === 'movie' && !un
   img.onload = () => { $('.bd', box).replaceChildren(img); requestAnimationFrame(() => img.classList.add('in')); };
   if (!first) { box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap'); } }
 
-// ---------- السلاسل ----------
-// مجموعة العرض: سلسلة مراجَعة يدوياً (ترتيب وتوصيات ومسلسلات مرتبطة) أو مجموعة TMDB كما هي (أفلام فقط بترتيب الصدور)
+// ---------- السلاسل والعوالم ----------
+// مجموعة العرض بالأولوية: ترتيب مراجَع يدوياً (توصيات ومسلسلات مرتبطة ومصادر)، ثم عالم من «خريطة العوالم» (Wikidata) إن ضمّ أجزاء مجموعة TMDB كلها،
+// ثم مجموعة TMDB كما هي (أفلام فقط بترتيب الصدور). العالم الآلي بلا توصيات، ويُذكر مصدره.
 const REC = { watch: 'شاهده', optional: 'اختياري', skip: 'تجاوزه', soon: 'قادم' };
+const WKIND = { series: 'سلسلة', universe: 'عالم مشترك', franchise: 'امتياز إعلامي', chain: 'أعمال متتالية' };
+const SRCK = { novel: 'رواية', book: 'كتاب', manga: 'مانغا', comic: 'قصص مصورة', game: 'لعبة فيديو', toy: 'خط ألعاب', musical: 'مسرحية موسيقية', play: 'مسرحية', tale: 'حكاية', story: 'قصة قصيرة', article: 'مقال', song: 'أغنية', tvshow: 'مسلسل', film: 'فيلم' };
+const RELN = { original: 'الأصل', derived: 'اقتُبس عنه', sibling: 'اقتباس آخر' };
+const nWorks = n => count(n, ['عمل واحد', 'عملان', 'أعمال', 'عملاً', 'عمل']);
 const whenOf = o => o.date && o.date > today ? 'بعد ' + nDays(daysTo(o.date)) : o.year || 'لم يُعلن موعده';
-const groupOf = f => { const k = D.frOf.get(f.id); if (k) return { key: k, curated: true, ...D.fr[k] }; const c = f.col && D.cols[f.col]; return c && c.parts.length > 1 ? { key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })) } : null; };
+const keyOf = f => f.id || (f.kind === 'tv' ? 't' : 'm') + f.tmdb;
+const stepOf = k => k[0] === 't' ? { t: +k.slice(1) } : { m: +k.slice(1) };
+const keyOfStep = s => s.m ? 'm' + s.m : s.t ? 't' + s.t : null;
+const ext = (name, url) => `<a href="${esc(url)}" target="_blank" rel="noopener"><bdi dir="ltr">${esc(name)}</bdi></a>`;
+function mergeWorlds(w) { if (!w?.worlds) return;
+  Object.assign(D.worlds, w.worlds); Object.assign(D.winfo, w.info || {}); for (const [k, v] of Object.entries(w.works || {})) D.wworks[k] = { ...D.wworks[k], ...v };
+  for (const [id, x] of Object.entries(w.worlds)) for (const k of x.order) { const a = D.memberOf.get(k) || D.memberOf.set(k, []).get(k); if (!a.includes(id)) a.push(id); }
+  for (const f of D.films) delete f._h; }
+// عوالم عمل: ما حدده البناء له (الأخص أولاً)، أو لعمل خارج القائمة العوالم التي تضمه
+const RANK = { series: 0, universe: 1, franchise: 2, chain: 3 };
+const worldIds = k => { const own = D.wworks[k]; if (own?.worlds) return own.worlds.filter(id => D.worlds[id]);
+  return (D.memberOf.get(k) || []).filter(id => D.worlds[id]).sort((a, b) => D.worlds[a].order.length - D.worlds[b].order.length || RANK[D.worlds[a].kind] - RANK[D.worlds[b].kind]); };
+const colOf = f => { const c = f.col && D.cols[f.col]; return c && c.parts.length > 1 ? c : null; };
+const autoOf = f => { const c = colOf(f), parts = c ? c.parts.map(p => 'm' + p.tmdb) : [];
+  return worldIds(keyOf(f)).find(id => { const o = D.worlds[id].order; return o.length > 1 && parts.every(p => o.includes(p)); }) || null; };
+const worldGroup = id => { const w = D.worlds[id]; return { key: 'w:' + id, auto: true, id, name: w.name, kind: w.kind, by: w.by, wd: w.wd, wiki: w.wiki, order: w.order.map(stepOf) }; };
+const groupOf = f => { const k = D.frOf.get(keyOf(f)); if (k) return { key: k, curated: true, ...D.fr[k] }; const id = autoOf(f); if (id) return worldGroup(id);
+  const c = colOf(f); return c ? { key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })) } : null; };
 const listedOf = s => s.m ? D.byTmdb.get(s.m) : s.t ? D.byId.get('t' + s.t) : null;
-const infoOf = s => listedOf(s) || (s.m ? D.fx['m' + s.m] || D.part.get(s.m) : s.t ? D.fx['t' + s.t] : s) || {};
+const infoOf = s => listedOf(s) || (s.m ? D.fx['m' + s.m] || D.part.get(s.m) || D.winfo['m' + s.m] : s.t ? D.fx['t' + s.t] || D.winfo['t' + s.t] : s) || {};
 // عمل خارج القائمة له رقم في TMDB: زره يفتح بطاقة اطلاع مباشرة بدل البحث
 const outRef = s => s.m ? ` data-tmdb="${s.m}" data-kind="movie"` : s.t ? ` data-tmdb="${s.t}" data-kind="tv"` : '';
-const kindOf = s => s.t ? 'مسلسل' : s.x ? XKIND[s.x] || '' : '';
-function groups() { const out = Object.entries(D.fr).map(([key, fr]) => ({ key, curated: true, ...fr }));
-  for (const c of Object.values(D.cols)) if (c.parts.length > 1 && c.parts.some(p => D.byTmdb.has(p.tmdb)) && !c.parts.some(p => D.frOf.has('m' + p.tmdb))) out.push({ key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })) });
-  return out.sort((a, b) => a.name.localeCompare(b.name, 'en')); }
+// نوع العمل في الترتيب: مسلسل، أنمي، فيلم رسوم، فيلم قصير (٤٠ دقيقة فأقل). الفيلم الحي بلا وصف
+const kindOf = s => { if (s.x) return XKIND[s.x] || ''; const o = infoOf(s), w = D.winfo[keyOfStep(s)] || {}, g = o.genres || w.genres || [], anim = g.includes(16), ja = (o.lang || w.lang) === 'ja', run = o.runtime || w.runtime;
+  if (s.t) return anim ? (ja ? 'أنمي' : 'مسلسل رسوم') : 'مسلسل';
+  if (run && run <= 40) return 'فيلم قصير';
+  return anim ? (ja ? 'فيلم أنمي' : 'فيلم رسوم') : ''; };
+function groups() { const out = new Map(Object.entries(D.fr).map(([key, fr]) => [key, { key, curated: true, ...fr }]));
+  for (const f of D.films) { if (D.frOf.has(f.id)) continue; const g = groupOf(f); if (g && !out.has(g.key)) out.set(g.key, g); }
+  return [...out.values()].sort((a, b) => a.name.localeCompare(b.name, 'en')); }
 function seriesHTML() { const gs = groups().filter(g => !ui.q || g.name.toLowerCase().includes(ui.q) || g.order.some(s => (infoOf(s).title || '').toLowerCase().includes(ui.q)));
   if (!gs.length) return '<p class="empty">لا سلسلة تطابق البحث.</p>';
   return gs.map(g => { const mine = g.order.map(listedOf).filter(Boolean), seen = mine.filter(f => st(f.id) === 'watched').length;
-    return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${count(g.order.length, ['عمل واحد', 'عملان', 'أعمال', 'عملاً', 'عمل'])}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ' · بتوصيات الدليل' : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
+    return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${nWorks(g.order.length)}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ' · بتوصيات الدليل' : g.auto ? ` · ${WKIND[g.kind]}، مرتّب آلياً` : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
       g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}"${f ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
 <span class="p">${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
 function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); $('#grid').hidden = v !== 'grid'; $('#series').hidden = v !== 'series'; $('#chips').hidden = v !== 'grid';
@@ -151,14 +179,56 @@ function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribut
 // ---------- نافذة الفيلم ----------
 const sheet = $('#sheet'), addDlg = $('#add');
 let openId = null;
-function orderHTML(f) { const g = groupOf(f);
-  if (!g) return `<section class="sec"><h3>السلسلة وترتيب المشاهدة</h3><p>${f.kind === 'tv' ? 'مسلسل، لا سلسلة أفلام مسجّلة له.' : 'فيلم مستقل: لا أجزاء أخرى مسجّلة له في <bdi dir="ltr">TMDB</bdi>.'}</p></section>`;
-  const row = s => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = l ? l.id === f.id : (s.m && f.kind === 'movie' && s.m === f.tmdb) || (s.t && f.kind === 'tv' && s.t === f.tmdb), k = kindOf(s);
-    return `<li class="${[here ? 'here' : '', w ? 'watched' : '', s.rec ? 'r-' + s.rec : ''].join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k)}</span>
+const isHere = (f, s) => { const l = listedOf(s); return l ? l.id === f.id : (s.m && f.kind === 'movie' && s.m === f.tmdb) || (s.t && f.kind === 'tv' && s.t === f.tmdb); };
+const row = (f, s, i, auto, far) => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = isHere(f, s), k = kindOf(s);
+  const rec = s.rec || (auto && (o.date ? o.date > today : !o.year) ? 'soon' : '');
+  return `<li data-n="${i + 1}" class="${[here ? 'here' : '', w ? 'watched' : '', rec ? 'r-' + rec : '', far ? 'far' : ''].filter(Boolean).join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k)}</span>
 <span class="t"><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? ar(s.note) : ''].filter(Boolean).join(' · ')}</small></span>
-<span class="st">${s.rec ? `<i class="rc ${s.rec}">${REC[s.rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'اعرض'} ${esc(o.title || '')}"></button>`}</li>`; };
-  return `<section class="sec"><h3>ترتيب المشاهدة: <bdi dir="ltr">${esc(g.name)}</bdi></h3>${g.note ? `<p>${ar(g.note)}</p>` : ''}<ol class="order">${g.order.map(row).join('')}</ol>
-<p class="note">${g.curated ? `الترتيب والتوصيات من إعداد الدليل، مبنية على ترابط القصة وتقييم <bdi dir="ltr">TMDB</bdi> الظاهر بجانب كل عمل${g.sources?.length ? `. المصادر: ${g.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener"><bdi dir="ltr">${esc(x.name)}</bdi></a>`).join('، ')}` : ''}.` : 'الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط. لم يُراجَع يدوياً بعد.'}</p></section>`; }
+<span class="st">${rec ? `<i class="rc ${rec}">${REC[rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'اعرض'} ${esc(o.title || '')}"></button>`}</li>`; };
+// ترتيب طويل (أكثر من ١٤ عملاً) يُختصر إلى نافذة حول هذا العمل، وزر يعرضه كاملاً
+const rowsHTML = (f, order, auto) => { const n = order.length, at = Math.max(0, order.findIndex(s => isHere(f, s))), clip = n > 14, lo = Math.max(0, Math.min(at - 4, n - 9)), hi = lo + 8;
+  return `<ol class="order${clip ? ' clip' : ''}">${order.map((s, i) => row(f, s, i, auto, clip && (i < lo || i > hi))).join('')}</ol>${clip ? `<button class="more" data-act="more" aria-expanded="false">اعرض الترتيب كاملاً (${n})</button>` : ''}`; };
+const autoNote = g => `<p class="note">${g.kind === 'chain'
+  ? `رتّبه الدليل آلياً حسب تاريخ الصدور، من روابط «يسبقه» و«يليه» بين هذه الأعمال في ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)}، ومعلوماتها من <bdi dir="ltr">TMDB</bdi>`
+  : `رتّبه الدليل آلياً ${g.by === 'ord' ? 'برقم كل جزء في السلسلة' : 'حسب تاريخ الصدور'}، من بيانات ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)} و<bdi dir="ltr">TMDB</bdi>${g.wiki ? `، وتفصيله في ${ext('Wikipedia', g.wiki)}` : ''}`}. لم يُراجَع يدوياً بعد، فلا توصيات فيه.</p>`;
+const noteOf = g => g.curated ? `<p class="note">الترتيب والتوصيات من إعداد الدليل، مبنية على ترابط القصة وتقييم <bdi dir="ltr">TMDB</bdi> الظاهر بجانب كل عمل${g.sources?.length ? `. المصادر: ${g.sources.map(x => ext(x.name, x.url)).join('، ')}` : ''}.</p>`
+  : g.auto ? autoNote(g) : '<p class="note">الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط. لم يُراجَع يدوياً بعد.</p>';
+// عوالم أوسع يقع فيها العمل (لغير الترتيب المراجَع): كل واحد يضيف أعمالاً لم تظهر، مطويّاً، واثنان على الأكثر
+function widerHTML(f, g) { if (g.curated) return ''; const have = new Set(g.order.map(keyOfStep)); let out = '', n = 0;
+  for (const id of worldIds(keyOf(f))) { const w = D.worlds[id]; if ('w:' + id === g.key || n >= 2 || !w.order.some(x => !have.has(x))) continue; w.order.forEach(x => have.add(x)); n++;
+    out += `<details class="wider"><summary><b>${WKIND[w.kind]} أوسع</b><bdi dir="ltr">${esc(w.name)}</bdi><small>${nWorks(w.order.length)}</small></summary>${rowsHTML(f, w.order.map(stepOf), true)}${autoNote(worldGroup(id))}</details>`; }
+  return out; }
+// العمل نفسه في دليل DC أو Fate: رابط إلى بطاقته هناك
+const DOORS = { dc: 'DC', fate: 'Fate' };
+const xdoorHTML = gd => gd && DOORS[gd.door] ? `<a class="xdoor" href="../${gd.door}/#w=${encodeURIComponent(gd.id)}"><span><b>في دليل <bdi dir="ltr">${DOORS[gd.door]}</bdi> أيضاً</b><small>افتح بطاقته هناك، وترتيبه ضمن عالمه في الدليل</small></span></a>` : '';
+const aloneText = f => { const k = keyOf(f), live = D.wlive.get(k);
+  if (live === 'wait') return '<span class="wait">أبحث عن سلسلته وعالمه في <bdi dir="ltr">Wikidata</bdi>…</span>';
+  const both = live === 'done' || (D.wok && D.byId.has(k) && !D.byId.get(k).fresh), src = both ? '<bdi dir="ltr">TMDB</bdi> و<bdi dir="ltr">Wikidata</bdi>' : '<bdi dir="ltr">TMDB</bdi>';
+  return f.kind === 'tv' ? `مسلسل لا تجمعه سلسلة ولا عالم مشترك بأعمال أخرى في ${src}.` : `فيلم مستقل: لا أجزاء أخرى له ولا عالم مشترك في ${src}.`; };
+function orderHTML(f) { const g = groupOf(f), door = xdoorHTML(D.wworks[keyOf(f)]?.guide);
+  if (!g) return `<section class="sec"><h3>السلسلة وترتيب المشاهدة</h3>${door}<p>${aloneText(f)}</p></section>`;
+  return `<section class="sec"><h3>ترتيب المشاهدة: <bdi dir="ltr">${esc(g.name)}</bdi>${g.auto ? ` <span class="wk">${WKIND[g.kind]}</span>` : ''}</h3>${door}${g.note ? `<p>${ar(g.note)}</p>` : ''}${rowsHTML(f, g.order, g.auto)}${noteOf(g)}${widerHTML(f, g)}</section>`; }
+// أعمال مرتبطة: الأصل وما اقتُبس عنه واقتباسات أخرى للمصدر نفسه، والمصدر نفسه إن كان كتاباً أو لعبة. ما ظهر في الترتيب لا يتكرر هنا
+const relCard = r => { const s = stepOf(r.k), l = listedOf(s), o = infoOf(s);
+  return `<button class="part${l && st(l.id) === 'watched' ? ' watched' : ''}" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${l ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
+<span class="p">${poster(o.poster, '100px')}<span class="rl ${r.r}">${RELN[r.r]}</span></span><b>${esc(o.title || '')}</b><small>${[kindOf(s), o.year, r.r === 'sibling' && r.via ? `عن <bdi dir="ltr">${esc(r.via)}</bdi>` : '', l ? 'في قائمتك' : ''].filter(Boolean).join(' · ')}</small></button>`; };
+function relatedHTML(f) { const w = D.wworks[keyOf(f)]; if (!w) return '';
+  const shown = new Set((groupOf(f)?.order || []).map(keyOfStep)), rel = (w.rel || []).filter(r => !shown.has(r.k) && infoOf(stepOf(r.k)).title);
+  const src = (w.src || []).map(x => `<li>مقتبس عن ${SRCK[x.kind] || 'عمل'} ${x.wiki ? `<a href="${esc(x.wiki)}" target="_blank" rel="noopener">«<bdi dir="ltr">${esc(x.label)}</bdi>»</a>` : `«<bdi dir="ltr">${esc(x.label)}</bdi>»`}${x.year ? ` <bdi>(${x.year})</bdi>` : ''}</li>`).join('');
+  if (!rel.length && !src) return '';
+  return `<section class="sec"><h3>أعمال مرتبطة</h3>${src ? `<ul class="srcs">${src}</ul>` : ''}${rel.length ? `<div class="reel rels">${rel.map(relCard).join('')}</div>` : ''}
+<p class="note">العلاقات آلية من ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + (w.q || ''))}: الأصل الذي اقتُبس منه العمل، وما اقتُبس عنه من ريميك أو مسلسل، واقتباسات أخرى للمصدر نفسه.</p></section>`; }
+const worldHTML = f => orderHTML(f) + relatedHTML(f);
+// يعيد رسم قسم العالم في البطاقة المفتوحة (بعد وصول خريطة العوالم أو نتيجة البحث المباشر)
+const slotOf = { k: null, f: null };
+const refreshSlot = () => { const el = $('#wslot'); if (el && sheet.open && slotOf.f && el.dataset.k === slotOf.k) el.innerHTML = worldHTML(slotOf.f); };
+// عمل جديد أو بطاقة اطلاع: سلسلته وعالمه من Wikidata عبر الخادم، مرة واحدة لكل عمل. الفشل يُبقي ما لدينا (مجموعة TMDB أو «مستقل»)
+function liveWorlds(f) { const k = keyOf(f); if (!pass() || D.wlive.has(k)) return;
+  D.wlive.set(k, 'wait'); refreshSlot();
+  api({ action: 'worlds', tmdb: f.tmdb, kind: f.kind }, pass()).then(r => { mergeWorlds(r); D.wres.set(k, r); D.wlive.set(k, 'done'); keepPending(k); })
+    .catch(() => D.wlive.set(k, 'fail')).finally(() => { refreshSlot(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); }); }
+// عالم عمل مضاف يُحفظ مع إضافته المعلّقة، فيبقى ظاهراً حتى يصل البناء القادم
+function keepPending(k) { const r = D.wres.get(k); if (!r) return; try { const p = JSON.parse(localStorage.getItem(PEND) || '[]'), e = p.find(x => x?.film?.id === k); if (e && !e.worlds) { e.worlds = r; localStorage.setItem(PEND, JSON.stringify(p)); } } catch {} }
 function whereSec(f) { const p = f.prov, g = (t, ids) => ids.length ? `<div class="wgroup"><b>${t}</b><div class="wlist">${ids.map(id => `<a href="${esc(p.link || '#')}" target="_blank" rel="noopener">${D.prov[id]?.logo ? `<img alt="" src="${IMG}w92${D.prov[id].logo}">` : ''}${esc(D.prov[id]?.name || id)}</a>`).join('')}</div></div>` : '';
   const body = p ? g('باشتراك', p.stream) + g('مجاناً', p.free) + g('إيجار', p.rent) + g('شراء', p.buy) : '';
   return `<section class="sec"><h3>أين تشاهده في السعودية</h3>${body || `<p>${unreleased(f) ? 'لم يصدر بعد.' : 'غير متاح على منصات السعودية حالياً حسب بيانات <bdi dir="ltr">JustWatch</bdi>.'}</p>`}${body ? '<p class="note">الأزرار تفتح صفحة أماكن العرض على <bdi dir="ltr">TMDB</bdi>، ومنها إلى المنصة. البيانات من <bdi dir="ltr">JustWatch</bdi> وتتحدث يومياً.</p>' : ''}</section>`; }
@@ -167,7 +237,8 @@ function linksSec(f) { const ua = navigator.userAgent, ww = /android/i.test(ua) 
   return `<section class="sec"><h3>صفحته في المواقع</h3><div class="links">${f.imdb ? a(`https://www.imdb.com/title/${f.imdb}/`, 'IMDb', 'التقييم والطاقم') : ''}${f.kind === 'movie' ? a(`https://letterboxd.com/tmdb/${f.tmdb}`, 'Letterboxd', 'المراجعات والقوائم') : ''}${a(`https://www.themoviedb.org/${f.kind}/${f.tmdb}`, 'TMDB', 'مصدر البيانات')}
 <a href="${ww}" target="_blank" rel="noopener" data-act="ww" data-t="${esc(f.title)}"><b>WhattaWatch</b><small>يفتح التطبيق وينسخ اسم الفيلم للبحث</small></a></div></section>`; }
 // pv: بطاقة اطلاع لعمل ليس في القائمة (من TMDB مباشرة): معلوماته الكاملة، وبدل أزرار الحالة زر «أضفه إلى قائمتي»
-async function sheetHTML(f, pv = null) { const m = pv?.more || (await D.moreReady)?.[f.id] || {}, s = st(f.id), un = unreleased(f);
+async function sheetHTML(f, pv = null) { await Promise.race([D.worldsReady, new Promise(r => setTimeout(r, 2500))]);
+  const m = pv?.more || (await D.moreReady)?.[f.id] || {}, s = st(f.id), un = unreleased(f); slotOf.k = keyOf(f); slotOf.f = f;
   const ov = m.overviewAr ? `<p>${ar(m.overviewAr)}</p>${m.arSource === 'guide' ? '' : '<p class="note">نبذة <bdi dir="ltr">TMDB</bdi> العربية كما هي، لم نراجعها بعد.</p>'}` : m.overviewEn ? `<p dir="ltr" lang="en" style="text-align:left">${esc(m.overviewEn)}</p><p class="note">النبذة بالإنجليزية، والترجمة قيد الإعداد.</p>` : '<p>لا توجد نبذة.</p>';
   return `<div class="sh-hero">${f.backdrop ? `<img alt="" src="${IMG}w780${f.backdrop}" srcset="${IMG}w780${f.backdrop} 780w, ${IMG}w1280${f.backdrop} 1280w" sizes="(max-width:880px) 100vw, 880px">` : ''}</div>
 <div class="sh-head"><div class="poster">${poster(f.poster, '170px')}</div><div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
@@ -178,10 +249,10 @@ ${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data
   : `<div class="sh-acts"><button class="btn sec" data-act="set" data-v="watched" aria-pressed="${s === 'watched'}">${ic('check')}شاهدته</button><button class="btn sec nx" data-act="set" data-v="next" aria-pressed="${s === 'next'}">${ic('mark')}التالي في المشاهدة</button></div>`}
 ${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''}${f.src === 'added' ? '<section class="sec"><p class="ask">أُضيف بزر «أضف فيلماً»: معلوماته آلية من <bdi dir="ltr">TMDB</bdi> ولم تُراجَع يدوياً.</p></section>' : ''}
 <section class="sec"><h3>القصة</h3>${ov}</section>${un ? `<section class="sec"><h3>موعد الصدور</h3>${f.date ? `<div class="cd" data-until="${f.date}" aria-label="الوقت الباقي على الصدور">${cdHTML(f.date)}</div><p class="note">يصدر في <bdi>${new Date(f.date + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' })}</bdi> حسب <bdi dir="ltr">TMDB</bdi>، والموعد قابل للتغيير.</p>` : '<p>معلن، ولم يُحدَّد موعد صدوره بعد.</p>'}</section>` : ''}
-${whereSec(f)}${orderHTML(f)}
+${whereSec(f)}<div id="wslot" data-k="${keyOf(f)}">${worldHTML(f)}</div>
 ${(m.directors?.length || m.cast?.length) ? `<section class="sec"><h3>الطاقم</h3><p class="people">${m.directors?.length ? `<b>${f.kind === 'tv' ? 'صنّاع المسلسل' : 'الإخراج'}:</b> <bdi dir="ltr">${m.directors.map(esc).join(', ')}</bdi><br>` : ''}${m.cast?.length ? `<b>التمثيل:</b> <bdi dir="ltr">${m.cast.map(esc).join(', ')}</bdi>` : ''}</p></section>` : ''}
 ${linksSec(f)}`; }
-async function openFilm(id, push = true) { const f = D.byId.get(id); if (!f) return; openId = id; $('#sheet-body').innerHTML = await sheetHTML(f); $('#sheet-body').scrollTop = 0;
+async function openFilm(id, push = true) { const f = D.byId.get(id); if (!f) return; openId = id; $('#sheet-body').innerHTML = await sheetHTML(f); $('#sheet-body').scrollTop = 0; if (f.fresh && !D.wworks[id]?.q) liveWorlds(f);
   if (!sheet.open) { sheet.showModal(); if (!calm) sheet.animate(innerWidth <= 640 ? { transform: ['translateY(6%)', 'none'], opacity: [0, 1] } : { transform: ['scale(.97)', 'none'], opacity: [0, 1] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
     if (push) history.pushState({ film: id }, '', '#' + id); } else if (push) history.replaceState({ film: id }, '', '#' + id); }
 function closeFilm(fromPop) { if (!sheet.open) return; openId = null; const done = () => sheet.close();
@@ -220,7 +291,7 @@ $('#add-form').addEventListener('submit', async e => { e.preventDefault(); const
 async function addFilm(tmdb, kind, btn, label) { const msg = $('#add-msg'); btn.disabled = true; btn.textContent = 'يُضاف…';
   try { const r = await api({ action: 'add', tmdb, kind }, pass()); adopt(r, true);
     try { const p = JSON.parse(localStorage.getItem(PEND) || '[]'); p.push(r); localStorage.setItem(PEND, JSON.stringify(p)); } catch {}
-    if (addDlg.open) addDlg.close(); toast(`أُضيف «${r.film.title}»`); openFilm(r.film.id, !sheet.open);
+    keepPending(r.film.id); if (addDlg.open) addDlg.close(); toast(`أُضيف «${r.film.title}»`); openFilm(r.film.id, !sheet.open);
   } catch (err) { if (addDlg.open) msg.textContent = err.message; else toast(err.message); btn.disabled = false; btn.innerHTML = label; } }
 const addPick = btn => addFilm(+btn.dataset.tmdb, btn.dataset.kind, btn, 'أضفه');
 // بطاقة اطلاع: يجلب العمل كاملاً من TMDB عبر الخادم دون إضافته. تُحفظ في الذاكرة فلا يتكرر الطلب.
@@ -231,12 +302,14 @@ async function openPreview(tmdb, kind, btn) { const id = (kind === 'tv' ? 't' : 
   const label = btn?.innerHTML; if (btn) { btn.disabled = true; btn.textContent = 'يجهّز…'; }
   try { let r = previews.get(id); if (!r) { r = await api({ action: 'preview', tmdb, kind }, pass()); previews.set(id, r); }
     Object.assign(D.prov, r.providers || {}); if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) if (!D.part.has(p.tmdb)) D.part.set(p.tmdb, p); }
-    const [light, heavy] = split(r.film); openId = null; $('#sheet-body').innerHTML = await sheetHTML(light, { more: heavy }); $('#sheet-body').scrollTop = 0;
+    const [light, heavy] = split(r.film), k = keyOf(light); openId = null;
+    D.winfo[k] ||= { title: light.title, date: light.date, year: light.year, poster: light.poster, rating: light.rating, votes: light.votes, genres: light.genres, lang: light.lang, runtime: light.runtime };
+    $('#sheet-body').innerHTML = await sheetHTML(light, { more: heavy }); $('#sheet-body').scrollTop = 0; liveWorlds(light);
     if (!sheet.open) { sheet.showModal(); if (!calm) sheet.animate({ opacity: [0, 1], transform: [innerWidth <= 640 ? 'translateY(6%)' : 'scale(.97)', 'none'] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' }); history.pushState({ film: 'preview' }, '', location.pathname + location.search); }
   } catch (err) { if (addDlg.open) $('#add-msg').textContent = err.message; else toast(err.message); }
   finally { if (btn) { btn.disabled = false; btn.innerHTML = label; } } }
 // يُدخل فيلماً عاد من الخادم (أو محفوظاً بانتظار وصوله في البناء القادم) في القائمة المعروضة
-function adopt(r, draw) { if (!r?.film || D.byId.has(r.film.id)) return false; const [light, heavy] = split(r.film); light.fresh = true; light.ord = -Date.now(); Object.assign(D.prov, r.providers || {});
+function adopt(r, draw) { if (!r?.film || D.byId.has(r.film.id)) return false; const [light, heavy] = split(r.film); light.fresh = true; light.ord = -Date.now(); Object.assign(D.prov, r.providers || {}); if (r.worlds) { mergeWorlds(r.worlds); D.wlive.set(light.id, 'done'); }
   if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) D.part.set(p.tmdb, p); } register(light, heavy);
   if (draw) { $('#grid').insertAdjacentHTML('afterbegin', card(light)); $('#chips').innerHTML = chipsHTML(); apply(false); } return true; }
 
@@ -259,6 +332,7 @@ document.addEventListener('click', e => { const t = e.target.closest('[data-act]
   else if (act === 'preview') openPreview(+t.dataset.tmdb, t.dataset.kind, t);
   else if (act === 'preview-add') addFilm(+t.dataset.tmdb, t.dataset.kind, t, t.innerHTML);
   else if (act === 'cand-open') { addDlg.close(); openFilm(t.dataset.id); }
+  else if (act === 'more') { const ol = t.previousElementSibling, clip = ol.classList.toggle('clip'); t.setAttribute('aria-expanded', String(!clip)); t.textContent = clip ? `اعرض الترتيب كاملاً (${ol.children.length})` : 'اختصر الترتيب'; }
   else if (act === 'add-pick') addPick(t);
   else if (act === 'ww') { try { navigator.clipboard?.writeText(t.dataset.t).then(() => toast('نُسخ اسم الفيلم، الصقه في بحث التطبيق')); } catch {} } });
 document.addEventListener('change', e => { const s = e.target.closest('select[data-k]'); if (!s) return; ui[s.dataset.k] = s.value; s.classList.toggle('on', !!s.value || s.dataset.k === 'sort'); apply(s.dataset.k === 'sort'); });
@@ -272,6 +346,8 @@ try {
   for (const c of Object.values(cols)) for (const p of c.parts) D.part.set(p.tmdb, p);
   for (const [k, g] of Object.entries(D.fr)) for (const st of g.order) { const id = st.m ? 'm' + st.m : st.t ? 't' + st.t : null; if (id) { D.frOf.set(id, k); D.recOf.set(id, st.rec); } }
   D.moreReady = get('more.json').then(m => { D.more = { ...m, ...(D.more || {}) }; for (const f of D.films) delete f._h; return D.more; }).catch(() => (D.more ||= {}));
+  // خريطة العوالم بعد القائمة: لا تؤخر الرسم الأول. حين تصل يُعاد رسم ما يعتمد عليها
+  D.worldsReady = get('worlds.json').then(w => { mergeWorlds(w); D.wok = true; refreshSlot(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); if (ui.series || ui.q) apply(false); }).catch(() => {});
   // ما أُضيف بالزر ولم يصل البناء بعد يبقى ظاهراً من الحفظ المحلي، ويُحذف منه عند وصوله
   try { const pend = JSON.parse(localStorage.getItem(PEND) || '[]'), keep = pend.filter(r => r?.film && !D.byId.has(r.film.id)); D.more ||= {}; keep.forEach(r => adopt(r, false)); localStorage.setItem(PEND, JSON.stringify(keep)); } catch {}
   renderGrid(); reroll(true); liftVeil();

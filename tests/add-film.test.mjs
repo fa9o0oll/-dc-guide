@@ -1,7 +1,7 @@
 // يفحص دالة «أضف فيلماً» بلا شبكة: TMDB و GitHub مُحاكيان. node tests/add-film.test.mjs
 process.env.TMDB_API_KEY = 'k'.repeat(32); process.env.GH_TOKEN = 'test-token'; process.env.ADD_FILM_PASSWORD = 'open-sesame-42';
 const fails = [], check = (n, ok, d = '') => { console.log(`${ok ? '  ✓' : '  ✗'} ${n}${ok ? '' : ' — ' + JSON.stringify(d)}`); if (!ok) fails.push(n); };
-let stored = null, puts = [], conflictOnce = true;
+let stored = null, puts = [], conflictOnce = true, wdDown = false, wdAsked = 0;
 const res = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
   if (u.hostname === 'api.themoviedb.org') { const p = u.pathname.replace('/3', '');
@@ -10,8 +10,15 @@ globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
     if (p === '/movie/949') return res(200, { id: 949, title: 'Heat', original_title: 'Heat', release_date: '1995-12-15', runtime: 170, genres: [{ id: 80 }], vote_average: 7.9, vote_count: 7000, poster_path: '/h.jpg', imdb_id: 'tt0113277', status: 'Released', original_language: 'en',
       belongs_to_collection: { id: 77, name: 'Heat Collection' }, credits: { crew: [{ job: 'Director', name: 'Michael Mann' }], cast: [{ name: 'Al Pacino' }] }, 'watch/providers': { results: { SA: { link: 'https://tmdb/watch', flatrate: [{ provider_id: 8, provider_name: 'Netflix', logo_path: '/n.jpg' }] } } }, translations: { translations: [] } });
     if (p === '/movie/1') return res(200, { id: 1, title: 'The Heat' });
+    if (p === '/movie/950') return res(200, { id: 950, title: 'Heat 2', release_date: '', vote_count: 0, poster_path: '/h2.jpg', genres: [{ id: 80 }] });
     if (p === '/collection/77') return res(200, { id: 77, name: 'Heat Collection', parts: [{ id: 950, title: 'Heat 2', release_date: '' }, { id: 949, title: 'Heat', release_date: '1995-12-15', vote_count: 5, vote_average: 7.9 }] });
     return res(404, {}); }
+  // Wikidata: Heat يليه Heat 2 (المخرج نفسه، والعنوانان متشابهان، فهي تكملة)
+  if (u.hostname === 'query.wikidata.org') { wdAsked++; if (opt.headers['User-Agent']?.indexOf('dc-guide') !== 0) return res(403, {}); if (wdDown) return new Response('bad', { status: 400 });
+    const q = decodeURIComponent(opt.body.slice(6)), U = v => ({ type: 'uri', value: 'http://www.wikidata.org/entity/' + v }), L = v => ({ type: 'literal', value: String(v) }), B = b => res(200, { results: { bindings: b } });
+    if (q.includes('VALUES ?tid')) return B([{ tid: L(949), item: U('Q1'), prop: L('ITEM') }, { tid: L(949), item: U('Q1'), prop: L('P156'), o: U('Q2') }, { tid: L(949), item: U('Q1'), prop: L('DIR'), o: U('Q9') }]);
+    if (q.includes('(MIN(?d) AS ?date) (SAMPLE(?w) AS ?wiki)')) return B([...q.includes('wd:Q2') ? [{ o: U('Q2'), label: L('Heat 2'), tm: L(950), prev: L('Q1'), dir: L('Q9') }] : [], ...q.includes('wd:Q1 ') || q.includes('wd:Q1 }') ? [{ o: U('Q1'), label: L('Heat'), tm: L(949), next: L('Q2'), dir: L('Q9'), date: L('1995-12-15T00:00:00Z') }] : []]);
+    return B([]); }
   if (u.hostname === 'api.github.com') { if (opt.headers.Authorization !== 'Bearer test-token') return res(401, {});
     if (!opt.method) return stored ? res(200, { sha: 's' + puts.length, content: Buffer.from(stored).toString('base64') }) : res(404, {});
     if (conflictOnce) { conflictOnce = false; return res(409, {}); }
@@ -35,5 +42,10 @@ check('السلسلة مرتبة بالصدور والجزء بلا موعد آ�
 check('كُتب في المستودع بعد إعادة المحاولة عند التعارض', puts.length === 1 && JSON.parse(stored)[0].tmdb === 949 && puts[0].branch === 'main' && /films: add Heat \(1995\)/.test(puts[0].message), puts);
 const again = await call({ action: 'add', tmdb: 949, kind: 'movie', password: 'open-sesame-42' });
 check('إضافة الفيلم نفسه مرتين لا تكرره', again.body.state === 'exists' && puts.length === 1, again.body);
+const wl = await call({ action: 'worlds', tmdb: 949, kind: 'movie', password: 'open-sesame-42' });
+check('العالم: Heat ثم Heat 2 أعمالاً متتالية، بمعلومات الجزء الثاني من TMDB', wl.status === 200 && wl.body.key === 'm949' && wl.body.works.m949?.worlds?.[0] === 'c:m949' && wl.body.worlds['c:m949']?.order.join() === 'm949,m950' && wl.body.info.m950?.title === 'Heat 2' && wdAsked >= 2, wl.body);
+check('العالم يحتاج كلمة السر ولا يسأل Wikidata بدونها', await (async () => { const n = wdAsked, r = await call({ action: 'worlds', tmdb: 949, kind: 'movie', password: 'x' }); return r.status === 401 && wdAsked === n; })());
+wdDown = true; const wd = await call({ action: 'worlds', tmdb: 949, kind: 'movie', password: 'open-sesame-42' }); wdDown = false;
+check('تعطّل Wikidata يعيد خطأً واضحاً ولا يكتب شيئاً', wd.status === 502 && wd.body.error && puts.length === 1, wd);
 check('عمل غير موجود في TMDB برسالة واضحة', (await call({ action: 'add', tmdb: 123456, password: 'open-sesame-42' })).status === 422);
 console.log(fails.length ? `\n❌ فشل ${fails.length}` : '\n✅ كل الفحوص نجحت'); process.exit(fails.length ? 1 : 0);

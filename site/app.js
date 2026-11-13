@@ -54,6 +54,8 @@ async function boot() {
     $('#main').innerHTML = `<p class="empty">تعذّر تحميل البيانات. حدّث الصفحة، وإذا استمر الخطأ فالسبب: ${esc(e.message)}</p>`; return;
   }
   renderUnibar(); syncShield(); render(); liftVeil();
+  // رابط مباشر لعمل (#w=المعرّف)، تستعمله قائمة الأفلام للانتقال إلى بطاقته في هذا الدليل
+  { const w = new URLSearchParams(location.hash.slice(1)).get('w'); if (w && D.works.has(w)) { history.replaceState(null, '', location.pathname + location.search); openWork(w); } }
   // تغيير وصل من جهاز آخر وكُتب في السجل المحلي: نعيد قراءته ونرسم في المكان نفسه
   initSync(id => { if (id !== G.id) return; try { const raw = JSON.parse(localStorage.getItem(KEY)); if (raw?.v === 1) store = { ...blank(), ...raw }; } catch {}
     render(true); stats(); const tab = $('#seasonTabs .on'); if (tab) showSeason(tab.dataset.id, +tab.dataset.season); });

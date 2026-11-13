@@ -47,11 +47,24 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await fits('Fate ترتيب المشاهدة');
   await tap('.views [data-view=timeline]'); await page.waitForSelector('.tl .node'); await fits('Fate الخط الزمني');
   // قائمة الأفلام
-  let previewCalls = 0; const FL = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/films.json'))).films, inCol = FL.find(f => f.col && f.kind === 'movie' && f.prov);
+  let previewCalls = 0, worldsCalls = 0; const FL = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/films.json'))).films, inCol = FL.find(f => f.col && f.kind === 'movie' && f.prov);
+  // خريطة عوالم للاختبار: فيلم من القائمة بلا ترتيب مراجَع ولا مجموعة TMDB، في عالم صغير (مع أنمي خارج القائمة) وسلسلة أوسع طويلة، وله أصل ورواية ورابط في دليل DC
+  const FR = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/franchises.json'))), cur = new Set(Object.values(FR.items || {}).flatMap(g => g.order.map(x => x.m ? 'm' + x.m : x.t ? 't' + x.t : null)));
+  const solo = FL.find(f => f.kind === 'movie' && !f.col && !cur.has(f.id) && f.poster), big = Array.from({ length: 20 }, (_, i) => 'm' + (888000 + i)); big.splice(10, 0, solo.id);
+  const WORLDS = { worlds: { Q_T: { name: 'Test Universe', kind: 'universe', by: 'date', wd: 'Q_T', wiki: 'https://en.wikipedia.org/wiki/Test', order: ['m777001', solo.id, 't777002'], size: 3 },
+      Q_B: { name: 'Big Test Series', kind: 'series', by: 'ord', wd: 'Q_B', wiki: null, order: big, size: 21 } },
+    works: { [solo.id]: { q: 'Q_S', worlds: ['Q_T', 'Q_B'], rel: [{ k: 'm777003', r: 'original' }, { k: 'm777001', r: 'derived' }], src: [{ q: 'Q_N', label: 'Some Novel', kind: 'novel', year: 1950, wiki: 'https://en.wikipedia.org/wiki/Some_Novel' }], guide: { door: 'dc', id: 'the-dark-knight-rises-2012' } } },
+    info: { m777001: { title: 'Out Film', year: 1990, date: '1990-05-01', genres: [28] }, t777002: { title: 'Out Show', year: 2005, date: '2005-01-01', genres: [16], lang: 'ja', tv: true }, m777003: { title: 'Old Original', year: 1960, date: '1960-01-01', genres: [18] },
+      ...Object.fromEntries(big.filter(k => k !== solo.id).map((k, i) => [k, { title: 'Big Part ' + (i + 1), year: 1980 + i, date: `${1980 + i}-01-01` }])) } };
+  await page.route('**/films/data/worlds.json*', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(WORLDS) }));
   await page.route('**/api/add-film', async r => { const b = r.request().postDataJSON();
     if (b.password !== 'pw') return r.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"password"}' });
     if (b.action === 'search') return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ parsed: { title: 'Test Film', year: 1999 }, sure: true, candidates: [{ tmdb: 999001, kind: 'movie', title: 'Test Film', year: 1999, poster: null, collection: 'Test Saga' }, { tmdb: inCol.tmdb, kind: 'movie', title: inCol.title, year: inCol.year, poster: null }] }) });
-    previewCalls += b.action === 'preview';
+    previewCalls += b.action === 'preview'; worldsCalls += b.action === 'worlds';
+    // عالم الفيلم الجديد: سلسلة تضم مجموعته في TMDB وجزءاً ثالثاً بلا موعد، فتتقدم على المجموعة
+    if (b.action === 'worlds') return r.fulfill({ contentType: 'application/json', body: JSON.stringify(b.tmdb !== 999001 ? { key: 'm' + b.tmdb, worlds: {}, works: {}, info: {} } : { key: 'm999001',
+      worlds: { Q_SAGA: { name: 'Test Saga World', kind: 'series', by: 'ord', wd: 'Q_SAGA', wiki: null, order: ['m999001', 'm999002', 'm999004'], size: 3 } }, works: { m999001: { q: 'Q_TF', worlds: ['Q_SAGA'] } },
+      info: { m999002: { title: 'Test Film 2', year: 2003, date: '2003-01-01' }, m999004: { title: 'Test Film 4', year: null, date: null } } }) });
     return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ ...(b.action === 'add' ? { state: 'added' } : {}), providers: {}, collection: { id: 999, name: 'Test Saga', parts: [{ tmdb: 999001, title: 'Test Film', year: 1999 }, { tmdb: 999002, title: 'Test Film 2', year: 2003 }] },
       film: { id: 'm999001', tmdb: 999001, kind: 'movie', title: 'Test Film', year: 1999, date: '1999-01-01', genres: [18], rating: 7.1, votes: 10, poster: null, col: 999, prov: null, src: 'added', overviewEn: 'A test.', directors: ['Someone'] } }) }); });
   await page.goto(base + '/films/'); await page.waitForSelector('.tk'); await page.evaluate(() => { try { ['filmsg.progress', 'filmsg.pending', 'filmsg.pass'].forEach(k => localStorage.removeItem(k)); } catch {} }); await page.reload(); await page.waitForSelector('.tk');
@@ -68,6 +81,22 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await page.waitForTimeout(400); await page.evaluate(() => { location.hash = '#m218'; }); await page.waitForSelector('#sheet[open] .order .rc'); await page.waitForTimeout(300);
   check('الأفلام: سلسلة مراجَعة تعرض التوصيات والمسلسل المرتبط بتقييمه', await page.evaluate(() => { const o = document.querySelector('#sheet .order'), t = o.textContent; return o.querySelectorAll('.rc.watch').length >= 2 && o.querySelectorAll('.rc.skip').length >= 1 && t.includes('Sarah Connor') && t.includes('مسلسل') && /\d\.\d/.test(t) && document.querySelector('#sheet .order + .note').textContent.includes('توصيات'); }));
   await fits('الأفلام: نافذة سلسلة مراجَعة'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
+  // خريطة العوالم في بطاقة فيلم من القائمة
+  await page.waitForTimeout(300); await page.evaluate(id => { location.hash = '#' + id; }, solo.id); await page.waitForSelector('#sheet[open] #wslot .wk'); await page.waitForTimeout(300);
+  check('الأفلام: عالم آلي بنوعه وترتيبه والأنمي خارج القائمة موصوف', await page.evaluate(() => { const o = document.querySelector('#wslot .order'), rows = o.querySelectorAll(':scope > li');
+    return rows.length === 3 && o.querySelectorAll('li.here').length === 1 && document.querySelector('#wslot .wk').textContent === 'عالم مشترك' && rows[2].textContent.includes('أنمي') && rows[2].textContent.includes('خارج قائمتك'); }));
+  check('الأفلام: العالم الآلي يذكر أنه بلا مراجعة ويربط مصادره', await page.evaluate(() => { const n = document.querySelector('#wslot .order + .note'), h = [...n.querySelectorAll('a')].map(a => a.href);
+    return n.textContent.includes('لم يُراجَع يدوياً') && h.includes('https://www.wikidata.org/wiki/Q_T') && h.includes('https://en.wikipedia.org/wiki/Test') && !document.querySelector('#wslot .order .rc.watch'); }));
+  check('الأفلام: رابط بطاقته في دليل DC', (await page.getAttribute('#wslot .xdoor', 'href')) === '../dc/#w=the-dark-knight-rises-2012');
+  check('الأفلام: أعمال مرتبطة بالأصل والرواية، بلا تكرار ما في الترتيب', await page.evaluate(() => { const r = document.querySelectorAll('#wslot .rels .part'), s = document.querySelector('#wslot .srcs');
+    return r.length === 1 && r[0].textContent.includes('Old Original') && r[0].querySelector('.rl.original').textContent === 'الأصل' && s.textContent.includes('مقتبس عن رواية') && s.querySelector('a').href.includes('Some_Novel'); }));
+  await tap('#wslot .wider summary'); await page.waitForTimeout(250);
+  check('الأفلام: السلسلة الأوسع مطوية ومختصرة حول هذا العمل', await page.evaluate(() => { const w = document.querySelector('#wslot .wider'), o = w.querySelector('.order'), vis = [...o.children].filter(li => li.offsetHeight > 0);
+    return w.open && w.querySelector('summary').textContent.includes('سلسلة أوسع') && o.classList.contains('clip') && vis.length === 9 && vis.some(li => li.classList.contains('here')) && vis[0].dataset.n === '7'; }));
+  await fits('الأفلام: نافذة العالم الآلي'); await tap('#wslot .wider .more'); await page.waitForTimeout(200);
+  check('الأفلام: «اعرض الترتيب كاملاً» يعرض الأعمال كلها بأرقامها', await page.evaluate(() => { const o = document.querySelector('#wslot .wider .order'), vis = [...o.children].filter(li => li.offsetHeight > 0);
+    return vis.length === 21 && vis[20].dataset.n === '21' && document.querySelector('#wslot .wider .more').getAttribute('aria-expanded') === 'true'; }));
+  await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   await tap('[data-act=reset]'); await page.waitForTimeout(300);
   check('الأفلام: ما شاهدته يختفي من القائمة ويُذكر عدده', await page.evaluate(id => document.getElementById('f-' + id).hidden && document.querySelector('#count').textContent.includes('مخفي') && document.querySelector('#tally').textContent.includes('بقي'), inCol.id));
   await tap('[data-act=show-all]'); await page.waitForTimeout(250);
@@ -78,6 +107,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await page.evaluate(() => document.querySelector('#toast button').click()); await page.waitForTimeout(300);
   check('الأفلام: التراجع يعيدها', await page.evaluate(id => !document.getElementById('f-' + id).hidden && !JSON.parse(localStorage.getItem('filmsg.progress')).films[id], other.id));
   await tap('[data-v=series]'); await page.waitForSelector('.fr'); check('الأفلام: عرض السلاسل مرقّم', await page.locator('.fr').count() > 20 && (await page.textContent('.fr .part .n')).trim() === '1'); await fits('الأفلام: السلاسل');
+  check('الأفلام: العالم الآلي في عرض السلاسل بوصفه', await page.evaluate(() => [...document.querySelectorAll('.fr')].some(f => f.querySelector('h3').textContent === 'Test Universe' && f.querySelector('header span').textContent.includes('مرتّب آلياً'))));
   await tap('[data-v=grid]'); await tap('[data-act=add]'); await page.waitForSelector('#add[open]'); await page.fill('#add-q', 'test film 1999'); await page.fill('#add-pass', 'bad'); await tap('#add-form [type=submit]'); await page.waitForTimeout(300);
   check('الأفلام: كلمة سر خاطئة تُرفض برسالة', (await page.textContent('#add-msg')).includes('كلمة السر'));
   await page.fill('#add-pass', 'pw'); await tap('#add-form [type=submit]'); await page.waitForSelector('.cand'); check('الأفلام: الإضافة تعرض المرشح وسلسلته قبل الحفظ', (await page.textContent('.cand')).includes('Test Saga'));
@@ -89,16 +119,19 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await tap('[data-act=add]'); await page.waitForSelector('#add[open]'); await page.fill('#add-q', 'test film 1999'); await tap('#add-form [type=submit]'); await page.waitForSelector('.cand [data-act=preview]');
   await tap('.cand [data-act=preview]'); await page.waitForSelector('#sheet[open] [data-act=preview-add]'); await page.waitForTimeout(350);
   check('الأفلام: «التفاصيل» يفتح بطاقة كاملة من TMDB دون إضافة', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), t = b.textContent;
-    return t.includes('A test.') && t.includes('ليس في قائمتك') && b.querySelectorAll('.order li').length === 2 && b.querySelectorAll('.order li.here').length === 1 && !b.querySelector('[data-act=set]') && !document.getElementById('f-m999001'); }) && previewCalls === 1);
+    return t.includes('A test.') && t.includes('ليس في قائمتك') && b.querySelectorAll('.order li').length >= 2 && b.querySelectorAll('.order li.here').length === 1 && !b.querySelector('[data-act=set]') && !document.getElementById('f-m999001'); }) && previewCalls === 1);
+  await page.waitForSelector('#sheet[open] #wslot .wk');
+  check('الأفلام: بطاقة الاطلاع تجلب عالمه وتعرضه بدل مجموعة TMDB حين يضمها', await page.evaluate(() => { const rows = document.querySelectorAll('#wslot .order li');
+    return rows.length === 3 && rows[0].classList.contains('here') && rows[2].textContent.includes('Test Film 4') && rows[2].querySelector('.rc.soon') && document.querySelector('#wslot .wk').textContent === 'سلسلة'; }) && worldsCalls === 1);
   await fits('الأفلام: بطاقة الاطلاع'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
   check('الأفلام: إغلاق بطاقة الاطلاع يعيدك إلى نتائج البحث', await page.evaluate(() => document.querySelector('#add').open && document.querySelectorAll('.cand').length === 2));
-  await tap('.cand [data-act=preview]'); await page.waitForSelector('#sheet[open] [data-act=preview-add]'); check('الأفلام: بطاقة الاطلاع تُحفظ ولا يتكرر طلبها', previewCalls === 1);
+  await tap('.cand [data-act=preview]'); await page.waitForSelector('#sheet[open] [data-act=preview-add]'); check('الأفلام: بطاقة الاطلاع تُحفظ ولا يتكرر طلبها ولا طلب عالمها', previewCalls === 1 && worldsCalls === 1);
   await tap('#sheet [data-act=preview-add]'); await page.waitForSelector('#f-m999001'); await page.waitForSelector('#sheet[open] .sh-acts [data-act=set]');
   check('الأفلام: «أضفه إلى قائمتي» يضيفه ويحوّل البطاقة إلى بطاقته في القائمة', !(await page.evaluate(() => document.querySelector('#add').open)) && (await page.textContent('#sheet-body')).includes('لم تُراجَع يدوياً'));
   await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
   check('الأفلام: المضاف يظهر فوراً بعلامة «جديد»', (await page.textContent('#f-m999001 .tag')).includes('جديد') && await page.locator('.tk').count() === FL.length + 1);
   await page.reload(); await page.waitForSelector('.tk'); check('الأفلام: المضاف يبقى بعد التحديث وكلمة السر لا تُطلب ثانية', await page.locator('#f-m999001').count() === 1 && await page.evaluate(() => localStorage.getItem('filmsg.pass') === 'pw'));
-  await tap('#f-m999001 .poster'); await page.waitForSelector('#sheet[open] .order'); check('الأفلام: نافذة المضاف تعرض سلسلته وتنبيه عدم المراجعة', await page.locator('#sheet .order li').count() === 2 && (await page.textContent('#sheet-body')).includes('لم تُراجَع يدوياً'));
+  await tap('#f-m999001 .poster'); await page.waitForSelector('#sheet[open] .order'); check('الأفلام: نافذة المضاف تعرض عالمه المحفوظ معه وتنبيه عدم المراجعة دون طلب جديد', await page.locator('#sheet .order li').count() === 3 && (await page.textContent('#sheet-body')).includes('لم تُراجَع يدوياً') && worldsCalls === 1);
   await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3).join(' | '));
   await ctx.close();

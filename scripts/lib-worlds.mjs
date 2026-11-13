@@ -135,7 +135,7 @@ const groupKind = names => { const s = names.join(' ').toLowerCase();
 // نوع المصدر غير المرئي (كتاب، مانغا، لعبة…) من أسماء أنواعه بالإنجليزية. ما لا يُعرف يُهمَل (حدث، شخص، ظاهرة).
 export const SOURCE_KIND = [[/manga|manhwa|light novel|webtoon/, 'manga'], [/comic|graphic novel|comics/, 'comic'], [/video game|game series|videogame/, 'game'],
   [/tabletop|role-playing game|board game|card game|toy line|toy/, 'toy'], [/musical/, 'musical'], [/\bplay\b|stage|opera|drama work/, 'play'],
-  [/fairy tale|folk tale|folktale|legend|myth|epic poem|poem/, 'tale'], [/short story|novella/, 'story'], [/novel|book|literary work|written work|novel series|book series|memoir|biography/, 'book'],
+  [/fairy tale|folk tale|folktale|legend|myth|epic poem|poem/, 'tale'], [/short story|novella/, 'story'], [/\bnovel\b|novel series/, 'novel'], [/book|literary work|written work|book series|memoir|biography/, 'book'],
   [/article|essay|newspaper|magazine/, 'article'], [/song|album|single/, 'song'], [/television series|tv series|miniseries|television program/, 'tvshow'], [/film/, 'film']];
 const sourceKind = names => { const s = names.join(' ').toLowerCase(); for (const [re, k] of SOURCE_KIND) if (re.test(s)) return k; return null; };
 const ADULT = /\bxxx\b|porn|parody/i;
@@ -143,6 +143,11 @@ const ADULT = /\bxxx\b|porn|parody/i;
 const CATALOG = /feature films?\b|\bfilms$|\bstudios?\b|greatest|best films|top \d+/i;
 const norm = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').replace(/\b(the|a|an)\b/g, ' ').trim();
 const firstWord = s => norm(s).split(' ').find(w => w.length > 2 && !/^\d+$/.test(w)) || '';
+// تشابه العنوانين: كلمة مميزة مشتركة (Boyka: Undisputed IV ← Undisputed III) أو جذر مشترك (Twister ← Twisters، Freaky ← Freakier)
+const STOP = new Set(['part', 'chapter', 'movie', 'film', 'volume', 'story', 'saga', 'with', 'from', 'into', 'this', 'that', 'return', 'returns', 'rise']);
+const words = s => norm(s).split(' ').filter(w => w.length > 3 && !STOP.has(w) && !/^\d+$/.test(w) && !/^[ivx]+$/.test(w));
+const kin = (a, b) => { let i = 0; while (i < a.length && a[i] === b[i]) i++; return a === b || (i >= 5 && i >= Math.min(a.length, b.length) * 0.75); };
+const similar = (a, b) => { const fa = firstWord(a); if (fa && fa === firstWord(b)) return true; const B = words(b); return words(a).some(x => B.some(y => kin(x, y))); };
 
 // ---------- التجميع ----------
 // يبني الخريطة من نتائج الجلب. نقي بلا شبكة، فيُختبر بمدخلات ثابتة.
@@ -156,6 +161,8 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
   for (const r of mem) bind(r.m, r.tm ? 'm' + r.tm : r.tt ? 't' + r.tt : null);
   for (const r of adapt) bind(r.x, r.tm ? 'm' + r.tm : r.tt ? 't' + r.tt : null);
   const bad = k => { const b = basic[k]; return !!(b && (b.adult || ADULT.test(b.title || ''))); };
+  // يُعرض ما نعرف اسمه من TMDB، والأعمال المطلوبة نفسها. رقم محذوف أو خاطئ في Wikidata لا يظهر عملاً بلا اسم.
+  const fs = new Set(focus), shown = k => fs.has(k) || !!basic[k]?.title, fine = k => shown(k) && !bad(k);
   const dateOf = (k, wd) => basic[k]?.date || wd || null;
   const typeList = q => (info[q]?.types || []).map(t => typeNames[t] || t);
 
@@ -183,18 +190,18 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
     groupOk.set(g, { kind: groupKind(names), size }); }
 
   // ترتيب أعضاء مجموعة: برقمها في السلسلة إن غطّى معظمها، وإلا بتاريخ الصدور. ما لا تاريخ له آخراً.
-  const orderOf = g => { const ms = [...G.get(g).values()].filter(m => !bad(m.k)), withOrd = ms.filter(m => m.ord != null).length;
-    const d = m => dateOf(m.k, m.date) || '9999';
-    return ms.sort(withOrd >= ms.length * 0.7 ? (a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9) || d(a).localeCompare(d(b)) : (a, b) => d(a).localeCompare(d(b)) || (a.k > b.k ? 1 : -1)).map(m => m.k); };
+  const byOrd = g => { const ms = [...G.get(g).values()].filter(m => fine(m.k)); return ms.filter(m => m.ord != null).length >= ms.length * 0.7; };
+  const orderOf = g => { const ms = [...G.get(g).values()].filter(m => fine(m.k)), d = m => dateOf(m.k, m.date) || '9999';
+    return ms.sort(byOrd(g) ? (a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9) || d(a).localeCompare(d(b)) : (a, b) => d(a).localeCompare(d(b)) || (a.k > b.k ? 1 : -1)).map(m => m.k); };
   const worlds = {}, works = {};
   const addWorld = (id, w) => (worlds[id] ||= w);
 
   // أعمال يلي بعضها بعضاً دون مجموعة: نقبل الرابط إن كان متبادلاً، أو تشابه العنوانان، أو اختلف المخرجان.
   // (بعض صفحات Wikidata تستعمل «يليه» لفيلم المخرج التالي، وهذا ليس تكملة.)
-  const followOk = (aK, aQ, bQ) => { const bK = keyOfQ.get(bQ); if (!bK || bad(bK)) return false;
+  const followOk = (aK, aQ, bQ) => { const bK = keyOfQ.get(bQ); if (!bK || !fine(bK)) return false;
     const a = info[aQ] || { prev: W.get(aK)?.prev || [], next: W.get(aK)?.next || [], dir: W.get(aK)?.dir || [] }, b = info[bQ] || {};
     const back = (b.prev || []).includes(aQ) || (b.next || []).includes(aQ);
-    const ta = basic[aK]?.title || info[aQ]?.label, tb = basic[bK]?.title || info[bQ]?.label, same = firstWord(ta) && firstWord(ta) === firstWord(tb);
+    const ta = basic[aK]?.title || info[aQ]?.label, tb = basic[bK]?.title || info[bQ]?.label, same = similar(ta, tb);
     const da = uniq([...(W.get(aK)?.dir || []), ...(a.dir || [])]), db = b.dir || [], diffDir = da.length && db.length && !da.some(x => db.includes(x));
     const ok = same || diffDir || (back && !(da.length && db.length && da.some(x => db.includes(x))));
     if (!ok) report.rejectedFollows.push({ from: aK, to: bK, a: ta, b: tb }); return ok; };
@@ -202,13 +209,17 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
   for (const k of focus) { const w = W.get(k); if (!w) continue;
     const mine = uniq([...w.groups.map(x => x.g), ...[...G.keys()].filter(g => G.get(g).has(k))]).filter(g => groupOk.has(g) && G.get(g).has(k));
     // الأخصّ أولاً: سلسلة قبل عالم قبل امتياز، والأصغر قبل الأكبر. مجموعة تطابق أعضاؤها أخرى أصغر منها تُحذف.
-    const rank = { series: 0, universe: 1, franchise: 2 };
-    mine.sort((a, b) => groupOk.get(a).size - groupOk.get(b).size || rank[groupOk.get(a).kind] - rank[groupOk.get(b).kind]);
-    const chosen = [], sets = [];
-    for (const g of mine) { const o = orderOf(g), set = new Set(o);
-      if (sets.some(s => s.size === set.size && [...s].every(x => set.has(x)))) continue;
-      sets.push(set); chosen.push(g); if (chosen.length >= 3) break;
-      addWorld(g, { name: info[g]?.label || g, kind: groupOk.get(g).kind, wd: g, wiki: info[g]?.wiki || null, order: o, size: o.length }); }
+    // وعالم أو امتياز أصغر من مجموعة أخرى تضمه وسمٌ ناقص في Wikidata (مثل «امتياز جيمس بوند» بأربعة أفلام فقط من خمسة وعشرين)، فلا يُعرض.
+    const rank = { series: 0, universe: 1, franchise: 2 }, ord = new Map(mine.map(g => [g, orderOf(g)])), sets = new Map(mine.map(g => [g, new Set(ord.get(g))]));
+    const inside = (a, b) => a.size < b.size && [...a].every(x => b.has(x));
+    mine.sort((a, b) => sets.get(a).size - sets.get(b).size || rank[groupOk.get(a).kind] - rank[groupOk.get(b).kind]);
+    const chosen = [];
+    for (const g of mine) { const o = ord.get(g), set = sets.get(g);
+      if (o.length < 2 || chosen.some(c => sets.get(c).size === set.size && [...set].every(x => sets.get(c).has(x)))) continue;
+      if (groupOk.get(g).kind !== 'series' && mine.some(h => h !== g && inside(set, sets.get(h)))) continue;
+      chosen.push(g);
+      addWorld(g, { name: info[g]?.label || g, kind: groupOk.get(g).kind, by: byOrd(g) ? 'ord' : 'date', wd: g, wiki: info[g]?.wiki || null, order: o, size: o.length });
+      if (chosen.length >= 3) break; }
     const entry = { q: w.q, worlds: chosen };
     // سلسلة متتالية بلا مجموعة
     if (!chosen.length) { const chain = new Set([k]), todo = [[k, w.q]];
@@ -217,17 +228,17 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
           if (nk && !chain.has(nk) && chain.size < 30 && followOk(ck, cq, nq)) { chain.add(nk); todo.push([nk, nq]); } } }
       if (chain.size > 1) { const o = [...chain].sort((a, b) => (dateOf(a, info[qOfKey.get(a)]?.date) || '9999').localeCompare(dateOf(b, info[qOfKey.get(b)]?.date) || '9999'));
         const id = 'c:' + o[0]; report.chains++;
-        addWorld(id, { name: basic[o[0]]?.title || info[qOfKey.get(o[0])]?.label || o[0], kind: 'chain', wd: qOfKey.get(o[0]) || null, wiki: info[qOfKey.get(o[0])]?.wiki || null, order: o, size: o.length });
+        addWorld(id, { name: basic[o[0]]?.title || info[qOfKey.get(o[0])]?.label || o[0], kind: 'chain', by: 'date', wd: qOfKey.get(o[0]) || null, wiki: info[qOfKey.get(o[0])]?.wiki || null, order: o, size: o.length });
         entry.worlds = [id]; } }
     // أعمال مرتبطة: الأصل، وما اقتُبس عنه، واقتباسات أخرى للمصدر نفسه، والمصدر نفسه إن لم يكن له رقم في TMDB
-    const relx = [], src = [], seen = new Set([k]);
-    for (const q of uniq(w.based)) { const t = keyOfQ.get(q);
-      if (t) { if (!seen.has(t) && !bad(t)) { seen.add(t); relx.push({ k: t, r: 'original' }); } continue; }
+    // الأقوى أولاً: ما اقتُبس منه العمل مباشرة، ثم ما اقتُبس عنه (ريميك فيلم 1998 لـ Psycho مقتبس عنه، وليس مجرد اقتباس آخر للرواية)، ثم اقتباسات المصدر الأخرى
+    const relx = [], src = [], seen = new Set([k]), add = (t, r, via) => { if (t && !seen.has(t) && fine(t)) { seen.add(t); relx.push(via ? { k: t, r, via } : { k: t, r }); } };
+    for (const q of uniq(w.based)) add(keyOfQ.get(q), 'original');
+    for (const q of uniq(w.derived)) add(keyOfQ.get(q), 'derived');
+    for (const q of uniq(w.based)) { if (keyOfQ.get(q)) continue;
       const kind = sourceKind(typeList(q)); if (!kind || !info[q]?.label) continue;
       src.push(JSON.parse(JSON.stringify({ q, label: info[q].label, kind, year: info[q].date ? +info[q].date.slice(0, 4) : undefined, wiki: info[q].wiki || undefined })));
-      const sibs = adapt.filter(a => a.s === q);
-      if (sibs.length <= maxSiblings) for (const a of sibs) { const t = keyOfQ.get(a.x); if (t && !seen.has(t) && !bad(t)) { seen.add(t); relx.push({ k: t, r: 'sibling', via: info[q].label }); } } }
-    for (const q of uniq(w.derived)) { const t = keyOfQ.get(q); if (t && !seen.has(t) && !bad(t)) { seen.add(t); relx.push({ k: t, r: 'derived' }); } }
+      const sibs = adapt.filter(a => a.s === q); if (sibs.length <= maxSiblings) for (const a of sibs) add(keyOfQ.get(a.x), 'sibling', info[q].label); }
     const order = { original: 0, derived: 1, sibling: 2 }, votes = x => basic[x.k]?.votes || 0;
     relx.sort((a, b) => order[a.r] - order[b.r] || votes(b) - votes(a));
     if (relx.length) entry.rel = relx.slice(0, 10); if (src.length) entry.src = src.slice(0, 3);
@@ -235,7 +246,7 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
 
   // معلومات الأعمال المذكورة (للصورة والتاريخ)، من TMDB
   const used = new Set(); for (const w of Object.values(worlds)) w.order.forEach(k => used.add(k)); for (const w of Object.values(works)) (w.rel || []).forEach(r => used.add(r.k));
-  const fs = new Set(focus), outInfo = {}; for (const k of used) if (basic[k] && !fs.has(k)) { const { adult, ...b } = basic[k]; outInfo[k] = b; }
+  const outInfo = {}; for (const k of used) if (basic[k] && !fs.has(k)) { const { adult, ...b } = basic[k]; outInfo[k] = b; }
   return { worlds, works, info: outInfo, report };
 }
 
@@ -255,11 +266,14 @@ export function neededKeys({ focus, rel, info, mem, adapt = [], typeNames = {}, 
 }
 
 // يجلب كل ما يلزم لمجموعة أعمال ويجمّعه. tmdb = دالة طلب TMDB، وbasicCache قاموس اختياري للأعمال المجلوبة سابقاً.
-export async function worldsFor(focus, { tmdb, basicCache = {}, known = {}, opt, concurrency = 8, onStage = () => {} } = {}) {
+// keepRaw: يعيد مدخلات التجميع الخام أيضاً (للتدقيق وإعادة التجميع بلا شبكة)
+export async function worldsFor(focus, { tmdb, basicCache = {}, known = {}, opt, concurrency = 8, keepRaw = false, onStage = () => {} } = {}) {
   const rel = await relations(focus, opt); onStage('relations', rel.length);
   const groupIds = new Set(), others = new Set();
   for (const r of rel) { if (['P179', 'P1434', 'P8345'].includes(r.prop)) groupIds.add(r.o); else if (r.prop !== 'ITEM' && r.prop !== 'DIR') others.add(r.o); }
-  const info = await nodes([...groupIds, ...others], opt); onStage('nodes', Object.keys(info).length);
+  // والأعمال المطلوبة نفسها: اسمها ومخرجوها وما قبلها وما بعدها (تحتاجها السلاسل المتتالية حين لا يُعرف العمل من القائمة، كما في الدالة)
+  const own = uniq(rel.filter(r => r.prop === 'ITEM').map(r => r.item));
+  const info = await nodes([...groupIds, ...others, ...own], opt); onStage('nodes', Object.keys(info).length);
   // جيران الجيران (ما قبل وما بعد) لمعرفة السلاسل المتتالية خارج القائمة
   const second = uniq(Object.values(info).flatMap(n => [...n.prev, ...n.next])).filter(q => !info[q]);
   if (second.length) Object.assign(info, await nodes(second, opt));
@@ -274,5 +288,5 @@ export async function worldsFor(focus, { tmdb, basicCache = {}, known = {}, opt,
     if (basicCache[k]) return void (basic[k] = basicCache[k]);
     try { basic[k] = await tmdbBasic(tmdb, k); fetched++; } catch {} }));
   onStage('tmdb', fetched);
-  return { ...assemble({ focus, rel, info, mem, adapt, typeNames, basic }), basic };
+  return { ...assemble({ focus, rel, info, mem, adapt, typeNames, basic }), basic, ...(keepRaw ? { raw: { rel, info, mem, adapt, typeNames } } : {}) };
 }
