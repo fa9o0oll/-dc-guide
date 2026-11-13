@@ -57,6 +57,10 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     info: { m777001: { title: 'Out Film', year: 1990, date: '1990-05-01', genres: [28] }, t777002: { title: 'Out Show', year: 2005, date: '2005-01-01', genres: [16], lang: 'ja', tv: true }, m777003: { title: 'Old Original', year: 1960, date: '1960-01-01', genres: [18] },
       ...Object.fromEntries(big.filter(k => k !== solo.id).map((k, i) => [k, { title: 'Big Part ' + (i + 1), year: 1980 + i, date: `${1980 + i}-01-01` }])) } };
   await page.route('**/films/data/worlds.json*', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(WORLDS) }));
+  // سلسلة مراجَعة بترتيب أحداثها: Prey (1719) أولاً، والصدور يصح أيضاً
+  const PRED = [766507, 106, 169, 34851, 346910, 1242898];
+  await page.route('**/films/data/franchises.json*', async r => { const res = await r.fetch(), j = await res.json(), p = j.items.predator;
+    p.order = [...PRED.map(m => p.order.find(x => x.m === m)), ...p.order.filter(x => !PRED.includes(x.m))]; p.view = 'either'; return r.fulfill({ response: res, json: j }); });
   await page.route('**/api/add-film', async r => { const b = r.request().postDataJSON();
     if (b.password !== 'pw') return r.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"password"}' });
     if (b.action === 'search') return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ parsed: { title: 'Test Film', year: 1999 }, sure: true, candidates: [{ tmdb: 999001, kind: 'movie', title: 'Test Film', year: 1999, poster: null, collection: 'Test Saga' }, { tmdb: inCol.tmdb, kind: 'movie', title: inCol.title, year: inCol.year, poster: null }] }) });
@@ -70,22 +74,33 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await page.goto(base + '/films/'); await page.waitForSelector('.tk'); await page.evaluate(() => { try { ['filmsg.progress', 'filmsg.pending', 'filmsg.pass'].forEach(k => localStorage.removeItem(k)); } catch {} }); await page.reload(); await page.waitForSelector('.tk');
   check(`الأفلام: ${FL.length} تذكرة والعنوان صحيح`, await page.locator('.tk').count() === FL.length && await page.title() === 'قائمة أفلامي' && await page.getAttribute('.top .home', 'href') === '../');
   await fits('الأفلام: الشبكة');
+  check('الأفلام: أجزاء السلسلة متجاورة في «ترتيب قائمتي» بترتيب أحداثها مهما كان ترتيب إضافتها', await page.evaluate(ids => { const all = [...document.querySelectorAll('#grid .tk')].map(e => e.id), at = ids.map(m => all.indexOf('f-m' + m));
+    return at.every((x, i) => x >= 0 && (i === 0 || x === at[i - 1] + 1)); }, PRED));
+  check('الأفلام: تذكرة الجزء الذي تبدأ به الأحداث موسومة «بداية الأحداث»، وغيره بموضعه', (await page.textContent('#f-m766507 .tag')) === 'بداية الأحداث' && /^\d+\/\d+$/.test((await page.textContent('#f-m106 .tag')).trim()));
   await page.fill('#q', inCol.title.toLowerCase()); await page.waitForTimeout(350);
   const vis = await page.locator('.tk:not([hidden])').count(); check('الأفلام: البحث يصفّي ويعرض العدد', vis >= 1 && vis < FL.length && (await page.textContent('#count')).includes(String(vis)));
   await tap(`#f-${inCol.id} .seen`); check('الأفلام: «شاهدته» يُحفظ ويُختم', await page.evaluate(id => JSON.parse(localStorage.getItem('filmsg.progress')).films[id] === 'watched' && document.getElementById('f-' + id).classList.contains('watched'), inCol.id));
   await tap(`#f-${inCol.id} .poster`); await page.waitForSelector('#sheet[open] .sh-head'); await page.waitForTimeout(350);
   check('الأفلام: النافذة فيها أين يُعرض وترتيب السلسلة والروابط', await page.evaluate(([t, imdb]) => { const h = [...document.querySelectorAll('#sheet .links a')].map(a => a.href), o = document.querySelectorAll('#sheet .order li');
-    return o.length >= 2 && document.querySelectorAll('#sheet .order li.here').length === 1 && h.includes(`https://letterboxd.com/tmdb/${t}`) && h.includes(`https://www.imdb.com/title/${imdb}/`) && h.some(x => /whattawatch/.test(x)) && document.querySelectorAll('#sheet .wgroup').length >= 1; }, [inCol.tmdb, inCol.imdb]));
+    return o.length >= 2 && [...document.querySelectorAll('#sheet .order li.here')].filter(li => li.offsetParent).length === 1 && h.includes(`https://letterboxd.com/tmdb/${t}`) && h.includes(`https://www.imdb.com/title/${imdb}/`) && h.some(x => /whattawatch/.test(x)) && document.querySelectorAll('#sheet .wgroup').length >= 1; }, [inCol.tmdb, inCol.imdb]));
   check('الأفلام: رابط الفيلم في العنوان', (await page.evaluate(() => location.hash)) === '#' + inCol.id);
   await fits('الأفلام: النافذة'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   await page.waitForTimeout(400); await page.evaluate(() => { location.hash = '#m218'; }); await page.waitForSelector('#sheet[open] .order .rc'); await page.waitForTimeout(300);
-  check('الأفلام: سلسلة مراجَعة تعرض التوصيات والمسلسل المرتبط بتقييمه', await page.evaluate(() => { const o = document.querySelector('#sheet .order'), t = o.textContent; return o.querySelectorAll('.rc.watch').length >= 2 && o.querySelectorAll('.rc.skip').length >= 1 && t.includes('Sarah Connor') && t.includes('مسلسل') && /\d\.\d/.test(t) && document.querySelector('#sheet .order + .note').textContent.includes('توصيات'); }));
+  check('الأفلام: سلسلة مراجَعة تعرض التوصيات والمسلسل المرتبط بتقييمه', await page.evaluate(() => { const o = document.querySelector('#sheet .order'), t = o.textContent; return o.querySelectorAll('.rc.watch').length >= 2 && o.querySelectorAll('.rc.skip').length >= 1 && t.includes('Sarah Connor') && t.includes('مسلسل') && /\d\.\d/.test(t) && document.querySelector('#wslot .sec > .note').textContent.includes('توصيات'); }));
   await fits('الأفلام: نافذة سلسلة مراجَعة'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
+  // ترتيب الأحداث وترتيب الصدور في البطاقة
+  await page.waitForTimeout(300); await page.evaluate(() => { location.hash = '#m106'; }); await page.waitForSelector('#sheet[open] .ordv'); await page.waitForTimeout(250);
+  check('الأفلام: ترتيب الأحداث أولاً مع تبديل إلى ترتيب الصدور', await page.evaluate(() => { const vis = [...document.querySelectorAll('#wslot [data-ov]')].filter(d => !d.hidden);
+    return vis.length === 1 && vis[0].dataset.ov === 'chrono' && vis[0].querySelector('li .t b').textContent === 'Prey' && document.querySelector('[data-act=ordv][aria-pressed=true]').dataset.v === 'chrono'; }));
+  await tap('#wslot [data-act=ordv][data-v=release]'); await page.waitForTimeout(150);
+  check('الأفلام: ترتيب الصدور يبدأ بالأصل، والاختيار يبقى للبطاقة التالية', await page.evaluate(() => { const vis = [...document.querySelectorAll('#wslot [data-ov]')].filter(d => !d.hidden);
+    return vis.length === 1 && vis[0].dataset.ov === 'release' && vis[0].querySelector('li .t b').textContent === 'Predator'; }));
+  await fits('الأفلام: تبديل الترتيب'); await tap('#wslot [data-act=ordv][data-v=chrono]'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   // خريطة العوالم في بطاقة فيلم من القائمة
   await page.waitForTimeout(300); await page.evaluate(id => { location.hash = '#' + id; }, solo.id); await page.waitForSelector('#sheet[open] #wslot .wk'); await page.waitForTimeout(300);
   check('الأفلام: عالم آلي بنوعه وترتيبه والأنمي خارج القائمة موصوف', await page.evaluate(() => { const o = document.querySelector('#wslot .order'), rows = o.querySelectorAll(':scope > li');
     return rows.length === 3 && o.querySelectorAll('li.here').length === 1 && document.querySelector('#wslot .wk').textContent === 'عالم مشترك' && rows[2].textContent.includes('أنمي') && rows[2].textContent.includes('خارج قائمتك'); }));
-  check('الأفلام: العالم الآلي يذكر أنه بلا مراجعة ويربط مصادره', await page.evaluate(() => { const n = document.querySelector('#wslot .order + .note'), h = [...n.querySelectorAll('a')].map(a => a.href);
+  check('الأفلام: العالم الآلي يذكر أنه بلا مراجعة ويربط مصادره', await page.evaluate(() => { const n = document.querySelector('#wslot .sec > .note'), h = [...n.querySelectorAll('a')].map(a => a.href);
     return n.textContent.includes('لم يُراجَع يدوياً') && h.includes('https://www.wikidata.org/wiki/Q_T') && h.includes('https://en.wikipedia.org/wiki/Test') && !document.querySelector('#wslot .order .rc.watch'); }));
   check('الأفلام: رابط بطاقته في دليل DC', (await page.getAttribute('#wslot .xdoor', 'href')) === '../dc/#w=the-dark-knight-rises-2012');
   check('الأفلام: أعمال مرتبطة بالأصل والرواية، بلا تكرار ما في الترتيب', await page.evaluate(() => { const r = document.querySelectorAll('#wslot .rels .part'), s = document.querySelector('#wslot .srcs');
@@ -119,7 +134,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await tap('[data-act=add]'); await page.waitForSelector('#add[open]'); await page.fill('#add-q', 'test film 1999'); await tap('#add-form [type=submit]'); await page.waitForSelector('.cand [data-act=preview]');
   await tap('.cand [data-act=preview]'); await page.waitForSelector('#sheet[open] [data-act=preview-add]'); await page.waitForTimeout(350);
   check('الأفلام: «التفاصيل» يفتح بطاقة كاملة من TMDB دون إضافة', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), t = b.textContent;
-    return t.includes('A test.') && t.includes('ليس في قائمتك') && b.querySelectorAll('.order li').length >= 2 && b.querySelectorAll('.order li.here').length === 1 && !b.querySelector('[data-act=set]') && !document.getElementById('f-m999001'); }) && previewCalls === 1);
+    return t.includes('A test.') && t.includes('ليس في قائمتك') && b.querySelectorAll('.order li').length >= 2 && [...b.querySelectorAll('.order li.here')].filter(li => li.offsetParent).length === 1 && !b.querySelector('[data-act=set]') && !document.getElementById('f-m999001'); }) && previewCalls === 1);
   await page.waitForSelector('#sheet[open] #wslot .wk');
   check('الأفلام: بطاقة الاطلاع تجلب عالمه وتعرضه بدل مجموعة TMDB حين يضمها', await page.evaluate(() => { const rows = document.querySelectorAll('#wslot .order li');
     return rows.length === 3 && rows[0].classList.contains('here') && rows[2].textContent.includes('Test Film 4') && rows[2].querySelector('.rc.soon') && document.querySelector('#wslot .wk').textContent === 'سلسلة'; }) && worldsCalls === 1);

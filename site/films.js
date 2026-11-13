@@ -37,7 +37,8 @@ let P = { films: {} };
 try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {}
 const save = () => { try { P.at = Date.now(); localStorage.setItem(KEY, JSON.stringify(P)); } catch {} syncTouch('films'); };
 const st = id => P.films[id] || '';
-const ui = { q: '', status: 'todo', genre: '', decade: '', prov: '', sort: 'list', view: 'grid', series: false };
+// ov: ترتيب عرض السلسلة في البطاقة (الأحداث أولاً، ويمكن التبديل إلى الصدور)
+const ui = { q: '', status: 'todo', genre: '', decade: '', prov: '', sort: 'list', view: 'grid', series: false, ov: 'chrono' };
 
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${ic('home')}<span>البوابات</span></a><h1>قائمة أفلامي</h1>
@@ -73,7 +74,11 @@ function whereHTML(f) { const p = f.prov; if (!p) return '';
   const s = [...new Set([...p.stream, ...p.free])];
   if (s.length) return s.slice(0, 4).map(id => D.prov[id]?.logo ? `<img loading="lazy" alt="${esc(D.prov[id].name)}" title="${esc(D.prov[id].name)}" src="${IMG}w92${D.prov[id].logo}">` : '').join('') + (s.length > 4 ? `<span>+${s.length - 4}</span>` : '');
   return p.rent.length || p.buy.length ? '<span>إيجار أو شراء</span>' : ''; }
-function partTag(f) { const r = D.recOf.get(f.id); if (r === 'skip' || r === 'optional') return `<span class="tag">${r === 'skip' ? 'تجاوزه' : 'اختياري'}</span>`; const c = f.col && D.cols[f.col]; if (!c || c.parts.length < 2) return ''; const i = c.parts.findIndex(p => p.tmdb === f.tmdb); return i < 0 ? '' : `<span class="tag"><bdi dir="ltr">${i + 1}/${c.parts.length}</bdi></span>`; }
+// وسم التذكرة: «بداية الأحداث» لجزء صدر لاحقاً وتبدأ به القصة، ثم «اختياري/تجاوزه»، ثم موضعه في ترتيب سلسلته
+function partTag(f) { const g = groupOf(f), i = g ? g.order.findIndex(s => isHere(f, s)) : -1;
+  if (g?.view && i === 0 && firstReleased(g) !== 0) return '<span class="tag start">بداية الأحداث</span>';
+  const r = D.recOf.get(f.id); if (r === 'skip' || r === 'optional') return `<span class="tag">${r === 'skip' ? 'تجاوزه' : 'اختياري'}</span>`;
+  return g && i >= 0 && g.order.length > 1 ? `<span class="tag"><bdi dir="ltr">${i + 1}/${g.order.length}</bdi></span>` : ''; }
 function card(f) { const s = st(f.id), un = unreleased(f);
   return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}">
 <button class="poster" data-act="open" aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${f.fresh ? '<span class="tag new">جديد</span>' : f.kind === 'tv' ? '<span class="tag">مسلسل</span>' : un ? `<span class="tag">${f.date ? 'بعد ' + nDays(daysTo(f.date)) : 'لم يُعلن موعده'}</span>` : partTag(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
@@ -81,7 +86,10 @@ function card(f) { const s = st(f.id), un = unreleased(f);
 <button class="seen" data-act="seen" aria-pressed="${s === 'watched'}" aria-label="شاهدته: ${esc(f.title)}">${ic('check')}</button><div class="where">${whereHTML(f)}</div></div></article>`; }
 
 // ---------- التصفية والترتيب ----------
-const SORTS = { list: ['ترتيب قائمتي', (a, b) => a.ord - b.ord], new: ['الأحدث صدوراً', (a, b) => (b.date || '0').localeCompare(a.date || '0')], old: ['الأقدم صدوراً', (a, b) => (a.date || '9').localeCompare(b.date || '9')],
+// ترتيب قائمتي: أجزاء السلسلة الواحدة متجاورة بترتيب أحداثها، في موضع أقدم جزء منها في القائمة، مهما كان ترتيب إضافتها
+const listKey = f => f._lk ??= (() => { const g = groupOf(f), i = g ? g.order.findIndex(s => isHere(f, s)) : -1; if (i < 0 || g.order.length < 2) return [f.ord, 0];
+  return [Math.min(...g.order.map(listedOf).filter(Boolean).map(m => m.ord)), i]; })();
+const SORTS = { list: ['ترتيب قائمتي', (a, b) => { const x = listKey(a), y = listKey(b); return x[0] - y[0] || x[1] - y[1] || a.ord - b.ord; }], new: ['الأحدث صدوراً', (a, b) => (b.date || '0').localeCompare(a.date || '0')], old: ['الأقدم صدوراً', (a, b) => (a.date || '9').localeCompare(b.date || '9')],
   rate: ['الأعلى تقييماً', (a, b) => (b.votes >= 50 ? b.rating || 0 : 0) - (a.votes >= 50 ? a.rating || 0 : 0)], short: ['الأقصر مدة', (a, b) => (a.runtime || 9999) - (b.runtime || 9999)], az: ['أبجدياً', (a, b) => a.title.localeCompare(b.title, 'en')] };
 const hay = f => f._h ??= [f.title, f.orig, f.year, ...(D.more?.[f.id]?.directors || []), D.more?.[f.id]?.titleAr, f.col && D.cols[f.col]?.name, D.fr[D.frOf.get(f.id)]?.name, ...worldIds(f.id).map(id => D.worlds[id].name)].filter(Boolean).join(' ').toLowerCase();
 function match(f) { const s = st(f.id);
@@ -145,7 +153,9 @@ const ext = (name, url) => `<a href="${esc(url)}" target="_blank" rel="noopener"
 function mergeWorlds(w) { if (!w?.worlds) return;
   Object.assign(D.worlds, w.worlds); Object.assign(D.winfo, w.info || {}); for (const [k, v] of Object.entries(w.works || {})) D.wworks[k] = { ...D.wworks[k], ...v };
   for (const [id, x] of Object.entries(w.worlds)) for (const k of x.order) { const a = D.memberOf.get(k) || D.memberOf.set(k, []).get(k); if (!a.includes(id)) a.push(id); }
-  for (const f of D.films) delete f._h; }
+  stale(); }
+// ما يُحسب من السلاسل (البحث وموضع التذكرة في ترتيب القائمة) يُعاد حسابه حين تتغير البيانات
+const stale = () => { for (const f of D.films) { delete f._h; delete f._lk; } };
 // عوالم عمل: ما حدده البناء له (الأخص أولاً)، أو لعمل خارج القائمة العوالم التي تضمه
 const RANK = { series: 0, universe: 1, franchise: 2, chain: 3 };
 const worldIds = k => { const own = D.wworks[k]; if (own?.worlds) return own.worlds.filter(id => D.worlds[id]);
@@ -155,7 +165,8 @@ const autoOf = f => { const c = colOf(f), parts = c ? c.parts.map(p => 'm' + p.t
   return worldIds(keyOf(f)).find(id => { const o = D.worlds[id].order; return o.length > 1 && parts.every(p => o.includes(p)); }) || null; };
 const worldGroup = id => { const w = D.worlds[id]; return { key: 'w:' + id, auto: true, id, name: w.name, kind: w.kind, by: w.by, wd: w.wd, wiki: w.wiki, order: w.order.map(stepOf) }; };
 const groupOf = f => { const k = D.frOf.get(keyOf(f)); if (k) return { key: k, curated: true, ...D.fr[k] }; const id = autoOf(f); if (id) return worldGroup(id);
-  const c = colOf(f); return c ? { key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })) } : null; };
+  const c = colOf(f); if (!c) return null; const parts = c.parts.map(p => 'm' + p.tmdb), w = worldIds(keyOf(f)).map(id => D.worlds[id]).find(x => x.order.every(k => parts.includes(k)));
+  return { key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })), wiki: w?.wiki || null }; };
 const listedOf = s => s.m ? D.byTmdb.get(s.m) : s.t ? D.byId.get('t' + s.t) : null;
 const infoOf = s => listedOf(s) || (s.m ? D.fx['m' + s.m] || D.part.get(s.m) || D.winfo['m' + s.m] : s.t ? D.fx['t' + s.t] || D.winfo['t' + s.t] : s) || {};
 // عمل خارج القائمة له رقم في TMDB: زره يفتح بطاقة اطلاع مباشرة بدل البحث
@@ -171,7 +182,7 @@ function groups() { const out = new Map(Object.entries(D.fr).map(([key, fr]) => 
 function seriesHTML() { const gs = groups().filter(g => !ui.q || g.name.toLowerCase().includes(ui.q) || g.order.some(s => (infoOf(s).title || '').toLowerCase().includes(ui.q)));
   if (!gs.length) return '<p class="empty">لا سلسلة تطابق البحث.</p>';
   return gs.map(g => { const mine = g.order.map(listedOf).filter(Boolean), seen = mine.filter(f => st(f.id) === 'watched').length;
-    return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${nWorks(g.order.length)}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ' · بتوصيات الدليل' : g.auto ? ` · ${WKIND[g.kind]}، مرتّب آلياً` : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
+    return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${nWorks(g.order.length)}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ` · بتوصيات الدليل${g.view ? '، بترتيب الأحداث' : ''}` : g.auto ? ` · ${WKIND[g.kind]}، مرتّب آلياً` : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
       g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}"${f ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
 <span class="p">${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
 function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); $('#grid').hidden = v !== 'grid'; $('#series').hidden = v !== 'series'; $('#chips').hidden = v !== 'grid';
@@ -191,9 +202,9 @@ const rowsHTML = (f, order, auto) => { const n = order.length, at = Math.max(0, 
   return `<ol class="order${clip ? ' clip' : ''}">${order.map((s, i) => row(f, s, i, auto, clip && (i < lo || i > hi))).join('')}</ol>${clip ? `<button class="more" data-act="more" aria-expanded="false">اعرض الترتيب كاملاً (${n})</button>` : ''}`; };
 const autoNote = g => `<p class="note">${g.kind === 'chain'
   ? `رتّبه الدليل آلياً حسب تاريخ الصدور، من روابط «يسبقه» و«يليه» بين هذه الأعمال في ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)}، ومعلوماتها من <bdi dir="ltr">TMDB</bdi>`
-  : `رتّبه الدليل آلياً ${g.by === 'ord' ? 'برقم كل جزء في السلسلة' : 'حسب تاريخ الصدور'}، من بيانات ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)} و<bdi dir="ltr">TMDB</bdi>${g.wiki ? `، وتفصيله في ${ext('Wikipedia', g.wiki)}` : ''}`}. لم يُراجَع يدوياً بعد، فلا توصيات فيه.</p>`;
+  : `رتّبه الدليل آلياً ${g.by === 'ord' ? 'برقم كل جزء في السلسلة' : 'حسب تاريخ الصدور'}، من بيانات ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)} و<bdi dir="ltr">TMDB</bdi>${g.wiki ? `، وتفصيله في ${ext('Wikipedia', g.wiki)}` : ''}`}. لم يُراجَع يدوياً بعد، فلا توصيات فيه، وقد يختلف عن ترتيب الأحداث إن كان بينها جزء يسبق القصة.</p>`;
 const noteOf = g => g.curated ? `<p class="note">الترتيب والتوصيات من إعداد الدليل، مبنية على ترابط القصة وتقييم <bdi dir="ltr">TMDB</bdi> الظاهر بجانب كل عمل${g.sources?.length ? `. المصادر: ${g.sources.map(x => ext(x.name, x.url)).join('، ')}` : ''}.</p>`
-  : g.auto ? autoNote(g) : '<p class="note">الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط. لم يُراجَع يدوياً بعد.</p>';
+  : g.auto ? autoNote(g) : `<p class="note">الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط${g.wiki ? `، وتفصيل السلسلة في ${ext('Wikipedia', g.wiki)}` : ''}. لم يُراجَع يدوياً بعد، وقد يختلف عن ترتيب الأحداث إن كان بينها جزء يسبق القصة.</p>`;
 // عوالم أوسع يقع فيها العمل (لغير الترتيب المراجَع): كل واحد يضيف أعمالاً لم تظهر، مطويّاً، واثنان على الأكثر
 function widerHTML(f, g) { if (g.curated) return ''; const have = new Set(g.order.map(keyOfStep)); let out = '', n = 0;
   for (const id of worldIds(keyOf(f))) { const w = D.worlds[id]; if ('w:' + id === g.key || n >= 2 || !w.order.some(x => !have.has(x))) continue; w.order.forEach(x => have.add(x)); n++;
@@ -206,9 +217,20 @@ const aloneText = f => { const k = keyOf(f), live = D.wlive.get(k);
   if (live === 'wait') return '<span class="wait">أبحث عن سلسلته وعالمه في <bdi dir="ltr">Wikidata</bdi>…</span>';
   const both = live === 'done' || (D.wok && D.byId.has(k) && !D.byId.get(k).fresh), src = both ? '<bdi dir="ltr">TMDB</bdi> و<bdi dir="ltr">Wikidata</bdi>' : '<bdi dir="ltr">TMDB</bdi>';
   return f.kind === 'tv' ? `مسلسل لا تجمعه سلسلة ولا عالم مشترك بأعمال أخرى في ${src}.` : `فيلم مستقل: لا أجزاء أخرى له ولا عالم مشترك في ${src}.`; };
+// ترتيب الصدور: حسب التاريخ، وما لا موعد له آخراً. السلسلة المراجَعة مرتبة حسب أحداثها، وview يذكر المُوصى به للمشاهدة الأولى
+// (release: ترتيب الصدور كما أرادها صنّاعها، either: يصح الترتيبان، chrono: الأحداث). يظهر التبديل حين يختلف الترتيبان
+const dateKey = s => { const o = infoOf(s); return o.date || (o.year ? o.year + '-12-31' : '9999'); };
+const byRelease = order => order.map((s, i) => [s, i]).sort((a, b) => dateKey(a[0]).localeCompare(dateKey(b[0])) || a[1] - b[1]).map(x => x[0]);
+const firstReleased = g => g.order.indexOf(byRelease(g.order)[0]);
+function viewsHTML(f, g) { const rel = byRelease(g.order);
+  if (!g.view || rel.every((s, i) => s === g.order[i])) return rowsHTML(f, g.order, g.auto);
+  // ملاحظة السلسلة فوق التبديل تشرح لماذا يختلف الترتيبان وأيهما المُوصى به، فلا يتكرر الشرح هنا
+  const tab = (v, t) => `<button data-act="ordv" data-v="${v}" aria-pressed="${ui.ov === v}">${t}${g.view === v ? '<small>المُوصى به</small>' : ''}</button>`;
+  return `<div class="ordv" role="group" aria-label="ترتيب العرض">${tab('chrono', 'ترتيب الأحداث')}${tab('release', 'ترتيب الصدور')}</div>
+<div data-ov="chrono"${ui.ov === 'chrono' ? '' : ' hidden'}>${rowsHTML(f, g.order, g.auto)}</div><div data-ov="release"${ui.ov === 'release' ? '' : ' hidden'}>${rowsHTML(f, rel, g.auto)}</div>`; }
 function orderHTML(f) { const g = groupOf(f), door = xdoorHTML(D.wworks[keyOf(f)]?.guide);
   if (!g) return `<section class="sec"><h3>السلسلة وترتيب المشاهدة</h3>${door}<p>${aloneText(f)}</p></section>`;
-  return `<section class="sec"><h3>ترتيب المشاهدة: <bdi dir="ltr">${esc(g.name)}</bdi>${g.auto ? ` <span class="wk">${WKIND[g.kind]}</span>` : ''}</h3>${door}${g.note ? `<p>${ar(g.note)}</p>` : ''}${rowsHTML(f, g.order, g.auto)}${noteOf(g)}${widerHTML(f, g)}</section>`; }
+  return `<section class="sec"><h3>ترتيب المشاهدة: <bdi dir="ltr">${esc(g.name)}</bdi>${g.auto ? ` <span class="wk">${WKIND[g.kind]}</span>` : ''}</h3>${door}${g.note ? `<p>${ar(g.note)}</p>` : ''}${viewsHTML(f, g)}${noteOf(g)}${widerHTML(f, g)}</section>`; }
 // أعمال مرتبطة: الأصل وما اقتُبس عنه واقتباسات أخرى للمصدر نفسه، والمصدر نفسه إن كان كتاباً أو لعبة. ما ظهر في الترتيب لا يتكرر هنا
 const relCard = r => { const s = stepOf(r.k), l = listedOf(s), o = infoOf(s);
   return `<button class="part${l && st(l.id) === 'watched' ? ' watched' : ''}" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${l ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
@@ -310,7 +332,7 @@ async function openPreview(tmdb, kind, btn) { const id = (kind === 'tv' ? 't' : 
   } catch (err) { if (addDlg.open) $('#add-msg').textContent = err.message; else toast(err.message); }
   finally { if (btn) { btn.disabled = false; btn.innerHTML = label; } } }
 // يُدخل فيلماً عاد من الخادم (أو محفوظاً بانتظار وصوله في البناء القادم) في القائمة المعروضة
-function adopt(r, draw) { if (!r?.film || D.byId.has(r.film.id)) return false; const [light, heavy] = split(r.film); light.fresh = true; light.ord = -Date.now(); Object.assign(D.prov, r.providers || {}); if (r.worlds) { mergeWorlds(r.worlds); D.wlive.set(light.id, 'done'); }
+function adopt(r, draw) { if (!r?.film || D.byId.has(r.film.id)) return false; const [light, heavy] = split(r.film); light.fresh = true; light.ord = -Date.now(); stale(); Object.assign(D.prov, r.providers || {}); if (r.worlds) { mergeWorlds(r.worlds); D.wlive.set(light.id, 'done'); }
   if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) D.part.set(p.tmdb, p); } register(light, heavy);
   if (draw) { $('#grid').insertAdjacentHTML('afterbegin', card(light)); $('#chips').innerHTML = chipsHTML(); apply(false); } return true; }
 
@@ -333,6 +355,7 @@ document.addEventListener('click', e => { const t = e.target.closest('[data-act]
   else if (act === 'preview') openPreview(+t.dataset.tmdb, t.dataset.kind, t);
   else if (act === 'preview-add') addFilm(+t.dataset.tmdb, t.dataset.kind, t, t.innerHTML);
   else if (act === 'cand-open') { addDlg.close(); openFilm(t.dataset.id); }
+  else if (act === 'ordv') { ui.ov = t.dataset.v; const box = t.closest('.sec'); $$('[data-act=ordv]', box).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === ui.ov))); $$('[data-ov]', box).forEach(el => { el.hidden = el.dataset.ov !== ui.ov; }); }
   else if (act === 'more') { const ol = t.previousElementSibling, clip = ol.classList.toggle('clip'); t.setAttribute('aria-expanded', String(!clip)); t.textContent = clip ? `اعرض الترتيب كاملاً (${ol.children.length})` : 'اختصر الترتيب'; }
   else if (act === 'add-pick') addPick(t);
   else if (act === 'ww') { try { navigator.clipboard?.writeText(t.dataset.t).then(() => toast('نُسخ اسم الفيلم، الصقه في بحث التطبيق')); } catch {} } });
@@ -348,7 +371,7 @@ try {
   for (const [k, g] of Object.entries(D.fr)) for (const st of g.order) { const id = st.m ? 'm' + st.m : st.t ? 't' + st.t : null; if (id) { D.frOf.set(id, k); D.recOf.set(id, st.rec); } }
   D.moreReady = get('more.json').then(m => { D.more = { ...m, ...(D.more || {}) }; for (const f of D.films) delete f._h; return D.more; }).catch(() => (D.more ||= {}));
   // خريطة العوالم بعد القائمة: لا تؤخر الرسم الأول. حين تصل يُعاد رسم ما يعتمد عليها
-  D.worldsReady = get('worlds.json').then(w => { mergeWorlds(w); D.wok = true; refreshSlot(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); if (ui.series || ui.q) apply(false); }).catch(() => {});
+  D.worldsReady = get('worlds.json').then(w => { mergeWorlds(w); D.wok = true; refreshSlot(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); apply(ui.sort === 'list'); }).catch(() => {});
   // ما أُضيف بالزر ولم يصل البناء بعد يبقى ظاهراً من الحفظ المحلي، ويُحذف منه عند وصوله
   try { const pend = JSON.parse(localStorage.getItem(PEND) || '[]'), keep = pend.filter(r => r?.film && !D.byId.has(r.film.id)); D.more ||= {}; keep.forEach(r => adopt(r, false)); localStorage.setItem(PEND, JSON.stringify(keep)); } catch {}
   renderGrid(); reroll(true); liftVeil();

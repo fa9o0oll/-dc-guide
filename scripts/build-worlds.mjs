@@ -44,12 +44,14 @@ const curOf = new Map(); for (const [k, g] of Object.entries(fr.items || {})) fo
 const colOf = f => { const c = f.col && cols[f.col]; return c && c.parts.length > 1 ? c : null; };
 const title = k => known[k]?.title || res.info[k]?.title || k;
 const released = k => { const d = known[k]?.date || res.info[k]?.date; return d && d <= today; };
-const report = { generatedAt: out.generatedAt, counts: {}, missing: [], curatedGaps: [], collectionGaps: [], related: [], noItem: [], excludedGroups: res.report.excludedGroups, rejectedFollows: res.report.rejectedFollows };
+// uncurated: أعمال تُعرض سلسلتها من مجموعة TMDB أو عالم آلي بترتيب الصدور، وترتيب أحداثها لم يُراجَع (قد يكون فيها جزء يسبق القصة)
+const report = { generatedAt: out.generatedAt, counts: {}, missing: [], uncurated: [], curatedGaps: [], collectionGaps: [], related: [], noItem: [], excludedGroups: res.report.excludedGroups, rejectedFollows: res.report.rejectedFollows };
 const listed = new Set(focus);
 for (const f of films) { const k = keyOf(f), w = res.works[k];
   if (!w) { report.noItem.push({ k, t: f.title, y: f.year }); continue; }
   const ws = (w.worlds || []).map(id => res.worlds[id]), cur = curOf.get(k), col = colOf(f);
   if (ws.length && !cur && !col) report.missing.push({ k, t: f.title, y: f.year, worlds: ws.map(x => ({ name: x.name, kind: x.kind, size: x.size, order: x.order.map(title) })) });
+  if (!cur && (col || ws.length)) report.uncurated.push({ k, t: f.title, y: f.year, via: col ? 'collection' : 'world', name: col ? col.name : ws[0].name });
   if (cur) { const have = new Set(fr.items[cur].order.map(s => s.m ? 'm' + s.m : s.t ? 't' + s.t : null));
     for (const wd of ws.filter(x => x.size <= 40)) { const gap = wd.order.filter(x => !have.has(x) && released(x) && !(skip[cur] || []).includes(x));
       if (gap.length && !report.curatedGaps.some(g => g.cur === cur && g.world === wd.name)) report.curatedGaps.push({ cur, k, t: f.title, world: wd.name, kind: wd.kind, gap: gap.map(x => `${x} ${title(x)}`) }); } }
@@ -59,7 +61,7 @@ for (const f of films) { const k = keyOf(f), w = res.works[k];
   if (w.rel?.length || w.src?.length) report.related.push({ k, t: f.title, rel: (w.rel || []).map(r => `${r.r}:${title(r.k)}${listed.has(r.k) ? '*' : ''}`), src: (w.src || []).map(s => `${s.kind}:${s.label}`) });
 }
 report.counts = { works: focus.length, withEntry: focus.length - report.noItem.length, inWorld: Object.values(res.works).filter(w => w.worlds?.length).length, worlds: Object.keys(res.worlds).length,
-  chains: res.report.chains, withRelated: report.related.length, missing: report.missing.length, curatedGaps: report.curatedGaps.length, collectionGaps: report.collectionGaps.length,
+  chains: res.report.chains, withRelated: report.related.length, missing: report.missing.length, uncurated: report.uncurated.length, curatedGaps: report.curatedGaps.length, collectionGaps: report.collectionGaps.length,
   infoEntries: Object.keys(res.info).length, bytes: JSON.stringify(out).length, seconds: Math.round((Date.now() - t0) / 1000) };
 fs.writeFileSync(new URL('worlds-report.json', GEN), JSON.stringify(report, null, 1) + '\n');
 console.log('WORLDS counts ' + JSON.stringify(report.counts));
@@ -68,5 +70,6 @@ if (process.env.WORLDS_DUMP) { const zlib = await import('node:zlib');
   for (const [name, data] of [['worlds', out], ['report', report], ...(res.raw && !RAW ? [['raw', { ...res.raw, basic: Object.fromEntries(Object.entries(res.basic).filter(([k]) => !known[k])) }]] : [])]) { const b64 = zlib.gzipSync(JSON.stringify(data)).toString('base64'), n = Math.ceil(b64.length / 6000);
     for (let i = 0; i < n; i++) console.log(`WORLDSDUMP ${name} ${i + 1}/${n} ${b64.slice(i * 6000, (i + 1) * 6000)}`); } }
 for (const m of report.missing) console.log('WORLDS missing ' + JSON.stringify(m));
+for (const m of report.uncurated) console.log('WORLDS uncurated ' + JSON.stringify(m));
 for (const m of report.curatedGaps) console.log('WORLDS curated-gap ' + JSON.stringify(m));
 for (const m of report.collectionGaps) console.log('WORLDS collection-gap ' + JSON.stringify(m));

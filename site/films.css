@@ -206,6 +206,12 @@ dialog::backdrop{background:rgba(6,4,2,.72)}
 .wait{color:var(--acc2);animation:wait 1.2s ease-in-out infinite alternate}
 @keyframes wait{from{opacity:.45}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.wait{animation:none}}
+/* ترتيب الأحداث وترتيب الصدور: تبديل صغير فوق ترتيب السلسلة، والمُوصى به موسوم */
+.ordv{display:inline-flex;margin:2px 0 8px;border:1px solid var(--line);border-radius:10px;overflow:hidden;max-width:100%}
+.ordv button{min-height:40px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.86rem;color:var(--dim)}
+.ordv button[aria-pressed=true]{background:var(--acc);color:var(--on-acc)}
+.ordv small{padding:0 7px;border-radius:999px;box-shadow:inset 0 0 0 1px currentColor;font-size:.7rem;font-weight:600;line-height:1.6}
+.tk .tag.start{background:var(--ok);color:#06231a}
 .people{color:var(--dim);font-size:.92rem}
 .people b{color:var(--mute);font-weight:400}
 
