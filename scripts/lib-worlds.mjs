@@ -91,7 +91,7 @@ export async function labels(list, opt) {
 // ٤) أعضاء مجموعات (سلسلة أو عالم أو امتياز) ممن لهم رقم في TMDB فقط، أي أعمال تُشاهد. الصف: { g, prop, m, tm, tt, ord, date }
 export async function members(groups, opt) {
   const rows = [];
-  for (const part of chunks(uniq(groups), 30)) {
+  for (const part of chunks(uniq(groups).filter(q => /^Q\d+$/.test(q)), 30)) {
     const q = `SELECT ?g ?prop ?m (SAMPLE(?tm) AS ?tm) (SAMPLE(?tt) AS ?tt) (SAMPLE(?ord) AS ?ord) (MIN(?d) AS ?date) WHERE {
   VALUES ?g { ${qv(part)} }
   { ?m p:P179 ?st . ?st ps:P179 ?g . OPTIONAL { ?st pq:P1545 ?ord } BIND("P179" AS ?prop) }
@@ -107,7 +107,7 @@ export async function members(groups, opt) {
 // ٥) اقتباسات مصدر واحد (رواية، مانغا…) ممن لها رقم في TMDB. الصف: { s, x, tm, tt, date }
 export async function adaptations(sources, opt) {
   const rows = [];
-  for (const part of chunks(uniq(sources), 40)) {
+  for (const part of chunks(uniq(sources).filter(q => /^Q\d+$/.test(q)), 40)) {
     const q = `SELECT ?s ?x (SAMPLE(?tm) AS ?tm) (SAMPLE(?tt) AS ?tt) (MIN(?d) AS ?date) WHERE {
   VALUES ?s { ${qv(part)} }
   ?x wdt:P144 ?s . OPTIONAL { ?x wdt:P4947 ?tm } OPTIONAL { ?x wdt:P4983 ?tt } OPTIONAL { ?x wdt:P577 ?d }
