@@ -32,14 +32,24 @@ jobs:
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: node scripts/build-films.mjs
+      - name: Build the worlds map for the films list (Wikidata + TMDB; keeps the previous file if Wikidata is unreachable)
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: node scripts/build-worlds.mjs
+        continue-on-error: true
+      - name: Keep the worlds map and its audit report (work branches only)
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: worlds
+          path: |
+            site/films/data/worlds.json
+            data/generated/films/worlds-report.json
+          if-no-files-found: ignore
       - name: Report announced DC titles missing from the catalog
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: node scripts/tmdb-discover.mjs
-        continue-on-error: true
-      - name: Probe Wikidata for the films list (work branches only; logs WDP lines)
-        if: github.ref != 'refs/heads/main'
-        run: node scripts/wd-probe.mjs
         continue-on-error: true
       - name: Look up TMDB candidates for pending queries (data/lookup)
         env:
