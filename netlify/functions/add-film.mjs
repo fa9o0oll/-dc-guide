@@ -1,4 +1,4 @@
-// دالة «أضف فيلماً»: تبحث في TMDB عن سطر مكتوب بحرّية (اسم وسنة)، ثم تضيف الفيلم المختار إلى data/films/added.json في المستودع،
+// دالة «أضف فيلماً»: تبحث في TMDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي نتيجة للاطلاع (preview)، ثم تضيف المختار إلى data/films/added.json في المستودع،
 // فيعاد بناء القائمة ويظهر الفيلم على كل الأجهزة. محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
 //   TMDB_API_KEY  مفتاح TMDB        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع        ADD_FILM_PASSWORD  كلمة السر
 import { createHash, timingSafeEqual } from 'node:crypto';
@@ -45,10 +45,12 @@ export default async req => {
         return { tmdb: c.id, kind, title: c.title || c.name, year: year(c), poster: c.poster_path || null, collection: col || undefined }; }));
       return json(200, { parsed, sure: mv.sure, candidates });
     }
-    if (b.action === 'add') {
+    // preview: بطاقة كاملة لعمل ليس في القائمة، دون إضافته. add: البطاقة نفسها ثم الحفظ في المستودع
+    if (b.action === 'add' || b.action === 'preview') {
       const kind = b.kind === 'tv' ? 'tv' : 'movie', id = +b.tmdb; if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
       const providers = {}, film = shape(kind, await tmdb(detailPath(kind, id), detailParams(kind)), providers);
       const collection = film.col ? await tmdb('/collection/' + film.col, { language: 'en-US' }).then(shapeCollection).catch(() => null) : null;
+      if (b.action === 'preview') return json(200, { film, collection, providers });
       const at = new Date().toISOString(), state = await record({ tmdb: id, kind, title: film.title, year: film.year, at });
       return json(200, { state, film: { ...film, src: 'added', addedAt: at }, collection, providers });
     }

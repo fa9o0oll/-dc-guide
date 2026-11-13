@@ -26,6 +26,9 @@ check('بلا كلمة سر تُرفض', (await call({ action: 'add', tmdb: 949 
 const s = await call({ action: 'search', q: 'فيلم Heat (١٩٩٥)', password: 'open-sesame-42' });
 check('البحث يفهم الاسم والسنة بالأرقام العربية', s.status === 200 && s.body.parsed.title === 'Heat' && s.body.parsed.year === 1995, s);
 check('المرشح الأول هو المطابق ومعه اسم سلسلته', s.body.candidates?.[0]?.tmdb === 949 && s.body.candidates[0].collection === 'Heat' && s.body.sure === true, s.body);
+const pv = await call({ action: 'preview', tmdb: 949, kind: 'movie', password: 'open-sesame-42' });
+check('بطاقة الاطلاع تعيد الفيلم كاملاً بلا حفظ في المستودع', pv.status === 200 && pv.body.film.id === 'm949' && pv.body.film.overviewEn !== undefined && pv.body.collection?.id === 77 && !pv.body.state && puts.length === 0 && stored === null, pv.body);
+check('بطاقة الاطلاع تحتاج كلمة السر', (await call({ action: 'preview', tmdb: 949, kind: 'movie', password: 'x' })).status === 401);
 const a = await call({ action: 'add', tmdb: 949, kind: 'movie', password: 'open-sesame-42' });
 check('الإضافة تعيد الفيلم بصيغة الموقع', a.status === 200 && a.body.film.id === 'm949' && a.body.film.src === 'added' && a.body.film.prov.stream[0] === 8 && a.body.providers[8].name === 'Netflix' && a.body.film.directors[0] === 'Michael Mann', a);
 check('السلسلة مرتبة بالصدور والجزء بلا موعد آخراً', a.body.collection?.parts.map(p => p.tmdb).join() === '949,950', a.body.collection);

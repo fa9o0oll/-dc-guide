@@ -133,6 +133,8 @@ const whenOf = o => o.date && o.date > today ? 'بعد ' + nDays(daysTo(o.date))
 const groupOf = f => { const k = D.frOf.get(f.id); if (k) return { key: k, curated: true, ...D.fr[k] }; const c = f.col && D.cols[f.col]; return c && c.parts.length > 1 ? { key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })) } : null; };
 const listedOf = s => s.m ? D.byTmdb.get(s.m) : s.t ? D.byId.get('t' + s.t) : null;
 const infoOf = s => listedOf(s) || (s.m ? D.fx['m' + s.m] || D.part.get(s.m) : s.t ? D.fx['t' + s.t] : s) || {};
+// عمل خارج القائمة له رقم في TMDB: زره يفتح بطاقة اطلاع مباشرة بدل البحث
+const outRef = s => s.m ? ` data-tmdb="${s.m}" data-kind="movie"` : s.t ? ` data-tmdb="${s.t}" data-kind="tv"` : '';
 const kindOf = s => s.t ? 'مسلسل' : s.x ? XKIND[s.x] || '' : '';
 function groups() { const out = Object.entries(D.fr).map(([key, fr]) => ({ key, curated: true, ...fr }));
   for (const c of Object.values(D.cols)) if (c.parts.length > 1 && c.parts.some(p => D.byTmdb.has(p.tmdb)) && !c.parts.some(p => D.frOf.has('m' + p.tmdb))) out.push({ key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })) });
@@ -141,7 +143,7 @@ function seriesHTML() { const gs = groups().filter(g => !ui.q || g.name.toLowerC
   if (!gs.length) return '<p class="empty">لا سلسلة تطابق البحث.</p>';
   return gs.map(g => { const mine = g.order.map(listedOf).filter(Boolean), seen = mine.filter(f => st(f.id) === 'watched').length;
     return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${count(g.order.length, ['عمل واحد', 'عملان', 'أعمال', 'عملاً', 'عمل'])}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ' · بتوصيات الدليل' : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
-      g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}" data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
+      g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}"${f ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
 <span class="p">${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
 function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); $('#grid').hidden = v !== 'grid'; $('#series').hidden = v !== 'series'; $('#chips').hidden = v !== 'grid';
   if (v === 'series') $('#series').innerHTML = seriesHTML(); apply(false); }
@@ -151,10 +153,10 @@ const sheet = $('#sheet'), addDlg = $('#add');
 let openId = null;
 function orderHTML(f) { const g = groupOf(f);
   if (!g) return `<section class="sec"><h3>السلسلة وترتيب المشاهدة</h3><p>${f.kind === 'tv' ? 'مسلسل، لا سلسلة أفلام مسجّلة له.' : 'فيلم مستقل: لا أجزاء أخرى مسجّلة له في <bdi dir="ltr">TMDB</bdi>.'}</p></section>`;
-  const row = s => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = l?.id === f.id, k = kindOf(s);
+  const row = s => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = l ? l.id === f.id : (s.m && f.kind === 'movie' && s.m === f.tmdb) || (s.t && f.kind === 'tv' && s.t === f.tmdb), k = kindOf(s);
     return `<li class="${[here ? 'here' : '', w ? 'watched' : '', s.rec ? 'r-' + s.rec : ''].join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k)}</span>
 <span class="t"><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? ar(s.note) : ''].filter(Boolean).join(' · ')}</small></span>
-<span class="st">${s.rec ? `<i class="rc ${s.rec}">${REC[s.rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}" data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'أضف'} ${esc(o.title || '')}"></button>`}</li>`; };
+<span class="st">${s.rec ? `<i class="rc ${s.rec}">${REC[s.rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'اعرض'} ${esc(o.title || '')}"></button>`}</li>`; };
   return `<section class="sec"><h3>ترتيب المشاهدة: <bdi dir="ltr">${esc(g.name)}</bdi></h3>${g.note ? `<p>${ar(g.note)}</p>` : ''}<ol class="order">${g.order.map(row).join('')}</ol>
 <p class="note">${g.curated ? `الترتيب والتوصيات من إعداد الدليل، مبنية على ترابط القصة وتقييم <bdi dir="ltr">TMDB</bdi> الظاهر بجانب كل عمل${g.sources?.length ? `. المصادر: ${g.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener"><bdi dir="ltr">${esc(x.name)}</bdi></a>`).join('، ')}` : ''}.` : 'الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط. لم يُراجَع يدوياً بعد.'}</p></section>`; }
 function whereSec(f) { const p = f.prov, g = (t, ids) => ids.length ? `<div class="wgroup"><b>${t}</b><div class="wlist">${ids.map(id => `<a href="${esc(p.link || '#')}" target="_blank" rel="noopener">${D.prov[id]?.logo ? `<img alt="" src="${IMG}w92${D.prov[id].logo}">` : ''}${esc(D.prov[id]?.name || id)}</a>`).join('')}</div></div>` : '';
@@ -164,13 +166,16 @@ function linksSec(f) { const ua = navigator.userAgent, ww = /android/i.test(ua) 
   const a = (href, name, sub) => `<a href="${href}" target="_blank" rel="noopener"><b>${name}</b><small>${sub}</small></a>`;
   return `<section class="sec"><h3>صفحته في المواقع</h3><div class="links">${f.imdb ? a(`https://www.imdb.com/title/${f.imdb}/`, 'IMDb', 'التقييم والطاقم') : ''}${f.kind === 'movie' ? a(`https://letterboxd.com/tmdb/${f.tmdb}`, 'Letterboxd', 'المراجعات والقوائم') : ''}${a(`https://www.themoviedb.org/${f.kind}/${f.tmdb}`, 'TMDB', 'مصدر البيانات')}
 <a href="${ww}" target="_blank" rel="noopener" data-act="ww" data-t="${esc(f.title)}"><b>WhattaWatch</b><small>يفتح التطبيق وينسخ اسم الفيلم للبحث</small></a></div></section>`; }
-async function sheetHTML(f) { const m = (await D.moreReady)?.[f.id] || {}, s = st(f.id), un = unreleased(f);
+// pv: بطاقة اطلاع لعمل ليس في القائمة (من TMDB مباشرة): معلوماته الكاملة، وبدل أزرار الحالة زر «أضفه إلى قائمتي»
+async function sheetHTML(f, pv = null) { const m = pv?.more || (await D.moreReady)?.[f.id] || {}, s = st(f.id), un = unreleased(f);
   const ov = m.overviewAr ? `<p>${ar(m.overviewAr)}</p>${m.arSource === 'guide' ? '' : '<p class="note">نبذة <bdi dir="ltr">TMDB</bdi> العربية كما هي، لم نراجعها بعد.</p>'}` : m.overviewEn ? `<p dir="ltr" lang="en" style="text-align:left">${esc(m.overviewEn)}</p><p class="note">النبذة بالإنجليزية، والترجمة قيد الإعداد.</p>` : '<p>لا توجد نبذة.</p>';
   return `<div class="sh-hero">${f.backdrop ? `<img alt="" src="${IMG}w780${f.backdrop}" srcset="${IMG}w780${f.backdrop} 780w, ${IMG}w1280${f.backdrop} 1280w" sizes="(max-width:880px) 100vw, 880px">` : ''}</div>
 <div class="sh-head"><div class="poster">${poster(f.poster, '170px')}</div><div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
 <p class="facts">${[f.kind === 'tv' ? 'مسلسل' : '', f.year ? `<bdi>${f.year}</bdi>` : '', rt(f.runtime), f.seasons ? count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم']) : '', f.cert ? `<bdi dir="ltr">${esc(f.cert)}</bdi>` : '', LANGS[f.lang] ? 'اللغة ' + LANGS[f.lang] : '', f.rating ? `<span class="rate">تقييم <bdi dir="ltr">TMDB ${f.rating.toFixed(1)}</bdi></span>` : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</p>
 <div class="tags">${f.genres.map(g => GENRES[g] ? `<span>${GENRES[g]}</span>` : '').join('')}</div></div></div>
-<div class="sh-acts"><button class="btn sec" data-act="set" data-v="watched" aria-pressed="${s === 'watched'}">${ic('check')}شاهدته</button><button class="btn sec nx" data-act="set" data-v="next" aria-pressed="${s === 'next'}">${ic('mark')}التالي في المشاهدة</button></div>
+${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>
+<section class="sec"><p class="ask">ليس في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">TMDB</bdi>.</p></section>`
+  : `<div class="sh-acts"><button class="btn sec" data-act="set" data-v="watched" aria-pressed="${s === 'watched'}">${ic('check')}شاهدته</button><button class="btn sec nx" data-act="set" data-v="next" aria-pressed="${s === 'next'}">${ic('mark')}التالي في المشاهدة</button></div>`}
 ${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''}${f.src === 'added' ? '<section class="sec"><p class="ask">أُضيف بزر «أضف فيلماً»: معلوماته آلية من <bdi dir="ltr">TMDB</bdi> ولم تُراجَع يدوياً.</p></section>' : ''}
 <section class="sec"><h3>القصة</h3>${ov}</section>${un ? `<section class="sec"><h3>موعد الصدور</h3>${f.date ? `<div class="cd" data-until="${f.date}" aria-label="الوقت الباقي على الصدور">${cdHTML(f.date)}</div><p class="note">يصدر في <bdi>${new Date(f.date + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' })}</bdi> حسب <bdi dir="ltr">TMDB</bdi>، والموعد قابل للتغيير.</p>` : '<p>معلن، ولم يُحدَّد موعد صدوره بعد.</p>'}</section>` : ''}
 ${whereSec(f)}${orderHTML(f)}
@@ -208,13 +213,28 @@ $('#add-form').addEventListener('submit', async e => { e.preventDefault(); const
     msg.textContent = r.parsed.year ? `فهمت: «${r.parsed.title}»، سنة ${r.parsed.year}. اختر المقصود:` : `فهمت: «${r.parsed.title}» بلا سنة. اختر المقصود:`;
     $('#cands').innerHTML = r.candidates.map(c => { const has = D.byId.has((c.kind === 'tv' ? 't' : 'm') + c.tmdb);
       return `<div class="cand"><span class="th">${c.poster ? `<img alt="" src="${IMG}w92${c.poster}">` : ''}</span><span><b>${esc(c.title)}</b><small>${[c.kind === 'tv' ? 'مسلسل' : 'فيلم', c.year, c.collection ? `من سلسلة ${esc(c.collection)}` : ''].filter(Boolean).join(' · ')}</small></span>
-${has ? '<small>في قائمتك</small>' : `<button class="btn pri" type="button" data-act="add-pick" data-tmdb="${c.tmdb}" data-kind="${c.kind}">أضفه</button>`}</div>`; }).join('');
+<span class="cbtns">${has ? `<small>في قائمتك</small><button class="btn sec" type="button" data-act="cand-open" data-id="${(c.kind === 'tv' ? 't' : 'm') + c.tmdb}">افتح بطاقته</button>`
+  : `<button class="btn sec" type="button" data-act="preview" data-tmdb="${c.tmdb}" data-kind="${c.kind}">التفاصيل</button><button class="btn pri" type="button" data-act="add-pick" data-tmdb="${c.tmdb}" data-kind="${c.kind}">أضفه</button>`}</span></div>`; }).join('');
   } catch (err) { msg.textContent = err.message; } });
-async function addPick(btn) { const msg = $('#add-msg'); btn.disabled = true; btn.textContent = 'يُضاف…';
-  try { const r = await api({ action: 'add', tmdb: +btn.dataset.tmdb, kind: btn.dataset.kind }, pass()); adopt(r, true);
+// يضيف العمل إلى القائمة (في الخادم ثم هنا فوراً) ويفتح بطاقته
+async function addFilm(tmdb, kind, btn, label) { const msg = $('#add-msg'); btn.disabled = true; btn.textContent = 'يُضاف…';
+  try { const r = await api({ action: 'add', tmdb, kind }, pass()); adopt(r, true);
     try { const p = JSON.parse(localStorage.getItem(PEND) || '[]'); p.push(r); localStorage.setItem(PEND, JSON.stringify(p)); } catch {}
-    addDlg.close(); toast(`أُضيف «${r.film.title}»`); document.getElementById('f-' + r.film.id)?.scrollIntoView({ block: 'center', behavior: calm ? 'auto' : 'smooth' });
-  } catch (err) { msg.textContent = err.message; btn.disabled = false; btn.textContent = 'أضفه'; } }
+    if (addDlg.open) addDlg.close(); toast(`أُضيف «${r.film.title}»`); openFilm(r.film.id, !sheet.open);
+  } catch (err) { if (addDlg.open) msg.textContent = err.message; else toast(err.message); btn.disabled = false; btn.innerHTML = label; } }
+const addPick = btn => addFilm(+btn.dataset.tmdb, btn.dataset.kind, btn, 'أضفه');
+// بطاقة اطلاع: يجلب العمل كاملاً من TMDB عبر الخادم دون إضافته. تُحفظ في الذاكرة فلا يتكرر الطلب.
+// تُفتح فوق نافذة البحث (فإغلاقها يعيدك إلى النتائج) أو مكان البطاقة المفتوحة، وزر الرجوع في الجوال يغلقها.
+const previews = new Map();
+async function openPreview(tmdb, kind, btn) { const id = (kind === 'tv' ? 't' : 'm') + tmdb; if (D.byId.has(id)) { if (addDlg.open) addDlg.close(); return openFilm(id); }
+  if (!pass()) return openAdd(btn?.dataset.q || '');
+  const label = btn?.innerHTML; if (btn) { btn.disabled = true; btn.textContent = 'يجهّز…'; }
+  try { let r = previews.get(id); if (!r) { r = await api({ action: 'preview', tmdb, kind }, pass()); previews.set(id, r); }
+    Object.assign(D.prov, r.providers || {}); if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) if (!D.part.has(p.tmdb)) D.part.set(p.tmdb, p); }
+    const [light, heavy] = split(r.film); openId = null; $('#sheet-body').innerHTML = await sheetHTML(light, { more: heavy }); $('#sheet-body').scrollTop = 0;
+    if (!sheet.open) { sheet.showModal(); if (!calm) sheet.animate({ opacity: [0, 1], transform: [innerWidth <= 640 ? 'translateY(6%)' : 'scale(.97)', 'none'] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' }); history.pushState({ film: 'preview' }, '', location.pathname + location.search); }
+  } catch (err) { if (addDlg.open) $('#add-msg').textContent = err.message; else toast(err.message); }
+  finally { if (btn) { btn.disabled = false; btn.innerHTML = label; } } }
 // يُدخل فيلماً عاد من الخادم (أو محفوظاً بانتظار وصوله في البناء القادم) في القائمة المعروضة
 function adopt(r, draw) { if (!r?.film || D.byId.has(r.film.id)) return false; const [light, heavy] = split(r.film); light.fresh = true; light.ord = -Date.now(); Object.assign(D.prov, r.providers || {});
   if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) D.part.set(p.tmdb, p); } register(light, heavy);
@@ -235,7 +255,10 @@ document.addEventListener('click', e => { const t = e.target.closest('[data-act]
   else if (act === 'reroll') reroll(false);
   else if (act === 'open-tonight') openFilm(tonightId);
   else if (act === 'add') openAdd();
-  else if (act === 'add-part') { if (sheet.open) closeFilm(); openAdd(t.dataset.q); }
+  else if (act === 'add-part') { if (t.dataset.tmdb && pass()) openPreview(+t.dataset.tmdb, t.dataset.kind, t); else { if (sheet.open) closeFilm(); openAdd(t.dataset.q); } }
+  else if (act === 'preview') openPreview(+t.dataset.tmdb, t.dataset.kind, t);
+  else if (act === 'preview-add') addFilm(+t.dataset.tmdb, t.dataset.kind, t, t.innerHTML);
+  else if (act === 'cand-open') { addDlg.close(); openFilm(t.dataset.id); }
   else if (act === 'add-pick') addPick(t);
   else if (act === 'ww') { try { navigator.clipboard?.writeText(t.dataset.t).then(() => toast('نُسخ اسم الفيلم، الصقه في بحث التطبيق')); } catch {} } });
 document.addEventListener('change', e => { const s = e.target.closest('select[data-k]'); if (!s) return; ui[s.dataset.k] = s.value; s.classList.toggle('on', !!s.value || s.dataset.k === 'sort'); apply(s.dataset.k === 'sort'); });

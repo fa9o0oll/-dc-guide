@@ -47,11 +47,12 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await fits('Fate ترتيب المشاهدة');
   await tap('.views [data-view=timeline]'); await page.waitForSelector('.tl .node'); await fits('Fate الخط الزمني');
   // قائمة الأفلام
-  const FL = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/films.json'))).films, inCol = FL.find(f => f.col && f.kind === 'movie' && f.prov);
+  let previewCalls = 0; const FL = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/films.json'))).films, inCol = FL.find(f => f.col && f.kind === 'movie' && f.prov);
   await page.route('**/api/add-film', async r => { const b = r.request().postDataJSON();
     if (b.password !== 'pw') return r.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"password"}' });
-    if (b.action === 'search') return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ parsed: { title: 'Test Film', year: 1999 }, sure: true, candidates: [{ tmdb: 999001, kind: 'movie', title: 'Test Film', year: 1999, poster: null, collection: 'Test Saga' }] }) });
-    return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ state: 'added', providers: {}, collection: { id: 999, name: 'Test Saga', parts: [{ tmdb: 999001, title: 'Test Film', year: 1999 }, { tmdb: 999002, title: 'Test Film 2', year: 2003 }] },
+    if (b.action === 'search') return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ parsed: { title: 'Test Film', year: 1999 }, sure: true, candidates: [{ tmdb: 999001, kind: 'movie', title: 'Test Film', year: 1999, poster: null, collection: 'Test Saga' }, { tmdb: inCol.tmdb, kind: 'movie', title: inCol.title, year: inCol.year, poster: null }] }) });
+    previewCalls += b.action === 'preview';
+    return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ ...(b.action === 'add' ? { state: 'added' } : {}), providers: {}, collection: { id: 999, name: 'Test Saga', parts: [{ tmdb: 999001, title: 'Test Film', year: 1999 }, { tmdb: 999002, title: 'Test Film 2', year: 2003 }] },
       film: { id: 'm999001', tmdb: 999001, kind: 'movie', title: 'Test Film', year: 1999, date: '1999-01-01', genres: [18], rating: 7.1, votes: 10, poster: null, col: 999, prov: null, src: 'added', overviewEn: 'A test.', directors: ['Someone'] } }) }); });
   await page.goto(base + '/films/'); await page.waitForSelector('.tk'); await page.evaluate(() => { try { ['filmsg.progress', 'filmsg.pending', 'filmsg.pass'].forEach(k => localStorage.removeItem(k)); } catch {} }); await page.reload(); await page.waitForSelector('.tk');
   check(`الأفلام: ${FL.length} تذكرة والعنوان صحيح`, await page.locator('.tk').count() === FL.length && await page.title() === 'قائمة أفلامي' && await page.getAttribute('.top .home', 'href') === '../');
@@ -80,7 +81,21 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await tap('[data-v=grid]'); await tap('[data-act=add]'); await page.waitForSelector('#add[open]'); await page.fill('#add-q', 'test film 1999'); await page.fill('#add-pass', 'bad'); await tap('#add-form [type=submit]'); await page.waitForTimeout(300);
   check('الأفلام: كلمة سر خاطئة تُرفض برسالة', (await page.textContent('#add-msg')).includes('كلمة السر'));
   await page.fill('#add-pass', 'pw'); await tap('#add-form [type=submit]'); await page.waitForSelector('.cand'); check('الأفلام: الإضافة تعرض المرشح وسلسلته قبل الحفظ', (await page.textContent('.cand')).includes('Test Saga'));
-  await fits('الأفلام: نافذة الإضافة'); await tap('.cand [data-act=add-pick]'); await page.waitForSelector('#f-m999001');
+  await fits('الأفلام: نافذة الإضافة');
+  check('الأفلام: نتيجة في القائمة لها «افتح بطاقته»، وغيرها «التفاصيل» و«أضفه»', await page.locator(`.cand [data-act=cand-open][data-id=${inCol.id}]`).count() === 1 && await page.locator('.cand [data-act=preview][data-tmdb="999001"]').count() === 1 && await page.locator('.cand [data-act=add-pick]').count() === 1);
+  await tap('.cand [data-act=cand-open]'); await page.waitForSelector('#sheet[open] .sh-acts [data-act=set]');
+  check('الأفلام: «افتح بطاقته» يغلق البحث ويفتح بطاقة الفيلم من القائمة', !(await page.evaluate(() => document.querySelector('#add').open)) && (await page.evaluate(() => location.hash)) === '#' + inCol.id);
+  await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
+  await tap('[data-act=add]'); await page.waitForSelector('#add[open]'); await page.fill('#add-q', 'test film 1999'); await tap('#add-form [type=submit]'); await page.waitForSelector('.cand [data-act=preview]');
+  await tap('.cand [data-act=preview]'); await page.waitForSelector('#sheet[open] [data-act=preview-add]'); await page.waitForTimeout(350);
+  check('الأفلام: «التفاصيل» يفتح بطاقة كاملة من TMDB دون إضافة', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), t = b.textContent;
+    return t.includes('A test.') && t.includes('ليس في قائمتك') && b.querySelectorAll('.order li').length === 2 && b.querySelectorAll('.order li.here').length === 1 && !b.querySelector('[data-act=set]') && !document.getElementById('f-m999001'); }) && previewCalls === 1);
+  await fits('الأفلام: بطاقة الاطلاع'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
+  check('الأفلام: إغلاق بطاقة الاطلاع يعيدك إلى نتائج البحث', await page.evaluate(() => document.querySelector('#add').open && document.querySelectorAll('.cand').length === 2));
+  await tap('.cand [data-act=preview]'); await page.waitForSelector('#sheet[open] [data-act=preview-add]'); check('الأفلام: بطاقة الاطلاع تُحفظ ولا يتكرر طلبها', previewCalls === 1);
+  await tap('#sheet [data-act=preview-add]'); await page.waitForSelector('#f-m999001'); await page.waitForSelector('#sheet[open] .sh-acts [data-act=set]');
+  check('الأفلام: «أضفه إلى قائمتي» يضيفه ويحوّل البطاقة إلى بطاقته في القائمة', !(await page.evaluate(() => document.querySelector('#add').open)) && (await page.textContent('#sheet-body')).includes('لم تُراجَع يدوياً'));
+  await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
   check('الأفلام: المضاف يظهر فوراً بعلامة «جديد»', (await page.textContent('#f-m999001 .tag')).includes('جديد') && await page.locator('.tk').count() === FL.length + 1);
   await page.reload(); await page.waitForSelector('.tk'); check('الأفلام: المضاف يبقى بعد التحديث وكلمة السر لا تُطلب ثانية', await page.locator('#f-m999001').count() === 1 && await page.evaluate(() => localStorage.getItem('filmsg.pass') === 'pw'));
   await tap('#f-m999001 .poster'); await page.waitForSelector('#sheet[open] .order'); check('الأفلام: نافذة المضاف تعرض سلسلته وتنبيه عدم المراجعة', await page.locator('#sheet .order li').count() === 2 && (await page.textContent('#sheet-body')).includes('لم تُراجَع يدوياً'));
