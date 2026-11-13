@@ -134,7 +134,7 @@ function reroll(first) { const ok = f => f.backdrop && f.kind === 'movie' && !un
 const REC = { watch: 'شاهده', optional: 'اختياري', skip: 'تجاوزه', soon: 'قادم' };
 const WKIND = { series: 'سلسلة', universe: 'عالم مشترك', franchise: 'امتياز إعلامي', chain: 'أعمال متتالية' };
 const SRCK = { novel: 'رواية', novels: 'سلسلة روايات', book: 'كتاب', manga: 'مانغا', comic: 'قصص مصورة', game: 'لعبة فيديو', games: 'سلسلة ألعاب فيديو', toy: 'خط ألعاب', musical: 'مسرحية موسيقية', teleplay: 'تمثيلية تلفزيونية', play: 'مسرحية',
-  epic: 'ملحمة', tale: 'حكاية', story: 'قصة قصيرة', article: 'مقال', song: 'أغنية', tvshow: 'مسلسل', film: 'فيلم' };
+  epic: 'ملحمة', tale: 'حكاية', story: 'قصة قصيرة', article: 'مقال', song: 'أغنية', tvshow: 'مسلسل', films: 'سلسلة أفلام', film: 'فيلم' };
 const RELN = { original: 'الأصل', derived: 'اقتُبس عنه', sibling: 'اقتباس آخر' };
 const nWorks = n => count(n, ['عمل واحد', 'عملان', 'أعمال', 'عملاً', 'عمل']);
 const whenOf = o => o.date && o.date > today ? 'بعد ' + nDays(daysTo(o.date)) : o.year || 'لم يُعلن موعده';

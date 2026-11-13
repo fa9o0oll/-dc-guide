@@ -136,10 +136,10 @@ const groupKind = names => { const s = names.join(' ').toLowerCase();
 // شخصية أو إنسان أو جهة ليست مصدراً يُقتبس منه بهذا المعنى (Jason Bourne «شخصية» لا «فيلم»)
 const NOT_SOURCE = /\b(character|human|person|deity|organization|company|band|family|ethnic group)\b/;
 export const SOURCE_KIND = [[/manga|manhwa|light novel|webtoon/, 'manga'], [/comic|graphic novel|comics/, 'comic'], [/video game series|game series|video game franchise/, 'games'], [/video game|videogame/, 'game'],
-  [/tabletop|role-playing game|board game|card game|toy line|toy/, 'toy'], [/musical/, 'musical'], [/teleplay|television play/, 'teleplay'], [/\bplay\b|stage|opera|drama work/, 'play'],
+  [/tabletop|role-playing game|board game|card game|toy line|toy/, 'toy'], [/musical/, 'musical'], [/teleplay|television play/, 'teleplay'], [/\bplay\b|stage play|(?<!soap )opera\b|drama work/, 'play'],
   [/epic poem|epic poetry|oral poetry|\bepic\b/, 'epic'], [/fairy tale|folk tale|folktale|legend|myth|poem/, 'tale'], [/short story|novella/, 'story'],
   [/novel sequence|novel series|book series/, 'novels'], [/\bnovel\b/, 'novel'], [/book|literary work|written work|memoir|biography/, 'book'],
-  [/article|essay|newspaper|magazine/, 'article'], [/song|album|single/, 'song'], [/television series|tv series|miniseries|television program/, 'tvshow'], [/film/, 'film']];
+  [/article|essay|newspaper|magazine/, 'article'], [/song|album|single/, 'song'], [/television series|tv series|miniseries|television program/, 'tvshow'], [/film series|series of films|short film series/, 'films'], [/film/, 'film']];
 const sourceKind = names => { const s = names.join(' ').toLowerCase(); if (NOT_SOURCE.test(s)) return null; for (const [re, k] of SOURCE_KIND) if (re.test(s)) return k; return null; };
 const ADULT = /\bxxx\b|porn|parody/i;
 // فهارس استوديو أو قوائم «أفضل الأفلام» تُكتب أحياناً كسلسلة في Wikidata
