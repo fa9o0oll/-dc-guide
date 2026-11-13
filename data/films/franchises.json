@@ -405,6 +405,11 @@
   "note": "Evil Dead Rise قصة مستقلة بشخصيات جديدة ويكفي وحده، ومثله Evil Dead Burn. الثلاثية الأصلية ثم مسلسل Ash vs Evil Dead قصة آش المتصلة. فيلم 2013 قصة أخرى مستقلة في العالم نفسه.",
   "order": [
    {
+    "m": 2186,
+    "rec": "optional",
+    "note": "فيلم قصير صُنع نموذجاً للأول"
+   },
+   {
     "m": 764,
     "rec": "optional",
     "note": "بداية قصة آش"
@@ -456,6 +461,10 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/collection/1960"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Within_the_Woods"
    }
   ]
  },
@@ -671,7 +680,7 @@
  },
  "tmnt": {
   "name": "TMNT: Mutant Mayhem",
-  "note": "الفيلم بداية جديدة مستقلة عن كل أفلام السلاحف السابقة. المسلسل يكمل من بعده ويمهّد للجزء الثاني المجدول لعام 2027.",
+  "note": "الفيلم بداية جديدة مستقلة عن كل أفلام السلاحف السابقة. المسلسل يكمل من بعده، ومعه فيلم قصير في العالم نفسه، ثم الجزء الثاني المجدول لعام 2027.",
   "order": [
    {
     "m": 614930,
@@ -681,6 +690,11 @@
     "t": 231394,
     "rec": "optional",
     "note": "مسلسل يكمل بعد الفيلم"
+   },
+   {
+    "m": 1488195,
+    "rec": "optional",
+    "note": "فيلم قصير عُرض في السينما في ديسمبر 2025"
    },
    {
     "m": 1156621,
@@ -696,6 +710,10 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/collection/1156855"
+   },
+   {
+    "name": "Bleeding Cool",
+    "url": "https://bleedingcool.com/movies/tmnt-chrome-alone-2-producer-on-revamping-chrome-domes-design"
    }
   ]
  },
@@ -870,6 +888,11 @@
    {
     "m": 41154,
     "rec": "watch"
+   },
+   {
+    "m": 479455,
+    "rec": "skip",
+    "note": "جزء فرعي بأبطال جدد، والأضعف استقبالاً"
    }
   ],
   "sources": [
@@ -951,6 +974,11 @@
     "m": 395,
     "rec": "skip",
     "note": "تقاطع جانبي"
+   },
+   {
+    "m": 440,
+    "rec": "skip",
+    "note": "تكملة AVP، تقاطع جانبي"
    }
   ],
   "sources": [
@@ -1300,7 +1328,7 @@
  },
  "incredibles": {
   "name": "The Incredibles",
-  "note": "Incredibles 2 يبدأ من اللحظة التي انتهى عندها الفيلم الأول، فالأول قبله. الجزء الثالث معلن.",
+  "note": "Incredibles 2 يبدأ من اللحظة التي انتهى عندها الفيلم الأول، فالأول قبله. ومع كل فيلم قصة قصيرة تدور أثناءه: Jack-Jack Attack مع الأول وAuntie Edna مع الثاني، وصدرتا مع نسختيهما المنزلية. الجزء الثالث معلن.",
   "sources": [
    {
     "name": "Wikipedia",
@@ -1309,6 +1337,14 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/collection/468222"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Jack-Jack_Attack"
+   },
+   {
+    "name": "Flickering Myth",
+    "url": "https://www.flickeringmyth.com/2018/09/incredibles-2-blu-ray-special-features-include-auntie-edna-short-release-date-set-for-november/"
    }
   ],
   "order": [
@@ -1318,8 +1354,18 @@
     "note": "قبل Incredibles 2"
    },
    {
+    "m": 13932,
+    "rec": "optional",
+    "note": "فيلم قصير يدور أثناء الأول"
+   },
+   {
     "f": "Incredibles 2",
     "rec": "watch"
+   },
+   {
+    "m": 546728,
+    "rec": "optional",
+    "note": "فيلم قصير يدور أثناء الثاني"
    },
    {
     "m": 1327821,
@@ -1518,9 +1564,18 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/collection/656"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Saw_(2003_film)"
    }
   ],
   "order": [
+   {
+    "m": 246355,
+    "rec": "optional",
+    "note": "فيلم قصير صُنع لإقناع المنتجين، ومشهده جزء من الأول"
+   },
    {
     "all": 656,
     "watchFrom": 7,
@@ -1611,6 +1666,11 @@
     "note": "فيلم فرعي، أحداثه في الثمانينات"
    },
    {
+    "m": 667538,
+    "rec": "optional",
+    "note": "يكمل بعد Bumblebee"
+   },
+   {
     "m": 698687,
     "rec": "optional",
     "note": "فيلم رسوم، الأعلى تقييماً"
@@ -1637,8 +1697,18 @@
     "note": "الأصل"
    },
    {
+    "t": 2286,
+    "rec": "skip",
+    "note": "مسلسل رسوم بخط خاص بعد الأول"
+   },
+   {
     "m": 2978,
     "rec": "optional"
+   },
+   {
+    "m": 43074,
+    "rec": "skip",
+    "note": "ريبوت منفصل"
    },
    {
     "m": 425909,
@@ -1771,6 +1841,11 @@
   "note": "كل فيلم مهمة مستقلة، وترتيب الصدور أفضل لتطوّر الشخصيات، خصوصاً من الجزء الثالث. Dead Reckoning وThe Final Reckoning قصة واحدة في جزأين. علامة «شاهده» هنا على ما تقييمه 7 فأعلى في TMDB.",
   "order": [
    {
+    "t": 4357,
+    "rec": "optional",
+    "note": "المسلسل الأصلي (1966 إلى 1973) الذي ألهم الأفلام"
+   },
+   {
     "all": 87359,
     "watchFrom": 7,
     "set": {
@@ -1791,6 +1866,10 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/collection/87359"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Mission:_Impossible_(1966_TV_series)"
    }
   ]
  },
@@ -1808,6 +1887,11 @@
    }
   ],
   "order": [
+   {
+    "m": 8587,
+    "rec": "optional",
+    "note": "الأصل المرسوم، الأعلى تقييماً"
+   },
    {
     "m": 420818,
     "rec": "watch"
@@ -2077,7 +2161,7 @@
  },
  "m3gan": {
   "name": "M3GAN",
-  "note": "الأول مكتمل وحده. الثاني يدور بعده بسنتين وينتقل من الرعب إلى الأكشن والخيال العلمي.",
+  "note": "الأول مكتمل وحده. الثاني يدور بعده بسنتين وينتقل من الرعب إلى الأكشن والخيال العلمي. وSOULM8TE فيلم فرعي في العالم نفسه بقصة وأبطال آخرين، طُرح رقمياً في أغسطس 2026.",
   "order": [
    {
     "m": 536554,
@@ -2086,6 +2170,11 @@
    {
     "m": 1071585,
     "rec": "optional"
+   },
+   {
+    "m": 1307118,
+    "rec": "optional",
+    "note": "فيلم فرعي بقصة منفصلة"
    }
   ],
   "sources": [
@@ -2096,6 +2185,10 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/collection/1071588"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/SOULM8TE"
    }
   ]
  },
@@ -3320,6 +3413,342 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/movie/391"
+   }
+  ]
+ },
+ "unbreakable": {
+  "name": "Unbreakable Trilogy",
+  "note": "ثلاثية M. Night Shyamalan بترتيب صدورها. Split يبدو فيلماً مستقلاً حتى مشهده الأخير الذي يكشف أنه في عالم Unbreakable، ثم يجمع Glass أبطال الفيلمين. فلا تشاهد Glass قبلهما. الأول والثاني أعلى استقبالاً من الثالث.",
+  "order": [
+   {
+    "m": 9741,
+    "rec": "watch"
+   },
+   {
+    "m": 381288,
+    "rec": "watch",
+    "note": "يتصل بالأول في مشهده الأخير"
+   },
+   {
+    "m": 450465,
+    "rec": "watch",
+    "note": "يجمع الفيلمين"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Unbreakable_(film_series)"
+   },
+   {
+    "name": "Screen Rant",
+    "url": "https://screenrant.com/unbreakable-trilogy-split-glass-viewing-order/"
+   }
+  ]
+ },
+ "cloverfield": {
+  "name": "Cloverfield",
+  "note": "كل فيلم قصة مستقلة بأبطال مختلفين، يربطها خيط Cloverfield والعالم نفسه، فلا يلزم ترتيب. 10 Cloverfield Lane هو الأعلى تقييماً، وThe Cloverfield Paradox الأضعف استقبالاً. وجزء رابع قيد التطوير بإخراج Babak Anvari، بلا عنوان ولا موعد معلن، وسيكون أول تكملة مباشرة للفيلم الأول.",
+  "order": [
+   {
+    "m": 7191,
+    "rec": "watch",
+    "note": "الأول، مصوَّر بكاميرا محمولة"
+   },
+   {
+    "m": 333371,
+    "rec": "watch",
+    "note": "الأعلى تقييماً"
+   },
+   {
+    "m": 384521,
+    "rec": "skip",
+    "note": "الأضعف استقبالاً"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Cloverfield_(franchise)"
+   },
+   {
+    "name": "GamesRadar+",
+    "url": "https://www.gamesradar.com/entertainment/horror-movies/cloverfield-2-is-still-moving-forward-as-director-teases-the-long-awaited-sequel-youre-gonna-get-something-amazing"
+   }
+  ]
+ },
+ "middle-earth": {
+  "name": "Middle-earth",
+  "note": "أفلام الأرض الوسطى بترتيب صدورها، وهو المعتاد لأول مشاهدة. ثلاثية The Lord of the Rings هي القلب والأعلى تقييماً. ثلاثية The Hobbit تدور قبلها بعقود، ومسلسل The Rings of Power قبلها بآلاف السنين، وThe War of the Rohirrim فيلم أنمي قبلها بنحو 183 سنة. أما The Hunt for Gollum فيدور بين The Hobbit والثلاثية، ويتقاطع مع أحداث The Fellowship of the Ring.",
+  "order": [
+   {
+    "m": 120,
+    "rec": "watch"
+   },
+   {
+    "m": 121,
+    "rec": "watch"
+   },
+   {
+    "m": 122,
+    "rec": "watch"
+   },
+   {
+    "m": 49051,
+    "rec": "optional",
+    "note": "قبل الثلاثية بعقود"
+   },
+   {
+    "m": 57158,
+    "rec": "optional"
+   },
+   {
+    "m": 122917,
+    "rec": "optional"
+   },
+   {
+    "t": 84773,
+    "rec": "optional",
+    "note": "قبل الأفلام بآلاف السنين"
+   },
+   {
+    "m": 839033,
+    "rec": "optional",
+    "note": "قبل الثلاثية بنحو 183 سنة"
+   },
+   {
+    "m": 1090869,
+    "rec": "soon",
+    "note": "بين The Hobbit والثلاثية"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Lord_of_the_Rings:_The_Hunt_for_Gollum"
+   },
+   {
+    "name": "Rotten Tomatoes",
+    "url": "https://editorial.rottentomatoes.com/guide/lord-of-the-rings-in-order"
+   }
+  ]
+ },
+ "searching": {
+  "name": "Searching",
+  "note": "Missing قصة مستقلة بأبطال جدد في عالم Searching نفسه وبأسلوبه: الأحداث كلها تُروى عبر شاشات الحاسوب والهواتف. يكفي أي منهما وحده، والأفضل بترتيب الصدور.",
+  "order": [
+   {
+    "m": 489999,
+    "rec": "watch"
+   },
+   {
+    "m": 768362,
+    "rec": "watch",
+    "note": "قصة مستقلة في العالم نفسه"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Missing_(2023_film)"
+   },
+   {
+    "name": "RogerEbert.com",
+    "url": "https://www.rogerebert.com/reviews/missing-movie-review-2023"
+   }
+  ]
+ },
+ "cornetto": {
+  "name": "Three Flavours Cornetto",
+  "note": "ثلاثية Edgar Wright مع Simon Pegg وNick Frost: ثلاث قصص مستقلة بلا شخصيات مشتركة، يربطها الطاقم والروح الساخرة ومثلجات Cornetto بنكهة مختلفة في كل فيلم. ترتيب الصدور هو المفضل لأن نبرتها تنضج من فيلم إلى آخر.",
+  "order": [
+   {
+    "m": 747,
+    "rec": "watch"
+   },
+   {
+    "m": 4638,
+    "rec": "watch"
+   },
+   {
+    "m": 107985,
+    "rec": "watch",
+    "note": "الخاتمة"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Three_Flavours_Cornetto_trilogy"
+   },
+   {
+    "name": "/Film",
+    "url": "https://www.slashfilm.com/1579727/correct-order-to-watch-cornetto-trilogy"
+   }
+  ]
+ },
+ "vengeance": {
+  "name": "The Vengeance Trilogy",
+  "note": "ثلاثية Park Chan-wook عن الانتقام: ثلاث قصص مستقلة لا يربطها إلا الموضوع، فلا يلزم ترتيب. Oldboy أشهرها وأعلاها تقييماً، وفاز بالجائزة الكبرى في مهرجان كان 2004.",
+  "order": [
+   {
+    "m": 4689,
+    "rec": "optional"
+   },
+   {
+    "m": 670,
+    "rec": "watch",
+    "note": "الأعلى تقييماً"
+   },
+   {
+    "m": 4550,
+    "rec": "optional"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Vengeance_Trilogy"
+   },
+   {
+    "name": "The Playlist",
+    "url": "https://theplaylist.net/15-thematic-trilogies-from-15-directors-20140507/6/"
+   }
+  ]
+ },
+ "aladdin": {
+  "name": "Aladdin",
+  "note": "فيلم 2019 إعادة صنع حيّة لفيلم ديزني المرسوم (1992) بالقصة نفسها، ويكفي وحده. الأصل المرسوم أعلى تقييماً. تكملات النسخة المرسومة ومسلسلها تخصها وحدها ولا صلة لها بفيلم 2019. وأُعلن عام 2020 عن تطوير تكملة لفيلم 2019، ولا جديد عنها منذ ذلك.",
+  "order": [
+   {
+    "m": 812,
+    "rec": "watch",
+    "note": "الأصل المرسوم، الأعلى تقييماً"
+   },
+   {
+    "m": 420817,
+    "rec": "watch",
+    "note": "ريميك حي"
+   },
+   {
+    "t": 2745,
+    "rec": "skip",
+    "note": "مسلسل للنسخة المرسومة"
+   },
+   {
+    "m": 15969,
+    "rec": "skip",
+    "note": "تكملة للنسخة المرسومة"
+   },
+   {
+    "m": 11238,
+    "rec": "skip",
+    "note": "تكملة للنسخة المرسومة"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Aladdin_(2019_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/movie/420817"
+   }
+  ]
+ },
+ "little-mermaid": {
+  "name": "The Little Mermaid",
+  "note": "فيلم 2023 إعادة صنع حيّة لفيلم ديزني المرسوم (1989)، وكلاهما عن حكاية هانس كريستيان أندرسن (1837). يكفي وحده، والأصل المرسوم أعلى تقييماً. تكملات النسخة المرسومة ومسلسلها تخصها وحدها.",
+  "order": [
+   {
+    "m": 10144,
+    "rec": "watch",
+    "note": "الأصل المرسوم، الأعلى تقييماً"
+   },
+   {
+    "m": 447277,
+    "rec": "watch",
+    "note": "ريميك حي"
+   },
+   {
+    "t": 2675,
+    "rec": "skip",
+    "note": "مسلسل للنسخة المرسومة"
+   },
+   {
+    "m": 10898,
+    "rec": "skip",
+    "note": "تكملة للنسخة المرسومة"
+   },
+   {
+    "m": 13676,
+    "rec": "skip",
+    "note": "للنسخة المرسومة"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Little_Mermaid_(2023_film)"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/movie/447277"
+   }
+  ]
+ },
+ "alita": {
+  "name": "Battle Angel Alita",
+  "note": "الفيلم مقتبس عن مانغا Gunnm للياباني Yukito Kishiro، وتُعرف بالإنجليزية باسم Battle Angel Alita. سبقه أنمي قصير من حلقتين عام 1993 اقتبس أول مجلدين منها، وهو مستقل عن الفيلم ولا يلزم قبله. وتكملة الفيلم قيد الكتابة بين James Cameron وRobert Rodriguez، بلا موعد.",
+  "order": [
+   {
+    "m": 17189,
+    "rec": "optional",
+    "note": "أنمي من حلقتين، مستقل"
+   },
+   {
+    "m": 399579,
+    "rec": "watch"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Alita:_Battle_Angel"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Battle_Angel_Alita"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/movie/17189"
+   }
+  ]
+ },
+ "greyhound": {
+  "name": "Greyhound",
+  "note": "Greyhound 2 تكملة مباشرة يعود فيها Tom Hanks كاتباً وبطلاً، بدأ تصويرها في أستراليا في فبراير 2026، ولم يُعلن موعد عرضها.",
+  "order": [
+   {
+    "m": 516486,
+    "rec": "watch"
+   },
+   {
+    "m": 1051002,
+    "rec": "soon",
+    "note": "تكملة مباشرة"
+   }
+  ],
+  "sources": [
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Greyhound_2"
+   },
+   {
+    "name": "Film Stories",
+    "url": "https://filmstories.co.uk/news/greyhound-2-is-in-production-tom-hanks-and-stephen-graham-returning/"
    }
   ]
  }

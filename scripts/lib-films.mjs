@@ -100,5 +100,7 @@ export async function processFranchises(raw, get) {
   }
   return { items, extras, problems };
 }
-export const basicMovie = d => ({ title: d.title, date: d.release_date || null, year: d.release_date ? +d.release_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null });
-export const basicTv = d => ({ title: d.name, date: d.first_air_date || null, year: d.first_air_date ? +d.first_air_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null, seasons: d.number_of_seasons || null, tv: true });
+// النوع واللغة والمدة تصف العمل في الترتيب (فيلم رسوم، أنمي، فيلم قصير)
+const kindBits = d => JSON.parse(JSON.stringify({ genres: d.genres?.length ? d.genres.map(g => g.id) : undefined, lang: d.original_language || undefined, runtime: d.runtime || undefined }));
+export const basicMovie = d => ({ title: d.title, date: d.release_date || null, year: d.release_date ? +d.release_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null, ...kindBits(d) });
+export const basicTv = d => ({ title: d.name, date: d.first_air_date || null, year: d.first_air_date ? +d.first_air_date.slice(0, 4) : null, poster: d.poster_path || null, rating: d.vote_count ? Math.round(d.vote_average * 10) / 10 : null, seasons: d.number_of_seasons || null, tv: true, ...kindBits(d) });

@@ -8,7 +8,7 @@ const RAW = process.env.WORLDS_RAW;
 if (!RAW && !hasKey()) { console.error('missing TMDB_API_KEY'); process.exit(1); }
 const root = new URL('../', import.meta.url), dir = d => d && new URL(d.replace(/\/?$/, '/'), 'file://' + process.cwd() + '/');
 // WORLDS_OUT: مجلد بديل للناتج (عند التجربة المحلية، كي لا تتغير ملفات الموقع)
-const OUT = dir(process.env.WORLDS_OUT) || new URL('site/films/data/', root), GEN = dir(process.env.WORLDS_OUT) || new URL('data/generated/films/', root), SRC = new URL('site/films/data/', root);
+const OUT = dir(process.env.WORLDS_OUT) || new URL('site/films/data/', root), GEN = dir(process.env.WORLDS_OUT) || new URL('data/generated/films/', root), SRC = dir(process.env.WORLDS_SRC) || new URL('site/films/data/', root);
 const rd = (u, fb) => fs.existsSync(u) ? JSON.parse(fs.readFileSync(u)) : fb;
 const films = rd(new URL('films.json', SRC)).films, fr = rd(new URL('franchises.json', SRC), { items: {} }), cols = rd(new URL('collections.json', SRC), {});
 const keyOf = f => (f.kind === 'tv' ? 't' : 'm') + f.tmdb, focus = films.map(keyOf);
@@ -25,6 +25,10 @@ else {
   catch (e) { console.log('WORLDS failed, keeping the previous worlds.json: ' + e.message); process.exit(0); }
   for (const [k, v] of Object.entries(res.basic)) if (!known[k]) cache[k] = { ...v, at: cache[k] && fresh[k] ? cache[k].at : now };
   fs.writeFileSync(CACHE, JSON.stringify(cache) + '\n'); }
+// data/films/worlds-audit.json: skip أعمال تُركت عمداً خارج ترتيب مراجَع (للتقرير)، وhide أعمال لا تُعرض في «أعمال مرتبطة» لسببها المكتوب
+const audit = rd(new URL('data/films/worlds-audit.json', root), {}), hide = new Set(audit.hide || []);
+for (const w of Object.values(res.works)) if (w.rel) { w.rel = w.rel.filter(r => !hide.has(r.k)); if (!w.rel.length) delete w.rel; }
+for (const k of hide) if (!Object.values(res.worlds).some(w => w.order.includes(k))) delete res.info[k];
 // ربط البوابات: عمل في القائمة موجود في دليل DC أو Fate (المطابقة برقم IMDb لأنه لا يتكرر بين الأفلام والمسلسلات)
 for (const [door, file] of [['dc', 'site/dc/data/catalog.json'], ['fate', 'site/fate/data/catalog.json']]) {
   const cat = rd(new URL(file, root), { works: [] }), byImdb = new Map((cat.works || []).filter(w => w.imdb).map(w => [w.imdb, w.id]));
@@ -34,8 +38,8 @@ fs.writeFileSync(new URL('worlds.json', OUT), JSON.stringify(out) + '\n');
 
 // ---------- تقرير التدقيق ----------
 // ناقص: عمل في عالم أو سلسلة وليس له ترتيب مراجَع ولا مجموعة TMDB. فجوات المراجَع: أعضاء في العالم ليسوا في ترتيبه المراجَع.
-// data/films/worlds-audit.json: أعمال تُركت عمداً خارج ترتيب مراجَع (قرار تحريري موثّق)، فلا تُعدّ فجوة في كل تقرير.
-const skip = rd(new URL('data/films/worlds-audit.json', root), { skip: {} }).skip || {};
+// أعمال تُركت عمداً خارج ترتيب مراجَع (قرار تحريري موثّق في worlds-audit.json)، فلا تُعدّ فجوة في كل تقرير.
+const skip = audit.skip || {};
 const curOf = new Map(); for (const [k, g] of Object.entries(fr.items || {})) for (const s of g.order || []) { const id = s.m ? 'm' + s.m : s.t ? 't' + s.t : null; if (id) curOf.set(id, k); }
 const colOf = f => { const c = f.col && cols[f.col]; return c && c.parts.length > 1 ? c : null; };
 const title = k => known[k]?.title || res.info[k]?.title || k;

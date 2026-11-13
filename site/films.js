@@ -1,5 +1,5 @@
-// قائمة أفلامي: شبكة تذاكر، بحث وتصفية، نافذة لكل فيلم (معلوماته، أين يُعرض في السعودية، ترتيب سلسلته)، وزر «أضف فيلماً».
-// البيانات تُبنى في scripts/build-films.mjs. سجل المشاهدة يُحفظ في المتصفح بالمفتاح filmsg.progress.
+// قائمة أفلامي: شبكة تذاكر، بحث وتصفية، نافذة لكل فيلم (معلوماته، أين يُعرض في السعودية، ترتيب سلسلته أو عالمه، وأعماله المرتبطة)، وزر «أضف فيلماً».
+// البيانات تُبنى في scripts/build-films.mjs، وخريطة العوالم في scripts/build-worlds.mjs (Wikidata). سجل المشاهدة يُحفظ في المتصفح بالمفتاح filmsg.progress.
 import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { segs } from './count.js?v=__BUILD__';
@@ -133,7 +133,8 @@ function reroll(first) { const ok = f => f.backdrop && f.kind === 'movie' && !un
 // ثم مجموعة TMDB كما هي (أفلام فقط بترتيب الصدور). العالم الآلي بلا توصيات، ويُذكر مصدره.
 const REC = { watch: 'شاهده', optional: 'اختياري', skip: 'تجاوزه', soon: 'قادم' };
 const WKIND = { series: 'سلسلة', universe: 'عالم مشترك', franchise: 'امتياز إعلامي', chain: 'أعمال متتالية' };
-const SRCK = { novel: 'رواية', book: 'كتاب', manga: 'مانغا', comic: 'قصص مصورة', game: 'لعبة فيديو', toy: 'خط ألعاب', musical: 'مسرحية موسيقية', play: 'مسرحية', tale: 'حكاية', story: 'قصة قصيرة', article: 'مقال', song: 'أغنية', tvshow: 'مسلسل', film: 'فيلم' };
+const SRCK = { novel: 'رواية', novels: 'سلسلة روايات', book: 'كتاب', manga: 'مانغا', comic: 'قصص مصورة', game: 'لعبة فيديو', games: 'سلسلة ألعاب فيديو', toy: 'خط ألعاب', musical: 'مسرحية موسيقية', teleplay: 'تمثيلية تلفزيونية', play: 'مسرحية',
+  epic: 'ملحمة', tale: 'حكاية', story: 'قصة قصيرة', article: 'مقال', song: 'أغنية', tvshow: 'مسلسل', film: 'فيلم' };
 const RELN = { original: 'الأصل', derived: 'اقتُبس عنه', sibling: 'اقتباس آخر' };
 const nWorks = n => count(n, ['عمل واحد', 'عملان', 'أعمال', 'عملاً', 'عمل']);
 const whenOf = o => o.date && o.date > today ? 'بعد ' + nDays(daysTo(o.date)) : o.year || 'لم يُعلن موعده';
@@ -180,9 +181,9 @@ function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribut
 const sheet = $('#sheet'), addDlg = $('#add');
 let openId = null;
 const isHere = (f, s) => { const l = listedOf(s); return l ? l.id === f.id : (s.m && f.kind === 'movie' && s.m === f.tmdb) || (s.t && f.kind === 'tv' && s.t === f.tmdb); };
-const row = (f, s, i, auto, far) => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = isHere(f, s), k = kindOf(s);
+const row = (f, s, i, auto, far) => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = isHere(f, s), k0 = kindOf(s), k = k0 && s.note?.includes(k0) ? '' : k0;
   const rec = s.rec || (auto && (o.date ? o.date > today : !o.year) ? 'soon' : '');
-  return `<li data-n="${i + 1}" class="${[here ? 'here' : '', w ? 'watched' : '', rec ? 'r-' + rec : '', far ? 'far' : ''].filter(Boolean).join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k)}</span>
+  return `<li data-n="${i + 1}" class="${[here ? 'here' : '', w ? 'watched' : '', rec ? 'r-' + rec : '', far ? 'far' : ''].filter(Boolean).join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k0)}</span>
 <span class="t"><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? ar(s.note) : ''].filter(Boolean).join(' · ')}</small></span>
 <span class="st">${rec ? `<i class="rc ${rec}">${REC[rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'اعرض'} ${esc(o.title || '')}"></button>`}</li>`; };
 // ترتيب طويل (أكثر من ١٤ عملاً) يُختصر إلى نافذة حول هذا العمل، وزر يعرضه كاملاً

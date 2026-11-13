@@ -35,8 +35,8 @@ const mem = [
   ...Array.from({ length: 14 }, (_, i) => ({ g: 'Q_DISNEY', prop: 'P179', m: 'Q_D' + i, tm: 5000 + i, date: `19${50 + i}-01-01` })), { g: 'Q_DISNEY', prop: 'P179', m: 'Q_FIST', tm: 391 } ];
 const adapt = [{ s: 'Q_PNOVEL', x: 'Q_P98', tm: 11252, date: '1998-12-04' }, { s: 'Q_PNOVEL', x: 'Q_PSYCHO', tm: 539, date: '1960-06-22' }, { s: 'Q_DUNENOVEL', x: 'Q_DUNE84', tm: 841, date: '1984-12-14' }, { s: 'Q_DUNENOVEL', x: 'Q_DUNE21', tm: 438631, date: '2021-09-15' }, { s: 'Q_DUNENOVEL', x: 'Q_DUNEMINI', tt: 1, date: '2000-12-03' }];
 const basic = { m938: { title: 'For a Few Dollars More', date: '1965-12-18', votes: 4000 }, m429: { title: 'The Good, the Bad and the Ugly', date: '1966-12-23', votes: 9000 },
-  m391: { title: 'A Fistful of Dollars', date: '1964-09-12', votes: 4500 }, m489999: { title: 'Searching', date: '2018-08-24' }, m768362: { title: 'Missing', date: '2023-01-19' },
-  m265195: { title: 'Wild Tales', date: '2014-08-21' }, m78237: { title: 'On Probation', date: '2005-05-12' }, m966: { title: 'The Magnificent Seven', date: '1960-10-12', votes: 2000 },
+  m391: { title: 'A Fistful of Dollars', date: '1964-09-12', votes: 4500 }, m489999: { title: 'Searching', date: '2018-08-24' }, m768362: { title: 'Missing', date: '2023-01-19', votes: 1500 },
+  m265195: { title: 'Wild Tales', date: '2014-08-21' }, m78237: { title: 'On Probation', date: '2005-05-12', votes: 50 }, m966: { title: 'The Magnificent Seven', date: '1960-10-12', votes: 2000 },
   m999999: { title: 'Seven Samurai: A XXX Parody', adult: true }, m841: { title: 'Dune', date: '1984-12-14', votes: 3000 }, t1: { title: 'Frank Herbert\'s Dune', date: '2000-12-03', votes: 300, tv: true },
   t46786: { title: 'Bates Motel', date: '2013-03-18', votes: 3500, tv: true }, m11878: { title: 'Yojimbo', date: '1961-04-25', votes: 1500 }, m11252: { title: 'Psycho', date: '1998-12-04', votes: 900 } };
 const r = assemble({ focus, rel, info, mem, adapt, typeNames, basic });
@@ -54,18 +54,22 @@ check('ريميك مقتبس عن الفيلم وعن روايته يُوصف «
 check('معلومات الأعمال المذكورة فقط، بلا أعمال القائمة وبلا علامة البالغين', r.info.m938 && r.info.t46786 && !r.info.m391 && !Object.values(r.info).some(x => 'adult' in x), Object.keys(r.info));
 // قواعد إضافية: عمل في أربع مجموعات، وامتياز بوسم ناقص داخل سلسلة أكبر، وعضو بلا اسم في TMDB، وتكملة بعنوان مختلف البداية للمخرج نفسه
 { const rel2 = [{ tk: 'm1', item: 'Q1', prop: 'ITEM' }, ...['G_A', 'G_B', 'G_C', 'G_D'].map(g => ({ tk: 'm1', item: 'Q1', prop: 'P179', o: g })), { tk: 'm1', item: 'Q1', prop: 'P8345', o: 'G_BOND' }, { tk: 'm1', item: 'Q1', prop: 'P179', o: 'G_EON' },
-    { tk: 'm9', item: 'Q9', prop: 'ITEM' }, { tk: 'm9', item: 'Q9', prop: 'P156', o: 'Q10' }, { tk: 'm9', item: 'Q9', prop: 'DIR', o: 'Q_ISAAC' }];
+    { tk: 'm9', item: 'Q9', prop: 'ITEM' }, { tk: 'm9', item: 'Q9', prop: 'P156', o: 'Q10' }, { tk: 'm9', item: 'Q9', prop: 'DIR', o: 'Q_ISAAC' },
+    { tk: 'm1', item: 'Q1', prop: 'P144', o: 'Q_CHAR' }, { tk: 'm1', item: 'Q1', prop: 'P144', o: 'Q_ILIAD' }];
   const info2 = { G_A: { label: 'A', types: ['T_S'] }, G_B: { label: 'B', types: ['T_S'] }, G_C: { label: 'C', types: ['T_S'] }, G_D: { label: 'D', types: ['T_S'] }, G_EON: { label: 'Eon', types: ['T_S'] }, G_BOND: { label: 'Bond franchise', types: ['T_F'] },
-    Q9: { label: 'Undisputed III: Redemption', tm: 9, next: ['Q10'], dir: ['Q_ISAAC'], prev: [] }, Q10: { label: 'Boyka: Undisputed IV', tm: 10, prev: ['Q9'], dir: ['Q_ISAAC'], next: [] } };
+    Q9: { label: 'Undisputed III: Redemption', tm: 9, next: ['Q10'], dir: ['Q_ISAAC'], prev: [] }, Q10: { label: 'Boyka: Undisputed IV', tm: 10, prev: ['Q9'], dir: ['Q_ISAAC'], next: [] },
+    Q_CHAR: { label: 'Jason Bourne', types: ['T_FC', 'T_FH'] }, Q_ILIAD: { label: 'Iliad', types: ['T_LW', 'T_EP'] } };
   const M = (g, ...ks) => ks.map(k => ({ g, prop: 'P179', m: 'Q' + k.slice(1), tm: +k.slice(1) }));
   const mem2 = [...M('G_A', 'm1', 'm2'), ...M('G_B', 'm1', 'm2', 'm3'), ...M('G_C', 'm1', 'm2', 'm3', 'm4'), ...M('G_D', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6'), ...M('G_EON', 'm1', 'm20', 'm21', 'm22', 'm23'),
     ...M('G_BOND', 'm1', 'm20').map(r => ({ ...r, prop: 'P8345' })), ...M('G_A', 'm404')];
-  const basic2 = Object.fromEntries(['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm20', 'm21', 'm22', 'm23'].map((k, i) => [k, { title: 'Film ' + k, date: `20${10 + i}-01-01` }]));
-  basic2.m9 = { title: 'Undisputed III: Redemption', date: '2010-04-17' }; basic2.m10 = { title: 'Boyka: Undisputed IV', date: '2016-08-01' };
-  const r2 = assemble({ focus: ['m1', 'm9'], rel: rel2, info: info2, mem: mem2, typeNames: { T_S: 'film series', T_F: 'media franchise' }, basic: basic2 });
+  const basic2 = Object.fromEntries(['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm20', 'm21', 'm22', 'm23'].map((k, i) => [k, { title: 'Film ' + k, date: `20${10 + i}-01-01`, votes: 100 }]));
+  basic2.m9 = { title: 'Undisputed III: Redemption', date: '2010-04-17', votes: 300 }; basic2.m10 = { title: 'Boyka: Undisputed IV', date: '2016-08-01', votes: 800 };
+  basic2.m30 = { title: 'Fan Film', date: '2016-01-01', votes: 1 }; basic2.m31 = { title: 'Announced Sequel', date: null, votes: 0 }; mem2.push(...M('G_A', 'm30', 'm31'));
+  const r2 = assemble({ focus: ['m1', 'm9'], rel: rel2, info: info2, mem: mem2, typeNames: { T_S: 'film series', T_F: 'media franchise', T_FC: 'film character', T_FH: 'fictional human', T_LW: 'literary work', T_EP: 'epic poem' }, basic: basic2 });
+  check('الشخصية ليست مصدراً، والملحمة مصدر بنوعها', r2.works.m1.src?.length === 1 && r2.works.m1.src[0].label === 'Iliad' && r2.works.m1.src[0].kind === 'epic', r2.works.m1.src);
   check('عمل في أكثر من ثلاث مجموعات: كل عالم مذكور له موجود في الخريطة', r2.works.m1.worlds.length === 3 && r2.works.m1.worlds.every(id => r2.worlds[id]), { works: r2.works.m1, have: Object.keys(r2.worlds) });
   check('امتياز بوسم ناقص داخل سلسلة أكبر لا يُعرض عالماً', !r2.works.m1.worlds.includes('G_BOND') && !r2.worlds.G_BOND, r2.works.m1);
-  check('عضو لا اسم له في TMDB لا يظهر في الترتيب', !JSON.stringify(r2.worlds).includes('m404') && r2.worlds.G_A?.order.join() === 'm1,m2', r2.worlds.G_A);
+  check('عضو لا اسم له في TMDB لا يظهر، ولا فيلم صدر بلا جمهور تقريباً، والمعلن يظهر', !JSON.stringify(r2.worlds).includes('m404') && r2.worlds.G_A?.order.join() === 'm1,m2,m31', r2.worlds.G_A);
   check('تكملة بعنوان يشترك في كلمة مميزة تُقبل ولو كان المخرج نفسه', r2.worlds['c:m9']?.order.join() === 'm9,m10', { w: r2.worlds, rej: r2.report.rejectedFollows }); }
 const need = neededKeys({ focus, rel, info, mem, adapt, typeNames });
 check('لا تُجلب أعضاء فهرس الاستوديو ولا قوائم الأفلام من TMDB', !need.some(k => /^m50\d\d$/.test(k)) && need.includes('m938') && need.includes('m841') && !need.includes('m391'), need);

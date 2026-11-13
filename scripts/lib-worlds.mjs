@@ -59,7 +59,7 @@ export async function relations(keys, opt) {
   return rows;
 }
 
-// ٢) معلومات عناصر: الاسم، رقمه في TMDB، أنواعه (P31)، أقدم تاريخ صدور، مقالته في ويكيبيديا، ما قبله وما بعده، ومخرجوه.
+// ٢) معلومات عناصر: الاسم، رقمه في TMDB، أنواعه (P31، ومعها شكل العمل P7937: رواية، قصة قصيرة، ملحمة…)، أقدم تاريخ صدور، مقالته في ويكيبيديا، ما قبله وما بعده، ومخرجوه.
 export async function nodes(list, opt) {
   const out = {};
   for (const part of chunks(uniq(list).filter(q => /^Q\d+$/.test(q)), 120)) {
@@ -69,7 +69,7 @@ export async function nodes(list, opt) {
   (GROUP_CONCAT(DISTINCT STRAFTER(STR(?dr), "entity/"); separator=",") AS ?dir) WHERE {
   VALUES ?o { ${qv(part)} }
   OPTIONAL { ?o rdfs:label ?en FILTER(LANG(?en) = "en") }
-  OPTIONAL { ?o wdt:P4947 ?tm } OPTIONAL { ?o wdt:P4983 ?tt } OPTIONAL { ?o wdt:P31 ?ty } OPTIONAL { ?o wdt:P577 ?d }
+  OPTIONAL { ?o wdt:P4947 ?tm } OPTIONAL { ?o wdt:P4983 ?tt } OPTIONAL { ?o wdt:P31|wdt:P7937 ?ty } OPTIONAL { ?o wdt:P577 ?d }
   OPTIONAL { ?w schema:about ?o ; schema:isPartOf <https://en.wikipedia.org/> }
   OPTIONAL { ?o wdt:P155 ?pv } OPTIONAL { ?o wdt:P156 ?nx } OPTIONAL { ?o wdt:P57 ?dr }
 } GROUP BY ?o`;
@@ -133,11 +133,14 @@ const NOT_GROUP = /\b(list|category|ranking|award|catalog|filmography|disambigua
 const groupKind = names => { const s = names.join(' ').toLowerCase();
   if (/universe|setting|multiverse|continuity/.test(s)) return 'universe'; if (/franchise|brand|intellectual property/.test(s)) return 'franchise'; return 'series'; };
 // نوع المصدر غير المرئي (كتاب، مانغا، لعبة…) من أسماء أنواعه بالإنجليزية. ما لا يُعرف يُهمَل (حدث، شخص، ظاهرة).
-export const SOURCE_KIND = [[/manga|manhwa|light novel|webtoon/, 'manga'], [/comic|graphic novel|comics/, 'comic'], [/video game|game series|videogame/, 'game'],
-  [/tabletop|role-playing game|board game|card game|toy line|toy/, 'toy'], [/musical/, 'musical'], [/\bplay\b|stage|opera|drama work/, 'play'],
-  [/fairy tale|folk tale|folktale|legend|myth|epic poem|poem/, 'tale'], [/short story|novella/, 'story'], [/\bnovel\b|novel series/, 'novel'], [/book|literary work|written work|book series|memoir|biography/, 'book'],
+// شخصية أو إنسان أو جهة ليست مصدراً يُقتبس منه بهذا المعنى (Jason Bourne «شخصية» لا «فيلم»)
+const NOT_SOURCE = /\b(character|human|person|deity|organization|company|band|family|ethnic group)\b/;
+export const SOURCE_KIND = [[/manga|manhwa|light novel|webtoon/, 'manga'], [/comic|graphic novel|comics/, 'comic'], [/video game series|game series|video game franchise/, 'games'], [/video game|videogame/, 'game'],
+  [/tabletop|role-playing game|board game|card game|toy line|toy/, 'toy'], [/musical/, 'musical'], [/teleplay|television play/, 'teleplay'], [/\bplay\b|stage|opera|drama work/, 'play'],
+  [/epic poem|epic poetry|oral poetry|\bepic\b/, 'epic'], [/fairy tale|folk tale|folktale|legend|myth|poem/, 'tale'], [/short story|novella/, 'story'],
+  [/novel sequence|novel series|book series/, 'novels'], [/\bnovel\b/, 'novel'], [/book|literary work|written work|memoir|biography/, 'book'],
   [/article|essay|newspaper|magazine/, 'article'], [/song|album|single/, 'song'], [/television series|tv series|miniseries|television program/, 'tvshow'], [/film/, 'film']];
-const sourceKind = names => { const s = names.join(' ').toLowerCase(); for (const [re, k] of SOURCE_KIND) if (re.test(s)) return k; return null; };
+const sourceKind = names => { const s = names.join(' ').toLowerCase(); if (NOT_SOURCE.test(s)) return null; for (const [re, k] of SOURCE_KIND) if (re.test(s)) return k; return null; };
 const ADULT = /\bxxx\b|porn|parody/i;
 // فهارس استوديو أو قوائم «أفضل الأفلام» تُكتب أحياناً كسلسلة في Wikidata
 const CATALOG = /feature films?\b|\bfilms$|\bstudios?\b|greatest|best films|top \d+/i;
@@ -153,7 +156,7 @@ const similar = (a, b) => { const fa = firstWord(a); if (fa && fa === firstWord(
 // يبني الخريطة من نتائج الجلب. نقي بلا شبكة، فيُختبر بمدخلات ثابتة.
 // in: { focus: مفاتيح الأعمال المطلوب ربطها (القائمة، أو عمل واحد في الدالة), rel, info, mem, adapt, typeNames: {Q: اسم}, basic: {مفتاح: tmdbBasic} }
 // out: { worlds: {id: {name, kind, wd, wiki, order:[مفاتيح], size}}, works: {مفتاح: {q, worlds:[id…], rel:[…], src:[…]}}, info: {مفتاح: basic} , report }
-export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, basic = {}, maxGroup = 150, maxSiblings = 25 }) {
+export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, basic = {}, maxGroup = 150, maxSiblings = 25, minVotes = 10, relVotes = 20 }) {
   const keyOfQ = new Map(), qOfKey = new Map();
   const bind = (q, k) => { if (!q || !k) return; if (!keyOfQ.has(q) || k[0] === 'm') keyOfQ.set(q, k); if (!qOfKey.has(k)) qOfKey.set(k, q); };
   for (const r of rel) if (r.prop === 'ITEM') bind(r.item, r.tk);
@@ -162,7 +165,9 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
   for (const r of adapt) bind(r.x, r.tm ? 'm' + r.tm : r.tt ? 't' + r.tt : null);
   const bad = k => { const b = basic[k]; return !!(b && (b.adult || ADULT.test(b.title || ''))); };
   // يُعرض ما نعرف اسمه من TMDB، والأعمال المطلوبة نفسها. رقم محذوف أو خاطئ في Wikidata لا يظهر عملاً بلا اسم.
-  const fs = new Set(focus), shown = k => fs.has(k) || !!basic[k]?.title, fine = k => shown(k) && !bad(k);
+  // وعمل صدر وله أقل من عشرة أصوات في TMDB (فيلم معجبين، أو ربط خاطئ في Wikidata) لا يظهر. ما لم يصدر بعد يظهر.
+  const fs = new Set(focus), today = new Date().toISOString().slice(0, 10), shown = k => fs.has(k) || !!basic[k]?.title;
+  const heard = (k, n = minVotes) => fs.has(k) || !basic[k]?.date || basic[k].date > today || (basic[k].votes || 0) >= n, fine = k => shown(k) && !bad(k) && heard(k);
   const dateOf = (k, wd) => basic[k]?.date || wd || null;
   const typeList = q => (info[q]?.types || []).map(t => typeNames[t] || t);
 
@@ -231,17 +236,20 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
         addWorld(id, { name: basic[o[0]]?.title || info[qOfKey.get(o[0])]?.label || o[0], kind: 'chain', by: 'date', wd: qOfKey.get(o[0]) || null, wiki: info[qOfKey.get(o[0])]?.wiki || null, order: o, size: o.length });
         entry.worlds = [id]; } }
     // أعمال مرتبطة: الأصل، وما اقتُبس عنه، واقتباسات أخرى للمصدر نفسه، والمصدر نفسه إن لم يكن له رقم في TMDB
-    // الأقوى أولاً: ما اقتُبس منه العمل مباشرة، ثم ما اقتُبس عنه (ريميك فيلم 1998 لـ Psycho مقتبس عنه، وليس مجرد اقتباس آخر للرواية)، ثم اقتباسات المصدر الأخرى
-    const relx = [], src = [], seen = new Set([k]), add = (t, r, via) => { if (t && !seen.has(t) && fine(t)) { seen.add(t); relx.push(via ? { k: t, r, via } : { k: t, r }); } };
+    // الأقوى أولاً: ما اقتُبس منه العمل مباشرة، ثم ما اقتُبس عنه (ريميك فيلم 1998 لـ Psycho مقتبس عنه، وليس مجرد اقتباس آخر للرواية)، ثم اقتباسات المصدر الأخرى.
+    // وهنا عتبة أعلى للجمهور (٢٠ صوتاً) لأن «مقتبس عن» في Wikidata يشمل أعمالاً مغمورة أو متأثرة فقط
+    const relx = [], src = [], seen = new Set([k]), add = (t, r, via) => { if (t && !seen.has(t) && fine(t) && heard(t, relVotes)) { seen.add(t); relx.push(via ? { k: t, r, via } : { k: t, r }); } };
     for (const q of uniq(w.based)) add(keyOfQ.get(q), 'original');
     for (const q of uniq(w.derived)) add(keyOfQ.get(q), 'derived');
     for (const q of uniq(w.based)) { if (keyOfQ.get(q)) continue;
       const kind = sourceKind(typeList(q)); if (!kind || !info[q]?.label) continue;
       src.push(JSON.parse(JSON.stringify({ q, label: info[q].label, kind, year: info[q].date ? +info[q].date.slice(0, 4) : undefined, wiki: info[q].wiki || undefined })));
-      const sibs = adapt.filter(a => a.s === q); if (sibs.length <= maxSiblings) for (const a of sibs) add(keyOfQ.get(a.x), 'sibling', info[q].label); }
+      // اقتباس آخر من عالم العمل نفسه (أفلام بوند الأخرى عن روايات فليمنغ) مكانه الترتيب لا هنا
+      const sibs = adapt.filter(a => a.s === q), same = new Set(entry.worlds.flatMap(id => worlds[id]?.order || []));
+      if (sibs.length <= maxSiblings) for (const a of sibs) { const t = keyOfQ.get(a.x); if (!same.has(t)) add(t, 'sibling', info[q].label); } }
     const order = { original: 0, derived: 1, sibling: 2 }, votes = x => basic[x.k]?.votes || 0;
     relx.sort((a, b) => order[a.r] - order[b.r] || votes(b) - votes(a));
-    if (relx.length) entry.rel = relx.slice(0, 10); if (src.length) entry.src = src.slice(0, 3);
+    if (relx.length) entry.rel = relx.slice(0, 12); if (src.length) entry.src = src.slice(0, 3);
     if (entry.worlds.length || entry.rel || entry.src) works[k] = entry; }
 
   // معلومات الأعمال المذكورة (للصورة والتاريخ)، من TMDB
