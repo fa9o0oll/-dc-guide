@@ -82,15 +82,39 @@ check('بلا أدلة: ترتيب الصدور كما هو', r.order.join() ===
 r = chronoOrder(TW, { m664: W('It is a prequel to Twisters (2024).'), m718821: W('It is a prequel to Twister (1996).') });
 check('دليلان متناقضان: يعود الترتيب إلى الصدور', r.order.join() === 'm664,m718821');
 
+// أزمنة من كلمات TMDB وحدها لا تحرّك شيئاً (كثيراً ما تصف مشهداً لا زمن القصة: Army of Darkness، John Rambo)
+const RA = [M('m1368', 'First Blood', '1982-10-22'), M('m1369', 'Rambo: First Blood Part II', '1985-05-21'), M('m1370', 'Rambo III', '1988-05-24'), M('m7555', 'Rambo', '2008-01-24')];
+r = chronoOrder(RA, { m7555: { sents: [], kw: ['1970s'] }, m1370: { sents: [], kw: ['1980s'] } });
+check('زمن من كلمات TMDB وحدها لا يحرّك شيئاً', r.order.join() === 'm1368,m1369,m1370,m7555' && !Object.keys(r.moved).length, r);
+// سفر عبر الزمن أو إعادة إطلاق: الأزمنة المكتوبة لا ترتّب السلسلة كلها
+const TE = [M('m218', 'The Terminator', '1984-10-26'), M('m280', 'Terminator 2: Judgment Day', '1991-07-03'), M('m534', 'Terminator Salvation', '2009-05-20'), M('m87101', 'Terminator Genisys', '2015-06-23')];
+r = chronoOrder(TE, { m218: W('Set in 1984, a cyborg assassin is sent back in time from 2029.'), m280: W('Set in 1995, it is a sequel to The Terminator (1984).'), m534: W('Set in 2018, the film focuses on the war.'), m87101: W('Set in 2029 and 1984, it is a reboot of the franchise.') });
+check('سفر عبر الزمن أو إعادة إطلاق: لا ترتيب بالأزمنة وحدها', r.order.join() === 'm218,m280,m534,m87101' && !Object.keys(r.moved).length, r);
+// لا يتقدم جزء إلا بقدر ما يلزمه قيد: Delta قبل Beta، وGamma يبقى بعدهما، وAlpha أولاً
+const PQ = [M('m1', 'Alpha', '2000-01-01'), M('m2', 'Beta', '2002-01-01'), M('m3', 'Gamma', '2004-01-01'), M('m4', 'Delta', '2006-01-01')];
+r = chronoOrder(PQ, { m4: W('Delta is a prequel to Beta (2002).') });
+check('لا يتقدم جزء إلا بقدر ما يلزمه قيد', r.order.join() === 'm1,m4,m2,m3' && Object.keys(r.moved).join() === 'm4', r);
+// جملة «تكملة لـ» في جزء آخر تقدّم الأصل، ودليله جملة ذلك الجزء
+const SQ = [M('m10', 'Sequel Part', '2001-01-01'), M('m11', 'Origin Part', '2003-01-01')];
+r = chronoOrder(SQ, { m10: W('Sequel Part is a sequel to Origin Part (2003).') });
+check('دليل التقديم من جملة الجزء الآخر', r.order.join() === 'm11,m10' && r.moved.m11?.w === 'sequel' && r.moved.m11.ref.join() === 'm10' && r.moved.m11.q?.[0]?.t.includes('sequel to Origin Part') && r.moved.m11.src.join() === 'wikipedia', r);
+// زمن Wikidata يوافق Wikipedia فيُحسب مصدراً، وكلمة TMDB خارج مدته لا تُحسب
+r = chronoOrder(PR, { m766507: { ...W('It is a prequel to Predator (1987), set in the Northern Great Plains in 1719.'), period: 1701, periodEnd: 1800, periodLabel: '18th century', kw: ['1990s'] } });
+check('مصادر الزمن: Wikidata بمدته، وTMDB خارجها لا يُحسب', r.moved.m766507?.src.sort().join() === 'wikidata,wikipedia' && r.moved.m766507.q.some(q => q.s === 'wikidata' && q.t.includes('18th century')), r);
+
 // الجلب: Wikidata ثم Wikipedia ثم TMDB، مع ذاكرة سابقة
-const asked = [];
+const asked = [], badAlias = [];
+// SPARQL يرفض «(MIN(?x) AS ?x)»: اسم النتيجة لا يكون متغيراً مستعملاً في الاستعلام
+const aliasCheck = o => { const q = decodeURIComponent(String(o?.body || '').replace(/^query=/, '')), at = q.indexOf('WHERE'); for (const m of q.slice(0, at).matchAll(/AS (\?\w+)\)/g)) if (new RegExp('\\' + m[1] + '\\b').test(q.slice(at))) badAlias.push(m[1]); };
 const fakeFetch = async (url, o) => { asked.push(String(url).slice(0, 40));
+  if (String(url).includes('wikidata')) aliasCheck(o);
   if (String(url).includes('wikidata')) return { ok: true, json: async () => ({ results: { bindings: [{ tid: { type: 'literal', value: '766507' }, item: { type: 'uri', value: 'http://www.wikidata.org/entity/Q1' }, wiki: { type: 'uri', value: 'https://en.wikipedia.org/wiki/Prey_(2022_film)' }, py: { type: 'literal', value: '1719' }, pl: { type: 'literal', value: '1719' } }] } }) };
   if (String(url).includes('en.wikipedia.org/w/api.php')) { if (o.headers['User-Agent'].indexOf('dc-guide') !== 0) throw new Error('UA');
     return { ok: true, json: async () => ({ query: { normalized: [{ from: 'Prey_(2022_film)', to: 'Prey (2022 film)' }], pages: [{ title: 'Prey (2022 film)', extract: 'Prey is a 2022 American film. It is the fifth installment in the Predator franchise and a prequel to Predator (1987), set in the Northern Great Plains in 1719.' }] } }) }; }
   throw new Error('unexpected ' + url); };
 const ev = await gatherEvidence(['m766507', 'm106'], { tmdb: async p => { if (p === '/movie/766507/keywords') return { keywords: [{ name: 'Prequel' }, { name: 'comanche' }] }; return { keywords: [] }; },
   cache: { m106: { sents: [], kw: [] } }, opt: { fetchImpl: fakeFetch }, fetchImpl: fakeFetch });
+check('استعلام Wikidata سليم: لا اسم نتيجة يكرر متغيراً', badAlias.length === 0 && asked.some(a => a.includes('wikidata')), badAlias);
 check('الأدلة: جملة Wikipedia وكلمة TMDB وزمن Wikidata، والمحفوظ لا يُجلب ثانية', ev.m766507?.sents?.[0]?.includes('prequel to Predator (1987)') && ev.m766507.kw?.join() === 'prequel' && ev.m766507.period === 1719 && ev.m106 && asked.length === 2, { ev, asked });
 
 // تعذّر Wikipedia لعمل وTMDB لآخر: يُعلَّم الناقص فلا يُحفظ ولا يُدّعى أنه فُحص، وما وصل كاملاً بلا علامة

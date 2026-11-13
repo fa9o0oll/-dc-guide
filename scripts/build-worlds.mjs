@@ -47,7 +47,7 @@ for (const c of new Set(films.map(f => f.col).filter(c => c && cols[c]?.parts.le
 for (const [id, g] of Object.entries(fr.items || {})) { const keys = g.order.map(s => s.m ? 'm' + s.m : s.t ? 't' + s.t : null).filter(Boolean); if (keys.length >= 2) groupsC.push({ kind: 'cur', id, keys, view: g.view, name: g.name }); }
 const allKeys = [...new Set(groupsC.flatMap(g => g.keys))];
 let evid = Object.fromEntries(allKeys.filter(k => cfresh[k]).map(k => [k, cfresh[k]]));
-if (!RAW) { try { evid = await gatherEvidence(allKeys, { tmdb, cache: cfresh }); console.log(`WORLDS stage chrono ${allKeys.length} (${Math.round((Date.now() - t0) / 1000)}s)`); }
+if (!RAW) { try { evid = await gatherEvidence(allKeys, { tmdb, cache: cfresh, log: m => console.log('CHRONO ' + m) }); console.log(`WORLDS stage chrono ${allKeys.length} (${Math.round((Date.now() - t0) / 1000)}s)`); }
   catch (e) { console.log('CHRONO evidence failed, using the cache: ' + e.message); }
   // ما تعذّر جلب بعض مصادره لا يُحفظ، فيُعاد جلبه في البناء التالي بدل أن يبقى ناقصاً أسبوعين
   fs.writeFileSync(CHRONO, JSON.stringify(Object.fromEntries(Object.entries(evid).filter(([k, v]) => allKeys.includes(k) && !v.miss).map(([k, v]) => [k, { ...v, at: cfresh[k]?.at || now }]))) + '\n');
@@ -97,7 +97,9 @@ fs.writeFileSync(new URL('worlds-report.json', GEN), JSON.stringify(report, null
 console.log('WORLDS counts ' + JSON.stringify(report.counts));
 // فروع العمل: نسخة مضغوطة من الناتج في السجل (تحميل الملفات من GitHub غير متاح لأدوات المراجعة)
 if (process.env.WORLDS_DUMP) { const zlib = await import('node:zlib');
-  for (const [name, data] of [['worlds', out], ['report', report], ...(res.raw && !RAW ? [['raw', { ...res.raw, basic: Object.fromEntries(Object.entries(res.basic).filter(([k]) => !known[k])) }]] : [])]) { const b64 = zlib.gzipSync(JSON.stringify(data)).toString('base64'), n = Math.ceil(b64.length / 6000);
+  // chrono: أدلة محرّك الأحداث ومجموعاته، لضبط قواعده محلياً على البيانات الحقيقية
+  const chronoDump = { evid, groups: groupsC.map(g => ({ kind: g.kind, id: g.id, keys: g.keys, view: g.view })), meta: Object.fromEntries(allKeys.map(k => [k, meta(k)])) };
+  for (const [name, data] of [['worlds', out], ['report', report], ['chrono', chronoDump], ...(res.raw && !RAW ? [['raw', { ...res.raw, basic: Object.fromEntries(Object.entries(res.basic).filter(([k]) => !known[k])) }]] : [])]) { const b64 = zlib.gzipSync(JSON.stringify(data)).toString('base64'), n = Math.ceil(b64.length / 6000);
     for (let i = 0; i < n; i++) console.log(`WORLDSDUMP ${name} ${i + 1}/${n} ${b64.slice(i * 6000, (i + 1) * 6000)}`); } }
 for (const m of report.missing) console.log('WORLDS missing ' + JSON.stringify(m));
 for (const m of report.uncurated) console.log('WORLDS uncurated ' + JSON.stringify(m));
