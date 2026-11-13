@@ -32,7 +32,9 @@ const poster = (p, sizes) => p ? `<img loading="lazy" decoding="async" alt="" sr
 
 const D = { films: [], byId: new Map(), byTmdb: new Map(), more: null, cols: {}, prov: {}, fr: {}, fx: {}, frOf: new Map(), recOf: new Map(), part: new Map(),
   // خريطة العوالم (worlds.json): العوالم وترتيبها، وعوالم كل عمل وأعماله المرتبطة، ومعلومات الأعمال خارج القائمة. wlive: البحث المباشر لعمل جديد
-  worlds: {}, wworks: {}, winfo: {}, memberOf: new Map(), wok: false, wlive: new Map(), wres: new Map() };
+  worlds: {}, wworks: {}, winfo: {}, memberOf: new Map(), wok: false, wlive: new Map(), wres: new Map(),
+  // ترتيب أحداث مجموعات TMDB (من محرّك الأحداث): { رقم المجموعة: { order, moved } أو { chk } }
+  colChrono: {} };
 let P = { films: {} };
 try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {}
 const save = () => { try { P.at = Date.now(); localStorage.setItem(KEY, JSON.stringify(P)); } catch {} syncTouch('films'); };
@@ -79,9 +81,13 @@ function partTag(f) { const g = groupOf(f), i = g ? g.order.findIndex(s => isHer
   if (g?.view && i === 0 && firstReleased(g) !== 0) return '<span class="tag start">بداية الأحداث</span>';
   const r = D.recOf.get(f.id); if (r === 'skip' || r === 'optional') return `<span class="tag">${r === 'skip' ? 'تجاوزه' : 'اختياري'}</span>`;
   return g && i >= 0 && g.order.length > 1 ? `<span class="tag"><bdi dir="ltr">${i + 1}/${g.order.length}</bdi></span>` : ''; }
-function card(f) { const s = st(f.id), un = unreleased(f);
+const tagOf = f => f.fresh ? '<span class="tag new">جديد</span>' : f.kind === 'tv' ? '<span class="tag">مسلسل</span>' : unreleased(f) ? `<span class="tag">${f.date ? 'بعد ' + nDays(daysTo(f.date)) : 'لم يُعلن موعده'}</span>` : partTag(f);
+// خريطة العوالم تصل بعد رسم القائمة وقد تغيّر ترتيب سلسلة (عالم آلي أو ترتيب أحداث مجموعة)، فتُحدَّث الوسوم التي تغيّرت فقط
+function retag() { for (const f of D.films) { const el = document.querySelector(`#f-${f.id} .poster`); if (!el) continue; const old = el.querySelector(':scope > .tag'), html = tagOf(f);
+  if ((old?.outerHTML || '') === html) continue; old?.remove(); if (html) el.querySelector('.stamp').insertAdjacentHTML('beforebegin', html); } }
+function card(f) { const s = st(f.id);
   return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}">
-<button class="poster" data-act="open" aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${f.fresh ? '<span class="tag new">جديد</span>' : f.kind === 'tv' ? '<span class="tag">مسلسل</span>' : un ? `<span class="tag">${f.date ? 'بعد ' + nDays(daysTo(f.date)) : 'لم يُعلن موعده'}</span>` : partTag(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
+<button class="poster" data-act="open" aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${tagOf(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
 <div class="stub"><h3>${esc(f.title)}</h3><p class="meta">${f.year ? `<bdi>${f.year}</bdi>` : '<span>بلا موعد</span>'}${f.rating ? `<span class="rate"><bdi dir="ltr">${f.rating.toFixed(1)}</bdi></span>` : ''}${f.runtime ? `<span>${rt(f.runtime)}</span>` : f.seasons ? `<span>${count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم'])}</span>` : ''}</p>
 <button class="seen" data-act="seen" aria-pressed="${s === 'watched'}" aria-label="شاهدته: ${esc(f.title)}">${ic('check')}</button><div class="where">${whereHTML(f)}</div></div></article>`; }
 
@@ -151,9 +157,9 @@ const stepOf = k => k[0] === 't' ? { t: +k.slice(1) } : { m: +k.slice(1) };
 const keyOfStep = s => s.m ? 'm' + s.m : s.t ? 't' + s.t : null;
 const ext = (name, url) => `<a href="${esc(url)}" target="_blank" rel="noopener"><bdi dir="ltr">${esc(name)}</bdi></a>`;
 function mergeWorlds(w) { if (!w?.worlds) return;
-  Object.assign(D.worlds, w.worlds); Object.assign(D.winfo, w.info || {}); for (const [k, v] of Object.entries(w.works || {})) D.wworks[k] = { ...D.wworks[k], ...v };
+  Object.assign(D.worlds, w.worlds); Object.assign(D.winfo, w.info || {}); Object.assign(D.colChrono, w.cols || {}); for (const [k, v] of Object.entries(w.works || {})) D.wworks[k] = { ...D.wworks[k], ...v };
   for (const [id, x] of Object.entries(w.worlds)) for (const k of x.order) { const a = D.memberOf.get(k) || D.memberOf.set(k, []).get(k); if (!a.includes(id)) a.push(id); }
-  stale(); }
+  stale(); retag(); }
 // ما يُحسب من السلاسل (البحث وموضع التذكرة في ترتيب القائمة) يُعاد حسابه حين تتغير البيانات
 const stale = () => { for (const f of D.films) { delete f._h; delete f._lk; } };
 // عوالم عمل: ما حدده البناء له (الأخص أولاً)، أو لعمل خارج القائمة العوالم التي تضمه
@@ -163,10 +169,12 @@ const worldIds = k => { const own = D.wworks[k]; if (own?.worlds) return own.wor
 const colOf = f => { const c = f.col && D.cols[f.col]; return c && c.parts.length > 1 ? c : null; };
 const autoOf = f => { const c = colOf(f), parts = c ? c.parts.map(p => 'm' + p.tmdb) : [];
   return worldIds(keyOf(f)).find(id => { const o = D.worlds[id].order; return o.length > 1 && parts.every(p => o.includes(p)); }) || null; };
-const worldGroup = id => { const w = D.worlds[id]; return { key: 'w:' + id, auto: true, id, name: w.name, kind: w.kind, by: w.by, wd: w.wd, wiki: w.wiki, order: w.order.map(stepOf) }; };
+// العالم الآلي ومجموعة TMDB: إن وجد محرّك الأحداث دليلاً على جزء يسبق القصة صار الترتيب ترتيب الأحداث، والمُوصى به للمشاهدة الأولى الصدور
+const chronoOf = c => c?.order ? { view: 'release', chrono: c } : c?.chk ? { chk: true } : {};
+const worldGroup = id => { const w = D.worlds[id]; return { key: 'w:' + id, auto: true, id, name: w.name, kind: w.kind, by: w.by, wd: w.wd, wiki: w.wiki, order: (w.chrono?.order || w.order).map(stepOf), ...chronoOf(w.chrono || (w.chk && { chk: 1 })) }; };
 const groupOf = f => { const k = D.frOf.get(keyOf(f)); if (k) return { key: k, curated: true, ...D.fr[k] }; const id = autoOf(f); if (id) return worldGroup(id);
   const c = colOf(f); if (!c) return null; const parts = c.parts.map(p => 'm' + p.tmdb), w = worldIds(keyOf(f)).map(id => D.worlds[id]).find(x => x.order.every(k => parts.includes(k)));
-  return { key: 'c' + c.id, name: c.name, order: c.parts.map(p => ({ m: p.tmdb })), wiki: w?.wiki || null }; };
+  const cc = D.colChrono[c.id]; return { key: 'c' + c.id, name: c.name, order: (cc?.order || parts).map(stepOf), wiki: w?.wiki || null, ...chronoOf(cc) }; };
 const listedOf = s => s.m ? D.byTmdb.get(s.m) : s.t ? D.byId.get('t' + s.t) : null;
 const infoOf = s => listedOf(s) || (s.m ? D.fx['m' + s.m] || D.part.get(s.m) || D.winfo['m' + s.m] : s.t ? D.fx['t' + s.t] || D.winfo['t' + s.t] : s) || {};
 // عمل خارج القائمة له رقم في TMDB: زره يفتح بطاقة اطلاع مباشرة بدل البحث
@@ -182,7 +190,7 @@ function groups() { const out = new Map(Object.entries(D.fr).map(([key, fr]) => 
 function seriesHTML() { const gs = groups().filter(g => !ui.q || g.name.toLowerCase().includes(ui.q) || g.order.some(s => (infoOf(s).title || '').toLowerCase().includes(ui.q)));
   if (!gs.length) return '<p class="empty">لا سلسلة تطابق البحث.</p>';
   return gs.map(g => { const mine = g.order.map(listedOf).filter(Boolean), seen = mine.filter(f => st(f.id) === 'watched').length;
-    return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${nWorks(g.order.length)}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ` · بتوصيات الدليل${g.view ? '، بترتيب الأحداث' : ''}` : g.auto ? ` · ${WKIND[g.kind]}، مرتّب آلياً` : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
+    return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${nWorks(g.order.length)}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ` · بتوصيات الدليل${g.view ? '، بترتيب الأحداث' : ''}` : g.auto ? ` · ${WKIND[g.kind]}، مرتّب آلياً${g.chrono ? ' حسب الأحداث' : ''}` : g.chrono ? ' · مرتّب آلياً حسب الأحداث' : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
       g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}"${f ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
 <span class="p">${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
 function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); $('#grid').hidden = v !== 'grid'; $('#series').hidden = v !== 'series'; $('#chips').hidden = v !== 'grid';
@@ -192,23 +200,35 @@ function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribut
 const sheet = $('#sheet'), addDlg = $('#add');
 let openId = null;
 const isHere = (f, s) => { const l = listedOf(s); return l ? l.id === f.id : (s.m && f.kind === 'movie' && s.m === f.tmdb) || (s.t && f.kind === 'tv' && s.t === f.tmdb); };
-const row = (f, s, i, auto, far) => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = isHere(f, s), k0 = kindOf(s), k = k0 && s.note?.includes(k0) ? '' : k0;
-  const rec = s.rec || (auto && (o.date ? o.date > today : !o.year) ? 'soon' : '');
+// سبب تقدّم جزء على ما صدر قبله، من دليل محرّك الأحداث: «قبل «Predator»، عام 1719 · مؤكد من مصدرين»
+const titleOfKey = k => infoOf(stepOf(k)).title || '';
+const movedNote = m => { if (!m) return ''; const t = k => `«<bdi dir="ltr">${esc(titleOfKey(k))}</bdi>»`, r = m.ref || [], y = m.y != null ? (m.y < 0 ? `عام ${-m.y} ق.م` : `عام ${m.y}`) : '';
+  const head = m.w === 'between' && r.length >= 2 ? `بين ${t(r[0])} و${t(r[r.length - 1])}` : m.w === 'year' ? (y ? `أحداثه ${y}` : 'أقدم أحداثاً') : r.length ? `قبل ${t(r[0])}` : 'قبل القصة';
+  return head + (m.w !== 'year' && y ? `، ${y}` : '') + (m.src?.length >= 2 ? ' · مؤكد من مصدرين' : ''); };
+const row = (f, s, i, opt, far) => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = isHere(f, s), k0 = kindOf(s), k = k0 && s.note?.includes(k0) ? '' : k0;
+  const rec = s.rec || (opt?.auto && (o.date ? o.date > today : !o.year) ? 'soon' : ''), mv = opt?.moved?.[keyOfStep(s)];
   return `<li data-n="${i + 1}" class="${[here ? 'here' : '', w ? 'watched' : '', rec ? 'r-' + rec : '', far ? 'far' : ''].filter(Boolean).join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k0)}</span>
-<span class="t"><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? ar(s.note) : ''].filter(Boolean).join(' · ')}</small></span>
+<span class="t"><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? ar(s.note) : '', mv ? movedNote(mv) : ''].filter(Boolean).join(' · ')}</small></span>
 <span class="st">${rec ? `<i class="rc ${rec}">${REC[rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'اعرض'} ${esc(o.title || '')}"></button>`}</li>`; };
 // ترتيب طويل (أكثر من ١٤ عملاً) يُختصر إلى نافذة حول هذا العمل، وزر يعرضه كاملاً
-const rowsHTML = (f, order, auto) => { const n = order.length, at = Math.max(0, order.findIndex(s => isHere(f, s))), clip = n > 14, lo = Math.max(0, Math.min(at - 4, n - 9)), hi = lo + 8;
-  return `<ol class="order${clip ? ' clip' : ''}">${order.map((s, i) => row(f, s, i, auto, clip && (i < lo || i > hi))).join('')}</ol>${clip ? `<button class="more" data-act="more" aria-expanded="false">اعرض الترتيب كاملاً (${n})</button>` : ''}`; };
+const rowsHTML = (f, order, opt) => { const n = order.length, at = Math.max(0, order.findIndex(s => isHere(f, s))), clip = n > 14, lo = Math.max(0, Math.min(at - 4, n - 9)), hi = lo + 8;
+  return `<ol class="order${clip ? ' clip' : ''}">${order.map((s, i) => row(f, s, i, opt, clip && (i < lo || i > hi))).join('')}</ol>${clip ? `<button class="more" data-act="more" aria-expanded="false">اعرض الترتيب كاملاً (${n})</button>` : ''}`; };
+// ما وجده محرّك الأحداث: الترتيب حسب الأحداث ودليله مطوي تحته، أو أن المصادر لا تذكر جزءاً يسبق القصة، أو أنه لم يُفحص بعد
+const SRCN = { wikipedia: 'Wikipedia', tmdb: 'TMDB', wikidata: 'Wikidata' };
+const chronoTail = g => g.chrono ? '، ثم رتّبه حسب أحداث القصة مما تذكره <bdi dir="ltr">Wikipedia</bdi> و<bdi dir="ltr">TMDB</bdi> و<bdi dir="ltr">Wikidata</bdi> عن كل جزء، والمعتاد للمشاهدة الأولى ترتيب الصدور. لم يُراجَع يدوياً بعد، فلا توصيات فيه.'
+  : g.chk ? '. لم يُراجَع يدوياً بعد، فلا توصيات فيه. ولا تذكر <bdi dir="ltr">Wikipedia</bdi> ولا <bdi dir="ltr">TMDB</bdi> جزءاً يسبق القصة، فترتيب الصدور هنا هو ترتيب الأحداث.'
+  : '. لم يُراجَع يدوياً بعد، فلا توصيات فيه، وقد يختلف عن ترتيب الأحداث إن كان بينها جزء يسبق القصة.';
+const evidenceHTML = c => c ? `<details class="why"><summary>كيف رُتّب حسب الأحداث؟</summary><ul>${Object.entries(c.moved).map(([k, m]) => `<li><b dir="ltr">${esc(titleOfKey(k))}</b> ${movedNote(m)}<small>${(m.src || []).map(x => SRCN[x] || x).join(' · ')}</small>${
+  (m.q || []).map(q => `<blockquote dir="ltr" lang="en">${esc(q.t)} ${q.u ? `<a href="${esc(q.u)}" target="_blank" rel="noopener">${SRCN[q.s] || q.s}</a>` : `<cite>${SRCN[q.s] || q.s}</cite>`}</blockquote>`).join('')}</li>`).join('')}</ul></details>` : '';
 const autoNote = g => `<p class="note">${g.kind === 'chain'
   ? `رتّبه الدليل آلياً حسب تاريخ الصدور، من روابط «يسبقه» و«يليه» بين هذه الأعمال في ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)}، ومعلوماتها من <bdi dir="ltr">TMDB</bdi>`
-  : `رتّبه الدليل آلياً ${g.by === 'ord' ? 'برقم كل جزء في السلسلة' : 'حسب تاريخ الصدور'}، من بيانات ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)} و<bdi dir="ltr">TMDB</bdi>${g.wiki ? `، وتفصيله في ${ext('Wikipedia', g.wiki)}` : ''}`}. لم يُراجَع يدوياً بعد، فلا توصيات فيه، وقد يختلف عن ترتيب الأحداث إن كان بينها جزء يسبق القصة.</p>`;
+  : `رتّبه الدليل آلياً ${g.by === 'ord' ? 'برقم كل جزء في السلسلة' : 'حسب تاريخ الصدور'}، من بيانات ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)} و<bdi dir="ltr">TMDB</bdi>${g.wiki ? `، وتفصيله في ${ext('Wikipedia', g.wiki)}` : ''}`}${chronoTail(g)}</p>${evidenceHTML(g.chrono)}`;
 const noteOf = g => g.curated ? `<p class="note">الترتيب والتوصيات من إعداد الدليل، مبنية على ترابط القصة وتقييم <bdi dir="ltr">TMDB</bdi> الظاهر بجانب كل عمل${g.sources?.length ? `. المصادر: ${g.sources.map(x => ext(x.name, x.url)).join('، ')}` : ''}.</p>`
-  : g.auto ? autoNote(g) : `<p class="note">الترتيب حسب تاريخ الصدور، مجلوب آلياً من <bdi dir="ltr">TMDB</bdi> ويشمل الأفلام فقط${g.wiki ? `، وتفصيل السلسلة في ${ext('Wikipedia', g.wiki)}` : ''}. لم يُراجَع يدوياً بعد، وقد يختلف عن ترتيب الأحداث إن كان بينها جزء يسبق القصة.</p>`;
+  : g.auto ? autoNote(g) : `<p class="note">الأجزاء من مجموعة <bdi dir="ltr">TMDB</bdi> وتشمل الأفلام فقط${g.wiki ? `، وتفصيل السلسلة في ${ext('Wikipedia', g.wiki)}` : ''}. رتّبها الدليل آلياً حسب تاريخ الصدور${chronoTail(g)}</p>${evidenceHTML(g.chrono)}`;
 // عوالم أوسع يقع فيها العمل (لغير الترتيب المراجَع): كل واحد يضيف أعمالاً لم تظهر، مطويّاً، واثنان على الأكثر
 function widerHTML(f, g) { if (g.curated) return ''; const have = new Set(g.order.map(keyOfStep)); let out = '', n = 0;
   for (const id of worldIds(keyOf(f))) { const w = D.worlds[id]; if ('w:' + id === g.key || n >= 2 || !w.order.some(x => !have.has(x))) continue; w.order.forEach(x => have.add(x)); n++;
-    out += `<details class="wider"><summary><b>${WKIND[w.kind]} أوسع</b><bdi dir="ltr">${esc(w.name)}</bdi><small>${nWorks(w.order.length)}</small></summary>${rowsHTML(f, w.order.map(stepOf), true)}${autoNote(worldGroup(id))}</details>`; }
+    out += `<details class="wider"><summary><b>${WKIND[w.kind]} أوسع</b><bdi dir="ltr">${esc(w.name)}</bdi><small>${nWorks(w.order.length)}</small></summary>${rowsHTML(f, worldGroup(id).order, { auto: true, moved: w.chrono?.moved })}${autoNote(worldGroup(id))}</details>`; }
   return out; }
 // العمل نفسه في دليل DC أو Fate: رابط إلى بطاقته هناك
 const DOORS = { dc: 'DC', fate: 'Fate' };
@@ -223,11 +243,12 @@ const dateKey = s => { const o = infoOf(s); return o.date || (o.year ? o.year + 
 const byRelease = order => order.map((s, i) => [s, i]).sort((a, b) => dateKey(a[0]).localeCompare(dateKey(b[0])) || a[1] - b[1]).map(x => x[0]);
 const firstReleased = g => g.order.indexOf(byRelease(g.order)[0]);
 function viewsHTML(f, g) { const rel = byRelease(g.order);
-  if (!g.view || rel.every((s, i) => s === g.order[i])) return rowsHTML(f, g.order, g.auto);
+  const opt = { auto: g.auto, moved: g.chrono?.moved };
+  if (!g.view || rel.every((s, i) => s === g.order[i])) return rowsHTML(f, g.order, opt);
   // ملاحظة السلسلة فوق التبديل تشرح لماذا يختلف الترتيبان وأيهما المُوصى به، فلا يتكرر الشرح هنا
   const tab = (v, t) => `<button data-act="ordv" data-v="${v}" aria-pressed="${ui.ov === v}">${t}${g.view === v ? '<small>المُوصى به</small>' : ''}</button>`;
   return `<div class="ordv" role="group" aria-label="ترتيب العرض">${tab('chrono', 'ترتيب الأحداث')}${tab('release', 'ترتيب الصدور')}</div>
-<div data-ov="chrono"${ui.ov === 'chrono' ? '' : ' hidden'}>${rowsHTML(f, g.order, g.auto)}</div><div data-ov="release"${ui.ov === 'release' ? '' : ' hidden'}>${rowsHTML(f, rel, g.auto)}</div>`; }
+<div data-ov="chrono"${ui.ov === 'chrono' ? '' : ' hidden'}>${rowsHTML(f, g.order, opt)}</div><div data-ov="release"${ui.ov === 'release' ? '' : ' hidden'}>${rowsHTML(f, rel, opt)}</div>`; }
 function orderHTML(f) { const g = groupOf(f), door = xdoorHTML(D.wworks[keyOf(f)]?.guide);
   if (!g) return `<section class="sec"><h3>السلسلة وترتيب المشاهدة</h3>${door}<p>${aloneText(f)}</p></section>`;
   return `<section class="sec"><h3>ترتيب المشاهدة: <bdi dir="ltr">${esc(g.name)}</bdi>${g.auto ? ` <span class="wk">${WKIND[g.kind]}</span>` : ''}</h3>${door}${g.note ? `<p>${ar(g.note)}</p>` : ''}${viewsHTML(f, g)}${noteOf(g)}${widerHTML(f, g)}</section>`; }

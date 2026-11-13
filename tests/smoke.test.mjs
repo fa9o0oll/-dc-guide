@@ -51,12 +51,20 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   // خريطة عوالم للاختبار: فيلم من القائمة بلا ترتيب مراجَع ولا مجموعة TMDB، في عالم صغير (مع أنمي خارج القائمة) وسلسلة أوسع طويلة، وله أصل ورواية ورابط في دليل DC
   const FR = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/franchises.json'))), cur = new Set(Object.values(FR.items || {}).flatMap(g => g.order.map(x => x.m ? 'm' + x.m : x.t ? 't' + x.t : null)));
   const solo = FL.find(f => f.kind === 'movie' && !f.col && !cur.has(f.id) && f.poster), big = Array.from({ length: 20 }, (_, i) => 'm' + (888000 + i)); big.splice(10, 0, solo.id);
-  const WORLDS = { worlds: { Q_T: { name: 'Test Universe', kind: 'universe', by: 'date', wd: 'Q_T', wiki: 'https://en.wikipedia.org/wiki/Test', order: ['m777001', solo.id, 't777002'], size: 3 },
+  // ومحرّك الأحداث قدّم الأنمي (Out Show) على Out Film بدليلين، وفي مجموعة TMDB مصطنعة قدّم فيلماً من القائمة على أصلها
+  const QUOTE = 'Out Show is a prequel to Out Film (1990), set in 1850.';
+  const cf = FL.find(f => f.kind === 'movie' && !f.col && !cur.has(f.id) && f.id !== solo.id && f.poster && f.date > '1990'), CID = 999777;
+  const WORLDS = { worlds: { Q_T: { name: 'Test Universe', kind: 'universe', by: 'date', wd: 'Q_T', wiki: 'https://en.wikipedia.org/wiki/Test', order: ['m777001', solo.id, 't777002'], size: 3,
+        chrono: { order: ['t777002', 'm777001', solo.id], moved: { t777002: { w: 'prequel', ref: ['m777001'], y: 1850, src: ['wikipedia', 'tmdb'], q: [{ s: 'wikipedia', t: QUOTE, u: 'https://en.wikipedia.org/wiki/Out_Show' }, { s: 'tmdb', t: 'keyword: prequel' }] } } } },
       Q_B: { name: 'Big Test Series', kind: 'series', by: 'ord', wd: 'Q_B', wiki: null, order: big, size: 21 } },
     works: { [solo.id]: { q: 'Q_S', worlds: ['Q_T', 'Q_B'], rel: [{ k: 'm777003', r: 'original' }, { k: 'm777001', r: 'derived' }], src: [{ q: 'Q_N', label: 'Some Novel', kind: 'novel', year: 1950, wiki: 'https://en.wikipedia.org/wiki/Some_Novel' }], guide: { door: 'dc', id: 'the-dark-knight-rises-2012' } } },
     info: { m777001: { title: 'Out Film', year: 1990, date: '1990-05-01', genres: [28] }, t777002: { title: 'Out Show', year: 2005, date: '2005-01-01', genres: [16], lang: 'ja', tv: true }, m777003: { title: 'Old Original', year: 1960, date: '1960-01-01', genres: [18] },
-      ...Object.fromEntries(big.filter(k => k !== solo.id).map((k, i) => [k, { title: 'Big Part ' + (i + 1), year: 1980 + i, date: `${1980 + i}-01-01` }])) } };
+      ...Object.fromEntries(big.filter(k => k !== solo.id).map((k, i) => [k, { title: 'Big Part ' + (i + 1), year: 1980 + i, date: `${1980 + i}-01-01` }])) },
+    cols: { [CID]: { order: [cf.id, 'm777101'], moved: { [cf.id]: { w: 'prequel', ref: ['m777101'], src: ['wikipedia'], q: [{ s: 'wikipedia', t: 'It is a prequel to Col Original (1980).', u: 'https://en.wikipedia.org/wiki/X' }] } } } } };
   await page.route('**/films/data/worlds.json*', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(WORLDS) }));
+  await page.route('**/films/data/films.json*', async r => { const res = await r.fetch(), j = await res.json(); j.films.find(f => f.id === cf.id).col = CID; return r.fulfill({ response: res, json: j }); });
+  await page.route('**/films/data/collections.json*', async r => { const res = await r.fetch(), j = await res.json();
+    j[CID] = { id: CID, name: 'Chrono Test Collection', parts: [{ tmdb: 777101, title: 'Col Original', date: '1980-01-01', year: 1980 }, { tmdb: cf.tmdb, title: cf.title, date: cf.date, year: cf.year }] }; return r.fulfill({ response: res, json: j }); });
   // سلسلة مراجَعة بترتيب أحداثها: Prey (1719) أولاً، والصدور يصح أيضاً
   const PRED = [766507, 106, 169, 34851, 346910, 1242898];
   await page.route('**/films/data/franchises.json*', async r => { const res = await r.fetch(), j = await res.json(), p = j.items.predator;
@@ -77,6 +85,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   check('الأفلام: أجزاء السلسلة متجاورة في «ترتيب قائمتي» بترتيب أحداثها مهما كان ترتيب إضافتها', await page.evaluate(ids => { const all = [...document.querySelectorAll('#grid .tk')].map(e => e.id), at = ids.map(m => all.indexOf('f-m' + m));
     return at.every((x, i) => x >= 0 && (i === 0 || x === at[i - 1] + 1)); }, PRED));
   check('الأفلام: تذكرة الجزء الذي تبدأ به الأحداث موسومة «بداية الأحداث»، وغيره بموضعه', (await page.textContent('#f-m766507 .tag')) === 'بداية الأحداث' && /^\d+\/\d+$/.test((await page.textContent('#f-m106 .tag')).trim()));
+  check('الأفلام: ترتيب أحداث مجموعة TMDB من المحرّك يصل مع خريطة العوالم ويسِم أول الأحداث', await page.waitForFunction(id => document.querySelector(`#f-${id} .poster > .tag`)?.textContent === 'بداية الأحداث', cf.id, { timeout: 5000 }).then(() => true, () => false));
   await page.fill('#q', inCol.title.toLowerCase()); await page.waitForTimeout(350);
   const vis = await page.locator('.tk:not([hidden])').count(); check('الأفلام: البحث يصفّي ويعرض العدد', vis >= 1 && vis < FL.length && (await page.textContent('#count')).includes(String(vis)));
   await tap(`#f-${inCol.id} .seen`); check('الأفلام: «شاهدته» يُحفظ ويُختم', await page.evaluate(id => JSON.parse(localStorage.getItem('filmsg.progress')).films[id] === 'watched' && document.getElementById('f-' + id).classList.contains('watched'), inCol.id));
@@ -98,8 +107,15 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await fits('الأفلام: تبديل الترتيب'); await tap('#wslot [data-act=ordv][data-v=chrono]'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   // خريطة العوالم في بطاقة فيلم من القائمة
   await page.waitForTimeout(300); await page.evaluate(id => { location.hash = '#' + id; }, solo.id); await page.waitForSelector('#sheet[open] #wslot .wk'); await page.waitForTimeout(300);
-  check('الأفلام: عالم آلي بنوعه وترتيبه والأنمي خارج القائمة موصوف', await page.evaluate(() => { const o = document.querySelector('#wslot .order'), rows = o.querySelectorAll(':scope > li');
-    return rows.length === 3 && o.querySelectorAll('li.here').length === 1 && document.querySelector('#wslot .wk').textContent === 'عالم مشترك' && rows[2].textContent.includes('أنمي') && rows[2].textContent.includes('خارج قائمتك'); }));
+  check('الأفلام: عالم آلي بنوعه وترتيب أحداثه، والأنمي خارج القائمة موصوف وسبب تقدّمه مذكور', await page.evaluate(() => { const o = document.querySelector('#wslot [data-ov=chrono] .order'), rows = o.querySelectorAll(':scope > li');
+    return rows.length === 3 && o.querySelectorAll('li.here').length === 1 && document.querySelector('#wslot .wk').textContent === 'عالم مشترك' && rows[0].textContent.includes('أنمي') && rows[0].textContent.includes('خارج قائمتك')
+      && rows[0].textContent.includes('قبل «Out Film»، عام 1850 · مؤكد من مصدرين') && rows[1].textContent.includes('Out Film') && rows[2].classList.contains('here'); }));
+  check('الأفلام: العالم المرتّب بالأحداث يبدّل إلى الصدور، والصدور هو المُوصى به للمشاهدة الأولى', await page.evaluate(() => { const rel = document.querySelector('#wslot [data-act=ordv][data-v=release]');
+    return !!rel && rel.textContent.includes('المُوصى به') && !document.querySelector('#wslot [data-act=ordv][data-v=chrono] small') && document.querySelector('#wslot .sec > .note').textContent.includes('حسب أحداث القصة'); }));
+  await tap('#wslot .why summary'); await page.waitForTimeout(200);
+  check('الأفلام: «كيف رُتّب حسب الأحداث؟» يعرض الجملة بلغتها ورابط مصدرها', await page.evaluate(q => { const d = document.querySelector('#wslot .why'), b = d.querySelectorAll('blockquote');
+    return d.open && b.length === 2 && b[0].textContent.includes(q) && b[0].getAttribute('dir') === 'ltr' && b[0].querySelector('a').href === 'https://en.wikipedia.org/wiki/Out_Show' && b[1].textContent.includes('keyword: prequel'); }, QUOTE));
+  await fits('الأفلام: دليل ترتيب الأحداث');
   check('الأفلام: العالم الآلي يذكر أنه بلا مراجعة ويربط مصادره', await page.evaluate(() => { const n = document.querySelector('#wslot .sec > .note'), h = [...n.querySelectorAll('a')].map(a => a.href);
     return n.textContent.includes('لم يُراجَع يدوياً') && h.includes('https://www.wikidata.org/wiki/Q_T') && h.includes('https://en.wikipedia.org/wiki/Test') && !document.querySelector('#wslot .order .rc.watch'); }));
   check('الأفلام: رابط بطاقته في دليل DC', (await page.getAttribute('#wslot .xdoor', 'href')) === '../dc/#w=the-dark-knight-rises-2012');
@@ -111,6 +127,10 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await fits('الأفلام: نافذة العالم الآلي'); await tap('#wslot .wider .more'); await page.waitForTimeout(200);
   check('الأفلام: «اعرض الترتيب كاملاً» يعرض الأعمال كلها بأرقامها', await page.evaluate(() => { const o = document.querySelector('#wslot .wider .order'), vis = [...o.children].filter(li => li.offsetHeight > 0);
     return vis.length === 21 && vis[20].dataset.n === '21' && document.querySelector('#wslot .wider .more').getAttribute('aria-expanded') === 'true'; }));
+  await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
+  await page.waitForTimeout(300); await page.evaluate(id => { location.hash = '#' + id; }, cf.id); await page.waitForSelector('#sheet[open] #wslot .ordv'); await page.waitForTimeout(250);
+  check('الأفلام: مجموعة TMDB مرتّبة بالأحداث: الفيلم أولاً بسببه، والملاحظة تذكر المصدر', await page.evaluate(() => { const rows = document.querySelectorAll('#wslot [data-ov=chrono] .order > li'), n = document.querySelector('#wslot .sec > .note').textContent;
+    return rows.length === 2 && rows[0].classList.contains('here') && rows[0].textContent.includes('قبل «Col Original»') && !rows[0].textContent.includes('مؤكد') && n.includes('مجموعة') && n.includes('حسب أحداث القصة') && !!document.querySelector('#wslot .why'); }));
   await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   await tap('[data-act=reset]'); await page.waitForTimeout(300);
   check('الأفلام: ما شاهدته يختفي من القائمة ويُذكر عدده', await page.evaluate(id => document.getElementById('f-' + id).hidden && document.querySelector('#count').textContent.includes('مخفي') && document.querySelector('#tally').textContent.includes('بقي'), inCol.id));

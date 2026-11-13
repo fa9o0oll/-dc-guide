@@ -6,6 +6,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { tmdb, hasKey } from '../../scripts/lib-tmdb.mjs';
 import { parseLine, search, shape, shapeCollection, detailPath, detailParams } from '../../scripts/lib-films.mjs';
 import { worldsFor } from '../../scripts/lib-worlds.mjs';
+import { gatherEvidence, chronoOrder } from '../../scripts/lib-chrono.mjs';
 
 const REPO = process.env.GH_REPO || 'fa9o0oll/-dc-guide', BRANCH = 'main', FILE = 'data/films/added.json';
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
@@ -60,8 +61,21 @@ export default async req => {
     if (b.action === 'worlds') {
       const kind = b.kind === 'tv' ? 'tv' : 'movie', id = +b.tmdb; if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
       const key = (kind === 'tv' ? 't' : 'm') + id, budget = new Promise((_, no) => setTimeout(() => no(new Error('worlds timeout')), 45000));
-      const r = await Promise.race([worldsFor([key], { tmdb, opt: { timeout: 20000, tries: 2 } }), budget]);
-      return json(200, { key, worlds: r.worlds, works: r.works, info: r.info });
+      const work = (async () => {
+        const opt = { timeout: 20000, tries: 2 }, r = await worldsFor([key], { tmdb, opt }), cols = {};
+        // ترتيب الأحداث لعوالم العمل ولمجموعته في TMDB، من أدلة Wikipedia وTMDB وWikidata (scripts/lib-chrono.mjs)
+        const self = await tmdb(detailPath(kind, id), { language: 'en-US' }).catch(() => null), date = (kind === 'tv' ? self?.first_air_date : self?.release_date) || null;
+        const groups = (r.works[key]?.worlds || []).map(w => ({ w, keys: r.worlds[w].order })).filter(g => g.keys.length >= 2 && g.keys.length <= 40);
+        const col = kind === 'movie' && self?.belongs_to_collection?.id ? await tmdb('/collection/' + self.belongs_to_collection.id, { language: 'en-US' }).then(shapeCollection).catch(() => null) : null;
+        if (col?.parts.length > 1) groups.push({ c: col.id, keys: col.parts.map(p => 'm' + p.tmdb) });
+        if (groups.length) { const ev = await gatherEvidence([...new Set(groups.flatMap(g => g.keys))], { tmdb, opt }).catch(() => ({})), part = new Map((col?.parts || []).map(p => ['m' + p.tmdb, p]));
+          const meta = k => { const o = k === key ? { title: self?.title || self?.name, date } : r.basic[k] || part.get(k) || {}; return { k, title: o.title || k, date: o.date || null }; };
+          for (const g of groups) { const c = chronoOrder(g.keys.map(meta), ev), moved = Object.keys(c.moved).length;
+            const seen = g.keys.every(k => ev[k] && !ev[k].miss); if (!moved && !seen) continue;
+            if (g.c) cols[g.c] = moved ? c : { chk: 1 }; else if (moved) r.worlds[g.w].chrono = c; else r.worlds[g.w].chk = 1; } }
+        return { ...r, cols }; })();
+      const r = await Promise.race([work, budget]);
+      return json(200, { key, worlds: r.worlds, works: r.works, info: r.info, cols: r.cols });
     }
     return json(400, { error: 'طلب غير معروف.' });
   } catch (e) {

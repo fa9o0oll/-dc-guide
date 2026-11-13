@@ -16,9 +16,12 @@ globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
   // Wikidata: Heat يليه Heat 2 (المخرج نفسه، والعنوانان متشابهان، فهي تكملة)
   if (u.hostname === 'query.wikidata.org') { wdAsked++; if (opt.headers['User-Agent']?.indexOf('dc-guide') !== 0) return res(403, {}); if (wdDown) return new Response('bad', { status: 400 });
     const q = decodeURIComponent(opt.body.slice(6)), U = v => ({ type: 'uri', value: 'http://www.wikidata.org/entity/' + v }), L = v => ({ type: 'literal', value: String(v) }), B = b => res(200, { results: { bindings: b } });
+    if (q.includes('P2408')) return B([{ tid: L(950), item: U('Q2'), wiki: U('https://en.wikipedia.org/wiki/Heat_2') }, { tid: L(949), item: U('Q1'), wiki: U('https://en.wikipedia.org/wiki/Heat_(1995_film)') }]);
     if (q.includes('VALUES ?tid')) return B([{ tid: L(949), item: U('Q1'), prop: L('ITEM') }, { tid: L(949), item: U('Q1'), prop: L('P156'), o: U('Q2') }, { tid: L(949), item: U('Q1'), prop: L('DIR'), o: U('Q9') }]);
     if (q.includes('(MIN(?d) AS ?date) (SAMPLE(?w) AS ?wiki)')) return B([...q.includes('wd:Q2') ? [{ o: U('Q2'), label: L('Heat 2'), tm: L(950), prev: L('Q1'), dir: L('Q9') }] : [], ...q.includes('wd:Q1 ') || q.includes('wd:Q1 }') ? [{ o: U('Q1'), label: L('Heat'), tm: L(949), next: L('Q2'), dir: L('Q9'), date: L('1995-12-15T00:00:00Z') }] : []]);
     return B([]); }
+  // Wikipedia: مقدمة Heat 2 تقول إنه يسبق Heat ويليه (رواية مايكل مان)
+  if (u.hostname === 'en.wikipedia.org') return res(200, { query: { pages: [{ title: 'Heat 2', extract: 'Heat 2 is an upcoming American crime film. It serves as a prequel and sequel to Heat (1995).' }, { title: 'Heat (1995 film)', extract: 'Heat is a 1995 American crime film.' }] } });
   if (u.hostname === 'api.github.com') { if (opt.headers.Authorization !== 'Bearer test-token') return res(401, {});
     if (!opt.method) return stored ? res(200, { sha: 's' + puts.length, content: Buffer.from(stored).toString('base64') }) : res(404, {});
     if (conflictOnce) { conflictOnce = false; return res(409, {}); }
@@ -44,6 +47,7 @@ const again = await call({ action: 'add', tmdb: 949, kind: 'movie', password: 'o
 check('إضافة الفيلم نفسه مرتين لا تكرره', again.body.state === 'exists' && puts.length === 1, again.body);
 const wl = await call({ action: 'worlds', tmdb: 949, kind: 'movie', password: 'open-sesame-42' });
 check('العالم: Heat ثم Heat 2 أعمالاً متتالية، بمعلومات الجزء الثاني من TMDB', wl.status === 200 && wl.body.key === 'm949' && wl.body.works.m949?.worlds?.[0] === 'c:m949' && wl.body.worlds['c:m949']?.order.join() === 'm949,m950' && wl.body.info.m950?.title === 'Heat 2' && wdAsked >= 2, wl.body);
+check('ترتيب الأحداث: Heat 2 قبل Heat بدليل من Wikipedia، في العالم ومجموعة TMDB معاً', wl.body.worlds['c:m949']?.chrono?.order.join() === 'm950,m949' && wl.body.worlds['c:m949'].chrono.moved.m950?.src.includes('wikipedia') && wl.body.cols?.[77]?.order?.join() === 'm950,m949', { w: wl.body.worlds, c: wl.body.cols });
 check('العالم يحتاج كلمة السر ولا يسأل Wikidata بدونها', await (async () => { const n = wdAsked, r = await call({ action: 'worlds', tmdb: 949, kind: 'movie', password: 'x' }); return r.status === 401 && wdAsked === n; })());
 wdDown = true; const wd = await call({ action: 'worlds', tmdb: 949, kind: 'movie', password: 'open-sesame-42' }); wdDown = false;
 check('تعطّل Wikidata يعيد خطأً واضحاً ولا يكتب شيئاً', wd.status === 502 && wd.body.error && puts.length === 1, wd);

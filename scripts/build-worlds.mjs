@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import { tmdb, hasKey } from './lib-tmdb.mjs';
 import { worldsFor, assemble } from './lib-worlds.mjs';
+import { gatherEvidence, chronoOrder } from './lib-chrono.mjs';
 const RAW = process.env.WORLDS_RAW;
 if (!RAW && !hasKey()) { console.error('missing TMDB_API_KEY'); process.exit(1); }
 const root = new URL('../', import.meta.url), dir = d => d && new URL(d.replace(/\/?$/, '/'), 'file://' + process.cwd() + '/');
@@ -33,7 +34,35 @@ for (const k of hide) if (!Object.values(res.worlds).some(w => w.order.includes(
 for (const [door, file] of [['dc', 'site/dc/data/catalog.json'], ['fate', 'site/fate/data/catalog.json']]) {
   const cat = rd(new URL(file, root), { works: [] }), byImdb = new Map((cat.works || []).filter(w => w.imdb).map(w => [w.imdb, w.id]));
   for (const f of films) { const id = f.imdb && byImdb.get(f.imdb); if (id) { const k = keyOf(f); (res.works[k] ||= { worlds: [] }).guide = { door, id }; } } }
-const out = { generatedAt: new Date().toISOString(), worlds: res.worlds, works: res.works, info: res.info };
+// ---------- ترتيب الأحداث (scripts/lib-chrono.mjs) ----------
+// لكل عالم آلي (40 عملاً فأقل) ولكل مجموعة TMDB في القائمة: ترتيب أحداثه من أدلة Wikipedia وTMDB وWikidata، يُعرض حين لا ترتيب مراجَع.
+// ويُحسب للترتيبات المراجَعة أيضاً لا للعرض، بل ليقيس التقرير دقة المحرك عليها ويكشف ما قد يفوت المراجعة.
+const partOf = new Map(); for (const c of Object.values(cols)) for (const p of c.parts || []) partOf.set('m' + p.tmdb, p);
+const meta = k => { const o = known[k] || res.info[k] || res.basic?.[k] || fr.extras?.[k] || partOf.get(k) || {}; return { k, title: o.title || k, date: o.date || null, year: o.year || (o.date ? +o.date.slice(0, 4) : null) }; };
+const CHRONO = new URL('data/generated/films/chrono-cache.json', root), ccache = rd(CHRONO, {});
+const cfresh = Object.fromEntries(Object.entries(ccache).filter(([k, v]) => now - (v.at || 0) < ((meta(k).date || '9999') <= today ? 14 : 2) * 864e5));
+const groupsC = [];
+for (const [id, w] of Object.entries(res.worlds)) if (w.order.length >= 2 && w.order.length <= 40) groupsC.push({ kind: 'world', id, keys: w.order });
+for (const c of new Set(films.map(f => f.col).filter(c => c && cols[c]?.parts.length > 1))) groupsC.push({ kind: 'col', id: c, keys: cols[c].parts.map(p => 'm' + p.tmdb) });
+for (const [id, g] of Object.entries(fr.items || {})) { const keys = g.order.map(s => s.m ? 'm' + s.m : s.t ? 't' + s.t : null).filter(Boolean); if (keys.length >= 2) groupsC.push({ kind: 'cur', id, keys, view: g.view, name: g.name }); }
+const allKeys = [...new Set(groupsC.flatMap(g => g.keys))];
+let evid = Object.fromEntries(allKeys.filter(k => cfresh[k]).map(k => [k, cfresh[k]]));
+if (!RAW) { try { evid = await gatherEvidence(allKeys, { tmdb, cache: cfresh }); console.log(`WORLDS stage chrono ${allKeys.length} (${Math.round((Date.now() - t0) / 1000)}s)`); }
+  catch (e) { console.log('CHRONO evidence failed, using the cache: ' + e.message); }
+  // ما تعذّر جلب بعض مصادره لا يُحفظ، فيُعاد جلبه في البناء التالي بدل أن يبقى ناقصاً أسبوعين
+  fs.writeFileSync(CHRONO, JSON.stringify(Object.fromEntries(Object.entries(evid).filter(([k, v]) => allKeys.includes(k) && !v.miss).map(([k, v]) => [k, { ...v, at: cfresh[k]?.at || now }]))) + '\n');
+  const miss = Object.values(evid).filter(v => v.miss).length; if (miss) console.log(`CHRONO evidence incomplete for ${miss} works (not cached)`); }
+const outCols = {}, chronoAudit = { agree: [], conflict: [], missed: [], auto: [] };
+for (const g of groupsC) { const ms = g.keys.map(meta), r = chronoOrder(ms, evid), moved = Object.entries(r.moved), seen = g.keys.every(k => evid[k] && !evid[k].miss);
+  // chk: فُحصت أدلة كل الأجزاء ولم يُذكر جزء يسبق القصة. إن تعذّر جلب دليل جزء لا يُدّعى ذلك
+  if (g.kind === 'world') { if (moved.length) res.worlds[g.id].chrono = r; else if (seen) res.worlds[g.id].chk = 1; }
+  else if (g.kind === 'col' && (moved.length || seen)) outCols[g.id] = moved.length ? r : { chk: 1 };
+  if (g.kind !== 'cur') { if (moved.length) chronoAudit.auto.push({ group: g.kind === 'col' ? 'col ' + (cols[g.id]?.name || g.id) : res.worlds[g.id].name, order: r.order.map(k => meta(k).title), moved: moved.map(([k, m]) => `${meta(k).title} ← ${m.w} ${m.ref.map(t => meta(t).title).join(' / ')} [${m.src}]`) }); continue; }
+  // المراجَع: هل يضع كل جزء حرّكه المحرك قبل ما يسبقه في دليله؟ وأي جزء قدّمته المراجعة ولم يقدّمه المحرك؟
+  const pos = new Map(g.keys.map((k, i) => [k, i]));
+  for (const [k, m] of moved) (m.ref.every(t => pos.get(k) < pos.get(t)) ? chronoAudit.agree : chronoAudit.conflict).push({ cur: g.id, view: g.view || null, t: meta(k).title, w: m.w, before: m.ref.map(t => meta(t).title), src: m.src });
+  if (g.view) for (const k of g.keys) { const d = meta(k).date || '9999'; if (g.keys.some(j => pos.get(j) > pos.get(k) && (meta(j).date || '9999') < d) && !r.moved[k]) chronoAudit.missed.push({ cur: g.id, t: meta(k).title }); } }
+const out = { generatedAt: new Date().toISOString(), worlds: res.worlds, works: res.works, info: res.info, cols: outCols };
 fs.writeFileSync(new URL('worlds.json', OUT), JSON.stringify(out) + '\n');
 
 // ---------- تقرير التدقيق ----------
@@ -45,7 +74,7 @@ const colOf = f => { const c = f.col && cols[f.col]; return c && c.parts.length 
 const title = k => known[k]?.title || res.info[k]?.title || k;
 const released = k => { const d = known[k]?.date || res.info[k]?.date; return d && d <= today; };
 // uncurated: أعمال تُعرض سلسلتها من مجموعة TMDB أو عالم آلي بترتيب الصدور، وترتيب أحداثها لم يُراجَع (قد يكون فيها جزء يسبق القصة)
-const report = { generatedAt: out.generatedAt, counts: {}, missing: [], uncurated: [], curatedGaps: [], collectionGaps: [], related: [], noItem: [], excludedGroups: res.report.excludedGroups, rejectedFollows: res.report.rejectedFollows };
+const report = { generatedAt: out.generatedAt, counts: {}, missing: [], uncurated: [], chronoAudit, curatedGaps: [], collectionGaps: [], related: [], noItem: [], excludedGroups: res.report.excludedGroups, rejectedFollows: res.report.rejectedFollows };
 const listed = new Set(focus);
 for (const f of films) { const k = keyOf(f), w = res.works[k];
   if (!w) { report.noItem.push({ k, t: f.title, y: f.year }); continue; }
@@ -62,6 +91,7 @@ for (const f of films) { const k = keyOf(f), w = res.works[k];
 }
 report.counts = { works: focus.length, withEntry: focus.length - report.noItem.length, inWorld: Object.values(res.works).filter(w => w.worlds?.length).length, worlds: Object.keys(res.worlds).length,
   chains: res.report.chains, withRelated: report.related.length, missing: report.missing.length, uncurated: report.uncurated.length, curatedGaps: report.curatedGaps.length, collectionGaps: report.collectionGaps.length,
+  chronoAgree: chronoAudit.agree.length, chronoConflict: chronoAudit.conflict.length, chronoMissed: chronoAudit.missed.length, chronoAuto: chronoAudit.auto.length,
   infoEntries: Object.keys(res.info).length, bytes: JSON.stringify(out).length, seconds: Math.round((Date.now() - t0) / 1000) };
 fs.writeFileSync(new URL('worlds-report.json', GEN), JSON.stringify(report, null, 1) + '\n');
 console.log('WORLDS counts ' + JSON.stringify(report.counts));
@@ -73,3 +103,4 @@ for (const m of report.missing) console.log('WORLDS missing ' + JSON.stringify(m
 for (const m of report.uncurated) console.log('WORLDS uncurated ' + JSON.stringify(m));
 for (const m of report.curatedGaps) console.log('WORLDS curated-gap ' + JSON.stringify(m));
 for (const m of report.collectionGaps) console.log('WORLDS collection-gap ' + JSON.stringify(m));
+for (const [kind, list] of Object.entries(chronoAudit)) for (const m of list) console.log(`CHRONO ${kind} ` + JSON.stringify(m));
