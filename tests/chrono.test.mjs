@@ -97,10 +97,58 @@ check('لا يتقدم جزء إلا بقدر ما يلزمه قيد', r.order.j
 // جملة «تكملة لـ» في جزء آخر تقدّم الأصل، ودليله جملة ذلك الجزء
 const SQ = [M('m10', 'Sequel Part', '2001-01-01'), M('m11', 'Origin Part', '2003-01-01')];
 r = chronoOrder(SQ, { m10: W('Sequel Part is a sequel to Origin Part (2003).') });
-check('دليل التقديم من جملة الجزء الآخر', r.order.join() === 'm11,m10' && r.moved.m11?.w === 'sequel' && r.moved.m11.ref.join() === 'm10' && r.moved.m11.q?.[0]?.t.includes('sequel to Origin Part') && r.moved.m11.src.join() === 'wikipedia', r);
+check('دليل التقديم من جملة الجزء الآخر', r.order.join() === 'm11,m10' && r.moved.m11?.w === 'before' && r.moved.m11.ref.join() === 'm10' && r.moved.m11.q?.[0]?.t.includes('sequel to Origin Part') && r.moved.m11.src.join() === 'wikipedia', r);
 // زمن Wikidata يوافق Wikipedia فيُحسب مصدراً، وكلمة TMDB خارج مدته لا تُحسب
 r = chronoOrder(PR, { m766507: { ...W('It is a prequel to Predator (1987), set in the Northern Great Plains in 1719.'), period: 1701, periodEnd: 1800, periodLabel: '18th century', kw: ['1990s'] } });
 check('مصادر الزمن: Wikidata بمدته، وTMDB خارجها لا يُحسب', r.moved.m766507?.src.sort().join() === 'wikidata,wikipedia' && r.moved.m766507.q.some(q => q.s === 'wikidata' && q.t.includes('18th century')), r);
+
+// جمل حقيقية من مقدمات Wikipedia (نوفمبر 2026) كشفها بناء الفرع
+// جملة وصلية عن عمل آخر تُنسب إليه: مقالة The Little Mermaid II تذكر أن Ariel's Beginning جزء سابق
+const LM = [M('m10144', 'The Little Mermaid', '1989-11-17'), M('m10898', 'The Little Mermaid II: Return to the Sea', '2000-01-23'), M('m13676', "The Little Mermaid: Ariel's Beginning", '2008-08-25')];
+r = chronoOrder(LM, { m10898: W("It is the sequel to the 1989 Walt Disney Animation Studios film, The Little Mermaid and the second installment in The Little Mermaid trilogy. In 2008, Disney released a third film, The Little Mermaid: Ariel's Beginning, which is a prequel to the first film.") });
+check('«…, X, which is a prequel to Y» دليل لـX لا لصاحب المقالة', r.order.join() === 'm13676,m10144,m10898' && Object.keys(r.moved).join() === 'm13676' && r.moved.m13676.w === 'prequel', r);
+check('«Plans for a direct sequel to X» ليست دليلاً', !parseSentence('Plans for a direct sequel to The Bourne Legacy (2012) starring Jeremy Renner were put on hold in favor of an official sequel to Ultimatum.').some(x => x.t === 'sequel' || x.t === 'prequel'));
+// مقالة الأصل تسمّي جزءه السابق
+const RB = [M('m1368', 'First Blood', '1982-10-22'), M('m1369', 'Rambo: First Blood Part II', '1985-05-21'), M('m1150369', 'John Rambo', '2027-06-03')];
+r = chronoOrder(RB, { m1368: W('A prequel, John Rambo is scheduled to be released in 2027.') });
+check('«A prequel, John Rambo is scheduled…» في مقالة First Blood', r.order[0] === 'm1150369' && r.moved.m1150369?.ref.join() === 'm1368' && r.moved.m1150369.w === 'prequel', r);
+const HG = [M('m70160', 'The Hunger Games', '2012-03-12'), M('m101299', 'The Hunger Games: Catching Fire', '2013-11-15'), M('m695721', 'The Hunger Games: The Ballad of Songbirds & Snakes', '2023-11-15'), M('m1300968', 'The Hunger Games: Sunrise on the Reaping', '2026-11-18')];
+r = chronoOrder(HG, { m70160: W('The film has been followed by three sequels: Catching Fire (2013), Mockingjay – Part 1 (2014), and Mockingjay – Part 2 (2015), and two prequels: The Ballad of Songbirds and Snakes (2023) and Sunrise on the Reaping (2026).'),
+  m1300968: W('Based on the 2025 novel, it serves as both a sequel to The Hunger Games: The Ballad of Songbirds & Snakes (2023) and a prequel to The Hunger Games (2012), and is the sixth installment in The Hunger Games film series.') });
+check('«two prequels: A and B»، و«both a sequel to A and a prequel to B» بلا حلقة', r.order.join() === 'm695721,m1300968,m70160,m101299', r);
+// «trilogy (2001–2003)»: الأفلام الثلاثة في تلك السنوات، لا المسلسل الذي يحمل الاسم
+const ME = [M('m120', 'The Lord of the Rings: The Fellowship of the Ring', '2001-12-18'), M('m121', 'The Lord of the Rings: The Two Towers', '2002-12-18'), M('m122', 'The Lord of the Rings: The Return of the King', '2003-12-01'),
+  M('m49051', 'The Hobbit: An Unexpected Journey', '2012-12-12'), M('t84773', 'The Lord of the Rings: The Rings of Power', '2022-09-01')];
+r = chronoOrder(ME, { m49051: W("The film is the first installment in The Hobbit trilogy, acting as a prequel to Jackson's The Lord of the Rings trilogy (2001–2003).") });
+check('ثلاثية بمدى سنوات: أفلامها الثلاثة فقط', r.moved.m49051?.ref.join() === 'm120,m121,m122' && r.order.join() === 'm49051,m120,m121,m122,t84773', r);
+// وصف قبل العنوان، وسنة TMDB متأخرة عن العرض الأول
+const CW = [M('m6075', "Carlito's Way", '1993-11-10'), M('m12261', "Carlito's Way: Rise to Power", '2005-09-27')];
+r = chronoOrder(CW, { m12261: W("Carlito's Way: Rise to Power is a 2005 prequel to Brian De Palma's 1993 film Carlito's Way.") });
+check('«Brian De Palma\'s 1993 film Carlito\'s Way»', r.order.join() === 'm12261,m6075', r);
+const ED = [M('m764', 'The Evil Dead', '1983-01-16'), M('m765', 'Evil Dead II', '1987-03-13'), M('m109428', 'Evil Dead', '2013-04-05'), M('m1280608', 'Evil Dead Wrath', '2028-04-05')];
+r = chronoOrder(ED, { m1280608: W('It is the seventh installment in the Evil Dead film series, and a prequel to The Evil Dead (1981), taking place in 1972.') });
+check('«The Evil Dead (1981)» هو فيلم 1983 في TMDB لا Evil Dead (2013)', r.order[0] === 'm1280608' && r.moved.m1280608.ref.join() === 'm764', r);
+// «sequel and a prequel» بزمن بعد الأصل: إطاره غالب فلا يتقدم (Psycho IV في 1990)، وبلا زمن يتقدم (Mufasa أعلاه)
+const PS = [M('m539', 'Psycho', '1960-06-22'), M('m10576', 'Psycho II', '1983-06-03'), M('m40377', 'Psycho IV: The Beginning', '1990-11-10')];
+r = chronoOrder(PS, { m40377: { ...W("It serves as both the third sequel and a prequel to Alfred Hitchcock's Psycho (1960), focusing on the early life of Norman Bates."), period: 1990, periodEnd: 1999, periodLabel: '1990s' } });
+check('جزء «سابق ولاحق» زمنه بعد الأصل يبقى مكانه', r.order.join() === 'm539,m10576,m40377' && !Object.keys(r.moved).length, r);
+// جزء بخطين زمنيين يصنع حلقة: تُترك جمله وحدها وتبقى سلسلة التكملات
+const BN = [M('m2501', 'The Bourne Identity', '2002-06-14'), M('m2502', 'The Bourne Supremacy', '2004-07-23'), M('m2503', 'The Bourne Ultimatum', '2007-08-03'), M('m324668', 'Jason Bourne', '2016-07-27'), M('t83949', 'Treadstone', '2019-10-15')];
+r = chronoOrder(BN, { m2502: W('Loosely based on the novel, and a sequel to The Bourne Identity (2002), the film stars Matt Damon.'), m2503: W('Loosely based on the novel of the same name, the story takes place both during and after the events of The Bourne Supremacy (2004).'),
+  m324668: W('It is the fifth installment of the Bourne film series and a direct sequel to The Bourne Ultimatum (2007).'), t83949: W('It is part of the Bourne franchise and serves as both a prequel to The Bourne Identity (2002) and a sequel to Jason Bourne (2016).') });
+check('Treadstone (سابق ولاحق معاً) لا يكسر سلسلة Bourne', r.order.join() === 'm2501,m2502,m2503,m324668,t83949' && !Object.keys(r.moved).length, r);
+// «prequels to» بالجمع، وسنة العنوان مصدر أضعف يكمل سلسلة مؤرخة
+const BR = [M('m78', 'Blade Runner', '1982-06-25'), M('m473072', '2036: Nexus Dawn', '2017-08-30'), M('m475946', 'Blade Runner: Black Out 2022', '2017-09-26'), M('m335984', 'Blade Runner 2049', '2017-10-04')];
+r = chronoOrder(BR, { m78: W('The film is set in a dystopian future Los Angeles of 2019.'), m473072: W('It is a 2017 American short film acting as a prequel to the feature film Blade Runner 2049. The film takes place in Los Angeles in 2036, 13 years before the events of Blade Runner 2049.'),
+  m475946: W('The short is one of three short films that serve as prequels to the live-action film Blade Runner 2049.') });
+check('Blade Runner: 2019 ثم 2022 ثم 2036 ثم 2049', titles(r, BR).join() === 'Blade Runner,Blade Runner: Black Out 2022,2036: Nexus Dawn,Blade Runner 2049' && r.moved.m475946?.y === 2022 && r.moved.m475946.src.includes('title'), r);
+const FT = [M('m591273', 'Fear Street: 1994', '2021-06-28'), M('m591274', 'Fear Street: 1978', '2021-07-08'), M('m591275', 'Fear Street: 1666', '2021-07-14')];
+r = chronoOrder(FT, { m591274: { ...W('Primarily set in the summer of 1978, the film follows a group of teens.'), kw: ['1970s'] }, m591275: { sents: [], kw: ['17th century'] } });
+check('أزمنة من العناوين تكمل سلسلة: 1666 مؤكد بالعنوان وTMDB', titles(r, FT).join() === 'Fear Street: 1666,Fear Street: 1978,Fear Street: 1994' && r.moved.m591275?.src.sort().join() === 'title,tmdb', r);
+// «بين» زمنه لا يُذكر إن لم يُعرف زمن طرفيه
+const CM = [M('m9529', 'Candyman', '1992-10-16'), M('m9530', 'Candyman: Farewell to the Flesh', '1995-03-17'), M('m9531', 'Candyman: Day of the Dead', '1999-07-13'), M('m565028', 'Candyman', '2021-08-25')];
+r = chronoOrder(CM, { m565028: { ...W('It is a direct sequel to the 1992 film, and set between the films Candyman: Farewell to the Flesh (1995) and Candyman 3: Day of the Dead (1999).'), period: 1977, periodEnd: 1977, periodLabel: '1977' } });
+check('«بين» بلا زمن مذكور حين لا يُعرف زمن طرفيه', r.order.join() === 'm9529,m9530,m565028,m9531' && r.moved.m565028?.w === 'between' && r.moved.m565028.y == null && !r.moved.m565028.src.includes('wikidata'), r);
 
 // الجلب: Wikidata ثم Wikipedia ثم TMDB، مع ذاكرة سابقة
 const asked = [], badAlias = [];
@@ -108,14 +156,15 @@ const asked = [], badAlias = [];
 const aliasCheck = o => { const q = decodeURIComponent(String(o?.body || '').replace(/^query=/, '')), at = q.indexOf('WHERE'); for (const m of q.slice(0, at).matchAll(/AS (\?\w+)\)/g)) if (new RegExp('\\' + m[1] + '\\b').test(q.slice(at))) badAlias.push(m[1]); };
 const fakeFetch = async (url, o) => { asked.push(String(url).slice(0, 40));
   if (String(url).includes('wikidata')) aliasCheck(o);
-  if (String(url).includes('wikidata')) return { ok: true, json: async () => ({ results: { bindings: [{ tid: { type: 'literal', value: '766507' }, item: { type: 'uri', value: 'http://www.wikidata.org/entity/Q1' }, wiki: { type: 'uri', value: 'https://en.wikipedia.org/wiki/Prey_(2022_film)' }, py: { type: 'literal', value: '1719' }, pl: { type: 'literal', value: '1719' } }] } }) };
+  if (String(url).includes('wikidata')) return { ok: true, json: async () => ({ results: { bindings: [{ tid: { type: 'literal', value: '766507' }, item: { type: 'uri', value: 'http://www.wikidata.org/entity/Q1' }, wiki: { type: 'uri', value: 'https://en.wikipedia.org/wiki/Prey_(2022_film)' }, y0: { type: 'literal', value: '1701' }, y1: { type: 'literal', value: '1800' }, l0: { type: 'literal', value: '18th century' } },
+    { tid: { type: 'literal', value: '766507' }, item: { type: 'uri', value: 'http://www.wikidata.org/entity/Q1' }, wiki: { type: 'uri', value: 'https://en.wikipedia.org/wiki/Prey_(2022_film)' }, y0: { type: 'literal', value: '1719' }, l0: { type: 'literal', value: '1719' } }] } }) };
   if (String(url).includes('en.wikipedia.org/w/api.php')) { if (o.headers['User-Agent'].indexOf('dc-guide') !== 0) throw new Error('UA');
     return { ok: true, json: async () => ({ query: { normalized: [{ from: 'Prey_(2022_film)', to: 'Prey (2022 film)' }], pages: [{ title: 'Prey (2022 film)', extract: 'Prey is a 2022 American film. It is the fifth installment in the Predator franchise and a prequel to Predator (1987), set in the Northern Great Plains in 1719.' }] } }) }; }
   throw new Error('unexpected ' + url); };
 const ev = await gatherEvidence(['m766507', 'm106'], { tmdb: async p => { if (p === '/movie/766507/keywords') return { keywords: [{ name: 'Prequel' }, { name: 'comanche' }] }; return { keywords: [] }; },
   cache: { m106: { sents: [], kw: [] } }, opt: { fetchImpl: fakeFetch }, fetchImpl: fakeFetch });
 check('استعلام Wikidata سليم: لا اسم نتيجة يكرر متغيراً', badAlias.length === 0 && asked.some(a => a.includes('wikidata')), badAlias);
-check('الأدلة: جملة Wikipedia وكلمة TMDB وزمن Wikidata، والمحفوظ لا يُجلب ثانية', ev.m766507?.sents?.[0]?.includes('prequel to Predator (1987)') && ev.m766507.kw?.join() === 'prequel' && ev.m766507.period === 1719 && ev.m106 && asked.length === 2, { ev, asked });
+check('الأدلة: جملة Wikipedia وكلمة TMDB وأضيق زمن في Wikidata، والمحفوظ لا يُجلب ثانية', ev.m766507?.sents?.[0]?.includes('prequel to Predator (1987)') && ev.m766507.kw?.join() === 'prequel' && ev.m766507.period === 1719 && ev.m766507.periodEnd === 1719 && ev.m106 && asked.length === 2, { ev, asked });
 
 // تعذّر Wikipedia لعمل وTMDB لآخر: يُعلَّم الناقص فلا يُحفظ ولا يُدّعى أنه فُحص، وما وصل كاملاً بلا علامة
 const badFetch = async url => { if (String(url).includes('wikidata')) return { ok: true, json: async () => ({ results: { bindings: [{ tid: { type: 'literal', value: '1' }, item: { type: 'uri', value: 'http://www.wikidata.org/entity/Q9' }, wiki: { type: 'uri', value: 'https://en.wikipedia.org/wiki/A' } }] } }) };

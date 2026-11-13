@@ -408,8 +408,13 @@
  },
  "evil-dead": {
   "name": "Evil Dead",
-  "note": "Evil Dead Rise قصة مستقلة بشخصيات جديدة ويكفي وحده، ومثله Evil Dead Burn. الثلاثية الأصلية ثم مسلسل Ash vs Evil Dead قصة آش المتصلة. فيلم 2013 قصة أخرى مستقلة في العالم نفسه.",
+  "note": "Evil Dead Rise قصة مستقلة بشخصيات جديدة ويكفي وحده، ومثله Evil Dead Burn. الثلاثية الأصلية ثم مسلسل Ash vs Evil Dead قصة آش المتصلة. فيلم 2013 قصة أخرى مستقلة في العالم نفسه. Evil Dead Wrath القادم تدور أحداثه عام 1972 قبل The Evil Dead، فهو أول الأحداث، والمُوصى به البدء بالأصل كما صدر.",
   "order": [
+   {
+    "m": 1280608,
+    "rec": "soon",
+    "note": "عام 1972، قبل The Evil Dead"
+   },
    {
     "m": 2186,
     "rec": "optional",
@@ -449,10 +454,6 @@
     "m": 1212763,
     "rec": "optional",
     "note": "قصة مستقلة"
-   },
-   {
-    "m": 1280608,
-    "rec": "soon"
    }
   ],
   "sources": [
@@ -471,8 +472,17 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Within_the_Woods"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Evil_Dead_Wrath"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/movie/1280608"
    }
-  ]
+  ],
+  "view": "release"
  },
  "terminator": {
   "name": "The Terminator",
@@ -953,7 +963,7 @@
  },
  "predator": {
   "name": "Predator",
-  "note": "كل فيلم قصة مستقلة، فلا يلزم ترتيب. مرتبة هنا حسب الأحداث: Prey عام 1719، ثم قصص Killer of Killers (841 و1609 و1941)، ثم الأصل عام 1987، وBadlands في المستقبل البعيد. الأعلى تقييماً: الأول وPrey وKiller of Killers وBadlands. فيلما Alien vs. Predator تقاطع جانبي خارج السلسلة.",
+  "note": "كل فيلم قصة مستقلة، فلا يلزم ترتيب. مرتبة هنا حسب الأحداث: Prey عام 1719، ثم قصص Killer of Killers (841 و1609 و1941)، ثم الأصل عام 1987، وBadlands في المستقبل البعيد. الأعلى تقييماً: الأول وPrey وKiller of Killers وBadlands. فيلما Alien vs. Predator تقاطع جانبي خارج السلسلة. وتضع Wikipedia فيلم The Predator بين Predator 2 وPredators، بينما يضعه Space.com بعدهما لأن أحداثه عام 2018، وهو المتبع هنا.",
   "order": [
    {
     "m": 766507,
@@ -1015,6 +1025,10 @@
    {
     "name": "Space.com",
     "url": "https://www.space.com/predator-movies-in-order"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Predator_(film)"
    }
   ],
   "view": "either"
@@ -1409,7 +1423,7 @@
  },
  "rambo": {
   "name": "Rambo",
-  "note": "First Blood هو الأعلى تقييماً وقصته مكتملة. الأجزاء التالية مغامرات منفصلة لنفس الشخصية بترتيب صدورها. John Rambo القادم يحكي نشأة الشخصية في حرب فيتنام، أي قبل First Blood.",
+  "note": "First Blood هو الأعلى تقييماً وقصته مكتملة. الأجزاء التالية مغامرات منفصلة لنفس الشخصية بترتيب صدورها. John Rambo القادم يحكي نشأة الشخصية في حرب فيتنام، فهو أول الأحداث، والمُوصى به البدء بـFirst Blood كما صدرت.",
   "sources": [
    {
     "name": "Wikipedia",
@@ -1418,9 +1432,22 @@
    {
     "name": "Wikipedia",
     "url": "https://en.wikipedia.org/wiki/Rambo_(franchise)"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/First_Blood"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/movie/1150369"
    }
   ],
   "order": [
+   {
+    "m": 1150369,
+    "rec": "soon",
+    "note": "نشأة الشخصية في حرب فيتنام، قبل First Blood"
+   },
    {
     "f": "First Blood",
     "rec": "watch"
@@ -1441,13 +1468,9 @@
    {
     "f": "Rambo: Last Blood",
     "rec": "optional"
-   },
-   {
-    "m": 1150369,
-    "rec": "soon",
-    "note": "قصة النشأة، قبل First Blood"
    }
-  ]
+  ],
+  "view": "release"
  },
  "heat": {
   "name": "Heat",
@@ -1842,7 +1865,7 @@
  },
  "candyman": {
   "name": "Candyman",
-  "note": "فيلم 2021 تكملة مباشرة لفيلم 1992، فالأصل قبله. الجزآن الثاني والثالث ضعيفا التقييم ولا يعتمد عليهما.",
+  "note": "فيلم 2021 تكملة مباشرة لفيلم 1992، فالأصل قبله. الجزآن الثاني والثالث ضعيفا التقييم ولا يعتمد عليهما. وتضع Wikipedia فيلم 2021 بين الجزأين الثاني والثالث، لكنه يتجاهل أحداثهما بحسب Screen Rant، فبقي بعدهما.",
   "sources": [
    {
     "name": "Wikipedia",
@@ -1851,6 +1874,10 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/collection/98580"
+   },
+   {
+    "name": "Screen Rant",
+    "url": "https://screenrant.com/candyman-2021-original-movies-connection-reboot-sequel-continuity/"
    }
   ],
   "order": [
@@ -3412,7 +3439,7 @@
  },
  "weapons": {
   "name": "Weapons",
-  "note": "الفيلم مكتمل وحده. Gladys فيلم عمّا قبل أحداثه أُعلن في أبريل 2026. موعده 8 سبتمبر 2028 بحسب Wikipedia، وTMDB يسجّل 7 سبتمبر.",
+  "note": "الفيلم مكتمل وحده. Gladys فيلم عمّا قبل أحداثه أُعلن في أبريل 2026، فهو أول الأحداث، والمُوصى به مشاهدة Weapons أولاً. موعده 8 سبتمبر 2028 بحسب Wikipedia، وTMDB يسجّل 7 سبتمبر.",
   "sources": [
    {
     "name": "Wikipedia",
@@ -3421,19 +3448,24 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/collection/1531466"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/movie/1529266"
    }
   ],
   "order": [
    {
-    "m": 1078605,
-    "rec": "watch"
-   },
-   {
     "m": 1529266,
     "rec": "soon",
     "note": "ما قبل الأحداث"
+   },
+   {
+    "m": 1078605,
+    "rec": "watch"
    }
-  ]
+  ],
+  "view": "release"
  },
  "longlegs": {
   "name": "Longlegs",
@@ -3585,8 +3617,36 @@
  },
  "middle-earth": {
   "name": "Middle-earth",
-  "note": "أفلام الأرض الوسطى بترتيب صدورها، وهو المعتاد لأول مشاهدة. ثلاثية The Lord of the Rings هي القلب والأعلى تقييماً. ثلاثية The Hobbit تدور قبلها بعقود، ومسلسل The Rings of Power قبلها بآلاف السنين، وThe War of the Rohirrim فيلم أنمي قبلها بنحو 183 سنة. أما The Hunt for Gollum فيدور بين The Hobbit والثلاثية، ويتقاطع مع أحداث The Fellowship of the Ring.",
+  "note": "مرتبة حسب أحداثها: مسلسل The Rings of Power في العصر الثاني قبل الأفلام بآلاف السنين، ثم The War of the Rohirrim (أنمي) قبلها بنحو قرنين، ثم ثلاثية The Hobbit قبل The Lord of the Rings بستين سنة، وThe Hunt for Gollum بينهما. والمعتاد لأول مشاهدة ترتيب الصدور، بدءاً بثلاثية The Lord of the Rings، وهي القلب والأعلى تقييماً.",
   "order": [
+   {
+    "t": 84773,
+    "rec": "optional",
+    "note": "قبل الأفلام بآلاف السنين"
+   },
+   {
+    "m": 839033,
+    "rec": "optional",
+    "note": "قبل The Hobbit والثلاثية بنحو قرنين"
+   },
+   {
+    "m": 49051,
+    "rec": "optional",
+    "note": "قبل الثلاثية بستين سنة"
+   },
+   {
+    "m": 57158,
+    "rec": "optional"
+   },
+   {
+    "m": 122917,
+    "rec": "optional"
+   },
+   {
+    "m": 1090869,
+    "rec": "soon",
+    "note": "بين The Hobbit والثلاثية، ويتقاطع مع The Fellowship of the Ring"
+   },
    {
     "m": 120,
     "rec": "watch"
@@ -3598,34 +3658,6 @@
    {
     "m": 122,
     "rec": "watch"
-   },
-   {
-    "m": 49051,
-    "rec": "optional",
-    "note": "قبل الثلاثية بعقود"
-   },
-   {
-    "m": 57158,
-    "rec": "optional"
-   },
-   {
-    "m": 122917,
-    "rec": "optional"
-   },
-   {
-    "t": 84773,
-    "rec": "optional",
-    "note": "قبل الأفلام بآلاف السنين"
-   },
-   {
-    "m": 839033,
-    "rec": "optional",
-    "note": "قبل الثلاثية بنحو 183 سنة"
-   },
-   {
-    "m": 1090869,
-    "rec": "soon",
-    "note": "بين The Hobbit والثلاثية"
    }
   ],
   "sources": [
@@ -3636,8 +3668,17 @@
    {
     "name": "Rotten Tomatoes",
     "url": "https://editorial.rottentomatoes.com/guide/lord-of-the-rings-in-order"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Hobbit:_An_Unexpected_Journey"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Lord_of_the_Rings:_The_War_of_the_Rohirrim"
    }
-  ]
+  ],
+  "view": "release"
  },
  "searching": {
   "name": "Searching",
@@ -3765,22 +3806,22 @@
  },
  "little-mermaid": {
   "name": "The Little Mermaid",
-  "note": "فيلم 2023 إعادة صنع حيّة لفيلم ديزني المرسوم (1989)، وكلاهما عن حكاية هانس كريستيان أندرسن (1837). يكفي وحده، والأصل المرسوم أعلى تقييماً. تكملات النسخة المرسومة ومسلسلها تخصها وحدها.",
+  "note": "فيلم 2023 إعادة صنع حيّة لفيلم ديزني المرسوم (1989)، وكلاهما عن حكاية هانس كريستيان أندرسن (1837). يكفي وحده، والأصل المرسوم أعلى تقييماً. للنسخة المرسومة تكملة ومسلسل وفيلم Ariel's Beginning الذي تدور أحداثه قبلها بسنة، فهو أول أحداثها.",
   "order": [
    {
-    "m": 10144,
-    "rec": "watch",
-    "note": "الأصل المرسوم، الأعلى تقييماً"
-   },
-   {
-    "m": 447277,
-    "rec": "watch",
-    "note": "ريميك حي"
+    "m": 13676,
+    "rec": "skip",
+    "note": "للنسخة المرسومة، قبل أحداثها بسنة"
    },
    {
     "t": 2675,
     "rec": "skip",
-    "note": "مسلسل للنسخة المرسومة"
+    "note": "مسلسل للنسخة المرسومة، قبل أحداث الفيلم"
+   },
+   {
+    "m": 10144,
+    "rec": "watch",
+    "note": "الأصل المرسوم، الأعلى تقييماً"
    },
    {
     "m": 10898,
@@ -3788,9 +3829,9 @@
     "note": "تكملة للنسخة المرسومة"
    },
    {
-    "m": 13676,
-    "rec": "skip",
-    "note": "للنسخة المرسومة"
+    "m": 447277,
+    "rec": "watch",
+    "note": "ريميك حي"
    }
   ],
   "sources": [
@@ -3801,8 +3842,17 @@
    {
     "name": "TMDB",
     "url": "https://www.themoviedb.org/movie/447277"
+   },
+   {
+    "name": "Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/The_Little_Mermaid:_Ariel%27s_Beginning"
+   },
+   {
+    "name": "TMDB",
+    "url": "https://www.themoviedb.org/movie/13676"
    }
-  ]
+  ],
+  "view": "release"
  },
  "alita": {
   "name": "Battle Angel Alita",

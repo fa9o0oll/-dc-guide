@@ -130,7 +130,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   await page.waitForTimeout(300); await page.evaluate(id => { location.hash = '#' + id; }, cf.id); await page.waitForSelector('#sheet[open] #wslot .ordv'); await page.waitForTimeout(250);
   check('الأفلام: مجموعة TMDB مرتّبة بالأحداث: الفيلم أولاً بسببه، والملاحظة تذكر المصدر', await page.evaluate(() => { const rows = document.querySelectorAll('#wslot [data-ov=chrono] .order > li'), n = document.querySelector('#wslot .sec > .note').textContent;
-    return rows.length === 2 && rows[0].classList.contains('here') && rows[0].textContent.includes('قبل «Col Original»') && !rows[0].textContent.includes('مؤكد') && n.includes('مجموعة') && n.includes('حسب أحداث القصة') && !!document.querySelector('#wslot .why'); }));
+    return rows.length === 2 && rows[0].classList.contains('here') && rows[0].textContent.includes('قبل «Col Original» · مصدره Wikipedia فقط') && !rows[0].textContent.includes('مؤكد') && n.includes('مجموعة') && n.includes('حسب أحداث القصة') && !!document.querySelector('#wslot .why'); }));
   await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   await tap('[data-act=reset]'); await page.waitForTimeout(300);
   check('الأفلام: ما شاهدته يختفي من القائمة ويُذكر عدده', await page.evaluate(id => document.getElementById('f-' + id).hidden && document.querySelector('#count').textContent.includes('مخفي') && document.querySelector('#tally').textContent.includes('بقي'), inCol.id));

@@ -36,27 +36,36 @@ const SPLIT = /(?<!\b(?:Vol|Mr|Mrs|Ms|Dr|Jr|Sr|St|No|Pt|vs|Inc|Ltd|U\.S)\.)(?<=[
 export const sentences = text => String(text || '').replace(/\s+/g, ' ').split(SPLIT).filter(s => CUE.test(s) && s.length < 700).slice(0, 12);
 
 // حدود العبارة الهدف: تنتهي عند فاصل جملة أو بداية جملة فرعية
-const CUT = /;|(?<!\b(?:Vol|Mr|Mrs|Ms|Dr|Jr|Sr|St|No|Pt|vs))\.\s|\.$|,\s+(?:and\s+)?(?:the\s+(?:film|story|series)|it|its|which|who|where|while|starring|directed|written|produced|following|follows|set|serving|making|marking|with|as|in|after|before|was|is)\b|\s+(?:and|but)\s+(?:the|a|an)\s+(?:first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|\d+(?:st|nd|rd|th)|final|last)\s+(?:installment|instalment|film|entry|chapter)|\s+(?:and|but)\s+(?:also\s+)?(?:serves|serving|is|was)\b/i;
+const CUT = /;|(?<!\b(?:Vol|Mr|Mrs|Ms|Dr|Jr|Sr|St|No|Pt|vs))\.\s|\.$|,\s+(?:and\s+)?(?:the\s+(?:film|story|series)|it|its|which|who|where|while|starring|directed|written|produced|following|follows|set|serving|making|marking|with|as|in|after|before|was|is)\b|\s+(?:and|but)\s+(?:the|a|an)\s+(?:first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|\d+(?:st|nd|rd|th)|final|last)\s+(?:installment|instalment|film|entry|chapter)|\s+(?:and|but)\s+(?:also\s+)?(?:serves|serving|is|was)\b|\s+and\s+(?:also\s+)?(?:a\s+|the\s+)?(?:prequel|sequel|spin-?off|interquel)\b/i;
 const clip = s => { const m = s.match(CUT); return (m ? s.slice(0, m.index) : s).trim(); };
 const yearsOf = s => [...s.matchAll(/(?<![\d-])(\d{3,4})(?:\s*(BC|BCE|AD|CE))?(?![\ds])/g)].map(m => (m[2] && /BC/.test(m[2]) ? -1 : 1) * +m[1]);
 const NOISE = /release|premiere|filmed|filming|scheduled|announced|production|shot|opened|debut|grossed|award/i;
 
-// جملة واحدة ← أدلة: { t: prequel|sequel|between|before|after|year, p: العبارة الهدف, a, b: طرفا «بين», y: سنة }
+// جملة واحدة ← أدلة: { t: prequel|sequel|between|before|after|year|has-prequel|break, p: العبارة الهدف, y: سنة, framed, subj }
+// subj: الجملة تصف عملاً آخر بجملة وصلية («…, X, which is a prequel to Y»)، فالدليل لـX لا لصاحب المقالة
+// has-prequel: مقالة العمل تسمّي جزءاً سابقاً له («A prequel, John Rambo, …»، «two prequels: A (2023) and B (2026)»)
 export function parseSentence(s) {
   const out = [], t = s.replace(/\s+/g, ' ').replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
   let m;
-  // prequel to X — ومعها «spin-off of and prequel to» و«prequel and sequel to» (إطار يُروى بعد X وقصته قبله)
-  if ((m = t.match(/\bprequel(\s+and\s+(?:a\s+)?sequel)?\s+(?:film\s+|series\s+|story\s+)?(?:to|of)\s+(.+)/i))) out.push({ t: 'prequel', p: m[2], framed: !!m[1] });
-  else if (/\b(?:is|was|be|as|serves as)\s+(?:a|the)\s+(?:spin-?off\s+)?prequel\b/i.test(t)) out.push({ t: 'prequel', p: null });
+  const subjOf = i => { const r = t.slice(0, i).match(/(?:^|,)\s*([^,]+?),\s+which\s+(?:is|was|serves\s+as|acts\s+as)\s+(?:also\s+)?(?:both\s+)?(?:a|the|an)\s+(?:(?:direct|standalone|spin-?off|legacy)\s+(?:and\s+)?)?$/i); return r ? r[1] : undefined; };
+  // خطط ومقترحات لا تصف العمل نفسه: «Plans for a direct sequel to X were put on hold»
+  const hedged = i => /\b(?:plans?|planned|proposed|potential|possible|announc\w*|develop\w*|ideas?|pitch\w*|wanting to make|hoped|rumou?red|in favor of)\b[^,.;]{0,40}$/i.test(t.slice(0, i));
+  // «both the third sequel and a prequel to X» و«a prequel and sequel to X»: إطار يُروى بعد X وقصته قبله
+  if ((m = t.match(/\b(?:both\s+)?(?:(?:the|a)\s+(?:\w+\s+)?)?sequel\s+and\s+(?:also\s+)?(?:a\s+|the\s+)?prequel\s+(?:film\s+)?(?:to|of)\s+(.+)/i))) { if (!hedged(m.index)) out.push({ t: 'prequel', p: m[1], framed: true, subj: subjOf(m.index) }); }
+  // prequel(s) to X — ومعها «prequel and spin-off of X»
+  else if ((m = t.match(/\bprequels?(\s+and\s+(?:a\s+)?sequel)?(?:\s+and\s+(?:a\s+)?spin-?off)?\s+(?:film\s+|series\s+|story\s+)?(?:to|of)\s+(.+)/i))) { if (!hedged(m.index)) out.push({ t: 'prequel', p: m[2], framed: !!m[1], subj: subjOf(m.index) }); }
+  else if (/\b(?:is|was|be|as|serves as)\s+(?:both\s+)?(?:a|the)\s+(?:spin-?off\s+)?prequel\b/i.test(t)) out.push({ t: 'prequel', p: null });
+  if ((m = t.match(/\b(?:a|an|one)\s+(?:spin-?off\s+)?prequel(?:\s+film)?(?:,\s+|\s+titled\s+|\s+called\s+)(.+?),?\s+(?:is|was|will\s+be|has\s+been|released|scheduled|set|premiered|followed)\b/i))
+    || (m = t.match(/\bprequels?(?:\s+films?)?:\s+(.+)/i))) out.push({ t: 'has-prequel', p: m[1] });
   if ((m = t.match(/\binterquel\b(?:\s+(?:to|between)\s+(.+))?/i))) out.push({ t: 'interquel', p: m[1] || null });
-  if (!out.some(x => x.framed) && (m = t.match(/\b(?:standalone\s+|direct\s+|legacy\s+)?(?<!spiritual\s)sequel\s+(?:film\s+|series\s+)?to\s+(.+)/i))) out.push({ t: 'sequel', p: m[1] });
+  if (!out.some(x => x.framed) && (m = t.match(/\b(?:standalone\s+|direct\s+|legacy\s+)?(?<!spiritual\s)sequel\s+(?:film\s+|series\s+)?to\s+(.+)/i)) && !hedged(m.index)) out.push({ t: 'sequel', p: m[1], subj: subjOf(m.index) });
   // set between (the events of) A and B
   if ((m = t.match(/\b(?:set|takes?\s+place|occurs?)\s+(?:[a-z]+\s+){0,3}?between\s+(?:the\s+events\s+of\s+)?(.+)/i))) out.push({ t: 'between', p: m[1] });
   // set (a week | ten years | years) before/after (the events of) X — و«ten years prior to the events of X»
   // ومعها المسافة الزمنية إن ذُكرت، لترتيب جزأين يقيسان على العمل نفسه (Solo قبل Star Wars بعشر سنوات، وRogue One قبله بأسبوع)
-  if ((m = t.match(/\b(?:set|takes?\s+place|occurs?)\s+(?:(?:about|around|roughly|some|nearly|over|just|shortly|immediately)\s+)?(?:(\w+)\s+)?(?:(years?|decades?|centuries|century|months?|weeks?|days?|generations?)\s+)?(before|prior\s+to|after|following)\s+(?:the\s+(?:events|end)\s+of\s+)?(.+)/i))
-    || (m = t.match(/\b(\w+)\s+(years?|decades?|centuries)\s+(before|prior\s+to|after)\s+the\s+events\s+of\s+(.+)/i))) {
-    const before = /before|prior/i.test(m[3]), n = m[2] ? (WORDNUM[String(m[1]).toLowerCase()] ?? (+m[1] || (/several|few/i.test(m[1]) ? 3 : null))) : null;
+  if ((m = t.match(/\b(?:set|takes?\s+place|occurs?)\s+(?:(?:about|around|roughly|some|nearly|over|just|shortly|immediately)\s+)?(?:(\d{1,3}(?:,\d{3})+|(?!both\b)\w+)\s+)?(?:(years?|decades?|centuries|century|months?|weeks?|days?|generations?)\s+)?(?:both\s+)?(?:during\s+and\s+)?(before|prior\s+to|after|following)\s+(?:the\s+(?:events|end)\s+of\s+)?(.+)/i))
+    || (m = t.match(/(?<![\d,])\b(\d{1,3}(?:,\d{3})+|\w+)\s+(years?|decades?|centuries)\s+(before|prior\s+to|after)\s+the\s+events\s+of\s+(.+)/i))) {
+    const before = /before|prior/i.test(m[3]), n = m[2] ? (WORDNUM[String(m[1]).toLowerCase()] ?? (+String(m[1]).replace(/,/g, '') || (/several|few/i.test(m[1]) ? 3 : null))) : null;
     const unit = m[2] ? ({ y: 1, d: 10, c: 100, m: 1 / 12, w: 1 / 52, g: 25 }[m[2][0].toLowerCase()] ?? (/^day/i.test(m[2]) ? 1 / 365 : 1)) : null;
     out.push({ t: before ? 'before' : 'after', p: m[4], off: n != null && unit ? (before ? -1 : 1) * n * (/^day/i.test(m[2]) ? 1 / 365 : unit) : undefined }); }
   // زمن القصة: «Set in 1987»، «set primarily in 1962»، «set in the Northern Great Plains in 1719»، «set in the 1920s»، «during World War I»
@@ -87,8 +96,18 @@ function relRef(s, others, self, all) {
   if ((m = s.match(/^(?:the\s+)?(?:first|original)(?:\s+(.+?))?\s+(?:film|movie|installment|instalment|entry|one)$/i)) || /^(?:the\s+)?original$/i.test(s)) { const p = named(m?.[1] || ''); return p.length ? [p[0].k] : null; }
   return null;
 }
+// وصف قبل العنوان يُنزع إن لم يُربط النص كما هو: صاحب بالملكية، وسنة، وصفات، ثم film/movie/series/short
+const DESC = /^(?:(?:[A-Z][\w.-]*\s+){0,3}[A-Z][\w.-]*'s\s+)?(?:the\s+)?(?:(\d{4})\s+)?(?:[a-z][a-z-]*\s+){0,3}?(?:film|movie|picture|series|short)\s+(?=[A-Z0-9"'])(.+)$/, OWNER = /^(?:[A-Z][\w.-]*\s+){0,3}[A-Z][\w.-]*'s\s+(?=[A-Z0-9"'])(.+)$/;
 export function resolveOne(seg, all, self) {
-  let s = seg.trim().replace(/^["']|["']$/g, '').replace(/^(?:the\s+)?events\s+of\s+/i, '').trim(), year = null, m;
+  const r0 = resolveBare(seg, all, self); if (r0) return r0;
+  const s = seg.trim().replace(/[‘’]/g, "'"), d = s.match(DESC) || s.match(OWNER); if (!d) return null;
+  const rest = d.length > 2 ? d[2] : d[1], y = d.length > 2 ? d[1] : null;
+  return resolveBare(y && !/\(\d{4}/.test(rest) ? `${rest} (${y})` : rest, all, self);
+}
+function resolveBare(seg, all, self) {
+  // مدى سنوات «The Lord of the Rings (2001–2003)» يعني أعمالاً بالاسم صدرت فيه
+  let range = null;
+  let s = seg.trim().replace(/\s*\((\d{4})\s*[–-]\s*(\d{2,4})\)/g, (_, a, b) => { range = [+a, +(b.length === 2 ? a.slice(0, 2) + b : b)]; return ''; }).replace(/^["']|["']$/g, '').replace(/^(?:the\s+)?events\s+of\s+/i, '').trim(), year = null, m;
   const others = all.filter(x => x.k !== self);
   if ((s.match(/\(\d{4}/g) || []).length > 1) return null; // أكثر من عمل في القطعة، تُربط أجزاؤها كلٌّ وحده
   if ((m = s.match(/\s*\((\d{4})(?:\s+(?:film|movie|series))?\)/))) { year = +m[1]; s = s.replace(m[0], '').trim(); }
@@ -98,16 +117,24 @@ export function resolveOne(seg, all, self) {
   s = s.replace(/^(?:the\s+)?(?:film|movie|novel)\s+/i, '').trim();
   const r = relRef(s, others, self, all); if (r) return r.length ? r : null;
   // السلسلة كلها: «the Harry Potter film series»، «The Purge film series»، «the Predator franchise»
-  if ((m = s.match(/^(.*?)\s*(?:film\s+series|film\s+franchise|media\s+franchise|franchise|film\s+saga|series\s+of\s+films|saga|series|trilogy|quadrilogy)$/i))) {
-    const n = norm(m[1]); if (!n) return others.map(x => x.k);
+  // ثلاثية/رباعية: أول ثلاثة/أربعة أفلام بالاسم، و«film series» أفلامها فقط (لا المسلسلات التي تحمل الاسم)
+  if ((m = s.match(/^(.*?)\s*(film\s+series|film\s+franchise|media\s+franchise|franchise|film\s+saga|series\s+of\s+films|saga|series|(?:film\s+)?trilog(?:y|ies)|(?:film\s+)?quadrilogy)$/i))) {
+    const n = norm(m[1]), kind = m[2].toLowerCase(), films = /film|trilog|quadrilogy/.test(kind), cap = /trilog/.test(kind) ? 3 : /quadrilogy/.test(kind) ? 4 : Infinity;
+    if (!n) return others.map(x => x.k);
     if (/\b(installment|instalment|entry|film|part|chapter|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|\d+(st|nd|rd|th))\b/.test(n)) return null;
-    const hit = others.filter(x => norm(x.title).includes(n)); return hit.length ? hit.map(x => x.k) : null; }
+    const hit = others.filter(x => norm(x.title).includes(n) && (!films || x.k[0] === 'm') && (!range || (x.year >= range[0] && x.year <= range[1]))).slice(0, cap); return hit.length ? hit.map(x => x.k) : null; }
   const n = norm(s);
+  if (range) { const h = n ? others.filter(x => norm(x.title).includes(n) && x.year >= range[0] && x.year <= range[1]) : []; return h.length ? h.map(x => x.k) : null; }
   if (!n) { const y = year ? others.filter(x => x.year === year) : []; return y.length === 1 ? [y[0].k] : null; }
   let hit = others.filter(x => norm(x.title) === n);
   if (!hit.length && (n.includes(' ') || n.length >= 6)) hit = others.filter(x => { const t = norm(x.title); return t.includes(n) || (t.length >= 5 && n.includes(t) && n.split(' ').length - t.split(' ').length <= 2); });
-  if (year) { const y = hit.filter(x => x.year === year); if (y.length) hit = y; else if (!hit.length) hit = others.filter(x => x.year === year && n.split(' ').some(w => w.length > 3 && norm(x.title).includes(w))); }
-  if (hit.length > 1) { const exact = hit.filter(x => norm(x.title) === n); hit = exact.length === 1 ? exact : [hit[0]]; }
+  // السنة المذكورة تحسم العنوان المكرر. تاريخ TMDB قد يتأخر عن عرض المهرجان أو البلد الأول (The Evil Dead: ‏1981 في Wikipedia و1983 في TMDB)،
+  // فيُقبل فرق سنتين، وإن لم يقرب أي عمل بالاسم من السنة فلا ربط
+  if (year) { if (hit.length) { const d = x => Math.abs((x.year || -9999) - year), ok = hit.filter(x => d(x) <= 2).sort((a, b) => d(a) - d(b)); hit = ok.length ? ok.filter(x => d(x) === d(ok[0])) : []; }
+    else hit = others.filter(x => x.year === year && n.split(' ').some(w => w.length > 3 && norm(x.title).includes(w))); }
+  // عنوان يتكرر (The Mummy 1932 و1999 و2017) بلا سنة: الأحدث صدوراً قبل صاحب الجملة، فالإشارة عادة إلى ما سبقه مباشرة
+  if (hit.length > 1) { const exact = hit.filter(x => norm(x.title) === n), pool = exact.length ? exact : hit, me = all.find(x => x.k === self);
+    const before = me?.date ? pool.filter(x => x.date && x.date < me.date) : []; hit = pool.length === 1 ? pool : [before.length ? before[before.length - 1] : pool[0]]; }
   return hit.length ? hit.map(x => x.k) : null;
 }
 // عبارة قد تجمع أكثر من عمل: «Kingsman: The Secret Service (2014) and Kingsman: The Golden Circle (2017)».
@@ -139,36 +166,52 @@ export const kwSignals = kws => { const k = (kws || []).map(x => String(x).toLow
   return { prequel: k.includes('prequel'), interquel: k.includes('interquel'), spans, year: spans.length ? Math.min(...spans.map(x => x[0])) : null }; };
 
 // ---------- الترتيب ----------
+// سنة في العنوان (Fear Street: 1666، Blade Runner 2049، Wonder Woman 1984): أضعف مصادر الزمن، تُستعمل بعد Wikipedia وWikidata
+export const titleYear = t => { const m = String(t || '').match(/(?<![\d,.])([12]\d{3})(?![\d,])/); return m ? +m[1] : null; };
 // ev[k] = { wiki: رابط المقالة, sents: [جمل], kw: [كلمات], period, periodEnd: مدة زمن القصة من Wikidata, periodLabel }
-// يعيد { order: [مفاتيح بترتيب الأحداث], moved: { k: { w: prequel|between|before|sequel|year, ref: [مفاتيح], y, src: [wikipedia|tmdb|wikidata], q: [{ s, t, u }] } } }
-export function chronoOrder(members, ev = {}) {
-  const all = [...members].sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999') || (a.k > b.k ? 1 : -1));
+// opt.wide: عالم واسع (امتياز أو عالم مشترك) قد يجمع استمراريات منفصلة، فالجزء السابق للقصة لا يتقدم إلا على ما يتصل به بجمل صريحة
+// يعيد { order: [مفاتيح بترتيب الأحداث], moved: { k: { w: prequel|between|before|sequel|year, ref: [مفاتيح], y, yl, src: [wikipedia|tmdb|wikidata|title], q: [{ s, t, u }] } } }
+export function chronoOrder(members, ev = {}, opt = {}) {
+  const all = members.map(m => ({ ...m, year: m.year ?? (m.date ? +m.date.slice(0, 4) : null) })).sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999') || (a.k > b.k ? 1 : -1));
   const idx = new Map(all.map((x, i) => [x.k, i])), keys = all.map(x => x.k), ryear = k => +((all[idx.get(k)].date || '').slice(0, 4)) || null;
-  const facts = {}, year = {}, ysrc = {}, flag = {}, kwq = {}; let brk = false;
+  const facts = {}, year = {}, ysrc = {}, ylab = {}, flag = {}, kwq = {}; let brk = false;
   const within = (y, lo, hi) => y >= lo - 1 && y <= hi + 1;
   for (const x of all) { const e = ev[x.k] || {}, f = facts[x.k] = [], kw = kwSignals(e.kw);
     for (const s of e.sents || []) for (const st of parseSentence(s)) f.push({ ...st, quote: s, url: e.wiki, own: x.k });
     if (f.some(st => st.t === 'break')) brk = true;
-    // زمن القصة من Wikipedia ثم Wikidata، ويؤكده الآخر وكلمات TMDB إن وقع في مدتها
-    const wy = f.find(st => st.t === 'year')?.y, pend = e.periodEnd ?? (e.period != null ? e.period + 9 : null);
+    // زمن القصة: Wikipedia ثم Wikidata ثم العنوان، ويؤكده كل مصدر آخر يقع الزمن في مدته (ومنها كلمات TMDB، التي لا تُنشئ زمناً وحدها)
+    const wy = f.find(st => st.t === 'year' && !st.subj)?.y, pend = e.periodEnd ?? e.period, ty = titleYear(x.title);
     if (wy != null) { year[x.k] = wy; ysrc[x.k] = new Set(['wikipedia']); if (e.period != null && within(wy, e.period, pend)) ysrc[x.k].add('wikidata'); }
-    else if (e.period != null) { year[x.k] = e.period; ysrc[x.k] = new Set(['wikidata']); }
+    else if (e.period != null) { year[x.k] = e.period; ysrc[x.k] = new Set(['wikidata']); if (pend - e.period > 1 && e.periodLabel) ylab[x.k] = e.periodLabel; }
+    else if (ty != null) { year[x.k] = ty; ysrc[x.k] = new Set(['title']); }
+    if (year[x.k] != null && ty != null && Math.abs(ty - year[x.k]) <= 1) ysrc[x.k].add('title');
     const tk = year[x.k] != null ? (e.kw || []).filter(w => kwSignals([w]).spans.some(([lo, hi]) => within(year[x.k], lo, hi))) : [];
     if (tk.length) { ysrc[x.k].add('tmdb'); kwq[x.k] = tk; }
-    flag[x.k] = new Set([...(kw.prequel || kw.interquel ? ['tmdb'] : []), ...(f.some(st => st.t === 'prequel' || st.t === 'interquel') ? ['wikipedia'] : [])]); }
-  // القيود: a قبل b. why يربط القيد بدليله
-  const edges = [], placed = new Map(), seqOf = new Map(), rel = {}, add = (a, b, why) => { if (a !== b && idx.has(a) && idx.has(b)) edges.push({ a, b, why }); };
+    flag[x.k] = new Set(kw.prequel || kw.interquel ? ['tmdb'] : []); }
+  // القيود: a قبل b. why يربط القيد بدليله. ex: روابط الجمل الصريحة، لمعرفة ما يتصل بكل جزء
+  const edges = [], placed = new Map(), seqOf = new Map(), rel = {}, ex = new Map(keys.map(k => [k, new Set([k])]));
+  const add = (a, b, why) => { if (a === b || !idx.has(a) || !idx.has(b)) return; edges.push({ a, b, why }); if (why.st) { const A = ex.get(a), B = ex.get(b); if (A !== B) for (const k of B) { A.add(k); ex.set(k, A); } } };
+  // جزء يصف نفسه بأنه سابق لعمل ولاحق لآخر (Treadstone: «both a prequel to The Bourne Identity and a sequel to Jason Bourne») قد يكون بخطين زمنيين
+  const sides = new Map(), side = (k, v) => sides.set(k, new Set([...(sides.get(k) || []), v]));
   for (const x of all) for (const st of facts[x.k]) {
-    const T = st.t === 'between' || st.t === 'interquel' ? null : st.p ? resolvePhrase(st.p, all, x.k) : [];
-    if (st.t === 'prequel' || st.t === 'before') { for (const t of T) add(x.k, t, { st, ref: T }); if (T.length) placed.set(x.k, T); if (st.off != null && T.length === 1) rel[x.k] = { t: T[0], off: st.off }; }
-    else if (st.t === 'between' || (st.t === 'interquel' && st.p)) { const r = resolveBetween(st.p, all, x.k); if (r) { const ref = [...r[0], ...r[1]]; r[0].forEach(a => add(a, x.k, { st, ref })); r[1].forEach(b => add(x.k, b, { st, ref })); placed.set(x.k, r[1]); } }
-    else if (st.t === 'after' || st.t === 'sequel') { for (const t of T) add(t, x.k, { st, ref: [x.k] }); if (T.length) seqOf.set(x.k, { T, st }); if (st.off != null && T.length === 1) rel[x.k] = { t: T[0], off: st.off }; } }
+    // جملة وصلية عن عمل آخر في السلسلة تُنسب إليه («…, Ariel's Beginning, which is a prequel to the first film»)
+    let o = x.k; if (st.subj) { const r = resolvePhrase(st.subj, all, x.k); if (r.length === 1) { o = r[0]; st.own = o; } }
+    if (st.t === 'has-prequel') { for (const t of resolvePhrase(st.p, all, o)) { add(t, o, { st, ref: [o] }); flag[t].add('wikipedia'); if (!placed.has(t)) placed.set(t, [o]); } continue; }
+    const T = st.t === 'between' || st.t === 'interquel' ? null : st.p ? resolvePhrase(st.p, all, o) : [];
+    if (st.t === 'prequel' || st.t === 'interquel') flag[o].add('wikipedia');
+    if (st.t === 'prequel' || st.t === 'before') {
+      // جزء «سابق ولاحق» (إطار يُروى بعد ما قبله) زمنه بعد الأصل: إطاره هو الغالب، فلا يتقدم (Psycho IV في 1990)
+      if (st.framed && year[o] != null && T.some(t => year[o] >= (year[t] ?? ryear(t) ?? Infinity))) continue;
+      for (const t of T) add(o, t, { st, ref: T }); if (T.length) { placed.set(o, T); side(o, 'pre'); } if (st.off != null && T.length === 1) rel[o] = { t: T[0], off: st.off }; }
+    else if (st.t === 'between' || (st.t === 'interquel' && st.p)) { const r = resolveBetween(st.p, all, o); if (r) { const ref = [...r[0], ...r[1]], why = { st, ref, lo: r[0], hi: r[1] }; r[0].forEach(a => add(a, o, why)); r[1].forEach(b => add(o, b, why)); placed.set(o, r[1]); } }
+    else if (st.t === 'after' || st.t === 'sequel') { for (const t of T) add(t, o, { st, ref: [o] }); if (T.length) { seqOf.set(o, { T, st }); side(o, 'post'); } if (st.off != null && T.length === 1) rel[o] = { t: T[0], off: st.off }; } }
   // مسافة زمنية عن العمل نفسه: الأبعد قبل الأقرب، وإن عُرف زمن ذلك العمل عُرف زمن هذا
   for (const [a, ra] of Object.entries(rel)) for (const [b, rb] of Object.entries(rel)) if (a !== b && ra.t === rb.t && ra.off < rb.off) add(a, b, { rel: true });
-  for (const [k, r] of Object.entries(rel)) if (year[k] == null && year[r.t] != null) { year[k] = Math.round(year[r.t] + r.off); ysrc[k] = new Set(ysrc[r.t]); }
+  for (const [k, r] of Object.entries(rel)) if ((year[k] == null || ysrc[k].has('title') && ysrc[k].size === 1) && year[r.t] != null && !ysrc[r.t].has('title')) { year[k] = Math.round(year[r.t] + r.off); ysrc[k] = new Set(ysrc[r.t]); delete ylab[k]; }
   const strong = k => flag[k].size > 0 || placed.has(k), dated = () => all.filter(x => year[x.k] != null);
-  // جزء موصوف بأنه سابق للقصة وزمنه معروف يسبق ما صدر قبله بعد زمنه ولا يُعرف زمنه (يُفترض معاصراً لصدوره): Bumblebee (1987) قبل Transformers (2007)
-  for (const x of dated()) if (strong(x.k)) { const S = all.filter(z => year[z.k] == null && idx.get(z.k) < idx.get(x.k) && (ryear(z.k) || 0) > year[x.k]).map(z => z.k);
+  // جزء موصوف بأنه سابق للقصة بلا هدف مسمّى، وزمنه معروف، يسبق ما صدر قبله بعد زمنه ولا يُعرف زمنه (يُفترض معاصراً لصدوره):
+  // Bumblebee (1987) قبل Transformers (2007). ما رُبط بجملة صريحة («قبل X»، «بين A وB») تكفيه جملته. في العالم الواسع: مما يتصل به بجمل صريحة فقط
+  for (const x of dated()) if (flag[x.k].size && !placed.has(x.k)) { const S = all.filter(z => year[z.k] == null && idx.get(z.k) < idx.get(x.k) && (ryear(z.k) || 0) > year[x.k] && (!opt.wide || ex.get(x.k).has(z.k))).map(z => z.k);
     for (const z of S) add(x.k, z, { yr: true, assumed: true }); if (S.length && !placed.has(x.k)) placed.set(x.k, S); }
   // تكملة جزء سابق للقصة تبقى قبل القصة مثله (Fantastic Beasts 2 و3 بعد الأول وقبل Harry Potter، وRise of the Beasts بعد Bumblebee)،
   // إلا ما يُعرف زمنه وهو بعد زمن تلك الأجزاء
@@ -191,25 +234,42 @@ export function chronoOrder(members, ev = {}) {
     while (ready.length) { ready.sort((a, b) => prio.get(a) - prio.get(b) || idx.get(a) - idx.get(b)); const k = ready.shift(); order.push(k);
       for (const b of outs.get(k)) { into.set(b, into.get(b) - 1); if (!into.get(b)) ready.push(b); } }
     return order; };
-  // تناقض: تُترك الأزمنة المفترضة، ثم كل الأزمنة، ثم يعود كل شيء إلى الصدور
-  const order = topo(edges) || topo(edges.filter(e => !e.why.assumed)) || topo(edges.filter(e => !e.why.yr)) || keys;
+  // تناقض: داخل كل حلقة فقط تُترك الأزمنة المفترضة، ثم الأزمنة، ثم جمل الجزء ذي الخطين الزمنيين، ثم كل قيودها، ويبقى ما سواها من الأدلة
+  const cyclic = list => { const outs = new Map(keys.map(k => [k, []])); for (const e of list) outs.get(e.a).push(e.b);
+    let n = 0; const num = new Map(), low = new Map(), on = new Set(), st = [], comp = new Map();
+    const dfs = v => { num.set(v, n); low.set(v, n++); st.push(v); on.add(v);
+      for (const w of outs.get(v)) { if (!num.has(w)) { dfs(w); low.set(v, Math.min(low.get(v), low.get(w))); } else if (on.has(w)) low.set(v, Math.min(low.get(v), num.get(w))); }
+      if (low.get(v) === num.get(v)) { let w; do { w = st.pop(); on.delete(w); comp.set(w, v); } while (w !== v); } };
+    for (const k of keys) if (!num.has(k)) dfs(k);
+    return e => comp.get(e.a) === comp.get(e.b); };
+  let list = edges, order = topo(list);
+  const dual = e => e.why.st && sides.get(e.why.st.own)?.size === 2;
+  for (const weak of [e => e.why.assumed, e => e.why.yr, dual, () => true]) { if (order) break; const inCycle = cyclic(list); list = list.filter(e => !(inCycle(e) && weak(e))); order = topo(list); }
+  order ||= keys;
   // المتحرك: جزء يسبق في الأحداث جزءاً صدر قبله، ومعه دليله ومصادره (المصدر يُحسب إن كان يدل على هذا التقديم نفسه)
-  const pos = new Map(order.map((k, i) => [k, i])), moved = {};
+  const pos = new Map(order.map((k, i) => [k, i])), moved = {}, kept = new Set(list);
   for (const x of all) { const earlier = all.filter(y => idx.get(y.k) < idx.get(x.k) && pos.get(y.k) > pos.get(x.k)); if (!earlier.length) continue;
-    const used = edges.filter(e => e.a === x.k && e.why.st && pos.get(e.b) > pos.get(x.k)).map(e => e.why), inh = used.find(u => u.inherited);
-    const own = used.find(u => !u.inherited && u.st.own === x.k), st = (own || used.find(u => !u.inherited))?.st;
-    const w = inh && !own ? 'prequel' : st ? (st.t === 'interquel' ? 'between' : st.own === x.k ? st.t : 'sequel') : 'year';
-    const ref = ((inh && !own ? inh.ref : (own || used[0])?.ref) || earlier.map(y => y.k)).slice(0, 4);
-    const ytrue = year[x.k] != null && ref.every(r => year[x.k] < (year[r] ?? ryear(r) ?? Infinity));
-    const src = new Set([...(st || inh ? ['wikipedia'] : []), ...(['prequel', 'between', 'before'].includes(w) ? flag[x.k] : []), ...(ytrue ? ysrc[x.k] : [])]);
+    // الدليل: القيود التي تضعه قبل ما تجاوزه مباشرة، وإلا كل قيوده التي تسبق
+    const E = edges.filter(e => kept.has(e) && e.a === x.k && e.why.st && pos.get(e.b) > pos.get(x.k)), over = new Set(earlier.map(y => y.k)), Ed = E.filter(e => over.has(e.b));
+    const used = uniq((Ed.length ? Ed : E).map(e => e.why)), inh = used.find(u => u.inherited);
+    const own = used.find(u => !u.inherited && u.st.own === x.k && u.st.t !== 'has-prequel'), hp = used.find(u => u.st.t === 'has-prequel'), main = own || hp || used.find(u => !u.inherited);
+    const w = main ? (main === hp ? 'prequel' : main.st.own === x.k ? (main.st.t === 'interquel' ? 'between' : main.st.t) : 'before') : inh ? 'prequel' : 'year';
+    // ما يسبقه بهذا الدليل: أهداف جملته، أو صاحب الجملة إن كانت جملة عمل آخر (تكملة له، أو جزء سابق ذكره، أو «بين» هو طرفها الأول)
+    const mine = main && main.st.own === x.k && main.st.t !== 'has-prequel';
+    const ref = (mine || (!main && inh) ? (main || inh).ref : main ? uniq((Ed.length ? Ed : E).filter(e => e.why === main).map(e => e.b)) : earlier.map(y => y.k)).slice(0, 4);
+    // الزمن دليل على هذا التقديم إن وضعه قبل ما تقدّم عليه (وبين طرفي «بين» إن عُرف زمناهما)
+    const Y = year[x.k], btw = mine && main.lo ? main : null;
+    const ytrue = Y != null && (w === 'year' || (btw ? btw.lo.every(r => year[r] != null && year[r] < Y) && btw.hi.every(r => year[r] != null && Y < year[r]) : ref.every(r => Y < (year[r] ?? ryear(r) ?? Infinity))));
+    const src = new Set([...(main || inh ? ['wikipedia'] : []), ...(['prequel', 'between', 'before'].includes(w) ? flag[x.k] : []), ...(ytrue ? ysrc[x.k] : [])]);
     const q = []; const quote = (t, u) => { if (t && !q.some(z => z.t === t.slice(0, 300))) q.push({ s: 'wikipedia', t: t.slice(0, 300), u }); };
-    for (const u of used) quote(u.st.quote, u.st.url);
-    if (inh && !own) for (const f of facts[inh.via].filter(f => f.t === 'prequel')) quote(f.quote, f.url);
+    for (const u of [main, ...used.filter(u => u !== main && !u.inherited)].filter(Boolean)) quote(u.st.quote, u.st.url);
+    if (!main && inh) for (const f of facts[inh.via].filter(f => f.t === 'prequel')) quote(f.quote, f.url);
     if (ytrue && ysrc[x.k].has('wikipedia')) { const ys = facts[x.k].find(f => f.t === 'year'); if (ys) quote(ys.quote, ys.url); }
     if (ytrue && ysrc[x.k].has('wikidata')) q.push({ s: 'wikidata', t: `set in period: ${ev[x.k]?.periodLabel || year[x.k]}` });
     const tk = [...(src.has('tmdb') && flag[x.k].has('tmdb') ? (ev[x.k]?.kw || []).filter(k => /^(prequel|interquel)$/i.test(k)) : []), ...(ytrue ? kwq[x.k] || [] : [])];
     if (tk.length) q.push({ s: 'tmdb', t: 'keywords: ' + uniq(tk).join(', ') });
-    moved[x.k] = JSON.parse(JSON.stringify({ w, ref, via: inh && !own ? inh.via : undefined, y: year[x.k] ?? undefined, src: [...src], q: q.length ? q.slice(0, 4) : undefined })); }
+    if (ytrue && ysrc[x.k].has('title')) q.push({ s: 'title', t: all[idx.get(x.k)].title });
+    moved[x.k] = JSON.parse(JSON.stringify({ w, ref, via: !main && inh ? inh.via : undefined, y: ytrue ? Y : undefined, yl: ytrue ? ylab[x.k] : undefined, src: [...src], q: q.length ? q.slice(0, 4) : undefined })); }
   return { order, moved };
 }
 
@@ -218,16 +278,18 @@ export function chronoOrder(members, ev = {}) {
 export async function wdItems(keys, opt) {
   const out = {};
   for (const kind of ['m', 't']) for (const part of chunks(keys.filter(k => k[0] === kind).map(k => k.slice(1)), 150)) {
-    // أسماء النتائج المجمّعة غير أسماء المتغيرات داخل الاستعلام (SPARQL يرفض «AS» لمتغير مستعمل)
-    const q = `SELECT ?tid ?item (SAMPLE(?w) AS ?wiki) (MIN(?y0) AS ?py) (MAX(?y1) AS ?pz) (SAMPLE(?l0) AS ?pl) WHERE {
+    // صف لكل زمن قصة (P2408) بمدته، ويُختار أضيقها: «World War I» لا «20th century»
+    const q = `SELECT ?tid ?item ?wiki ?y0 ?y1 ?l0 WHERE {
   VALUES ?tid { ${part.map(x => '"' + x.replace(/\D/g, '') + '"').join(' ')} }
   ?item wdt:${kind === 'm' ? 'P4947' : 'P4983'} ?tid .
-  OPTIONAL { ?w schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> }
+  OPTIONAL { ?wiki schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> }
   OPTIONAL { ?item wdt:P2408 ?per . OPTIONAL { ?per rdfs:label ?l0 FILTER(LANG(?l0) = "en") }
     OPTIONAL { ?per wdt:P580|wdt:P585|wdt:P571 ?t0 } BIND(YEAR(?t0) AS ?y0) OPTIONAL { ?per wdt:P582 ?t1 } BIND(YEAR(?t1) AS ?y1) }
-} GROUP BY ?tid ?item`;
-    const num = v => v != null && v !== '' && !isNaN(+v) ? +v : undefined;
-    for (const r of await sparql(q, opt)) { const k = kind + r.tid; if (out[k]) continue; out[k] = JSON.parse(JSON.stringify({ q: r.item, wiki: r.wiki || undefined, period: num(r.py), periodEnd: num(r.pz), periodLabel: r.pl || undefined })); }
+}`;
+    const num = v => v != null && v !== '' && !isNaN(+v) ? +v : undefined, per = {};
+    for (const r of await sparql(q, opt)) { const k = kind + r.tid; if (out[k] && out[k].q !== r.item) continue; out[k] ||= { q: r.item, wiki: r.wiki || undefined };
+      const y0 = num(r.y0); if (y0 != null) (per[k] ||= []).push({ y0, y1: Math.max(y0, num(r.y1) ?? y0), l: r.l0 }); }
+    for (const [k, ps] of Object.entries(per)) { const b = ps.sort((a, c) => (a.y1 - a.y0) - (c.y1 - c.y0) || a.y0 - c.y0)[0]; Object.assign(out[k], JSON.parse(JSON.stringify({ period: b.y0, periodEnd: b.y1, periodLabel: b.l }))); }
   }
   return out;
 }

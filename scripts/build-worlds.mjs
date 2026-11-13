@@ -42,7 +42,7 @@ const meta = k => { const o = known[k] || res.info[k] || res.basic?.[k] || fr.ex
 const CHRONO = new URL('data/generated/films/chrono-cache.json', root), ccache = rd(CHRONO, {});
 const cfresh = Object.fromEntries(Object.entries(ccache).filter(([k, v]) => now - (v.at || 0) < ((meta(k).date || '9999') <= today ? 14 : 2) * 864e5));
 const groupsC = [];
-for (const [id, w] of Object.entries(res.worlds)) if (w.order.length >= 2 && w.order.length <= 40) groupsC.push({ kind: 'world', id, keys: w.order });
+for (const [id, w] of Object.entries(res.worlds)) if (w.order.length >= 2 && w.order.length <= 40) groupsC.push({ kind: 'world', id, keys: w.order, wide: w.kind === 'universe' || w.kind === 'franchise' });
 for (const c of new Set(films.map(f => f.col).filter(c => c && cols[c]?.parts.length > 1))) groupsC.push({ kind: 'col', id: c, keys: cols[c].parts.map(p => 'm' + p.tmdb) });
 for (const [id, g] of Object.entries(fr.items || {})) { const keys = g.order.map(s => s.m ? 'm' + s.m : s.t ? 't' + s.t : null).filter(Boolean); if (keys.length >= 2) groupsC.push({ kind: 'cur', id, keys, view: g.view, name: g.name }); }
 const allKeys = [...new Set(groupsC.flatMap(g => g.keys))];
@@ -52,15 +52,17 @@ if (!RAW) { try { evid = await gatherEvidence(allKeys, { tmdb, cache: cfresh, lo
   // ما تعذّر جلب بعض مصادره لا يُحفظ، فيُعاد جلبه في البناء التالي بدل أن يبقى ناقصاً أسبوعين
   fs.writeFileSync(CHRONO, JSON.stringify(Object.fromEntries(Object.entries(evid).filter(([k, v]) => allKeys.includes(k) && !v.miss).map(([k, v]) => [k, { ...v, at: cfresh[k]?.at || now }]))) + '\n');
   const miss = Object.values(evid).filter(v => v.miss).length; if (miss) console.log(`CHRONO evidence incomplete for ${miss} works (not cached)`); }
-const outCols = {}, chronoAudit = { agree: [], conflict: [], missed: [], auto: [] };
-for (const g of groupsC) { const ms = g.keys.map(meta), r = chronoOrder(ms, evid), moved = Object.entries(r.moved), seen = g.keys.every(k => evid[k] && !evid[k].miss);
+// reviewed: تقديمات راجعتها المراجعة وتركتها عمداً (worlds-audit.json ← chrono)، بسببها
+const outCols = {}, chronoAudit = { agree: [], conflict: [], reviewed: [], missed: [], auto: [] }, chronoKeep = audit.chrono || {};
+for (const g of groupsC) { const ms = g.keys.map(meta), r = chronoOrder(ms, evid, { wide: g.wide }), moved = Object.entries(r.moved), seen = g.keys.every(k => evid[k] && !evid[k].miss);
   // chk: فُحصت أدلة كل الأجزاء ولم يُذكر جزء يسبق القصة. إن تعذّر جلب دليل جزء لا يُدّعى ذلك
   if (g.kind === 'world') { if (moved.length) res.worlds[g.id].chrono = r; else if (seen) res.worlds[g.id].chk = 1; }
   else if (g.kind === 'col' && (moved.length || seen)) outCols[g.id] = moved.length ? r : { chk: 1 };
   if (g.kind !== 'cur') { if (moved.length) chronoAudit.auto.push({ group: g.kind === 'col' ? 'col ' + (cols[g.id]?.name || g.id) : res.worlds[g.id].name, order: r.order.map(k => meta(k).title), moved: moved.map(([k, m]) => `${meta(k).title} ← ${m.w} ${m.ref.map(t => meta(t).title).join(' / ')} [${m.src}]`) }); continue; }
   // المراجَع: هل يضع كل جزء حرّكه المحرك قبل ما يسبقه في دليله؟ وأي جزء قدّمته المراجعة ولم يقدّمه المحرك؟
   const pos = new Map(g.keys.map((k, i) => [k, i]));
-  for (const [k, m] of moved) (m.ref.every(t => pos.get(k) < pos.get(t)) ? chronoAudit.agree : chronoAudit.conflict).push({ cur: g.id, view: g.view || null, t: meta(k).title, w: m.w, before: m.ref.map(t => meta(t).title), src: m.src });
+  const fits = (k, m) => m.w === 'between' && m.ref.length >= 2 ? pos.get(m.ref[0]) < pos.get(k) && pos.get(k) < pos.get(m.ref.at(-1)) : m.ref.every(t => pos.get(k) < pos.get(t));
+  for (const [k, m] of moved) (fits(k, m) ? chronoAudit.agree : chronoKeep[g.id]?.[k] ? chronoAudit.reviewed : chronoAudit.conflict).push({ cur: g.id, view: g.view || null, t: meta(k).title, w: m.w, before: m.ref.map(t => meta(t).title), src: m.src });
   if (g.view) for (const k of g.keys) { const d = meta(k).date || '9999'; if (g.keys.some(j => pos.get(j) > pos.get(k) && (meta(j).date || '9999') < d) && !r.moved[k]) chronoAudit.missed.push({ cur: g.id, t: meta(k).title }); } }
 const out = { generatedAt: new Date().toISOString(), worlds: res.worlds, works: res.works, info: res.info, cols: outCols };
 fs.writeFileSync(new URL('worlds.json', OUT), JSON.stringify(out) + '\n');
@@ -91,14 +93,14 @@ for (const f of films) { const k = keyOf(f), w = res.works[k];
 }
 report.counts = { works: focus.length, withEntry: focus.length - report.noItem.length, inWorld: Object.values(res.works).filter(w => w.worlds?.length).length, worlds: Object.keys(res.worlds).length,
   chains: res.report.chains, withRelated: report.related.length, missing: report.missing.length, uncurated: report.uncurated.length, curatedGaps: report.curatedGaps.length, collectionGaps: report.collectionGaps.length,
-  chronoAgree: chronoAudit.agree.length, chronoConflict: chronoAudit.conflict.length, chronoMissed: chronoAudit.missed.length, chronoAuto: chronoAudit.auto.length,
+  chronoAgree: chronoAudit.agree.length, chronoConflict: chronoAudit.conflict.length, chronoReviewed: chronoAudit.reviewed.length, chronoMissed: chronoAudit.missed.length, chronoAuto: chronoAudit.auto.length,
   infoEntries: Object.keys(res.info).length, bytes: JSON.stringify(out).length, seconds: Math.round((Date.now() - t0) / 1000) };
 fs.writeFileSync(new URL('worlds-report.json', GEN), JSON.stringify(report, null, 1) + '\n');
 console.log('WORLDS counts ' + JSON.stringify(report.counts));
 // فروع العمل: نسخة مضغوطة من الناتج في السجل (تحميل الملفات من GitHub غير متاح لأدوات المراجعة)
 if (process.env.WORLDS_DUMP) { const zlib = await import('node:zlib');
   // chrono: أدلة محرّك الأحداث ومجموعاته، لضبط قواعده محلياً على البيانات الحقيقية
-  const chronoDump = { evid, groups: groupsC.map(g => ({ kind: g.kind, id: g.id, keys: g.keys, view: g.view })), meta: Object.fromEntries(allKeys.map(k => [k, meta(k)])) };
+  const chronoDump = { evid, groups: groupsC.map(g => ({ kind: g.kind, id: g.id, keys: g.keys, view: g.view, wide: g.wide })), meta: Object.fromEntries(allKeys.map(k => [k, meta(k)])) };
   for (const [name, data] of [['worlds', out], ['report', report], ['chrono', chronoDump], ...(res.raw && !RAW ? [['raw', { ...res.raw, basic: Object.fromEntries(Object.entries(res.basic).filter(([k]) => !known[k])) }]] : [])]) { const b64 = zlib.gzipSync(JSON.stringify(data)).toString('base64'), n = Math.ceil(b64.length / 6000);
     for (let i = 0; i < n; i++) console.log(`WORLDSDUMP ${name} ${i + 1}/${n} ${b64.slice(i * 6000, (i + 1) * 6000)}`); } }
 for (const m of report.missing) console.log('WORLDS missing ' + JSON.stringify(m));
