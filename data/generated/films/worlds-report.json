@@ -1,24 +1,24 @@
 {
- "generatedAt": "2026-11-13T19:37:05.348Z",
+ "generatedAt": "2026-11-13T22:04:32.104Z",
  "counts": {
-  "works": 623,
-  "withEntry": 372,
-  "inWorld": 227,
+  "works": 624,
+  "withEntry": 373,
+  "inWorld": 228,
   "worlds": 109,
   "chains": 50,
-  "withRelated": 247,
+  "withRelated": 248,
   "missing": 2,
-  "uncurated": 2,
+  "uncurated": 3,
   "curatedGaps": 0,
-  "collectionGaps": 0,
+  "collectionGaps": 1,
   "chronoAgree": 27,
   "chronoConflict": 0,
   "chronoReviewed": 2,
   "chronoMissed": 28,
   "chronoAuto": 31,
-  "infoEntries": 468,
-  "bytes": 202328,
-  "seconds": 38
+  "infoEntries": 467,
+  "bytes": 202594,
+  "seconds": 39
  },
  "missing": [
   {
@@ -84,6 +84,13 @@
    "t": "Crystal Lake",
    "y": 2026,
    "via": "world",
+   "name": "Friday the 13th"
+  },
+  {
+   "k": "m4488",
+   "t": "Friday the 13th",
+   "y": 1980,
+   "via": "collection",
    "name": "Friday the 13th"
   }
  ],
@@ -1073,7 +1080,19 @@
   ]
  },
  "curatedGaps": [],
- "collectionGaps": [],
+ "collectionGaps": [
+  {
+   "k": "m4488",
+   "t": "Friday the 13th",
+   "col": "Friday the 13th",
+   "world": "Friday the 13th",
+   "extra": [
+    "m13207 Friday the 13th",
+    "t213562 Crystal Lake"
+   ],
+   "lack": []
+  }
+ ],
  "related": [
   {
    "k": "m670",
@@ -1664,8 +1683,8 @@
     "sibling:Untitled James Bond Film*"
    ],
    "src": [
-    "novels:James Bond",
-    "story:Quantum of Solace"
+    "story:Quantum of Solace",
+    "novels:James Bond"
    ]
   },
   {
@@ -2511,8 +2530,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "musical:Wicked",
     "novel:The Wonderful Wizard of Oz",
+    "musical:Wicked",
     "novel:Wicked"
    ]
   },
@@ -3309,6 +3328,14 @@
    "src": [
     "novel:Red Harvest"
    ]
+  },
+  {
+   "k": "m4488",
+   "t": "Friday the 13th",
+   "rel": [
+    "derived:Friday the 13th"
+   ],
+   "src": []
   }
  ],
  "noItem": [
