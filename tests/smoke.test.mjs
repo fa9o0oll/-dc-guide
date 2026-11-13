@@ -114,7 +114,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     return !!rel && rel.textContent.includes('المُوصى به') && !document.querySelector('#wslot [data-act=ordv][data-v=chrono] small') && document.querySelector('#wslot .sec > .note').textContent.includes('حسب أحداث القصة'); }));
   await tap('#wslot .why summary'); await page.waitForTimeout(200);
   check('الأفلام: «كيف رُتّب حسب الأحداث؟» يعرض الجملة بلغتها ورابط مصدرها', await page.evaluate(q => { const d = document.querySelector('#wslot .why'), b = d.querySelectorAll('blockquote');
-    return d.open && b.length === 2 && b[0].textContent.includes(q) && b[0].getAttribute('dir') === 'ltr' && b[0].querySelector('a').href === 'https://en.wikipedia.org/wiki/Out_Show' && b[1].textContent.includes('keyword: prequel'); }, QUOTE));
+    return d.open && b.length === 2 && d.querySelector('li small').textContent.startsWith('مؤكد من مصدرين:') && !d.querySelector('li').firstChild.parentNode.textContent.includes('· مؤكد') && b[0].textContent.includes(q) && b[0].getAttribute('dir') === 'ltr' && b[0].querySelector('a').href === 'https://en.wikipedia.org/wiki/Out_Show' && b[1].textContent.includes('keyword: prequel'); }, QUOTE));
   await fits('الأفلام: دليل ترتيب الأحداث');
   check('الأفلام: العالم الآلي يذكر أنه بلا مراجعة ويربط مصادره', await page.evaluate(() => { const n = document.querySelector('#wslot .sec > .note'), h = [...n.querySelectorAll('a')].map(a => a.href);
     return n.textContent.includes('لم يُراجَع يدوياً') && h.includes('https://www.wikidata.org/wiki/Q_T') && h.includes('https://en.wikipedia.org/wiki/Test') && !document.querySelector('#wslot .order .rc.watch'); }));

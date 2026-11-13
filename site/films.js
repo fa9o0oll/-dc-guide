@@ -211,9 +211,12 @@ const yearText = m => { const l = String(m.yl || '').trim(); let d;
   if (l) { if ((d = l.match(/^(\d{3})0s$/))) return 'في ' + (DECADES[+d[1] * 10] || `عقد ${d[1]}0`); if ((d = l.match(/^(\d{1,2})(?:st|nd|rd|th) century( BC| BCE)?$/i))) return `في القرن ${CENTS[+d[1]] || d[1]}${d[2] ? ' قبل الميلاد' : ''}`;
     return ERAS[l.toLowerCase()] ? 'في ' + ERAS[l.toLowerCase()] : `في <bdi dir="ltr">${esc(l)}</bdi>`; }
   return m.y == null ? '' : m.y < 0 ? `عام ${-m.y} ق.م` : `عام ${m.y}`; };
-const movedNote = m => { if (!m) return ''; const t = k => `«<bdi dir="ltr">${esc(titleOfKey(k))}</bdi>»`, r = m.ref || [], y = yearText(m);
+const movedNote = (m, bare) => { if (!m) return ''; const t = k => `«<bdi dir="ltr">${esc(titleOfKey(k))}</bdi>»`, r = m.ref || [], y = yearText(m);
   const head = m.w === 'between' && r.length >= 2 ? `بين ${t(r[0])} و${t(r[r.length - 1])}` : m.w === 'year' ? (y ? `أحداثه ${y}` : 'أقدم أحداثاً') : r.length ? `قبل ${t(r[0])}` : 'قبل القصة';
-  return head + (m.w !== 'year' && y ? `، ${y}` : '') + (m.src?.length >= 2 ? ' · مؤكد من مصدرين' : m.src?.length === 1 ? ` · مصدره <bdi>${SRCN[m.src[0]] || esc(m.src[0])}</bdi> فقط` : ''); };
+  return head + (m.w !== 'year' && y ? `، ${y}` : '') + (bare ? '' : m.src?.length >= 2 ? ' · مؤكد من مصدرين' : m.src?.length === 1 ? ` · مصدره <bdi>${SRCN[m.src[0]] || esc(m.src[0])}</bdi> فقط` : ''); };
+// مصادر التقديم في الدليل: «مؤكد من ثلاثة مصادر: …» أو «مصدر واحد: …»
+const srcLine = src => { const n = src?.length || 0, l = (src || []).map(x => `<bdi>${SRCN[x] || esc(x)}</bdi>`).join(' · ');
+  return !n ? '' : n === 1 ? `مصدر واحد: ${l}` : `مؤكد من ${n === 2 ? 'مصدرين' : (['', '', '', 'ثلاثة', 'أربعة'][n] || n) + ' مصادر'}: ${l}`; };
 const row = (f, s, i, opt, far) => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = isHere(f, s), k0 = kindOf(s), k = k0 && s.note?.includes(k0) ? '' : k0;
   const rec = s.rec || (opt?.auto && (o.date ? o.date > today : !o.year) ? 'soon' : ''), mv = opt?.moved?.[keyOfStep(s)];
   return `<li data-n="${i + 1}" class="${[here ? 'here' : '', w ? 'watched' : '', rec ? 'r-' + rec : '', far ? 'far' : ''].filter(Boolean).join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k0)}</span>
@@ -225,9 +228,9 @@ const rowsHTML = (f, order, opt) => { const n = order.length, at = Math.max(0, o
 // ما وجده محرّك الأحداث: الترتيب حسب الأحداث ودليله مطوي تحته، أو أن المصادر لا تذكر جزءاً يسبق القصة، أو أنه لم يُفحص بعد
 const SRCN = { wikipedia: 'Wikipedia', tmdb: 'TMDB', wikidata: 'Wikidata', title: 'العنوان' };
 const chronoTail = g => g.chrono ? '، ثم رتّبه حسب أحداث القصة مما تذكره <bdi dir="ltr">Wikipedia</bdi> و<bdi dir="ltr">TMDB</bdi> و<bdi dir="ltr">Wikidata</bdi> عن كل جزء، والمعتاد للمشاهدة الأولى ترتيب الصدور. لم يُراجَع يدوياً بعد، فلا توصيات فيه.'
-  : g.chk ? '. لم يُراجَع يدوياً بعد، فلا توصيات فيه. ولا تذكر <bdi dir="ltr">Wikipedia</bdi> ولا <bdi dir="ltr">TMDB</bdi> جزءاً يسبق القصة، فترتيب الصدور هنا هو ترتيب الأحداث.'
+  : g.chk ? '. لم يُراجَع يدوياً بعد، فلا توصيات فيه. وقد فُحصت مقدمات <bdi dir="ltr">Wikipedia</bdi> وكلمات <bdi dir="ltr">TMDB</bdi> لكل أجزائه، فلم يُذكر فيها جزء تسبق أحداثه ما صدر قبله، فبقي بترتيب الصدور.'
   : '. لم يُراجَع يدوياً بعد، فلا توصيات فيه، وقد يختلف عن ترتيب الأحداث إن كان بينها جزء يسبق القصة.';
-const evidenceHTML = c => c ? `<details class="why"><summary>كيف رُتّب حسب الأحداث؟</summary><ul>${Object.entries(c.moved).map(([k, m]) => `<li><b dir="ltr">${esc(titleOfKey(k))}</b> ${movedNote(m)}<small>${(m.src || []).map(x => `<bdi>${SRCN[x] || esc(x)}</bdi>`).join(' · ')}</small>${
+const evidenceHTML = c => c ? `<details class="why"><summary>كيف رُتّب حسب الأحداث؟</summary><ul>${Object.entries(c.moved).map(([k, m]) => `<li><b dir="ltr">${esc(titleOfKey(k))}</b> ${movedNote(m, true)}<small>${srcLine(m.src)}</small>${
   (m.q || []).map(q => `<blockquote dir="ltr" lang="en">${esc(q.t)} ${q.u ? `<a href="${esc(q.u)}" target="_blank" rel="noopener">${SRCN[q.s] || q.s}</a>` : `<cite>${SRCN[q.s] || q.s}</cite>`}</blockquote>`).join('')}</li>`).join('')}</ul></details>` : '';
 const autoNote = g => `<p class="note">${g.kind === 'chain'
   ? `رتّبه الدليل آلياً حسب تاريخ الصدور، من روابط «يسبقه» و«يليه» بين هذه الأعمال في ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)}، ومعلوماتها من <bdi dir="ltr">TMDB</bdi>`
