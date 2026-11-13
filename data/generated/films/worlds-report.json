@@ -1,22 +1,53 @@
 {
- "generatedAt": "2026-11-13T14:42:41.066Z",
+ "generatedAt": "2026-11-13T15:36:13.974Z",
  "counts": {
-  "works": 618,
-  "withEntry": 368,
-  "inWorld": 222,
-  "worlds": 106,
+  "works": 622,
+  "withEntry": 371,
+  "inWorld": 225,
+  "worlds": 107,
   "chains": 50,
   "withRelated": 248,
   "missing": 0,
   "curatedGaps": 0,
-  "collectionGaps": 0,
+  "collectionGaps": 3,
   "infoEntries": 449,
-  "bytes": 164989,
-  "seconds": 37
+  "bytes": 173865,
+  "seconds": 12
  },
  "missing": [],
  "curatedGaps": [],
- "collectionGaps": [],
+ "collectionGaps": [
+  {
+   "k": "m346648",
+   "t": "Paddington 2",
+   "col": "Paddington",
+   "world": "Paddington",
+   "extra": [],
+   "lack": [
+    "m1670528 Paddington 4"
+   ]
+  },
+  {
+   "k": "m116149",
+   "t": "Paddington",
+   "col": "Paddington",
+   "world": "Paddington",
+   "extra": [],
+   "lack": [
+    "m1670528 Paddington 4"
+   ]
+  },
+  {
+   "k": "m516729",
+   "t": "Paddington in Peru",
+   "col": "Paddington",
+   "world": "Paddington",
+   "extra": [],
+   "lack": [
+    "m1670528 Paddington 4"
+   ]
+  }
+ ],
  "related": [
   {
    "k": "m670",
@@ -3512,6 +3543,11 @@
    "k": "m1437511",
    "t": "How to Rob a Bank",
    "y": 2026
+  },
+  {
+   "k": "m1670528",
+   "t": "Paddington 4",
+   "y": null
   }
  ],
  "excludedGroups": [
