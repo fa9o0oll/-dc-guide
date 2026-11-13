@@ -1,1 +1,35 @@
-{"top":2,"queries":[]}
+{
+ "top": 2,
+ "queries": [
+  {
+   "q": "A Fistful of Dollars",
+   "kind": "movie",
+   "year": 1964,
+   "top": 2
+  },
+  {
+   "q": "For a Few Dollars More",
+   "kind": "movie",
+   "year": 1965,
+   "top": 2
+  },
+  {
+   "q": "The Good, the Bad and the Ugly",
+   "kind": "movie",
+   "year": 1966,
+   "top": 2
+  },
+  {
+   "q": "Yojimbo",
+   "kind": "movie",
+   "year": 1961,
+   "top": 2
+  },
+  {
+   "q": "Last Man Standing",
+   "kind": "movie",
+   "year": 1996,
+   "top": 2
+  }
+ ]
+}
