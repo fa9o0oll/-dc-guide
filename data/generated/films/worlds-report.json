@@ -1,27 +1,92 @@
 {
- "generatedAt": "2026-11-13T18:01:25.346Z",
+ "generatedAt": "2026-11-13T19:37:05.348Z",
  "counts": {
   "works": 623,
   "withEntry": 372,
-  "inWorld": 225,
-  "worlds": 107,
+  "inWorld": 227,
+  "worlds": 109,
   "chains": 50,
-  "withRelated": 249,
-  "missing": 0,
-  "uncurated": 0,
+  "withRelated": 247,
+  "missing": 2,
+  "uncurated": 2,
   "curatedGaps": 0,
   "collectionGaps": 0,
   "chronoAgree": 27,
   "chronoConflict": 0,
   "chronoReviewed": 2,
   "chronoMissed": 28,
-  "chronoAuto": 30,
-  "infoEntries": 449,
-  "bytes": 197941,
-  "seconds": 66
+  "chronoAuto": 31,
+  "infoEntries": 468,
+  "bytes": 202328,
+  "seconds": 38
  },
- "missing": [],
- "uncurated": [],
+ "missing": [
+  {
+   "k": "m1204680",
+   "t": "Coyote vs. Acme",
+   "y": 2026,
+   "worlds": [
+    {
+     "name": "Wile E. Coyote and the Road Runner",
+     "kind": "series",
+     "size": 8,
+     "order": [
+      "Fast and Furry-ous",
+      "Beep, Beep",
+      "Going! Going! Gosh!",
+      "Fastest with the Mostest",
+      "Hopalong Casualty",
+      "War and Pieces",
+      "Chariots of Fur",
+      "Coyote vs. Acme"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "t213562",
+   "t": "Crystal Lake",
+   "y": 2026,
+   "worlds": [
+    {
+     "name": "Friday the 13th",
+     "kind": "franchise",
+     "size": 13,
+     "order": [
+      "Friday the 13th",
+      "Friday the 13th Part 2",
+      "Friday the 13th Part III",
+      "Friday the 13th: The Final Chapter",
+      "Friday the 13th: A New Beginning",
+      "Jason Lives - Friday the 13th Part VI",
+      "Friday the 13th Part VII - The New Blood",
+      "Friday the 13th Part VIII: Jason Takes Manhattan",
+      "Jason Goes to Hell: The Final Friday",
+      "Jason X",
+      "Freddy vs. Jason",
+      "Friday the 13th",
+      "Crystal Lake"
+     ]
+    }
+   ]
+  }
+ ],
+ "uncurated": [
+  {
+   "k": "m1204680",
+   "t": "Coyote vs. Acme",
+   "y": 2026,
+   "via": "world",
+   "name": "Wile E. Coyote and the Road Runner"
+  },
+  {
+   "k": "t213562",
+   "t": "Crystal Lake",
+   "y": 2026,
+   "via": "world",
+   "name": "Friday the 13th"
+  }
+ ],
  "chronoAudit": {
   "agree": [
    {
@@ -835,6 +900,27 @@
     ]
    },
    {
+    "group": "Friday the 13th",
+    "order": [
+     "Crystal Lake",
+     "Friday the 13th",
+     "Friday the 13th Part 2",
+     "Friday the 13th Part III",
+     "Friday the 13th: The Final Chapter",
+     "Friday the 13th: A New Beginning",
+     "Jason Lives - Friday the 13th Part VI",
+     "Friday the 13th Part VII - The New Blood",
+     "Friday the 13th Part VIII: Jason Takes Manhattan",
+     "Jason Goes to Hell: The Final Friday",
+     "Jason X",
+     "Freddy vs. Jason",
+     "Friday the 13th"
+    ],
+    "moved": [
+     "Crystal Lake ← before Friday the 13th [wikipedia,tmdb]"
+    ]
+   },
+   {
     "group": "col Saw",
     "order": [
      "Saw",
@@ -1578,8 +1664,8 @@
     "sibling:Untitled James Bond Film*"
    ],
    "src": [
-    "story:Quantum of Solace",
-    "novels:James Bond"
+    "novels:James Bond",
+    "story:Quantum of Solace"
    ]
   },
   {
@@ -1779,14 +1865,6 @@
     "original:A Star Is Born"
    ],
    "src": []
-  },
-  {
-   "k": "m1204680",
-   "t": "Coyote vs. Acme",
-   "rel": [],
-   "src": [
-    "films:Wile E. Coyote and the Road Runner"
-   ]
   },
   {
    "k": "m565028",
@@ -2433,8 +2511,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "novel:The Wonderful Wizard of Oz",
     "musical:Wicked",
+    "novel:The Wonderful Wizard of Oz",
     "novel:Wicked"
    ]
   },
@@ -3230,14 +3308,6 @@
    ],
    "src": [
     "novel:Red Harvest"
-   ]
-  },
-  {
-   "k": "t213562",
-   "t": "Crystal Lake",
-   "rel": [],
-   "src": [
-    "film:Friday the 13th"
    ]
   }
  ],
@@ -4518,6 +4588,15 @@
    ]
   },
   {
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
+   "why": "catalog",
+   "size": 23,
+   "types": [
+    "animated film series"
+   ]
+  },
+  {
    "g": "Q56070713",
    "name": "Walt Disney Animation Studios feature film",
    "why": "catalog",
@@ -4533,15 +4612,6 @@
    "size": 28,
    "types": [
     "Wikimedia list article"
-   ]
-  },
-  {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
-   "why": "catalog",
-   "size": 23,
-   "types": [
-    "animated film series"
    ]
   }
  ],
