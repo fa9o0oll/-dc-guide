@@ -1,0 +1,3590 @@
+{
+ "generatedAt": "2026-11-13T14:42:41.066Z",
+ "counts": {
+  "works": 618,
+  "withEntry": 368,
+  "inWorld": 222,
+  "worlds": 106,
+  "chains": 50,
+  "withRelated": 248,
+  "missing": 0,
+  "curatedGaps": 0,
+  "collectionGaps": 0,
+  "infoEntries": 449,
+  "bytes": 164989,
+  "seconds": 37
+ },
+ "missing": [],
+ "curatedGaps": [],
+ "collectionGaps": [],
+ "related": [
+  {
+   "k": "m670",
+   "t": "Oldboy",
+   "rel": [
+    "derived:Oldboy",
+    "derived:Zinda"
+   ],
+   "src": [
+    "manga:Old Boy"
+   ]
+  },
+  {
+   "k": "m420817",
+   "t": "Aladdin",
+   "rel": [
+    "original:Aladdin"
+   ],
+   "src": []
+  },
+  {
+   "k": "m369972",
+   "t": "First Man",
+   "rel": [],
+   "src": [
+    "book:First Man: The Life of Neil A. Armstrong"
+   ]
+  },
+  {
+   "k": "m399579",
+   "t": "Alita: Battle Angel",
+   "rel": [],
+   "src": [
+    "manga:Battle Angel Alita"
+   ]
+  },
+  {
+   "k": "m644583",
+   "t": "The Mauritanian",
+   "rel": [],
+   "src": [
+    "book:Guantanamo Diary"
+   ]
+  },
+  {
+   "k": "m70160",
+   "t": "The Hunger Games",
+   "rel": [],
+   "src": [
+    "novel:The Hunger Games"
+   ]
+  },
+  {
+   "k": "m101299",
+   "t": "The Hunger Games: Catching Fire",
+   "rel": [],
+   "src": [
+    "novel:Catching Fire"
+   ]
+  },
+  {
+   "k": "m131631",
+   "t": "The Hunger Games: Mockingjay - Part 1",
+   "rel": [],
+   "src": [
+    "novel:Mockingjay"
+   ]
+  },
+  {
+   "k": "m131634",
+   "t": "The Hunger Games: Mockingjay - Part 2",
+   "rel": [],
+   "src": [
+    "novel:Mockingjay"
+   ]
+  },
+  {
+   "k": "m49046",
+   "t": "All Quiet on the Western Front",
+   "rel": [
+    "sibling:All Quiet on the Western Front",
+    "sibling:All Quiet on the Western Front"
+   ],
+   "src": [
+    "novel:All Quiet on the Western Front"
+   ]
+  },
+  {
+   "k": "m329865",
+   "t": "Arrival",
+   "rel": [],
+   "src": [
+    "story:Story of Your Life"
+   ]
+  },
+  {
+   "k": "m931285",
+   "t": "Mortal Kombat II",
+   "rel": [
+    "sibling:Mortal Kombat",
+    "sibling:Mortal Kombat Legends: Scorpion's Revenge",
+    "sibling:Mortal Kombat: Annihilation",
+    "sibling:Mortal Kombat: Conquest",
+    "sibling:Mortal Kombat: Defenders of the Realm",
+    "sibling:Mortal Kombat: Legacy",
+    "sibling:Mortal Kombat: The Journey Begins"
+   ],
+   "src": [
+    "games:Mortal Kombat"
+   ]
+  },
+  {
+   "k": "m954",
+   "t": "Mission: Impossible",
+   "rel": [
+    "original:Mission: Impossible"
+   ],
+   "src": []
+  },
+  {
+   "k": "m955",
+   "t": "Mission: Impossible II",
+   "rel": [
+    "original:Mission: Impossible"
+   ],
+   "src": []
+  },
+  {
+   "k": "m956",
+   "t": "Mission: Impossible III",
+   "rel": [
+    "original:Mission: Impossible"
+   ],
+   "src": []
+  },
+  {
+   "k": "m56292",
+   "t": "Mission: Impossible - Ghost Protocol",
+   "rel": [
+    "original:Mission: Impossible"
+   ],
+   "src": []
+  },
+  {
+   "k": "m177677",
+   "t": "Mission: Impossible - Rogue Nation",
+   "rel": [
+    "original:Mission: Impossible"
+   ],
+   "src": []
+  },
+  {
+   "k": "m353081",
+   "t": "Mission: Impossible - Fallout",
+   "rel": [
+    "original:Mission: Impossible"
+   ],
+   "src": []
+  },
+  {
+   "k": "m12155",
+   "t": "Alice in Wonderland",
+   "rel": [
+    "sibling:Alice",
+    "sibling:Alice in Wonderland",
+    "sibling:Alice's Adventures in Wonderland",
+    "sibling:Alice in Wonderland",
+    "sibling:Alice Through the Looking Glass",
+    "sibling:Alice in Wonderland",
+    "sibling:Alice Through the Looking Glass"
+   ],
+   "src": [
+    "novel:Alice's Adventures in Wonderland",
+    "novel:Through the Looking-Glass"
+   ]
+  },
+  {
+   "k": "m241259",
+   "t": "Alice Through the Looking Glass",
+   "rel": [
+    "sibling:Alice in Wonderland",
+    "sibling:Alice",
+    "sibling:Alice in Wonderland",
+    "sibling:Alice's Adventures in Wonderland",
+    "sibling:Alice in Wonderland",
+    "sibling:Alice Through the Looking Glass",
+    "sibling:Alice in Wonderland",
+    "sibling:Alice Through the Looking Glass"
+   ],
+   "src": [
+    "novel:Through the Looking-Glass"
+   ]
+  },
+  {
+   "k": "m8882",
+   "t": "Gomorrah",
+   "rel": [
+    "sibling:Gomorrah"
+   ],
+   "src": [
+    "novel:Gomorrah"
+   ]
+  },
+  {
+   "k": "m598",
+   "t": "City of God",
+   "rel": [],
+   "src": [
+    "novel:City of God"
+   ]
+  },
+  {
+   "k": "m389",
+   "t": "12 Angry Men",
+   "rel": [
+    "original:Twelve Angry Men",
+    "sibling:12 Angry Men",
+    "sibling:12",
+    "sibling:12 Citizens",
+    "sibling:Ek Ruka Hua Faisla"
+   ],
+   "src": [
+    "book:Twelve Angry Men"
+   ]
+  },
+  {
+   "k": "m343668",
+   "t": "Kingsman: The Golden Circle",
+   "rel": [],
+   "src": [
+    "comic:The Secret Service",
+    "comic:Kingsman"
+   ]
+  },
+  {
+   "k": "m600354",
+   "t": "The Father",
+   "rel": [
+    "sibling:Florida"
+   ],
+   "src": [
+    "play:Le Père"
+   ]
+  },
+  {
+   "k": "m1226863",
+   "t": "The Super Mario Galaxy Movie",
+   "rel": [
+    "sibling:Super Mario Brothers: Great Mission to Rescue Princess Peach"
+   ],
+   "src": [
+    "game:Super Mario Galaxy",
+    "game:Super Mario Galaxy 2",
+    "games:Mario"
+   ]
+  },
+  {
+   "k": "m2501",
+   "t": "The Bourne Identity",
+   "rel": [
+    "derived:The Ghost"
+   ],
+   "src": [
+    "novel:The Bourne Identity"
+   ]
+  },
+  {
+   "k": "m2502",
+   "t": "The Bourne Supremacy",
+   "rel": [],
+   "src": [
+    "novel:The Bourne Supremacy"
+   ]
+  },
+  {
+   "k": "m2503",
+   "t": "The Bourne Ultimatum",
+   "rel": [],
+   "src": [
+    "novel:The Bourne Ultimatum"
+   ]
+  },
+  {
+   "k": "m49040",
+   "t": "The Bourne Legacy",
+   "rel": [],
+   "src": [
+    "novels:Bourne"
+   ]
+  },
+  {
+   "k": "m433498",
+   "t": "Papillon",
+   "rel": [
+    "original:Papillon"
+   ],
+   "src": [
+    "book:Banco",
+    "book:Papillon"
+   ]
+  },
+  {
+   "k": "m671",
+   "t": "Harry Potter and the Philosopher's Stone",
+   "rel": [],
+   "src": [
+    "novel:Harry Potter and the Philosopher's Stone"
+   ]
+  },
+  {
+   "k": "m672",
+   "t": "Harry Potter and the Chamber of Secrets",
+   "rel": [],
+   "src": [
+    "novel:Harry Potter and the Chamber of Secrets"
+   ]
+  },
+  {
+   "k": "m673",
+   "t": "Harry Potter and the Prisoner of Azkaban",
+   "rel": [],
+   "src": [
+    "novel:Harry Potter and the Prisoner of Azkaban"
+   ]
+  },
+  {
+   "k": "m674",
+   "t": "Harry Potter and the Goblet of Fire",
+   "rel": [],
+   "src": [
+    "novel:Harry Potter and the Goblet of Fire"
+   ]
+  },
+  {
+   "k": "m675",
+   "t": "Harry Potter and the Order of the Phoenix",
+   "rel": [],
+   "src": [
+    "novel:Harry Potter and the Order of the Phoenix"
+   ]
+  },
+  {
+   "k": "m767",
+   "t": "Harry Potter and the Half-Blood Prince",
+   "rel": [],
+   "src": [
+    "novel:Harry Potter and the Half-Blood Prince"
+   ]
+  },
+  {
+   "k": "m12444",
+   "t": "Harry Potter and the Deathly Hallows: Part 1",
+   "rel": [],
+   "src": [
+    "novel:Harry Potter and the Deathly Hallows"
+   ]
+  },
+  {
+   "k": "m12445",
+   "t": "Harry Potter and the Deathly Hallows: Part 2",
+   "rel": [],
+   "src": [
+    "novel:Harry Potter and the Deathly Hallows"
+   ]
+  },
+  {
+   "k": "m967",
+   "t": "Spartacus",
+   "rel": [
+    "derived:The Slave",
+    "sibling:Spartacus"
+   ],
+   "src": [
+    "novel:Spartacus"
+   ]
+  },
+  {
+   "k": "m652",
+   "t": "Troy",
+   "rel": [
+    "sibling:Helen of Troy"
+   ],
+   "src": [
+    "epic:Iliad"
+   ]
+  },
+  {
+   "k": "m769",
+   "t": "GoodFellas",
+   "rel": [],
+   "src": [
+    "novel:Wiseguy"
+   ]
+  },
+  {
+   "k": "m646",
+   "t": "Dr. No",
+   "rel": [],
+   "src": [
+    "novel:Dr. No"
+   ]
+  },
+  {
+   "k": "m657",
+   "t": "From Russia with Love",
+   "rel": [],
+   "src": [
+    "novel:From Russia, with Love"
+   ]
+  },
+  {
+   "k": "m658",
+   "t": "Goldfinger",
+   "rel": [],
+   "src": [
+    "novel:Goldfinger"
+   ]
+  },
+  {
+   "k": "m660",
+   "t": "Thunderball",
+   "rel": [],
+   "src": [
+    "novel:Thunderball"
+   ]
+  },
+  {
+   "k": "m667",
+   "t": "You Only Live Twice",
+   "rel": [],
+   "src": [
+    "novel:You Only Live Twice"
+   ]
+  },
+  {
+   "k": "m668",
+   "t": "On Her Majesty's Secret Service",
+   "rel": [],
+   "src": [
+    "novel:On Her Majesty's Secret Service"
+   ]
+  },
+  {
+   "k": "m681",
+   "t": "Diamonds Are Forever",
+   "rel": [],
+   "src": [
+    "novel:Diamonds Are Forever"
+   ]
+  },
+  {
+   "k": "m253",
+   "t": "Live and Let Die",
+   "rel": [],
+   "src": [
+    "novel:Live and Let Die"
+   ]
+  },
+  {
+   "k": "m682",
+   "t": "The Man with the Golden Gun",
+   "rel": [],
+   "src": [
+    "novel:The Man with the Golden Gun"
+   ]
+  },
+  {
+   "k": "m691",
+   "t": "The Spy Who Loved Me",
+   "rel": [
+    "sibling:Untitled James Bond Film*"
+   ],
+   "src": [
+    "novels:James Bond"
+   ]
+  },
+  {
+   "k": "m698",
+   "t": "Moonraker",
+   "rel": [],
+   "src": [
+    "novel:Moonraker"
+   ]
+  },
+  {
+   "k": "m699",
+   "t": "For Your Eyes Only",
+   "rel": [],
+   "src": [
+    "story:Risico",
+    "story:For Your Eyes Only"
+   ]
+  },
+  {
+   "k": "m700",
+   "t": "Octopussy",
+   "rel": [],
+   "src": [
+    "story:The Property of a Lady"
+   ]
+  },
+  {
+   "k": "m36670",
+   "t": "Never Say Never Again",
+   "rel": [],
+   "src": [
+    "novel:Thunderball"
+   ]
+  },
+  {
+   "k": "m707",
+   "t": "A View to a Kill",
+   "rel": [],
+   "src": [
+    "story:From a View to a Kill"
+   ]
+  },
+  {
+   "k": "m708",
+   "t": "The Living Daylights",
+   "rel": [],
+   "src": [
+    "story:The Living Daylights"
+   ]
+  },
+  {
+   "k": "m709",
+   "t": "Licence to Kill",
+   "rel": [
+    "sibling:Untitled James Bond Film*"
+   ],
+   "src": [
+    "novels:James Bond"
+   ]
+  },
+  {
+   "k": "m710",
+   "t": "GoldenEye",
+   "rel": [
+    "sibling:Untitled James Bond Film*"
+   ],
+   "src": [
+    "novels:James Bond"
+   ]
+  },
+  {
+   "k": "m714",
+   "t": "Tomorrow Never Dies",
+   "rel": [
+    "sibling:Untitled James Bond Film*"
+   ],
+   "src": [
+    "novels:James Bond"
+   ]
+  },
+  {
+   "k": "m36643",
+   "t": "The World Is Not Enough",
+   "rel": [
+    "sibling:Untitled James Bond Film*"
+   ],
+   "src": [
+    "novels:James Bond"
+   ]
+  },
+  {
+   "k": "m36669",
+   "t": "Die Another Day",
+   "rel": [
+    "sibling:Untitled James Bond Film*"
+   ],
+   "src": [
+    "novels:James Bond"
+   ]
+  },
+  {
+   "k": "m36557",
+   "t": "Casino Royale",
+   "rel": [],
+   "src": [
+    "novel:Casino Royale"
+   ]
+  },
+  {
+   "k": "m10764",
+   "t": "Quantum of Solace",
+   "rel": [
+    "sibling:Untitled James Bond Film*"
+   ],
+   "src": [
+    "novels:James Bond",
+    "story:Quantum of Solace"
+   ]
+  },
+  {
+   "k": "m37724",
+   "t": "Skyfall",
+   "rel": [
+    "sibling:Untitled James Bond Film*"
+   ],
+   "src": [
+    "novels:James Bond"
+   ]
+  },
+  {
+   "k": "m206647",
+   "t": "Spectre",
+   "rel": [
+    "sibling:Untitled James Bond Film*"
+   ],
+   "src": [
+    "novels:James Bond"
+   ]
+  },
+  {
+   "k": "m370172",
+   "t": "No Time to Die",
+   "rel": [],
+   "src": [
+    "novel:You Only Live Twice"
+   ]
+  },
+  {
+   "k": "m1184696",
+   "t": "Untitled James Bond Film",
+   "rel": [
+    "sibling:Skyfall*",
+    "sibling:Quantum of Solace*",
+    "sibling:GoldenEye*",
+    "sibling:Die Another Day*",
+    "sibling:Tomorrow Never Dies*",
+    "sibling:The World Is Not Enough*",
+    "sibling:The Spy Who Loved Me*",
+    "sibling:Licence to Kill*"
+   ],
+   "src": [
+    "novels:James Bond"
+   ]
+  },
+  {
+   "k": "m228150",
+   "t": "Fury",
+   "rel": [],
+   "src": [
+    "book:Death Traps"
+   ]
+  },
+  {
+   "k": "m607",
+   "t": "Men in Black",
+   "rel": [
+    "derived:Men in Black: The Series*"
+   ],
+   "src": [
+    "comic:The Men in Black"
+   ]
+  },
+  {
+   "k": "m608",
+   "t": "Men in Black II",
+   "rel": [],
+   "src": [
+    "comic:The Men in Black"
+   ]
+  },
+  {
+   "k": "m41154",
+   "t": "Men in Black 3",
+   "rel": [],
+   "src": [
+    "comic:The Men in Black"
+   ]
+  },
+  {
+   "k": "m61791",
+   "t": "Rise of the Planet of the Apes",
+   "rel": [],
+   "src": [
+    "novel:Planet of the Apes"
+   ]
+  },
+  {
+   "k": "m119450",
+   "t": "Dawn of the Planet of the Apes",
+   "rel": [],
+   "src": [
+    "novel:Planet of the Apes"
+   ]
+  },
+  {
+   "k": "m281338",
+   "t": "War for the Planet of the Apes",
+   "rel": [],
+   "src": [
+    "novel:Planet of the Apes"
+   ]
+  },
+  {
+   "k": "m4922",
+   "t": "The Curious Case of Benjamin Button",
+   "rel": [],
+   "src": [
+    "story:The Curious Case of Benjamin Button"
+   ]
+  },
+  {
+   "k": "m522627",
+   "t": "The Gentlemen",
+   "rel": [
+    "derived:The Gentlemen"
+   ],
+   "src": []
+  },
+  {
+   "k": "m102651",
+   "t": "Maleficent",
+   "rel": [
+    "original:Sleeping Beauty"
+   ],
+   "src": [
+    "tale:The Tales of my Mother Goose"
+   ]
+  },
+  {
+   "k": "m446807",
+   "t": "The Girl in the Spider's Web",
+   "rel": [],
+   "src": [
+    "novel:The Girl in the Spider's Web"
+   ]
+  },
+  {
+   "k": "m447273",
+   "t": "Snow White",
+   "rel": [
+    "original:Snow White and the Seven Dwarfs",
+    "sibling:Mirror Mirror",
+    "sibling:Sydney White",
+    "sibling:Snow White: A Tale of Terror",
+    "sibling:Blancanieves",
+    "sibling:Snow White",
+    "sibling:White as Snow",
+    "sibling:Grimm's Snow White",
+    "sibling:Snow White",
+    "sibling:Snow White",
+    "sibling:The Death of Snow White",
+    "sibling:Snow White and the Evil Queen"
+   ],
+   "src": [
+    "story:Snow White"
+   ]
+  },
+  {
+   "k": "m11645",
+   "t": "Ran",
+   "rel": [
+    "sibling:King Lear",
+    "sibling:King Lear",
+    "sibling:King Lear",
+    "sibling:King Lear",
+    "sibling:Lear Rex"
+   ],
+   "src": [
+    "play:King Lear"
+   ]
+  },
+  {
+   "k": "m497",
+   "t": "The Green Mile",
+   "rel": [],
+   "src": [
+    "novel:The Green Mile"
+   ]
+  },
+  {
+   "k": "m476669",
+   "t": "The King's Man",
+   "rel": [],
+   "src": [
+    "comic:The Secret Service"
+   ]
+  },
+  {
+   "k": "m332562",
+   "t": "A Star Is Born",
+   "rel": [
+    "original:A Star Is Born",
+    "original:A Star Is Born",
+    "original:A Star Is Born"
+   ],
+   "src": []
+  },
+  {
+   "k": "m1204680",
+   "t": "Coyote vs. Acme",
+   "rel": [],
+   "src": [
+    "films:Wile E. Coyote and the Road Runner"
+   ]
+  },
+  {
+   "k": "m565028",
+   "t": "Candyman",
+   "rel": [
+    "original:Candyman",
+    "sibling:Book of Blood"
+   ],
+   "src": [
+    "novels:Books of Blood"
+   ]
+  },
+  {
+   "k": "m1422",
+   "t": "The Departed",
+   "rel": [
+    "original:Infernal Affairs"
+   ],
+   "src": []
+  },
+  {
+   "k": "m371638",
+   "t": "The Disaster Artist",
+   "rel": [],
+   "src": [
+    "book:The Disaster Artist"
+   ]
+  },
+  {
+   "k": "m37799",
+   "t": "The Social Network",
+   "rel": [],
+   "src": [
+    "book:The Accidental Billionaires"
+   ]
+  },
+  {
+   "k": "m11324",
+   "t": "Shutter Island",
+   "rel": [],
+   "src": [
+    "novel:Shutter Island"
+   ]
+  },
+  {
+   "k": "m3131",
+   "t": "Gangs of New York",
+   "rel": [],
+   "src": [
+    "book:The Gangs of New York"
+   ]
+  },
+  {
+   "k": "m7345",
+   "t": "There Will Be Blood",
+   "rel": [],
+   "src": [
+    "book:Oil!"
+   ]
+  },
+  {
+   "k": "m336000",
+   "t": "The Glass Castle",
+   "rel": [],
+   "src": [
+    "book:The Glass Castle"
+   ]
+  },
+  {
+   "k": "m447277",
+   "t": "The Little Mermaid",
+   "rel": [
+    "original:The Little Mermaid",
+    "sibling:The Little Mermaid",
+    "sibling:The Lure",
+    "sibling:Hans Christian Andersen's The Little Mermaid",
+    "sibling:The Little Mermaid",
+    "sibling:The Little Mermaid",
+    "sibling:The Little Mermaid",
+    "sibling:The Little Mermaid",
+    "sibling:The Little Mermaid"
+   ],
+   "src": [
+    "tale:The Little Mermaid"
+   ]
+  },
+  {
+   "k": "m46738",
+   "t": "Incendies",
+   "rel": [],
+   "src": [
+    "play:Scorched"
+   ]
+  },
+  {
+   "k": "m420818",
+   "t": "The Lion King",
+   "rel": [
+    "original:The Lion King",
+    "derived:Black Is King"
+   ],
+   "src": []
+  },
+  {
+   "k": "m762509",
+   "t": "Mufasa: The Lion King",
+   "rel": [
+    "original:The Lion King"
+   ],
+   "src": []
+  },
+  {
+   "k": "m696506",
+   "t": "Mickey 17",
+   "rel": [],
+   "src": [
+    "novel:Mickey7"
+   ]
+  },
+  {
+   "k": "m13363",
+   "t": "The Man from Earth",
+   "rel": [
+    "derived:The Man from Earth: Holocene*"
+   ],
+   "src": []
+  },
+  {
+   "k": "m415312",
+   "t": "The Man from Earth: Holocene",
+   "rel": [
+    "original:The Man from Earth*"
+   ],
+   "src": []
+  },
+  {
+   "k": "m694",
+   "t": "The Shining",
+   "rel": [
+    "derived:Room 237",
+    "sibling:The Shining"
+   ],
+   "src": [
+    "novel:The Shining"
+   ]
+  },
+  {
+   "k": "m14537",
+   "t": "Harakiri",
+   "rel": [
+    "derived:Hara-Kiri: Death of a Samurai"
+   ],
+   "src": []
+  },
+  {
+   "k": "m1054867",
+   "t": "One Battle After Another",
+   "rel": [],
+   "src": [
+    "novel:Vineland"
+   ]
+  },
+  {
+   "k": "m286217",
+   "t": "The Martian",
+   "rel": [],
+   "src": [
+    "novel:The Martian"
+   ]
+  },
+  {
+   "k": "m522212",
+   "t": "Just Mercy",
+   "rel": [],
+   "src": [
+    "book:Just Mercy"
+   ]
+  },
+  {
+   "k": "m25376",
+   "t": "The Secret in Their Eyes",
+   "rel": [
+    "derived:Secret in Their Eyes"
+   ],
+   "src": [
+    "novel:The Question in Their Eyes"
+   ]
+  },
+  {
+   "k": "m107",
+   "t": "Snatch",
+   "rel": [
+    "derived:Snatch"
+   ],
+   "src": []
+  },
+  {
+   "k": "m1408208",
+   "t": "Exit 8",
+   "rel": [],
+   "src": [
+    "game:The Exit 8"
+   ]
+  },
+  {
+   "k": "m770",
+   "t": "Gone with the Wind",
+   "rel": [],
+   "src": [
+    "novel:Gone with the Wind"
+   ]
+  },
+  {
+   "k": "m252",
+   "t": "Willy Wonka & the Chocolate Factory",
+   "rel": [
+    "derived:Tom and Jerry: Willy Wonka & the Chocolate Factory",
+    "sibling:Charlie and the Chocolate Factory*",
+    "sibling:Wonka*"
+   ],
+   "src": [
+    "book:Charlie and the Chocolate Factory"
+   ]
+  },
+  {
+   "k": "m118",
+   "t": "Charlie and the Chocolate Factory",
+   "rel": [
+    "sibling:Wonka*",
+    "sibling:Willy Wonka & the Chocolate Factory*",
+    "sibling:Tom and Jerry: Willy Wonka & the Chocolate Factory"
+   ],
+   "src": [
+    "book:Charlie and the Chocolate Factory"
+   ]
+  },
+  {
+   "k": "m787699",
+   "t": "Wonka",
+   "rel": [
+    "sibling:Charlie and the Chocolate Factory*",
+    "sibling:Willy Wonka & the Chocolate Factory*",
+    "sibling:Tom and Jerry: Willy Wonka & the Chocolate Factory"
+   ],
+   "src": [
+    "book:Charlie and the Chocolate Factory"
+   ]
+  },
+  {
+   "k": "m38363",
+   "t": "Fair Game",
+   "rel": [],
+   "src": [
+    "book:Fair Game: My Life as a Spy, My Betrayal by the White Hous",
+    "book:The Politics of Truth"
+   ]
+  },
+  {
+   "k": "m28178",
+   "t": "Hachi: A Dog's Tale",
+   "rel": [
+    "original:Hachiko"
+   ],
+   "src": []
+  },
+  {
+   "k": "m399019",
+   "t": "The Beguiled",
+   "rel": [
+    "original:The Beguiled"
+   ],
+   "src": [
+    "novel:The Beguiled"
+   ]
+  },
+  {
+   "k": "m51608",
+   "t": "The Man from Nowhere",
+   "rel": [
+    "derived:Rocky Handsome"
+   ],
+   "src": []
+  },
+  {
+   "k": "m945729",
+   "t": "A Haunting in Venice",
+   "rel": [],
+   "src": [
+    "novel:Hallowe'en Party"
+   ]
+  },
+  {
+   "k": "m360920",
+   "t": "The Grinch",
+   "rel": [
+    "sibling:How the Grinch Stole Christmas",
+    "sibling:How the Grinch Stole Christmas!",
+    "sibling:The Mean One"
+   ],
+   "src": [
+    "book:How the Grinch Stole Christmas!"
+   ]
+  },
+  {
+   "k": "m600",
+   "t": "Full Metal Jacket",
+   "rel": [],
+   "src": [
+    "novel:The Short-Timers"
+   ]
+  },
+  {
+   "k": "m537116",
+   "t": "tick, tick... BOOM!",
+   "rel": [],
+   "src": [
+    "musical:Tick, Tick... Boom!"
+   ]
+  },
+  {
+   "k": "m515001",
+   "t": "Jojo Rabbit",
+   "rel": [],
+   "src": [
+    "novel:Caging Skies"
+   ]
+  },
+  {
+   "k": "m6977",
+   "t": "No Country for Old Men",
+   "rel": [],
+   "src": [
+    "novel:No Country for Old Men"
+   ]
+  },
+  {
+   "k": "m615667",
+   "t": "Ma Rainey's Black Bottom",
+   "rel": [],
+   "src": [
+    "play:Ma Rainey's Black Bottom"
+   ]
+  },
+  {
+   "k": "m1368337",
+   "t": "The Odyssey",
+   "rel": [
+    "sibling:O Brother, Where Art Thou?",
+    "sibling:The Return",
+    "sibling:Ulysses",
+    "sibling:The Return of Ringo",
+    "sibling:Ulysses' Gaze",
+    "sibling:Ulysses 31",
+    "sibling:The Odyssey",
+    "sibling:Ulysses and the Giant Polyphemus"
+   ],
+   "src": [
+    "novel:Odyssey"
+   ]
+  },
+  {
+   "k": "m63",
+   "t": "Twelve Monkeys",
+   "rel": [
+    "original:La Jetée",
+    "derived:12 Monkeys"
+   ],
+   "src": []
+  },
+  {
+   "k": "m11878",
+   "t": "Yojimbo",
+   "rel": [
+    "derived:A Fistful of Dollars*",
+    "derived:Last Man Standing",
+    "derived:Django",
+    "derived:Omega Doom",
+    "derived:The Warrior and the Sorceress"
+   ],
+   "src": [
+    "novel:Red Harvest"
+   ]
+  },
+  {
+   "k": "m438650",
+   "t": "Cold Pursuit",
+   "rel": [
+    "original:In Order of Disappearance"
+   ],
+   "src": []
+  },
+  {
+   "k": "m592984",
+   "t": "Hillbilly Elegy",
+   "rel": [],
+   "src": [
+    "book:Hillbilly Elegy"
+   ]
+  },
+  {
+   "k": "m1443",
+   "t": "The Virgin Suicides",
+   "rel": [],
+   "src": [
+    "novel:The Virgin Suicides"
+   ]
+  },
+  {
+   "k": "m12405",
+   "t": "Slumdog Millionaire",
+   "rel": [],
+   "src": [
+    "novel:Q & A"
+   ]
+  },
+  {
+   "k": "m84892",
+   "t": "The Perks of Being a Wallflower",
+   "rel": [],
+   "src": [
+    "novel:The Perks of Being a Wallflower"
+   ]
+  },
+  {
+   "k": "m279",
+   "t": "Amadeus",
+   "rel": [
+    "sibling:Amadeus"
+   ],
+   "src": [
+    "play:Amadeus"
+   ]
+  },
+  {
+   "k": "m322",
+   "t": "Mystic River",
+   "rel": [],
+   "src": [
+    "book:Mystic River"
+   ]
+  },
+  {
+   "k": "m346",
+   "t": "Seven Samurai",
+   "rel": [
+    "derived:The Magnificent Seven",
+    "derived:The Magnificent Seven",
+    "derived:Samurai 7"
+   ],
+   "src": []
+  },
+  {
+   "k": "m1858",
+   "t": "Transformers",
+   "rel": [],
+   "src": [
+    "toy:Transformers"
+   ]
+  },
+  {
+   "k": "m8373",
+   "t": "Transformers: Revenge of the Fallen",
+   "rel": [
+    "sibling:Transformers One"
+   ],
+   "src": [
+    "toy:Transformers"
+   ]
+  },
+  {
+   "k": "m38356",
+   "t": "Transformers: Dark of the Moon",
+   "rel": [
+    "sibling:Transformers One"
+   ],
+   "src": [
+    "toy:Transformers"
+   ]
+  },
+  {
+   "k": "m91314",
+   "t": "Transformers: Age of Extinction",
+   "rel": [
+    "sibling:Transformers One"
+   ],
+   "src": [
+    "toy:Transformers"
+   ]
+  },
+  {
+   "k": "m335988",
+   "t": "Transformers: The Last Knight",
+   "rel": [
+    "sibling:Transformers One"
+   ],
+   "src": [
+    "toy:Transformers"
+   ]
+  },
+  {
+   "k": "m289",
+   "t": "Casablanca",
+   "rel": [],
+   "src": [
+    "play:Everybody Comes to Rick's"
+   ]
+  },
+  {
+   "k": "m629",
+   "t": "The Usual Suspects",
+   "rel": [
+    "derived:Sons of Rizk"
+   ],
+   "src": []
+  },
+  {
+   "k": "m661539",
+   "t": "A Complete Unknown",
+   "rel": [],
+   "src": [
+    "book:Dylan Goes Electric!"
+   ]
+  },
+  {
+   "k": "m1283515",
+   "t": "Verity",
+   "rel": [],
+   "src": [
+    "novel:Verity"
+   ]
+  },
+  {
+   "k": "m591275",
+   "t": "Fear Street: 1666",
+   "rel": [],
+   "src": [
+    "novels:Fear Street"
+   ]
+  },
+  {
+   "k": "m1900",
+   "t": "Traffic",
+   "rel": [
+    "original:Traffik"
+   ],
+   "src": []
+  },
+  {
+   "k": "m161",
+   "t": "Ocean's Eleven",
+   "rel": [
+    "original:Ocean's Eleven",
+    "derived:Ocean's Eight"
+   ],
+   "src": []
+  },
+  {
+   "k": "m163",
+   "t": "Ocean's Twelve",
+   "rel": [
+    "derived:Italia's War"
+   ],
+   "src": []
+  },
+  {
+   "k": "m179826",
+   "t": "Odd Thomas",
+   "rel": [],
+   "src": [
+    "novel:Odd Thomas"
+   ]
+  },
+  {
+   "k": "m510",
+   "t": "One Flew Over the Cuckoo's Nest",
+   "rel": [
+    "sibling:Ratched"
+   ],
+   "src": [
+    "novel:One Flew Over the Cuckoo's Nest"
+   ]
+  },
+  {
+   "k": "m682507",
+   "t": "Where the Crawdads Sing",
+   "rel": [],
+   "src": [
+    "novel:Where the Crawdads Sing"
+   ]
+  },
+  {
+   "k": "m746036",
+   "t": "The Fall Guy",
+   "rel": [
+    "original:The Fall Guy"
+   ],
+   "src": []
+  },
+  {
+   "k": "m345",
+   "t": "Eyes Wide Shut",
+   "rel": [],
+   "src": [
+    "story:Dream Story"
+   ]
+  },
+  {
+   "k": "m167",
+   "t": "K-PAX",
+   "rel": [],
+   "src": [
+    "novel:K-PAX"
+   ]
+  },
+  {
+   "k": "m284293",
+   "t": "Still Alice",
+   "rel": [],
+   "src": [
+    "novel:Still Alice"
+   ]
+  },
+  {
+   "k": "m559907",
+   "t": "The Green Knight",
+   "rel": [
+    "sibling:Sword of the Valiant: The Legend of Sir Gawain and the Green Knight"
+   ],
+   "src": [
+    "tale:Sir Gawain and the Green Knight"
+   ]
+  },
+  {
+   "k": "m402431",
+   "t": "Wicked",
+   "rel": [
+    "sibling:The Wizard of Oz",
+    "sibling:The Wiz",
+    "sibling:Tin Man",
+    "sibling:Tom and Jerry & The Wizard of Oz",
+    "sibling:The Wonderful Wizard of Oz",
+    "sibling:The Wizard of Oz",
+    "sibling:The Wizard of Oz",
+    "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
+   ],
+   "src": [
+    "novel:The Wonderful Wizard of Oz",
+    "musical:Wicked",
+    "novel:Wicked"
+   ]
+  },
+  {
+   "k": "m516632",
+   "t": "The Empty Man",
+   "rel": [],
+   "src": [
+    "comic:The Empty Man"
+   ]
+  },
+  {
+   "k": "m1124620",
+   "t": "The Monkey",
+   "rel": [],
+   "src": [
+    "story:The Monkey"
+   ]
+  },
+  {
+   "k": "m777245",
+   "t": "Women Talking",
+   "rel": [],
+   "src": [
+    "novel:Women Talking"
+   ]
+  },
+  {
+   "k": "m614911",
+   "t": "The Midnight Sky",
+   "rel": [],
+   "src": [
+    "novel:Good Morning, Midnight"
+   ]
+  },
+  {
+   "k": "m62",
+   "t": "2001: A Space Odyssey",
+   "rel": [],
+   "src": [
+    "story:The Sentinel",
+    "story:Encounter in the Dawn"
+   ]
+  },
+  {
+   "k": "m500840",
+   "t": "I'm Thinking of Ending Things",
+   "rel": [],
+   "src": [
+    "novel:I'm Thinking of Ending Things"
+   ]
+  },
+  {
+   "k": "m522924",
+   "t": "The Art of Racing in the Rain",
+   "rel": [],
+   "src": [
+    "novel:The Art of Racing in the Rain"
+   ]
+  },
+  {
+   "k": "m22947",
+   "t": "Up in the Air",
+   "rel": [],
+   "src": [
+    "novel:Up in the Air"
+   ]
+  },
+  {
+   "k": "m1184918",
+   "t": "The Wild Robot",
+   "rel": [],
+   "src": [
+    "novel:The Wild Robot"
+   ]
+  },
+  {
+   "k": "m338729",
+   "t": "The Beauty Inside",
+   "rel": [
+    "original:The Beauty Inside"
+   ],
+   "src": []
+  },
+  {
+   "k": "m426063",
+   "t": "Nosferatu",
+   "rel": [
+    "original:Nosferatu"
+   ],
+   "src": [
+    "novel:Dracula"
+   ]
+  },
+  {
+   "k": "t97173",
+   "t": "Behind Her Eyes",
+   "rel": [],
+   "src": [
+    "novel:Behind Her Eyes"
+   ]
+  },
+  {
+   "k": "m10158",
+   "t": "White Men Can't Jump",
+   "rel": [
+    "derived:White Men Can't Jump"
+   ],
+   "src": []
+  },
+  {
+   "k": "m968",
+   "t": "Dog Day Afternoon",
+   "rel": [
+    "original:The Dog",
+    "derived:Terrorism and Kebab"
+   ],
+   "src": []
+  },
+  {
+   "k": "m628534",
+   "t": "The White Tiger",
+   "rel": [],
+   "src": [
+    "book:The White Tiger"
+   ]
+  },
+  {
+   "k": "m1585",
+   "t": "It's a Wonderful Life",
+   "rel": [],
+   "src": [
+    "story:The Greatest Gift"
+   ]
+  },
+  {
+   "k": "m1265",
+   "t": "Bridge to Terabithia",
+   "rel": [
+    "sibling:Bridge to Terabithia"
+   ],
+   "src": [
+    "novel:Bridge to Terabithia"
+   ]
+  },
+  {
+   "k": "m185",
+   "t": "A Clockwork Orange",
+   "rel": [
+    "sibling:Vinyl"
+   ],
+   "src": [
+    "novel:A Clockwork Orange"
+   ]
+  },
+  {
+   "k": "m935",
+   "t": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
+   "rel": [],
+   "src": [
+    "novel:Red Alert"
+   ]
+  },
+  {
+   "k": "m115",
+   "t": "The Big Lebowski",
+   "rel": [
+    "derived:The Jesus Rolls"
+   ],
+   "src": []
+  },
+  {
+   "k": "m1887",
+   "t": "Marie Antoinette",
+   "rel": [],
+   "src": [
+    "book:Marie Antoinette: The Journey"
+   ]
+  },
+  {
+   "k": "m614930",
+   "t": "Teenage Mutant Ninja Turtles: Mutant Mayhem",
+   "rel": [],
+   "src": [
+    "comic:Teenage Mutant Ninja Turtles"
+   ]
+  },
+  {
+   "k": "m318846",
+   "t": "The Big Short",
+   "rel": [],
+   "src": [
+    "book:The Big Short"
+   ]
+  },
+  {
+   "k": "m432836",
+   "t": "Memoir of a Murderer",
+   "rel": [],
+   "src": [
+    "novel:Diary of a Murderer"
+   ]
+  },
+  {
+   "k": "m937278",
+   "t": "A Man Called Otto",
+   "rel": [
+    "original:A Man Called Ove*"
+   ],
+   "src": [
+    "novel:A Man Called Ove"
+   ]
+  },
+  {
+   "k": "m539",
+   "t": "Psycho",
+   "rel": [
+    "derived:Bates Motel",
+    "sibling:Psycho"
+   ],
+   "src": [
+    "novel:Psycho"
+   ]
+  },
+  {
+   "k": "m426",
+   "t": "Vertigo",
+   "rel": [],
+   "src": [
+    "book:The Living and the Dead"
+   ]
+  },
+  {
+   "k": "m3175",
+   "t": "Barry Lyndon",
+   "rel": [],
+   "src": [
+    "book:The Luck of Barry Lyndon"
+   ]
+  },
+  {
+   "k": "m873",
+   "t": "The Color Purple",
+   "rel": [
+    "sibling:The Color Purple"
+   ],
+   "src": [
+    "novel:The Color Purple"
+   ]
+  },
+  {
+   "k": "m1487",
+   "t": "Hellboy",
+   "rel": [
+    "sibling:Hellboy: The Crooked Man",
+    "sibling:Hellboy Animated: Sword of Storms",
+    "sibling:Hellboy Animated: Blood and Iron"
+   ],
+   "src": [
+    "comic:Hellboy"
+   ]
+  },
+  {
+   "k": "m11253",
+   "t": "Hellboy II: The Golden Army",
+   "rel": [
+    "sibling:Hellboy: The Crooked Man",
+    "sibling:Hellboy Animated: Sword of Storms",
+    "sibling:Hellboy Animated: Blood and Iron"
+   ],
+   "src": [
+    "comic:Hellboy"
+   ]
+  },
+  {
+   "k": "m1056360",
+   "t": "American Fiction",
+   "rel": [],
+   "src": [
+    "novel:Erasure"
+   ]
+  },
+  {
+   "k": "m975",
+   "t": "Paths of Glory",
+   "rel": [],
+   "src": [
+    "novel:Paths of Glory"
+   ]
+  },
+  {
+   "k": "m181886",
+   "t": "Enemy",
+   "rel": [],
+   "src": [
+    "novel:The Double"
+   ]
+  },
+  {
+   "k": "m802",
+   "t": "Lolita",
+   "rel": [
+    "sibling:Lolita"
+   ],
+   "src": [
+    "novel:Lolita"
+   ]
+  },
+  {
+   "k": "m980026",
+   "t": "The Promised Land",
+   "rel": [],
+   "src": [
+    "novel:The Captain and Ann Barbara"
+   ]
+  },
+  {
+   "k": "m466420",
+   "t": "Killers of the Flower Moon",
+   "rel": [],
+   "src": [
+    "book:Killers of the Flower Moon"
+   ]
+  },
+  {
+   "k": "m300668",
+   "t": "Annihilation",
+   "rel": [],
+   "src": [
+    "novel:Annihilation"
+   ]
+  },
+  {
+   "k": "m247",
+   "t": "The Killing",
+   "rel": [],
+   "src": [
+    "novel:Clean Break"
+   ]
+  },
+  {
+   "k": "m555604",
+   "t": "Guillermo del Toro's Pinocchio",
+   "rel": [],
+   "src": [
+    "book:The Adventures of Pinocchio"
+   ]
+  },
+  {
+   "k": "m278",
+   "t": "The Shawshank Redemption",
+   "rel": [],
+   "src": [
+    "story:Rita Hayworth and Shawshank Redemption"
+   ]
+  },
+  {
+   "k": "t86831",
+   "t": "Love, Death & Robots",
+   "rel": [
+    "original:Heavy Metal"
+   ],
+   "src": []
+  },
+  {
+   "k": "m524",
+   "t": "Casino",
+   "rel": [],
+   "src": [
+    "book:Casino: Love and Honor in Las Vegas"
+   ]
+  },
+  {
+   "k": "m81481",
+   "t": "Silenced",
+   "rel": [],
+   "src": [
+    "novel:The Crucible"
+   ]
+  },
+  {
+   "k": "m785084",
+   "t": "The Whale",
+   "rel": [],
+   "src": [
+    "play:The Whale"
+   ]
+  },
+  {
+   "k": "m11360",
+   "t": "Dumbo",
+   "rel": [
+    "derived:Dumbo"
+   ],
+   "src": [
+    "book:Dumbo, the Flying Elephant"
+   ]
+  },
+  {
+   "k": "m335984",
+   "t": "Blade Runner 2049",
+   "rel": [
+    "derived:Blade Runner: Black Out 2022",
+    "derived:2036: Nexus Dawn",
+    "derived:2048: Nowhere to Run"
+   ],
+   "src": []
+  },
+  {
+   "k": "m451915",
+   "t": "Beautiful Boy",
+   "rel": [],
+   "src": [
+    "book:Beautiful Boy: A Father's Journey Through His Son's Addiction"
+   ]
+  },
+  {
+   "k": "m516486",
+   "t": "Greyhound",
+   "rel": [],
+   "src": [
+    "novel:The Good Shepherd"
+   ]
+  },
+  {
+   "k": "m206487",
+   "t": "Predestination",
+   "rel": [],
+   "src": [
+    "story:\"—All You Zombies—\""
+   ]
+  },
+  {
+   "k": "m8488",
+   "t": "Hitch",
+   "rel": [
+    "derived:Partner"
+   ],
+   "src": []
+  },
+  {
+   "k": "m805320",
+   "t": "Bird Box Barcelona",
+   "rel": [
+    "original:Bird Box"
+   ],
+   "src": []
+  },
+  {
+   "k": "m432985",
+   "t": "Gintama",
+   "rel": [
+    "sibling:Gintama",
+    "sibling:Gintama: The Final Chapter - Be Forever Yorozuya",
+    "sibling:Gintama: The Movie",
+    "sibling:Gintama: The Very Final",
+    "sibling:Gintama the Movie 2026: Yoshiwara in Flames"
+   ],
+   "src": [
+    "manga:Gintama"
+   ]
+  },
+  {
+   "k": "m967847",
+   "t": "Ghostbusters: Frozen Empire",
+   "rel": [
+    "original:Ghostbusters"
+   ],
+   "src": []
+  },
+  {
+   "k": "m949",
+   "t": "Heat",
+   "rel": [
+    "original:L.A. Takedown"
+   ],
+   "src": []
+  },
+  {
+   "k": "m76203",
+   "t": "12 Years a Slave",
+   "rel": [],
+   "src": [
+    "book:Twelve Years a Slave"
+   ]
+  },
+  {
+   "k": "t157008",
+   "t": "Clark",
+   "rel": [],
+   "src": [
+    "book:Vafan var det som hände?"
+   ]
+  },
+  {
+   "k": "m17654",
+   "t": "District 9",
+   "rel": [
+    "original:Alive in Joburg"
+   ],
+   "src": []
+  },
+  {
+   "k": "m564",
+   "t": "The Mummy",
+   "rel": [
+    "original:The Mummy",
+    "derived:The Mummy: The Animated Series"
+   ],
+   "src": []
+  },
+  {
+   "k": "m1734",
+   "t": "The Mummy Returns",
+   "rel": [
+    "derived:The Scorpion King",
+    "derived:The Mummy: The Animated Series"
+   ],
+   "src": []
+  },
+  {
+   "k": "m6075",
+   "t": "Carlito's Way",
+   "rel": [
+    "sibling:Carlito's Way: Rise to Power"
+   ],
+   "src": [
+    "novel:After Hours",
+    "novel:Carlito's Way"
+   ]
+  },
+  {
+   "k": "m9509",
+   "t": "Man on Fire",
+   "rel": [
+    "sibling:Man on Fire",
+    "sibling:Man on Fire"
+   ],
+   "src": [
+    "novel:Man on Fire"
+   ]
+  },
+  {
+   "k": "m570670",
+   "t": "The Invisible Man",
+   "rel": [
+    "sibling:The Invisible Man",
+    "sibling:Bud Abbott and Lou Costello Meet the Invisible Man",
+    "sibling:The Invisible Woman"
+   ],
+   "src": [
+    "novel:The Invisible Man"
+   ]
+  },
+  {
+   "k": "m1979",
+   "t": "Fantastic Four: Rise of the Silver Surfer",
+   "rel": [],
+   "src": [
+    "comic:The Galactus Trilogy"
+   ]
+  },
+  {
+   "k": "m668461",
+   "t": "Slumberland",
+   "rel": [],
+   "src": [
+    "comic:Little Nemo"
+   ]
+  },
+  {
+   "k": "m38778",
+   "t": "Dinner for Schmucks",
+   "rel": [
+    "original:The Dinner Game"
+   ],
+   "src": []
+  },
+  {
+   "k": "m493529",
+   "t": "Dungeons & Dragons: Honor Among Thieves",
+   "rel": [
+    "sibling:Dungeons & Dragons",
+    "sibling:Futurama: Bender's Game",
+    "sibling:Dungeons & Dragons",
+    "sibling:Dungeons & Dragons: Wrath of the Dragon God",
+    "sibling:Dungeons & Dragons: The Book of Vile Darkness",
+    "sibling:Critical Role"
+   ],
+   "src": [
+    "toy:Dungeons & Dragons"
+   ]
+  },
+  {
+   "k": "m833339",
+   "t": "Speak No Evil",
+   "rel": [
+    "derived:Speak No Evil"
+   ],
+   "src": []
+  },
+  {
+   "k": "m800815",
+   "t": "The Pale Blue Eye",
+   "rel": [],
+   "src": [
+    "novel:The Pale Blue Eye"
+   ]
+  },
+  {
+   "k": "m10234",
+   "t": "Funny Games",
+   "rel": [
+    "derived:Funny Games"
+   ],
+   "src": []
+  },
+  {
+   "k": "m601635",
+   "t": "Laal Singh Chaddha",
+   "rel": [
+    "original:Forrest Gump*"
+   ],
+   "src": [
+    "novel:Forrest Gump"
+   ]
+  },
+  {
+   "k": "m4147",
+   "t": "Road to Perdition",
+   "rel": [],
+   "src": [
+    "comic:Road to Perdition"
+   ]
+  },
+  {
+   "k": "m378064",
+   "t": "A Silent Voice: The Movie",
+   "rel": [],
+   "src": [
+    "manga:A Silent Voice"
+   ]
+  },
+  {
+   "k": "m59436",
+   "t": "Midnight in Paris",
+   "rel": [],
+   "src": [
+    "book:A Moveable Feast"
+   ]
+  },
+  {
+   "k": "m581",
+   "t": "Dances with Wolves",
+   "rel": [],
+   "src": [
+    "novel:Dances with Wolves"
+   ]
+  },
+  {
+   "k": "m280",
+   "t": "Terminator 2: Judgment Day",
+   "rel": [
+    "derived:Terminator: The Sarah Connor Chronicles"
+   ],
+   "src": []
+  },
+  {
+   "k": "m1368",
+   "t": "First Blood",
+   "rel": [],
+   "src": [
+    "novel:First Blood"
+   ]
+  },
+  {
+   "k": "m9008",
+   "t": "The Insider",
+   "rel": [],
+   "src": [
+    "article:The Man Who Knew Too Much"
+   ]
+  },
+  {
+   "k": "m1607",
+   "t": "A Bronx Tale",
+   "rel": [],
+   "src": [
+    "play:A Bronx Tale"
+   ]
+  },
+  {
+   "k": "m491283",
+   "t": "Judy",
+   "rel": [],
+   "src": [
+    "musical:End of the Rainbow"
+   ]
+  },
+  {
+   "k": "m479718",
+   "t": "The Outlaws",
+   "rel": [
+    "derived:Radhe"
+   ],
+   "src": []
+  },
+  {
+   "k": "m111",
+   "t": "Scarface",
+   "rel": [
+    "original:Scarface"
+   ],
+   "src": [
+    "novel:Scarface"
+   ]
+  },
+  {
+   "k": "m522098",
+   "t": "Babyteeth",
+   "rel": [],
+   "src": [
+    "play:Babyteeth"
+   ]
+  },
+  {
+   "k": "m13",
+   "t": "Forrest Gump",
+   "rel": [
+    "derived:Laal Singh Chaddha*"
+   ],
+   "src": [
+    "novel:Forrest Gump"
+   ]
+  },
+  {
+   "k": "m16094",
+   "t": "House Party",
+   "rel": [
+    "derived:House Party"
+   ],
+   "src": []
+  },
+  {
+   "k": "m695721",
+   "t": "The Hunger Games: The Ballad of Songbirds & Snakes",
+   "rel": [],
+   "src": [
+    "novel:The Ballad of Songbirds and Snakes"
+   ]
+  },
+  {
+   "k": "m1300968",
+   "t": "The Hunger Games: Sunrise on the Reaping",
+   "rel": [],
+   "src": [
+    "novel:Sunrise on the Reaping"
+   ]
+  },
+  {
+   "k": "m1047807",
+   "t": "Heat 2",
+   "rel": [],
+   "src": [
+    "novel:Heat 2"
+   ]
+  },
+  {
+   "k": "m348678",
+   "t": "A Man Called Ove",
+   "rel": [
+    "derived:A Man Called Otto*"
+   ],
+   "src": [
+    "novel:A Man Called Ove"
+   ]
+  },
+  {
+   "k": "t1153",
+   "t": "Men in Black: The Series",
+   "rel": [
+    "original:Men in Black*"
+   ],
+   "src": [
+    "comic:The Men in Black"
+   ]
+  },
+  {
+   "k": "m391",
+   "t": "A Fistful of Dollars",
+   "rel": [
+    "original:Yojimbo*"
+   ],
+   "src": [
+    "novel:Red Harvest"
+   ]
+  }
+ ],
+ "noItem": [
+  {
+   "k": "m1509671",
+   "t": "Untitled Saw Film",
+   "y": null
+  },
+  {
+   "k": "m961268",
+   "t": "Ballerina",
+   "y": 2023
+  },
+  {
+   "k": "m489",
+   "t": "Good Will Hunting",
+   "y": 1997
+  },
+  {
+   "k": "m1273002",
+   "t": "28 Years Later: Part III",
+   "y": null
+  },
+  {
+   "k": "m37165",
+   "t": "The Truman Show",
+   "y": 1998
+  },
+  {
+   "k": "m103663",
+   "t": "The Hunt",
+   "y": 2012
+  },
+  {
+   "k": "m1419406",
+   "t": "The Shadow's Edge",
+   "y": 2025
+  },
+  {
+   "k": "m11826",
+   "t": "Sexy Beast",
+   "y": 2001
+  },
+  {
+   "k": "m852046",
+   "t": "Athena",
+   "y": 2022
+  },
+  {
+   "k": "m2252",
+   "t": "Eastern Promises",
+   "y": 2007
+  },
+  {
+   "k": "m563103",
+   "t": "Door Lock",
+   "y": 2018
+  },
+  {
+   "k": "m103",
+   "t": "Taxi Driver",
+   "y": 1976
+  },
+  {
+   "k": "m497828",
+   "t": "Triangle of Sadness",
+   "y": 2022
+  },
+  {
+   "k": "t1891",
+   "t": "Rome",
+   "y": 2005
+  },
+  {
+   "k": "m1241132",
+   "t": "Johnny English 4",
+   "y": null
+  },
+  {
+   "k": "m635731",
+   "t": "Pig",
+   "y": 2021
+  },
+  {
+   "k": "m500664",
+   "t": "Upgrade",
+   "y": 2018
+  },
+  {
+   "k": "m491418",
+   "t": "Instant Family",
+   "y": 2018
+  },
+  {
+   "k": "m1786818",
+   "t": "Sicario 3",
+   "y": null
+  },
+  {
+   "k": "m85350",
+   "t": "Boyhood",
+   "y": 2014
+  },
+  {
+   "k": "m290250",
+   "t": "The Nice Guys",
+   "y": 2016
+  },
+  {
+   "k": "m644495",
+   "t": "House of Gucci",
+   "y": 2021
+  },
+  {
+   "k": "m11545",
+   "t": "Rushmore",
+   "y": 1998
+  },
+  {
+   "k": "m1339713",
+   "t": "Obsession",
+   "y": 2026
+  },
+  {
+   "k": "m10774",
+   "t": "Network",
+   "y": 1976
+  },
+  {
+   "k": "m446021",
+   "t": "Bad Times at the El Royale",
+   "y": 2018
+  },
+  {
+   "k": "m5595",
+   "t": "Fermat's Room",
+   "y": 2007
+  },
+  {
+   "k": "m1291559",
+   "t": "Drawing Closer",
+   "y": 2024
+  },
+  {
+   "k": "m24226",
+   "t": "The Verdict",
+   "y": 1982
+  },
+  {
+   "k": "m10950",
+   "t": "I Am Sam",
+   "y": 2001
+  },
+  {
+   "k": "m4553",
+   "t": "The Machinist",
+   "y": 2004
+  },
+  {
+   "k": "m1499867",
+   "t": "Untitled Harold & Kumar Sequel",
+   "y": null
+  },
+  {
+   "k": "m7512",
+   "t": "Idiocracy",
+   "y": 2006
+  },
+  {
+   "k": "m87492",
+   "t": "Foxcatcher",
+   "y": 2014
+  },
+  {
+   "k": "m9319",
+   "t": "The Last Boy Scout",
+   "y": 1991
+  },
+  {
+   "k": "m2666",
+   "t": "Dark City",
+   "y": 1998
+  },
+  {
+   "k": "m1208348",
+   "t": "Rental Family",
+   "y": 2025
+  },
+  {
+   "k": "m812635",
+   "t": "Chevalier",
+   "y": 2023
+  },
+  {
+   "k": "m850165",
+   "t": "The Iron Claw",
+   "y": 2023
+  },
+  {
+   "k": "m395834",
+   "t": "Wind River",
+   "y": 2017
+  },
+  {
+   "k": "m1005331",
+   "t": "Carry-On",
+   "y": 2024
+  },
+  {
+   "k": "m7972",
+   "t": "Before the Devil Knows You're Dead",
+   "y": 2007
+  },
+  {
+   "k": "m1098110",
+   "t": "Blood & Gold",
+   "y": 2023
+  },
+  {
+   "k": "m647250",
+   "t": "The Machine",
+   "y": 2023
+  },
+  {
+   "k": "m717930",
+   "t": "Kandahar",
+   "y": 2023
+  },
+  {
+   "k": "m1765072",
+   "t": "You Can See Everything",
+   "y": 2026
+  },
+  {
+   "k": "m49797",
+   "t": "I Saw the Devil",
+   "y": 2010
+  },
+  {
+   "k": "m628704",
+   "t": "Midnight",
+   "y": 2021
+  },
+  {
+   "k": "m616747",
+   "t": "Haunted Mansion",
+   "y": 2023
+  },
+  {
+   "k": "m490132",
+   "t": "Green Book",
+   "y": 2018
+  },
+  {
+   "k": "m579047",
+   "t": "Reminiscence",
+   "y": 2021
+  },
+  {
+   "k": "m1239193",
+   "t": "Deep Cover",
+   "y": 2025
+  },
+  {
+   "k": "m265195",
+   "t": "Wild Tales",
+   "y": 2014
+  },
+  {
+   "k": "m678512",
+   "t": "Sound of Freedom",
+   "y": 2023
+  },
+  {
+   "k": "m581528",
+   "t": "The Gangster, the Cop, the Devil",
+   "y": 2019
+  },
+  {
+   "k": "m1198994",
+   "t": "Send Help",
+   "y": 2026
+  },
+  {
+   "k": "m801604",
+   "t": "Shark: The Beginning",
+   "y": 2021
+  },
+  {
+   "k": "m1078605",
+   "t": "Weapons",
+   "y": 2025
+  },
+  {
+   "k": "m254320",
+   "t": "The Lobster",
+   "y": 2015
+  },
+  {
+   "k": "m8960",
+   "t": "Hancock",
+   "y": 2008
+  },
+  {
+   "k": "m242224",
+   "t": "The Babadook",
+   "y": 2014
+  },
+  {
+   "k": "m800158",
+   "t": "The Killer",
+   "y": 2023
+  },
+  {
+   "k": "m359940",
+   "t": "Three Billboards Outside Ebbing, Missouri",
+   "y": 2017
+  },
+  {
+   "k": "m950396",
+   "t": "The Gorge",
+   "y": 2025
+  },
+  {
+   "k": "m458220",
+   "t": "Palmer",
+   "y": 2021
+  },
+  {
+   "k": "m915935",
+   "t": "Anatomy of a Fall",
+   "y": 2023
+  },
+  {
+   "k": "m587996",
+   "t": "Below Zero",
+   "y": 2021
+  },
+  {
+   "k": "m936075",
+   "t": "Michael",
+   "y": 2026
+  },
+  {
+   "k": "m1242011",
+   "t": "Together",
+   "y": 2025
+  },
+  {
+   "k": "m594673",
+   "t": "The Tashkent Files",
+   "y": 2019
+  },
+  {
+   "k": "m68718",
+   "t": "Django Unchained",
+   "y": 2012
+  },
+  {
+   "k": "m1248226",
+   "t": "Playdate",
+   "y": 2025
+  },
+  {
+   "k": "m1242419",
+   "t": "Roofman",
+   "y": 2025
+  },
+  {
+   "k": "m14161",
+   "t": "2012",
+   "y": 2009
+  },
+  {
+   "k": "m64296",
+   "t": "My Little Loves",
+   "y": 1974
+  },
+  {
+   "k": "m1119449",
+   "t": "Good Luck, Have Fun, Don't Die",
+   "y": 2026
+  },
+  {
+   "k": "m488623",
+   "t": "Forgotten",
+   "y": 2017
+  },
+  {
+   "k": "m146233",
+   "t": "Prisoners",
+   "y": 2013
+  },
+  {
+   "k": "m938614",
+   "t": "Late Night with the Devil",
+   "y": 2024
+  },
+  {
+   "k": "m38",
+   "t": "Eternal Sunshine of the Spotless Mind",
+   "y": 2004
+  },
+  {
+   "k": "m1248832",
+   "t": "Digger",
+   "y": 2026
+  },
+  {
+   "k": "m933260",
+   "t": "The Substance",
+   "y": 2024
+  },
+  {
+   "k": "m506528",
+   "t": "Harriet",
+   "y": 2019
+  },
+  {
+   "k": "m575417",
+   "t": "On the Rocks",
+   "y": 2020
+  },
+  {
+   "k": "m39538",
+   "t": "Contagion",
+   "y": 2011
+  },
+  {
+   "k": "m393457",
+   "t": "Fences",
+   "y": 2016
+  },
+  {
+   "k": "m451048",
+   "t": "Jungle Cruise",
+   "y": 2021
+  },
+  {
+   "k": "m674324",
+   "t": "The Banshees of Inisherin",
+   "y": 2022
+  },
+  {
+   "k": "m783111",
+   "t": "Land of Happiness",
+   "y": 2024
+  },
+  {
+   "k": "m663866",
+   "t": "Censor",
+   "y": 2021
+  },
+  {
+   "k": "m400928",
+   "t": "Gifted",
+   "y": 2017
+  },
+  {
+   "k": "m9739",
+   "t": "Demolition Man",
+   "y": 1993
+  },
+  {
+   "k": "m576845",
+   "t": "Last Night in Soho",
+   "y": 2021
+  },
+  {
+   "k": "m929590",
+   "t": "Civil War",
+   "y": 2024
+  },
+  {
+   "k": "m588228",
+   "t": "The Tomorrow War",
+   "y": 2021
+  },
+  {
+   "k": "m9040",
+   "t": "Serpico",
+   "y": 1973
+  },
+  {
+   "k": "m542836",
+   "t": "The Negotiation",
+   "y": 2018
+  },
+  {
+   "k": "m11423",
+   "t": "Memories of Murder",
+   "y": 2003
+  },
+  {
+   "k": "m753342",
+   "t": "Napoleon",
+   "y": 2023
+  },
+  {
+   "k": "m74308",
+   "t": "Detachment",
+   "y": 2011
+  },
+  {
+   "k": "m44214",
+   "t": "Black Swan",
+   "y": 2010
+  },
+  {
+   "k": "m560016",
+   "t": "Monkey Man",
+   "y": 2024
+  },
+  {
+   "k": "m840705",
+   "t": "Blink Twice",
+   "y": 2024
+  },
+  {
+   "k": "m567",
+   "t": "Rear Window",
+   "y": 1954
+  },
+  {
+   "k": "m1280738",
+   "t": "The Furious",
+   "y": 2026
+  },
+  {
+   "k": "m437068",
+   "t": "A Taxi Driver",
+   "y": 2017
+  },
+  {
+   "k": "m1173185",
+   "t": "The Fetus",
+   "y": 2025
+  },
+  {
+   "k": "m1324327",
+   "t": "Men of War",
+   "y": 2024
+  },
+  {
+   "k": "m1330443",
+   "t": "Strange Harvest",
+   "y": 2025
+  },
+  {
+   "k": "m337170",
+   "t": "American Made",
+   "y": 2017
+  },
+  {
+   "k": "m882059",
+   "t": "Boy Kills World",
+   "y": 2024
+  },
+  {
+   "k": "m39210",
+   "t": "Somewhere",
+   "y": 2010
+  },
+  {
+   "k": "m2355",
+   "t": "Reign Over Me",
+   "y": 2007
+  },
+  {
+   "k": "m579974",
+   "t": "RRR",
+   "y": 2022
+  },
+  {
+   "k": "m804095",
+   "t": "The Fabelmans",
+   "y": 2022
+  },
+  {
+   "k": "m1106739",
+   "t": "Juror #2",
+   "y": 2024
+  },
+  {
+   "k": "m399055",
+   "t": "The Shape of Water",
+   "y": 2017
+  },
+  {
+   "k": "m845781",
+   "t": "Red One",
+   "y": 2024
+  },
+  {
+   "k": "m582014",
+   "t": "Promising Young Woman",
+   "y": 2020
+  },
+  {
+   "k": "m153",
+   "t": "Lost in Translation",
+   "y": 2003
+  },
+  {
+   "k": "m615777",
+   "t": "Babylon",
+   "y": 2022
+  },
+  {
+   "k": "m568091",
+   "t": "Fractured",
+   "y": 2019
+  },
+  {
+   "k": "m374720",
+   "t": "Dunkirk",
+   "y": 2017
+  },
+  {
+   "k": "m500",
+   "t": "Reservoir Dogs",
+   "y": 1992
+  },
+  {
+   "k": "m16869",
+   "t": "Inglourious Basterds",
+   "y": 2009
+  },
+  {
+   "k": "m435615",
+   "t": "Possessor",
+   "y": 2020
+  },
+  {
+   "k": "m22302",
+   "t": "Polytechnique",
+   "y": 2009
+  },
+  {
+   "k": "m513310",
+   "t": "Boss Level",
+   "y": 2021
+  },
+  {
+   "k": "m376867",
+   "t": "Moonlight",
+   "y": 2016
+  },
+  {
+   "k": "m530723",
+   "t": "Bad Education",
+   "y": 2019
+  },
+  {
+   "k": "m863873",
+   "t": "Caddo Lake",
+   "y": 2024
+  },
+  {
+   "k": "m57361",
+   "t": "The Yellow Sea",
+   "y": 2010
+  },
+  {
+   "k": "m313369",
+   "t": "La La Land",
+   "y": 2016
+  },
+  {
+   "k": "m594",
+   "t": "The Terminal",
+   "y": 2004
+  },
+  {
+   "k": "m540549",
+   "t": "Monica",
+   "y": 2023
+  },
+  {
+   "k": "m620705",
+   "t": "Crater",
+   "y": 2023
+  },
+  {
+   "k": "m502033",
+   "t": "Sound of Metal",
+   "y": 2020
+  },
+  {
+   "k": "m1578",
+   "t": "Raging Bull",
+   "y": 1980
+  },
+  {
+   "k": "m1120911",
+   "t": "Saturday Night",
+   "y": 2024
+  },
+  {
+   "k": "m877817",
+   "t": "Wolfs",
+   "y": 2024
+  },
+  {
+   "k": "m616446",
+   "t": "Brothers",
+   "y": 2024
+  },
+  {
+   "k": "m876969",
+   "t": "Assassin Club",
+   "y": 2023
+  },
+  {
+   "k": "m595671",
+   "t": "Never Rarely Sometimes Always",
+   "y": 2020
+  },
+  {
+   "k": "m424694",
+   "t": "Bohemian Rhapsody",
+   "y": 2018
+  },
+  {
+   "k": "m399174",
+   "t": "Isle of Dogs",
+   "y": 2018
+  },
+  {
+   "k": "m453127",
+   "t": "Midnight Runners",
+   "y": 2017
+  },
+  {
+   "k": "m714888",
+   "t": "Argentina 1985",
+   "y": 2022
+  },
+  {
+   "k": "m475215",
+   "t": "Mirai",
+   "y": 2018
+  },
+  {
+   "k": "t225180",
+   "t": "BLUE EYE SAMURAI",
+   "y": 2023
+  },
+  {
+   "k": "m1677",
+   "t": "Ray",
+   "y": 2004
+  },
+  {
+   "k": "m1106213",
+   "t": "Wolf Mountain",
+   "y": 2022
+  },
+  {
+   "k": "m1114905",
+   "t": "Death's Roulette",
+   "y": 2023
+  },
+  {
+   "k": "m536437",
+   "t": "Hypnotic",
+   "y": 2023
+  },
+  {
+   "k": "m1306368",
+   "t": "The Rip",
+   "y": 2026
+  },
+  {
+   "k": "m1148486",
+   "t": "Vedaa",
+   "y": 2024
+  },
+  {
+   "k": "m10476",
+   "t": "Hustle & Flow",
+   "y": 2005
+  },
+  {
+   "k": "m1111873",
+   "t": "Abigail",
+   "y": 2024
+  },
+  {
+   "k": "m957258",
+   "t": "What Is a Woman?",
+   "y": 2022
+  },
+  {
+   "k": "m639933",
+   "t": "The Northman",
+   "y": 2022
+  },
+  {
+   "k": "m316029",
+   "t": "The Greatest Showman",
+   "y": 2017
+  },
+  {
+   "k": "m1226578",
+   "t": "Longlegs",
+   "y": 2024
+  },
+  {
+   "k": "m648579",
+   "t": "The Unbearable Weight of Massive Talent",
+   "y": 2022
+  },
+  {
+   "k": "m120467",
+   "t": "The Grand Budapest Hotel",
+   "y": 2014
+  },
+  {
+   "k": "m637",
+   "t": "Life Is Beautiful",
+   "y": 1997
+  },
+  {
+   "k": "m556984",
+   "t": "The Trial of the Chicago 7",
+   "y": 2020
+  },
+  {
+   "k": "m10056",
+   "t": "Killer's Kiss",
+   "y": 1955
+  },
+  {
+   "k": "m817758",
+   "t": "TÁR",
+   "y": 2022
+  },
+  {
+   "k": "m29845",
+   "t": "A Woman Under the Influence",
+   "y": 1974
+  },
+  {
+   "k": "m363093",
+   "t": "The Tiger",
+   "y": 2015
+  },
+  {
+   "k": "m492188",
+   "t": "Marriage Story",
+   "y": 2019
+  },
+  {
+   "k": "m593643",
+   "t": "The Menu",
+   "y": 2022
+  },
+  {
+   "k": "m579583",
+   "t": "The King of Staten Island",
+   "y": 2020
+  },
+  {
+   "k": "m152532",
+   "t": "Dallas Buyers Club",
+   "y": 2013
+  },
+  {
+   "k": "m639720",
+   "t": "IF",
+   "y": 2024
+  },
+  {
+   "k": "m857553",
+   "t": "Johnny & Clyde",
+   "y": 2023
+  },
+  {
+   "k": "m1093994",
+   "t": "One Ranger",
+   "y": 2023
+  },
+  {
+   "k": "m264660",
+   "t": "Ex Machina",
+   "y": 2015
+  },
+  {
+   "k": "m799583",
+   "t": "The Ministry of Ungentlemanly Warfare",
+   "y": 2024
+  },
+  {
+   "k": "m339527",
+   "t": "Solace",
+   "y": 2015
+  },
+  {
+   "k": "m1058699",
+   "t": "STILL: A Michael J. Fox Movie",
+   "y": 2023
+  },
+  {
+   "k": "m726759",
+   "t": "Tetris",
+   "y": 2023
+  },
+  {
+   "k": "m1071215",
+   "t": "Thanksgiving",
+   "y": 2023
+  },
+  {
+   "k": "m399361",
+   "t": "Triple Frontier",
+   "y": 2019
+  },
+  {
+   "k": "m715931",
+   "t": "Emancipation",
+   "y": 2022
+  },
+  {
+   "k": "m965150",
+   "t": "Aftersun",
+   "y": 2022
+  },
+  {
+   "k": "m2179",
+   "t": "Tenacious D in The Pick of Destiny",
+   "y": 2006
+  },
+  {
+   "k": "m553600",
+   "t": "Promare",
+   "y": 2019
+  },
+  {
+   "k": "m96721",
+   "t": "Rush",
+   "y": 2013
+  },
+  {
+   "k": "m458723",
+   "t": "Us",
+   "y": 2019
+  },
+  {
+   "k": "m1109206",
+   "t": "The Secret Life of Pets 3",
+   "y": null
+  },
+  {
+   "k": "m445629",
+   "t": "Fighting with My Family",
+   "y": 2019
+  },
+  {
+   "k": "m738652",
+   "t": "Copshop",
+   "y": 2021
+  },
+  {
+   "k": "m569499",
+   "t": "Detainment",
+   "y": 2018
+  },
+  {
+   "k": "m1272",
+   "t": "Sunshine",
+   "y": 2007
+  },
+  {
+   "k": "m625568",
+   "t": "Unhinged",
+   "y": 2020
+  },
+  {
+   "k": "m1138194",
+   "t": "Heretic",
+   "y": 2024
+  },
+  {
+   "k": "m508439",
+   "t": "Onward",
+   "y": 2020
+  },
+  {
+   "k": "m101",
+   "t": "Léon: The Professional",
+   "y": 1994
+  },
+  {
+   "k": "m500682",
+   "t": "The Highwaymen",
+   "y": 2019
+  },
+  {
+   "k": "m429200",
+   "t": "Good Time",
+   "y": 2017
+  },
+  {
+   "k": "m9377",
+   "t": "Ferris Bueller's Day Off",
+   "y": 1986
+  },
+  {
+   "k": "m505948",
+   "t": "I Am Mother",
+   "y": 2019
+  },
+  {
+   "k": "m454293",
+   "t": "Night School",
+   "y": 2018
+  },
+  {
+   "k": "m554972",
+   "t": "Unstoppable",
+   "y": 2018
+  },
+  {
+   "k": "m547017",
+   "t": "Shirley",
+   "y": 2020
+  },
+  {
+   "k": "m581859",
+   "t": "Da 5 Bloods",
+   "y": 2020
+  },
+  {
+   "k": "m545611",
+   "t": "Everything Everywhere All at Once",
+   "y": 2022
+  },
+  {
+   "k": "m9558",
+   "t": "King of New York",
+   "y": 1990
+  },
+  {
+   "k": "m643532",
+   "t": "The Card Counter",
+   "y": 2021
+  },
+  {
+   "k": "m830788",
+   "t": "The Invitation",
+   "y": 2022
+  },
+  {
+   "k": "m1574840",
+   "t": "The Mummy: Book of the Dead",
+   "y": 2027
+  },
+  {
+   "k": "m1817",
+   "t": "Phone Booth",
+   "y": 2003
+  },
+  {
+   "k": "m10337",
+   "t": "Bugsy",
+   "y": 1991
+  },
+  {
+   "k": "m20504",
+   "t": "The Book of Eli",
+   "y": 2010
+  },
+  {
+   "k": "m334533",
+   "t": "Captain Fantastic",
+   "y": 2016
+  },
+  {
+   "k": "m1155828",
+   "t": "Sing Sing",
+   "y": 2024
+  },
+  {
+   "k": "m315439",
+   "t": "The Throne",
+   "y": 2015
+  },
+  {
+   "k": "m9315",
+   "t": "Flightplan",
+   "y": 2005
+  },
+  {
+   "k": "m215830",
+   "t": "Open Grave",
+   "y": 2013
+  },
+  {
+   "k": "m28355",
+   "t": "Case 39",
+   "y": 2009
+  },
+  {
+   "k": "m50646",
+   "t": "Crazy, Stupid, Love.",
+   "y": 2011
+  },
+  {
+   "k": "m122906",
+   "t": "About Time",
+   "y": 2013
+  },
+  {
+   "k": "m158852",
+   "t": "Tomorrowland",
+   "y": 2015
+  },
+  {
+   "k": "m129",
+   "t": "Spirited Away",
+   "y": 2001
+  },
+  {
+   "k": "m138832",
+   "t": "We're the Millers",
+   "y": 2013
+  },
+  {
+   "k": "m379",
+   "t": "Miller's Crossing",
+   "y": 1990
+  },
+  {
+   "k": "m823482",
+   "t": "Dream Scenario",
+   "y": 2023
+  },
+  {
+   "k": "m14807",
+   "t": "The Long Good Friday",
+   "y": 1980
+  },
+  {
+   "k": "m736769",
+   "t": "They Cloned Tyrone",
+   "y": 2023
+  },
+  {
+   "k": "m68734",
+   "t": "Argo",
+   "y": 2012
+  },
+  {
+   "k": "m301804",
+   "t": "Before I Wake",
+   "y": 2016
+  },
+  {
+   "k": "m705996",
+   "t": "Decision to Leave",
+   "y": 2022
+  },
+  {
+   "k": "m347031",
+   "t": "Swiss Army Man",
+   "y": 2016
+  },
+  {
+   "k": "m762409",
+   "t": "Night Has Fallen",
+   "y": null
+  },
+  {
+   "k": "t41727",
+   "t": "Banshee",
+   "y": 2013
+  },
+  {
+   "k": "m1249415",
+   "t": "The Roundup 5",
+   "y": null
+  },
+  {
+   "k": "m616",
+   "t": "The Last Samurai",
+   "y": 2003
+  },
+  {
+   "k": "m1640",
+   "t": "Crash",
+   "y": 2005
+  },
+  {
+   "k": "m565743",
+   "t": "The Vast of Night",
+   "y": 2019
+  },
+  {
+   "k": "m6957",
+   "t": "The 40 Year-Old Virgin",
+   "y": 2005
+  },
+  {
+   "k": "m634528",
+   "t": "The Marksman",
+   "y": 2021
+  },
+  {
+   "k": "m722913",
+   "t": "Malcolm & Marie",
+   "y": 2021
+  },
+  {
+   "k": "m1402",
+   "t": "The Pursuit of Happyness",
+   "y": 2006
+  },
+  {
+   "k": "m11321",
+   "t": "Seven Pounds",
+   "y": 2008
+  },
+  {
+   "k": "m614934",
+   "t": "Elvis",
+   "y": 2022
+  },
+  {
+   "k": "m457332",
+   "t": "Hidden Strike",
+   "y": 2023
+  },
+  {
+   "k": "m1721637",
+   "t": "Five Nights at Freddy's 3",
+   "y": null
+  },
+  {
+   "k": "m1561021",
+   "t": "Mortal Kombat III",
+   "y": null
+  },
+  {
+   "k": "m1370190",
+   "t": "The Wild Robot Escapes",
+   "y": null
+  },
+  {
+   "k": "m1437511",
+   "t": "How to Rob a Bank",
+   "y": 2026
+  }
+ ],
+ "excludedGroups": [
+  {
+   "g": "Q65120698",
+   "name": "list of Illumination films",
+   "why": "list",
+   "size": 15,
+   "types": [
+    "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q26705935",
+   "name": "BBC's 100 Greatest Films of the 21st Century",
+   "why": "list",
+   "size": 102,
+   "types": [
+    "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q2732470",
+   "name": "list of Pixar films",
+   "why": "list",
+   "size": 28,
+   "types": [
+    "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q56070713",
+   "name": "Walt Disney Animation Studios feature film",
+   "why": "catalog",
+   "size": 66,
+   "types": [
+    "animated film series"
+   ]
+  },
+  {
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
+   "why": "catalog",
+   "size": 23,
+   "types": [
+    "animated film series"
+   ]
+  }
+ ],
+ "rejectedFollows": [
+  {
+   "from": "m206647",
+   "to": "m37724",
+   "a": "Spectre",
+   "b": "Skyfall"
+  },
+  {
+   "from": "m265195",
+   "to": "m78237",
+   "a": "Wild Tales",
+   "b": "On Probation"
+  },
+  {
+   "from": "m11878",
+   "to": "m11712",
+   "a": "Yojimbo",
+   "b": "Sanjuro"
+  },
+  {
+   "from": "m420634",
+   "to": "m231001",
+   "a": "Terrifier",
+   "b": "All Hallows' Eve"
+  }
+ ]
+}
