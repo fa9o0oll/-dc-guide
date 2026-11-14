@@ -128,11 +128,11 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
       dcTitle: document.querySelector('.door.dc strong').textContent.includes('دي سي'), dcBg: cs[0].getPropertyValue('--bg').trim(),
       dcGrade: getComputedStyle(document.querySelector('.door.dc .art img') || document.body).filter, reflectAny: cs.some(c => /below/.test(c.webkitBoxReflect || '')),
       floor: [...document.querySelectorAll('.slot')].map(s => getComputedStyle(s, '::after')).every(a => a.content !== 'none' && /radial-gradient/.test(a.backgroundImage)),
-      title: document.querySelector('.hub-top h1').textContent.trim(), font: getComputedStyle(document.querySelector('.hub-top h1')).fontFamily, fontOk: document.fonts.check('40px Inscribe', 'قاعة'),
+      title: document.querySelector('.hub-top h1').textContent.trim(), font: getComputedStyle(document.querySelector('.hub-top h1')).fontFamily, fontOk: document.fonts.check('40px Inscribe', 'بوابات'),
       tag: document.querySelector('.hub-top p').textContent.trim() }; });
   check(`${name}: البوابات بحجم واحد وإطار واحد وإطار داخلي على البعد نفسه، ولها على الأرض ${w >= 1024 ? 'انعكاس' : 'ضوء ينسكب (لا انعكاس يُعاد رسمه مع الدوران)'}`, new Set(d.size.map(String)).size === 1 && new Set(d.radius).size === 1 && new Set(d.border).size === 1 && new Set(d.frame).size === 1 && (w >= 1024 ? d.reflect : !d.reflectAny && d.floor), d);
   check(`${name}: لا ظل مائل يميز بوابة عن غيرها، وبوابة دي سي سوداء وغلافها بألوانه (بلا رمادي)`, !d.slab && /^#0[0-9a-f]0[0-9a-f]0[0-9a-f]$/i.test(d.dcBg) && !/grayscale/.test(d.dcGrade), d);
-  check(`${name}: فوق القاعة نقشها «قاعة البوابات» بخطه، وسطر يقول ما وراء الأبواب`, d.title === 'قاعة البوابات' && /Inscribe/.test(d.font) && d.fontOk && d.tag.startsWith('خلف كل بوابة عالمٌ'), d);
+  check(`${name}: فوق البوابات نقشها «بوابات العوالم» بخطه، وتحته «لكل عالمٍ بوابة، ولكل حكايةٍ ترتيبها.»`, d.title === 'بوابات العوالم' && /Inscribe/.test(d.font) && d.fontOk && d.tag === 'لكل عالمٍ بوابة، ولكل حكايةٍ ترتيبها.', d);
   check(`${name}: «دي سي» لا تنقسم على سطرين، وبلا تمدد أفقي`, d.dcTitle && d.sw <= d.iw, d);
   // الجاران مائلان قليلاً في القوس فيُسقَط موضع أسطرهما بفارق بكسلات قليلة
   if (w >= 1024) check(`${name}: البوابات الثلاث ظاهرة في قوس، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 4) && facing(d.flat[1]) && !facing(d.flat[0]) && !d.nav.length, d);
@@ -151,7 +151,7 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
     });
     check(`${name}: كل ما يتحرك في القاعة transform وopacity فقط، وبلا تمويه`, fx.n > 20 && !fx.props.length && !fx.blur, fx);
     check(`${name}: حركة البوابتين الجانبيتين ساكنة، والتي في الوسط تتحرك`, fx.side.join() === 'paused' && fx.mid.join() === 'running', fx);
-    check(`${name}: مطر دي سي ثلاث طبقات من نسيج خيوط، كل طبقة تنزل مسافة تكرار نسيجها، مائلة كمطر الغلاف`, fx.rain.length === 3 && fx.rain.every(([svg, t, bs]) => svg && t === `translateY(${parseInt(bs.split(' ')[1])}px)`) && /^matrix\(1, 0, -0\.2/.test(fx.skew), fx);
+    check(`${name}: مطر دي سي خفيف: طبقتان من نسيج خيوط، كل طبقة تنزل مسافة تكرار نسيجها، مائلة كمطر الغلاف`, fx.rain.length === 2 && fx.rain.every(([svg, t, bs]) => svg && t === `translateY(${parseInt(bs.split(' ')[1])}px)`) && /^matrix\(1, 0, -0\.2/.test(fx.skew), fx);
     // النقش فوق القاعة يأخذ لون البوابة التي أمامك (Fate ذهبي)
     const lit = () => page.evaluate(() => [document.body.dataset.here, getComputedStyle(document.body).getPropertyValue('--lit').trim()]);
     await page.waitForTimeout(900); const l0 = await lit();
@@ -182,6 +182,64 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
   await page.mouse.move(8, 400, { steps: 4 }); await page.waitForTimeout(1200);
   check('مغادرة المؤشر تعيده مستوياً بنعومة ثم يُزال الميلان', await page.evaluate(s => !document.querySelectorAll(s)[2].classList.contains('pz-t'), sel));
   check('mouse: بلا أخطاء برمجية', !errs.length, errs);
+  await ctx.close(); }
+
+// ---------- البحث المتسامح: الاقتراحات أثناء الكتابة في «أضف فيلماً»، و«هل تقصد» في بحث القائمة ودي سي ----------
+// فهرس عناوين مصغّر بدل الملف الأسبوعي، والخادم مُحاكى (اقتراحات TMDB لما ليس في الفهرس، ثم البحث بعد الاختيار)
+const TITLES = { built: new Date().toISOString(), items: [[245891, 0, 2014, 90, 'John Wick', 'جون ويك'], [324552, 0, 2017, 85, 'John Wick: Chapter 2'], [157336, 0, 2014, 95, 'Interstellar', 'بين النجوم'],
+  [155, 0, 2008, 96, 'The Dark Knight', 'فارس الظلام'], [278, 0, 1994, 96, 'The Shawshank Redemption'], [872585, 0, 2023, 88, 'Oppenheimer', 'أوبنهايمر'], [1396, 1, 2008, 95, 'Breaking Bad']] };
+for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440, 900, false]]) {
+  console.log(`== search ${name}`);
+  const { ctx, page, errs } = await open(w, h, mobile), asked = [];
+  await page.route('**/films/data/titles.json*', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(TITLES) }));
+  await page.route('**/api/add-film', async r => { const b = r.request().postDataJSON(); asked.push(b.action + ':' + (b.q || b.tmdb));
+    if (b.action === 'suggest') return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ items: b.q.includes('مغمور') ? [{ tmdb: 999001, kind: 'movie', title: 'A Quiet Obscure Film', year: 2025 }] : [] }) });
+    if (b.action === 'search') return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ parsed: { title: b.q.replace(/ \d{4}$/, ''), year: +(b.q.match(/\d{4}$/) || [])[0] || null }, sure: true,
+      candidates: /intersteller/i.test(b.q) ? [] : [{ tmdb: 157336, kind: 'movie', title: 'Interstellar', year: 2014, poster: null }] }) });
+    return r.fulfill({ status: 404, body: '{}' }); });
+  await page.addInitScript(() => { try { localStorage.setItem('filmsg.pass', 'test'); } catch {} });
+  await page.goto(`${base}/films/`); await page.waitForSelector('#grid [id^=f-]');
+  await page.click('[data-act=add]'); await page.waitForSelector('#add[open]');
+  const sug = async q => { await page.fill('#add-q', ''); await page.type('#add-q', q, { delay: 15 }); await page.waitForTimeout(450);
+    return page.evaluate(() => ({ open: !document.getElementById('add-sug').hidden, exp: document.getElementById('add-q').getAttribute('aria-expanded'),
+      items: [...document.querySelectorAll('#add-sug li')].map(li => ({ t: li.querySelector('b').textContent, meant: li.classList.contains('meant'), ar: li.querySelector('bdi')?.textContent || '', srv: li.classList.contains('srv') })) })); };
+  const a1 = await sug('جون ويك');
+  check(`${name}: «جون ويك» بالعربي يقترح John Wick مباشرة قبل Enter (بلا «هل تقصد» لأنه اسمه العربي)`, a1.open && a1.exp === 'true' && a1.items[0]?.t === 'John Wick' && !a1.items[0].meant && a1.items[0].ar === 'جون ويك' && a1.items.some(x => x.t === 'John Wick: Chapter 2'), a1);
+  const a2 = await sug('intersteller');
+  check(`${name}: الإملاء الخاطئ «intersteller» يقترح «هل تقصد: Interstellar»`, a2.items[0]?.t === 'Interstellar' && a2.items[0].meant, a2);
+  const a3 = await sug('انترستلر');
+  check(`${name}: نطقه بالحروف العربية «انترستلر» يقترحه أيضاً`, a3.items[0]?.t === 'Interstellar' && a3.items[0].meant, a3);
+  const a4 = await sug('the dark kn');
+  check(`${name}: الاسم الناقص «the dark kn» يكفي`, a4.items[0]?.t === 'The Dark Knight' && !a4.items[0].meant, a4);
+  const a5 = await sug('فيلم مغمور');
+  check(`${name}: ما ليس في الفهرس يأتي من بحث TMDB نفسه عبر الخادم، تحت الاقتراحات`, a5.items.some(x => x.t === 'A Quiet Obscure Film') && asked.includes('suggest:فيلم مغمور'), { a5, asked });
+  // اختيار اقتراح بالأسهم وEnter يكتب اسمه وسنته ويبحث عنه
+  await sug('jon wik'); await page.keyboard.press('ArrowDown');
+  const act = await page.evaluate(() => [document.getElementById('add-q').getAttribute('aria-activedescendant'), document.querySelector('#add-sug li[aria-selected=true] b')?.textContent]);
+  await page.keyboard.press('Enter'); await page.waitForTimeout(300);
+  const after = await page.evaluate(() => ({ v: document.getElementById('add-q').value, open: !document.getElementById('add-sug').hidden, cands: document.querySelectorAll('#cands .cand').length }));
+  check(`${name}: الأسهم تتنقل في الاقتراحات وEnter يختار («jon wik» ← John Wick 2014) ويبحث`, act[0] === 'sg-0' && act[1] === 'John Wick' && after.v === 'John Wick 2014' && !after.open && asked.includes('search:John Wick 2014') && after.cands === 1, { act, after, asked });
+  // البحث بعد Enter بلا نتيجة: «هل تقصد» من الفهرس، والضغط عليه يبحث عنه
+  await page.fill('#add-q', 'intersteller'); await page.evaluate(() => document.getElementById('add-form').requestSubmit()); await page.waitForTimeout(350);
+  const nores = await page.evaluate(() => ({ msg: document.getElementById('add-msg').textContent, b: document.querySelector('#add-msg [data-act=meant-add]')?.dataset.q }));
+  check(`${name}: إن لم يجد البحث شيئاً يقول «هل تقصد Interstellar (2014)؟»`, /هل تقصد/.test(nores.msg) && nores.b === 'Interstellar 2014', nores);
+  await page.click('#add-msg [data-act=meant-add]'); await page.waitForTimeout(300);
+  check(`${name}: والضغط عليه يبحث عنه`, asked.includes('search:Interstellar 2014') && await page.$$eval('#cands .cand', x => x.length) === 1, asked);
+  await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+  // بحث القائمة: الإملاء الخاطئ والعربي يجدان الفيلم، و«هل تقصد» يضبط البحث
+  const list = async q => { await page.fill('#q', q); await page.waitForTimeout(400); return page.evaluate(() => ({ shown: [...document.querySelectorAll('#grid [id^=f-]')].filter(e => !e.hidden).map(e => e.id), meant: document.querySelector('#count [data-act=meant]')?.dataset.q || null })); };
+  const l1 = await list('balerina'), l2 = await list('بالرينا'), l3 = await list('ballerina');
+  check(`${name}: بحث القائمة: «balerina» و«بالرينا» يجدان Ballerina مع «هل تقصد»، والاسم الصحيح يجده بلا سؤال`, l1.meant === 'Ballerina' && l1.shown.length >= 1 && l2.meant === 'Ballerina' && l3.meant === null && l3.shown.length >= 1, { l1, l2, l3 });
+  await list('balerina'); await page.click('#count [data-act=meant]'); await page.waitForTimeout(400);
+  check(`${name}: الضغط على «هل تقصد» يكتب الاسم الصحيح في البحث`, await page.inputValue('#q') === 'Ballerina' && !await page.$('#count [data-act=meant]'), await page.inputValue('#q'));
+  // دي سي: نفس الشيء في البطاقات والفهرس
+  await page.goto(`${base}/dc/`); await page.waitForSelector('#main .card');
+  await page.fill('#q', 'supermn'); await page.waitForTimeout(500);
+  const dc = await page.evaluate(() => ({ bar: document.querySelector('.meant-bar [data-act=meant]')?.dataset.q, cards: document.querySelectorAll('#main .card').length, empty: !!document.querySelector('#main .empty') }));
+  check(`${name}: دي سي: «supermn» يُظهر أعمال سوبرمان مع «هل تقصد Superman»`, dc.bar === 'Superman' && dc.cards > 0 && !dc.empty, dc);
+  await page.click('.meant-bar [data-act=meant]'); await page.waitForTimeout(400);
+  check(`${name}: دي سي: الضغط عليه يصحح البحث`, await page.inputValue('#q') === 'Superman' && !await page.$('.meant-bar'), await page.inputValue('#q'));
+  check(`search ${name}: بلا أخطاء برمجية`, !errs.length, errs);
   await ctx.close(); }
 
 // ---------- زر الرجوع في كل عالم: بوابة صغيرة متحركة بهويته، تتسع عند الضغط وتعيدك إلى بوابتها في القاعة ----------

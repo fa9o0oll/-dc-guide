@@ -1,4 +1,4 @@
-// دالة «أضف فيلماً»: تبحث في TMDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي نتيجة للاطلاع (preview)، ثم تضيف المختار إلى data/films/added.json في المستودع،
+// دالة «أضف فيلماً»: تقترح أثناء الكتابة (suggest)، وتبحث في TMDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي نتيجة للاطلاع (preview)، ثم تضيف المختار إلى data/films/added.json في المستودع،
 // فيعاد بناء القائمة ويظهر الفيلم على كل الأجهزة. و worlds: سلسلة العمل وعالمه وأعماله المرتبطة من Wikidata (تطلبها الصفحة بعد فتح البطاقة، فلا تتأخر).
 // محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
 //   TMDB_API_KEY  مفتاح TMDB        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع        ADD_FILM_PASSWORD  كلمة السر
@@ -39,6 +39,14 @@ export default async req => {
   let b; try { b = await req.json(); } catch { return json(400, { error: 'طلب غير صالح.' }); }
   if (!b?.password || !same(b.password, process.env.ADD_FILM_PASSWORD)) { await wait(700); return json(401, { error: 'password' }); }
   try {
+    // اقتراحات أثناء الكتابة لما ليس في فهرس الصفحة: بحث TMDB الموحد (أفلام ومسلسلات، ويطابق العناوين المترجمة والبديلة) بطلب واحد
+    if (b.action === 'suggest') {
+      const q = String(b.q || '').replace(/\s+/g, ' ').trim().slice(0, 80); if (q.length < 2) return json(200, { items: [] });
+      const r = await tmdb('/search/multi', { query: q, include_adult: false, language: 'en-US' });
+      const items = (r.results || []).filter(x => (x.media_type === 'movie' || x.media_type === 'tv') && !x.adult).slice(0, 6)
+        .map(x => ({ tmdb: x.id, kind: x.media_type, title: x.title || x.name, year: year(x), poster: x.poster_path || null }));
+      return json(200, { items });
+    }
     if (b.action === 'search') {
       const parsed = parseLine(String(b.q || '').slice(0, 200)); if (!parsed.title) return json(400, { error: 'اكتب اسم الفيلم.' });
       const [mv, tv] = await Promise.all([search(tmdb, 'movie', parsed.title, parsed.year), search(tmdb, 'tv', parsed.title, parsed.year)]);

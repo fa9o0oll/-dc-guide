@@ -5,6 +5,7 @@ import { ar } from './bidi.js?v=__BUILD__';
 import { clock, spoken } from './count.js?v=__BUILD__';
 import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
 import { portalBack } from './portal.js?v=__BUILD__';
+import { prepare, find, fold } from './find.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
 const G = GUIDES[document.documentElement.dataset.guide] || GUIDES.dc;
@@ -185,11 +186,22 @@ function syncNav() {
   $('#unibar .on')?.scrollIntoView({ block: 'nearest', inline: 'center' });
 }
 
+// ---------- البحث: حرفياً بعد توحيد الهمزات والتاء المربوطة وعلامات الترقيم، وإن لم يطابق المكتوب أي عمل
+// تظهر الأعمال الأقرب إليه بالصوت أو الإملاء (site/find.js) ومعها «هل تقصد…؟»، فيكفي «باتمن» أو «سوبرمان» أو «spidrman»
+let WP = null, wz = null;
+const lit = (w, f) => (w._f ??= fold(`${w.title} ${w.titleAr || ''}`)).includes(f);
+function worksFor(q) { if (wz?.q === q) return wz; const f = fold(q), all = [...D.works.values()];
+  if (!f || all.some(w => lit(w, f))) return wz = { q, f, ids: null };
+  const r = find(WP ??= prepare(all, w => [w.title, w.titleAr]), q, { limit: 8, min: 55, spread: 8 });
+  return wz = { q, f, ids: new Set(r.hits.map(h => h.id)), meant: r.hits[0] || null }; }
+const meantBar = () => { const q = $('#q').value.trim(), z = q && worksFor(q);
+  return z?.ids && z.meant ? `<p class="meant-bar">لا عمل باسم «${esc(q)}». هل تقصد <button data-act="meant" data-q="${esc(z.meant.title)}"><bdi>${esc(z.meant.title)}</bdi></button>؟ وهذه أقرب الأعمال إليه.</p>` : ''; };
+
 // ---------- التصفية
 function visible(p) {
-  const w = D.works.get(p.work), q = $('#q').value.trim().toLowerCase(), t = $('#fType').value, s = $('#fStatus').value;
+  const w = D.works.get(p.work), q = $('#q').value.trim(), t = $('#fType').value, s = $('#fStatus').value;
   if (ui.uni !== 'all' && p.universe !== ui.uni) return false;
-  if (q && !(w.title.toLowerCase().includes(q) || (w.titleAr || '').includes(q))) return false;
+  if (q) { const z = worksFor(q); if (z.ids ? !z.ids.has(w.id) : !lit(w, z.f)) return false; }
   if (t && w.kind !== t && w.medium !== t) return false;
   if (s === 'upcoming') return isSoon(w) || ['episode', 'season', 'announced'].includes(nextInfo(w)?.kind);
   if (s === 'none') return !statusOf(p) && !isSoon(w);
@@ -247,7 +259,7 @@ function card(p) {
 }
 function renderCards() {
   const secs = sections();
-  $('#main').innerHTML = secs.length ? secs.map(({ u, all, list }) => `<section class="uni" id="u-${u.id}" data-uni="${u.id}" style="${themeVars(u.id)}">${uniHead(u, all)}<div class="grid">${list.map(card).join('')}</div></section>`).join('')
+  $('#main').innerHTML = secs.length ? meantBar() + secs.map(({ u, all, list }) => `<section class="uni" id="u-${u.id}" data-uni="${u.id}" style="${themeVars(u.id)}">${uniHead(u, all)}<div class="grid">${list.map(card).join('')}</div></section>`).join('')
     : '<p class="empty">لا توجد أعمال تطابق البحث أو التصفية الحالية.</p>';
 }
 
@@ -269,7 +281,7 @@ const avLine = (p, cls = '') => { const st = avStart(p); return st ? `<div class
 const tlNote = u => u.id === 'arrow' ? '<p class="tl-note">المسلسلات هنا مرتبة حسب سنة بدايتها فقط. المشاهدة الفعلية متداخلة بين مواسمها وحلقاتها. <button data-act="view" data-view="arrow">افتح ترتيب المشاهدة بالحلقات</button></p>' : '';
 function renderTimeline() {
   const secs = sections();
-  $('#main').innerHTML = secs.length ? secs.map(({ u, all, list }) => `<section class="uni" id="u-${u.id}" data-uni="${u.id}" style="${themeVars(u.id)}">${uniHead(u, all)}${tlNote(u)}<div class="tl">${list.map(node).join('')}</div></section>`).join('')
+  $('#main').innerHTML = secs.length ? meantBar() + secs.map(({ u, all, list }) => `<section class="uni" id="u-${u.id}" data-uni="${u.id}" style="${themeVars(u.id)}">${uniHead(u, all)}${tlNote(u)}<div class="tl">${list.map(node).join('')}</div></section>`).join('')
     : '<p class="empty">لا توجد أعمال تطابق البحث أو التصفية الحالية.</p>';
 }
 // تغيير الحالة أو تعليم حلقة يحدّث العناصر المعنية في مكانها: لا إعادة رسم للصفحة ولا إعادة تحميل للصور
@@ -502,10 +514,12 @@ function openJump() {
     <div id="jres"></div><div id="jhome"></div>
     <div class="idx-row tools2"><button data-act="shield">${store.shield ? 'درع الحرق: مفعّل' : 'درع الحرق: متوقف'}</button><button data-act="tonight">ماذا أشاهد؟</button><button data-act="backup">سجلّي</button><button data-act="guide">الدليل</button></div></div>`, 'jump', { wide: true, uni: sceneUni });
   const mark = { watched: '✓', watching: '▶', list: '+', skip: '✕' };
-  const draw = () => { const q = $('#jq').value.trim().toLowerCase();
-    const us = D.universes.filter(u => !q || u.name.includes(q) || u.nameEn.toLowerCase().includes(q));
-    const ws = q ? D.placements.filter(p => { const w = D.works.get(p.work); return w.title.toLowerCase().includes(q) || (w.titleAr || '').includes(q); }).slice(0, 40) : [];
-    $('#jres').innerHTML = ws.length ? `<h3>أعمال</h3><div class="hits">${ws.map(p => { const w = D.works.get(p.work), t = THEMES[p.universe]; return `<button class="hit" style="--c1:${t.c1}" data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w92')}" alt="">` : '<span class="ph"></span>'}<span class="hit-text"><span class="t">${ltr(titleOf(p))}</span><small>${esc(uniOf(p.universe).name)}</small></span><span class="hit-mark">${mark[statusOf(p)] || ''}</span></button>`; }).join('')}</div>` : q && !us.length ? '<p class="empty">لا يوجد عمل أو عالم بهذا الاسم.</p>' : '';
+  const draw = () => { const raw = $('#jq').value.trim(), q = fold(raw);
+    const us = D.universes.filter(u => !q || fold(`${u.name} ${u.nameEn}`).includes(q));
+    let ws = q ? D.placements.filter(p => lit(D.works.get(p.work), q)).slice(0, 40) : [], meant = null;
+    // لا شيء حرفياً: الأقرب بالصوت أو الإملاء، مرتبة بقربها
+    if (q && !ws.length && !us.length) { const z = worksFor(raw); if (z.ids) { const at = [...z.ids]; ws = D.placements.filter(p => z.ids.has(p.work)).sort((a, b) => at.indexOf(a.work) - at.indexOf(b.work)).slice(0, 40); meant = z.meant; } }
+    $('#jres').innerHTML = ws.length ? `${meant ? `<p class="meant-bar">هل تقصد <b><bdi>${esc(meant.title)}</bdi></b>؟</p>` : ''}<h3>أعمال</h3><div class="hits">${ws.map(p => { const w = D.works.get(p.work), t = THEMES[p.universe]; return `<button class="hit" style="--c1:${t.c1}" data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w92')}" alt="">` : '<span class="ph"></span>'}<span class="hit-text"><span class="t">${ltr(titleOf(p))}</span><small>${esc(uniOf(p.universe).name)}</small></span><span class="hit-mark">${mark[statusOf(p)] || ''}</span></button>`; }).join('')}</div>` : q && !us.length ? '<p class="empty">لا يوجد عمل أو عالم بهذا الاسم.</p>' : '';
     $('#jhome').innerHTML = group(G.groups[0], us.filter(u => u.serial)) + group(G.groups[1], us.filter(u => !u.serial)); };
   $('#jq').addEventListener('input', draw); draw();
   if (matchMedia('(hover:hover)').matches) $('#jq').focus();
@@ -545,6 +559,7 @@ document.addEventListener('click', ev => {
   const d = b.dataset, id = d.id, season = d.season ? +d.season : undefined;
   switch (d.act) {
     case 'view': if (ui.sheet) closeSheet(); ui.view = d.view; render(); scrollTo(0, 0); break;
+    case 'meant': $('#q').value = d.q; render(); break;
     case 'uni': if (ui.sheet) closeSheet(); if (ui.view === 'arrow') ui.view = 'cards'; ui.uni = d.uni; render(); scrollTo(0, 0); break;
     case 'open': openWork(id, season, b.closest('.card,.node')); break;
     case 'season': showSeason(id, season); break;

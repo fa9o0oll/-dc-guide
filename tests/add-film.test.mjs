@@ -7,6 +7,7 @@ globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
   if (u.hostname === 'api.themoviedb.org') { const p = u.pathname.replace('/3', '');
     if (p === '/search/movie') return res(200, { results: u.searchParams.get('query').toLowerCase() === 'heat' ? [{ id: 949, title: 'Heat', release_date: '1995-12-15', vote_count: 7000, poster_path: '/h.jpg' }, { id: 1, title: 'The Heat', release_date: '2013-06-27', vote_count: 5000 }] : [] });
     if (p === '/search/tv') return res(200, { results: [] });
+    if (p === '/search/multi') return res(200, { results: [{ id: 949, media_type: 'movie', title: 'Heat', release_date: '1995-12-15', poster_path: '/h.jpg' }, { id: 5, media_type: 'person', name: 'Someone' }, { id: 77, media_type: 'tv', name: 'Heat Wave', first_air_date: '2010-04-01' }, { id: 8, media_type: 'movie', title: 'X', adult: true }] });
     if (p === '/movie/949') return res(200, { id: 949, title: 'Heat', original_title: 'Heat', release_date: '1995-12-15', runtime: 170, genres: [{ id: 80 }], vote_average: 7.9, vote_count: 7000, poster_path: '/h.jpg', imdb_id: 'tt0113277', status: 'Released', original_language: 'en',
       belongs_to_collection: { id: 77, name: 'Heat Collection' }, credits: { crew: [{ job: 'Director', name: 'Michael Mann' }], cast: [{ name: 'Al Pacino' }] }, 'watch/providers': { results: { SA: { link: 'https://tmdb/watch', flatrate: [{ provider_id: 8, provider_name: 'Netflix', logo_path: '/n.jpg' }] } } }, translations: { translations: [] } });
     if (p === '/movie/1') return res(200, { id: 1, title: 'The Heat' });
@@ -33,6 +34,10 @@ check('المسار /api/add-film', config.path === '/api/add-film');
 check('GET مرفوض', (await handler(new Request('https://x/api/add-film'))).status === 405);
 check('كلمة سر خاطئة تُرفض', (await call({ action: 'search', q: 'Heat 1995', password: 'nope' })).status === 401);
 check('بلا كلمة سر تُرفض', (await call({ action: 'add', tmdb: 949 })).status === 401);
+check('اقتراحات الكتابة تتطلب كلمة السر', (await call({ action: 'suggest', q: 'heat' })).status === 401);
+const sg = await call({ action: 'suggest', q: 'هيت', password: 'open-sesame-42' });
+check('اقتراحات الكتابة: أفلام ومسلسلات فقط من بحث TMDB الموحد، بلا أشخاص ولا محتوى للكبار', sg.status === 200 && JSON.stringify(sg.body.items) === JSON.stringify([{ tmdb: 949, kind: 'movie', title: 'Heat', year: 1995, poster: '/h.jpg' }, { tmdb: 77, kind: 'tv', title: 'Heat Wave', year: 2010, poster: null }]), sg.body);
+check('اقتراحات الكتابة: حرف واحد لا يُرسل إلى TMDB', JSON.stringify((await call({ action: 'suggest', q: 'h', password: 'open-sesame-42' })).body) === '{"items":[]}');
 const s = await call({ action: 'search', q: 'فيلم Heat (١٩٩٥)', password: 'open-sesame-42' });
 check('البحث يفهم الاسم والسنة بالأرقام العربية', s.status === 200 && s.body.parsed.title === 'Heat' && s.body.parsed.year === 1995, s);
 check('المرشح الأول هو المطابق ومعه اسم سلسلته', s.body.candidates?.[0]?.tmdb === 949 && s.body.candidates[0].collection === 'Heat' && s.body.sure === true, s.body);

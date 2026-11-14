@@ -107,6 +107,10 @@ img{max-width:100%;display:block}
 main{padding:0 var(--pad) 90px;max-width:1560px;margin-inline:auto}
 main:focus{outline:none}
 .empty{padding:60px 12px;text-align:center;color:var(--dim)}
+/* «هل تقصد…؟» حين لا يطابق البحث أي عمل حرفياً وتظهر الأقرب إليه بالصوت أو الإملاء */
+.meant-bar{margin:4px var(--pad, 0) 14px;padding:10px 14px;border-radius:12px;border:1px dashed color-mix(in srgb,var(--c1) 45%,transparent);color:var(--dim);font-size:.92rem}
+.meant-bar button,.meant-bar b{display:inline;padding:0 2px;border:0;background:none;color:var(--c1);font:inherit;font-weight:700}
+.meant-bar button{text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 
 /* ---------- افتتاحية العالم: مشهد لا بطاقة */
 .uni{scroll-margin-top:56px;padding-bottom:26px}

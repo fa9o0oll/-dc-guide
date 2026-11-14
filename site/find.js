@@ -28,7 +28,7 @@ const AR = { 'ب': B, 'ف': F, 'ت': T, 'ط': T, 'د': D, 'ض': D, 'ث': TH | T,
 function arSyms(w, out) {
   for (let i = 0; i < w.length; i++) { const c = w[i];
     if (c === 'ت' && w[i + 1] === 'ش') { out.push(SH); i++; continue; }   // تش = ch
-    const m = AR[c]; if (m) out.push(m); }
+    const m = AR[c]; out.push(m || 0); }
 }
 function enSyms(w, out) {
   w = w.replace(/^kn/, 'n').replace(/^ps/, 's').replace(/^wr/, 'r').replace(/([aeiouy])gh/g, '$1').replace(/tion/g, 'Xn').replace(/sion/g, 'Xn')
@@ -52,14 +52,16 @@ function enSyms(w, out) {
       case 'n': out.push(N); break;
       case 'r': out.push(R); break;
       case 'h': out.push(H); break;
+      default: out.push(0);   // صوت لين يفصل بين الحروف (لا يُعدّ في الهيكل)
     } }
 }
-// هيكل الكلمات متصلاً (المسافات لا تهم: spiderman = spider man)، مع موضع بداية كل كلمة فيه، بلا تكرار متتالٍ
+// هيكل الكلمات متصلاً (المسافات لا تهم: spiderman = spider man)، مع موضع بداية كل كلمة فيه. الحرف المكرر المتجاور يُدمج
+// (ll في Interstellar)، أما ما يفصله صوت لين فيبقى صوتين (sh-a-w-sh في Shawshank = ش-ا-و-ش)
 function sound(ws) {
   const sym = [], starts = [];
   for (const w of ws) { if (/^\d+$/.test(w)) continue; const before = sym.length, tmp = [];
     (isAr(w) ? arSyms : enSyms)(w, tmp);
-    for (const m of tmp) if (!sym.length || sym[sym.length - 1] !== m || sym.length === before) sym.push(m);
+    let gap = true; for (const m of tmp) { if (!m) { gap = true; continue; } if (gap || sym.length === before || sym[sym.length - 1] !== m) sym.push(m); gap = false; }
     if (sym.length > before) starts.push(before); }
   return { sym: Int32Array.from(sym), starts };
 }
@@ -119,7 +121,7 @@ function scoreName(q, nm, hear) {
 }
 
 // يعيد أفضل النتائج مرتبة. meant: أول نتيجة إن جاءت بالصوت لا بالحرف (فنقول «هل تقصد…؟»)
-export function find(prepared, raw, { limit = 8, min = 40 } = {}) {
+export function find(prepared, raw, { limit = 8, min = 40, spread = 14 } = {}) {
   const q = query(raw); if (!q.ws.length || (q.f.length < 2 && !q.nums.length)) return { q, hits: [], meant: null };
   const first = q.sym[0], hits = [];
   for (const e of prepared) {
@@ -137,6 +139,7 @@ export function find(prepared, raw, { limit = 8, min = 40 } = {}) {
     if (s >= min) hits.push({ ...e.it, score: Math.round(s * 10) / 10, how: top.how, name: name.s });
   }
   hits.sort((a, b) => b.score - a.score);
-  const top = hits.slice(0, limit), m = top[0];
+  // ما جاء بالصوت ويبعد كثيراً عن أفضل ما جاء بالصوت تشويش (Winter's Tale لـintersteller)؛ ما طابق حرفياً يبقى
+  const loud = hits.find(h => h.how === 'sound')?.score ?? 0, top = hits.filter(h => h.how !== 'sound' || h.score >= loud - spread).slice(0, limit), m = top[0];
   return { q, hits: top, meant: m && m.how === 'sound' ? m : null };
 }
