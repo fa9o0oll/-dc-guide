@@ -122,7 +122,7 @@ dialog::backdrop{background:rgba(6,4,2,.72)}
 .sh-hero img{width:100%;height:100%;object-fit:cover;object-position:center 22%;opacity:.7}
 .sh-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--bg2),transparent 70%)}
 .sh-head{position:relative;display:grid;grid-template-columns:clamp(96px,22vw,170px) minmax(0,1fr);gap:clamp(12px,2.4vw,24px);padding:0 clamp(14px,3vw,30px);margin-top:clamp(-90px,-9vw,-46px)}
-.sh-head .poster{aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:var(--card2);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.sh-head .poster{display:block;width:100%;padding:0;border:0;font:inherit;color:var(--ink);aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:var(--card2);box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .sh-head .poster img{width:100%;height:100%;object-fit:cover}
 .sh-head .txt{align-self:end;min-width:0;display:grid;gap:4px}
 .sh-head h2{font-family:var(--display);font-weight:700;font-size:clamp(1.35rem,3.6vw,2.2rem);line-height:1.25;direction:ltr;text-align:right;overflow-wrap:anywhere}
@@ -196,8 +196,10 @@ dialog::backdrop{background:rgba(6,4,2,.72)}
 .xdoor::after{content:"";position:absolute;inset-inline-end:18px;top:50%;width:9px;height:9px;border:solid var(--acc);border-width:2px 2px 0 0;rotate:-135deg;translate:0 -50%}
 @media (hover:hover){.xdoor:hover{box-shadow:inset 0 0 0 1px var(--acc)}}
 .srcs{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
-.srcs li{padding:6px 12px;border-radius:10px;background:var(--card);font-size:.88rem;color:var(--dim)}
-.srcs a{color:var(--acc2);text-underline-offset:3px}
+.srcs li{display:flex}
+.srcs li>*{display:inline-flex;flex-wrap:wrap;align-items:center;column-gap:4px;min-height:40px;padding:6px 12px;border-radius:10px;background:var(--card);font-size:.88rem;color:var(--dim)}
+.srcs a{text-decoration:none}.srcs a bdi:first-of-type{color:var(--acc2);text-decoration:underline;text-underline-offset:3px}
+@media (hover:hover){.srcs a:hover{background:var(--card2)}}
 .rels{margin-inline:calc(clamp(14px,3vw,30px) * -1);padding-inline:clamp(14px,3vw,30px)}
 .rels .part{width:100px}
 .rels .rl{position:absolute;bottom:6px;inset-inline-start:6px;padding:1px 8px;border-radius:999px;font-size:.72rem;font-weight:600;background:rgba(12,9,5,.86);color:var(--acc2)}

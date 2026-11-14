@@ -3,6 +3,7 @@
 import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { segs } from './count.js?v=__BUILD__';
+import './zoom.js?v=__BUILD__'; // تكبير البوستر المشترك بين البوابات (data-zoom)
 const BUILD = '__BUILD__', KEY = 'filmsg.progress', PEND = 'filmsg.pending', PASS = 'filmsg.pass', IMG = 'https://image.tmdb.org/t/p/';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -270,7 +271,8 @@ const relCard = r => { const s = stepOf(r.k), l = listedOf(s), o = infoOf(s);
 <span class="p">${poster(o.poster, '100px')}<span class="rl ${r.r}">${RELN[r.r]}</span></span><b>${esc(o.title || '')}</b><small>${[kindOf(s), o.year, r.r === 'sibling' && r.via ? `عن <bdi dir="ltr">${esc(r.via)}</bdi>` : '', l ? 'في قائمتك' : ''].filter(Boolean).join(' · ')}</small></button>`; };
 function relatedHTML(f) { const w = D.wworks[keyOf(f)]; if (!w) return '';
   const shown = new Set((groupOf(f)?.order || []).map(keyOfStep)), rel = (w.rel || []).filter(r => !shown.has(r.k) && infoOf(stepOf(r.k)).title);
-  const src = (w.src || []).map(x => `<li>مقتبس عن ${SRCK[x.kind] || 'عمل'} ${x.wiki ? `<a href="${esc(x.wiki)}" target="_blank" rel="noopener">«<bdi dir="ltr">${esc(x.label)}</bdi>»</a>` : `«<bdi dir="ltr">${esc(x.label)}</bdi>»`}${x.year ? ` <bdi>(${x.year})</bdi>` : ''}</li>`).join('');
+  const src = (w.src || []).map(x => { const t = `مقتبس عن ${SRCK[x.kind] || 'عمل'} «<bdi dir="ltr">${esc(x.label)}</bdi>»${x.year ? ` <bdi>(${x.year})</bdi>` : ''}`;
+    return `<li>${x.wiki ? `<a href="${esc(x.wiki)}" target="_blank" rel="noopener">${t}</a>` : `<span>${t}</span>`}</li>`; }).join('');
   if (!rel.length && !src) return '';
   return `<section class="sec"><h3>أعمال مرتبطة</h3>${src ? `<ul class="srcs">${src}</ul>` : ''}${rel.length ? `<div class="reel rels">${rel.map(relCard).join('')}</div>` : ''}
 <p class="note">العلاقات آلية من ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + (w.q || ''))}: الأصل الذي اقتُبس منه العمل، وما اقتُبس عنه من ريميك أو مسلسل، واقتباسات أخرى للمصدر نفسه.</p></section>`; }
@@ -297,7 +299,7 @@ async function sheetHTML(f, pv = null) { await Promise.race([D.worldsReady, new 
   const m = pv?.more || (await D.moreReady)?.[f.id] || {}, s = st(f.id), un = unreleased(f); slotOf.k = keyOf(f); slotOf.f = f;
   const ov = m.overviewAr ? `<p>${ar(m.overviewAr)}</p>${m.arSource === 'guide' ? '' : '<p class="note">نبذة <bdi dir="ltr">TMDB</bdi> العربية كما هي، لم نراجعها بعد.</p>'}` : m.overviewEn ? `<p dir="ltr" lang="en" style="text-align:left">${esc(m.overviewEn)}</p><p class="note">النبذة بالإنجليزية، والترجمة قيد الإعداد.</p>` : '<p>لا توجد نبذة.</p>';
   return `<div class="sh-hero">${f.backdrop ? `<img alt="" src="${IMG}w780${f.backdrop}" srcset="${IMG}w780${f.backdrop} 780w, ${IMG}w1280${f.backdrop} 1280w" sizes="(max-width:880px) 100vw, 880px">` : ''}</div>
-<div class="sh-head"><div class="poster">${poster(f.poster, '170px')}</div><div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
+<div class="sh-head">${f.poster ? `<button type="button" class="poster" data-zoom="" data-zoom-title="${esc(f.title)}" aria-label="تكبير بوستر ${esc(f.title)}">${poster(f.poster, '170px')}</button>` : '<div class="poster"></div>'}<div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
 <p class="facts">${[f.kind === 'tv' ? 'مسلسل' : '', f.year ? `<bdi>${f.year}</bdi>` : '', rt(f.runtime), f.seasons ? count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم']) : '', f.cert ? `<bdi dir="ltr">${esc(f.cert)}</bdi>` : '', LANGS[f.lang] ? 'اللغة ' + LANGS[f.lang] : '', f.rating ? `<span class="rate">تقييم <bdi dir="ltr">TMDB ${f.rating.toFixed(1)}</bdi></span>` : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</p>
 <div class="tags">${f.genres.map(g => GENRES[g] ? `<span>${GENRES[g]}</span>` : '').join('')}</div></div></div>
 ${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>

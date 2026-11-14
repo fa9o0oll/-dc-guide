@@ -59,5 +59,4 @@ export const shell = G => `<svg hidden aria-hidden="true"><defs>
   <div class="sheet-head"><h2 id="sheetTitle"></h2><button class="close" data-act="close" aria-label="إغلاق">✕</button></div>
   <div class="sheet-body" id="sheetBody"></div>
 </aside>
-<div class="lightbox" id="lightbox" hidden><img alt="" id="lightImg"><button class="close" data-act="lightclose" aria-label="إغلاق">✕</button></div>
 <div class="toast" id="toast" role="status" hidden></div>`;

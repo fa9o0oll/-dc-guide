@@ -4,6 +4,7 @@ import { shell } from './shell.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { segs } from './count.js?v=__BUILD__';
 import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
+import './zoom.js?v=__BUILD__'; // تكبير البوستر المشترك بين البوابات (data-zoom)
 const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
 const G = GUIDES[document.documentElement.dataset.guide] || GUIDES.dc;
 const { THEMES, SHOW_COLORS = {} } = await import(`./themes-${G.id}.js?v=${BUILD}`);
@@ -425,7 +426,7 @@ function closeSheet(fromPop) {
     mine[1].finished.then(fin, () => {}); setTimeout(fin, 400); } // المؤقت يضمن الإغلاق حتى لو توقفت الإطارات
   if (!fromPop && history.state?.sheet) { ui.skipPop = true; history.back(); }
 }
-addEventListener('popstate', () => { if (ui.skipPop) { ui.skipPop = false; return; } if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return; } closeSheet(true); });
+addEventListener('popstate', () => { if (ui.skipPop) { ui.skipPop = false; return; } closeSheet(true); });
 // الجوال: سحب رأس النافذة للأسفل يغلقها، والنافذة تتبع الإصبع
 { const sh = $('#sheet'), head = $('.sheet-head'); let drag = null;
   head.addEventListener('pointerdown', e => { if (!phone.matches || e.target.closest('button') || closing) return; drag = { y: e.clientY, t: e.timeStamp, dy: 0 }; head.setPointerCapture(e.pointerId); });
@@ -442,7 +443,7 @@ function openWork(id, season, from) {
   const series = w.kind === 'series' && w.episodeCount, pl = places.find(p => p.universe === uni && (p.season ?? null) === (season ?? null)) || places.find(p => p.season === season) || places.find(p => p.universe === uni) || places[0];
   const tabs = series ? [...w.seasons, ...(w.specials ? [{ n: 0 }] : [])] : [];
   openSheet(ltr(w.title), `<div class="hero">${w.backdrop ? `<img decoding="async" src="${img(w.backdrop, 'w780')}" alt="">` : ''}</div>
-    <div class="dw"><div class="dw-top"><button class="poster" data-act="light" data-src="${img(w.poster, 'w780')}" aria-label="تكبير البوستر">${posterTag(w)}</button>
+    <div class="dw"><div class="dw-top">${w.poster ? `<button class="poster" data-zoom="${img(w.poster, 'w780')}" data-zoom-title="${esc(w.title)}" aria-label="تكبير بوستر ${esc(w.title)}">${posterTag(w)}</button>` : `<div class="poster">${posterTag(w)}</div>`}
       <div><h3>${ltr(w.title)}</h3>
       <div class="meta bits">${bits([typeOf(w), w.date ? fmtDate(w.date) : w.year, w.runtime ? cnt(w.runtime, 'min') : '', ...(w.episodeCount ? [cnt(w.seasons.length, 'season'), cnt(w.episodeCount, 'ep')] : [])])}</div>
       ${soon && w.date ? `<div class="tags"><span class="tag soon">قادم بعد ${cnt(daysLeft(w), 'day', true)}</span></div>` : ''}</div></div>
@@ -531,7 +532,7 @@ function tonight() {
 
 // ---------- الأحداث
 document.addEventListener('click', ev => {
-  const b = ev.target.closest('[data-act]'); if (!b) { if (ev.target.id === 'backdrop') closeSheet(); if (ev.target.id === 'lightbox') history.back(); return; }
+  const b = ev.target.closest('[data-act]'); if (!b) { if (ev.target.id === 'backdrop') closeSheet(); return; }
   const d = b.dataset, id = d.id, season = d.season ? +d.season : undefined;
   switch (d.act) {
     case 'view': if (ui.sheet) closeSheet(); ui.view = d.view; render(); scrollTo(0, 0); break;
@@ -563,16 +564,10 @@ document.addEventListener('click', ev => {
     case 'bkimport': importCode(); break;
     case 'guide': openGuide(); break;
     case 'tonight': if (ui.sheet) closeSheet(); setTimeout(tonight, 60); break;
-    case 'light': if (d.src) { $('#lightImg').src = d.src; $('#lightbox').hidden = false; history.pushState({ sheet: 1, light: 1 }, ''); } break;
-    case 'lightclose': history.back(); break;
   }
 });
-addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('#lightbox').hidden) history.back(); else closeSheet(); } });
+addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
 let qt; ['input', 'change'].forEach(t => $('#filters').addEventListener(t, () => { clearTimeout(qt); qt = setTimeout(() => render(), 150); }));
-// ميلان البوستر المكبَّر مع حركة المؤشر أو الإصبع
-$('#lightbox').addEventListener('pointermove', e => { const r = $('#lightImg').getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-  $('#lightImg').style.transform = `rotateY(${(x * 22).toFixed(1)}deg) rotateX(${(-y * 22).toFixed(1)}deg) scale(1.02)`; });
-$('#lightbox').addEventListener('pointerleave', () => $('#lightImg').style.transform = '');
 document.addEventListener('load', e => { if (e.target.tagName === 'IMG') e.target.classList.add('in'); }, true);
 document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && !t.dataset.failed) { t.dataset.failed = 1; t.style.visibility = 'hidden'; } }, true);
 

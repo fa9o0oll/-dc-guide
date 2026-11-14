@@ -66,8 +66,15 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await tap('#c-nolan-the-dark-knight-2008 [data-act=open]'); await page.waitForSelector('#sheet:not([hidden])');
   check('نافذة الفيلم: نبذة عربية وروابط دقيقة', await page.locator('#sheet .ov').count() === 1 && (await page.getAttribute('#sheet .rates a[href*="imdb.com/title/tt0468569"]', 'href')) !== null && await page.locator('#sheet .rates a[href*="rottentomatoes.com/m/"]').count() === 1);
   await overflow('نافذة الفيلم'); await snap('2-film');
-  await tap('#sheet [data-act=light]'); await page.waitForSelector('#lightbox:not([hidden])');
-  await page.goBack(); check('الرجوع يغلق البوستر المكبّر فقط', await page.isHidden('#lightbox') && await page.isVisible('#sheet'));
+  // تكبير البوستر (zoom.js المشترك بين البوابات)
+  await tap('#sheet [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(950);
+  check('البوستر يُكبَّر من مكانه: الأصل مرفوع، والعنوان تحته، والصورة الكبيرة بدقة أعلى', await page.evaluate(() => { const d = document.querySelector('dialog.pz'), t = document.querySelector('#sheet [data-zoom]'), r = d.querySelector('.pz-card').getBoundingClientRect();
+    return t.classList.contains('pz-lifted') && d.querySelector('.pz-cap').textContent === 'The Dark Knight' && /\/(w500|w780|original)\//.test(d.querySelector('.pz-hi').src) && r.width > 200 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1; }));
+  await overflow('البوستر المكبّر'); await snap('2b-zoom');
+  await page.goBack(); await page.waitForSelector('dialog.pz', { state: 'hidden' }); await page.waitForTimeout(350);
+  check('الرجوع يغلق البوستر المكبّر فقط ويعيده مكانه', await page.isVisible('#sheet') && !(await page.$('.pz-lifted')));
+  await tap('#sheet [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(400); await page.keyboard.press('Escape');
+  await page.waitForSelector('dialog.pz', { state: 'hidden' }); await page.waitForTimeout(350); check('Esc يغلق البوستر المكبّر وحده', await page.isVisible('#sheet'));
   await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' }); check('الرجوع يغلق النافذة', await page.isHidden('#sheet'));
   // نافذة مسلسل + حلقات
   await tap('#c-dcu-peacemaker-2022-s2 [data-act=open]'); await page.waitForSelector('.ep:not(.skel)');

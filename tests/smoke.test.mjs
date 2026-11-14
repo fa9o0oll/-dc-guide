@@ -13,12 +13,13 @@ const P = JSON.parse(fs.readFileSync(new URL('../data/fate/placements.json', imp
 const browser = await chromium.launch();
 for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fold-cover', 369, 905, true], ['fold-cover-zoom', 323, 792, true], ['fold-main', 707, 823, true], ['fold-main-landscape', 823, 707, true]]) {
   console.log('== ' + name);
-  const ctx = await browser.newContext({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, locale: 'ar-SA' }), page = await ctx.newPage(), errs = [];
+  // مقاس واحد بتفضيل «تقليل الحركة» في النظام، ليُختبر طريقه (تلاشٍ بلا طيران)
+  const ctx = await browser.newContext({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, locale: 'ar-SA', reducedMotion: name === 'fold-cover-zoom' ? 'reduce' : 'no-preference' }), page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => m.type() === 'error' && !/favicon|404|401/.test(m.text()) && errs.push(m.text()));
   await page.route(/image\.tmdb\.org/, r => r.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#345"/></svg>' }));
   const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); await page.waitForTimeout(550); return mobile ? l.tap() : l.click(); };
   const fits = async label => { await page.waitForTimeout(500); const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
-      small: [...document.querySelectorAll('button,a[href],summary,select,input')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight && r.bottom > 0 && (r.width < 40 || r.height < 40) && !e.closest('.foot,.hub-foot,.canon,.why,.note,[hidden]'); }).map(e => e.className || e.tagName).slice(0, 3) }));
+      small: [...document.querySelectorAll('button,a[href],summary,select,input')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight && r.bottom > 0 && (r.width < 40 || r.height < 40) && !e.closest('.foot,.hub-foot,.canon,.why,.note,[hidden]'); }).map(e => (e.className || e.tagName) + ':' + (e.textContent || '').trim().slice(0, 24)).slice(0, 3) }));
     check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw, `${o.sw}/${o.iw}`); if (mobile) check(`${label}: أهداف اللمس 40px فأكثر`, o.small.length === 0, o.small.join(' ')); };
   // الواجهة الرئيسية
   await page.goto(base + '/'); await page.waitForSelector('.door');
@@ -93,6 +94,24 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   check('الأفلام: النافذة فيها أين يُعرض وترتيب السلسلة والروابط', await page.evaluate(([t, imdb]) => { const h = [...document.querySelectorAll('#sheet .links a')].map(a => a.href), o = document.querySelectorAll('#sheet .order li');
     return o.length >= 2 && [...document.querySelectorAll('#sheet .order li.here')].filter(li => li.offsetParent).length === 1 && h.includes(`https://letterboxd.com/tmdb/${t}`) && h.includes(`https://www.imdb.com/title/${imdb}/`) && h.some(x => /whattawatch/.test(x)) && document.querySelectorAll('#sheet .wgroup').length >= 1; }, [inCol.tmdb, inCol.imdb]));
   check('الأفلام: رابط الفيلم في العنوان', (await page.evaluate(() => location.hash)) === '#' + inCol.id);
+  // تكبير البوستر (zoom.js المشترك): يُرفع من مكانه فوق النافذة، وEsc والرجوع والسحب تغلقه وحده وتبقى نافذة الفيلم ورابطها
+  await tap('#sheet .sh-head [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(950);
+  check('الأفلام: البوستر يُكبَّر فوق النافذة بعنوانه وبدقة أعلى، ومكانه فارغ', await page.evaluate(t => { const d = document.querySelector('dialog.pz'), r = d.querySelector('.pz-card').getBoundingClientRect();
+    return document.querySelector('#sheet .sh-head .poster').classList.contains('pz-lifted') && d.querySelector('.pz-cap').textContent === t && /\/(w500|w780|original)\//.test(d.querySelector('.pz-hi').src)
+      && r.width > 200 && r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1 && Math.abs(r.width / r.height - 2 / 3) < .02; }, inCol.title));
+  await fits('الأفلام: البوستر المكبّر');
+  await page.keyboard.press('Escape'); await page.waitForSelector('dialog.pz', { state: 'hidden' }); await page.waitForTimeout(350);
+  check('الأفلام: Esc يغلق البوستر وحده ويعيده مكانه', await page.evaluate(id => document.querySelector('#sheet').open && location.hash === '#' + id && !document.querySelector('.pz-lifted') && history.state?.film === id && !history.state?.pz, inCol.id));
+  await tap('#sheet .sh-head [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(950);
+  await page.goBack(); await page.waitForSelector('dialog.pz', { state: 'hidden' }); await page.waitForTimeout(350);
+  check('الأفلام: الرجوع يغلق البوستر وحده', await page.evaluate(id => document.querySelector('#sheet').open && location.hash === '#' + id && !document.querySelector('.pz-lifted'), inCol.id));
+  if (!mobile) { // السحب القصير يعيده مكانه بارتداد، والسحب لأسفل يغلقه
+    await tap('#sheet .sh-head [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(950);
+    const c = await page.locator('dialog.pz .pz-card').boundingBox(), cx = c.x + c.width / 2, cy = c.y + c.height / 2;
+    await page.mouse.move(cx, cy); await page.mouse.down(); await page.mouse.move(cx, cy + 30, { steps: 6 }); await page.mouse.up(); await page.waitForTimeout(700);
+    check('الأفلام: السحب القصير يعيد البوستر مكانه', await page.evaluate(() => document.querySelector('dialog.pz').open && !document.querySelector('.pz-fly').style.transform));
+    await page.mouse.move(cx, cy); await page.mouse.down(); await page.mouse.move(cx, cy + 240, { steps: 10 }); await page.mouse.up(); await page.waitForSelector('dialog.pz', { state: 'hidden' }); await page.waitForTimeout(350);
+    check('الأفلام: سحب البوستر لأسفل يغلقه وحده', await page.evaluate(id => document.querySelector('#sheet').open && location.hash === '#' + id && !document.querySelector('.pz-lifted'), inCol.id)); }
   await fits('الأفلام: النافذة'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   await page.waitForTimeout(400); await page.evaluate(() => { location.hash = '#m218'; }); await page.waitForSelector('#sheet[open] .order .rc'); await page.waitForTimeout(300);
   check('الأفلام: سلسلة مراجَعة تعرض التوصيات والمسلسل المرتبط بتقييمه', await page.evaluate(() => { const o = document.querySelector('#sheet .order'), t = o.textContent; return o.querySelectorAll('.rc.watch').length >= 2 && o.querySelectorAll('.rc.skip').length >= 1 && t.includes('Sarah Connor') && t.includes('مسلسل') && /\d\.\d/.test(t) && document.querySelector('#wslot .sec > .note').textContent.includes('توصيات'); }));
