@@ -117,11 +117,11 @@ function scoreName(q, nm, hear) {
   for (const st of nm.starts) { const d = prefixDistance(q.sym, nm.sym, st) + (st ? .5 : 0); if (d < best) { best = d; at = st; } if (!best) break; }
   if (best > cap) return null;
   // ما زاد من الاسم بعد ما كُتب لا يُحسب خطأً (فالكتابة ناقصة غالباً)، لكن المطابقة الكاملة أرجح قليلاً
-  return { s: 70 - best * 11 - (at ? 4 : 0) + (n >= nm.sym.length - 1 ? 3 : 0), how: 'sound' };
+  return { s: 70 - best * 14 - (at ? 4 : 0) + (n >= nm.sym.length - 1 ? 3 : 0), how: 'sound', d: best };
 }
 
 // يعيد أفضل النتائج مرتبة. meant: أول نتيجة إن جاءت بالصوت لا بالحرف (فنقول «هل تقصد…؟»)
-export function find(prepared, raw, { limit = 8, min = 40, spread = 14 } = {}) {
+export function find(prepared, raw, { limit = 8, min = 40, spread = 12 } = {}) {
   const q = query(raw); if (!q.ws.length || (q.f.length < 2 && !q.nums.length)) return { q, hits: [], meant: null };
   const first = q.sym[0], hits = [];
   for (const e of prepared) {
@@ -136,10 +136,11 @@ export function find(prepared, raw, { limit = 8, min = 40, spread = 14 } = {}) {
     let s = top.s + (e.it.v || 0) / 9;
     if (q.year && e.it.y) s += e.it.y === q.year ? 9 : Math.abs(e.it.y - q.year) === 1 ? 3 : -12;
     if (q.nums.length) s += q.nums.every(d => name.nums.includes(d)) ? 7 : -8;
-    if (s >= min) hits.push({ ...e.it, score: Math.round(s * 10) / 10, how: top.how, name: name.s });
+    if (s >= min) hits.push({ ...e.it, score: Math.round(s * 10) / 10, how: top.how, d: top.d ?? 0, name: name.s });
   }
   hits.sort((a, b) => b.score - a.score);
-  // ما جاء بالصوت ويبعد كثيراً عن أفضل ما جاء بالصوت تشويش (Winter's Tale لـintersteller)؛ ما طابق حرفياً يبقى
-  const loud = hits.find(h => h.how === 'sound')?.score ?? 0, top = hits.filter(h => h.how !== 'sound' || h.score >= loud - spread).slice(0, limit), m = top[0];
+  // ما طابق حرفياً، أو طابق بالصوت بلا خطأ (John Wick: Chapter 2 لـ«جون ويك»)، يبقى؛ أما ما احتاج تصحيحاً ويبعد عن
+  // أفضل نتيجة فتشويش (Winter's Tale لـintersteller، وBen-Hur لـ«اوبنهايمر»)
+  const best = hits[0]?.score ?? 0, top = hits.filter(h => h.how !== 'sound' || h.d <= .3 || h.score >= best - spread).slice(0, limit), m = top[0];
   return { q, hits: top, meant: m && m.how === 'sound' ? m : null };
 }
