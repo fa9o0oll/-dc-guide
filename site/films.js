@@ -3,6 +3,7 @@
 import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { clock, spoken, left } from './count.js?v=__BUILD__';
+import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 const BUILD = '__BUILD__', KEY = 'filmsg.progress', PEND = 'filmsg.pending', PASS = 'filmsg.pass', IMG = 'https://image.tmdb.org/t/p/';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -13,8 +14,7 @@ const LANGS = { en: 'الإنجليزية', ko: 'الكورية', ja: 'اليا�
 const XKIND = { tv: 'مسلسل', anime: 'أنمي', game: 'لعبة', short: 'فيلم قصير', book: 'كتاب', film: 'فيلم', comic: 'قصص مصورة' };
 const ic = n => `<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol><symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7M6.5 9.5V20h11V9.5"/></symbol>
-<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-mark" viewBox="0 0 24 24"><path d="M7 4.5h10v15l-5-3.5-5 3.5z"/></symbol>
 <symbol id="i-roll" viewBox="0 0 24 24"><path d="M4 7.5h3c2 0 3.2 1.2 4.5 4.5s2.5 4.5 4.5 4.5h4M4 16.5h3c1.1 0 1.9-.4 2.7-1.3M20 7.5h-4c-1.1 0-1.9.4-2.7 1.3M17.5 5L20 7.5 17.5 10M17.5 14l2.5 2.5-2.5 2.5"/></symbol></defs></svg>`;
 
@@ -54,11 +54,11 @@ const st = id => P.films[id] || '';
 const ui = { q: '', status: 'todo', genre: '', decade: '', prov: '', sort: 'list', view: 'grid', series: false, ov: 'chrono' };
 
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
-<header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${ic('home')}<span>البوابات</span></a><h1>قائمة أفلامي</h1>
+<header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${miniDoor}<span>البوابات</span></a><h1>قائمة أفلامي</h1>
   <button class="btn pri add" data-act="add">${ic('plus')}<span>أضف فيلماً</span><span class="sr">أضف فيلماً</span></button><p class="tally" id="tally"></p></header>
 <section class="tonight" id="tonight" hidden><div class="bd"></div><p class="lbl">اقتراح الليلة</p><h2 dir="ltr"></h2><p class="meta"></p>
   <div class="acts"><button class="btn pri" data-act="open-tonight">افتح بطاقته</button><button class="btn sec" data-act="reroll">${ic('roll')}اقتراح آخر</button></div></section>
-<nav class="bar" aria-label="البحث والتصفية"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em"><span class="gate-logo">${ic('home')}</span></span><span class="gate-t">البوابات</span></a><label class="search">${ic('search')}<span class="sr">ابحث في القائمة</span><input id="q" type="search" placeholder="ابحث: فيلم، مخرج، سنة" autocomplete="off" enterkeyhint="search"></label>
+<nav class="bar" aria-label="البحث والتصفية"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a><label class="search">${ic('search')}<span class="sr">ابحث في القائمة</span><input id="q" type="search" placeholder="ابحث: فيلم، مخرج، سنة" autocomplete="off" enterkeyhint="search"></label>
   <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الأفلام</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
   <div class="chips" id="chips"></div></nav>
 <p class="count" id="count" aria-live="polite"></p>
@@ -73,6 +73,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <button class="btn pri" type="submit">ابحث عنه</button><p class="msg" id="add-msg" aria-live="polite"></p><div class="cands" id="cands"></div>
   <p class="hint">الفيلم يظهر هنا فوراً، ويصل إلى بقية أجهزتك خلال دقائق. سلسلته وعالمه وأعماله المرتبطة تُجلب آلياً من <bdi dir="ltr">TMDB</bdi> و<bdi dir="ltr">Wikidata</bdi>.</p></form></dialog>
 <div class="toast" id="toast" role="status"></div>`);
+portalBack('films');
 
 const toast = (t, undo) => { const el = $('#toast'); el.textContent = t; if (undo) { const b = Object.assign(document.createElement('button'), { textContent: 'تراجع', onclick: () => { el.classList.remove('on', 'act'); el.textContent = ''; undo(); } }); el.append(b); }
   el.classList.toggle('act', !!undo); el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => { el.classList.remove('on', 'act'); setTimeout(() => { if (!el.classList.contains('on')) el.textContent = ''; }, 300); }, undo ? 5000 : 2600); };

@@ -1,4 +1,5 @@
 // الهيكل المشترك لكل دليل: الأيقونات، الترويسة، أشرطة التنقل، النافذة المنبثقة. يُحقن مرة واحدة قبل تشغيل الواجهة.
+import { miniDoor } from './portal.js?v=__BUILD__';
 export const shell = G => `<svg hidden aria-hidden="true"><defs>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
 <symbol id="i-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/></symbol>
@@ -12,7 +13,6 @@ export const shell = G => `<svg hidden aria-hidden="true"><defs>
 <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5l7 2.8v5.2c0 4.3-2.9 7.3-7 9-4.1-1.7-7-4.7-7-9V6.3z"/></symbol>
 <symbol id="i-pick" viewBox="0 0 24 24"><path d="M4 7.5h3c2 0 3.2 1.2 4.5 4.5s2.5 4.5 4.5 4.5h4M4 16.5h3c1.1 0 1.9-.4 2.7-1.3M20 7.5h-4c-1.1 0-1.9.4-2.7 1.3M17.5 5L20 7.5 17.5 10M17.5 14l2.5 2.5-2.5 2.5"/></symbol>
 <symbol id="i-log" viewBox="0 0 24 24"><path d="M6.5 4h11v16h-11zM9.5 8.5h5M9.5 12h5M9.5 15.5h3"/></symbol>
-<symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7M6.5 9.5V20h11V9.5"/></symbol>
 <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 6c2.8-1.1 5.4-.9 8 .7 2.6-1.6 5.2-1.8 8-.7v12.5c-2.8-1.1-5.4-.9-8 .7-2.6-1.6-5.2-1.8-8-.7zM12 6.7v12.5"/></symbol>
 </defs></svg>
 <div class="atmo" aria-hidden="true"><div class="scene"><div class="scene-img"></div><div class="motif"></div></div><div class="scene"><div class="scene-img"></div><div class="motif"></div></div></div>
@@ -21,11 +21,11 @@ export const shell = G => `<svg hidden aria-hidden="true"><defs>
     <a class="logo" href="../" aria-label="العودة إلى البوابات">${G.logo}</a>
     <div><h1>${G.name}</h1><p id="statsLine">جارٍ التحميل…</p></div>
   </div>
-  <a class="home" href="../"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span>البوابات</span></a>
+  <a class="home" href="../">${miniDoor}<span>البوابات</span></a>
 </header>
 <div class="stick" id="stick">
 <div class="controls">
-  <a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em"><span class="gate-logo">${G.logo}</span><svg class="ic gate-home" aria-hidden="true"><use href="#i-home"/></svg></span><span class="gate-t">البوابات</span></a>
+  <a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a>
   <nav class="views" aria-label="طرق العرض">
     <button data-act="view" data-view="cards" class="on">البطاقات</button>
     <button data-act="view" data-view="timeline">الخط الزمني</button>

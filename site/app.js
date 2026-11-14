@@ -4,11 +4,13 @@ import { shell } from './shell.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { clock, spoken } from './count.js?v=__BUILD__';
 import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
+import { portalBack } from './portal.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
 const G = GUIDES[document.documentElement.dataset.guide] || GUIDES.dc;
 const { THEMES, SHOW_COLORS = {} } = await import(`./themes-${G.id}.js?v=${BUILD}`);
 document.body.insertAdjacentHTML('afterbegin', shell(G));
+portalBack(document.documentElement.dataset.guide || 'dc');
 // حين تغيب الترويسة عن الشاشة ينتقل شعار الدليل إلى أول الشريط الثابت، زرّاً للعودة إلى البوابات، ويعود حين تظهر
 { const st = document.getElementById('stick'), g = st.querySelector('.gate');
   new IntersectionObserver(([e]) => { const on = !e.isIntersecting; st.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe(document.getElementById('top')); }

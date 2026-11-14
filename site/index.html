@@ -8,6 +8,7 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#06070a">
 <link rel="preconnect" href="https://image.tmdb.org">
+<link rel="preload" href="fonts/rakkas-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/lalezar-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/aref-ruqaa-arabic-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/reem-kufi-arabic-700-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -15,22 +16,23 @@
 </head>
 <body>
 <header class="hub-top">
-  <h1>دليل المشاهدة</h1>
-  <p>اختر بوابتك. كل دليل يرتّب لك ماذا تشاهد وبأي تسلسل، ويحفظ ما شاهدته.</p>
+  <h1>قاعة البوابات</h1>
+  <i class="lintel" aria-hidden="true"></i>
+  <p><span>خلف كل بوابة عالمٌ بترتيب مشاهدته،</span> <span>يحفظ لك أين توقفت.</span></p>
   <button class="syncb" type="button" data-sync-open><span data-sync-label>المزامنة بين الأجهزة</span></button>
 </header>
 <main class="doors" id="doors" aria-label="البوابات">
-  <div class="slot"><a class="door dc" href="dc/" data-guide="dc" data-key="dcg.progress" data-art="the-batman-2022">
+  <div class="slot s-dc"><a class="door dc" href="dc/" data-guide="dc" data-key="dcg.progress" data-art="the-batman-2022">
     <span class="art" aria-hidden="true"><i><b></b><b></b><b></b></i></span><span class="fx" aria-hidden="true"></span><span class="motif" aria-hidden="true"></span>
     <span class="txt"><strong>دليل عوالم دي&nbsp;سي</strong><bdi dir="ltr">DC Multiverse Guide</bdi>
       <span class="say">كل أفلام ومسلسلات DC، موزّعة على عوالمها، بترتيب مشاهدة كل عالم.</span><span class="stat" data-stat></span></span>
   </a></div>
-  <div class="slot"><a class="door fate" href="fate/" data-guide="fate" data-key="fateg.progress" data-art="fate-stay-night-unlimited-blade-works-2014">
+  <div class="slot s-fate"><a class="door fate" href="fate/" data-guide="fate" data-key="fateg.progress" data-art="fate-stay-night-unlimited-blade-works-2014">
     <span class="art" aria-hidden="true"></span><span class="fx" aria-hidden="true"></span><span class="motif" aria-hidden="true"><i style="left:18%;top:50%;animation-duration:6.8s;animation-delay:-0.4s"></i><i style="left:27%;top:46%;animation-duration:8.2s;animation-delay:-3.1s"></i><i style="left:36%;top:53%;animation-duration:7.1s;animation-delay:-5.6s"></i><i style="left:44%;top:47%;animation-duration:9s;animation-delay:-1.8s"></i><i style="left:52%;top:52%;animation-duration:6.4s;animation-delay:-4.4s"></i><i style="left:59%;top:45%;animation-duration:7.8s;animation-delay:-6.9s"></i><i style="left:66%;top:51%;animation-duration:8.6s;animation-delay:-2.6s"></i><i style="left:74%;top:48%;animation-duration:6.9s;animation-delay:-5s"></i><i style="left:82%;top:53%;animation-duration:7.5s;animation-delay:-0.9s"></i><i style="left:48%;top:56%;animation-duration:9.4s;animation-delay:-7.7s"></i></span>
     <span class="txt"><strong>دليل عالم Fate</strong><bdi dir="ltr">Fate Series Guide</bdi>
       <span class="say">أعمال Fate كلها حسب خط القصة، مع جواب السؤال الأشهر: من أين أبدأ؟</span><span class="stat" data-stat></span></span>
   </a></div>
-  <div class="slot"><a class="door films" href="films/" data-guide="films" data-key="filmsg.progress" data-file="films.json" data-art="m335984">
+  <div class="slot s-films"><a class="door films" href="films/" data-guide="films" data-key="filmsg.progress" data-file="films.json" data-art="m335984">
     <span class="art" aria-hidden="true"></span><span class="fx" aria-hidden="true"><i style="left:74%;top:10%;animation-duration:11s;animation-delay:-2s"></i><i style="left:66%;top:18%;animation-duration:9s;animation-delay:-6s"></i><i style="left:60%;top:26%;animation-duration:13s;animation-delay:-4s"></i><i style="left:71%;top:22%;animation-duration:10s;animation-delay:-8s"></i><i style="left:54%;top:32%;animation-duration:12s;animation-delay:-1s"></i><i style="left:47%;top:40%;animation-duration:9.5s;animation-delay:-5s"></i><i style="left:58%;top:37%;animation-duration:14s;animation-delay:-9s"></i><i style="left:40%;top:47%;animation-duration:11.5s;animation-delay:-3s"></i><i style="left:63%;top:14%;animation-duration:10.5s;animation-delay:-7s"></i></span><span class="motif" aria-hidden="true"></span>
     <span class="txt"><strong>قائمة أفلامي</strong><bdi dir="ltr">My Watchlist</bdi>
       <span class="say">أفلامي التي أنوي مشاهدتها: أين تُعرض، ولأي سلسلة تنتمي، وبأي ترتيب.</span><span class="stat" data-stat></span></span>

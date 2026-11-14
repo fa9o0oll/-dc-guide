@@ -5,6 +5,9 @@
 //   • العدّ نفسه: يتحرك كل ثانية، والرقم المتغير وحده يتحرك، ويكتب «اليوم» حين يحين الموعد (بساعة مصطنعة)
 //   • أبواب الصفحة الرئيسية متناسقة: إطار وحجم واحد، بلا ظل مائل، وأسطرها مصطفة على الشاشات العريضة
 //   • ميلان البوستر مع المؤشر والضغط عليه على الكمبيوتر، وتوقف الحركة مع «تقليل الحركة»
+//   • القاعة على الجوال لا تعيد رسم شيء أثناء السحب: كل حركة فيها transform وopacity فقط، بلا انعكاس ولا تمويه، وحركة الجارين ساكنة
+//   • بوابة دي سي: غلافها بألوانه ومطره ينزل بثلاث طبقات، والنقش فوق القاعة يأخذ لون البوابة التي أمامك
+//   • زر الرجوع في كل عالم بوابة صغيرة متحركة بهويته، يتسع عند الضغط ويعيدك إلى بوابته في القاعة
 // node tests/upcoming.test.mjs   (يحتاج playwright عبر NODE_PATH)
 import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright');
@@ -122,17 +125,43 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
       rows: doors.map(x => ['strong', 'bdi', '.say', '.stat'].map(s => x.querySelector(s).getBoundingClientRect()).map((r, i) => Math.round(i ? r.top : r.bottom))), sw: document.documentElement.scrollWidth, iw: innerWidth,
       here: doors.filter(x => x.hasAttribute('data-here')).map(x => x.dataset.guide), off: doors.map(x => Math.round((r => r.left + r.width / 2)(x.parentElement.getBoundingClientRect()) - hc)),
       flat: doors.map(x => getComputedStyle(x).transform), nav: [...document.querySelectorAll('.hall-nav button')].filter(b => b.offsetParent).map(b => b.getAttribute('aria-current')),
-      dcTitle: document.querySelector('.door.dc strong').textContent.includes('دي سي'), dcNoir: cs[0].getPropertyValue('--bg').trim() }; });
-  check(`${name}: البوابات بحجم واحد وإطار واحد وإطار داخلي على البعد نفسه، ولكل منها انعكاس على الأرض`, new Set(d.size.map(String)).size === 1 && new Set(d.radius).size === 1 && new Set(d.border).size === 1 && new Set(d.frame).size === 1 && d.reflect, d);
-  check(`${name}: لا ظل مائل يميز بوابة عن غيرها، وبوابة دي سي ليلية داكنة`, !d.slab && d.dcNoir === '#05070c', d);
+      dcTitle: document.querySelector('.door.dc strong').textContent.includes('دي سي'), dcBg: cs[0].getPropertyValue('--bg').trim(),
+      dcGrade: getComputedStyle(document.querySelector('.door.dc .art img') || document.body).filter, reflectAny: cs.some(c => /below/.test(c.webkitBoxReflect || '')),
+      floor: [...document.querySelectorAll('.slot')].map(s => getComputedStyle(s, '::after')).every(a => a.content !== 'none' && /radial-gradient/.test(a.backgroundImage)),
+      title: document.querySelector('.hub-top h1').textContent.trim(), font: getComputedStyle(document.querySelector('.hub-top h1')).fontFamily, fontOk: document.fonts.check('40px Inscribe', 'قاعة'),
+      tag: document.querySelector('.hub-top p').textContent.trim() }; });
+  check(`${name}: البوابات بحجم واحد وإطار واحد وإطار داخلي على البعد نفسه، ولها على الأرض ${w >= 1024 ? 'انعكاس' : 'ضوء ينسكب (لا انعكاس يُعاد رسمه مع الدوران)'}`, new Set(d.size.map(String)).size === 1 && new Set(d.radius).size === 1 && new Set(d.border).size === 1 && new Set(d.frame).size === 1 && (w >= 1024 ? d.reflect : !d.reflectAny && d.floor), d);
+  check(`${name}: لا ظل مائل يميز بوابة عن غيرها، وبوابة دي سي سوداء وغلافها بألوانه (بلا رمادي)`, !d.slab && /^#0[0-9a-f]0[0-9a-f]0[0-9a-f]$/i.test(d.dcBg) && !/grayscale/.test(d.dcGrade), d);
+  check(`${name}: فوق القاعة نقشها «قاعة البوابات» بخطه، وسطر يقول ما وراء الأبواب`, d.title === 'قاعة البوابات' && /Inscribe/.test(d.font) && d.fontOk && d.tag.startsWith('خلف كل بوابة عالمٌ'), d);
   check(`${name}: «دي سي» لا تنقسم على سطرين، وبلا تمدد أفقي`, d.dcTitle && d.sw <= d.iw, d);
-  if (w >= 1024) check(`${name}: البوابات الثلاث ظاهرة في قوس، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 2) && facing(d.flat[1]) && !facing(d.flat[0]) && !d.nav.length, d);
+  // الجاران مائلان قليلاً في القوس فيُسقَط موضع أسطرهما بفارق بكسلات قليلة
+  if (w >= 1024) check(`${name}: البوابات الثلاث ظاهرة في قوس، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 4) && facing(d.flat[1]) && !facing(d.flat[0]) && !d.nav.length, d);
   else {
     check(`${name}: القاعة تبدأ بالبوابة الوسطى كبيرة تواجهك وجاراها مائلان على الجانبين`, d.here.join() === 'fate' && Math.abs(d.off[1]) <= 2 && d.off[0] > 0 && d.off[2] < 0 && facing(d.flat[1]) && !facing(d.flat[0]) && !facing(d.flat[2]) && d.nav.join() === 'false,true,false', d);
+    // ما يتحرك في القاعة: transform وopacity فقط (يحرّكه كرت الشاشة دون إعادة رسم)، بلا تمويه، وحركة الجارين ساكنة حتى يصلا الوسط
+    const fx = await page.evaluate(() => { const ok = new Set(['offset', 'computedOffset', 'easing', 'composite', 'transform', 'opacity', 'translate', 'rotate', 'scale']);
+      const anims = document.getAnimations().filter(a => a.effect?.target?.closest?.('.doors'));
+      const props = [...new Set(anims.flatMap(a => a.effect.getKeyframes().flatMap(k => Object.keys(k))))].filter(p => !ok.has(p));
+      const amb = anims.filter(a => a instanceof CSSAnimation && a.effect.target.closest('.door') && !/^hall/.test(a.animationName));
+      const here = t => t.closest('.door').hasAttribute('data-here');
+      const blur = [...document.querySelectorAll('.doors *')].some(e => [getComputedStyle(e), getComputedStyle(e, '::before'), getComputedStyle(e, '::after')].some(c => /blur/.test(c.filter)));
+      const rain = [...document.querySelectorAll('.door.dc .art b')];
+      return { props, n: anims.length, side: [...new Set(amb.filter(a => !here(a.effect.target)).map(a => a.playState))], mid: [...new Set(amb.filter(a => here(a.effect.target)).map(a => a.playState))], blur,
+        rain: rain.map(b => [/svg/.test(getComputedStyle(b).backgroundImage), b.getAnimations()[0]?.effect.getKeyframes().at(-1)?.transform, getComputedStyle(b).backgroundSize]), skew: getComputedStyle(document.querySelector('.door.dc .art i')).transform };
+    });
+    check(`${name}: كل ما يتحرك في القاعة transform وopacity فقط، وبلا تمويه`, fx.n > 20 && !fx.props.length && !fx.blur, fx);
+    check(`${name}: حركة البوابتين الجانبيتين ساكنة، والتي في الوسط تتحرك`, fx.side.join() === 'paused' && fx.mid.join() === 'running', fx);
+    check(`${name}: مطر دي سي ثلاث طبقات من نسيج خيوط، كل طبقة تنزل مسافة تكرار نسيجها، مائلة كمطر الغلاف`, fx.rain.length === 3 && fx.rain.every(([svg, t, bs]) => svg && t === `translateY(${parseInt(bs.split(' ')[1])}px)`) && /^matrix\(1, 0, -0\.2/.test(fx.skew), fx);
+    // النقش فوق القاعة يأخذ لون البوابة التي أمامك (Fate ذهبي)
+    const lit = () => page.evaluate(() => [document.body.dataset.here, getComputedStyle(document.body).getPropertyValue('--lit').trim()]);
+    await page.waitForTimeout(900); const l0 = await lit();
+    check(`${name}: لون النقش من البوابة التي أمامك`, l0[0] === 'fate' && /230, 182, 92|#e6b65c/i.test(l0[1]), l0);
     const tapDoor = async g => { const b = await page.locator(`.door.${g}`).boundingBox(); const x = g === 'dc' ? Math.min(w - 6, b.x + b.width * .5) : b.x + b.width * .5; if (mobile) await page.touchscreen.tap(x, b.y + b.height * .5); else await page.mouse.click(x, b.y + b.height * .5); };
     await tapDoor('dc'); await page.waitForTimeout(1100);
     const after = await page.evaluate(() => ({ url: location.pathname, here: document.querySelector('.door[data-here]')?.dataset.guide, t: getComputedStyle(document.querySelector('.door.dc')).transform }));
     check(`${name}: الضغط على البوابة الجانبية يأتي بها إلى الوسط ولا يدخلها`, after.url === '/' && after.here === 'dc' && facing(after.t), after);
+    await page.waitForTimeout(900); const l1 = await lit();
+    check(`${name}: وحين تصل دي سي إلى الوسط يحمرّ النقش معها`, l1[0] === 'dc' && /255, 90, 76|#ff5a4c/i.test(l1[1]), l1);
     await tapDoor('dc'); await page.waitForURL(/\/dc\/$/, { timeout: 4000 }).catch(() => {});
     check(`${name}: والضغط على التي في الوسط يدخلها`, /\/dc\/$/.test(page.url()), page.url());
   }
@@ -155,6 +184,29 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
   check('mouse: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
 
+// ---------- زر الرجوع في كل عالم: بوابة صغيرة متحركة بهويته، تتسع عند الضغط وتعيدك إلى بوابتها في القاعة ----------
+for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440, 900, false]]) {
+  console.log(`== mini portals ${name}`);
+  const { ctx, page, errs } = await open(w, h, mobile), look = {};
+  for (const g of ['dc', 'fate', 'films']) {
+    await page.goto(`${base}/${g}/`); await page.waitForSelector('.top .home .pdoor'); await page.waitForTimeout(500);
+    const m = await page.evaluate(() => { const ok = new Set(['offset', 'computedOffset', 'easing', 'composite', 'transform', 'opacity', 'translate', 'rotate', 'scale']);
+      const d = document.querySelector('.top .home .pdoor'), a = d.getAnimations({ subtree: true }), r = document.querySelector('.top .home').getBoundingClientRect(), cs = getComputedStyle(d);
+      return { n: a.length, run: a.every(x => x.playState === 'running'), props: [...new Set(a.flatMap(x => x.effect.getKeyframes().flatMap(k => Object.keys(k))))].filter(p => !ok.has(p)),
+        box: [Math.round(r.width), Math.round(r.height)], look: [cs.borderTopStyle, cs.borderTopColor, cs.backgroundColor].join(' '),
+        house: !!document.querySelector('.top .home svg, .gate svg'), gate: !!document.querySelector('.gate .gate-em .pdoor') }; });
+    look[g] = m.look;
+    check(`${name} ${g}: زر الرجوع بوابة صغيرة يتحرك ضوؤها (transform وopacity فقط)، ومساحة لمسه كافية، وفي الشريط الثابت مثلها`, m.n >= 2 && m.run && !m.props.length && m.box[0] >= 40 && m.box[1] >= 40 && !m.house && m.gate, m);
+    await page.click('.top .home'); await page.waitForTimeout(150);
+    const grow = await page.evaluate(() => { const x = document.querySelector('.pexit'); return !!x && x.getAnimations().length === 1; });
+    await page.waitForURL(u => new URL(u).pathname === '/', { timeout: 4000 }).catch(() => {}); await page.waitForTimeout(900);
+    const back = await page.evaluate(() => ({ path: location.pathname, last: localStorage.getItem('hub.last'), here: document.querySelector('.door[data-here]')?.dataset.guide }));
+    check(`${name} ${g}: الضغط يوسّع البوابة الصغيرة حتى تملأ الشاشة ثم يعيدك إلى القاعة${mobile ? '، وبوابة هذا العالم في وسطها' : ''}`, grow && back.path === '/' && back.last === g && (!mobile || back.here === g), { grow, back });
+  }
+  check(`${name}: لكل عالم بوابته الصغيرة بهويته (إطار ولون مختلفان)`, new Set(Object.values(look)).size === 3, look);
+  check(`mini portals ${name}: بلا أخطاء برمجية`, !errs.length, errs);
+  await ctx.close(); }
+
 // ---------- تقليل الحركة: لا حركة في العدّ ولا في اللافتة ----------
 { console.log('== reduced-motion');
   const { ctx, page, errs } = await open(369, 905, true, { reducedMotion: 'reduce' });
@@ -162,8 +214,13 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
   check('تقليل الحركة: الأرقام تتغير بلا حركة، ومصابيح اللافتة ثابتة', await page.evaluate(() => [...document.querySelectorAll('.dg span')].every(s => !s.getAnimations().length) && [...document.querySelectorAll('.mq')].every(m => getComputedStyle(m, '::before').animationName === 'none')));
   await page.goto(`${base}/dc/`); await page.waitForSelector('.pm'); await page.waitForTimeout(1300);
   check('تقليل الحركة: لوحة العدّ بلا ضوء يمر ولا نبض', await page.evaluate(() => [...document.querySelectorAll('.pm')].every(p => getComputedStyle(p, '::after').animationName === 'none') && [...document.querySelectorAll('.dg span')].every(s => !s.getAnimations().length)));
+  await page.goto(`${base}/fate/`); await page.waitForSelector('.top .home .pdoor'); await page.waitForTimeout(400);
+  const rm = await page.evaluate(() => document.querySelector('.top .home .pdoor').getAnimations({ subtree: true }).length);
+  await page.click('.top .home'); const g2 = await page.evaluate(() => !!document.querySelector('.pexit')).catch(() => false);
+  await page.waitForURL(u => new URL(u).pathname === '/', { timeout: 3000 }).catch(() => {});
+  check('تقليل الحركة: البوابة الصغيرة ساكنة، والضغط ينقلك مباشرة بلا اتساع', !rm && !g2 && new URL(page.url()).pathname === '/', { rm, g2, url: page.url() });
   await page.goto(`${base}/`); await page.waitForTimeout(700);
-  check('تقليل الحركة: البوابات مستوية بلا ميل ولا مطر ولا جمر، والتنقل بينها يبقى', await page.evaluate(() => [...document.querySelectorAll('.door')].every(d => getComputedStyle(d).transform === 'none' && getComputedStyle(d.querySelector('.fx'), '::before').animationName === 'none' && getComputedStyle(d.querySelector('.fx'), '::after').animationName === 'none') && !!document.querySelector('.door.fate[data-here]')));
+  check('تقليل الحركة: البوابات مستوية بلا ميل ولا مطر ولا جمر، والنقش بلا ضوء يمر، والتنقل بينها يبقى', await page.evaluate(() => [...document.querySelectorAll('.door')].every(d => getComputedStyle(d).transform === 'none') && !document.getAnimations().length && !!document.querySelector('.door.fate[data-here]')));
   check('reduced-motion: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
 

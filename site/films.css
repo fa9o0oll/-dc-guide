@@ -23,7 +23,7 @@ bdi[dir=ltr],.ltr{direction:ltr;unicode-bidi:isolate}
 
 /* الرأس */
 .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px var(--pad) 6px}
-.top .home{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;font-size:.86rem;color:var(--dim)}
+.top .home{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:0 12px 0 14px;border:1px solid var(--line);border-radius:999px;text-decoration:none;font-size:.86rem;color:var(--dim)}
 .top h1{font-family:var(--display);font-weight:700;font-size:clamp(1.7rem,4.4vw,2.6rem);line-height:1.25;margin-inline-end:auto}
 .top .tally{flex-basis:100%;order:5;color:var(--mute);font-size:.9rem}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:10px;font-weight:600;font-size:.95rem;text-decoration:none;transition:transform .15s var(--ease),background-color .15s ease}
@@ -322,8 +322,8 @@ dialog::backdrop{background:rgba(6,4,2,.72)}
 @media (max-width:640px){
   #sheet{width:100vw;height:100dvh;border-radius:0;margin:0;max-width:100vw}
   .top{padding-top:12px}
-  .top .home span{display:none}
-  .top .home{padding:0;width:40px;justify-content:center}
+  .top .home>span:not(.pdoor){display:none}
+  .top .home{padding:0;width:44px;justify-content:center;border-color:transparent}
   .top .add span{display:none}
   .top .add{padding:0 14px}
   .order li{grid-template-columns:24px 40px minmax(0,1fr) auto;gap:8px}
@@ -348,11 +348,26 @@ dialog::backdrop{background:rgba(6,4,2,.72)}
 .gate{flex:none;display:inline-flex;align-items:center;gap:9px;max-width:0;margin-inline-end:-8px;opacity:0;overflow:hidden;pointer-events:none;color:var(--dim);text-decoration:none;font-weight:600;font-size:.86rem;white-space:nowrap;transform:translateY(-18px) scale(.6);transform-origin:right center;transition:max-width .5s var(--ease),margin .5s var(--ease),opacity .3s ease,transform .5s cubic-bezier(.34,1.4,.5,1)}
 .bar.docked .gate{max-width:170px;margin-inline-end:0;opacity:1;pointer-events:auto;transform:none}
 .gate-em{flex:none;width:44px;height:44px;display:grid;place-items:center}
-/* تذكرة صغيرة بحافتين مثقوبتين، كبطاقات القائمة */
-.gate-logo{width:40px;height:40px;display:grid;place-items:center;border-radius:8px;background:var(--acc);color:var(--on-acc);-webkit-mask:radial-gradient(circle 5px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 5px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 5px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 5px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;transition:transform .3s cubic-bezier(.34,1.4,.5,1)}
-.gate-logo .ic{width:20px;height:20px;stroke-width:2.2}
 .gate-t{padding-inline-end:12px;border-inline-end:1px solid var(--line)}
 .gate:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:10px}
-@media (hover:hover){.gate:hover .gate-logo{transform:rotate(-8deg) scale(1.06)}.gate:hover .gate-t{color:var(--ink)}}
+@media (hover:hover){.gate:hover .gate-t{color:var(--ink)}}
 @media (max-width:560px){.gate-t{display:none}.bar.docked .gate{max-width:52px}}
-@media (prefers-reduced-motion:reduce){.gate,.gate-logo{transition:none}}
+@media (prefers-reduced-motion:reduce){.gate{transition:none}}
+
+/* ===== البوابة الصغيرة: زر الرجوع إلى القاعة هو بوابة الأفلام في القاعة مصغّرة: قاعة عرض مظلمة بإطار متقطع كالتذكرة،
+   شعاع آلة العرض من الزاوية العليا يرتعش، وشاشة تضيء حيث يسقط، وثقوب الشريط تمر على الطرف (transform وopacity فقط) */
+.pdoor{--pw:20px;--pd-glow:rgba(255,159,67,.6);position:relative;flex:none;display:block;width:var(--pw);height:calc(var(--pw) * 1.42);overflow:hidden;isolation:isolate;border-radius:3px;
+  background:radial-gradient(70% 40% at 40% 92%,rgba(255,170,90,.32),transparent 70%),#120e09;border:1px solid rgba(255,159,67,.65);box-shadow:0 0 14px -4px var(--pd-glow);
+  transition:transform .3s cubic-bezier(.34,1.4,.5,1),box-shadow .3s ease}
+.pdoor::before{content:"";position:absolute;inset:2px;z-index:3;border:1px dashed rgba(255,159,67,.42);border-radius:2px}
+.pdoor i{position:absolute;pointer-events:none}
+.gate .pdoor{--pw:26px}
+.pdoor i:nth-child(1){inset:-10% -10% 6% -60%;background:conic-gradient(from 200deg at 86% 0,transparent,rgba(255,222,176,.66) 9deg,transparent 19deg);animation:pd-flicker 3s steps(1) infinite}
+@keyframes pd-flicker{0%,100%{opacity:1}7%{opacity:.68}9%{opacity:1}44%{opacity:.82}46%{opacity:1}73%{opacity:.62}75%{opacity:1}}
+.pdoor i:nth-child(2){left:3px;width:3px;top:-5px;bottom:0;background:radial-gradient(circle,#120e09 0 .8px,transparent 1.1px) 0 0/3px 5px repeat-y,rgba(255,159,67,.5);animation:pd-reel .8s linear infinite}
+@keyframes pd-reel{to{transform:translateY(5px)}}
+.pdoor i:nth-child(3){left:20%;right:8%;bottom:8%;height:24%;border-radius:2px;background:radial-gradient(closest-side,rgba(255,232,196,.62),transparent);animation:pd-flicker 3s steps(1) infinite}
+@media (hover:hover){a:hover>.pdoor,.gate:hover .pdoor{transform:scale(1.1);box-shadow:0 0 18px -2px var(--pd-glow)}}
+@media (prefers-reduced-motion:reduce){.pdoor i{animation:none!important}}
+/* الرجوع: البوابة الصغيرة تتسع حتى تملأ الشاشة (portal.js) */
+.pexit{position:fixed;inset:0;z-index:500;transform-origin:0 0;pointer-events:none;will-change:transform}
