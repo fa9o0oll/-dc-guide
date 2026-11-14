@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-14T15:23:22.167Z",
+ "generatedAt": "2026-11-14T15:32:13.609Z",
  "counts": {
   "works": 628,
   "withEntry": 375,
@@ -18,7 +18,7 @@
   "chronoAuto": 31,
   "infoEntries": 467,
   "bytes": 203232,
-  "seconds": 138
+  "seconds": 33
  },
  "missing": [
   {
@@ -1690,8 +1690,8 @@
     "sibling:Untitled James Bond Film*"
    ],
    "src": [
-    "novels:James Bond",
-    "story:Quantum of Solace"
+    "story:Quantum of Solace",
+    "novels:James Bond"
    ]
   },
   {
