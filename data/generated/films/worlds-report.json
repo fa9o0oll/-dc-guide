@@ -1,14 +1,14 @@
 {
- "generatedAt": "2026-11-14T10:25:46.800Z",
+ "generatedAt": "2026-11-14T12:34:18.570Z",
  "counts": {
-  "works": 626,
-  "withEntry": 373,
-  "inWorld": 228,
-  "worlds": 109,
-  "chains": 50,
+  "works": 627,
+  "withEntry": 374,
+  "inWorld": 229,
+  "worlds": 110,
+  "chains": 51,
   "withRelated": 248,
   "missing": 2,
-  "uncurated": 3,
+  "uncurated": 4,
   "curatedGaps": 0,
   "collectionGaps": 1,
   "chronoAgree": 27,
@@ -16,9 +16,9 @@
   "chronoReviewed": 2,
   "chronoMissed": 28,
   "chronoAuto": 31,
-  "infoEntries": 467,
-  "bytes": 202594,
-  "seconds": 41
+  "infoEntries": 468,
+  "bytes": 203032,
+  "seconds": 163
  },
  "missing": [
   {
@@ -92,6 +92,13 @@
    "y": 1980,
    "via": "collection",
    "name": "Friday the 13th"
+  },
+  {
+   "k": "m840326",
+   "t": "Sisu",
+   "y": 2022,
+   "via": "collection",
+   "name": "Sisu"
   }
  ],
  "chronoAudit": {
@@ -1683,8 +1690,8 @@
     "sibling:Untitled James Bond Film*"
    ],
    "src": [
-    "novels:James Bond",
-    "story:Quantum of Solace"
+    "story:Quantum of Solace",
+    "novels:James Bond"
    ]
   },
   {
@@ -2530,8 +2537,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "novel:The Wonderful Wizard of Oz",
     "musical:Wicked",
+    "novel:The Wonderful Wizard of Oz",
     "novel:Wicked"
    ]
   },
@@ -4625,6 +4632,15 @@
    ]
   },
   {
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
+   "why": "catalog",
+   "size": 23,
+   "types": [
+    "animated film series"
+   ]
+  },
+  {
    "g": "Q56070713",
    "name": "Walt Disney Animation Studios feature film",
    "why": "catalog",
@@ -4640,15 +4656,6 @@
    "size": 28,
    "types": [
     "Wikimedia list article"
-   ]
-  },
-  {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
-   "why": "catalog",
-   "size": 23,
-   "types": [
-    "animated film series"
    ]
   }
  ],
