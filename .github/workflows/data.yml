@@ -32,6 +32,13 @@ jobs:
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: node scripts/build-films.mjs
+      - name: Build the title index for search suggestions in «أضف فيلماً» (weekly; keeps the previous file if TMDB fails)
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          TITLES_FORCE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
+          TITLES_PROBE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
+        run: node scripts/build-titles.mjs
+        continue-on-error: true
       - name: Build the worlds map for the films list (Wikidata + TMDB; keeps the previous file if Wikidata is unreachable)
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
@@ -45,6 +52,7 @@ jobs:
           path: |
             site/films/data/worlds.json
             data/generated/films/worlds-report.json
+            site/films/data/titles.json
           if-no-files-found: ignore
       - name: Report announced DC titles missing from the catalog
         env:
