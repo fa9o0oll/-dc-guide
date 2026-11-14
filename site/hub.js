@@ -12,29 +12,50 @@ const hall = document.getElementById('doors'), nav = document.querySelector('.ha
 const slots = [...hall.querySelectorAll('.slot')], doorOf = s => s.querySelector('.door');
 const mid = el => { const r = el.getBoundingClientRect(); return r.left + r.width / 2; };
 const off = s => mid(s) - mid(hall);   // بعد البوابة عن وسط القاعة (الخانة نفسها لا تميل، فقياسها صادق)
-const here = () => slots.reduce((a, s) => Math.abs(off(s)) < Math.abs(off(a)) ? s : a);
 const go = (s, smooth = true) => hall.scrollBy({ left: off(s), behavior: smooth && !calm ? 'smooth' : 'instant' });
-function mark() { const h = here(); for (const s of slots) doorOf(s).toggleAttribute('data-here', s === h);
-  nav?.querySelectorAll('button').forEach(b => b.setAttribute('aria-current', String(b.dataset.to === doorOf(h).dataset.guide))); }
-let mraf = 0; hall.addEventListener('scroll', () => { if (!mraf) mraf = requestAnimationFrame(() => { mraf = 0; mark(); }); }, { passive: true });
+// أي بوابة في الوسط؟ من موضع التمرير ومراكز الخانات المحفوظة: لا قياس للصفحة في كل إطار أثناء السحب،
+// ولا تُلمس الصفحة إلا حين تتبدل البوابة التي في الوسط (فتبدأ حركتها وتسكن حركة جارتها)
+let centers = [], cur;
+const measure = () => { centers = slots.map(s => s.offsetLeft + s.offsetWidth / 2); };
+const nearest = () => { const c = hall.scrollLeft + hall.clientWidth / 2; let k = 0; centers.forEach((x, i) => { if (Math.abs(x - c) < Math.abs(centers[k] - c)) k = i; }); return slots[k]; };
+let onHere = () => {};
+function mark() { const h = narrow.matches ? nearest() : null; if (h === cur) return; cur = h;
+  for (const s of slots) doorOf(s).toggleAttribute('data-here', s === h);
+  document.body.dataset.here = h ? doorOf(h).dataset.guide : '';
+  nav?.querySelectorAll('button').forEach(b => b.setAttribute('aria-current', String(!!h && b.dataset.to === doorOf(h).dataset.guide))); onHere(); }
+// أثناء السحب (وحتى يستقر) لا يُكتب شيء غير ما يلزم؛ الاستقرار من scrollend، وإلا بعد سكون قصير
+let mraf = 0, still = 0, moving = false;
+const settle = () => { clearTimeout(still); moving = false; mark(); onHere(); };
+hall.addEventListener('scroll', () => { moving = true; clearTimeout(still); still = setTimeout(settle, 180);
+  if (!mraf) mraf = requestAnimationFrame(() => { mraf = 0; mark(); }); }, { passive: true });
+hall.addEventListener('scrollend', settle);
 nav?.addEventListener('click', e => { const b = e.target.closest('button[data-to]'); if (b) go(slots.find(s => doorOf(s).dataset.guide === b.dataset.to)); });
 hall.addEventListener('focusin', e => { const s = e.target.closest('.slot'); if (s && narrow.matches) go(s); });
 // تبدأ القاعة بالبوابة التي دخلتها آخر مرة، وإلا بالوسطى فيظهر جاراها على الجانبين
-function start() { if (narrow.matches) { let last = null; try { last = localStorage.getItem('hub.last'); } catch {}
-  go(slots.find(s => doorOf(s).dataset.guide === last) || slots[1], false); } mark(); }
+function start() { measure(); if (narrow.matches) { let last = null; try { last = localStorage.getItem('hub.last'); } catch {}
+  go(slots.find(s => doorOf(s).dataset.guide === last) || slots[1], false); } cur = undefined; mark(); }
 requestAnimationFrame(start); narrow.addEventListener('change', start);
+new ResizeObserver(() => { measure(); cur = undefined; mark(); }).observe(hall);
 
-// ---------- ميلان الجوال يحرّك صور البوابات وأضواءها بعمقين متعاكسين، فتبدو البوابة نافذة على عالم وراءها.
-// يُقرأ الميلان نسبةً إلى وضع مرجعي ينجرف ببطء (أي زاوية يُمسك بها الجوال تصير محايدة)، كما في ميلان البوسترات
-if (!calm) { let bx = null, by = null, last = 0, x = 0, y = 0, tx = 0, ty = 0, raf = 0;
-  const frame = () => { raf = 0; x += (tx - x) * .12; y += (ty - y) * .12; hall.style.setProperty('--gx', x.toFixed(3)); hall.style.setProperty('--gy', y.toFixed(3));
-    if (Math.abs(tx - x) > .002 || Math.abs(ty - y) > .002) raf = requestAnimationFrame(frame); };
+// ---------- ميلان الجوال يحرّك صورة البوابة التي في الوسط وحدها، في طبقتها (لا إعادة رسم)، ويسكن أثناء السحب.
+// يُقرأ الميلان نسبةً إلى وضع مرجعي ينجرف ببطء (أي زاوية يُمسك بها الجوال تصير محايدة)، وارتجاف اليد الصغير لا يحرّك شيئاً
+if (!calm) { let bx = null, by = null, last = 0, x = 0, y = 0, tx = 0, ty = 0, raf = 0, art = null, wx = NaN, wy = NaN;
+  const frame = () => { raf = 0; if (moving || document.hidden) return;
+    const a = cur ? doorOf(cur).querySelector('.art') : null;
+    if (a !== art) { if (art) art.style.translate = ''; art = a; wx = wy = NaN; }
+    x += (tx - x) * .12; y += (ty - y) * .12;
+    const px = +(x * -16).toFixed(1), py = +(y * -12).toFixed(1);
+    if (art && (px !== wx || py !== wy)) { art.style.translate = `${px}px ${py}px`; wx = px; wy = py; }
+    if (Math.abs(tx - x) > .004 || Math.abs(ty - y) > .004) raf = requestAnimationFrame(frame); };
+  onHere = () => { if (!raf && !moving) raf = requestAnimationFrame(frame); };
   addEventListener('deviceorientation', e => { if (e.gamma == null || e.beta == null) return;
     const a = ((screen.orientation?.angle ?? 0) + 360) % 360, [gx, gy] = a === 90 ? [e.beta, -e.gamma] : a === 180 ? [-e.gamma, -e.beta] : a === 270 ? [-e.beta, e.gamma] : [e.gamma, e.beta];
     const now = performance.now(), dt = last ? Math.min(.25, (now - last) / 1000) : 0; last = now;
     if (bx == null || Math.abs(gx - bx) > 50 || Math.abs(gy - by) > 50) { bx = gx; by = gy; }
     const k = 1 - Math.exp(-dt / 3); bx += (gx - bx) * k; by += (gy - by) * k;
-    tx = Math.max(-1, Math.min(1, (gx - bx) / 18)); ty = Math.max(-1, Math.min(1, (gy - by) / 18)); if (!raf) raf = requestAnimationFrame(frame); });
+    const nx = Math.max(-1, Math.min(1, (gx - bx) / 18)), ny = Math.max(-1, Math.min(1, (gy - by) / 18));
+    if (Math.abs(nx - tx) < .012 && Math.abs(ny - ty) < .012) return;
+    tx = nx; ty = ny; onHere(); });
 }
 // المؤشر يحرّك صورة البوابة قليلاً (على الكمبيوتر)
 if (matchMedia('(hover:hover)').matches) for (const door of document.querySelectorAll('a.door')) {

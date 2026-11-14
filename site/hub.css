@@ -30,74 +30,87 @@ body{min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;background:
    الأرض ويصعد منها جمر (Fate)، وشعاع آلة عرض يسبح فيه الغبار (الأفلام). والأرضية مصقولة تعكس البوابات.
    الإطار واحد للثلاث (الحجم والزوايا والحافة وإطار داخلي على البعد نفسه)، والهوية داخله: الضوء والنقش واللون والخط
    ونوع خط الإطار الداخلي (فولاذي متصل، ذهبي مزدوج بزوايا حادة، متقطع كتذكرة).
-   على الشاشات العريضة تقف الثلاث في قوس يواجهك، وعلى الأضيق تمشي في القاعة: البوابة في الوسط كبيرة تواجهك وجاراها مائلان */
+   على الشاشات العريضة تقف الثلاث في قوس يواجهك، وعلى الأضيق تمشي في القاعة: البوابة في الوسط كبيرة تواجهك وجاراها مائلان.
+   كل ما يتحرك هنا يتحرك بـ transform و opacity فقط: يُرسم مرة واحدة ثم يحرّكه كرت الشاشة، فلا يُعاد رسم البوابة في كل إطار
+   (المطر نقش يتكرر ينزل مسافة تكراره، والجمر والغبار ذرات صغيرة، والدائرة صورة تدور). */
 body{background:radial-gradient(120% 60% at 50% 108%,#121218,transparent 60%),#06070a}
 .doors{--dw:min(80vw,400px);--dh:min(66dvh,640px);position:relative;min-height:0}
 .slot{display:contents}
 .door{position:relative;isolation:isolate;overflow:hidden;display:grid;align-content:end;padding:28px 24px 26px;color:var(--ink);text-decoration:none;background:var(--bg);
   border:1px solid color-mix(in srgb,var(--c1) 30%,transparent);border-radius:20px;box-shadow:0 34px 70px -38px rgba(0,0,0,.95);
-  -webkit-box-reflect:below 12px linear-gradient(transparent 70%,rgba(255,255,255,.2));
   transition:translate .45s cubic-bezier(.2,.8,.2,1),scale .2s ease,filter .4s ease,border-color .3s ease}
 .door::before{content:"";position:absolute;inset:8px;pointer-events:none;border:1px solid color-mix(in srgb,var(--c1) 22%,transparent);border-radius:13px}
 .door .art,.door .fx,.door .motif{position:absolute;inset:0;z-index:-1;pointer-events:none}
-.door .art{translate:calc(var(--gx,0) * -16px) calc(var(--gy,0) * -12px);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.door .art{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .door .art img{width:100%;height:100%;object-fit:cover;object-position:center 22%;opacity:0;transition:opacity .8s ease,transform 7s cubic-bezier(.15,.6,.25,1);transform:scale(1.12)}
 .door .art img.in{opacity:.62}
+/* ضوء العالم ومطره بين الصورة وعتمتها: يخفت نحو الأسفل وعند الحواف وحده، بلا قناع يُعاد حسابه */
+.door .art>i,.door .fx>i,.door .motif>i{position:absolute}
+.door .art>i{z-index:1}
 /* الإضاءة والعتمة فوق الصورة: سقف معتم، وعتمة عند الحواف كأن العالم غائر في عمق البوابة، وقاعدة داكنة للنص */
-.door .art::after{content:"";position:absolute;inset:0;background:radial-gradient(130% 80% at 50% 35%,transparent 45%,color-mix(in srgb,var(--bg) 75%,transparent)),linear-gradient(180deg,color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 55%,transparent) 40%,var(--bg) 80%)}
-.door .fx{overflow:hidden;translate:calc(var(--gx,0) * 9px) calc(var(--gy,0) * 6px)}
-.door .fx::before,.door .fx::after{content:"";position:absolute}
+.door .art::after{content:"";position:absolute;inset:0;z-index:2;background:radial-gradient(130% 80% at 50% 35%,transparent 45%,color-mix(in srgb,var(--bg) 75%,transparent)),linear-gradient(180deg,color-mix(in srgb,var(--bg) 35%,transparent),color-mix(in srgb,var(--bg) 55%,transparent) 40%,var(--bg) 80%)}
+.door .fx{overflow:hidden}
 .door .txt{display:grid;gap:4px;position:relative}
 .door strong{font-family:var(--display);font-weight:var(--dw,400);font-size:clamp(2.1rem,3.4vw,3.2rem);line-height:var(--lh,1.1);text-shadow:0 2px 24px rgba(0,0,0,.75);transition:translate .45s cubic-bezier(.2,.8,.2,1)}
 .door bdi{color:var(--c1);font-weight:600;font-size:.95rem}
 .door .say{color:#e3dccd;font-size:.95rem;max-width:34ch;margin-top:6px;text-shadow:0 1px 12px rgba(0,0,0,.8)}
 .door .stat{margin-top:12px;font-size:.84rem;font-weight:600;color:var(--c1);min-height:1.6em}
-a.door:active{scale:.985;transition-duration:.12s}
 a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
 
-/* دي سي: ليل المدينة. صورة باتمان باهتة اللون، ومطر بارد بطبقتين (قريبة أسرع)، وكشّاف أصفر شاحب يمسح السماء من بين الضباب */
-.door.dc{--bg:#05070c;--c1:#ffd25e;--c2:#9fb2c8;--ink:#f3f5f8;--display:Lalezar,Plex,sans-serif;border-color:rgba(159,178,200,.3)}
-.door.dc::before{border-color:rgba(159,178,200,.2)}
-.door.dc .art img{filter:grayscale(.6) contrast(1.15) brightness(.78)}
-.door.dc .fx::before{left:-30%;width:160%;top:-6%;height:96%;transform-origin:42% 100%;background:radial-gradient(16% 5% at 42% 5%,rgba(255,232,165,.42),transparent 70%),conic-gradient(from -8deg at 42% 100%,transparent 0deg,rgba(255,228,150,.0) 1deg,rgba(255,230,160,.34) 8deg,rgba(255,228,150,.0) 15deg,transparent 16deg),conic-gradient(from 22deg at 42% 100%,transparent 0deg,rgba(200,215,235,.12) 5deg,transparent 11deg);
-  filter:blur(4px);-webkit-mask:linear-gradient(#000 25%,transparent 80%);mask:linear-gradient(#000 25%,transparent 80%);animation:dc-sweep 15s ease-in-out infinite alternate}
-@keyframes dc-sweep{from{rotate:-18deg}to{rotate:16deg}}
-.door.dc .fx::after{inset:-10% -20% 18% -20%;rotate:13deg;background:radial-gradient(.8px 11px at 50% 50%,rgba(210,225,242,.42),transparent 70%) 0 0/23px 97px,radial-gradient(1px 16px at 50% 50%,rgba(210,225,242,.26),transparent 70%) 11px 31px/37px 151px;
-  -webkit-mask:linear-gradient(#000 35%,transparent 92%);mask:linear-gradient(#000 35%,transparent 92%);animation:dc-rain .6s linear infinite}
-@keyframes dc-rain{to{background-position:0 97px,11px 182px}}
-.door.dc .motif{background:radial-gradient(90% 34% at 50% 104%,rgba(120,140,170,.22),transparent 70%)}
+/* دي سي: الغلاف نفسه (باتمان في المطر الأحمر) بعتمة سينمائية: الأحمر يتوهج من قلب الظلام، والحواف والقاعدة سوداء.
+   ومطر الصورة ينزل فعلاً: ثلاث طبقات من خيوط مطر عشوائية الطول والشفافية، مائلة بميل مطر الصورة نفسه وبلون ضوئه
+   (البعيدة كثيفة باهتة، والقريبة طويلة أسرع وأنعم)، وضوء أحمر يرتعش كوهج الشعلة. كل طبقة نسيج يتكرر، تنزل مسافة تكراره وتعود */
+.door.dc{--bg:#050304;--c1:#ff5a4c;--c2:#b8221b;--ink:#f6f0ef;--display:Lalezar,Plex,sans-serif;border-color:rgba(255,90,76,.26)}
+.door.dc::before{border-color:rgba(255,90,76,.15)}
+.door.dc .art img{filter:contrast(1.14) brightness(.72) saturate(1.06);transform-origin:50% 100%;transform:scale(1.22)}
+.door.dc .art img.in{opacity:.95}
+.door.dc .art::after{background:radial-gradient(100% 72% at 50% 34%,transparent 36%,rgba(5,3,4,.9)),linear-gradient(180deg,rgba(5,3,4,.42),rgba(5,3,4,.06) 22%,rgba(5,3,4,.38) 52%,#050304 80%)}
+.door.dc .art::before{content:"";position:absolute;z-index:1;inset:0;background:radial-gradient(72% 46% at 50% 42%,rgba(255,46,28,.3),transparent 72%);animation:dc-flare 2.8s linear infinite}
+@keyframes dc-flare{0%,100%{opacity:.7}8%{opacity:.9}15%{opacity:.68}23%{opacity:1}31%{opacity:.76}40%{opacity:.93}48%{opacity:.7}57%{opacity:.86}66%{opacity:.74}74%{opacity:1}83%{opacity:.8}91%{opacity:.92}}
+.door.dc .art>i{left:-34%;right:-34%;top:-3%;bottom:14%;transform:skewX(-16deg)}
+.door.dc .art>i>b{position:absolute;left:0;right:0;bottom:0}
+.door.dc .art>i>b:nth-child(1){top:-260px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='260' viewBox='0 0 180 260'%3E%3Cg fill='none' stroke='%23ff9d92' stroke-width='0.8' stroke-linecap='round'%3E%3Cpath stroke-opacity='0.14' d='M100.5 240.3v23.2M100.5 -19.7v23.2M55.4 23.6v19.6M174.9 250.8v25.5M174.9 -9.2v25.5M4.6 137.4v16.2M7.3 120.6v30.5M177.6 258.9v19.8M177.6 -1.1v19.8M42.4 75.2v28.9M151.0 100.5v21.3M38.9 236.7v33.6M38.9 -23.3v33.6M14.9 163.7v15.0M60.5 250.7v13.3M60.5 -9.3v13.3M19.8 15.6v14.0M152.4 166.9v33.8M47.5 200.9v18.5M17.9 151.5v25.2M81.8 249.4v24.6M81.8 -10.6v24.6M35.4 192.3v14.2M171.4 62.0v14.8M42.2 145.4v18.8M163.5 53.0v17.9M12.6 45.8v24.6M65.7 231.6v19.2M130.6 82.9v12.8M55.0 176.3v15.7M149.3 220.7v22.5M31.8 117.2v16.7M112.1 128.4v30.5M126.7 148.4v29.4M25.9 118.3v30.3M26.8 12.2v21.8M85.6 46.5v22.4M112.1 236.6v24.5M112.1 -23.4v24.5M129.1 212.8v27.8M160.4 254.9v17.9M160.4 -5.1v17.9M79.6 143.1v17.4M144.4 16.7v13.9M140.7 36.5v23.4M69.1 219.8v14.3M42.0 178.6v19.8M36.8 137.9v20.3M95.2 41.5v25.9M132.4 210.7v15.5M164.4 56.7v21.8M44.1 188.9v14.1M149.9 257.5v13.0M149.9 -2.5v13.0M169.5 120.1v15.6M92.7 111.8v12.3M36.3 42.9v12.3M107.5 131.1v20.9M162.4 193.6v21.0M159.8 228.8v28.9M3.9 92.5v25.7M168.3 173.2v26.5M19.3 65.2v18.1M128.1 77.0v17.4M29.6 196.2v31.7M11.2 137.3v21.7M22.0 232.1v18.9'/%3E%3Cpath stroke-opacity='0.13' d='M100.5 256.1v7.4M100.5 -3.9v7.4M55.4 36.9v6.3M174.9 268.1v8.2M174.9 8.1v8.2M4.6 148.4v5.2M7.3 141.3v9.8M177.6 272.4v6.3M177.6 12.4v6.3M42.4 94.9v9.2M151.0 115.0v6.8M38.9 259.5v10.8M38.9 -0.5v10.8M14.9 173.9v4.8M60.5 259.7v4.3M60.5 -0.3v4.3M19.8 25.1v4.5M152.4 189.9v10.8M47.5 213.5v5.9M17.9 168.6v8.1M81.8 266.1v7.9M81.8 6.1v7.9M35.4 202.0v4.5M171.4 72.1v4.7M42.2 158.2v6.0M163.5 65.2v5.7M12.6 62.5v7.9M65.7 244.7v6.1M130.6 91.6v4.1M55.0 187.0v5.0M149.3 236.0v7.2M31.8 128.6v5.3M112.1 149.1v9.8M126.7 168.4v9.4M25.9 138.9v9.7M26.8 27.0v7.0M85.6 61.7v7.2M112.1 253.3v7.8M112.1 -6.7v7.8M129.1 231.7v8.9M160.4 267.1v5.7M160.4 7.1v5.7M79.6 154.9v5.6M144.4 26.2v4.4M140.7 52.4v7.5M69.1 229.5v4.6M42.0 192.1v6.3M36.8 151.7v6.5M95.2 59.1v8.3M132.4 221.2v5.0M164.4 71.5v7.0M44.1 198.5v4.5M149.9 266.3v4.2M149.9 6.3v4.2M169.5 130.7v5.0M92.7 120.2v3.9M36.3 51.3v3.9M107.5 145.3v6.7M162.4 207.9v6.7M159.8 248.5v9.2M3.9 110.0v8.2M168.3 191.2v8.5M19.3 77.5v5.8M128.1 88.8v5.6M29.6 217.8v10.1M11.2 152.1v6.9M22.0 245.0v6.0'/%3E%3Cpath stroke-opacity='0.22' d='M34.5 133.1v29.4M114.7 129.9v22.1M80.7 49.6v13.4M22.5 109.4v17.9M107.0 76.3v27.8M104.9 36.5v12.4M131.7 234.1v19.7M163.0 91.5v31.8M69.3 151.5v13.8M176.8 228.7v16.3M104.2 114.5v12.9M7.2 156.3v17.1M89.5 159.8v14.8M36.9 112.0v22.1M117.3 209.9v19.5M33.5 70.8v27.3M110.1 196.6v29.4M58.4 236.6v15.8M149.8 179.2v17.4M114.4 135.9v18.2M90.6 157.4v33.3M72.5 208.3v22.8M13.6 140.1v33.1M160.5 123.9v16.2M164.8 33.7v12.3M20.5 190.0v23.2M95.2 221.3v30.8M76.2 205.4v20.9M5.1 52.2v32.1M35.3 18.3v12.8M92.6 147.9v16.1M150.6 47.1v28.3M73.4 187.9v19.5M95.8 101.3v19.1M136.1 254.8v25.5M136.1 -5.2v25.5M47.2 104.4v16.3M172.2 147.7v19.0M15.4 155.4v12.5M12.3 245.8v23.6M12.3 -14.2v23.6M66.3 74.3v24.3M10.8 257.1v12.8M10.8 -2.9v12.8M167.0 187.9v33.5M108.2 29.9v22.0M82.2 68.2v21.2M95.4 259.4v20.1M95.4 -0.6v20.1'/%3E%3Cpath stroke-opacity='0.2' d='M34.5 153.1v9.4M114.7 144.9v7.1M80.7 58.7v4.3M22.5 121.6v5.7M107.0 95.2v8.9M104.9 44.9v4.0M131.7 247.5v6.3M163.0 113.1v10.2M69.3 160.9v4.4M176.8 239.8v5.2M104.2 123.3v4.1M7.2 167.9v5.5M89.5 169.9v4.7M36.9 127.0v7.1M117.3 223.2v6.2M33.5 89.4v8.7M110.1 216.6v9.4M58.4 247.3v5.1M149.8 191.0v5.6M114.4 148.3v5.8M90.6 180.0v10.7M72.5 223.8v7.3M13.6 162.6v10.6M160.5 134.9v5.2M164.8 42.1v3.9M20.5 205.8v7.4M95.2 242.2v9.9M76.2 219.6v6.7M5.1 74.0v10.3M35.3 27.0v4.1M92.6 158.8v5.2M150.6 66.3v9.1M73.4 201.2v6.2M95.8 114.3v6.1M136.1 272.1v8.2M136.1 12.1v8.2M47.2 115.5v5.2M172.2 160.6v6.1M15.4 163.9v4.0M12.3 261.8v7.6M12.3 1.8v7.6M66.3 90.8v7.8M10.8 265.8v4.1M10.8 5.8v4.1M167.0 210.7v10.7M108.2 44.9v7.0M82.2 82.6v6.8M95.4 273.1v6.4M95.4 13.1v6.4'/%3E%3Cpath stroke-opacity='0.32' d='M143.4 79.1v14.3M34.2 40.1v21.0M157.3 156.9v14.3M125.4 250.3v26.0M125.4 -9.7v26.0M75.4 205.5v18.3M118.2 114.9v15.6M69.7 151.6v15.0M81.6 19.4v31.2M17.3 242.5v13.4M142.2 245.5v26.3M142.2 -14.5v26.3M17.1 57.6v18.4M172.4 136.3v16.4M49.4 123.0v21.5M22.3 131.5v17.5M143.1 183.2v18.9M30.1 122.7v22.9M77.6 124.2v14.7'/%3E%3Cpath stroke-opacity='0.29' d='M143.4 88.8v4.6M34.2 54.4v6.7M157.3 166.6v4.6M125.4 268.0v8.3M125.4 8.0v8.3M75.4 217.9v5.9M118.2 125.5v5.0M69.7 161.8v4.8M81.6 40.6v10.0M17.3 251.6v4.3M142.2 263.4v8.4M142.2 3.4v8.4M17.1 70.1v5.9M172.4 147.5v5.2M49.4 137.6v6.9M22.3 143.4v5.6M143.1 196.1v6.0M30.1 138.3v7.3M77.6 134.2v4.7'/%3E%3C/g%3E%3C/svg%3E") 0 0/180px 260px;animation:dc-rain-1 .42s linear infinite}
+.door.dc .art>i>b:nth-child(2){top:-300px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='300' viewBox='0 0 220 300'%3E%3Cg fill='none' stroke='%23ffb3a8' stroke-width='1.1' stroke-linecap='round'%3E%3Cpath stroke-opacity='0.2' d='M116.5 39.1v43.1M100.3 7.4v52.1M112.7 220.3v30.0M166.1 110.6v50.5M20.5 142.2v38.0M140.8 54.6v39.0M125.7 246.2v40.6M67.8 233.3v36.8M171.3 212.1v32.0M18.4 139.8v59.7M76.0 267.7v43.2M76.0 -32.3v43.2M65.8 122.9v37.5M157.2 1.2v54.7M189.4 61.1v33.9M93.3 24.5v44.3M67.3 287.9v41.2M67.3 -12.1v41.2M178.4 143.3v36.7M21.2 65.2v57.0M187.4 77.8v32.2M33.7 251.2v53.1M33.7 -48.8v53.1M148.8 87.9v59.1M134.0 41.7v36.0'/%3E%3Cpath stroke-opacity='0.18' d='M116.5 68.4v13.8M100.3 42.8v16.7M112.7 240.7v9.6M166.1 144.9v16.2M20.5 168.0v12.2M140.8 81.1v12.5M125.7 273.8v13.0M67.8 258.3v11.8M171.3 233.9v10.2M18.4 180.4v19.1M76.0 297.1v13.8M76.0 -2.9v13.8M65.8 148.4v12.0M157.2 38.4v17.5M189.4 84.2v10.8M93.3 54.6v14.2M67.3 315.9v13.2M67.3 15.9v13.2M178.4 168.3v11.7M21.2 104.0v18.2M187.4 99.7v10.3M33.7 287.3v17.0M33.7 -12.7v17.0M148.8 128.1v18.9M134.0 66.2v11.5'/%3E%3Cpath stroke-opacity='0.3' d='M129.3 197.4v61.0M44.3 34.3v29.3M200.4 177.8v30.8M212.3 241.5v37.2M177.6 75.9v58.6M91.1 207.9v38.9M180.5 32.5v39.3M182.4 74.5v29.3M119.0 70.5v44.0M118.5 166.8v38.1M147.4 181.5v38.9M25.8 138.8v47.2M38.7 292.9v31.1M38.7 -7.1v31.1M125.1 231.2v38.2'/%3E%3Cpath stroke-opacity='0.27' d='M129.3 238.9v19.5M44.3 54.2v9.4M200.4 198.7v9.9M212.3 266.8v11.9M177.6 115.7v18.8M91.1 234.4v12.4M180.5 59.2v12.6M182.4 94.4v9.4M119.0 100.4v14.1M118.5 192.7v12.2M147.4 208.0v12.4M25.8 170.9v15.1M38.7 314.0v10.0M38.7 14.0v10.0M125.1 257.2v12.2'/%3E%3Cpath stroke-opacity='0.42' d='M206.9 267.7v48.1M206.9 -32.3v48.1M14.1 124.9v55.5M163.8 103.8v34.4M48.6 31.1v33.8M20.7 263.0v36.5M139.0 12.8v32.7'/%3E%3Cpath stroke-opacity='0.38' d='M206.9 300.4v15.4M206.9 0.4v15.4M14.1 162.6v17.8M163.8 127.2v11.0M48.6 54.1v10.8M20.7 287.8v11.7M139.0 35.0v10.5'/%3E%3C/g%3E%3C/svg%3E") 0 0/220px 300px;animation:dc-rain-2 .3s linear infinite}
+.door.dc .art>i>b:nth-child(3){top:-340px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='340' viewBox='0 0 260 340'%3E%3Cdefs%3E%3Cfilter id='b' x='-50%' y='-5%' width='200%' height='110%'%3E%3CfeGaussianBlur stdDeviation='0.55'/%3E%3C/filter%3E%3C/defs%3E%3Cg fill='none' stroke='%23ffd3cb' stroke-width='1.6' stroke-linecap='round' filter='url(%23b)'%3E%3Cpath stroke-opacity='0.22' d='M247.7 330.2v63.0M247.7 -9.8v63.0M75.9 122.8v86.9M108.7 3.0v119.2M150.5 8.0v70.4M144.5 0.9v65.7'/%3E%3Cpath stroke-opacity='0.2' d='M247.7 373.0v20.2M247.7 33.0v20.2M75.9 181.9v27.8M108.7 84.1v38.1M150.5 55.9v22.5M144.5 45.6v21.0'/%3E%3Cpath stroke-opacity='0.34' d='M25.5 210.1v87.1M163.5 125.5v67.0M155.8 95.9v107.8M165.6 194.8v94.2M132.7 311.5v78.4M132.7 -28.5v78.4M125.2 72.4v63.1M89.3 10.0v62.1'/%3E%3Cpath stroke-opacity='0.31' d='M25.5 269.3v27.9M163.5 171.1v21.4M155.8 169.2v34.5M165.6 258.9v30.1M132.7 364.8v25.1M132.7 24.8v25.1M125.2 115.3v20.2M89.3 52.2v19.9'/%3E%3Cpath stroke-opacity='0.48' d='M188.4 304.8v106.7M188.4 -35.2v106.7'/%3E%3Cpath stroke-opacity='0.43' d='M188.4 377.4v34.1M188.4 37.4v34.1'/%3E%3C/g%3E%3C/svg%3E") 0 0/260px 340px;animation:dc-rain-3 .22s linear infinite}
+@keyframes dc-rain-1{to{transform:translateY(260px)}}
+@keyframes dc-rain-2{to{transform:translateY(300px)}}
+@keyframes dc-rain-3{to{transform:translateY(340px)}}
+.door.dc .motif{background:radial-gradient(90% 30% at 50% 104%,rgba(150,24,18,.24),transparent 70%)}
 
-/* Fate: دائرة استدعاء ذهبية على الأرض حيث يقف الخادم، تدور ببطء، وجمر يصعد منها */
+/* Fate: دائرة استدعاء ذهبية على الأرض حيث يقف الخادم، تدور ببطء ويتنفس ضوؤها، وجمر يصعد منها */
 .door.fate{--bg:#12060a;--c1:#e6b65c;--c2:#e0445a;--ink:#f7efe0;--display:Ruqaa,Plex,serif;--dw:700;--lh:1.35}
 .door.fate::before{border:3px double color-mix(in srgb,var(--c1) 34%,transparent);border-radius:2px}
-@property --spin{syntax:"<angle>";inherits:false;initial-value:0deg}
-.door.fate .fx::before{left:50%;top:46%;width:118%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;opacity:.8;
-  background:radial-gradient(circle,rgba(255,214,140,.5),transparent 32%),repeating-conic-gradient(rgba(240,196,110,.95) 0 .7deg,transparent .7deg 9deg);
-  -webkit-mask:radial-gradient(circle,#000 0 12%,transparent 12.5% 30%,#000 30.4% 31.4%,transparent 31.8% 42%,#000 42.4% 45.6%,transparent 46% 56%,#000 56.4% 57.4%,transparent 58% 65%,#000 65.4% 69%,transparent 69.5%);
-  mask:radial-gradient(circle,#000 0 12%,transparent 12.5% 30%,#000 30.4% 31.4%,transparent 31.8% 42%,#000 42.4% 45.6%,transparent 46% 56%,#000 56.4% 57.4%,transparent 58% 65%,#000 65.4% 69%,transparent 69.5%);
-  transform:perspective(560px) rotateX(68deg) rotate(var(--spin));animation:fate-spin 48s linear infinite}
-@keyframes fate-spin{to{--spin:360deg}}
-.door.fate .fx::after{inset:0;background:radial-gradient(circle,rgba(255,206,130,.95) 0 1.2px,transparent 2px) 0 0/61px 89px,radial-gradient(circle,rgba(255,150,110,.8) 0 1px,transparent 1.8px) 23px 41px/43px 67px,radial-gradient(48% 16% at 50% 47%,rgba(230,182,92,.28),transparent 72%);
-  -webkit-mask:radial-gradient(70% 55% at 50% 45%,#000 20%,transparent 75%);mask:radial-gradient(70% 55% at 50% 45%,#000 20%,transparent 75%);animation:fate-rise 7s linear infinite}
-@keyframes fate-rise{to{background-position:0 -89px,23px -26px,0 0}}
+.door.fate .fx::before{content:"";position:absolute;left:50%;top:46%;width:118%;aspect-ratio:1;translate:-50% -50%;opacity:.8;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%23ffd68c' stop-opacity='.6'/%3E%3Cstop offset='1' stop-color='%23ffd68c' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle r='22.6' fill='url(%23g)'/%3E%3Cg fill='none' stroke='%23f0c46e'%3E%3Ccircle r='5' stroke-width='7' stroke-dasharray='0.061 0.724' opacity='0.8'/%3E%3Ccircle r='21.85' stroke-width='0.8' stroke-dasharray='0.267 3.165' opacity='1'/%3E%3Ccircle r='31.1' stroke-width='2.3' stroke-dasharray='0.380 4.505' opacity='1'/%3E%3Ccircle r='40.25' stroke-width='0.8' stroke-dasharray='0.492 5.831' opacity='1'/%3E%3Ccircle r='47.5' stroke-width='2.6' stroke-dasharray='0.580 6.881' opacity='1'/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat;
+  transform:perspective(560px) rotateX(68deg);animation:fate-spin 48s linear infinite}
+@keyframes fate-spin{from{transform:perspective(560px) rotateX(68deg) rotate(0deg)}to{transform:perspective(560px) rotateX(68deg) rotate(360deg)}}
+.door.fate .fx::after{content:"";position:absolute;inset:0;background:radial-gradient(48% 16% at 50% 47%,rgba(230,182,92,.3),transparent 72%);animation:fate-glow 5s ease-in-out infinite alternate}
+@keyframes fate-glow{from{opacity:.5}to{opacity:1}}
+/* الجمر: ذرات تبدأ من الدائرة وتصعد وهي تخفت، كل واحدة بمدتها وموضعها (في الصفحة) */
+.door.fate .motif>i{width:3px;height:3px;border-radius:50%;background:#ffd8a0;box-shadow:0 0 5px 1px rgba(255,150,80,.7);opacity:0;animation:ember 7s linear infinite}
+.door.fate .motif>i:nth-child(3n){width:2px;height:2px}
+.door.fate .motif>i:nth-child(even){animation-name:ember-l}
+@keyframes ember{0%{transform:translate(0,0) scale(.6);opacity:0}14%{opacity:1}62%{opacity:.85}100%{transform:translate(12px,-230px) scale(.9);opacity:0}}
+@keyframes ember-l{0%{transform:translate(0,0) scale(.6);opacity:0}14%{opacity:1}62%{opacity:.85}100%{transform:translate(-14px,-205px) scale(.9);opacity:0}}
 
-/* الأفلام: قاعة عرض مظلمة، شعاع آلة العرض من الأعلى يرتعش قليلاً ويسبح فيه الغبار، وثقوب شريط الفيلم على الطرف */
+/* الأفلام: قاعة عرض مظلمة، شعاع آلة العرض من الأعلى يرتعش قليلاً ويسبح فيه الغبار، وثقوب شريط الفيلم تمر على الطرف */
 .door.films{--bg:#120e09;--c1:#ff9f43;--c2:#ffe2b8;--ink:#fbf3e4;--display:Kufi,Plex,sans-serif;--dw:700;--lh:1.3;padding-inline-end:46px}
 .door.films::before{border-style:dashed;border-color:color-mix(in srgb,var(--c1) 36%,transparent)}
-.door.films .fx::before{inset:-4% -10% 10% -40%;background:conic-gradient(from 198deg at 86% -2%,transparent 0deg,rgba(255,220,170,.0) 1deg,rgba(255,220,170,.2) 8deg,rgba(255,210,150,.07) 15deg,transparent 21deg);
-  filter:blur(4px);-webkit-mask:linear-gradient(#000 45%,transparent 90%);mask:linear-gradient(#000 45%,transparent 90%);animation:films-flicker 3.4s steps(1) infinite}
+.door.films .art::before{content:"";position:absolute;z-index:1;inset:-4% -10% 10% -40%;background:conic-gradient(from 198deg at 86% -2%,transparent,rgba(255,220,170,.1) 3deg,rgba(255,220,170,.3) 9deg,rgba(255,210,150,.12) 15deg,transparent 21deg);animation:films-flicker 3.4s steps(1) infinite}
 @keyframes films-flicker{0%,100%{opacity:1}6%{opacity:.82}8%{opacity:1}41%{opacity:.9}43%{opacity:1}72%{opacity:.78}74%{opacity:1}}
-.door.films .fx::after{inset:0 -20% 0 -20%;background:radial-gradient(circle,rgba(255,236,205,.85) 0 .9px,transparent 1.6px) 0 0/47px 59px,radial-gradient(circle,rgba(255,226,180,.6) 0 .7px,transparent 1.3px) 19px 23px/31px 43px;
-  -webkit-mask:conic-gradient(from 198deg at 74% -2%,transparent 0deg,#000 6deg,#000 16deg,transparent 22deg);mask:conic-gradient(from 198deg at 74% -2%,transparent 0deg,#000 6deg,#000 16deg,transparent 22deg);animation:films-dust 16s linear infinite}
-@keyframes films-dust{to{background-position:-47px 59px,31px -43px}}
-.door.films .motif{background:radial-gradient(circle,#08090d 0 4.5px,transparent 5px) left 22px top 0/22px 24px repeat-y;animation:reel 2.6s linear infinite}
-@keyframes reel{to{background-position:left 22px top 24px}}
+.door.films .fx>i{width:2px;height:2px;border-radius:50%;background:#ffecd0;box-shadow:0 0 4px rgba(255,220,170,.8);animation:mote 10s ease-in-out infinite alternate}
+.door.films .fx>i:nth-child(even){animation-name:mote-b}
+@keyframes mote{from{transform:translate(0,0);opacity:.15}50%{opacity:.85}to{transform:translate(-16px,22px);opacity:.2}}
+@keyframes mote-b{from{transform:translate(0,0);opacity:.7}50%{opacity:.12}to{transform:translate(13px,-15px);opacity:.75}}
+.door.films .motif::before{content:"";position:absolute;left:22px;width:22px;top:-24px;bottom:0;background:radial-gradient(circle,#08090d 0 4.5px,transparent 5px) 0 0/22px 24px repeat-y;animation:reel 2.6s linear infinite}
+@keyframes reel{to{transform:translateY(24px)}}
 
-/* ----- الشاشات العريضة: البوابات الثلاث في قوس يواجهك، وأسطرها مصطفة (الشبكة الفرعية) ----- */
+/* ----- الشاشات العريضة: البوابات الثلاث في قوس يواجهك، وأسطرها مصطفة (الشبكة الفرعية)، والأرضية تعكسها ----- */
 @media (min-width:1024px){
   .doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1fr) repeat(4,auto);column-gap:clamp(22px,2.8vw,48px);row-gap:4px;
     height:clamp(520px,calc(100dvh - 290px),860px);margin:4px var(--pad) 120px;perspective:2200px}
-  .door{grid-row:1/-1;grid-template-rows:subgrid;align-content:normal;transition:transform .55s cubic-bezier(.2,.8,.2,1),translate .45s cubic-bezier(.2,.8,.2,1),scale .2s ease,filter .4s ease,border-color .3s ease}
+  .door{grid-row:1/-1;grid-template-rows:subgrid;align-content:normal;-webkit-box-reflect:below 12px linear-gradient(transparent 70%,rgba(255,255,255,.2));
+    transition:transform .55s cubic-bezier(.2,.8,.2,1),translate .45s cubic-bezier(.2,.8,.2,1),scale .2s ease,filter .4s ease,border-color .3s ease}
   .door .txt{display:contents}
   .door strong{grid-row:2;align-self:end}
   .door bdi{grid-row:3}
@@ -112,8 +125,10 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   .doors:has(a.door:hover) a.door:not(:hover){filter:brightness(.62) saturate(.8)}
   a.door:hover .art{transform:translate(calc(var(--mx,0) * -18px),calc(var(--my,0) * -14px))}
   a.door:hover .art img.in{transform:scale(1.2);opacity:.78}
+  a.door.dc:hover .art img.in{transform:scale(1.3);opacity:1}
   a.door:hover strong{translate:0 -6px}
 }
+@media (hover:hover){a.door:active{scale:.985;transition-duration:.12s}}
 /* ----- الأضيق (ومنها الفولد والجوال): القاعة تُمرَّر أفقياً، والبوابة في الوسط تواجهك وجاراها مائلان ومعتمان ----- */
 @media (max-width:1023.98px){
   /* التمرير باتجاه اليسار-لليمين والترتيب معكوس (دي سي يميناً كما في القراءة العربية): خط زمن التمرير يُحسب صحيحاً هكذا */
@@ -121,18 +136,27 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
     padding:6px calc(50% - var(--dw) / 2) 112px;margin-bottom:-58px}
   .slot:nth-child(1){order:3}.slot:nth-child(2){order:2}.slot:nth-child(3){order:1}
   .doors::-webkit-scrollbar{display:none}
-  .slot{direction:rtl;display:block;flex:0 0 var(--dw);scroll-snap-align:center;perspective:1000px;view-timeline:--slot inline}
+  .slot{direction:rtl;display:block;position:relative;flex:0 0 var(--dw);scroll-snap-align:center;perspective:1000px;view-timeline:--slot inline}
   .door{height:var(--dh)}
-  @supports (animation-timeline:--slot){.door{animation:hall linear both;animation-timeline:--slot}.door::after{content:"";position:absolute;inset:0;pointer-events:none;background:#050508;border-radius:inherit;animation:hall-dim linear both;animation-timeline:--slot}}
-  .door:not([data-here]) .fx::before,.door:not([data-here]) .fx::after,.door:not([data-here]) .motif{animation-play-state:paused}
+  /* صورة البوابة في طبقة مستقلة: ميلان الجوال يزيحها دون إعادة رسم */
+  .door .art{will-change:transform}
+  /* الأرضية المصقولة: ضوء كل عالم ينسكب تحت بوابته (أخف على الجوال من عكس البوابة كاملة وهي تدور) */
+  .slot::after{content:"";position:absolute;inset-inline:3%;top:calc(100% + 12px);height:clamp(64px,13dvh,112px);pointer-events:none;
+    background:radial-gradient(50% 70% at 50% 0,color-mix(in srgb,var(--glow) 30%,transparent),transparent 72%),linear-gradient(180deg,color-mix(in srgb,var(--glow) 9%,transparent),transparent 55%);border-radius:18px 18px 50% 50%}
+  .slot:has(.dc){--glow:#ff5a4c}.slot:has(.fate){--glow:#e6b65c}.slot:has(.films){--glow:#ff9f43}
+  @supports (animation-timeline:--slot){.door{animation:hall linear both;animation-timeline:--slot}.slot::after{animation:hall-floor linear both;animation-timeline:--slot}
+    .door::after{content:"";position:absolute;inset:0;pointer-events:none;background:#050508;border-radius:inherit;animation:hall-dim linear both;animation-timeline:--slot}}
+  /* الجاران ساكنان: حركتهما تبدأ حين يصلان الوسط */
+  .door:not([data-here]) :is(.art,.fx,.motif)::before,.door:not([data-here]) .fx::after,.door:not([data-here]) :is(.art,.fx,.motif) :is(i,b){animation-play-state:paused}
   .hall-nav{position:relative;z-index:2;display:flex;justify-content:center;gap:8px;padding:0 var(--pad) 6px}
   .hall-nav button{min-height:40px;min-width:64px;padding:4px 14px;border-radius:999px;border:1px solid #2c2b28;background:rgba(14,14,18,.72);color:#a9a498;font:inherit;font-size:.84rem;font-weight:600;cursor:pointer;transition:color .3s ease,border-color .3s ease,background-color .3s ease}
   .hall-nav button[aria-current=true]{color:#f6f1e6;border-color:rgba(246,241,230,.55);background:rgba(246,241,230,.08)}
   .hall-nav button:focus-visible{outline:2px solid #f6f1e6;outline-offset:2px}
 }
 @keyframes hall{0%{transform:translateX(-28%) rotateY(-46deg) scale(.8)}50%{transform:none}100%{transform:translateX(28%) rotateY(46deg) scale(.8)}}
-/* الجاران يعتمان بطبقة فوقهما لا بمرشّح (المرشّح يُسقط انعكاس البوابة على الأرض) */
+/* الجاران يعتمان بطبقة فوقهما لا بمرشّح، وضوؤهما على الأرض يبتعد ويخفت معهما */
 @keyframes hall-dim{0%,100%{opacity:.55}50%{opacity:0}}
+@keyframes hall-floor{0%{transform:translateX(-26%) scale(.72);opacity:.3}50%{transform:none;opacity:1}100%{transform:translateX(26%) scale(.72);opacity:.3}}
 @media (max-width:600px){.doors{--dw:min(82vw,340px);--dh:min(64dvh,600px)}.door{padding:24px 20px 22px}.door.films{padding-inline-end:42px}.door strong{font-size:2rem}}
 @media (max-height:560px) and (max-width:1023.98px){.doors{--dh:76dvh}}
 /* الدخول: الباب يتمدد حتى يملأ الشاشة بلون عالمه واسمه، والصفحة التالية تبدأ بنفس المشهد ثم تكشف نفسها */
