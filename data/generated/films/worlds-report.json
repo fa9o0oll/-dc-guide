@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-14T20:10:12.568Z",
+ "generatedAt": "2026-11-14T20:15:10.343Z",
  "counts": {
   "works": 628,
   "withEntry": 375,
@@ -18,7 +18,7 @@
   "chronoAuto": 31,
   "infoEntries": 467,
   "bytes": 203232,
-  "seconds": 39
+  "seconds": 44
  },
  "missing": [
   {
@@ -1690,8 +1690,8 @@
     "sibling:Untitled James Bond Film*"
    ],
    "src": [
-    "novels:James Bond",
-    "story:Quantum of Solace"
+    "story:Quantum of Solace",
+    "novels:James Bond"
    ]
   },
   {
@@ -4640,15 +4640,6 @@
    ]
   },
   {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
-   "why": "catalog",
-   "size": 23,
-   "types": [
-    "animated film series"
-   ]
-  },
-  {
    "g": "Q56070713",
    "name": "Walt Disney Animation Studios feature film",
    "why": "catalog",
@@ -4664,6 +4655,15 @@
    "size": 28,
    "types": [
     "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
+   "why": "catalog",
+   "size": 23,
+   "types": [
+    "animated film series"
    ]
   }
  ],
