@@ -6,7 +6,7 @@
 <title>دليل المشاهدة</title>
 <meta name="description" content="أدلة مشاهدة عربية: عوالم DC، عالم Fate، وقائمة أفلام.">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#08090d">
+<meta name="theme-color" content="#06070a">
 <link rel="preconnect" href="https://image.tmdb.org">
 <link rel="preload" href="fonts/lalezar-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/aref-ruqaa-arabic-700-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -19,23 +19,24 @@
   <p>اختر بوابتك. كل دليل يرتّب لك ماذا تشاهد وبأي تسلسل، ويحفظ ما شاهدته.</p>
   <button class="syncb" type="button" data-sync-open><span data-sync-label>المزامنة بين الأجهزة</span></button>
 </header>
-<main class="doors" id="doors">
-  <a class="door dc" href="dc/" data-guide="dc" data-key="dcg.progress" data-art="superman-2025">
-    <span class="art" aria-hidden="true"></span><span class="motif" aria-hidden="true"></span>
+<main class="doors" id="doors" aria-label="البوابات">
+  <div class="slot"><a class="door dc" href="dc/" data-guide="dc" data-key="dcg.progress" data-art="the-batman-2022">
+    <span class="art" aria-hidden="true"></span><span class="fx" aria-hidden="true"></span><span class="motif" aria-hidden="true"></span>
     <span class="txt"><strong>دليل عوالم دي&nbsp;سي</strong><bdi dir="ltr">DC Multiverse Guide</bdi>
       <span class="say">كل أفلام ومسلسلات DC، موزّعة على عوالمها، بترتيب مشاهدة كل عالم.</span><span class="stat" data-stat></span></span>
-  </a>
-  <a class="door fate" href="fate/" data-guide="fate" data-key="fateg.progress" data-art="fate-stay-night-unlimited-blade-works-2014">
-    <span class="art" aria-hidden="true"></span><span class="motif" aria-hidden="true"></span>
+  </a></div>
+  <div class="slot"><a class="door fate" href="fate/" data-guide="fate" data-key="fateg.progress" data-art="fate-stay-night-unlimited-blade-works-2014">
+    <span class="art" aria-hidden="true"></span><span class="fx" aria-hidden="true"></span><span class="motif" aria-hidden="true"></span>
     <span class="txt"><strong>دليل عالم Fate</strong><bdi dir="ltr">Fate Series Guide</bdi>
       <span class="say">أعمال Fate كلها حسب خط القصة، مع جواب السؤال الأشهر: من أين أبدأ؟</span><span class="stat" data-stat></span></span>
-  </a>
-  <a class="door films" href="films/" data-guide="films" data-key="filmsg.progress" data-file="films.json" data-art="m335984">
-    <span class="art" aria-hidden="true"></span><span class="motif" aria-hidden="true"></span>
+  </a></div>
+  <div class="slot"><a class="door films" href="films/" data-guide="films" data-key="filmsg.progress" data-file="films.json" data-art="m335984">
+    <span class="art" aria-hidden="true"></span><span class="fx" aria-hidden="true"></span><span class="motif" aria-hidden="true"></span>
     <span class="txt"><strong>قائمة أفلامي</strong><bdi dir="ltr">My Watchlist</bdi>
       <span class="say">أفلامي التي أنوي مشاهدتها: أين تُعرض، ولأي سلسلة تنتمي، وبأي ترتيب.</span><span class="stat" data-stat></span></span>
-  </a>
+  </a></div>
 </main>
+<nav class="hall-nav" aria-label="التنقل بين البوابات"><button type="button" data-to="dc">دي سي</button><button type="button" data-to="fate"><bdi dir="ltr">Fate</bdi></button><button type="button" data-to="films">أفلامي</button></nav>
 <footer class="hub-foot"><p>البوسترات وبيانات الأعمال من <a href="https://www.themoviedb.org/" target="_blank" rel="noopener"><bdi dir="ltr">TMDB</bdi></a>. <bdi dir="ltr">This product uses the TMDB API but is not endorsed or certified by TMDB.</bdi></p></footer>
 <script type="module" src="hub.js?v=__BUILD__"></script>
 </body>
