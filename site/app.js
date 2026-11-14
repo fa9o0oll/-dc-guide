@@ -4,7 +4,7 @@ import { shell } from './shell.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { segs } from './count.js?v=__BUILD__';
 import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
-import './zoom.js?v=__BUILD__'; // تكبير البوستر المشترك بين البوابات (data-zoom)
+import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
 const G = GUIDES[document.documentElement.dataset.guide] || GUIDES.dc;
 const { THEMES, SHOW_COLORS = {} } = await import(`./themes-${G.id}.js?v=${BUILD}`);
@@ -217,7 +217,7 @@ function card(p) {
     .filter(Boolean).map(x => `<div class="meta bits">${x}</div>`).join('');
   const tot = w.seasons ? seasonTotal(w, p.season) : 0, dn = tot ? seasonDone(w.id, p.season) : 0;
   return `<article class="card" id="${domId('c', p)}" data-k="${esc(sKey(p))}">
-    <div class="chead"><button class="poster" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} aria-label="تفاصيل ${esc(w.title)}">${posterTag(w)}</button>
+    <div class="chead"><button class="poster" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''}${w.poster ? ` data-zoom-pinch data-zoom-title="${esc(w.title)}"` : ''} aria-label="تفاصيل ${esc(w.title)}">${posterTag(w)}</button>
     <div>
       <div class="ord">${uniOf(p.universe).serial && !soon ? 'الترتيب: ' : ''}${esc(p.label)}</div>
       <h3>${ltr(titleOf(p))}</h3>
@@ -249,7 +249,7 @@ function node(p, i, list, step) {
   const around = !step && u.serial && u.id !== 'arrow' ? [prev && ['قبله', D.works.get(prev.work).title], next && ['بعده', D.works.get(next.work).title]].filter(Boolean) : [];
   return `<div class="node ${done ? 'done' : ''} ${soon ? 'soon' : ''}" id="${domId('t', p)}" data-k="${esc(sKey(p))}">
     <button class="node-main" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} aria-label="تفاصيل ${esc(w.title)}">
-      <span class="thumb">${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w154')}" alt="">` : ''}<i class="seen" aria-hidden="true">✓</i></span>
+      <span class="thumb"${w.poster ? ` data-zoom-pinch data-zoom-title="${esc(w.title)}"` : ''}>${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w154')}" alt="">` : ''}<i class="seen" aria-hidden="true">✓</i></span>
       <span class="node-text"><span class="n">${step ? `الخطوة ${i + 1}${step.optional ? ' (اختيارية)' : ''}` : esc(p.label)}${soon ? (w.date ? ` · قادم بعد ${cnt(daysLeft(w), 'day', true)}` : ' · قادم') : ''}</span>
         <span class="t">${ltr(titleOf(p))}</span>
         <span class="meta">${esc([yearOf(w, p), typeOf(w)].filter(Boolean).join(' · '))}</span>
@@ -323,7 +323,7 @@ function renderArrow() {
 }
 // صورة الموسم (أو المسلسل إن لم تكن للموسم صورة) في أول كل سطر من ترتيب آروفيرس
 const avThumb = (id, season) => { const w = D.works.get(id), p = w?.seasons?.find(x => x.n === season)?.poster || w?.poster;
-  return `<span class="thumb av-th">${p ? `<img loading="lazy" decoding="async" src="${img(p, 'w154')}" srcset="${img(p, 'w92')} 92w, ${img(p, 'w154')} 154w" sizes="48px" alt="">` : ''}</span>`; };
+  return `<span class="thumb av-th"${p ? ` data-zoom-pinch data-zoom-title="${esc(`الموسم ${season} من ${w.title}`)}"` : ''}>${p ? `<img loading="lazy" decoding="async" src="${img(p, 'w154')}" srcset="${img(p, 'w92')} 92w, ${img(p, 'w154')} 154w" sizes="48px" alt="">` : ''}</span>`; };
 const stepHTML = (s, shown) => s.kind === 'crossover' ? `<div class="step cross${shown ? ' shown' : ''}" id="${s.id}"><div class="step-head"><span class="num">${s.n}</span><h3>${esc(s.title)} <span class="en">${ltr(s.titleEn)}</span></h3><span class="tag soon">${cnt(s.parts.filter(p => !p.tieIn).length, 'part')} بالترتيب</span><span class="meta">${esc(s.label)}</span></div>
         ${s.parts.map(p => { const d = epDone(p.work, p.season, p.episode); return `<div class="row ${d ? 'done' : ''} ${p.tieIn ? 'tie' : ''}" style="--show:${SHOW_COLORS[p.work]}"><span class="k">${p.tieIn ? '＋' : p.part}</span>${avThumb(p.work, p.season)}
           <span class="show">${ltr(p.show)}<span class="epname">${ltr(p.name || '')}</span></span>

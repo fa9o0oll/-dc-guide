@@ -3,7 +3,7 @@
 import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { segs } from './count.js?v=__BUILD__';
-import './zoom.js?v=__BUILD__'; // تكبير البوستر المشترك بين البوابات (data-zoom)
+import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 const BUILD = '__BUILD__', KEY = 'filmsg.progress', PEND = 'filmsg.pending', PASS = 'filmsg.pass', IMG = 'https://image.tmdb.org/t/p/';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -88,7 +88,7 @@ function retag() { for (const f of D.films) { const el = document.querySelector(
   if ((old?.outerHTML || '') === html) continue; old?.remove(); if (html) el.querySelector('.stamp').insertAdjacentHTML('beforebegin', html); } }
 function card(f) { const s = st(f.id);
   return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}">
-<button class="poster" data-act="open" aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${tagOf(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
+<button class="poster" data-act="open" ${f.poster ? `data-zoom-pinch data-zoom-title="${esc(f.title)}" ` : ''}aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${tagOf(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
 <div class="stub"><h3>${esc(f.title)}</h3><p class="meta">${f.year ? `<bdi>${f.year}</bdi>` : '<span>بلا موعد</span>'}${f.rating ? `<span class="rate"><bdi dir="ltr">${f.rating.toFixed(1)}</bdi></span>` : ''}${f.runtime ? `<span>${rt(f.runtime)}</span>` : f.seasons ? `<span>${count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم'])}</span>` : ''}</p>
 <button class="seen" data-act="seen" aria-pressed="${s === 'watched'}" aria-label="شاهدته: ${esc(f.title)}">${ic('check')}</button><div class="where">${whereHTML(f)}</div></div></article>`; }
 
@@ -193,7 +193,7 @@ function seriesHTML() { const gs = groups().filter(g => !ui.q || g.name.toLowerC
   return gs.map(g => { const mine = g.order.map(listedOf).filter(Boolean), seen = mine.filter(f => st(f.id) === 'watched').length;
     return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${nWorks(g.order.length)}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ` · بتوصيات الدليل${g.view ? '، بترتيب الأحداث' : ''}` : g.auto ? ` · ${WKIND[g.kind]}، مرتّب آلياً${g.chrono ? ' حسب الأحداث' : ''}` : g.chrono ? ' · مرتّب آلياً حسب الأحداث' : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
       g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}"${f ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
-<span class="p">${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
+<span class="p"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
 function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); $('#grid').hidden = v !== 'grid'; $('#series').hidden = v !== 'series'; $('#chips').hidden = v !== 'grid';
   if (v === 'series') $('#series').innerHTML = seriesHTML(); apply(false); }
 
@@ -220,7 +220,7 @@ const srcLine = src => { const n = src?.length || 0, l = (src || []).map(x => `<
   return !n ? '' : n === 1 ? `مصدر واحد: ${l}` : `مؤكد من ${n === 2 ? 'مصدرين' : (['', '', '', 'ثلاثة', 'أربعة'][n] || n) + ' مصادر'}: ${l}`; };
 const row = (f, s, i, opt, far) => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = isHere(f, s), k0 = kindOf(s), k = k0 && s.note?.includes(k0) ? '' : k0;
   const rec = s.rec || (opt?.auto && (o.date ? o.date > today : !o.year) ? 'soon' : ''), mv = opt?.moved?.[keyOfStep(s)];
-  return `<li data-n="${i + 1}" class="${[here ? 'here' : '', w ? 'watched' : '', rec ? 'r-' + rec : '', far ? 'far' : ''].filter(Boolean).join(' ')}"><span class="th">${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k0)}</span>
+  return `<li data-n="${i + 1}" class="${[here ? 'here' : '', w ? 'watched' : '', rec ? 'r-' + rec : '', far ? 'far' : ''].filter(Boolean).join(' ')}"><span class="th"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k0)}</span>
 <span class="t"><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? ar(s.note) : '', mv ? movedNote(mv) : ''].filter(Boolean).join(' · ')}</small></span>
 <span class="st">${rec ? `<i class="rc ${rec}">${REC[rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'اعرض'} ${esc(o.title || '')}"></button>`}</li>`; };
 // ترتيب طويل (أكثر من ١٤ عملاً) يُختصر إلى نافذة حول هذا العمل، وزر يعرضه كاملاً
@@ -268,7 +268,7 @@ function orderHTML(f) { const g = groupOf(f), door = xdoorHTML(D.wworks[keyOf(f)
 // أعمال مرتبطة: الأصل وما اقتُبس عنه واقتباسات أخرى للمصدر نفسه، والمصدر نفسه إن كان كتاباً أو لعبة. ما ظهر في الترتيب لا يتكرر هنا
 const relCard = r => { const s = stepOf(r.k), l = listedOf(s), o = infoOf(s);
   return `<button class="part${l && st(l.id) === 'watched' ? ' watched' : ''}" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${l ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
-<span class="p">${poster(o.poster, '100px')}<span class="rl ${r.r}">${RELN[r.r]}</span></span><b>${esc(o.title || '')}</b><small>${[kindOf(s), o.year, r.r === 'sibling' && r.via ? `عن <bdi dir="ltr">${esc(r.via)}</bdi>` : '', l ? 'في قائمتك' : ''].filter(Boolean).join(' · ')}</small></button>`; };
+<span class="p"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '100px')}<span class="rl ${r.r}">${RELN[r.r]}</span></span><b>${esc(o.title || '')}</b><small>${[kindOf(s), o.year, r.r === 'sibling' && r.via ? `عن <bdi dir="ltr">${esc(r.via)}</bdi>` : '', l ? 'في قائمتك' : ''].filter(Boolean).join(' · ')}</small></button>`; };
 function relatedHTML(f) { const w = D.wworks[keyOf(f)]; if (!w) return '';
   const shown = new Set((groupOf(f)?.order || []).map(keyOfStep)), rel = (w.rel || []).filter(r => !shown.has(r.k) && infoOf(stepOf(r.k)).title);
   const src = (w.src || []).map(x => { const t = `مقتبس عن ${SRCK[x.kind] || 'عمل'} «<bdi dir="ltr">${esc(x.label)}</bdi>»${x.year ? ` <bdi>(${x.year})</bdi>` : ''}`;
@@ -341,7 +341,7 @@ $('#add-form').addEventListener('submit', async e => { e.preventDefault(); const
     if (!r.candidates.length) { msg.textContent = `لم أجد فيلماً باسم «${r.parsed.title}»${r.parsed.year ? ` وسنة ${r.parsed.year}` : ''}. تأكد من الإملاء أو السنة.`; return; }
     msg.textContent = r.parsed.year ? `فهمت: «${r.parsed.title}»، سنة ${r.parsed.year}. اختر المقصود:` : `فهمت: «${r.parsed.title}» بلا سنة. اختر المقصود:`;
     $('#cands').innerHTML = r.candidates.map(c => { const has = D.byId.has((c.kind === 'tv' ? 't' : 'm') + c.tmdb);
-      return `<div class="cand"><span class="th">${c.poster ? `<img alt="" src="${IMG}w92${c.poster}">` : ''}</span><span><b>${esc(c.title)}</b><small>${[c.kind === 'tv' ? 'مسلسل' : 'فيلم', c.year, c.collection ? `من سلسلة ${esc(c.collection)}` : ''].filter(Boolean).join(' · ')}</small></span>
+      return `<div class="cand"><span class="th"${c.poster ? ` data-zoom-pinch data-zoom-title="${esc(c.title)}"` : ''}>${c.poster ? `<img alt="" src="${IMG}w92${c.poster}">` : ''}</span><span><b>${esc(c.title)}</b><small>${[c.kind === 'tv' ? 'مسلسل' : 'فيلم', c.year, c.collection ? `من سلسلة ${esc(c.collection)}` : ''].filter(Boolean).join(' · ')}</small></span>
 <span class="cbtns">${has ? `<small>في قائمتك</small><button class="btn sec" type="button" data-act="cand-open" data-id="${(c.kind === 'tv' ? 't' : 'm') + c.tmdb}">افتح بطاقته</button>`
   : `<button class="btn sec" type="button" data-act="preview" data-tmdb="${c.tmdb}" data-kind="${c.kind}">التفاصيل</button><button class="btn pri" type="button" data-act="add-pick" data-tmdb="${c.tmdb}" data-kind="${c.kind}">أضفه</button>`}</span></div>`; }).join('');
   } catch (err) { msg.textContent = err.message; } });
