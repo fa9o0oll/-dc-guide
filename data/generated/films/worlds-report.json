@@ -1,12 +1,12 @@
 {
- "generatedAt": "2026-11-14T12:34:18.570Z",
+ "generatedAt": "2026-11-14T12:39:46.813Z",
  "counts": {
-  "works": 627,
-  "withEntry": 374,
-  "inWorld": 229,
-  "worlds": 110,
+  "works": 628,
+  "withEntry": 375,
+  "inWorld": 230,
+  "worlds": 111,
   "chains": 51,
-  "withRelated": 248,
+  "withRelated": 249,
   "missing": 2,
   "uncurated": 4,
   "curatedGaps": 0,
@@ -16,9 +16,9 @@
   "chronoReviewed": 2,
   "chronoMissed": 28,
   "chronoAuto": 31,
-  "infoEntries": 468,
-  "bytes": 203032,
-  "seconds": 163
+  "infoEntries": 467,
+  "bytes": 203232,
+  "seconds": 64
  },
  "missing": [
   {
@@ -1690,8 +1690,8 @@
     "sibling:Untitled James Bond Film*"
    ],
    "src": [
-    "story:Quantum of Solace",
-    "novels:James Bond"
+    "novels:James Bond",
+    "story:Quantum of Solace"
    ]
   },
   {
@@ -3343,6 +3343,14 @@
     "derived:Friday the 13th"
    ],
    "src": []
+  },
+  {
+   "k": "m338953",
+   "t": "Fantastic Beasts: The Secrets of Dumbledore",
+   "rel": [],
+   "src": [
+    "book:Fantastic Beasts: The Secrets of Dumbledore — The Original Screenplay"
+   ]
   }
  ],
  "noItem": [
