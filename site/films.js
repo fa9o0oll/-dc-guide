@@ -2,7 +2,7 @@
 // البيانات تُبنى في scripts/build-films.mjs، وخريطة العوالم في scripts/build-worlds.mjs (Wikidata). سجل المشاهدة يُحفظ في المتصفح بالمفتاح filmsg.progress.
 import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
-import { segs } from './count.js?v=__BUILD__';
+import { clock, spoken, left } from './count.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 const BUILD = '__BUILD__', KEY = 'filmsg.progress', PEND = 'filmsg.pending', PASS = 'filmsg.pass', IMG = 'https://image.tmdb.org/t/p/';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -26,9 +26,19 @@ const today = new Date().toISOString().slice(0, 10);
 const unreleased = f => f.kind === 'movie' && (!f.date || f.date > today);
 const daysTo = d => Math.ceil((new Date(d + 'T00:00:00') - Date.now()) / 864e5);
 const nDays = n => count(n, ['يوم واحد', 'يومان', 'أيام', 'يوماً', 'يوم']);
-// عدّاد حي حتى منتصف ليل يوم الصدور بتوقيت الجهاز
-const cdHTML = date => segs(date) || '<b class="now">صدر اليوم</b>';
-setInterval(() => { if (!document.hidden) for (const el of document.querySelectorAll('.cd[data-until]')) el.innerHTML = cdHTML(el.dataset.until); }, 1000);
+const dateAr = d => new Date(d + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' });
+// المسلسل الذي يُعرض الآن: موعد حلقته القادمة من TMDB
+const nextEp = f => f.kind === 'tv' && f.next?.date && f.next.date >= today ? f.next : null;
+// عمل لم يصدر (أو حلقة قادمة): لافتة سينما أسفل البوستر، بمصابيح تجري وعدّ حي تحرّكه count.js، أو «قريباً» إن لم يُعلن موعده
+function marquee(f) { const n = nextEp(f); if (!n && !unreleased(f)) return '';
+  const date = n ? n.date : f.date, now = n ? 'تُعرض اليوم' : 'يُعرض اليوم';
+  if (!date) return '<span class="mq tba" aria-hidden="true"><b>قريباً</b><small>لم يُعلن موعده</small></span>';
+  return `<span class="mq" data-until="${date}" data-now="${now}"><small>${n ? `الحلقة ${n.e} بعد` : 'يُعرض بعد'}</small><span class="ck" aria-hidden="true">${clock(date, now)}</span><span class="sr sr-time">${spoken(date)}</span></span>`; }
+// موعد الصدور في البطاقة: شريط العدّ في أول بكرات الأفلام القديمة، عقربه يدور مع الثواني وفي وسطه الأيام الباقية
+function leader(date, note, now = 'يُعرض اليوم') { const t = date && left(date);
+  return `<div class="leader${date ? '' : ' tba'}"${date ? ` data-until="${date}" data-now="${now}"` : ''}><span class="ld-dial" aria-hidden="true"><i class="ld-sweep" style="animation-delay:-${t ? 60 - t.s : 0}s"></i>${date ? '' : '<b class="ld-q">؟</b>'}</span>${date ? `<span class="ck" aria-hidden="true">${clock(date, now)}</span><span class="sr sr-time">${spoken(date)}</span>` : ''}<p class="note">${note}</p></div>`; }
+// بلا بوستر بعد: لوح تصوير (كلاكيت) عليه اسم العمل وحالته، يُطبق ذراعه حين يمر عليه المؤشر
+const slate = o => `<span class="ph slate" aria-hidden="true"><span class="sl-top"><i class="sl-arm"></i><i class="sl-base"></i></span><span class="sl-body"><bdi class="sl-t" dir="ltr">${esc(o.title || '')}</bdi><span class="sl-f"><span><small>الحالة</small><b>${!o.date || o.date > today ? 'قريباً' : 'صدر'}</b></span><span><small>الموعد</small><b>${o.date ? `<bdi>${o.date.slice(0, 4)}</bdi>` : 'لم يُعلن'}</b></span></span></span></span>`;
 const poster = (p, sizes) => p ? `<img loading="lazy" decoding="async" alt="" src="${IMG}w342${p}" srcset="${IMG}w185${p} 185w, ${IMG}w342${p} 342w, ${IMG}w500${p} 500w" sizes="${sizes}">` : '';
 
 const D = { films: [], byId: new Map(), byTmdb: new Map(), more: null, cols: {}, prov: {}, fr: {}, fx: {}, frOf: new Map(), recOf: new Map(), part: new Map(),
@@ -82,13 +92,13 @@ function partTag(f) { const g = groupOf(f), i = g ? g.order.findIndex(s => isHer
   if (g?.view && i === 0 && firstReleased(g) !== 0) return '<span class="tag start">بداية الأحداث</span>';
   const r = D.recOf.get(f.id); if (r === 'skip' || r === 'optional') return `<span class="tag">${r === 'skip' ? 'تجاوزه' : 'اختياري'}</span>`;
   return g && i >= 0 && g.order.length > 1 ? `<span class="tag"><bdi dir="ltr">${i + 1}/${g.order.length}</bdi></span>` : ''; }
-const tagOf = f => f.fresh ? '<span class="tag new">جديد</span>' : f.kind === 'tv' ? '<span class="tag">مسلسل</span>' : unreleased(f) ? `<span class="tag">${f.date ? 'بعد ' + nDays(daysTo(f.date)) : 'لم يُعلن موعده'}</span>` : partTag(f);
+const tagOf = f => f.fresh ? '<span class="tag new">جديد</span>' : f.kind === 'tv' ? '<span class="tag">مسلسل</span>' : partTag(f); // موعد ما لم يصدر في لافتته أسفل البوستر
 // خريطة العوالم تصل بعد رسم القائمة وقد تغيّر ترتيب سلسلة (عالم آلي أو ترتيب أحداث مجموعة)، فتُحدَّث الوسوم التي تغيّرت فقط
 function retag() { for (const f of D.films) { const el = document.querySelector(`#f-${f.id} .poster`); if (!el) continue; const old = el.querySelector(':scope > .tag'), html = tagOf(f);
   if ((old?.outerHTML || '') === html) continue; old?.remove(); if (html) el.querySelector('.stamp').insertAdjacentHTML('beforebegin', html); } }
 function card(f) { const s = st(f.id);
   return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}">
-<button class="poster" data-act="open" ${f.poster ? `data-zoom-pinch data-zoom-title="${esc(f.title)}" ` : ''}aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || `<span class="ph" dir="ltr">${esc(f.title)}</span>`}${tagOf(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
+<button class="poster" data-act="open" ${f.poster ? `data-zoom-pinch data-zoom-title="${esc(f.title)}" ` : ''}aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || slate(f)}${tagOf(f)}${marquee(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
 <div class="stub"><h3>${esc(f.title)}</h3><p class="meta">${f.year ? `<bdi>${f.year}</bdi>` : '<span>بلا موعد</span>'}${f.rating ? `<span class="rate"><bdi dir="ltr">${f.rating.toFixed(1)}</bdi></span>` : ''}${f.runtime ? `<span>${rt(f.runtime)}</span>` : f.seasons ? `<span>${count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم'])}</span>` : ''}</p>
 <button class="seen" data-act="seen" aria-pressed="${s === 'watched'}" aria-label="شاهدته: ${esc(f.title)}">${ic('check')}</button><div class="where">${whereHTML(f)}</div></div></article>`; }
 
@@ -193,7 +203,7 @@ function seriesHTML() { const gs = groups().filter(g => !ui.q || g.name.toLowerC
   return gs.map(g => { const mine = g.order.map(listedOf).filter(Boolean), seen = mine.filter(f => st(f.id) === 'watched').length;
     return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${nWorks(g.order.length)}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ` · بتوصيات الدليل${g.view ? '، بترتيب الأحداث' : ''}` : g.auto ? ` · ${WKIND[g.kind]}، مرتّب آلياً${g.chrono ? ' حسب الأحداث' : ''}` : g.chrono ? ' · مرتّب آلياً حسب الأحداث' : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
       g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}"${f ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
-<span class="p"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '118px')}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
+<span class="p"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '118px') || slate(o)}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
 function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); $('#grid').hidden = v !== 'grid'; $('#series').hidden = v !== 'series'; $('#chips').hidden = v !== 'grid';
   if (v === 'series') $('#series').innerHTML = seriesHTML(); apply(false); }
 
@@ -268,7 +278,7 @@ function orderHTML(f) { const g = groupOf(f), door = xdoorHTML(D.wworks[keyOf(f)
 // أعمال مرتبطة: الأصل وما اقتُبس عنه واقتباسات أخرى للمصدر نفسه، والمصدر نفسه إن كان كتاباً أو لعبة. ما ظهر في الترتيب لا يتكرر هنا
 const relCard = r => { const s = stepOf(r.k), l = listedOf(s), o = infoOf(s);
   return `<button class="part${l && st(l.id) === 'watched' ? ' watched' : ''}" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${l ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
-<span class="p"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '100px')}<span class="rl ${r.r}">${RELN[r.r]}</span></span><b>${esc(o.title || '')}</b><small>${[kindOf(s), o.year, r.r === 'sibling' && r.via ? `عن <bdi dir="ltr">${esc(r.via)}</bdi>` : '', l ? 'في قائمتك' : ''].filter(Boolean).join(' · ')}</small></button>`; };
+<span class="p"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '100px') || slate(o)}<span class="rl ${r.r}">${RELN[r.r]}</span></span><b>${esc(o.title || '')}</b><small>${[kindOf(s), o.year, r.r === 'sibling' && r.via ? `عن <bdi dir="ltr">${esc(r.via)}</bdi>` : '', l ? 'في قائمتك' : ''].filter(Boolean).join(' · ')}</small></button>`; };
 function relatedHTML(f) { const w = D.wworks[keyOf(f)]; if (!w) return '';
   const shown = new Set((groupOf(f)?.order || []).map(keyOfStep)), rel = (w.rel || []).filter(r => !shown.has(r.k) && infoOf(stepOf(r.k)).title);
   const src = (w.src || []).map(x => { const t = `مقتبس عن ${SRCK[x.kind] || 'عمل'} «<bdi dir="ltr">${esc(x.label)}</bdi>»${x.year ? ` <bdi>(${x.year})</bdi>` : ''}`;
@@ -299,14 +309,14 @@ async function sheetHTML(f, pv = null) { await Promise.race([D.worldsReady, new 
   const m = pv?.more || (await D.moreReady)?.[f.id] || {}, s = st(f.id), un = unreleased(f); slotOf.k = keyOf(f); slotOf.f = f;
   const ov = m.overviewAr ? `<p>${ar(m.overviewAr)}</p>${m.arSource === 'guide' ? '' : '<p class="note">نبذة <bdi dir="ltr">TMDB</bdi> العربية كما هي، لم نراجعها بعد.</p>'}` : m.overviewEn ? `<p dir="ltr" lang="en" style="text-align:left">${esc(m.overviewEn)}</p><p class="note">النبذة بالإنجليزية، والترجمة قيد الإعداد.</p>` : '<p>لا توجد نبذة.</p>';
   return `<div class="sh-hero">${f.backdrop ? `<img alt="" src="${IMG}w780${f.backdrop}" srcset="${IMG}w780${f.backdrop} 780w, ${IMG}w1280${f.backdrop} 1280w" sizes="(max-width:880px) 100vw, 880px">` : ''}</div>
-<div class="sh-head">${f.poster ? `<button type="button" class="poster" data-zoom="" data-zoom-title="${esc(f.title)}" aria-label="تكبير بوستر ${esc(f.title)}">${poster(f.poster, '170px')}</button>` : '<div class="poster"></div>'}<div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
+<div class="sh-head">${f.poster ? `<button type="button" class="poster" data-zoom="" data-zoom-title="${esc(f.title)}" aria-label="تكبير بوستر ${esc(f.title)}">${poster(f.poster, '170px')}</button>` : `<div class="poster">${slate(f)}</div>`}<div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
 <p class="facts">${[f.kind === 'tv' ? 'مسلسل' : '', f.year ? `<bdi>${f.year}</bdi>` : '', rt(f.runtime), f.seasons ? count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم']) : '', f.cert ? `<bdi dir="ltr">${esc(f.cert)}</bdi>` : '', LANGS[f.lang] ? 'اللغة ' + LANGS[f.lang] : '', f.rating ? `<span class="rate">تقييم <bdi dir="ltr">TMDB ${f.rating.toFixed(1)}</bdi></span>` : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</p>
 <div class="tags">${f.genres.map(g => GENRES[g] ? `<span>${GENRES[g]}</span>` : '').join('')}</div></div></div>
 ${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>
 <section class="sec"><p class="ask">ليس في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">TMDB</bdi>.</p></section>`
   : `<div class="sh-acts"><button class="btn sec" data-act="set" data-v="watched" aria-pressed="${s === 'watched'}">${ic('check')}شاهدته</button><button class="btn sec nx" data-act="set" data-v="next" aria-pressed="${s === 'next'}">${ic('mark')}التالي في المشاهدة</button></div>`}
 ${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''}${f.src === 'added' ? '<section class="sec"><p class="ask">أُضيف بزر «أضف فيلماً»: معلوماته آلية من <bdi dir="ltr">TMDB</bdi> ولم تُراجَع يدوياً.</p></section>' : ''}
-<section class="sec"><h3>القصة</h3>${ov}</section>${un ? `<section class="sec"><h3>موعد الصدور</h3>${f.date ? `<div class="cd" data-until="${f.date}" aria-label="الوقت الباقي على الصدور">${cdHTML(f.date)}</div><p class="note">يصدر في <bdi>${new Date(f.date + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' })}</bdi> حسب <bdi dir="ltr">TMDB</bdi>، والموعد قابل للتغيير.</p>` : '<p>معلن، ولم يُحدَّد موعد صدوره بعد.</p>'}</section>` : ''}
+<section class="sec"><h3>القصة</h3>${ov}</section>${un ? `<section class="sec"><h3>موعد الصدور</h3>${f.date ? leader(f.date, `يصدر في <bdi>${dateAr(f.date)}</bdi> حسب <bdi dir="ltr">TMDB</bdi>، والموعد قابل للتغيير.`) : leader(null, 'معلن، ولم يُحدَّد موعد صدوره بعد.')}</section>` : ''}${nextEp(f) ? `<section class="sec"><h3>الحلقة القادمة</h3>${leader(f.next.date, `الموسم ${f.next.s}، الحلقة ${f.next.e}: تُعرض في <bdi>${dateAr(f.next.date)}</bdi> حسب <bdi dir="ltr">TMDB</bdi>.`, 'تُعرض اليوم')}</section>` : ''}
 ${whereSec(f)}<div id="wslot" data-k="${keyOf(f)}">${worldHTML(f)}</div>
 ${(m.directors?.length || m.cast?.length) ? `<section class="sec"><h3>الطاقم</h3><p class="people">${m.directors?.length ? `<b>${f.kind === 'tv' ? 'صنّاع المسلسل' : 'الإخراج'}:</b> <bdi dir="ltr">${m.directors.map(esc).join(', ')}</bdi><br>` : ''}${m.cast?.length ? `<b>التمثيل:</b> <bdi dir="ltr">${m.cast.map(esc).join(', ')}</bdi>` : ''}</p></section>` : ''}
 ${linksSec(f)}`; }

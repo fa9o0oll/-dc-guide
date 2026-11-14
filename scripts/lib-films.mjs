@@ -64,7 +64,8 @@ export function shape(kind, d, providers = {}) {
     cast: cast.slice(0, 5).map(p => p.name), overviewEn: (d.overview || '').trim() || null, overviewAr: ar.overview || undefined,
     col: d.belongs_to_collection?.id || undefined,
     prov: wp ? { link: wp.link || undefined, stream: provIds(wp.flatrate, providers), free: provIds([...(wp.free || []), ...(wp.ads || [])], providers), rent: provIds(wp.rent, providers), buy: provIds(wp.buy, providers) } : null };
-  if (kind === 'tv') { o.seasons = d.number_of_seasons || null; o.episodes = d.number_of_episodes || null; o.lastDate = d.last_air_date || null; }
+  if (kind === 'tv') { o.seasons = d.number_of_seasons || null; o.episodes = d.number_of_episodes || null; o.lastDate = d.last_air_date || null;
+    const n = d.next_episode_to_air; if (n?.air_date) o.next = { s: n.season_number, e: n.episode_number, date: n.air_date }; } // الحلقة القادمة لمسلسل يُعرض الآن (لعدّادها)
   return JSON.parse(JSON.stringify(o));
 }
 

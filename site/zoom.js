@@ -45,9 +45,10 @@ dialog.pz::backdrop{background:none}
 [data-zoom]::after{content:"";position:absolute;z-index:3;inset-block-end:7px;inset-inline-start:7px;width:26px;height:26px;border-radius:50%;background:rgba(10,10,14,.6) url("${ICON}") center/13px no-repeat;box-shadow:0 0 0 1px rgba(255,255,255,.18);pointer-events:none;opacity:.9;transition:transform .2s ease,opacity .2s ease}
 @media (hover:hover){[data-zoom]:hover::after{transform:scale(1.12);opacity:1}}
 .pz-lifted{visibility:hidden}
-/* ميلان البوسترات مع الجوال: الصورة تميل وتنزاح داخل إطارها (كأن للبوستر عمقاً)، وخيط ضوء ينزلق على سطحه بعكس الميلان */
-.pz-t>img{transform:perspective(520px) translate(calc(var(--pz-x,0) * -3%),calc(var(--pz-y,0) * -3%)) rotateX(calc(var(--pz-y,0) * -9deg)) rotateY(calc(var(--pz-x,0) * 9deg)) scale(1.12);transition:opacity .4s ease,filter .3s ease!important;will-change:transform}
-.pz-t::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;mix-blend-mode:screen;opacity:var(--pz-m,0);background:linear-gradient(105deg,transparent 34%,rgba(255,255,255,.1) 42%,rgba(255,255,255,.42) 49%,rgba(255,255,255,.1) 56%,transparent 64%) calc(50% + var(--pz-x,0) * 70%) calc(50% + var(--pz-y,0) * 50%)/260% 260% no-repeat}
+/* ميلان البوسترات مع الجوال (أو المؤشر على الكمبيوتر): الصورة تميل وتنزاح داخل إطارها كأن للبوستر عمقاً، وخيط ضوء ينزلق
+   على سطحه بعكس الميلان. --pz-k يُدخل الميلان ويُخرجه بنعومة (المؤشر)، و--pz-p يدفع الصورة للداخل ويقوّي الضوء حين يُضغط */
+.pz-t>img{transform:perspective(520px) translate(calc(var(--pz-x,0) * -3%),calc(var(--pz-y,0) * -3%)) rotateX(calc(var(--pz-y,0) * -9deg)) rotateY(calc(var(--pz-x,0) * 9deg)) scale(calc(1 + var(--pz-k,1) * .12 - var(--pz-p,0) * .07));transition:opacity .4s ease,filter .3s ease!important;will-change:transform}
+.pz-t::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;mix-blend-mode:screen;opacity:calc(var(--pz-m,0) * var(--pz-k,1) + var(--pz-p,0) * .3);background:linear-gradient(105deg,transparent 34%,rgba(255,255,255,.1) 42%,rgba(255,255,255,.42) 49%,rgba(255,255,255,.1) 56%,transparent 64%) calc(50% + var(--pz-x,0) * 70%) calc(50% + var(--pz-y,0) * 50%)/260% 260% no-repeat}
 /* القرص على بوستر صغير: نسخة منه تكبر بين الإصبعين فوق ستار يعتم */
 .pz-veil{position:fixed;inset:0;z-index:2147483646;background:rgba(5,5,8,.86);opacity:0;pointer-events:none}
 .pz-ghost{position:fixed;z-index:2147483647;margin:0;overflow:hidden;pointer-events:none;box-shadow:0 30px 70px -16px rgba(0,0,0,.8);will-change:transform}
@@ -125,7 +126,7 @@ function original() { const u = cur?.src; if (!u || !TMDB.test(u) || cur.orig) r
 export function zoom(t, opt = {}) {
   const im = t?.querySelector('img'); if (S !== 'closed' || !im || !(im.currentSrc || im.src) || im.dataset.failed) return false;
   build(); S = 'opening'; askMotion();
-  const rt = im.getBoundingClientRect(), r0 = opt.from || rt, lo = opt.src || im.currentSrc || im.src;
+  flatNow(t); const rt = t.getBoundingClientRect(), r0 = opt.from || rt, lo = opt.src || im.currentSrc || im.src; // الإطار لا الصورة: الصورة قد تكون مائلة
   cur = { t, shape: shapeOf(t, im), w0: rt.width || 1, ar: rt.width && rt.height ? rt.width / rt.height : 2 / 3, src: srcOf(t), orig: false };
   const w = size(), hi = sized(cur.src, w * (devicePixelRatio || 1));
   setZ({ s: 1, x: 0, y: 0 }); D.lo.src = lo; D.ambImg.src = lo; D.hi.classList.remove('in'); D.hi.removeAttribute('src'); if (hi && hi !== lo) D.hi.src = hi;
@@ -150,7 +151,7 @@ export function unzoom(fromPop = false) {
   if (!D || S === 'closed' || S === 'closing') return; S = 'closing'; G = null; P.clear(); clearTimeout(single); D.d.classList.remove('pz-on', 'pz-gyro');
   for (const a of anims) { try { a.commitStyles(); } catch {} a.cancel(); } anims = [];
   if (!fromPop && history.state?.pz) { skipPop = true; history.back(); }
-  const t = cur?.t, im = t?.isConnected ? t.querySelector('img') : null, r0 = im?.getBoundingClientRect(), els = [D.d, D.fly, D.zoom, D.card, D.scrim, D.amb, D.cap, D.x, D.sheen];
+  const t = cur?.t, im = t?.isConnected ? t.querySelector('img') : null, r0 = im && t.getBoundingClientRect(), els = [D.d, D.fly, D.zoom, D.card, D.scrim, D.amb, D.cap, D.x, D.sheen];
   const seen = r0 && r0.width > 0 && r0.bottom > 0 && r0.top < innerHeight && r0.right > 0 && r0.left < innerWidth;
   const done = () => { if (S !== 'closing') return; t?.classList.remove('pz-lifted'); D.d.close(); for (const a of anims) a.cancel(); anims = [];
     for (const e of els) { e.style.transform = ''; e.style.opacity = ''; e.style.translate = ''; } D.zoom.classList.remove('pz-ease'); D.d.classList.remove('pz-zoomed'); Z = { s: 1, x: 0, y: 0 }; cur = null; S = 'closed'; gyro.rebase(2.5); };
@@ -251,7 +252,7 @@ function askMotion() { if (asked) return; asked = true; const R = globalThis.Dev
 // البوسترات الظاهرة على الشاشة فقط تميل (تتبعها IntersectionObserver)، وما خرج منها يعود مستوياً
 let painted = '';   // آخر قيم كُتبت، فلا يُعاد رسم البوسترات ما دام الجوال ثابتاً
 const vis = new Set(), io = 'IntersectionObserver' in window ? new IntersectionObserver(es => { painted = ''; for (const e of es) { if (e.isIntersecting) vis.add(e.target); else { vis.delete(e.target); still(e.target); } } }, { rootMargin: '40px' }) : null;
-const still = el => { el.classList.remove('pz-t'); el.style.removeProperty('--pz-x'); el.style.removeProperty('--pz-y'); el.style.removeProperty('--pz-m'); };
+const still = el => { el.classList.remove('pz-t'); for (const k of ['x', 'y', 'm', 'k', 'p']) el.style.removeProperty('--pz-' + k); };
 // كل بوستر في الصفحة (وما يُضاف لاحقاً): يُتابَع ظهوره للميلان إن كان للجهاز مستشعر، ويُمنع تمرير الصفحة أثناء القرص عليه في اللمس
 const touchy = navigator.maxTouchPoints > 0 || 'ontouchstart' in window, hooked = new WeakSet();
 const hold = e => { if (pin && e.cancelable) e.preventDefault(); }; // متصفح الجوال يمرّر الصفحة إن تحرك الإصبعان معاً فيقطع القرص
@@ -263,6 +264,29 @@ function posters(x, y) { const m = (Math.min(1, Math.hypot(x, y)) * .9).toFixed(
   if (key === painted) return; painted = key;
   for (const el of vis) { if (!el.isConnected) { vis.delete(el); continue; } if (el.classList.contains('pz-lifted')) continue;
     el.classList.add('pz-t'); el.style.setProperty('--pz-x', sx); el.style.setProperty('--pz-y', sy); el.style.setProperty('--pz-m', m); } }
+
+// ================= ميلان البوستر مع المؤشر (الكمبيوتر) =================
+// البوستر تحت المؤشر يميل نحو موضعه ويمر عليه الضوء، ويدخل الميلان ويخرج بنعومة، والضغط عليه يدفعه للداخل قليلاً.
+// المطابقة نفسها لميلان الجوال (المتغيرات ذاتها)، فالحركة واحدة على الجهازين
+const mouse = matchMedia('(hover: hover) and (pointer: fine)'), H = new Map(); let hraf = 0, hel = null;
+function hset(el, o) { let v = H.get(el); if (!v) { v = { x: 0, y: 0, k: 0, p: 0, tx: 0, ty: 0, tk: 0, tp: 0 }; H.set(el, v); el.classList.add('pz-t'); el.style.setProperty('--pz-k', '0'); }
+  Object.assign(v, o); if (!hraf) hraf = requestAnimationFrame(hframe); }
+function hframe() { hraf = 0; let busy = false;
+  for (const [el, v] of H) { for (const k of 'xykp') v[k] += (v['t' + k] - v[k]) * (k === 'p' ? .3 : .14);
+    const done = [...'xykp'].every(k => Math.abs(v['t' + k] - v[k]) < .004);
+    if (done && !v.tk && !v.tp) { H.delete(el); still(el); continue; }
+    for (const k of 'xykp') el.style.setProperty('--pz-' + k, v[k].toFixed(3));
+    el.style.setProperty('--pz-m', (Math.min(1, Math.hypot(v.x, v.y)) * .85).toFixed(3)); if (!done) busy = true; }
+  if (busy) hraf = requestAnimationFrame(hframe); }
+const hleave = () => { if (hel && H.has(hel)) hset(hel, { tx: 0, ty: 0, tk: 0, tp: 0 }); hel = null; };
+// يُمسح الميلان فوراً قبل قياس البوستر (للتكبير أو القرص)، فالقياس على شكله المستوي
+function flatNow(t) { if (H.has(t)) { H.delete(t); if (hel === t) hel = null; } still(t); }
+document.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' || !mouse.matches || reduce.matches || S !== 'closed') return;
+  const t = e.target.closest?.(SEL); if (t !== hel) { hleave(); hel = t; } if (!t || t.classList.contains('pz-lifted')) return;
+  const r = t.getBoundingClientRect(); hset(t, { tx: lim((e.clientX - r.left) / r.width * 2 - 1, -1, 1), ty: lim((e.clientY - r.top) / r.height * 2 - 1, -1, 1), tk: 1 }); }, { passive: true });
+document.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && !e.button && hel && e.target.closest?.(SEL) === hel) hset(hel, { tp: 1 }); }, true);
+addEventListener('pointerup', () => { if (hel && H.has(hel)) hset(hel, { tp: 0 }); }, true);
+document.documentElement.addEventListener('pointerleave', hleave); addEventListener('blur', hleave); addEventListener('scroll', hleave, { passive: true, capture: true });
 
 // ================= القرص على بوستر صغير =================
 // إصبعان على بوستر في الصفحة: نسخة منه تكبر بينهما فوق ستار يعتم. إن كبُرت بما يكفي عند رفع الأصابع فُتح المكبَّر من حيث
@@ -278,7 +302,7 @@ const lift = e => { if (!T.has(e.pointerId)) return; T.delete(e.pointerId); if (
 document.addEventListener('pointerup', lift, true); document.addEventListener('pointercancel', lift, true);
 function pinchStart(t, a, b) {
   const im = t.querySelector('img'); if (!im || !(im.currentSrc || im.src) || im.dataset.failed) return;
-  const r = im.getBoundingClientRect(), host = t.closest('dialog[open]') || document.body, m = mid(a, b);
+  flatNow(t); const r = t.getBoundingClientRect(), host = t.closest('dialog[open]') || document.body, m = mid(a, b);
   const veil = Object.assign(document.createElement('div'), { className: 'pz-veil' }), g = Object.assign(document.createElement('figure'), { className: 'pz-ghost' });
   g.style.cssText = `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:${getComputedStyle(shapeOf(t, im)).borderRadius};transform-origin:${m.x - r.left}px ${m.y - r.top}px`;
   g.append(Object.assign(new Image(), { src: im.currentSrc || im.src, alt: '' })); host.append(veil, g); t.classList.add('pz-lifted');

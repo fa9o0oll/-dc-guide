@@ -25,9 +25,13 @@ body{min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;background:
 @media (max-width:560px){.hub-top .syncb{grid-column:1;grid-row:auto;justify-self:start;margin-top:6px}}
 .hub-foot{padding:12px var(--pad) 18px;font-size:.78rem;color:#8d887d}
 .hub-foot a{color:inherit}
-/* الأبواب: ثلاثة أعمدة طويلة على الشاشات العريضة (ومنها شاشة الفولد الداخلية)، وصفوف على الجوال */
-.doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 var(--pad);min-height:0}
-.door{position:relative;isolation:isolate;overflow:hidden;display:grid;align-content:end;min-height:min(72dvh,760px);padding:22px 20px;color:var(--ink);text-decoration:none;background:var(--bg);border:1px solid color-mix(in srgb,var(--c1) 38%,transparent);transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s ease}
+/* الأبواب: ثلاثة أعمدة طويلة على الشاشات العريضة (ومنها شاشة الفولد الداخلية)، وصفوف على الجوال.
+   الإطار واحد للثلاثة (الشكل والحافة والظل والإطار الداخلي على بعد واحد)، والهوية داخله: لون العالم وخطه ونقشه،
+   ونوع خط الإطار الداخلي (متصل في دي سي، مزدوج بزوايا حادة في Fate، متقطع كتذكرة في الأفلام) */
+.doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0 var(--pad);min-height:0}
+.door{position:relative;isolation:isolate;overflow:hidden;display:grid;align-content:end;min-height:min(72dvh,760px);padding:24px 22px;color:var(--ink);text-decoration:none;background:var(--bg);border:1px solid color-mix(in srgb,var(--c1) 34%,transparent);border-radius:16px;
+  box-shadow:0 26px 50px -32px rgba(0,0,0,.95);transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s ease,box-shadow .3s ease}
+.door::before{content:"";position:absolute;inset:7px;pointer-events:none;border:1px solid color-mix(in srgb,var(--c1) 24%,transparent);border-radius:10px}
 .door .art,.door .motif{position:absolute;inset:0;z-index:-1;pointer-events:none}
 .door .art{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .door .art img{width:100%;height:100%;object-fit:cover;object-position:center 20%;opacity:0;transition:opacity .7s ease,transform 7s cubic-bezier(.15,.6,.25,1);transform:scale(1.08)}
@@ -38,11 +42,11 @@ body{min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;background:
 .door bdi{color:var(--c1);font-weight:600;font-size:.95rem}
 .door .say{color:#e0d9cb;font-size:.95rem;max-width:34ch;margin-top:6px}
 .door .stat{margin-top:12px;font-size:.84rem;font-weight:600;color:var(--c1);min-height:1.6em}
-a.door:active{transform:scale(.985)}
+a.door:active{transform:scale(.985);transition-duration:.12s}
 a.door:focus-visible{outline:3px solid var(--c1);outline-offset:3px}
 /* التفاعل: الصورة تقترب ببطء وتتبع المؤشر، العنوان يرتفع، ونقش كل عالم يتحرك بطريقته */
 @media (hover:hover){
-  a.door:hover{border-color:var(--c1)}
+  a.door:hover{border-color:var(--c1);transform:translateY(-4px);box-shadow:0 34px 60px -30px color-mix(in srgb,var(--c1) 40%,rgba(0,0,0,.9))}
   a.door:hover .art{transform:translate(calc(var(--mx,0) * -16px),calc(var(--my,0) * -12px))}
   a.door:hover .art img.in{transform:scale(1.2);opacity:.72}
   a.door:hover strong{transform:translateY(-8px)}
@@ -50,31 +54,42 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:3px}
   a.door.fate:hover .motif{transform:scale(1.14);opacity:.85}
 }
 @media (hover:none){.door.dc .motif::before{animation-play-state:running}}
-/* دي سي: خط سميك، أصفر على كحلي، وظل مائل صلب */
-.door.dc{--bg:#07183a;--c1:#ffc23d;--ink:#fff;--display:Lalezar,Plex,sans-serif;border-radius:12px;box-shadow:-8px 8px 0 #1c3f8f}
+/* دي سي: خط سميك، أصفر على كحلي، وأشعة تدور من الزاوية */
+.door.dc{--bg:#07183a;--c1:#ffc23d;--ink:#fff;--display:Lalezar,Plex,sans-serif}
 .door.dc .motif{-webkit-mask:linear-gradient(#000,transparent 72%);mask:linear-gradient(#000,transparent 72%)}
 .door.dc .motif::before{content:"";position:absolute;inset:-90%;background:repeating-conic-gradient(rgba(255,194,61,.16) 0 3.5deg,transparent 3.5deg 10deg);transform-origin:50% 50%;translate:42% -44%;animation:spin 90s linear infinite paused}
-/* Fate: خط رقعة، ذهبي على نبيذي، إطار مزدوج وزوايا حادة */
-.door.fate{--bg:#12060a;--c1:#e6b65c;--ink:#f7efe0;--display:Ruqaa,Plex,serif;--dw:700;--lh:1.35;border-radius:3px;outline:1px solid rgba(230,182,92,.22);outline-offset:-7px}
+/* Fate: خط رقعة، ذهبي على نبيذي، دائرة استدعاء، وإطار داخلي مزدوج بزوايا حادة */
+.door.fate{--bg:#12060a;--c1:#e6b65c;--ink:#f7efe0;--display:Ruqaa,Plex,serif;--dw:700;--lh:1.35}
+.door.fate::before{border:3px double color-mix(in srgb,var(--c1) 34%,transparent);border-radius:2px}
 .door.fate .motif{inset:-20% auto auto -40%;width:130%;aspect-ratio:1;opacity:.45;transition:transform 1.2s cubic-bezier(.2,.8,.2,1),opacity .6s ease}
 .door.fate .motif::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(230,182,92,.7) 0 .6deg,transparent .6deg 10deg);
   -webkit-mask:radial-gradient(circle,transparent 0 30%,#000 30.4% 31%,transparent 31.4% 43%,#000 43.4% 46%,transparent 46.4% 57%,#000 57.4% 58%,transparent 58.4% 66%,#000 66.4% 70%,transparent 70.4%);
   mask:radial-gradient(circle,transparent 0 30%,#000 30.4% 31%,transparent 31.4% 43%,#000 43.4% 46%,transparent 46.4% 57%,#000 57.4% 58%,transparent 58.4% 66%,#000 66.4% 70%,transparent 70.4%);animation:spin 120s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* الأفلام: تذكرة سينما، برتقالي دافئ على فحمي، وثقوب شريط الفيلم على الحافة */
-.door.films{--bg:#14100b;--c1:#ff9f43;--ink:#fbf3e4;--display:Kufi,Plex,sans-serif;--dw:700;--lh:1.3;border-radius:14px;border-style:dashed}
-.door.films .motif{background:radial-gradient(circle,#08090d 0 5px,transparent 5.5px) right 8px top 0/26px 26px repeat-y,radial-gradient(60% 40% at 80% 0,rgba(255,159,67,.2),transparent 70%)}
-@keyframes reel{to{background-position:right 8px top 26px,0 0}}
+/* الأفلام: تذكرة سينما، برتقالي دافئ على فحمي، خط تمزيق متقطع، وثقوب شريط الفيلم على الطرف */
+.door.films{--bg:#14100b;--c1:#ff9f43;--ink:#fbf3e4;--display:Kufi,Plex,sans-serif;--dw:700;--lh:1.3}
+.door.films::before{border-style:dashed;border-color:color-mix(in srgb,var(--c1) 38%,transparent)}
+.door.films .motif{background:radial-gradient(circle,#08090d 0 4.5px,transparent 5px) left 20px top 0/22px 24px repeat-y,radial-gradient(60% 40% at 80% 0,rgba(255,159,67,.2),transparent 70%)}
+@keyframes reel{to{background-position:left 20px top 24px,0 0}}
 @media (hover:hover){a.door.films:hover .motif{animation:reel .5s linear infinite}}
 @media (hover:none){.door.films .motif{animation:reel 2.4s linear infinite}}
-.door.films{padding-inline-start:38px}
-.door.soon{opacity:.8}
+.door.films{padding-inline-end:40px}
 @media (max-width:600px){
   .doors{grid-template-columns:1fr;gap:12px}
-  .door{min-height:max(190px,24dvh);padding:18px 16px}
-  .door.films{padding-inline-start:38px}
+  .door{min-height:max(190px,24dvh);padding:20px 18px}
+  .door.films{padding-inline-end:40px}
   .door strong{font-size:2rem}
-  .door.dc{box-shadow:-5px 5px 0 #1c3f8f}
+}
+/* على الشاشات العريضة تصطف أسطر الأبواب الثلاثة: العنوان ثم اسمه الإنجليزي ثم وصفه ثم العدد، كلٌّ على خط واحد
+   مهما طال عنوان أحدها أو وصفه (الشبكة الفرعية تشارك صفوفها بين الأبواب) */
+@media (min-width:601px){
+  .doors{grid-template-rows:minmax(0,1fr) repeat(4,auto)}
+  .door{grid-row:1/-1;grid-template-rows:subgrid;row-gap:4px;align-content:normal}
+  .door .txt{display:contents}
+  .door strong{grid-row:2;align-self:end}
+  .door bdi{grid-row:3}
+  .door .say{grid-row:4;align-self:start}
+  .door .stat{grid-row:5}
 }
 @media (max-height:520px) and (min-width:601px){.door{min-height:60dvh}}
 /* الدخول: الباب يتمدد حتى يملأ الشاشة بلون عالمه واسمه، والصفحة التالية تبدأ بنفس المشهد ثم تكشف نفسها */

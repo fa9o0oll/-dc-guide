@@ -2,7 +2,7 @@
 import { GUIDES } from './guides.js?v=__BUILD__';
 import { shell } from './shell.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
-import { segs } from './count.js?v=__BUILD__';
+import { clock, spoken } from './count.js?v=__BUILD__';
 import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
@@ -74,7 +74,7 @@ function liftVeil() {
 
 // ---------- مساعدات
 const img = (path, size) => path ? D.base + size + path : '';
-const STAGE = { production: 'قيد الإنتاج، وتاريخ الصدور لم يُحدَّد بعد', development: 'قيد التطوير، وموعده لم يُحدَّد بعد' };
+const STAGE = { production: 'قيد الإنتاج', development: 'قيد التطوير' };
 const isSoon = w => !w.date || w.date > TODAY;
 // العدد والمعدود بقواعد العربية: 1 مفرد، 2 مثنى، 3 إلى 10 جمع، 11 إلى 99 مفرد منصوب، والمئات وما بعدها حسب آخر خانتين
 // [مفرد، مثنى مرفوع، مثنى منصوب أو مجرور، جمع، مفرد منصوب، واحد/واحدة]
@@ -85,12 +85,18 @@ const unit = (n, k) => { const f = NOUN[k], m = n % 100; return n === 0 || (m >=
 const cnt = (n, k, obl) => { const f = NOUN[k]; return n === 1 ? `${f[0]} ${f[5]}` : n === 2 ? f[obl ? 2 : 1] : `${n.toLocaleString('en')} ${unit(n, k)}`; };
 const bits = a => a.filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
 const daysLeft = w => Math.ceil((new Date(w.date) - new Date(TODAY)) / 864e5);
-// العدّاد الحي: اسم المعدود، ثم خانات الأيام والساعات والدقائق والثواني، ثم التاريخ. يتحدث كل ثانية (انظر المؤقت تحته).
-const liveCount = (date, what) => { const sg = segs(date);
-  return sg ? `<span class="lbl">باقٍ على ${what}</span><span class="segs">${sg}</span><small>${fmtDate(date)}</small>`
-    : `<span class="lbl"><b class="now">اليوم</b> ${what}</span><small>${fmtDate(date)}</small>`; };
-const liveBox = (date, what, cls, extra = '') => `<div class="count ${cls}" data-until="${date}" data-what="${esc(what)}"><span class="cd">${liveCount(date, what)}</span>${extra}</div>`;
-setInterval(() => { if (document.hidden) return; for (const el of document.querySelectorAll('.count[data-until] > .cd')) el.innerHTML = liveCount(el.parentNode.dataset.until, el.parentNode.dataset.what); }, 1000);
+// العدّاد بهوية العالم: لوحة بنقش العالم وألوانه وخطه، وعنوانها كتعليق القصص المصورة. بموعد: عدّ حي بالأيام ثم الساعات
+// والدقائق والثواني (يحرّكها count.js). بلا موعد: «قريباً» ومرحلة العمل. حين يحين الموعد يُكتب now
+const premiere = ({ date, cap, uni, src = '', tba = '', now = 'يُعرض اليوم', cls = '' }) => {
+  const head = `<span class="motif" aria-hidden="true"></span><span class="pm-top"><span class="pm-cap">${cap}</span><span class="pm-meta">${date ? `<small class="pm-date">${fmtDate(date)}</small>` : ''}${src}</span></span>`;
+  return date ? `<div class="pm m-${THEMES[uni]?.motif || 'stars'} ${cls}" data-until="${date}" data-now="${now}">${head}<span class="ck" aria-hidden="true">${clock(date, now)}</span><span class="sr sr-time">${spoken(date)}</span></div>`
+    : `<div class="pm tba m-${THEMES[uni]?.motif || 'stars'} ${cls}">${head}<span class="pm-tba"><b>قريباً</b><span>${tba}</span></span></div>`; };
+// بوستر لم يُعلن بعد: ملصق تشويقي بنقش العالم وألوانه، وأول حرف من اسم العمل شعاراً، و«قريباً»
+const initial = t => (t.replace(/^(the|an?)\s+/i, '').match(/[A-Za-z0-9]/)?.[0] || '؟').toUpperCase();
+// عمل قادم: عدّ حي إن عُرف موعده، وإلا مرحلته («قيد الإنتاج»…) و«قريباً»، ومعه مصدر الخبر إن وُجد
+const soonBlock = (w, uni, up, cls = '') => { const src = up?.source ? `<a class="src" href="${esc(up.source)}" target="_blank" rel="noopener">المصدر</a>` : '';
+  return w.date ? premiere({ date: w.date, cap: 'العرض الأول', uni, src, cls }) : premiere({ cap: STAGE[up?.stage] || STAGE.production, uni, src, cls, tba: 'موعده لم يُحدَّد بعد' }); };
+const teaser = (w, uni) => `<span class="ph tz m-${THEMES[uni]?.motif || 'stars'}" aria-hidden="true"><span class="motif"></span><span class="tz-s">${isSoon(w) ? 'قريباً' : 'بلا بوستر'}</span><b class="tz-l">${initial(w.title)}</b><bdi class="tz-t" dir="ltr">${esc(w.title)}</bdi></span>`;
 const sKey = p => p.season ? `${p.work}#${p.season}` : p.work;
 const statusOf = p => store.works[sKey(p)] || '';
 const domId = (pre, p) => `${pre}-${p.universe}-${p.work}${p.season ? '-s' + p.season : ''}`;
@@ -128,19 +134,19 @@ function nextInfo(w) {
   const ann = w.seasons.find(x => !x.date); if (ann) return { kind: 'announced', season: ann.n };
   return w.status === 'Returning Series' ? { kind: 'returning' } : null;
 }
-function nextBlock(w, cls = '') {
+function nextBlock(w, cls = '', uni) {
   const n = nextInfo(w); if (!n) return '';
   if (n.kind === 'returning') return `<p class="next-note ${cls}">المسلسل مستمر، ولم يُعلن موعد حلقات جديدة بعد.</p>`;
-  if (n.kind === 'announced') return `<div class="count ${cls}"><span>الموسم ${n.season} معلن، وموعد عرضه لم يُحدَّد بعد</span></div>`;
-  const d = daysTo(n.date), what = n.kind === 'episode' ? `الحلقة القادمة: الموسم ${n.season}، الحلقة ${n.episode}` : `بداية الموسم ${n.season}`;
-  return liveBox(n.date, what, cls);
+  if (n.kind === 'announced') return premiere({ cap: `الموسم ${n.season}`, uni, cls, tba: 'معلن، وموعد عرضه لم يُحدَّد بعد' });
+  return n.kind === 'episode' ? premiere({ date: n.date, cap: `الحلقة ${n.episode} من الموسم ${n.season}`, uni, cls, now: 'تُعرض اليوم' })
+    : premiere({ date: n.date, cap: `بداية الموسم ${n.season}`, uni, cls, now: 'يبدأ اليوم' });
 }
 const nextTag = w => { const k = nextInfo(w)?.kind; return k === 'episode' ? '<span class="tag soon">يُعرض الآن</span>' : k === 'season' || k === 'announced' ? '<span class="tag soon">موسم قادم</span>' : ''; };
 const verdict = r => r == null ? null : r >= 7.5 ? ['ممتاز', '#35d07f'] : r >= 6.8 ? ['جيد', '#57abff'] : r >= 6 ? ['متوسط', '#f2b84b'] : ['ضعيف', '#ef5d57'];
 function toast(msg) { const t = $('#toast'); t.classList.remove('ask'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); }
-const posterTag = w => w.poster
+const posterTag = (w, uni) => w.poster
   ? `<img loading="lazy" decoding="async" src="${img(w.poster, 'w342')}" srcset="${img(w.poster, 'w185')} 185w, ${img(w.poster, 'w342')} 342w, ${img(w.poster, 'w500')} 500w" sizes="128px" alt="بوستر ${esc(w.title)}">`
-  : `<span class="ph">${esc(w.title)}</span>`;
+  : teaser(w, uni);
 
 // سؤال بزرّين في مكان الإشعار. يبقى حتى يُجاب أو تمضي 20 ثانية، وتجاهله مثل «لا»: لا يتغيّر شيء.
 function ask(msg, yes, no, fn) { const t = $('#toast'); clearTimeout(toast.t); ask.fn = fn; t.classList.add('ask');
@@ -217,7 +223,7 @@ function card(p) {
     .filter(Boolean).map(x => `<div class="meta bits">${x}</div>`).join('');
   const tot = w.seasons ? seasonTotal(w, p.season) : 0, dn = tot ? seasonDone(w.id, p.season) : 0;
   return `<article class="card" id="${domId('c', p)}" data-k="${esc(sKey(p))}">
-    <div class="chead"><button class="poster" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''}${w.poster ? ` data-zoom-pinch data-zoom-title="${esc(w.title)}"` : ''} aria-label="تفاصيل ${esc(w.title)}">${posterTag(w)}</button>
+    <div class="chead"><button class="poster" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''}${w.poster ? ` data-zoom-pinch data-zoom-title="${esc(w.title)}"` : ''} aria-label="تفاصيل ${esc(w.title)}">${posterTag(w, p.universe)}</button>
     <div>
       <div class="ord">${uniOf(p.universe).serial && !soon ? 'الترتيب: ' : ''}${esc(p.label)}</div>
       <h3>${ltr(titleOf(p))}</h3>
@@ -226,8 +232,8 @@ function card(p) {
       ${rating(w, p) ? `<div class="rates">${gaugeRow(w, p)}</div>` : ''}
     </div></div>
     <div class="cbody"><p class="note">${ar(p.note)}</p>
-    ${soon ? (src => w.date ? liveBox(w.date, 'الصدور', 'wide', src) : `<div class="count wide"><span>${STAGE[p.upcoming?.stage] || STAGE.production}</span>${src}</div>`)(p.upcoming?.source ? `<a class="src" href="${esc(p.upcoming.source)}" target="_blank" rel="noopener">المصدر</a>` : '') : ''}
-    ${nextBlock(w, 'wide')}
+    ${soon ? soonBlock(w, p.universe, p.upcoming, 'wide') : ''}
+    ${nextBlock(w, 'wide', p.universe)}
     ${avLine(p, 'wide')}
     ${p.order ? `<p class="canon wide">${ar(p.order.note)} <a href="${esc(p.order.source)}" target="_blank" rel="noopener">المصدر</a></p>` : ''}${p.news ? `<p class="canon wide"><b>قادم:</b> ${ar(p.news.note)} ${p.news.sources.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener">المصدر${p.news.sources.length > 1 ? ' ' + (i + 1) : ''}</a>`).join(' ')}</p>` : ''}
     ${p.canon ? `<div class="canon wide">يظهر في عالمين: ${ar(p.canon.note)} <a href="${esc(p.canon.source)}" target="_blank" rel="noopener">المصدر</a></div>` : ''}
@@ -249,7 +255,7 @@ function node(p, i, list, step) {
   const around = !step && u.serial && u.id !== 'arrow' ? [prev && ['قبله', D.works.get(prev.work).title], next && ['بعده', D.works.get(next.work).title]].filter(Boolean) : [];
   return `<div class="node ${done ? 'done' : ''} ${soon ? 'soon' : ''}" id="${domId('t', p)}" data-k="${esc(sKey(p))}">
     <button class="node-main" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} aria-label="تفاصيل ${esc(w.title)}">
-      <span class="thumb"${w.poster ? ` data-zoom-pinch data-zoom-title="${esc(w.title)}"` : ''}>${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w154')}" alt="">` : ''}<i class="seen" aria-hidden="true">✓</i></span>
+      <span class="thumb${w.poster ? '' : ` tz m-${THEMES[p.universe]?.motif || 'stars'}`}"${w.poster ? ` data-zoom-pinch data-zoom-title="${esc(w.title)}"` : ''}>${w.poster ? `<img loading="lazy" src="${img(w.poster, 'w154')}" alt="">` : `<span class="motif" aria-hidden="true"></span><b class="tz-l" aria-hidden="true">${initial(w.title)}</b>`}<i class="seen" aria-hidden="true">✓</i></span>
       <span class="node-text"><span class="n">${step ? `الخطوة ${i + 1}${step.optional ? ' (اختيارية)' : ''}` : esc(p.label)}${soon ? (w.date ? ` · قادم بعد ${cnt(daysLeft(w), 'day', true)}` : ' · قادم') : ''}</span>
         <span class="t">${ltr(titleOf(p))}</span>
         <span class="meta">${esc([yearOf(w, p), typeOf(w)].filter(Boolean).join(' · '))}</span>
@@ -443,14 +449,15 @@ function openWork(id, season, from) {
   const series = w.kind === 'series' && w.episodeCount, pl = places.find(p => p.universe === uni && (p.season ?? null) === (season ?? null)) || places.find(p => p.season === season) || places.find(p => p.universe === uni) || places[0];
   const tabs = series ? [...w.seasons, ...(w.specials ? [{ n: 0 }] : [])] : [];
   openSheet(ltr(w.title), `<div class="hero">${w.backdrop ? `<img decoding="async" src="${img(w.backdrop, 'w780')}" alt="">` : ''}</div>
-    <div class="dw"><div class="dw-top">${w.poster ? `<button class="poster" data-zoom="${img(w.poster, 'w780')}" data-zoom-title="${esc(w.title)}" aria-label="تكبير بوستر ${esc(w.title)}">${posterTag(w)}</button>` : `<div class="poster">${posterTag(w)}</div>`}
+    <div class="dw"><div class="dw-top">${w.poster ? `<button class="poster" data-zoom="${img(w.poster, 'w780')}" data-zoom-title="${esc(w.title)}" aria-label="تكبير بوستر ${esc(w.title)}">${posterTag(w, uni)}</button>` : `<div class="poster">${posterTag(w, uni)}</div>`}
       <div><h3>${ltr(w.title)}</h3>
       <div class="meta bits">${bits([typeOf(w), w.date ? fmtDate(w.date) : w.year, w.runtime ? cnt(w.runtime, 'min') : '', ...(w.episodeCount ? [cnt(w.seasons.length, 'season'), cnt(w.episodeCount, 'ep')] : [])])}</div>
-      ${soon && w.date ? `<div class="tags"><span class="tag soon">قادم بعد ${cnt(daysLeft(w), 'day', true)}</span></div>` : ''}</div></div>
+      ${soon ? `<div class="tags"><span class="tag soon">${pl.upcoming?.stage === 'development' ? 'معلن' : 'قادم'}</span></div>` : ''}</div></div>
     ${w.overviewAr ? `<p class="ov">${ar(w.overviewAr)}</p>` : w.overviewEn ? `<div><span class="lbl">النبذة بالإنجليزية (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(w.overviewEn)}</p></div>` : ''}
     <div class="actions">${places.map(p => `<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">البطاقة في ${esc(uniOf(p.universe).name)}${p.season ? `، الموسم ${p.season}` : ''}</button>`).join('')}</div>
+    ${soon ? soonBlock(w, uni, pl.upcoming) : ''}
     ${rateBlock(w, pl)}
-    ${nextBlock(w)}
+    ${nextBlock(w, '', uni)}
     ${series ? `<div class="seasons" id="seasonTabs">${tabs.map(s => `<button data-act="season" data-id="${id}" data-season="${s.n}">${s.n ? 'الموسم ' + s.n : 'خاصة'}</button>`).join('')}</div><div id="eps" class="dw" style="padding:0" aria-busy="true">${'<div class="ep skel"><span class="epthumb"><span class="ph"></span></span><div><i></i><i></i></div></div>'.repeat(4)}</div>` : ''}</div>`, 'work', { uni, tall: series, from: from?.querySelector('img') });
   if (series) showSeason(id, tabs.some(s => s.n === season) ? season : w.seasons[0].n);
 }

@@ -190,16 +190,6 @@ main:focus{outline:none}
 /* تقدم الحلقات داخل الزر نفسه: عدّاد صغير وخط يمتلئ على حافته السفلية */
 .cta .epprog{flex:none;font-size:.76rem;font-weight:700;padding:1px 9px;border-radius:999px;background:rgba(0,0,0,.2)}
 .cta[style*="--p"]::after{content:"";position:absolute;inset:auto 0 0 0;height:4px;background:linear-gradient(to left,#0b0b0b var(--p),rgba(0,0,0,.16) var(--p));transition:background .4s ease}
-.count{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;border-inline-start:4px solid var(--c2);padding:10px 12px;background:var(--surface)}
-.count .cd{display:grid;gap:6px;flex:1 1 220px;min-width:0}
-.count .lbl{line-height:1.6}
-.count .now{font-family:var(--display);font-weight:400;font-size:1.5rem;color:var(--c2);margin-inline-end:4px}
-.count small{color:var(--dim)}
-/* خانة لكل وحدة: الرقم فوق اسمها، بعرض ثابت حتى لا يهتز السطر مع كل ثانية، ولا ينكسر الرقم على سطرين */
-.count .segs{display:flex;gap:6px;flex-wrap:nowrap}
-.seg{display:grid;justify-items:center;align-content:center;min-width:54px;padding:6px 4px 5px;border-radius:8px;background:color-mix(in srgb,var(--c2) 11%,transparent);border:1px solid color-mix(in srgb,var(--c2) 24%,transparent)}
-.seg b{font-family:var(--display);font-weight:400;font-size:1.45rem;line-height:1.15;color:var(--c2);font-variant-numeric:tabular-nums;white-space:nowrap;direction:ltr}
-.seg i{font-style:normal;font-size:.72rem;line-height:1.3;color:var(--dim)}
 .lbl{font-size:.76rem;color:var(--dim);font-weight:600}
 
 /* ---------- الخط الزمني */
@@ -412,7 +402,56 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 .next-note{font-size:.84rem;color:var(--dim)}
 
 .canon button{min-height:36px;padding:4px 10px;font-size:.78rem;margin-inline-start:4px}
-.count .src{margin-inline-start:auto;flex:none;font-size:.85rem;min-height:40px;min-width:40px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center}
+.pm .src{flex:none;font-size:.85rem;min-height:40px;min-width:40px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* ===== العدّاد بهوية العالم: لوحة بنقش العالم وضوئه، عنوانها تعليق قصص مصورة، والأيام بخط العالم =====
+   الألوان والنقش من متغيرات العالم (--bg --c1 --c2 و.m-*)، فلوحة «باتمان» ممطرة ولوحة «سوبرمان» شعاعية… */
+.pm{position:relative;isolation:isolate;overflow:hidden;display:grid;gap:10px;padding:12px 14px 14px;border-radius:10px;
+  background:radial-gradient(110% 150% at 100% 0%,color-mix(in srgb,var(--c1) 17%,transparent),transparent 58%),linear-gradient(color-mix(in srgb,var(--bg) 80%,#000),color-mix(in srgb,var(--bg) 94%,#000));
+  border:1px solid color-mix(in srgb,var(--c1) 32%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.pm>.motif{z-index:-1;opacity:.85}
+/* ضوء عرض أول يمر على اللوحة كل بضع ثوانٍ */
+.pm::after{content:"";position:absolute;z-index:-1;inset:-40% auto -40% 0;width:34%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--c1) 15%,transparent),transparent);transform:translateX(-150%) skewX(-16deg);animation:pm-sweep 9s cubic-bezier(.5,0,.3,1) infinite}
+@keyframes pm-sweep{0%,55%{transform:translateX(-150%) skewX(-16deg)}100%{transform:translateX(360%) skewX(-16deg)}}
+.pm-top{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;min-height:40px}
+.pm-meta{display:inline-flex;align-items:center;gap:4px 10px;flex-wrap:wrap}
+.pm-cap{font-family:var(--display);font-size:.95rem;line-height:1.6;padding:1px 13px 0;color:var(--bg);background:var(--c1);clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%)}
+.pm.tba .pm-cap{color:var(--c1);background:color-mix(in srgb,var(--c1) 20%,var(--bg))}
+.pm-date{font-size:.8rem;color:var(--dim)}
+.pm .ck,.pm-tba{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 16px;min-width:0}
+.ck-d{display:inline-flex;align-items:baseline;gap:7px}
+.ck-d .dg{font-family:var(--display);font-size:2.7rem;line-height:1;color:var(--c1);text-shadow:0 0 26px color-mix(in srgb,var(--c1) 50%,transparent)}
+.ck-d i{font-style:normal;font-family:var(--display);font-size:1.15rem;color:color-mix(in srgb,var(--c1) 78%,var(--ink))}
+.ck-t{display:inline-flex;align-items:baseline;font-family:var(--display);font-size:1.6rem;line-height:1;color:var(--ink)}
+.ck-t u{text-decoration:none;color:color-mix(in srgb,var(--c1) 75%,transparent);margin:0 2px;animation:ck-blink 1s steps(1) infinite}
+@keyframes ck-blink{50%{opacity:.35}}
+/* كل رقم في خانة بعرض ثابت، فلا يهتز العدّاد حين يتغير رقم بآخر أعرض منه، والرقم الجديد يصعد مكانه ويظهر */
+.dg{display:inline-flex;direction:ltr}
+.dg span{display:inline-block;min-width:.6em;text-align:center}
+.ck-now{font-family:var(--display);font-weight:400;font-size:2.1rem;line-height:1.1;color:var(--c1)}
+.pm-tba b{font-family:var(--display);font-weight:400;font-size:2.2rem;line-height:1.1;color:var(--c1);text-shadow:0 0 26px color-mix(in srgb,var(--c1) 45%,transparent)}
+/* بلا موعد: نبضة كإشارة تنتظر الإعلان */
+.pm-tba b::after{content:"";display:inline-block;width:.24em;height:.24em;margin-inline-start:.22em;vertical-align:.12em;border-radius:50%;background:var(--c1);animation:pm-ping 1.8s ease-out infinite}
+@keyframes pm-ping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c1) 70%,transparent)}100%{box-shadow:0 0 0 .5em transparent}}
+.pm-tba span{font-size:.86rem;color:var(--dim)}
+[data-guide=fate] .pm{border-radius:0;clip-path:var(--cut)}
+[data-guide=fate] .pm-cap{clip-path:var(--cut);padding-inline:15px}
+[data-guide=fate] :is(.pm-cap,.ck-d .dg,.ck-d i,.ck-t,.ck-now,.pm-tba b){font-weight:700}
+[data-guide=fate] .ck-d .dg{font-size:2.5rem}
+
+/* ===== بوستر لم يُعلن بعد: ملصق تشويقي بنقش العالم وضوء من أسفل، وأول حرف من اسم العمل شعاراً ===== */
+.poster .tz{display:grid;grid-template-rows:auto minmax(0,1fr) auto;justify-items:center;align-items:center;padding:10px 8px 11px;isolation:isolate;overflow:hidden;color:var(--ink);
+  background:radial-gradient(110% 55% at 50% 112%,color-mix(in srgb,var(--c1) 58%,transparent),transparent 62%),radial-gradient(90% 40% at 50% -8%,color-mix(in srgb,var(--c2) 24%,transparent),transparent 70%),linear-gradient(var(--bg),color-mix(in srgb,var(--bg) 55%,#000))}
+.tz>.motif{z-index:-1;opacity:.8}
+.tz-s{font-family:var(--display);font-size:.74rem;line-height:1.7;padding:0 10px;color:var(--c1);border:1px solid color-mix(in srgb,var(--c1) 55%,transparent);border-radius:999px;background:color-mix(in srgb,var(--bg) 72%,transparent)}
+.tz-l{font-family:var(--display);font-weight:400;font-size:4.4rem;line-height:1;color:color-mix(in srgb,var(--c1) 10%,transparent);-webkit-text-stroke:1.6px var(--c1);text-shadow:0 0 28px color-mix(in srgb,var(--c1) 55%,transparent);animation:tz-glow 4s ease-in-out infinite alternate}
+@keyframes tz-glow{to{text-shadow:0 0 46px color-mix(in srgb,var(--c1) 85%,transparent)}}
+.tz-t{display:block;justify-self:stretch;text-align:center;font-weight:600;font-size:.72rem;line-height:1.3;letter-spacing:.04em;text-transform:uppercase;color:#fff;text-wrap:balance;overflow-wrap:anywhere;text-shadow:0 1px 8px rgba(0,0,0,.8)}
+.thumb.tz{display:grid;place-items:center;isolation:isolate;background:linear-gradient(var(--bg),color-mix(in srgb,var(--bg) 55%,#000))}
+.thumb.tz .tz-l{font-size:1.9rem;-webkit-text-stroke-width:1.2px;animation:none}
+[data-guide=fate] .tz-s{border-radius:0;clip-path:var(--cut)}
+[data-guide=fate] .tz-l{font-weight:700;-webkit-text-stroke-width:1.2px}
 
 /* ===== الحركة: transform و opacity فقط، حتى تبقى على كرت الشاشة ولا تعيد رسم الصفحة ===== */
 .sheet-open body{overflow:hidden}
@@ -476,7 +515,7 @@ img.in{opacity:1}
 @font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/aref-ruqaa-arabic-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
 @font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/aref-ruqaa-latin-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
 [data-guide=fate]{--display:Ruqaa,"Plex",Tahoma,serif;--cut:polygon(9px 0,calc(100% - 9px) 0,100% 9px,100% calc(100% - 9px),calc(100% - 9px) 100%,9px 100%,0 calc(100% - 9px),0 9px)}
-[data-guide=fate] :is(.brand h1,.opener h2,.av-intro h2,.dock-index,.logo,.gauge,.seg b,.count .now,.tile-name){font-weight:700}
+[data-guide=fate] :is(.brand h1,.opener h2,.av-intro h2,.dock-index,.logo,.gauge,.tile-name){font-weight:700}
 [data-guide=fate] .opener h2{font-size:clamp(2.1rem,5.6vw,4.2rem);line-height:1.3;max-width:20ch}
 [data-guide=fate] .opener .en{letter-spacing:.02em}
 /* الشعار: ختم مشطوف بدل الدائرة */

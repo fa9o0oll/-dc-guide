@@ -93,7 +93,7 @@ bdi[dir=ltr],.ltr{direction:ltr;unicode-bidi:isolate}
 .tk.watched .stamp{opacity:1;scale:1}
 .tk.stamping .stamp{transition:opacity .2s ease,scale .3s cubic-bezier(.3,1.6,.5,1)}
 .tk.next .poster::after{content:"التالي";position:absolute;bottom:0;inset-inline:0;padding:3px 0;text-align:center;background:var(--acc);color:var(--on-acc);font-weight:600;font-size:.8rem}
-@media (hover:hover){.tk .poster:hover img{transform:scale(1.05)}.tk .seen:hover{border-color:var(--ok);color:var(--ok)}.tk.watched .seen:hover{color:#06231a}}
+@media (hover:hover){.tk .poster:not(.pz-t):hover img{transform:scale(1.05)}.tk .seen:hover{border-color:var(--ok);color:var(--ok)}.tk.watched .seen:hover{color:#06231a}}
 .empty{grid-column:1/-1;padding:40px 0;text-align:center;color:var(--dim)}
 
 /* عرض السلاسل */
@@ -122,7 +122,7 @@ dialog::backdrop{background:rgba(6,4,2,.72)}
 .sh-hero img{width:100%;height:100%;object-fit:cover;object-position:center 22%;opacity:.7}
 .sh-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--bg2),transparent 70%)}
 .sh-head{position:relative;display:grid;grid-template-columns:clamp(96px,22vw,170px) minmax(0,1fr);gap:clamp(12px,2.4vw,24px);padding:0 clamp(14px,3vw,30px);margin-top:clamp(-90px,-9vw,-46px)}
-.sh-head .poster{display:block;width:100%;padding:0;border:0;font:inherit;color:var(--ink);aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:var(--card2);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.sh-head .poster{position:relative;display:block;width:100%;padding:0;border:0;font:inherit;color:var(--ink);aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:var(--card2);box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .sh-head .poster img{width:100%;height:100%;object-fit:cover}
 .sh-head .txt{align-self:end;min-width:0;display:grid;gap:4px}
 .sh-head h2{font-family:var(--display);font-weight:700;font-size:clamp(1.35rem,3.6vw,2.2rem);line-height:1.25;direction:ltr;text-align:right;overflow-wrap:anywhere}
@@ -251,12 +251,67 @@ dialog::backdrop{background:rgba(6,4,2,.72)}
 .toast.act{pointer-events:auto;display:flex;gap:14px;align-items:center}
 .toast button{min-height:40px;min-width:40px;padding:0 12px;border-radius:8px;background:var(--bg);color:var(--ink);font-weight:600}
 .tk.leaving{transition:opacity .35s ease .45s,scale .35s ease .45s;opacity:0;scale:.94}
-.cd{display:flex;gap:8px;flex-wrap:nowrap}
-.cd .seg{display:grid;justify-items:center;min-width:64px;padding:8px 6px;border-radius:10px;background:var(--card)}
-.cd .seg b{font-family:var(--display);font-weight:700;font-size:1.6rem;line-height:1.2;color:var(--acc2);font-variant-numeric:tabular-nums;white-space:nowrap;direction:ltr}
-.cd .seg i{font-style:normal;color:var(--mute);font-size:.8rem}
-.cd .now{font-family:var(--display);font-size:1.3rem;color:var(--acc2)}
 .chip bdi{opacity:.7;margin-inline-start:4px}
+
+/* ===== العدّ لما لم يصدر (count.js يحرّك الأرقام): كل رقم بخانة ثابتة العرض، والجديد يصعد مكان القديم ===== */
+.dg{display:inline-flex;direction:ltr}
+.dg span{display:inline-block;min-width:.6em;text-align:center}
+.ck-t u{text-decoration:none;margin:0 1px;animation:ck-blink 1s steps(1) infinite}
+@keyframes ck-blink{50%{opacity:.35}}
+/* لافتة سينما أسفل بوستر ما لم يصدر: مصابيح تجري على حافتها، والأيام كبيرة ثم الساعات */
+.tk .mq{position:absolute;inset:auto 0 0 0;z-index:2;display:grid;gap:1px;padding:17px 10px 9px;color:var(--ink);background:linear-gradient(transparent,rgba(14,10,6,.86) 32%,rgba(14,10,6,.97))}
+.tk .mq::before{content:"";position:absolute;inset:7px 9px auto;height:5px;background:radial-gradient(circle,var(--acc2) 0 1.8px,transparent 2.4px) 0 50%/15px 5px repeat-x,radial-gradient(circle,color-mix(in srgb,var(--acc) 40%,transparent) 0 1.3px,transparent 1.9px) 0 50%/5px 5px repeat-x;filter:drop-shadow(0 0 3px var(--acc));animation:mq-run 1.2s steps(3) infinite}
+@keyframes mq-run{to{background-position:15px 50%,0 50%}}
+.tk .mq small{font-size:.72rem;font-weight:600;line-height:1.4;color:var(--acc2)}
+.tk .mq .ck{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 8px}
+.tk .mq .ck-d{display:inline-flex;align-items:baseline;gap:5px}
+.tk .mq .ck-d .dg{font-family:var(--display);font-weight:700;font-size:1.5rem;line-height:1.1;color:var(--acc);text-shadow:0 0 16px rgba(255,159,67,.45)}
+.tk .mq .ck-d i{font-style:normal;font-family:var(--display);font-weight:700;font-size:.8rem;color:var(--acc2)}
+.tk .mq .ck-t{font-family:var(--display);font-weight:700;font-size:.92rem;line-height:1.3;color:var(--ink)}
+.tk .mq .ck-t u{color:var(--acc)}
+.tk .mq .ck-now{font-family:var(--display);font-weight:700;font-size:1.15rem;color:var(--acc)}
+.tk .mq.tba b{font-family:var(--display);font-weight:700;font-size:1.3rem;line-height:1.2;color:var(--acc);text-shadow:0 0 16px rgba(255,159,67,.4)}
+.tk .mq.tba small{color:var(--dim);font-weight:400}
+.tk.next .poster:has(.mq)::after{content:none}
+/* لوح التصوير (كلاكيت) مكان البوستر الغائب: اسم العمل بالطباشير وحالته، وذراعه يُطبق حين يمر عليه المؤشر */
+.ph.slate,.tk .poster .ph.slate{position:absolute;inset:0;container-type:size;display:grid;grid-template-rows:22% minmax(0,1fr);place-items:stretch;padding:0;background:#16120c;color:#f3eadb;overflow:hidden;text-align:start}
+.sl-top{display:grid;grid-template-rows:1fr 1fr;gap:5%;padding:6cqi 6cqi 0}
+.sl-arm,.sl-base{display:block;border-radius:1.6cqi;background:repeating-linear-gradient(-58deg,#f3eadb 0 8cqi,#1b1610 8cqi 16cqi)}
+.sl-base{background:repeating-linear-gradient(-58deg,var(--acc) 0 8cqi,#1b1610 8cqi 16cqi)}
+.sl-arm{transform-origin:4% 100%;rotate:-12deg;translate:0 -1cqi;box-shadow:0 2cqi 4cqi rgba(0,0,0,.45);transition:rotate .3s cubic-bezier(.3,1.7,.5,1)}
+.sl-body{display:grid;align-content:center;gap:6cqi;padding:7cqi 8cqi 9cqi;margin-top:4cqi;background:radial-gradient(90% 60% at 30% 20%,rgba(255,255,255,.05),transparent 70%),linear-gradient(#221b12,#16120c);border-top:1px solid rgba(255,255,255,.08)}
+.sl-t{display:block;text-align:center;font-family:var(--display);font-weight:700;font-size:10.5cqi;line-height:1.25;letter-spacing:.03em;text-transform:uppercase;color:#f6eedf;text-wrap:balance;overflow-wrap:anywhere;padding-bottom:5cqi;border-bottom:1px dashed rgba(246,238,223,.3)}
+.sl-f{display:grid;grid-template-columns:1fr 1fr}
+/* في التذكرة تغطي لافتة الموعد أسفل اللوح، فيعلو الاسم ولا تتكرر الحالة */
+.tk .slate .sl-body{align-content:start;padding-top:12cqi}
+.tk .slate .sl-f{display:none}
+.sl-f>span{display:grid;justify-items:center;gap:1cqi;padding:0 2cqi;text-align:center}
+.sl-f>span+span{border-inline-start:1px dashed rgba(246,238,223,.3)}
+.sl-f small{font-size:7cqi;font-weight:600;color:#a89a80}
+.sl-f b{font-family:var(--display);font-size:9cqi;font-weight:700;color:var(--acc2)}
+@media (hover:hover){:is(.tk .poster,.part,.sh-head .poster):hover .sl-arm{rotate:0deg}}
+/* موعد الصدور في البطاقة: شريط العدّ في أول البكرة، عقربه يدور مع الثواني تاركاً أثراً، والأيام في الوسط */
+.leader{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"dial time" "dial note";align-items:center;gap:4px 18px}
+.leader .ck{display:contents}
+.ld-dial{grid-area:dial;position:relative;width:clamp(118px,30vw,150px);aspect-ratio:1;border-radius:50%;overflow:hidden;isolation:isolate;box-shadow:0 0 0 1px var(--line),0 12px 30px rgba(0,0,0,.45);
+  background:radial-gradient(circle,transparent 0 36.5%,rgba(255,190,122,.55) 37% 38%,transparent 38.5% 46.5%,rgba(255,190,122,.32) 47% 48%,transparent 48.5%),
+    linear-gradient(transparent calc(50% - .6px),rgba(255,190,122,.28) 0 calc(50% + .6px),transparent 0),linear-gradient(90deg,transparent calc(50% - .6px),rgba(255,190,122,.28) 0 calc(50% + .6px),transparent 0),
+    radial-gradient(circle,#2b2116,#120e09 74%)}
+.ld-sweep{position:absolute;inset:0;z-index:-1;border-radius:50%;background:conic-gradient(transparent 68%,rgba(255,159,67,.5));animation:ld-spin 60s linear infinite}
+.ld-sweep::after{content:"";position:absolute;left:calc(50% - 1px);top:3%;width:2px;height:47%;border-radius:2px;background:var(--acc2);box-shadow:0 0 8px var(--acc)}
+@keyframes ld-spin{to{rotate:360deg}}
+.leader .ck-d{grid-area:dial;place-self:center;z-index:1;display:grid;justify-items:center;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.leader .ck-d .dg{font-family:var(--display);font-weight:700;font-size:2.7rem;color:var(--acc2)}
+.leader .ck-d i{font-style:normal;font-family:var(--display);font-weight:700;font-size:.85rem;color:var(--dim);margin-top:6px}
+.leader .ck-t{grid-area:time;align-self:end;justify-self:start;font-family:var(--display);font-weight:700;font-size:1.95rem;line-height:1.15;color:var(--ink)}
+.leader .ck-t u{color:var(--acc)}
+.leader .ck-now{grid-area:dial;place-self:center;z-index:1;max-width:80%;text-align:center;font-family:var(--display);font-weight:700;font-size:1.15rem;line-height:1.4;color:var(--acc2)}
+.leader .note{grid-area:note;align-self:start;justify-self:start;margin:0;max-width:44ch}
+.ld-q{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:3.2rem;color:var(--acc2);text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.leader.tba{grid-template-areas:"dial note"}
+.leader.tba .note{align-self:center}
+.leader.tba .ld-sweep{animation-duration:5s}
+@media (prefers-reduced-motion:reduce){.tk .mq::before,.ck-t u,.ld-sweep{animation:none!important}}
 .foot .syncb{margin-top:10px;min-height:44px;padding:6px 16px;border:1px solid var(--line);border-radius:999px;color:var(--dim);font-weight:600;font-size:.86rem}
 .foot .syncb[data-sync-state=on]{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
 .foot .syncb[data-sync-state=err]{color:#ff8f7a}
