@@ -7,7 +7,7 @@
 // يكبّر عند موضع النقر ويعيده (وعلى الكمبيوتر العجلة، و+ و- و0 والأسهم). يُغلق بالسحب لأعلى أو لأسفل، أو بقرصه للداخل، أو بالضغط خارجه أو ✕ أو Esc أو زر الرجوع،
 // فيعود طائراً إلى مكانه. صور TMDB تُطلب بالدقة التي تحتاجها الشاشة، والأصلية عند التكبير.
 // تفضيل «تقليل الحركة» في النظام: تلاشٍ بسيط، بلا طيران ولا ميلان مع الجوال (القرص والسحب يبقيان لأنهما بيد المستخدم).
-const TMDB = /(\/t\/p\/)(?:w\d+|original)(\/)/, reduce = matchMedia('(prefers-reduced-motion: reduce)'), SEL = '[data-zoom],[data-zoom-pinch]', MAX = 5;
+const TMDB = /(\/t\/p\/)(?:w\d+|original)(\/)/, IGDB = /(\/igdb\/image\/upload\/)t_([a-z0-9_]+)(\/)/, reduce = matchMedia('(prefers-reduced-motion: reduce)'), SEL = '[data-zoom],[data-zoom-pinch]', MAX = 5;
 const ICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5'/%3E%3C/svg%3E";
 const CSS = `
 dialog.pz{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:none;color:#fff;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;outline:0}
@@ -59,8 +59,9 @@ const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y), mid = (a, b) => ({ x: (
 // أكبر مقاس يسعه العرض والارتفاع بنسبة البوستر الصغير نفسها، مع مكان للعنوان تحته
 const fit = ar => { const vw = document.documentElement.clientWidth || innerWidth, vh = innerHeight, pad = Math.max(16, Math.min(40, vw * .05));
   let w = Math.min(vw - pad * 2, 600), h = w / ar; const mh = vh - pad * 2 - 64; if (h > mh) { h = mh; w = h * ar; } return [w, h]; };
-// صورة TMDB بالدقة التي تحتاجها الشاشة، وأي رابط آخر كما هو
-const sized = (u, px) => TMDB.test(u) ? u.replace(TMDB, `$1${px > 900 ? 'original' : px > 560 ? 'w780' : 'w500'}$2`) : u;
+// صورة TMDB أو IGDB (أغلفة ألعابي) بالدقة التي تحتاجها الشاشة، وأي رابط آخر كما هو
+const sized = (u, px) => TMDB.test(u) ? u.replace(TMDB, `$1${px > 900 ? 'original' : px > 560 ? 'w780' : 'w500'}$2`)
+  : IGDB.test(u) ? u.replace(IGDB, (m, a, t, b) => a + (px > 560 || !/^cover/.test(t) ? 't_1080p' : 't_cover_big_2x') + b) : u;
 const srcOf = t => { const im = t.querySelector('img'); return t.dataset.zoom || im?.currentSrc || im?.src || ''; };
 // حواف البوستر الصغير مضروبة في نسبة التكبير، فيبقى شكله (القوس والزوايا) كما هو
 const radius = (el, k) => { const cs = getComputedStyle(el), c = ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'].map(x => cs[`border${x}Radius`].split(' '));
@@ -120,7 +121,7 @@ function keys(e) { if (S !== 'open' || e.altKey || e.ctrlKey || e.metaKey) retur
   else if (m && Z.s > 1.01) { const b = bounds(Z.s); setZ({ s: Z.s, x: lim(Z.x + m[0] * 90, ...b.x), y: lim(Z.y + m[1] * 90, ...b.y) }, true); } else return;
   e.preventDefault(); }
 // الصورة الأصلية عند التكبير (حين تصل تحل محل w780 بصمت)
-function original() { const u = cur?.src; if (!u || !TMDB.test(u) || cur.orig) return; cur.orig = true; const o = u.replace(TMDB, '$1original$2'); if (D.hi.src === o) return;
+function original() { const u = cur?.src; if (!u || !(TMDB.test(u) || IGDB.test(u)) || cur.orig) return; cur.orig = true; const o = TMDB.test(u) ? u.replace(TMDB, '$1original$2') : u.replace(IGDB, '$1t_1080p$3'); if (D.hi.src === o) return;
   const i = new Image(); i.decoding = 'async'; i.onload = () => { if (cur?.src === u) { D.hi.src = o; D.hi.classList.add('in'); } }; i.src = o; }
 
 export function zoom(t, opt = {}) {

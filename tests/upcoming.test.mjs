@@ -113,6 +113,8 @@ for (const door of ['dc', 'fate']) {
 // «مستقيمة تواجهك»: مصفوفة التحويل قريبة من الهوية (يبقى كسر عشري صغير من خط زمن التمرير)
 const facing = t => { if (t === 'none') return true; const v = (t.match(/\(([^)]+)\)/)?.[1] || '').split(',').map(Number);
   return v.length === 6 ? Math.abs(v[0] - 1) < .01 && Math.abs(v[1]) < .01 && Math.abs(v[4]) < 1.5 : v.length === 16 && Math.abs(v[0] - 1) < .01 && Math.abs(v[2]) < .01 && Math.abs(v[12]) < 1.5; };
+// زاوية الميل حول المحور الرأسي (بالدرجات) من مصفوفة rotateY
+const rotY = t => { const v = (t.match(/\(([^)]+)\)/)?.[1] || '').split(',').map(Number); return v.length === 16 ? -Math.asin(v[2]) * 180 / Math.PI : 0; };
 // الشاشات العريضة: الثلاث في قوس وأسطرها مصطفة. الأضيق: قاعة تُمرَّر، البوابة في الوسط كبيرة تواجهك وجاراها مائلان ومعتمان،
 // والضغط على بوابة جانبية يأتي بها إلى الوسط، وعلى التي في الوسط يدخلها. والإطار واحد للثلاث، بلا ظل مائل يميز إحداها
 for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main', 707, 823, true], ['fold-landscape', 823, 707, true], ['fold-cover', 369, 905, true]]) {
@@ -135,9 +137,9 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
   check(`${name}: فوق البوابات نقشها «بوابات العوالم» بخطه، وتحته «لكل عالمٍ بوابة، ولكل حكايةٍ ترتيبها.»`, d.title === 'بوابات العوالم' && /Inscribe/.test(d.font) && d.fontOk && d.tag === 'لكل عالمٍ بوابة، ولكل حكايةٍ ترتيبها.', d);
   check(`${name}: «دي سي» لا تنقسم على سطرين، وبلا تمدد أفقي`, d.dcTitle && d.sw <= d.iw, d);
   // الجاران مائلان قليلاً في القوس فيُسقَط موضع أسطرهما بفارق بكسلات قليلة
-  if (w >= 1024) check(`${name}: البوابات الثلاث ظاهرة في قوس، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 4) && facing(d.flat[1]) && !facing(d.flat[0]) && !d.nav.length, d);
+  if (w >= 1024) check(`${name}: البوابات الأربع ظاهرة في قوس يواجهك (الطرفان أكثر ميلاً من الوسطيين)، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, d.flat.length === 4 && [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 4) && (a => a[0] < a[1] && a[1] < 0 && 0 < a[2] && a[2] < a[3])(d.flat.map(rotY)) && !d.nav.length, { ...d, angles: d.flat.map(rotY) });
   else {
-    check(`${name}: القاعة تبدأ بالبوابة الوسطى كبيرة تواجهك وجاراها مائلان على الجانبين`, d.here.join() === 'fate' && Math.abs(d.off[1]) <= 2 && d.off[0] > 0 && d.off[2] < 0 && facing(d.flat[1]) && !facing(d.flat[0]) && !facing(d.flat[2]) && d.nav.join() === 'false,true,false', d);
+    check(`${name}: القاعة تبدأ بالبوابة الوسطى كبيرة تواجهك وجاراها مائلان على الجانبين`, d.here.join() === 'fate' && Math.abs(d.off[1]) <= 2 && d.off[0] > 0 && d.off[2] < 0 && d.off[3] < d.off[2] && facing(d.flat[1]) && !facing(d.flat[0]) && !facing(d.flat[2]) && d.nav.join() === 'false,true,false,false', d);
     // ما يتحرك في القاعة: transform وopacity فقط (يحرّكه كرت الشاشة دون إعادة رسم)، بلا تمويه، وحركة الجارين ساكنة حتى يصلا الوسط
     const fx = await page.evaluate(() => { const ok = new Set(['offset', 'computedOffset', 'easing', 'composite', 'transform', 'opacity', 'translate', 'rotate', 'scale']);
       const anims = document.getAnimations().filter(a => a.effect?.target?.closest?.('.doors'));
@@ -246,7 +248,7 @@ for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440,
 for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440, 900, false]]) {
   console.log(`== mini portals ${name}`);
   const { ctx, page, errs } = await open(w, h, mobile), look = {};
-  for (const g of ['dc', 'fate', 'films']) {
+  for (const g of ['dc', 'fate', 'films', 'games']) {
     await page.goto(`${base}/${g}/`); await page.waitForSelector('.top .home .pdoor'); await page.waitForTimeout(500);
     const m = await page.evaluate(() => { const ok = new Set(['offset', 'computedOffset', 'easing', 'composite', 'transform', 'opacity', 'translate', 'rotate', 'scale']);
       const d = document.querySelector('.top .home .pdoor'), a = d.getAnimations({ subtree: true }), r = document.querySelector('.top .home').getBoundingClientRect(), cs = getComputedStyle(d);
@@ -261,7 +263,7 @@ for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440,
     const back = await page.evaluate(() => ({ path: location.pathname, last: localStorage.getItem('hub.last'), here: document.querySelector('.door[data-here]')?.dataset.guide }));
     check(`${name} ${g}: الضغط يوسّع البوابة الصغيرة حتى تملأ الشاشة ثم يعيدك إلى القاعة${mobile ? '، وبوابة هذا العالم في وسطها' : ''}`, grow && back.path === '/' && back.last === g && (!mobile || back.here === g), { grow, back });
   }
-  check(`${name}: لكل عالم بوابته الصغيرة بهويته (إطار ولون مختلفان)`, new Set(Object.values(look)).size === 3, look);
+  check(`${name}: لكل عالم بوابته الصغيرة بهويته (إطار ولون مختلفان)`, new Set(Object.values(look)).size === 4, look);
   check(`mini portals ${name}: بلا أخطاء برمجية`, !errs.length, errs);
   await ctx.close(); }
 

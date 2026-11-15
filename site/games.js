@@ -130,8 +130,7 @@ const badge = g => { const s = rec(g.id).s; return s && s !== 'new' ? `<span cla
 function chip(o) { if (!soon(o)) return '';
   if (exact(o)) return `<span class="cd" data-until="${o.date}" data-now="تصدر اليوم"><small>تصدر بعد</small><span class="ck" aria-hidden="true">${clock(o.date, 'تصدر اليوم')}</span><span class="sr sr-time">${spoken(o.date)}</span></span>`;
   return `<span class="cd tba"><small>قريباً</small><b>${esc(whenText(o))}</b></span>`; }
-const metaLine = g => { const r = rec(g.id); return [g.year && !soon(g) ? `<bdi>${g.year}</bdi>` : soon(g) ? '<span class="up">قادمة</span>' : '', r.h ? `لعبتها ${hrs(r.h)}` : g.ttb?.n ? `تُختم في ${hrs(g.ttb.n)}` : '',
-  g.critic ? `<span class="rate" title="تقييم النقاد"><bdi>${g.critic}</bdi></span>` : ''].filter(Boolean).join('<i aria-hidden="true">·</i>'); };
+const metaLine = g => { const r = rec(g.id); return [soon(g) ? '<span class="up">قادمة</span>' : g.year ? `<span><bdi>${g.year}</bdi></span>` : '', r.h ? `<span>لعبتها ${hrs(r.h)}</span>` : g.ttb?.n && !soon(g) ? `<span>تُختم في ${hrs(g.ttb.n)}</span>` : ''].filter(Boolean).join(''); };
 function card(g) { const s = rec(g.id).s || 'new';
   return `<article class="gc s-${s}${g.fresh ? ' fresh' : ''}" id="g-${g.id}" data-id="${g.id}"><div class="case">${band(g)}
 <button class="cover" data-act="open" ${g.cover ? `data-zoom-pinch data-zoom-title="${esc(g.title)}" ` : ''}aria-label="افتح بطاقة ${esc(g.title)}">${coverImg(g.cover, '(max-width:520px) 45vw, 200px') || cart(g)}${badge(g)}${chip(g)}</button></div>
@@ -314,7 +313,7 @@ function showSheet(state, hash) { if (!sheet.open) { sheet.showModal(); if (!cal
 function closeGame(fromPop) { if (!sheet.open) return; openId = null; const done = () => sheet.close();
   if (calm) done(); else { const a = sheet.animate({ opacity: [1, 0], transform: ['none', innerWidth <= 640 ? 'translateY(5%)' : 'scale(.98)'] }, { duration: 160, easing: 'ease-in' }); a.onfinish = done; setTimeout(done, 300); }
   if (!fromPop && history.state?.game) history.back(); else if (!fromPop && location.hash) history.replaceState(null, '', location.pathname + location.search); }
-addEventListener('popstate', () => { const m = location.hash.match(/^#g(\d+)$/); if (m && D.byId.has(+m[1])) openGame(+m[1], false); else closeGame(true); });
+addEventListener('popstate', () => { if (/^#steam/.test(location.hash)) return route(); const m = location.hash.match(/^#g(\d+)$/); if (m && D.byId.has(+m[1])) openGame(+m[1], false); else closeGame(true); });
 sheet.addEventListener('cancel', e => { e.preventDefault(); closeGame(); });
 sheet.addEventListener('click', e => { if (e.target === sheet) closeGame(); });
 for (const d of [addDlg, accDlg]) d.addEventListener('click', e => { if (e.target === d) d.close(); });
@@ -332,14 +331,15 @@ function setList1(id, v, quiet) { const r = rec(id), was = r.s || 'new'; if (was
   if (!quiet) toast(v === 'done' ? `شارة النهاية: «${D.byId.get(id)?.title}»` : `انتقلت إلى «${LISTS[v].t}»`, () => { P.games[id] = prev; if (!Object.keys(prev).length) delete P.games[id]; save(); refresh(id); }); }
 
 // ---------- القائمة السريعة تحت الغلاف (⋮): نقل اللعبة بين القوائم دون فتح بطاقتها
-const qm = $('#qm'); let qmFor = null;
+const qm = $('#qm'); let qmFor = null, qmY = 0;
 function openQm(btn) { const id = +btn.closest('[data-id]').dataset.id, s = lst(id); qmFor = { id, btn };
   qm.innerHTML = `<p>انقلها إلى</p>${['play', 'new', 'done', 'seen'].map(k => `<button type="button" role="menuitemradio" class="m-${k}" data-act="qm-set" data-v="${k}" aria-checked="${s === k}">${ic(LISTS[k].ic)}${LISTS[k].t}</button>`).join('')}`;
   qm.hidden = false; const r = btn.getBoundingClientRect(), w = qm.offsetWidth, h = qm.offsetHeight;
   qm.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.right - w)) + 'px'; qm.style.top = (r.bottom + h + 8 > innerHeight ? Math.max(8, r.top - h - 6) : r.bottom + 6) + 'px';
-  btn.setAttribute('aria-expanded', 'true'); qm.querySelector('[aria-checked=true]')?.focus() || qm.querySelector('button').focus(); }
+  btn.setAttribute('aria-expanded', 'true'); qmY = scrollY; (qm.querySelector('[aria-checked=true]') || qm.querySelector('button')).focus({ preventScroll: true }); }
 function closeQm(back) { if (qm.hidden) return; qm.hidden = true; qmFor?.btn.setAttribute('aria-expanded', 'false'); if (back) qmFor?.btn.focus(); qmFor = null; }
-addEventListener('scroll', () => closeQm(), { passive: true }); addEventListener('resize', () => closeQm());
+// تُغلق إن مُرّرت الصفحة فعلاً (لا لتمرير صغير يسبق اللمسة نفسها)، أو تغيّر حجم النافذة
+addEventListener('scroll', () => { if (!qm.hidden && Math.abs(scrollY - qmY) > 30) closeQm(); }, { passive: true }); addEventListener('resize', () => closeQm());
 qm.addEventListener('keydown', e => { const b = $$('button', qm), i = b.indexOf(document.activeElement);
   if (e.key === 'Escape') { e.preventDefault(); closeQm(true); } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); b[(i + (e.key === 'ArrowDown' ? 1 : -1) + b.length) % b.length].focus(); } });
 

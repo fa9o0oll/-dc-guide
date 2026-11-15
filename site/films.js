@@ -480,5 +480,7 @@ try {
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }
   // تغيير وصل من جهاز آخر: نعيد قراءة السجل ونرسم
   initSync(id => { if (id !== 'films') return; try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {} renderGrid(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); });
+  // ‎#add=اسم وسنة: من بوابة أخرى (ألعابي تقترح إضافة فيلم اقتُبس من لعبة) يفتح «أضف فيلماً» بالبحث عنه
   const h = location.hash.slice(1); if (h && D.byId.has(h)) openFilm(h, false);
+  else if (h.startsWith('add=')) { history.replaceState(null, '', location.pathname + location.search); openAdd(decodeURIComponent(h.slice(4)).slice(0, 120)); }
 } catch (err) { $('#grid').innerHTML = '<p class="load">تعذّر تحميل القائمة. حدّث الصفحة.</p>'; liftVeil(); console.error(err); }

@@ -4,8 +4,12 @@ const BUILD = '__BUILD__';
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const works = (n) => { const m = n % 100; return n === 1 ? 'عمل واحد' : n === 2 ? 'عملين' : `${n} ${n === 0 || (m >= 3 && m <= 10) ? 'أعمال' : m >= 11 ? 'عملاً' : 'عمل'}`; };
 const films = (n) => { const m = n % 100; return n === 1 ? 'فيلم واحد' : n === 2 ? 'فيلمين' : `${n} ${m >= 3 && m <= 10 ? 'أفلام' : m >= 11 ? 'فيلماً' : 'فيلم'}`; };
-const stat = door => { if (!door.dataset.total) return; let seen = 0; try { const pr = JSON.parse(localStorage.getItem(door.dataset.key) || '{}'); seen = Object.values(pr.works || pr.films || {}).filter(v => v === 'watched').length; } catch {}
-  door.querySelector('[data-stat]').textContent = seen ? `شاهدت ${seen} من ${door.dataset.total}` : door.dataset.total; };
+const games = (n) => { const m = n % 100; return n === 1 ? 'لعبة واحدة' : n === 2 ? 'لعبتين' : `${n} ${m >= 3 && m <= 10 ? 'ألعاب' : 'لعبة'}`; };
+const progress = door => { try { return JSON.parse(localStorage.getItem(door.dataset.key) || '{}'); } catch { return {}; } };
+// العدّاد: ما شاهدته من كل دليل، وفي ألعابي ما ختمته
+const stat = door => { if (!door.dataset.total) return; const pr = progress(door), isGames = door.dataset.guide === 'games';
+  const seen = isGames ? Object.values(pr.games || {}).filter(v => v?.s === 'done').length : Object.values(pr.works || pr.films || {}).filter(v => v === 'watched').length;
+  door.querySelector('[data-stat]').textContent = seen ? `${isGames ? 'ختمت' : 'شاهدت'} ${seen} من ${door.dataset.total}` : door.dataset.total; };
 
 // ---------- القاعة على الشاشات الأضيق من 1024: تُمرَّر أفقياً، والبوابة في الوسط تواجهك وجاراها مائلان (الميل في hub.css)
 const hall = document.getElementById('doors'), nav = document.querySelector('.hall-nav'), narrow = matchMedia('(max-width: 1023.98px)');
@@ -81,10 +85,23 @@ addEventListener('pageshow', () => { document.querySelectorAll('.curtain,.curtai
 initSync(id => { const door = document.querySelector(`.door[data-guide="${id}"]`); if (door) stat(door); });
 await Promise.all([...document.querySelectorAll('.door[data-key]')].map(async door => {
   try {
-    const cat = await (await fetch(`${door.dataset.guide}/data/${door.dataset.file || 'catalog.json'}?v=${BUILD}`)).json(), items = cat.works || cat.films, isFilms = !cat.works;
-    const art = items.find(w => w.id === door.dataset.art) || items.find(w => w.backdrop);
-    if (art?.backdrop) { const img = new Image(); img.decoding = 'async'; img.alt = ''; img.src = cat.imageBase + (innerWidth * devicePixelRatio > 1000 ? 'w1280' : 'w780') + art.backdrop;
-      img.onload = () => img.classList.add('in'); door.querySelector('.art').append(img); }
-    door.dataset.total = isFilms ? films(items.length) : works(items.length); stat(door);
+    // دقة الصورة بقدر ما تحتاجه البوابة: الخلفيات عريضة (16:9) والبوابة طولية، فتُكبَّر الصورة حتى يملأ ارتفاعها البوابة. على الشاشات
+    // الكبيرة (والمكبَّرة 125٪ و175٪ في ويندوز) لا يكفي w1280 (ارتفاعه 720) فيبدو الغلاف مغبشاً، فتُطلب الأصلية
+    const cat = await (await fetch(`${door.dataset.guide}/data/${door.dataset.file || 'catalog.json'}?v=${BUILD}`)).json(), big = innerWidth * devicePixelRatio > 1000;
+    const tmdbSize = !narrow.matches && door.offsetHeight * devicePixelRatio * 1.2 > 720 ? 'original' : big ? 'w1280' : 'w780';
+    let src = null;
+    if (cat.games) {
+      // ألعابي: صورة ما تلعبه الآن (آخر ما حدّثته)، وإلا أول لعبة لها صورة
+      const pr = progress(door).games || {}, pic = g => g.art || g.shots?.[0], has = cat.games.filter(pic);
+      const g = has.filter(x => pr[x.id]?.s === 'play').sort((a, b) => (pr[b.id].at || '').localeCompare(pr[a.id].at || ''))[0] || has[0];
+      if (g) src = `${cat.img}t_${big ? '1080p' : '720p'}/${pic(g)}.jpg`;
+      if (cat.games.length) door.dataset.total = games(cat.games.length); else door.querySelector('[data-stat]').textContent = 'قائمتك تنتظر أول لعبة';
+    } else {
+      const items = cat.works || cat.films, art = items.find(w => w.id === door.dataset.art) || items.find(w => w.backdrop);
+      if (art?.backdrop) src = cat.imageBase + tmdbSize + art.backdrop;
+      door.dataset.total = cat.works ? works(items.length) : films(items.length);
+    }
+    if (src) { const img = new Image(); img.decoding = 'async'; img.alt = ''; img.src = src; img.onload = () => img.classList.add('in'); door.querySelector('.art').append(img); }
+    stat(door);
   } catch { door.querySelector('[data-stat]').textContent = ''; }
 }));

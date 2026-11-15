@@ -23,7 +23,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw, `${o.sw}/${o.iw}`); if (mobile) check(`${label}: أهداف اللمس 40px فأكثر`, o.small.length === 0, o.small.join(' ')); };
   // الواجهة الرئيسية
   await page.goto(base + '/'); await page.waitForSelector('.door');
-  check('الواجهة: ثلاثة أبواب بروابطها', await page.locator('a.door').count() === 3 && await page.getAttribute('.door.dc', 'href') === 'dc/' && (await page.getAttribute('.door.fate', 'href')) === 'fate/' && (await page.getAttribute('.door.films', 'href')) === 'films/');
+  check('الواجهة: أربعة أبواب بروابطها', await page.locator('a.door').count() === 4 && await page.getAttribute('.door.dc', 'href') === 'dc/' && (await page.getAttribute('.door.fate', 'href')) === 'fate/' && (await page.getAttribute('.door.films', 'href')) === 'films/' && (await page.getAttribute('.door.games', 'href')) === 'games/');
   await page.waitForFunction(() => /\d/.test(document.querySelector('.door.dc [data-stat]').textContent)); check('الواجهة: عدد أعمال كل دليل ظاهر', /196/.test(await page.textContent('.door.dc [data-stat]')));
   await fits('الواجهة');
   // دليل Fate
