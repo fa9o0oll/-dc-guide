@@ -28,7 +28,7 @@ const browser = await chromium.launch();
 async function open(width, height, mobile, extra = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, locale: 'ar-SA', ...extra }), page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => m.type() === 'error' && !/favicon|404|Failed to load/.test(m.text()) && errs.push(m.text()));
-  await page.route(/image\.tmdb\.org/, r => r.fulfill({ contentType: 'image/svg+xml', body: ph }));
+  await page.route(/image\.tmdb\.org|images\.igdb\.com/, r => r.fulfill({ contentType: 'image/svg+xml', body: ph }));
   return { ctx, page, errs };
 }
 

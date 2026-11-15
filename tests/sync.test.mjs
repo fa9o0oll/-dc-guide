@@ -60,7 +60,7 @@ const browser = await chromium.launch();
 async function device(name, viewport, mobile) {
   const ctx = await browser.newContext({ viewport, isMobile: mobile, hasTouch: mobile, deviceScaleFactor: shots ? 2 : 1, locale: 'ar-SA' }), page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource|\[sync\]/.test(m.text())) errs.push(m.text()); });
-  await ctx.route(/image\.tmdb\.org/, r => r.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#234"/></svg>' }));
+  await ctx.route(/image\.tmdb\.org|images\.igdb\.com/, r => r.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#234"/></svg>' }));
   await ctx.route(/gstatic\.com\/firebasejs\/.*firebase-(app|auth|database)\.js/, r => r.fulfill({ contentType: 'text/javascript', headers: cors, body: FAKE[r.request().url().match(/firebase-(\w+)\.js/)[1]] }));
   const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); await page.waitForTimeout(250); return mobile ? l.tap() : l.click(); };
   const open = async p => { await page.goto(base + p); await page.waitForSelector(p.includes('films') ? '#grid .tk, #grid article' : '.card'); };

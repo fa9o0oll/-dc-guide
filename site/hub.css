@@ -127,7 +127,9 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
 .door.games{--bg:#070818;--c1:#35e0ff;--c2:#a78bff;--ink:#eef3ff;--display:Handjet,Plex,sans-serif;--dw:700;--lh:1.05}
 .door.games::before{border:2px dotted color-mix(in srgb,var(--c1) 42%,transparent)}
 .door.games strong{font-size:clamp(2.7rem,4.3vw,4rem);letter-spacing:.02em;text-shadow:0 0 24px rgba(53,224,255,.5),2px 2px 0 rgba(167,139,255,.55)}
-.door.games .art img.in{opacity:.55}
+/* صورتها: لوحة Tekken 8 الرسمية (كازويا وجين في نار الجين الشيطاني) على وسطها، بحضور كامل */
+.door.games .art img{object-position:47% 28%}
+.door.games .art img.in{opacity:.9}
 .door.games .art::before{content:"";position:absolute;inset:0;z-index:1;background:repeating-linear-gradient(0deg,rgba(4,5,16,.32) 0 1px,transparent 1px 3px)}
 .door.games .fx::before{content:"";position:absolute;inset:-10% -70%;background:linear-gradient(105deg,transparent 42%,rgba(110,240,255,.14) 47%,rgba(190,150,255,.16) 50%,rgba(255,226,140,.11) 53%,transparent 58%);animation:games-holo 7.5s ease-in-out infinite}
 @keyframes games-holo{0%,18%{transform:translateX(42%)}62%,100%{transform:translateX(-42%)}}
@@ -159,14 +161,14 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   .door.fate{transform:rotateY(-3deg)}
   .door.films{transform:rotateY(3deg)}
   .door.games{transform:rotateY(9deg)}
-  /* على الشاشة الكبيرة يملأ أحمر الغلاف بوابة طويلة، وكان فاقعاً ومغبشاً: الخلفية 1280×720 تُكبَّر نحو ضعفيها لتملأ ارتفاع البوابة
-     (وأكثر على شاشات 4K بتكبير 175٪)، وشد التباين يُظهر تكسّرها. فهنا: الصورة بدقتها الأصلية (hub.js)، والأحمر أعمق قليلاً لا أبهت،
-     والتباين خفيف، والإطار أعلى قليلاً فتظهر الأذنان كاملتين، والعتمة من الحواف فيبقى الضوء خلف باتمان وظله الأسود واضحاً. الجوال كما هو */
-  .door.dc .art img{filter:contrast(1.12) brightness(.85) saturate(.87);object-position:center 18%}
-  .door.dc .art::after{background:radial-gradient(90% 68% at 50% 30%,transparent 46%,rgba(5,3,4,.9)),linear-gradient(180deg,rgba(5,3,4,.2),transparent 14%,transparent 46%,rgba(5,3,4,.58) 63%,#050304 83%)}
-  /* حبيبات دقيقة ثابتة فوق الغلاف كحبيبات الفيلم: تكسر تدرج الأحمر إلى السواد فلا يظهر بدرجات متكسرة على شاشات الأوليد،
-     ومزجها «تراكب» فلا ترفع السواد ولا تغيّر اللون. صورة واحدة تُرسم مرة، بلا حركة */
-  .door.dc .art::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.4;mix-blend-mode:overlay;
+  /* على الشاشات العريضة (ومنها الأوليد) بُنيت البوابة من جديد: غلاف طولي للفيلم بلا كتابة، باتمان واقفاً بدرعه كاملاً في العتمة
+     وخلفه هالة حمراء، فالسواد الحقيقي يملأ أكثر البوابة والأحمر ضوء خلفه لا مساحة فاقعة. بدقته الأصلية (1000×1426، فلا تكبير)
+     وبلا مرشحات (الصورة مدرّجة أصلاً)، والعتمة خفيفة من الحواف والقاعدة للنص. الجوال باقٍ على غلافه الأحمر كما هو */
+  .door.dc .art img{filter:none;object-position:center 30%}
+  .door.dc .art::after{background:radial-gradient(100% 75% at 50% 32%,transparent 55%,rgba(5,3,4,.75)),linear-gradient(180deg,rgba(5,3,4,.1),transparent 12%,transparent 52%,rgba(5,3,4,.55) 66%,#050304 86%)}
+  /* حبيبات دقيقة ثابتة كحبيبات الفيلم: تكسر تدرج الهالة الحمراء إلى السواد فلا يظهر بدرجات متكسرة على الأوليد، ومزجها «تراكب»
+     فلا ترفع السواد ولا تغيّر اللون. صورة واحدة تُرسم مرة، بلا حركة */
+  .door.dc .art::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.22;mix-blend-mode:overlay;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px}
   .hall-nav{display:none}
 }

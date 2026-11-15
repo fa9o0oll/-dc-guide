@@ -20,7 +20,7 @@ const browser = await chromium.launch();
 async function session(name, width, height, mobile, extra = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, locale: 'ar-SA', permissions: mobile ? sensors : [], ...extra }), page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => m.type() === 'error' && !/favicon|404|401|Failed to load/.test(m.text()) && errs.push(m.text()));
-  await page.route(/image\.tmdb\.org/, r => r.fulfill({ contentType: 'image/svg+xml', body: ph }));
+  await page.route(/image\.tmdb\.org|images\.igdb\.com/, r => r.fulfill({ contentType: 'image/svg+xml', body: ph }));
   await page.addInitScript(helpers);
   const cdp = mobile ? await ctx.newCDPSession(page) : null, pause = ms => page.waitForTimeout(ms);
   const touch = (type, pts) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts.map(([x, y], i) => ({ x, y, id: i, radiusX: 6, radiusY: 6, force: 1 })) });

@@ -49,7 +49,7 @@ check('بلا مفاتيح IGDB: رسالة واضحة بالعربي ونوع �
 process.env.IGDB_CLIENT_ID = ' cid\n'; process.env.IGDB_CLIENT_SECRET = 'sec \n';
 secretOk = false;
 const bad = await call(add, { action: 'suggest', q: 'witcher', password: PW });
-check('سر IGDB مرفوض من تويتش: «المفاتيح غير صحيحة» بلا تفاصيل سرية', bad.status === 502 && bad.body.need === 'igdb' && /غير صحيحة/.test(bad.body.error), bad);
+check('سر IGDB مرفوض من تويتش: يقول أي المفتاحين المرفوض (السر) بلا تفاصيل سرية', bad.status === 502 && bad.body.need === 'igdb' && /رفض السر/.test(bad.body.error) && /IGDB_CLIENT_SECRET/.test(bad.body.error), bad);
 secretOk = true;
 const sg = await call(add, { action: 'suggest', q: 'witcher', password: PW });
 check('الاقتراحات: من IGDB بعائلات منصاتها، بلا المحتوى الإباحي، والمفتاحان بلا مسافات زائدة', sg.status === 200 && sg.body.items.length === 2 && sg.body.items[0].igdb === 1942 && sg.body.items[0].fams === (8 | 1) && !sg.body.items.some(x => x.igdb === 666), sg.body);

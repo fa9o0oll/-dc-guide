@@ -9,7 +9,7 @@ const ph = (w, h, seed) => { const a = hues[seed % 8], b = hues[(seed * 3 + 2) %
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: mobile ? { width: 390, height: 700 } : { width: 1280, height: 640 }, isMobile: mobile, hasTouch: mobile, deviceScaleFactor: 1 });
 const page = await ctx.newPage();
-await page.route(/image\.tmdb\.org/, r => { const u = r.request().url(), seed = [...u].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7); return r.fulfill({ contentType: 'image/svg+xml', body: /\/(w300|w1280)\//.test(u) ? ph(640, 360, seed) : ph(342, 513, seed) }); });
+await page.route(/image\.tmdb\.org|images\.igdb\.com/, r => { const u = r.request().url(), seed = [...u].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7); return r.fulfill({ contentType: 'image/svg+xml', body: /\/(w300|w1280)\//.test(u) ? ph(640, 360, seed) : ph(342, 513, seed) }); });
 await page.goto(`http://127.0.0.1:${server.address().port}/`); await page.waitForSelector('.card');
 for (const id of (process.argv[4] || 'reeves,dcau,arrow,harley,dcamu,burton,early_st,joker,nolan,reeve,sandman,tomorrow').split(',')) {
   await page.evaluate(i => document.querySelector(`#unibar [data-uni="${i}"]`).click(), id); await page.waitForTimeout(1500);

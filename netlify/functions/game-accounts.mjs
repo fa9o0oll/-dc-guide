@@ -15,6 +15,9 @@ const go = url => new Response(null, { status: 302, headers: { location: url, 'c
 const digest = x => createHash('sha256').update(String(x)).digest(), same = (a, b) => timingSafeEqual(digest(a), digest(b));
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const password = () => process.env.ADD_GAME_PASSWORD || process.env.ADD_FILM_PASSWORD;
+// سبب رفض تويتش للمفتاحين بلا أي سر: «invalid client secret» (السر) أو «invalid client» (المعرّف)
+const igdbKeyError = msg => /invalid client secret/.test(msg) ? 'تويتش رفض السر: قيمة IGDB_CLIENT_SECRET في Netlify ليست سر التطبيق (ربما لُصق المعرّف مكانه، أو أُلغي بسر أحدث). عدّلها ثم أعد نشر الموقع.'
+  : /invalid client/.test(msg) ? 'تويتش رفض المعرّف: قيمة IGDB_CLIENT_ID في Netlify غير صحيحة. عدّلها ثم أعد نشر الموقع.' : 'مفاتيح IGDB في Netlify غير صحيحة: راجع IGDB_CLIENT_ID وIGDB_CLIENT_SECRET.';
 const STEAM_OP = 'https://steamcommunity.com/openid/login', NS = 'http://specs.openid.net/auth/2.0';
 const fail = (msg, status = 400, extra = {}) => Object.assign(new Error(msg), { status, extra });
 
@@ -140,7 +143,7 @@ export default async req => {
     return json(400, { error: 'طلب غير معروف.' });
   } catch (e) {
     if (e.status) return json(e.status, { error: e.message, ...e.extra });
-    if (/twitch auth (400|401|403)/.test(e.message)) return json(502, { error: 'مفاتيح IGDB في Netlify غير صحيحة.', need: 'igdb' });
+    if (/twitch auth (400|401|403)/.test(e.message)) return json(502, { error: igdbKeyError(e.message), need: 'igdb' });
     console.error(e.name, e.message?.replace(/[A-Za-z0-9]{40,}/g, '…')); return json(502, { error: 'تعذّر إكمال الطلب الآن. حاول بعد قليل.' });
   }
 };

@@ -10,7 +10,7 @@
 // ---------- التطبيع: أشكال الهمزة والتاء المربوطة والألف المقصورة، والتشكيل، والأرقام العربية، وعلامات الترقيم
 const DIAC = /[ؐ-ًؚ-ٰٟۖ-ۭـ̀-ͯ]/g;
 const ROMAN = { ii: '2', iii: '3', iv: '4', v: '5', vi: '6', vii: '7', viii: '8', ix: '9' };
-const STOP = new Set(['the', 'a', 'an', 'of', 'and', 'ذا', 'ذي']);
+const STOP = new Set(['the', 'a', 'an', 'of', 'and', 'ذا', 'ذي', 'اوف', 'اند']);   // وكتابتها بالعربي: «قود اوف وور»، «توم اند جيري»
 export function fold(s) {
   return String(s || '').normalize('NFKD').replace(DIAC, '')
     .replace(/[٠-٩]/g, d => d.charCodeAt(0) - 0x660).replace(/[۰-۹]/g, d => d.charCodeAt(0) - 0x6F0)
