@@ -22,6 +22,11 @@ if (process.env.GAMES_PROBE) {
   show('steam 292030 (Witcher 3)', await igdb('external_games', 'fields game,uid,external_game_source; where uid = "292030" & external_game_source = 1; limit 5;').catch(e => e.message));
   show('search', await igdb('games', 'search "god of war"; fields name,slug,first_release_date,game_type,collections,release_dates.human; limit 5;').catch(e => e.message));
   show('upcoming', await igdb('games', `fields name,first_release_date,release_dates.human,game_status,hypes; where first_release_date > ${Math.floor(Date.now() / 1000)} & hypes > 50; sort hypes desc; limit 5;`).catch(e => e.message));
+  show('famous (GTA V, Witcher 3, Elden Ring, RDR2, GoW 2018)', await igdb('games', 'fields name,game_type,total_rating_count,rating_count,aggregated_rating_count,hypes,themes,version_parent; where id = (1020,1942,119133,25076,19560);').catch(e => e.message));
+  show('top by total_rating_count, no type filter', await igdb('games', 'fields name,game_type,total_rating_count; where total_rating_count != null; sort total_rating_count desc; limit 12;').catch(e => e.message));
+  show('top by rating_count', await igdb('games', 'fields name,game_type,rating_count; where rating_count != null; sort rating_count desc; limit 12;').catch(e => e.message));
+  show('popularity types', await igdb('popularity_types', 'fields name,external_popularity_source; limit 50;').catch(e => e.message));
+  show('popularity top (type 1)', await igdb('popularity_primitives', 'fields game_id,value,popularity_type; where popularity_type = 1; sort value desc; limit 10;').catch(e => e.message));
 }
 
 if (!added.length) { await writeFile(OUT, JSON.stringify(empty)); console.log('games: the list is empty'); process.exit(0); }
