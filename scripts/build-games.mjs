@@ -27,7 +27,7 @@ if (process.env.GAMES_PROBE) {
 if (!added.length) { await writeFile(OUT, JSON.stringify(empty)); console.log('games: the list is empty'); process.exit(0); }
 const story = (await import('../data/games/story-orders.mjs')).default.series || [];
 const ids = added.map(g => +g.igdb).filter(Boolean);
-const r = await gamesFor(ids, { wikidata: true, story, log: m => console.log('games: ' + m) });
+let r; try { r = await gamesFor(ids, { wikidata: true, story, log: m => console.log('games: ' + m) }); } catch (e) { console.log(`games: IGDB failed (${e.message}), keeping the previous file`); process.exit(0); }
 if (!r.games.length) { console.log('games: IGDB returned nothing, keeping the previous file'); process.exit(0); }
 // ترتيب القائمة وتاريخ الإضافة من ملف المضافات
 const at = new Map(added.map((g, i) => [+g.igdb, { ord: i, at: g.at || null }]));

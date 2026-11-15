@@ -2,14 +2,17 @@
 // حتى قرب انتهائه، والطلبات بلغة Apicalypse، بحد IGDB: أربعة طلبات في الثانية وثمانية مفتوحة على الأكثر.
 // المفاتيح: IGDB_CLIENT_ID وIGDB_CLIENT_SECRET (تطبيق في لوحة مطوري تويتش، نوعه Confidential).
 export const IMG = 'https://images.igdb.com/igdb/image/upload/';
-export const hasIgdb = () => !!(process.env.IGDB_CLIENT_ID && process.env.IGDB_CLIENT_SECRET);
+// المفتاحان كما لُصقا، بلا مسافة أو سطر جديد زائد في طرفيهما (يحدث كثيراً عند النسخ)
+const ID = () => String(process.env.IGDB_CLIENT_ID || '').trim(), SECRET = () => String(process.env.IGDB_CLIENT_SECRET || '').trim();
+export const hasIgdb = () => !!(ID() && SECRET());
 let token = null, until = 0;
 async function auth() {
   if (token && Date.now() < until) return token;
   const u = new URL('https://id.twitch.tv/oauth2/token');
-  u.search = new URLSearchParams({ client_id: process.env.IGDB_CLIENT_ID, client_secret: process.env.IGDB_CLIENT_SECRET, grant_type: 'client_credentials' });
+  u.search = new URLSearchParams({ client_id: ID(), client_secret: SECRET(), grant_type: 'client_credentials' });
   const r = await fetch(u, { method: 'POST' });
-  if (!r.ok) throw new Error(`twitch auth ${r.status}`);
+  // رد تويتش يقول السبب بلا أسرار: «invalid client» (المعرّف خطأ) أو «invalid client secret» (السر خطأ أو أُلغي بسر أحدث)
+  if (!r.ok) throw new Error(`twitch auth ${r.status}: ${(await r.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 120)}`);
   const j = await r.json(); token = j.access_token; until = Date.now() + Math.max(60, (j.expires_in || 3600) - 300) * 1000;
   return token;
 }
@@ -25,7 +28,7 @@ async function slot() {
 export async function igdb(endpoint, body, tries = 4) {
   await slot();
   try {
-    const r = await fetch('https://api.igdb.com/v4/' + endpoint, { method: 'POST', headers: { 'Client-ID': process.env.IGDB_CLIENT_ID, Authorization: `Bearer ${await auth()}`, Accept: 'application/json' }, body });
+    const r = await fetch('https://api.igdb.com/v4/' + endpoint, { method: 'POST', headers: { 'Client-ID': ID(), Authorization: `Bearer ${await auth()}`, Accept: 'application/json' }, body });
     if (r.status === 429 && tries) { await sleep(1100); return igdb(endpoint, body, tries - 1); }
     if (r.status === 401 && tries) { token = null; return igdb(endpoint, body, tries - 1); }
     if (!r.ok) throw new Error(`igdb ${endpoint} ${r.status}: ${(await r.text()).slice(0, 200)}`);

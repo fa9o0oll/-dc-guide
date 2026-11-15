@@ -14,7 +14,7 @@ if (old && Date.now() - Date.parse(old.built) < WEEK && !process.env.GAME_TITLES
 if (!hasIgdb()) { console.log('game titles: no IGDB keys, keeping the previous index'); process.exit(0); }
 await mkdir('site/games/data', { recursive: true });
 
-const types = gameyIds(await meta()).filter(Boolean);
+let types; try { types = gameyIds(await meta()).filter(Boolean); await igdb('games', 'fields id; limit 1;'); } catch (e) { console.log('game titles: IGDB unreachable (' + e.message + '), keeping the previous index'); process.exit(0); }
 const BIT = { ps: 1, xbox: 2, nin: 4, pc: 8, mobile: 16 }, fam = new Map();
 for (let off = 0; off < 1500; off += 500) for (const p of await igdb('platforms', `fields name; limit 500; offset ${off};`)) fam.set(p.id, BIT[famOf(p.name)] || 0);
 const F = 'fields name,slug,first_release_date,total_rating_count,hypes,platforms,alternative_names.name,themes;', T = types.length ? ` & game_type = (${types.join(',')})` : '';
