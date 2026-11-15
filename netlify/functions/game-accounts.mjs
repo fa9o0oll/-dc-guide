@@ -22,7 +22,7 @@ const STEAM_OP = 'https://steamcommunity.com/openid/login', NS = 'http://specs.o
 const fail = (msg, status = 400, extra = {}) => Object.assign(new Error(msg), { status, extra });
 
 // ---------- تنظيف أسماء المتاجر قبل مطابقتها: علامات ™ و®، ومنصة الإصدار، والطبعات التي ليست لعبة مستقلة
-export const clean = s => String(s || '').replace(/[™®©]/g, '').replace(/\((?:ps[45]|playstation\s*[45]|xbox[^)]*|windows[^)]*|pc)\)/gi, '').replace(/\b(?:ps4\s*(?:&|and|\/)\s*ps5|ps5\s*(?:&|and|\/)\s*ps4)\b/gi, '')
+export const clean = s => String(s || '').replace(/[™®©]/g, '').replace(/[’‘ʼ]/g, "'").replace(/\((?:ps[45]|playstation\s*[45]|xbox[^)]*|windows[^)]*|pc)\)/gi, '').replace(/\b(?:ps4\s*(?:&|and|\/)\s*ps5|ps5\s*(?:&|and|\/)\s*ps4)\b/gi, '')
   .replace(/\s*[-–—:]?\s*(?:digital\s+)?(?:standard|deluxe|digital deluxe|gold|ultimate|complete|premium|game of the year|goty|launch|cross-gen|ps[45]|playstation\s*[45])\s+edition\b/gi, '')
   .replace(/\s+(?:for|on)\s+(?:ps[45]|playstation\s*[45]|xbox(?: series x\|s| one)?|pc)\s*$/i, '').replace(/\s*[-–—]\s*(?:ps[45]|pc|xbox(?: series x\|s| one)?)\s*$/i, '').replace(/\s+/g, ' ').trim();
 const norm = s => clean(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').replace(/\b(?:the|a|an)\b/g, ' ').replace(/\s+/g, ' ').trim();
@@ -31,7 +31,35 @@ const overlap = (a, b) => { const A = words(a), B = words(b); let n = 0; for (co
 // مدة ISO مثل PT228H56M33S إلى ساعات
 export const isoHours = d => { const m = String(d || '').match(/P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:([\d.]+)S)?/); return m ? Math.round(((+m[1] || 0) * 24 + (+m[2] || 0) + (+m[3] || 0) / 60 + (+m[4] || 0) / 3600) * 10) / 10 : 0; };
 
-// ---------- المطابقة بـ IGDB: Steam برقم اللعبة في متجره، والبقية بالاسم (عشرة أسماء في كل طلب)
+// ---------- المطابقة بـ IGDB: Steam برقم اللعبة في متجره، والبقية بالاسم
+// IGDB لا يقبل «search» داخل multiquery (يرجع فارغاً بلا خطأ، تحقّقنا منه على IGDB نفسه)، فالمطابقة بالاسم على مرحلتين:
+//   1) الاسم كما هو بلا فرق الحروف الكبيرة والصغيرة (name ~)، عشرة أسماء في كل multiquery، فتُطابق أغلب الأسماء في ثانية أو اثنتين
+//   2) البحث العادي لكل اسم بقي، بحد IGDB (أربعة في الثانية)، حتى تقترب مهلة الدالة؛ وما لم يُبحث عنه يُعاد «للمطابقة» فتطلبه الصفحة في دفعة تالية
+// وبين أكثر من لعبة بالاسم نفسه (Resident Evil 4 الأصلية والجديدة مثلاً): التي على منصتك، ولا لعبة صدرت بعد آخر مرة لعبتها
+const PID = { ps5: 167, ps4: 48, xsx: 169, xone: 49, x360: 12, pc: 6 }, FAM = { ps5: [167, 48], ps4: [48, 167], xsx: [169, 49], xone: [49, 169], x360: [12], pc: [6] };
+const pick = (x, list, base) => { const last = x.last ? Date.parse(x.last) / 1000 + 86400 : Infinity, want = norm(x.name);
+  return list.filter(g => !(g.first_release_date > last)).map(g => ({ g, s: base(g, want) + ((g.platforms || []).includes(PID[x.plat]) ? 30 : (g.platforms || []).some(p => (FAM[x.plat] || []).includes(p)) ? 20 : 0)
+    + Math.min(10, Math.log10((g.total_rating_count || 0) + 1) * 4) })).sort((a, b) => b.s - a.s)[0]; };
+const F = 'fields name,first_release_date,platforms,total_rating_count;';
+async function byExact(items, T) {
+  const out = new Map(), parts = []; for (let i = 0; i < items.length; i += 10) parts.push(items.slice(i, i + 10));
+  await Promise.all(parts.map(async part => { const body = part.map((x, k) => `query games "${k}" { ${F} where name ~ ${quote(x.name)} & version_parent = null${T}; limit 8; };`).join('\n');
+    for (const r of await igdb('multiquery', body)) { const x = part[+r.name], best = x && pick(x, r.result || [], () => 100); if (best) out.set(x.key, { id: best.g.id, sure: true }); } }));
+  return out;
+}
+async function bySearch(x, T) {
+  const best = pick(x, await igdb('games', `search ${quote(x.name)}; ${F} where version_parent = null${T}; limit 8;`), (g, want) => norm(g.name) === want ? 100 : overlap(g.name, x.name) * 80);
+  return best && best.s >= 62 ? { id: best.g.id, sure: norm(best.g.name) === norm(x.name) } : null;
+}
+// يعيد ما طوبق (how) وما لم يُبحث عنه قبل المهلة (todo). خطأ IGDB في المرحلة الأولى يُرفع (لا يُعرض كأن الألعاب غير موجودة)
+export async function byName(items, T, until = Infinity) {
+  const how = await byExact(items, T), left = items.filter(x => !how.has(x.key)), todo = new Set(); let i = 0, fails = 0;
+  const worker = async () => { while (i < left.length) { const x = left[i++]; if (Date.now() > until) { todo.add(x.key); continue; }
+    try { const m = await bySearch(x, T); if (m) how.set(x.key, m); } catch { fails++; todo.add(x.key); } } };
+  await Promise.all([0, 1, 2, 3].map(worker));
+  if (fails && fails === left.length) throw new Error('igdb search failed');
+  return { how, todo };
+}
 async function bySteam(appids) {
   const out = new Map(), list = [...new Set(appids.map(String))];
   for (let i = 0; i < list.length; i += 300) {
@@ -42,27 +70,25 @@ async function bySteam(appids) {
   }
   return out;
 }
-export async function byName(items, T) {
-  const out = new Map();
-  for (let i = 0; i < items.length; i += 10) {
-    const part = items.slice(i, i + 10), body = part.map((x, k) => `query games "${k}" { search ${quote(clean(x.name))}; fields name,first_release_date,platforms,total_rating_count; where version_parent = null${T}; limit 6; };`).join('\n');
-    const res = await igdb('multiquery', body).catch(() => []);
-    for (const r of res) { const x = part[+r.name], want = norm(x.name); if (!x) continue;
-      const list = (r.result || []).map(g => ({ g, s: (norm(g.name) === want ? 100 : overlap(g.name, x.name) * 80) + Math.min(10, Math.log10((g.total_rating_count || 0) + 1) * 4) }));
-      const best = list.sort((a, b) => b.s - a.s)[0]; if (best && best.s >= 62) out.set(x.key, { id: best.g.id, sure: norm(best.g.name) === want }); }
-  }
-  return out;
-}
 // معلومات خفيفة لما طوبق: الاسم والغلاف والسنة، ومتوسط وقت الختم (لترجيح «ختمتها»)
 async function describe(ids) {
   const [games, ttb] = await Promise.all([igdbIn('games', 'name,first_release_date,cover.image_id,themes', ids), igdbIn('game_time_to_beats', 'game_id,hastily,normally', ids, 'game_id').catch(() => [])]);
   const t = new Map(ttb.map(x => [x.game_id, { h: x.hastily ? Math.round(x.hastily / 360) / 10 : null, n: x.normally ? Math.round(x.normally / 360) / 10 : null }]));
   return new Map(games.filter(g => !(g.themes || []).includes(EROTIC)).map(g => [g.id, { title: g.name, year: year(g.first_release_date), cover: g.cover?.image_id || null, ttb: t.get(g.id) || null }]));
 }
-async function finish(source, items, how) {
+async function finish(source, items, how, todo = new Set()) {
   const ids = [...new Set([...how.values()].map(x => x.id))], info = ids.length ? await describe(ids) : new Map();
-  const out = items.map(x => { const h = how.get(x.key), g = h && info.get(h.id); return g ? { ...x, igdb: h.id, sure: h.sure, ...g } : { ...x, igdb: null }; });
-  return { source, total: out.length, matched: out.filter(x => x.igdb).length, items: out };
+  const out = items.map(x => { const h = how.get(x.key), g = h && info.get(h.id); return g ? { ...x, igdb: h.id, sure: h.sure, ...g } : todo.has(x.key) ? { ...x, igdb: null, todo: true } : { ...x, igdb: null }; });
+  return { source, total: out.length, matched: out.filter(x => x.igdb).length, todo: out.filter(x => x.todo).length, items: out };
+}
+const typeFilter = async () => { const t = gameyIds(await meta()); return t.length ? ` & game_type = (${t.join(',')})` : ''; };
+// دفعة مطابقة بالاسم تطلبها الصفحة بعد السحب (حتى لا تتجاوز أي دالة مهلتها مهما طالت قائمتك): حتى أربعين لعبة في كل مرة
+async function match(b, until) {
+  const PL = new Set(Object.keys(PID)), items = (Array.isArray(b.items) ? b.items : []).slice(0, 40).map(x => ({ key: String(x?.key || '').slice(0, 80), name: clean(String(x?.name || '').slice(0, 160)),
+    plat: PL.has(x?.plat) ? x.plat : null, last: /^\d{4}-\d{2}-\d{2}$/.test(x?.last || '') ? x.last : null })).filter(x => x.key && x.name);
+  if (!items.length) throw fail('لا ألعاب في الطلب.');
+  const { how, todo } = await byName(items, await typeFilter(), until);
+  return finish(String(b.source || 'match').replace(/[^a-z]/g, '').slice(0, 10), items, how, todo);
 }
 
 // ---------- المصادر
@@ -78,8 +104,7 @@ async function steam(b) {
     .map(g => ({ key: 'steam:' + g.appid, name: g.name, plat: 'pc', hours: Math.round((g.playtime_forever || 0) / 6) / 10, last: g.rtime_last_played ? new Date(g.rtime_last_played * 1000).toISOString().slice(0, 10) : null }));
   const ids = await bySteam(items.map(x => x.key.slice(6))), how = new Map();
   for (const x of items) { const g = ids.get(x.key.slice(6)); if (g) how.set(x.key, { id: g, sure: true }); }
-  const left = items.filter(x => !how.has(x.key)); if (left.length) { const m = await meta(), t = gameyIds(m); for (const [k, v] of await byName(left, t.length ? ` & game_type = (${t.join(',')})` : '')) how.set(k, v); }
-  return finish('steam', items, how);
+  return finish('steam', items, how, new Set(items.filter(x => !how.has(x.key)).map(x => x.key)));
 }
 async function psn(b) {
   const npsso = String(b.npsso || process.env.PSN_NPSSO || '').trim(); if (!npsso) throw fail('رمز NPSSO غير موجود: الصقه في الصفحة أو احفظه في Netlify (PSN_NPSSO).', 400, { need: 'psn-npsso' });
@@ -94,8 +119,7 @@ async function psn(b) {
     const tr = tro.get(k), plat = /ps5/i.test(t.category) ? 'ps5' : /pspc/i.test(t.category) ? 'pc' : 'ps4';
     items.push({ key: 'psn:' + (t.concept?.id || t.titleId), name: clean(t.localizedName || t.name) || t.name, plat, hours: isoHours(t.playDuration), last: t.lastPlayedDateTime ? t.lastPlayedDateTime.slice(0, 10) : null,
       progress: tr ? tr.progress : null, platinum: tr ? (tr.earnedTrophies?.platinum || 0) > 0 : false }); }
-  const m = await meta(), t = gameyIds(m);
-  return finish('psn', items.slice(0, 600), await byName(items.slice(0, 600), t.length ? ` & game_type = (${t.join(',')})` : ''));
+  const got = items.slice(0, 600); return finish('psn', got, new Map(), new Set(got.map(x => x.key)));
 }
 async function xbox(b) {
   const key = String(b.key || process.env.XBL_API_KEY || '').trim(); if (!key) throw fail('مفتاح OpenXBL غير موجود: الصقه في الصفحة أو احفظه في Netlify (XBL_API_KEY).', 400, { need: 'xbox-key' });
@@ -110,12 +134,11 @@ async function xbox(b) {
     const progress = a.progressPercentage ?? (t.maxGamerscore ? Math.round(100 * (t.currentGamerscore || 0) / t.maxGamerscore) : null);
     items.push({ key: 'xbox:' + (t.titleId || t.pfn || k), name: clean(t.name), plat: /series/i.test(dev) ? 'xsx' : /xboxone|xbox one/i.test(dev) ? 'xone' : /xbox360|xbox 360/i.test(dev) ? 'x360' : /pc|win32|windows/i.test(dev) ? 'pc' : 'xsx',
       hours: null, last: String(t.titleHistory?.lastTimePlayed || t.lastUnlock || '').slice(0, 10) || null, progress: progress ?? null }); }
-  const m = await meta(), t = gameyIds(m);
-  return finish('xbox', items.slice(0, 600), await byName(items.slice(0, 600), t.length ? ` & game_type = (${t.join(',')})` : ''));
+  const got = items.slice(0, 600); return finish('xbox', got, new Map(), new Set(got.map(x => x.key)));
 }
 
 export default async req => {
-  const url = new URL(req.url), origin = url.origin;
+  const t0 = Date.now(), url = new URL(req.url), origin = url.origin;
   // ---------- «ادخل عبر Steam» (OpenID 2.0): الذهاب، ثم الرجوع والتحقق من Steam نفسه، ثم إلى الصفحة برقم حسابك (رقم عام لا سرّي)
   if (req.method === 'GET' && url.searchParams.get('steam') === 'login') {
     const back = `${origin}/api/game-accounts?steam=back`, p = new URLSearchParams({ 'openid.ns': NS, 'openid.mode': 'checkid_setup', 'openid.return_to': back, 'openid.realm': origin + '/',
@@ -140,6 +163,7 @@ export default async req => {
     if (b.action === 'steam') return json(200, await steam(b));
     if (b.action === 'psn') return json(200, await psn(b));
     if (b.action === 'xbox') return json(200, await xbox(b));
+    if (b.action === 'match') return json(200, await match(b, t0 + 7000));
     return json(400, { error: 'طلب غير معروف.' });
   } catch (e) {
     if (e.status) return json(e.status, { error: e.message, ...e.extra });

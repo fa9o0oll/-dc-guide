@@ -2,7 +2,10 @@
 process.env.GH_TOKEN = 'test-token'; process.env.ADD_FILM_PASSWORD = 'open-sesame-42';
 const fails = [], check = (n, ok, d = '') => { console.log(`${ok ? '  ✓' : '  ✗'} ${n}${ok ? '' : ' — ' + JSON.stringify(d).slice(0, 600)}`); if (!ok) fails.push(n); };
 const res = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
-let stored = null, puts = [], twitch = 0, igdbAsked = [], wdAsked = 0, secretOk = true;
+let stored = null, puts = [], twitch = 0, igdbAsked = [], wdAsked = 0, secretOk = true, mq = [];
+// ألعاب بأسمائها كما في IGDB: Resident Evil 4 لعبتان بالاسم نفسه (الأصلية 2005 والجديدة 2023)
+const EXACT = { hades: [{ id: 5555, name: 'Hades', platforms: [6, 130], first_release_date: 1600300800, total_rating_count: 500 }],
+  'resident evil 4': [{ id: 7001, name: 'Resident Evil 4', platforms: [6, 48, 21], first_release_date: 1105401600, total_rating_count: 2000 }, { id: 7002, name: 'Resident Evil 4', platforms: [167, 48, 6], first_release_date: 1679616000, total_rating_count: 900 }] };
 const T = [{ id: 0, type: 'Main Game' }, { id: 1, type: 'DLC' }, { id: 8, type: 'Remake' }, { id: 4, type: 'Standalone Expansion' }];
 const PL = [{ id: 167, name: 'PlayStation 5', abbreviation: 'PS5' }, { id: 6, name: 'PC (Microsoft Windows)', abbreviation: 'PC' }, { id: 130, name: 'Nintendo Switch', abbreviation: 'Switch' }, { id: 169, name: 'Xbox Series X|S', abbreviation: 'Series X|S' }];
 const GAME = { id: 1942, name: 'The Witcher 3: Wild Hunt', slug: 'the-witcher-3-wild-hunt', first_release_date: 1431993600, game_type: 0, platforms: [6, 167, 130], cover: { image_id: 'co1wyy' }, artworks: [{ image_id: 'ar1', width: 1920 }],
@@ -26,7 +29,11 @@ globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
     if (ep === 'franchises') return res(200, []);
     if (ep === 'game_time_to_beats') return res(200, [{ game_id: 1942, hastily: 50 * 3600, normally: 100 * 3600, completely: 180 * 3600, count: 40 }]);
     if (ep === 'external_games') return res(200, /"292030"/.test(b) ? [{ game: 1942, uid: '292030' }] : []);
-    if (ep === 'multiquery') return res(200, [{ name: '0', result: [{ id: 5555, name: 'Hades', total_rating_count: 500 }] }]);
+    // كـ IGDB الحقيقي: «search» داخل multiquery يرجع فارغاً بلا خطأ؛ والمطابقة بالاسم كما هو (name ~) تعمل
+    if (ep === 'multiquery') { mq.push(b); if (/search /.test(b)) return res(200, []);
+      return res(200, [...b.matchAll(/query games "(\d+)" \{[^}]*where name ~ "([^"]*)"/g)].map(([, n, name]) => ({ name: n, result: EXACT[name.toLowerCase()] || [] }))); }
+    if (ep === 'games' && /^search "ghost of tsushima director's cut"/i.test(b)) return res(200, [{ id: 8001, name: "Ghost of Tsushima: Director's Cut", platforms: [167, 48], first_release_date: 1629417600, total_rating_count: 300 }, { id: 8000, name: 'Ghost of Tsushima', platforms: [48], first_release_date: 1594944000, total_rating_count: 900 }]);
+    if (ep === 'games' && /^search "/.test(b)) return res(200, []);
     return res(200, []); }
   if (u.hostname === 'query.wikidata.org') { wdAsked++; const q = decodeURIComponent(String(opt.body).slice(6));
     if (/P5794/.test(q)) return res(200, { results: { bindings: [{ g: { value: 'http://www.wikidata.org/entity/Q1' }, slug: { value: 'the-witcher-3-wild-hunt' }, ar: { value: 'ذا ويتشر 3' } }] } });
@@ -39,7 +46,7 @@ globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
   if (u.hostname === 'steamcommunity.com') return new Response(/openid\.sig=good/.test(String(opt.body)) ? 'ns:http://specs.openid.net/auth/2.0\nis_valid:true\n' : 'is_valid:false\n');
   throw new Error('unexpected fetch ' + url); };
 const { default: add, config } = await import('../netlify/functions/add-game.mjs');
-const { default: acc, config: cfg2, clean, isoHours } = await import('../netlify/functions/game-accounts.mjs');
+const { default: acc, config: cfg2, clean, isoHours, byName } = await import('../netlify/functions/game-accounts.mjs');
 const call = async (h, body, path = '/api/add-game') => { const r = await h(new Request('https://site.test' + path, { method: 'POST', body: JSON.stringify(body) })); return { status: r.status, body: await r.json() }; };
 const PW = 'open-sesame-42';
 check('المساران /api/add-game و/api/game-accounts', config.path === '/api/add-game' && cfg2.path === '/api/game-accounts');
@@ -85,7 +92,17 @@ const nosk = await call(acc, { action: 'steam', steamid: '76561198000000001', pa
 check('Steam بلا مفتاح في Netlify: رسالة واضحة', nosk.status === 503 && nosk.body.need === 'steam-key', nosk.body);
 process.env.STEAM_API_KEY = 'k';
 const sm = await call(acc, { action: 'steam', steamid: '76561198000000001', password: PW }, '/api/game-accounts');
-check('Steam: ما لعبته فقط (لا «Never Played»)، مطابقاً برقم المتجر (Witcher 3) وبالاسم (Hades)، بساعاته ومتوسط ختمه', sm.status === 200 && sm.body.total === 2 && sm.body.items.find(x => x.name.startsWith('The Witcher'))?.igdb === 1942 && sm.body.items.find(x => x.name.startsWith('The Witcher')).hours === 100 && sm.body.items.find(x => x.name === 'Hades')?.igdb === 5555 && sm.body.items.find(x => x.igdb === 1942).ttb?.n === 100, sm.body);
+check('Steam: ما لعبته فقط (لا «Never Played»)، مطابقاً برقم المتجر (Witcher 3) بساعاته ومتوسط ختمه، والبقية (Hades) تعود للمطابقة بالاسم', sm.status === 200 && sm.body.total === 2 && sm.body.items.find(x => x.name.startsWith('The Witcher'))?.igdb === 1942 && sm.body.items.find(x => x.name.startsWith('The Witcher')).hours === 100 && sm.body.items.find(x => x.name === 'Hades')?.todo === true && sm.body.todo === 1 && sm.body.items.find(x => x.igdb === 1942).ttb?.n === 100, sm.body);
+// المطابقة بالاسم في دفعات: الاسم كما هو أولاً (multiquery بلا search)، ثم البحث لما بقي؛ وبين لعبتين بالاسم نفسه: التي على منصتك ولم تصدر بعد آخر لعب
+mq.length = 0; igdbAsked.length = 0;
+const mt = await call(acc, { action: 'match', source: 'psn', items: [{ key: 'steam:1145360', name: 'Hades', plat: 'pc' }, { key: 'psn:1', name: 'Resident Evil 4', plat: 'ps5', last: '2024-01-10' },
+  { key: 'psn:2', name: 'Resident Evil 4', plat: 'ps4', last: '2019-05-01' }, { key: 'psn:3', name: "Ghost of Tsushima DIRECTOR’S CUT", plat: 'ps5' }, { key: 'psn:4', name: 'Totally Unknown Game', plat: 'ps5' }, { key: '', name: 'x' }], password: PW }, '/api/game-accounts');
+const M = k => mt.body.items?.find(x => x.key === k);
+check('المطابقة بالاسم: Hades كما هو، وResident Evil 4 على PS5 الجديدة وعلى PS4 قبل 2023 الأصلية، والاسم بعلامات مختلفة بالبحث، وغير الموجودة «لم أجدها» لا «للمطابقة»',
+  mt.status === 200 && M('steam:1145360')?.igdb === 5555 && M('steam:1145360').title === 'Hades' && M('psn:1')?.igdb === 7002 && M('psn:2')?.igdb === 7001 && M('psn:3')?.igdb === 8001 && M('psn:4')?.igdb === null && !M('psn:4').todo && mt.body.items.length === 5, mt.body);
+check('المطابقة: لا «search» داخل multiquery (IGDB يرجعه فارغاً)، والبحث العادي لما لم يطابق اسمه فقط', mq.length >= 1 && mq.every(b => !/search /.test(b) && /where name ~ /.test(b)) && igdbAsked.filter(x => /^games: search /.test(x)).length === 2, { mq, asked: igdbAsked });
+const late = await byName([{ key: 'a', name: 'Hades', plat: 'pc' }, { key: 'b', name: 'Somewhere Else', plat: 'pc' }], '', Date.now() - 1);
+check('المطابقة: ما لم يُبحث عنه قبل مهلة الدالة يعود «للمطابقة» في الدفعة التالية', late.how.get('a')?.id === 5555 && late.todo.has('b') && !late.how.has('b'), { how: [...late.how], todo: [...late.todo] });
 const priv = await call(acc, { action: 'steam', steamid: '76561198000000009', password: PW }, '/api/game-accounts');
 check('ملف Steam خاص: يقول لك اجعل «تفاصيل الألعاب» عامة', priv.status === 422 && /عامة/.test(priv.body.error), priv.body);
 check('PlayStation بلا رمز: يطلبه، ورمز بشكل خاطئ يُرفض قبل أي طلب', (await call(acc, { action: 'psn', password: PW }, '/api/game-accounts')).body.need === 'psn-npsso' && /لا يشبه/.test((await call(acc, { action: 'psn', npsso: 'abc"def', password: PW }, '/api/game-accounts')).body.error));

@@ -28,14 +28,20 @@ if (process.env.GAMES_PROBE) {
   show('popularity types', await igdb('popularity_types', 'fields name,external_popularity_source; limit 50;').catch(e => e.message));
   show('popularity top (type 1)', await igdb('popularity_primitives', 'fields game_id,value,popularity_type; where popularity_type = 1; sort value desc; limit 10;').catch(e => e.message));
   // مطابقة أسماء PlayStation وXbox بـ IGDB كما تفعلها دالة «حساباتي»: الطلب الخام أولاً (ليظهر الخطأ إن وُجد)، ثم المطابقة نفسها
-  const { meta, gameyIds } = await import('./lib-games.mjs'), { byName } = await import('../netlify/functions/game-accounts.mjs');
+  const { meta, gameyIds } = await import('./lib-games.mjs'), { byName, clean } = await import('../netlify/functions/game-accounts.mjs');
   const m = await meta(), T = (t => t.length ? ` & game_type = (${t.join(',')})` : '')(gameyIds(m));
   show('multiquery raw (search)', await igdb('multiquery', `query games "0" { search "ELDEN RING"; fields name; limit 3; };\nquery games "1" { search "Halo Infinite"; fields name; limit 3; };`).catch(e => e.message));
   show('multiquery raw (search + where)', await igdb('multiquery', `query games "0" { search "ELDEN RING"; fields name,first_release_date,platforms,total_rating_count; where version_parent = null${T}; limit 6; };`).catch(e => e.message));
   show('single search + where', await igdb('games', `search "ELDEN RING"; fields name; where version_parent = null${T}; limit 3;`).catch(e => e.message));
-  const sample = ["Marvel's Spider-Man 2", 'God of War Ragnarök', 'ELDEN RING', "Ghost of Tsushima DIRECTOR'S CUT", 'Grand Theft Auto V', 'The Last of Us Part I', 'Call of Duty: Modern Warfare III', 'EA SPORTS FC 24', 'TEKKEN 8', 'FINAL FANTASY VII REBIRTH', 'Forza Horizon 5', 'Halo Infinite', 'Hogwarts Legacy', 'Resident Evil 4', 'Cyberpunk 2077'].map((name, i) => ({ key: 'p' + i, name }));
-  const t0 = Date.now(), hits = await byName(sample, T);
-  show(`byName ${hits.size}/${sample.length} in ${Date.now() - t0}ms`, sample.map(x => x.name + ' => ' + JSON.stringify(hits.get(x.key) || null)));
+  const sample = [["Marvel's Spider-Man 2", 'ps5', '2024-02-01'], ['God of War Ragnarök', 'ps5', '2023-05-01'], ['ELDEN RING', 'ps5', '2024-07-01'], ["Ghost of Tsushima DIRECTOR’S CUT", 'ps5', '2022-01-01'], ['Grand Theft Auto V', 'ps5', '2023-01-01'],
+    ['The Last of Us Part I', 'ps5', '2023-01-01'], ['Call of Duty: Modern Warfare III', 'ps5', '2024-01-01'], ['EA SPORTS FC 24', 'ps5', '2024-03-01'], ['TEKKEN 8', 'ps5', '2024-06-01'], ['FINAL FANTASY VII REBIRTH', 'ps5', '2024-04-01'],
+    ['Forza Horizon 5', 'xsx', '2023-01-01'], ['Halo Infinite', 'xsx', '2022-01-01'], ['Hogwarts Legacy', 'ps5', '2023-03-01'], ['Resident Evil 4', 'ps5', '2024-01-01'], ['Resident Evil 4', 'ps4', '2018-01-01'], ['Cyberpunk 2077', 'ps5', '2023-10-01'],
+    ['UNCHARTED: Legacy of Thieves Collection', 'ps5', '2022-03-01'], ['Gran Turismo 7', 'ps5', '2022-05-01'], ['Batman: Arkham Knight', 'ps4', '2016-01-01'], ['Crash Bandicoot N. Sane Trilogy', 'ps4', '2018-01-01']]
+    .map(([name, plat, last], i) => ({ key: 'p' + i, name: clean(name), plat, last }));
+  show('multiquery exact (name ~)', await igdb('multiquery', `query games "0" { fields name; where name ~ "ELDEN RING" & version_parent = null${T}; limit 3; };`).catch(e => e.message));
+  const t0 = Date.now(), { how, todo } = await byName(sample, T, Date.now() + 7000), ids = [...new Set([...how.values()].map(x => x.id))];
+  const names = new Map((ids.length ? await igdb('games', `fields name,first_release_date; where id = (${ids.join(',')}); limit 100;`) : []).map(g => [g.id, g.name + ' (' + (g.first_release_date ? new Date(g.first_release_date * 1000).getUTCFullYear() : '?') + ')']));
+  console.log(`probe byName ${how.size}/${sample.length} in ${Date.now() - t0}ms, todo ${todo.size}`); for (const x of sample) console.log(`probe   ${x.name} [${x.plat}] => ${how.has(x.key) ? names.get(how.get(x.key).id) + (how.get(x.key).sure ? '' : ' ~') : '—'}`);
 }
 
 if (!added.length) { await writeFile(OUT, JSON.stringify(empty)); console.log('games: the list is empty'); process.exit(0); }
