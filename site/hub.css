@@ -172,12 +172,13 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px}
   /* والثلاث الباقية على طريقة دي سي نفسها: غلاف طولي بلا كتابة بدقته الأصلية، بحضوره كاملاً (بلا تعتيم ولا مرشحات)، والعتمة من
      الحواف والقاعدة للنص فقط، وحبيبات الفيلم نفسها. تُطبَّق حين يحمل الغلاف فعلاً (data-poster)، وإن تعذّر بقيت البوابة على صورتها السابقة.
-     Fate: سيبر ترفع إكسكاليبر ذهباً، وخلفها خدم الحرب الكبرى في العتمة (Fate/Zero، بمقاس 1280×1920 من أصل 2000×3000: أكبر مما تحتاجه البوابة، وبربع الوزن)، ودائرة الاستدعاء تنزل إلى الأرض تحت قدميها.
+     Fate: آرتشر ورين في أرض السيوف تحت سماء تحترق، لوحة ufotable الرقمية لـ Unlimited Blade Works بدقتها الأصلية (1442×2048؛ غلاف Fate/Zero السابق
+     مسحٌ ضوئي لملصق مطبوع فخطوطه لينة حتى بأصله)، ودائرة الاستدعاء على الأرض تحت قدميهما والجمر يصعد منها.
      الأفلام: وجه K يرفع عينيه في المطر (Blade Runner 2049)، وشعاع آلة العرض يعبره.
      ألعابي: كازويا وجين في نار الجين الشيطاني، لوحة Tekken 8 الرسمية بدقة 4K، كاملة بارتفاع البوابة إلا قاعدتها، وأرضية الحلبة تحتهما */
   .door[data-poster]:is(.fate,.films,.games) .art img{filter:none}
   .door[data-poster]:is(.fate,.films,.games) .art img.in{opacity:1}
-  .door[data-poster].fate .art img{object-position:center 30%;transform-origin:50% 30%}
+  .door[data-poster].fate .art img{object-position:center 30%;transform-origin:50% 20%}
   .door[data-poster].films .art img{object-position:center 30%;transform-origin:50% 15%}
   .door[data-poster].games .art img{position:absolute;top:0;left:50%;width:auto;max-width:none;height:90%;translate:-28% 0;transform-origin:28% 30%}
   .door[data-poster]:is(.fate,.films,.games) .art::after{background:radial-gradient(100% 75% at 50% 32%,transparent 55%,color-mix(in srgb,var(--bg) 75%,transparent)),

@@ -5,8 +5,9 @@ const res = (status, body) => new Response(JSON.stringify(body), { status, heade
 let stored = null, puts = [], twitch = 0, igdbAsked = [], wdAsked = 0, secretOk = true, mq = [];
 // ألعاب بأسمائها كما في IGDB: Resident Evil 4 لعبتان بالاسم نفسه (الأصلية 2005 والجديدة 2023)
 const EXACT = { hades: [{ id: 5555, name: 'Hades', platforms: [6, 130], first_release_date: 1600300800, total_rating_count: 500 }],
+  'uncharted: legacy of thieves collection': [{ id: 9100, name: 'UNCHARTED: Legacy of Thieves Collection', game_type: 3, platforms: [167, 6], first_release_date: 1643328000, total_rating_count: 150 }],
   'resident evil 4': [{ id: 7001, name: 'Resident Evil 4', platforms: [6, 48, 21], first_release_date: 1105401600, total_rating_count: 2000 }, { id: 7002, name: 'Resident Evil 4', platforms: [167, 48, 6], first_release_date: 1679616000, total_rating_count: 900 }] };
-const T = [{ id: 0, type: 'Main Game' }, { id: 1, type: 'DLC' }, { id: 8, type: 'Remake' }, { id: 4, type: 'Standalone Expansion' }];
+const T = [{ id: 0, type: 'Main Game' }, { id: 1, type: 'DLC' }, { id: 8, type: 'Remake' }, { id: 4, type: 'Standalone Expansion' }, { id: 3, type: 'Bundle' }];
 const PL = [{ id: 167, name: 'PlayStation 5', abbreviation: 'PS5' }, { id: 6, name: 'PC (Microsoft Windows)', abbreviation: 'PC' }, { id: 130, name: 'Nintendo Switch', abbreviation: 'Switch' }, { id: 169, name: 'Xbox Series X|S', abbreviation: 'Series X|S' }];
 const GAME = { id: 1942, name: 'The Witcher 3: Wild Hunt', slug: 'the-witcher-3-wild-hunt', first_release_date: 1431993600, game_type: 0, platforms: [6, 167, 130], cover: { image_id: 'co1wyy' }, artworks: [{ image_id: 'ar1', width: 1920 }],
   genres: [{ name: 'Role-playing (RPG)' }], themes: [{ id: 1, name: 'Action' }], collections: [42], release_dates: [{ date: 1431993600, platform: 6, human: 'May 19, 2015' }], external_games: [{ uid: '292030', external_game_source: 1 }],
@@ -96,11 +97,11 @@ check('Steam: ما لعبته فقط (لا «Never Played»)، مطابقاً ب
 // المطابقة بالاسم في دفعات: الاسم كما هو أولاً (multiquery بلا search)، ثم البحث لما بقي؛ وبين لعبتين بالاسم نفسه: التي على منصتك ولم تصدر بعد آخر لعب
 mq.length = 0; igdbAsked.length = 0;
 const mt = await call(acc, { action: 'match', source: 'psn', items: [{ key: 'steam:1145360', name: 'Hades', plat: 'pc' }, { key: 'psn:1', name: 'Resident Evil 4', plat: 'ps5', last: '2024-01-10' },
-  { key: 'psn:2', name: 'Resident Evil 4', plat: 'ps4', last: '2019-05-01' }, { key: 'psn:3', name: "Ghost of Tsushima DIRECTOR’S CUT", plat: 'ps5' }, { key: 'psn:4', name: 'Totally Unknown Game', plat: 'ps5' }, { key: '', name: 'x' }], password: PW }, '/api/game-accounts');
+  { key: 'psn:2', name: 'Resident Evil 4', plat: 'ps4', last: '2019-05-01' }, { key: 'psn:3', name: "Ghost of Tsushima DIRECTOR’S CUT", plat: 'ps5' }, { key: 'psn:4', name: 'Totally Unknown Game', plat: 'ps5' }, { key: 'psn:5', name: 'UNCHARTED™: Legacy of Thieves Collection', plat: 'ps5' }, { key: '', name: 'x' }], password: PW }, '/api/game-accounts');
 const M = k => mt.body.items?.find(x => x.key === k);
 check('المطابقة بالاسم: Hades كما هو، وResident Evil 4 على PS5 الجديدة وعلى PS4 قبل 2023 الأصلية، والاسم بعلامات مختلفة بالبحث، وغير الموجودة «لم أجدها» لا «للمطابقة»',
-  mt.status === 200 && M('steam:1145360')?.igdb === 5555 && M('steam:1145360').title === 'Hades' && M('psn:1')?.igdb === 7002 && M('psn:2')?.igdb === 7001 && M('psn:3')?.igdb === 8001 && M('psn:4')?.igdb === null && !M('psn:4').todo && mt.body.items.length === 5, mt.body);
-check('المطابقة: لا «search» داخل multiquery (IGDB يرجعه فارغاً)، والبحث العادي لما لم يطابق اسمه فقط', mq.length >= 1 && mq.every(b => !/search /.test(b) && /where name ~ /.test(b)) && igdbAsked.filter(x => /^games: search /.test(x)).length === 2, { mq, asked: igdbAsked });
+  mt.status === 200 && M('steam:1145360')?.igdb === 5555 && M('steam:1145360').title === 'Hades' && M('psn:1')?.igdb === 7002 && M('psn:2')?.igdb === 7001 && M('psn:3')?.igdb === 8001 && M('psn:4')?.igdb === null && !M('psn:4').todo && M('psn:5')?.igdb === 9100 && mt.body.items.length === 6, mt.body);
+check('المطابقة: لا «search» داخل multiquery (IGDB يرجعه فارغاً)، والمجموعات (Bundle) مقبولة، والبحث العادي لما لم يطابق اسمه فقط', mq.length >= 1 && mq.every(b => !/search /.test(b) && /where name ~ /.test(b) && /game_type = \([^)]*\b3\)/.test(b)) && igdbAsked.filter(x => /^games: search /.test(x)).length === 2, { mq, asked: igdbAsked });
 const late = await byName([{ key: 'a', name: 'Hades', plat: 'pc' }, { key: 'b', name: 'Somewhere Else', plat: 'pc' }], '', Date.now() - 1);
 check('المطابقة: ما لم يُبحث عنه قبل مهلة الدالة يعود «للمطابقة» في الدفعة التالية', late.how.get('a')?.id === 5555 && late.todo.has('b') && !late.how.has('b'), { how: [...late.how], todo: [...late.todo] });
 const priv = await call(acc, { action: 'steam', steamid: '76561198000000009', password: PW }, '/api/game-accounts');

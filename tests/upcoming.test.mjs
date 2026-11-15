@@ -140,9 +140,9 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
   await page.waitForTimeout(900);
   const art = await page.evaluate(() => [...document.querySelectorAll('.door')].map(x => { const i = x.querySelector('.art img'); return { g: x.dataset.guide, poster: x.hasAttribute('data-poster'), src: i?.src || '', op: i ? getComputedStyle(i).opacity : '', filter: i ? getComputedStyle(i).filter : '' }; }));
   if (w >= 1024) check(`${name}: كل بوابة بغلافها الطولي بدقته الأصلية (دي سي وFate وأفلامي من TMDB، وألعابي لوحة Tekken 8 بدقة 4K)، والثلاث بحضورها كاملاً بلا تعتيم ولا مرشحات`,
-    art.every(a => a.poster) && /original\/mhOo2k/.test(art[0].src) && /w1280\/qwThyB/.test(art[1].src) && /original\/xWRahw/.test(art[2].src) && /store-images\.s-microsoft\.com\/.*w=2880/.test(art[3].src)
+    art.every(a => a.poster) && /original\/mhOo2k/.test(art[0].src) && /original\/pgsHTHQ/.test(art[1].src) && /original\/xWRahw/.test(art[2].src) && /store-images\.s-microsoft\.com\/.*w=2880/.test(art[3].src)
     && art.slice(1).every(a => a.op === '1' && a.filter === 'none'), art);
-  else check(`${name}: على الأضيق كل بوابة بصورتها العادية، لا غلاف الشاشات العريضة`, art.every(a => !a.poster) && /images\.igdb\.com\/.*ar5zhb/.test(art[3].src) && !/qwThyB|xWRahw|mhOo2k|s-microsoft/.test(art.map(a => a.src).join()), art);
+  else check(`${name}: على الأضيق كل بوابة بصورتها العادية، لا غلاف الشاشات العريضة`, art.every(a => !a.poster) && /images\.igdb\.com\/.*ar5zhb/.test(art[3].src) && !/pgsHTHQ|xWRahw|mhOo2k|s-microsoft/.test(art.map(a => a.src).join()), art);
   // الجاران مائلان قليلاً في القوس فيُسقَط موضع أسطرهما بفارق بكسلات قليلة
   if (w >= 1024) check(`${name}: البوابات الأربع ظاهرة في قوس يواجهك (الطرفان أكثر ميلاً من الوسطيين)، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, d.flat.length === 4 && [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 4) && (a => a[0] < a[1] && a[1] < 0 && 0 < a[2] && a[2] < a[3])(d.flat.map(rotY)) && !d.nav.length, { ...d, angles: d.flat.map(rotY) });
   else {

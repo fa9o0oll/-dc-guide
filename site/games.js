@@ -417,9 +417,9 @@ addDlg.addEventListener('cancel', e => { if (!sugEl.hidden) { e.preventDefault()
 let ACC = null;
 const steamId = () => store.get(STEAM) || ACC?.steamId || '';
 async function openAccounts() { if (!accDlg.open) accDlg.showModal(); drawAcc(); if (pass() && !ACC) { try { ACC = await api('/api/game-accounts', { action: 'status' }); } catch (e) { ACC = { err: e.message }; } drawAcc(); } }
-function drawAcc(busy = '', err = {}) { const id = steamId(), s = ACC || {};
+function drawAcc(busy = '', err = {}, note = '') { const id = steamId(), s = ACC || {};
   const box = (k, name, body) => `<section class="src s-${k}"><header><h3 dir="ltr">${name}</h3></header>${body}${err[k] ? `<p class="msg" role="alert">${esc(err[k])}</p>` : ''}</section>`;
-  const pull = (k, t = 'اسحب ألعابي') => `<button class="btn pri" type="button" data-act="pull" data-src="${k}"${busy ? ' disabled' : ''}>${busy === k ? 'أسحب وأطابق…' : t}</button>`;
+  const pull = (k, t = 'اسحب ألعابي') => `<button class="btn pri" type="button" data-act="pull" data-src="${k}"${busy ? ' disabled' : ''}>${busy === k ? esc(note || 'أسحب ألعابك…') : t}</button>`;
   $('#acc-body').innerHTML = `<h2 id="acc-h">حساباتي في المنصات</h2><p class="lead">اسحب ما لعبته، وأسألك عن كل لعبة: ختمتها؟ ما زلت تلعبها؟ أم لاحقاً؟ ثم تُضاف إلى قوائمك بمنصتها.</p>
 ${pass() ? '' : `<label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة»)<input id="acc-pass" type="password" autocomplete="current-password"></label>`}${s.err ? `<p class="msg">${esc(s.err)}</p>` : ''}${s.igdb === false ? '<p class="msg">مفاتيح <bdi dir="ltr">IGDB</bdi> غير موجودة في Netlify بعد، فلا يمكن مطابقة الألعاب.</p>' : ''}
 ${box('steam', 'Steam', id ? `<p>مرتبط بحسابك (<bdi dir="ltr">…${esc(id.slice(-5))}</bdi>). يسحب ما لعبته وساعاته.</p><label class="tick"><input type="checkbox" id="steam-all"> ومعها ما في مكتبتي ولم ألعبه</label><div class="acts">${pull('steam')}<button class="btn sec" type="button" data-act="steam-off">افصل</button></div>${s.steam === false ? '<p class="note">يلزم مفتاح Steam في Netlify باسم <code>STEAM_API_KEY</code> (من steamcommunity.com/dev/apikey).</p>' : ''}`
@@ -435,8 +435,19 @@ async function pull(src, btn) { const pw = $('#acc-pass')?.value || pass(), err 
   const body = { action: src }; if (src === 'steam') { body.steamid = steamId(); body.all = !!$('#steam-all')?.checked; } if (src === 'psn' && !ACC?.psn) body.npsso = $('#psn-key')?.value.trim(); if (src === 'xbox' && !ACC?.xbox) body.key = $('#xbox-key')?.value.trim();
   if (src === 'psn' && !ACC?.psn && !body.npsso) return drawAcc('', { psn: 'الصق رمز NPSSO أولاً.' }); if (src === 'xbox' && !ACC?.xbox && !body.key) return drawAcc('', { xbox: 'الصق مفتاح OpenXBL أولاً.' });
   drawAcc(src);
-  try { const r = await api('/api/game-accounts', body, pw); if (!pass()) remember(pw); accDlg.close(); openInbox(r); }
+  try { const r = await api('/api/game-accounts', body, pw); if (!pass()) remember(pw);
+    const all = await matchAll(r, pw, (n, t) => drawAcc(src, {}, `أطابقها مع IGDB… ${n} من ${t}`)); accDlg.close(); openInbox(all); }
   catch (e) { err[src] = e.message; drawAcc('', err); } }
+// المطابقة بالاسم في دفعات (حتى أربعين لعبة في كل طلب، فلا تتجاوز دالة مهلتها مهما طالت قائمتك)، والتقدّم ظاهر على الزر.
+// ما لم يُطابق بعد دفعتين بلا تقدّم يُعرض «لم أجدها» مع زر البحث عنه بالاسم
+async function matchAll(r, pw, tick) { const items = r.items.map(x => ({ ...x })), at = new Map(items.map((x, i) => [x.key, i]));
+  for (let round = 0, stall = 0; round < 40; round++) { const todo = items.filter(x => x.todo); if (!todo.length) break;
+    tick(items.length - todo.length, items.length);
+    const m = await api('/api/game-accounts', { action: 'match', source: r.source, items: todo.slice(0, 40).map(({ key, name, plat, last }) => ({ key, name, plat, last })) }, pw); let moved = 0;
+    for (const u of m.items) { const x = items[at.get(u.key)]; if (!x) continue; if (!u.todo) moved++; Object.assign(x, { igdb: u.igdb, sure: u.sure, title: u.title, year: u.year, cover: u.cover, ttb: u.ttb, todo: !!u.todo }); }
+    stall = moved ? 0 : stall + 1; if (stall >= 2) break; }
+  for (const x of items) if (x.todo) { x.todo = false; x.igdb = null; }
+  return { ...r, items, matched: items.filter(x => x.igdb).length }; }
 
 // صندوق الأسئلة: لعبة لعبة، بغلافها وما يرجّح جوابها (ساعاتك ومتوسط ختمها، كؤوسك، آخر لعب)، والجواب يضعها في قائمتها بمنصتها
 let IB = null;
@@ -455,8 +466,8 @@ function openInbox(r) { const have = new Set(D.games.map(g => g.id)), ign = igno
   if (!ibDlg.open) ibDlg.showModal(); drawIb(); }
 function drawIb(dir) { const ib = $('#ib'), n = IB.items.length, x = IB.items[IB.at], kept = IB.picks.filter(p => p.s !== 'skip').length;
   const head = `<header class="ib-h"><h2 id="ib-h">من ${SRCN[IB.src] || IB.src}</h2><p>${n ? `${Math.min(IB.at + 1, n)} من ${n}` : ''}${IB.have ? ` · ${nGames(IB.have)} في قائمتك من قبل` : ''}</p><i class="ib-bar" style="--p:${n ? IB.at / n : 1}"></i><button class="close" type="button" data-act="ib-close" aria-label="إغلاق">${ic('x')}</button></header>`;
-  if (!x) { ib.innerHTML = `${head}<div class="ib-end"><h3>${n ? 'انتهت الأسئلة' : 'لا جديد هنا'}</h3><p>${n ? (kept ? `اخترت قوائم ${nGames(kept)}. احفظها لتُضاف إلى قوائمك.` : 'لم تختر إضافة شيء.') : `كل ما لعبته في ${SRCN[IB.src] || ''} في قائمتك من قبل، أو تجاهلته.`}</p>
-${IB.miss.length ? `<details class="miss"><summary>${nGames(IB.miss.length)} لم أجدها في <bdi dir="ltr">IGDB</bdi></summary><ul>${IB.miss.slice(0, 60).map(m => `<li><bdi dir="ltr">${esc(m.name)}</bdi><button type="button" data-act="ib-find" data-q="${esc(m.name)}">ابحث عنها</button></li>`).join('')}</ul></details>` : ''}
+  if (!x) { ib.innerHTML = `${head}<div class="ib-end"><h3>${n ? 'انتهت الأسئلة' : IB.have || !IB.miss.length ? 'لا جديد هنا' : 'لم أطابق شيئاً'}</h3><p>${n ? (kept ? `اخترت قوائم ${nGames(kept)}. احفظها لتُضاف إلى قوائمك.` : 'لم تختر إضافة شيء.') : IB.have || !IB.miss.length ? `كل ما لعبته في ${SRCN[IB.src] || ''} في قائمتك من قبل، أو تجاهلته.` : `لم أجد ما لعبته في ${SRCN[IB.src] || ''} بأسمائه في <bdi dir="ltr">IGDB</bdi>. ابحث عن أي لعبة منها بالاسم:`}</p>
+${IB.miss.length ? `<details class="miss"${!n && !IB.have ? ' open' : ''}><summary>${nGames(IB.miss.length)} لم أجدها في <bdi dir="ltr">IGDB</bdi></summary><ul>${IB.miss.slice(0, 60).map(m => `<li><bdi dir="ltr">${esc(m.name)}</bdi><button type="button" data-act="ib-find" data-q="${esc(m.name)}">ابحث عنها</button></li>`).join('')}</ul></details>` : ''}
 <div class="acts">${kept ? `<button class="btn pri" type="button" data-act="ib-save">احفظ ${nGames(kept)}</button>` : ''}${IB.at ? `<button class="btn sec" type="button" data-act="ib-back">${ic('undo')}رجوع</button>` : ''}<button class="btn sec" type="button" data-act="ib-close">${kept ? 'لاحقاً' : 'إغلاق'}</button></div></div>`; return; }
   const [g, why] = guess(x), next = IB.items.slice(IB.at + 1, IB.at + 3);
   const hints = [x.hours != null && `<span>${x.hours ? `لعبتها ${hrs(x.hours)}` : 'لم تلعبها'}</span>`, x.ttb?.n && `<span>متوسط ختمها ${hrs(x.ttb.n)}</span>`, x.platinum && '<span class="plat">بلاتينيوم</span>', x.progress != null && `<span>إنجازاتك ${x.progress}%</span>`, x.last && `<span>آخر لعب ${monthAr(x.last)}</span>`].filter(Boolean).join('');

@@ -37,10 +37,11 @@ export const isoHours = d => { const m = String(d || '').match(/P(?:(\d+)D)?T?(?
 //   2) البحث العادي لكل اسم بقي، بحد IGDB (أربعة في الثانية)، حتى تقترب مهلة الدالة؛ وما لم يُبحث عنه يُعاد «للمطابقة» فتطلبه الصفحة في دفعة تالية
 // وبين أكثر من لعبة بالاسم نفسه (Resident Evil 4 الأصلية والجديدة مثلاً): التي على منصتك، ولا لعبة صدرت بعد آخر مرة لعبتها
 const PID = { ps5: 167, ps4: 48, xsx: 169, xone: 49, x360: 12, pc: 6 }, FAM = { ps5: [167, 48], ps4: [48, 167], xsx: [169, 49], xone: [49, 169], x360: [12], pc: [6] };
+let BUNDLE = null;
 const pick = (x, list, base) => { const last = x.last ? Date.parse(x.last) / 1000 + 86400 : Infinity, want = norm(x.name);
   return list.filter(g => !(g.first_release_date > last)).map(g => ({ g, s: base(g, want) + ((g.platforms || []).includes(PID[x.plat]) ? 30 : (g.platforms || []).some(p => (FAM[x.plat] || []).includes(p)) ? 20 : 0)
-    + Math.min(10, Math.log10((g.total_rating_count || 0) + 1) * 4) })).sort((a, b) => b.s - a.s)[0]; };
-const F = 'fields name,first_release_date,platforms,total_rating_count;';
+    + Math.min(10, Math.log10((g.total_rating_count || 0) + 1) * 4) - (g.game_type === BUNDLE ? 15 : 0) })).sort((a, b) => b.s - a.s)[0]; };
+const F = 'fields name,first_release_date,platforms,total_rating_count,game_type;';
 async function byExact(items, T) {
   const out = new Map(), parts = []; for (let i = 0; i < items.length; i += 10) parts.push(items.slice(i, i + 10));
   await Promise.all(parts.map(async part => { const body = part.map((x, k) => `query games "${k}" { ${F} where name ~ ${quote(x.name)} & version_parent = null${T}; limit 8; };`).join('\n');
@@ -81,7 +82,9 @@ async function finish(source, items, how, todo = new Set()) {
   const out = items.map(x => { const h = how.get(x.key), g = h && info.get(h.id); return g ? { ...x, igdb: h.id, sure: h.sure, ...g } : todo.has(x.key) ? { ...x, igdb: null, todo: true } : { ...x, igdb: null }; });
   return { source, total: out.length, matched: out.filter(x => x.igdb).length, todo: out.filter(x => x.todo).length, items: out };
 }
-const typeFilter = async () => { const t = gameyIds(await meta()); return t.length ? ` & game_type = (${t.join(',')})` : ''; };
+// أنواع «اللعبة» ومعها المجموعات (Bundle): مجموعات مثل UNCHARTED: Legacy of Thieves Collection تُلعب كلعبة، وتأتي بعد اللعبة نفسها إن تشابه الاسمان
+const typeFilter = async () => { const m = await meta(), t = gameyIds(m); BUNDLE = [...m.type].find(([, v]) => v === 'bundle')?.[0] ?? null;
+  return t.length ? ` & game_type = (${[...t, ...(BUNDLE != null ? [BUNDLE] : [])].join(',')})` : ''; };
 // دفعة مطابقة بالاسم تطلبها الصفحة بعد السحب (حتى لا تتجاوز أي دالة مهلتها مهما طالت قائمتك): حتى أربعين لعبة في كل مرة
 async function match(b, until) {
   const PL = new Set(Object.keys(PID)), items = (Array.isArray(b.items) ? b.items : []).slice(0, 40).map(x => ({ key: String(x?.key || '').slice(0, 80), name: clean(String(x?.name || '').slice(0, 160)),

@@ -38,11 +38,14 @@ async function mockApi(page) {
   await page.route('**/api/game-accounts', async r => { const b = JSON.parse(r.request().postData() || '{}'); asked.push('acc:' + b.action + (b.steamid ? ':' + b.steamid : '') + (b.npsso ? ':npsso' : ''));
     const J = o => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
     if (b.action === 'status') return J({ igdb: true, steam: true, steamId: null, psn: false, xbox: false });
-    if (b.action === 'steam') return J({ source: 'steam', total: 4, matched: 3, items: [
+    // السحب يطابق برقم المتجر فقط ويعيد البقية «للمطابقة»، فتطلبها الصفحة بالاسم في دفعات
+    if (b.action === 'steam') return J({ source: 'steam', total: 4, matched: 2, todo: 2, items: [
       { key: 'steam:1', name: 'Portal 2', plat: 'pc', hours: 12.4, last: '2025-01-03', igdb: 72, sure: true, title: 'Portal 2', year: 2011, cover: 'c72', ttb: { h: 6, n: 8.5 } },
-      { key: 'steam:2', name: 'Hades', plat: 'pc', hours: 3, last: new Date(Date.now() - 5 * 864e5).toISOString().slice(0, 10), igdb: 113112, sure: true, title: 'Hades', year: 2020, cover: 'c113112', ttb: { h: 20, n: 22 } },
+      { key: 'steam:2', name: 'Hades', plat: 'pc', hours: 3, last: new Date(Date.now() - 5 * 864e5).toISOString().slice(0, 10), igdb: null, todo: true },
       { key: 'steam:3', name: 'Elden Ring', plat: 'pc', hours: 80, last: '2026-11-10', igdb: 119133, sure: true, title: 'Elden Ring', year: 2022, cover: 'c119133' },
-      { key: 'steam:4', name: 'Some Unknown Thing', plat: 'pc', hours: 1, last: null, igdb: null }] });
+      { key: 'steam:4', name: 'Some Unknown Thing', plat: 'pc', hours: 1, last: null, igdb: null, todo: true }] });
+    if (b.action === 'match') { asked.push('match:' + b.items.map(x => x.key + '/' + x.plat).join(',')); await new Promise(z => setTimeout(z, 250));
+      return J({ source: b.source, items: b.items.map(x => x.key === 'steam:2' ? { key: x.key, name: x.name, igdb: 113112, sure: true, title: 'Hades', year: 2020, cover: 'c113112', ttb: { h: 20, n: 22 } } : { key: x.key, name: x.name, igdb: null }) }); }
     return r.fulfill({ status: 400, body: '{}' }); });
 }
 const browser = await chromium.launch();
@@ -160,7 +163,10 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   // حساباتي: الرجوع من Steam، ثم السحب وصندوق الأسئلة
   await page.goto(`${base}/games/#steam=76561198000000001`); await page.waitForSelector('#acc[open] [data-act=pull][data-src=steam]');
   check('الرجوع من «ادخل عبر Steam» يحفظ الحساب ويفتح «حساباتي» مرتبطاً، ويزيل الرقم من الرابط', await page.evaluate(() => localStorage.getItem('gamesg.steam') === '76561198000000001' && !location.hash && /مرتبط/.test(document.querySelector('#acc .s-steam').textContent)));
-  await page.click('#acc [data-act=pull][data-src=steam]'); await page.waitForSelector('#inbox[open] .ib-card.top');
+  await page.click('#acc [data-act=pull][data-src=steam]');
+  const prog = await page.waitForFunction(() => /أطابقها مع IGDB… 2 من 4/.test(document.querySelector('#acc [data-src=steam]')?.textContent || ''), null, { timeout: 3000 }).then(() => true).catch(() => false);
+  await page.waitForSelector('#inbox[open] .ib-card.top');
+  check('بعد السحب تُطابق البقية بالاسم في دفعة (بمنصتها)، والتقدّم ظاهر على الزر', prog && asked.includes('acc:match') && asked.includes('match:steam:2/pc,steam:4/pc'), asked);
   const ib = await page.evaluate(() => ({ h: document.querySelector('.ib-h h2').textContent, n: document.querySelector('.ib-h p').textContent, t: document.querySelector('.ib-card.top h3').textContent, rec: document.querySelector('.ib-a .rec')?.dataset.v, why: document.querySelector('.ib-q small').textContent }));
   check('السحب من Steam: صندوق الأسئلة بما ليس في قائمتك (Elden Ring موجودة فتُستبعد)، وأولها Portal 2 والأرجح «ختمتها» لأن ساعاتك تجاوزت متوسط ختمها',
     asked.includes('acc:steam:76561198000000001') && ib.h === 'من Steam' && /1 من 2/.test(ib.n) && /لعبة واحدة في قائمتك/.test(ib.n) && ib.t === 'Portal 2' && ib.rec === 'done' && /متوسط ختمها/.test(ib.why), ib);

@@ -29,7 +29,7 @@ if (process.env.GAMES_PROBE) {
   show('popularity top (type 1)', await igdb('popularity_primitives', 'fields game_id,value,popularity_type; where popularity_type = 1; sort value desc; limit 10;').catch(e => e.message));
   // مطابقة أسماء PlayStation وXbox بـ IGDB كما تفعلها دالة «حساباتي»: الطلب الخام أولاً (ليظهر الخطأ إن وُجد)، ثم المطابقة نفسها
   const { meta, gameyIds } = await import('./lib-games.mjs'), { byName, clean } = await import('../netlify/functions/game-accounts.mjs');
-  const m = await meta(), T = (t => t.length ? ` & game_type = (${t.join(',')})` : '')(gameyIds(m));
+  const m = await meta(), B = [...m.type].find(([, v]) => v === 'bundle')?.[0], T = (t => t.length ? ` & game_type = (${[...t, ...(B != null ? [B] : [])].join(',')})` : '')(gameyIds(m));
   show('multiquery raw (search)', await igdb('multiquery', `query games "0" { search "ELDEN RING"; fields name; limit 3; };\nquery games "1" { search "Halo Infinite"; fields name; limit 3; };`).catch(e => e.message));
   show('multiquery raw (search + where)', await igdb('multiquery', `query games "0" { search "ELDEN RING"; fields name,first_release_date,platforms,total_rating_count; where version_parent = null${T}; limit 6; };`).catch(e => e.message));
   show('single search + where', await igdb('games', `search "ELDEN RING"; fields name; where version_parent = null${T}; limit 3;`).catch(e => e.message));
