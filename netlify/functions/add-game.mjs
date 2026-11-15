@@ -47,13 +47,18 @@ const abbrs = (ids, P) => [...new Set((ids || []).map(id => P.get(id)).filter(Bo
 export const parseLine = s => { s = String(s || '').replace(/\s+/g, ' ').trim(); const m = s.match(/^(.*?)[\s(]+((?:19[5-9]|20[0-4])\d)\)?$/); return m && m[1].trim() ? { title: m[1].trim(), year: +m[2] } : { title: s, year: null }; };
 const norm = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 
-// فحص بلا كلمة سر (GET /api/add-game): هل مفتاحا IGDB في Netlify صالحان؟ لا يكشف أي قيمة، والجواب السلبي يُحفظ عشرين ثانية فلا يُستنزف تويتش
-let health = null;
+// فحص بلا كلمة سر (GET /api/add-game): هل مفاتيح المنصات في Netlify صالحة؟ لا يكشف أي قيمة، والجواب السلبي يُحفظ عشرين ثانية فلا تُستنزف الخدمة
+//   igdb: ok أو missing أو secret (تويتش رفض السر) أو id (رفض المعرّف) أو down
+//   steam: ok أو missing أو bad (Steam رفض STEAM_API_KEY) أو down. الطلب بلا بيانات أي مستخدم (قائمة واجهات Steam)
+async function steamHealth() {
+  const key = String(process.env.STEAM_API_KEY || '').trim(); if (!key) return 'missing';
+  try { const r = await fetch(`https://api.steampowered.com/ISteamWebAPIUtil/GetSupportedAPIList/v1/?key=${encodeURIComponent(key)}`, { signal: AbortSignal.timeout(6000) });
+    return r.ok ? 'ok' : r.status === 401 || r.status === 403 ? 'bad' : 'down'; } catch { return 'down'; }
+}
+const memo = {};
+const cached = async (k, f) => { const c = memo[k]; if (c && Date.now() < c.until) return c.v; const v = await f(); memo[k] = v === 'missing' ? null : { v, until: Date.now() + (v === 'ok' ? 600e3 : 20e3) }; return v; };
 export default async req => {
-  if (req.method === 'GET') {
-    if (!health || Date.now() > health.until) { const v = await igdbHealth(); health = v === 'missing' ? null : { v, until: Date.now() + (v === 'ok' ? 600e3 : 20e3) }; if (!health) return json(200, { igdb: v }); }
-    return json(200, { igdb: health.v });
-  }
+  if (req.method === 'GET') { const [igdb, steam] = await Promise.all([cached('igdb', igdbHealth), cached('steam', steamHealth)]); return json(200, { igdb, steam }); }
   if (req.method !== 'POST') return json(405, { error: 'POST only' });
   if (!password()) return json(500, { error: 'إعدادات الخادم ناقصة: كلمة السر (ADD_GAME_PASSWORD أو ADD_FILM_PASSWORD) غير موجودة في Netlify.' });
   let b; try { b = await req.json(); } catch { return json(400, { error: 'طلب غير صالح.' }); }

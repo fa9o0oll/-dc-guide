@@ -2,7 +2,7 @@
 process.env.GH_TOKEN = 'test-token'; process.env.ADD_FILM_PASSWORD = 'open-sesame-42';
 const fails = [], check = (n, ok, d = '') => { console.log(`${ok ? '  ✓' : '  ✗'} ${n}${ok ? '' : ' — ' + JSON.stringify(d).slice(0, 600)}`); if (!ok) fails.push(n); };
 const res = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
-let stored = null, puts = [], twitch = 0, igdbAsked = [], wdAsked = 0, secretOk = true, mq = [];
+let stored = null, puts = [], twitch = 0, igdbAsked = [], wdAsked = 0, secretOk = true, mq = [], steamAsked = 0;
 // ألعاب بأسمائها كما في IGDB: Resident Evil 4 لعبتان بالاسم نفسه (الأصلية 2005 والجديدة 2023)
 const EXACT = { hades: [{ id: 5555, name: 'Hades', platforms: [6, 130], first_release_date: 1600300800, total_rating_count: 500 }],
   'uncharted: legacy of thieves collection': [{ id: 9100, name: 'UNCHARTED: Legacy of Thieves Collection', game_type: 3, platforms: [167, 6], first_release_date: 1643328000, total_rating_count: 150 }],
@@ -42,6 +42,8 @@ globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
   if (u.hostname === 'api.github.com') { if (opt.headers.Authorization !== 'Bearer test-token') return res(401, {});
     if (!opt.method) return stored ? res(200, { sha: 's' + puts.length, content: Buffer.from(stored).toString('base64') }) : res(404, {});
     const b = JSON.parse(opt.body); puts.push(b); stored = Buffer.from(b.content, 'base64').toString('utf8'); return res(200, {}); }
+  if (u.hostname === 'api.steampowered.com' && u.searchParams.get('key') === 'bad') return new Response('Forbidden', { status: 403 });
+  if (u.hostname === 'api.steampowered.com' && /GetSupportedAPIList/.test(u.pathname)) { steamAsked++; return res(200, { apilist: { interfaces: [] } }); }
   if (u.hostname === 'api.steampowered.com') return res(200, u.searchParams.get('steamid') === '76561198000000009' ? { response: {} } : { response: { game_count: 3, games: [
     { appid: 292030, name: 'The Witcher 3: Wild Hunt', playtime_forever: 6000, rtime_last_played: 1700000000 }, { appid: 1145360, name: 'Hades', playtime_forever: 90, rtime_last_played: 1760000000 }, { appid: 7, name: 'Never Played', playtime_forever: 0 }] } });
   if (u.hostname === 'steamcommunity.com') return new Response(/openid\.sig=good/.test(String(opt.body)) ? 'ns:http://specs.openid.net/auth/2.0\nis_valid:true\n' : 'is_valid:false\n');
@@ -57,7 +59,7 @@ check('بلا مفاتيح IGDB: رسالة واضحة بالعربي ونوع �
 // الفحص بلا كلمة سر (GET): حالة المفتاحين فقط، بلا أي قيمة
 const health = async h => { const r = await h(new Request('https://site.test/api/add-game')); return { status: r.status, text: await r.text() }; };
 const h0 = await health(add);
-check('الفحص بلا كلمة سر: «missing» بلا مفاتيح، بلا طلب إلى تويتش', h0.status === 200 && JSON.parse(h0.text).igdb === 'missing' && twitch === 0, h0);
+check('الفحص بلا كلمة سر: «missing» بلا مفاتيح (IGDB وSteam)، بلا طلب إلى تويتش ولا Steam', h0.status === 200 && JSON.parse(h0.text).igdb === 'missing' && JSON.parse(h0.text).steam === 'missing' && twitch === 0 && steamAsked === 0, h0);
 process.env.IGDB_CLIENT_ID = ' cid\n'; process.env.IGDB_CLIENT_SECRET = 'sec \n';
 secretOk = false;
 const h1 = await health(add), t1 = twitch, h1b = await health(add);
@@ -91,7 +93,12 @@ check('رجوع Steam بتوقيع صحيح يتحقق منه Steam نفسه و�
 check('رجوع مزوّر (توقيع خاطئ أو رابط رجوع غريب) يُرفض', (await back({ 'openid.sig': 'forged' })).headers.get('location').endsWith('#steam-fail') && (await back({ 'openid.sig': 'good', 'openid.return_to': 'https://evil.test/x' })).headers.get('location').endsWith('#steam-fail'));
 const nosk = await call(acc, { action: 'steam', steamid: '76561198000000001', password: PW }, '/api/game-accounts');
 check('Steam بلا مفتاح في Netlify: رسالة واضحة', nosk.status === 503 && nosk.body.need === 'steam-key', nosk.body);
+// فحص مفتاح Steam بلا كلمة سر: «bad» حين يرفضه Steam، و«ok» حين يقبله، ولا يظهر المفتاح في الجواب
+process.env.STEAM_API_KEY = 'bad';
+const { default: add3 } = await import('../netlify/functions/add-game.mjs?steam-bad'), hs1 = await health(add3);
 process.env.STEAM_API_KEY = 'k';
+const { default: add4 } = await import('../netlify/functions/add-game.mjs?steam-ok'), hs2 = await health(add4);
+check('الفحص: مفتاح Steam «bad» حين يرفضه Steam و«ok» حين يقبله، بلا أي قيمة في الجواب', JSON.parse(hs1.text).steam === 'bad' && JSON.parse(hs2.text).steam === 'ok' && !/"k"|bad"?:/.test(hs2.text.replace(/"steam":"\w+"/, '')), [hs1.text, hs2.text]);
 const sm = await call(acc, { action: 'steam', steamid: '76561198000000001', password: PW }, '/api/game-accounts');
 check('Steam: ما لعبته فقط (لا «Never Played»)، مطابقاً برقم المتجر (Witcher 3) بساعاته ومتوسط ختمه، والبقية (Hades) تعود للمطابقة بالاسم', sm.status === 200 && sm.body.total === 2 && sm.body.items.find(x => x.name.startsWith('The Witcher'))?.igdb === 1942 && sm.body.items.find(x => x.name.startsWith('The Witcher')).hours === 100 && sm.body.items.find(x => x.name === 'Hades')?.todo === true && sm.body.todo === 1 && sm.body.items.find(x => x.igdb === 1942).ttb?.n === 100, sm.body);
 // المطابقة بالاسم في دفعات: الاسم كما هو أولاً (multiquery بلا search)، ثم البحث لما بقي؛ وبين لعبتين بالاسم نفسه: التي على منصتك ولم تصدر بعد آخر لعب
