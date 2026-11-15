@@ -24,16 +24,18 @@ async function slot() {
     if (starts.length < 4 && open < 8) { starts.push(now); open++; return; }
     await sleep(starts.length >= 4 ? 1000 - (now - starts[0]) + 5 : 40); }
 }
-// استعلام واحد. 429 (تجاوز الحد) يُعاد بعد انتظار، و401 يجدد الرمز مرة
+// استعلام واحد. 429 (تجاوز الحد) يُعاد بعد انتظار، و401 يجدد الرمز مرة. المكان في الطابور يُترك قبل الإعادة،
+// فلا تنتظر الإعادات أماكن تحجزها هي نفسها
 export async function igdb(endpoint, body, tries = 4) {
-  await slot();
-  try {
-    const r = await fetch('https://api.igdb.com/v4/' + endpoint, { method: 'POST', headers: { 'Client-ID': ID(), Authorization: `Bearer ${await auth()}`, Accept: 'application/json' }, body });
-    if (r.status === 429 && tries) { await sleep(1100); return igdb(endpoint, body, tries - 1); }
-    if (r.status === 401 && tries) { token = null; return igdb(endpoint, body, tries - 1); }
+  for (let attempt = 0; ; attempt++) {
+    await slot(); let r;
+    try { r = await fetch('https://api.igdb.com/v4/' + endpoint, { method: 'POST', headers: { 'Client-ID': ID(), Authorization: `Bearer ${await auth()}`, Accept: 'application/json' }, body }); }
+    finally { open--; }
+    if (r.status === 429 && attempt < tries) { await sleep(1100 * (attempt + 1)); continue; }
+    if (r.status === 401 && attempt < tries) { token = null; continue; }
     if (!r.ok) throw new Error(`igdb ${endpoint} ${r.status}: ${(await r.text()).slice(0, 200)}`);
     return r.json();
-  } finally { open--; }
+  }
 }
 // كل النتائج لاستعلام طويل القائمة (where id = (...)) بأجزاء من 500
 export async function igdbAll(endpoint, fields, ids, extra = '') {

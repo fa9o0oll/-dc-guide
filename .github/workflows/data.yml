@@ -56,6 +56,7 @@ jobs:
           IGDB_CLIENT_ID: ${{ secrets.IGDB_CLIENT_ID }}
           IGDB_CLIENT_SECRET: ${{ secrets.IGDB_CLIENT_SECRET }}
           GAME_TITLES_FORCE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
+          GAMES_PROBE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
         run: node scripts/build-game-titles.mjs
         continue-on-error: true
       - name: Keep the worlds map and its audit report (work branches only)

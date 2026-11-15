@@ -26,7 +26,9 @@ const PLAN = [
 ];
 const rows = new Map(), latin = s => /^[\p{Script=Latin}\p{N}\p{P}\p{Zs}\p{S}]+$/u.test(s);
 const fame = g => Math.round(Math.min(100, Math.log10((g.total_rating_count || 0) + (g.hypes || 0) / 2 + 1) * 30));
-for (const page of await Promise.all(PLAN.map(q => igdb('games', q).catch(e => { console.log('game titles: page failed,', e.message); return []; }))))
+const pages = await Promise.all(PLAN.map(q => igdb('games', q).catch(e => { console.log('game titles: page failed,', e.message); return []; })));
+if (process.env.GAMES_PROBE) pages.forEach((p, i) => console.log(`  page ${i}: ${p.length} ${p.slice(0, 3).map(g => `${g.name} [${g.total_rating_count ?? '-'}]`).join(' | ')}`));
+for (const page of pages)
   for (const g of page) {
     if (rows.has(g.id) || !g.name || (g.themes || []).includes(EROTIC)) continue;
     const y = g.first_release_date ? new Date(g.first_release_date * 1000).getUTCFullYear() : 0, f = [...new Set((g.platforms || []).map(p => fam.get(p) || 0))].reduce((a, b) => a | b, 0);
