@@ -1,0 +1,46 @@
+// عميل IGDB المشترك بين البناء (GitHub Actions) ودالة «أضف لعبة» (Netlify): رمز دخول تطبيق تويتش يُطلب ويُحفظ في الذاكرة
+// حتى قرب انتهائه، والطلبات بلغة Apicalypse، بحد IGDB: أربعة طلبات في الثانية وثمانية مفتوحة على الأكثر.
+// المفاتيح: IGDB_CLIENT_ID وIGDB_CLIENT_SECRET (تطبيق في لوحة مطوري تويتش، نوعه Confidential).
+export const IMG = 'https://images.igdb.com/igdb/image/upload/';
+export const hasIgdb = () => !!(process.env.IGDB_CLIENT_ID && process.env.IGDB_CLIENT_SECRET);
+let token = null, until = 0;
+async function auth() {
+  if (token && Date.now() < until) return token;
+  const u = new URL('https://id.twitch.tv/oauth2/token');
+  u.search = new URLSearchParams({ client_id: process.env.IGDB_CLIENT_ID, client_secret: process.env.IGDB_CLIENT_SECRET, grant_type: 'client_credentials' });
+  const r = await fetch(u, { method: 'POST' });
+  if (!r.ok) throw new Error(`twitch auth ${r.status}`);
+  const j = await r.json(); token = j.access_token; until = Date.now() + Math.max(60, (j.expires_in || 3600) - 300) * 1000;
+  return token;
+}
+// طابور بسيط: لا يبدأ أكثر من أربعة طلبات في كل ثانية، ولا يُفتح أكثر من ثمانية معاً
+const starts = [], waiting = []; let open = 0;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function slot() {
+  for (;;) { const now = Date.now(); while (starts.length && now - starts[0] >= 1000) starts.shift();
+    if (starts.length < 4 && open < 8) { starts.push(now); open++; return; }
+    await sleep(starts.length >= 4 ? 1000 - (now - starts[0]) + 5 : 40); }
+}
+// استعلام واحد. 429 (تجاوز الحد) يُعاد بعد انتظار، و401 يجدد الرمز مرة
+export async function igdb(endpoint, body, tries = 4) {
+  await slot();
+  try {
+    const r = await fetch('https://api.igdb.com/v4/' + endpoint, { method: 'POST', headers: { 'Client-ID': process.env.IGDB_CLIENT_ID, Authorization: `Bearer ${await auth()}`, Accept: 'application/json' }, body });
+    if (r.status === 429 && tries) { await sleep(1100); return igdb(endpoint, body, tries - 1); }
+    if (r.status === 401 && tries) { token = null; return igdb(endpoint, body, tries - 1); }
+    if (!r.ok) throw new Error(`igdb ${endpoint} ${r.status}: ${(await r.text()).slice(0, 200)}`);
+    return r.json();
+  } finally { open--; }
+}
+// كل النتائج لاستعلام طويل القائمة (where id = (...)) بأجزاء من 500
+export async function igdbAll(endpoint, fields, ids, extra = '') {
+  const out = [], list = [...new Set(ids)].filter(Boolean);
+  await Promise.all(Array.from({ length: Math.ceil(list.length / 400) }, (_, i) => list.slice(i * 400, i * 400 + 400)).map(async part =>
+    out.push(...await igdb(endpoint, `fields ${fields}; where id = (${part.join(',')})${extra}; limit 500;`))));
+  return out;
+}
+// نص آمن داخل استعلام: علامات التنصيص والشرطة المائلة
+export const quote = s => '"' + String(s).replace(/["\\]/g, ' ').trim() + '"';
+// السنة والتاريخ من طابع IGDB (ثوانٍ)
+export const ymd = t => t ? new Date(t * 1000).toISOString().slice(0, 10) : null;
+export const year = t => t ? new Date(t * 1000).getUTCFullYear() : null;

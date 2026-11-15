@@ -44,6 +44,20 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: WORLDS_DUMP=${{ github.ref != 'refs/heads/main' && '1' || '' }} node scripts/build-worlds.mjs
         continue-on-error: true
+      - name: Build «ألعابي» (IGDB + Wikidata; keeps the previous file if IGDB is unreachable)
+        env:
+          IGDB_CLIENT_ID: ${{ secrets.IGDB_CLIENT_ID }}
+          IGDB_CLIENT_SECRET: ${{ secrets.IGDB_CLIENT_SECRET }}
+          GAMES_PROBE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
+        run: node scripts/build-games.mjs
+        continue-on-error: true
+      - name: Build the game title index for suggestions in «أضف لعبة» (weekly; keeps the previous file if IGDB fails)
+        env:
+          IGDB_CLIENT_ID: ${{ secrets.IGDB_CLIENT_ID }}
+          IGDB_CLIENT_SECRET: ${{ secrets.IGDB_CLIENT_SECRET }}
+          GAME_TITLES_FORCE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
+        run: node scripts/build-game-titles.mjs
+        continue-on-error: true
       - name: Keep the worlds map and its audit report (work branches only)
         if: github.ref != 'refs/heads/main'
         uses: actions/upload-artifact@v4
@@ -53,6 +67,8 @@ jobs:
             site/films/data/worlds.json
             data/generated/films/worlds-report.json
             site/films/data/titles.json
+            site/games/data/games.json
+            site/games/data/titles.json
           if-no-files-found: ignore
       - name: Report announced DC titles missing from the catalog
         env:
@@ -71,7 +87,7 @@ jobs:
         run: |
           git config user.name "dc-guide-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/generated site/dc/data site/fate/data site/films/data
+          git add data/generated site/dc/data site/fate/data site/films/data site/games/data
           git diff --cached --quiet || git commit -m "data: daily refresh"
           # إن وصل إلى الفرع إيداع جديد أثناء البناء (ملف توثيق مثلاً) يُدمج قبل الدفع بدل أن يُرفض
           git pull --rebase origin "${GITHUB_REF_NAME}"

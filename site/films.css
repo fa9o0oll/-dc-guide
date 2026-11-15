@@ -44,6 +44,16 @@ bdi[dir=ltr],.ltr{direction:ltr;unicode-bidi:isolate}
 .tonight h2{direction:ltr;text-align:right;font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,4.6vw,3rem);line-height:1.2;max-width:22ch;text-wrap:balance}
 .tonight .meta{color:var(--dim);font-size:.92rem;margin-top:2px}
 .tonight .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+/* مزاج السهرة: تختار النوع فيأتي الاقتراح منه. شريط يُمرَّر أفقياً فوق صورة الفيلم */
+.tonight .mood{display:flex;align-items:center;gap:10px;margin-top:16px;margin-inline-end:calc(clamp(16px,3vw,34px) * -1);min-width:0}
+.tonight .mood-l{flex:none;color:var(--acc);font-size:.84rem;font-weight:600}
+.tonight .mood-c{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-inline-end:clamp(16px,3vw,34px);overscroll-behavior-x:contain;-webkit-mask:linear-gradient(90deg,transparent,#000 28px);mask:linear-gradient(90deg,transparent,#000 28px)}
+.tonight .mood-c::-webkit-scrollbar{display:none}
+.tonight .mood .chip{min-height:40px;background:rgba(12,9,6,.62);border-color:rgba(255,226,184,.18);color:var(--ink);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.tonight .mood .chip small{margin-inline-start:7px;color:var(--mute);font-size:.76rem;font-variant-numeric:tabular-nums}
+.tonight .mood .chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.tonight .mood .chip[aria-pressed=true] small{color:inherit;opacity:.75}
+@media (max-width:560px){.tonight .mood{flex-direction:column;align-items:stretch;gap:6px}.tonight .mood-c{margin-inline-start:calc(clamp(16px,3vw,34px) * -1);padding-inline-start:clamp(16px,3vw,34px)}}
 .tonight.swap h2,.tonight.swap .meta{animation:swap .35s var(--ease)}
 @keyframes swap{from{opacity:0;transform:translateY(8px)}}
 
