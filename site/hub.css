@@ -135,12 +135,14 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
 .door.games .fx>i:nth-child(3n){background:#ffd36b;box-shadow:0 0 6px rgba(255,201,77,.9)}
 .door.games .fx>i:nth-child(3n+1){background:#c3b0ff;box-shadow:0 0 6px rgba(167,139,255,.9)}
 @keyframes pixel{0%{transform:translateY(0);opacity:0}10%{opacity:1}55%{opacity:.85}100%{transform:translateY(-190px);opacity:0}}
-.door.games .motif{overflow:hidden}
-.door.games .motif>i{left:-60%;right:-60%;bottom:-6%;height:46%;transform-origin:50% 100%;transform:perspective(260px) rotateX(62deg);
-  background:linear-gradient(rgba(53,224,255,.34) 1.5px,transparent 1.5px) 0 0/100% 34px,linear-gradient(90deg,rgba(53,224,255,.24) 1.5px,transparent 1.5px) 50% 0/34px 100%;animation:grid-run 2.2s linear infinite}
-@keyframes grid-run{from{transform:perspective(260px) rotateX(62deg) translateY(0)}to{transform:perspective(260px) rotateX(62deg) translateY(34px)}}
-/* الأفق: ضوء سماوي خافت حيث تختفي الأرضية، والعتمة تبتلع أبعدها */
-.door.games .motif::before{content:"";position:absolute;z-index:1;left:0;right:0;bottom:34%;height:22%;background:linear-gradient(180deg,transparent,rgba(7,8,24,.96) 70%,rgba(53,224,255,.22) 96%,transparent)}
+.door.games .motif{overflow:hidden;container-type:size}
+/* الأرضية: سطح طويل مائل نحو الأفق، منظوره بمقاس البوابة نفسها (cqh) فيبقى الأفق في الموضع ذاته على كل شاشة، ويجري نحوك خلية خلية */
+.door.games .motif>i{left:-70%;right:-70%;bottom:-2cqh;height:150cqh;transform-origin:50% 100%;transform:perspective(200cqh) rotateX(60deg);
+  background:linear-gradient(rgba(53,224,255,.4) 2px,transparent 2px) 0 0/100% 7cqh,linear-gradient(90deg,rgba(53,224,255,.3) 2px,transparent 2px) 50% 0/7cqh 100%;animation:grid-run 1.8s linear infinite}
+@keyframes grid-run{from{transform:perspective(200cqh) rotateX(60deg) translateY(0)}to{transform:perspective(200cqh) rotateX(60deg) translateY(7cqh)}}
+/* الأفق خط ضوء خافت، والعتمة تبتلع الأرضية خلف النص */
+.door.games .motif::before{content:"";position:absolute;z-index:1;left:0;right:0;top:calc(53% - 40px);height:80px;background:radial-gradient(60% 50% at 50% 50%,rgba(53,224,255,.28),transparent 70%)}
+.door.games .motif::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,var(--bg) 0,transparent 1px,transparent 60%,rgba(7,8,24,.7) 74%,var(--bg) 90%)}
 
 /* ----- الشاشات العريضة: البوابات الثلاث في قوس يواجهك، وأسطرها مصطفة (الشبكة الفرعية)، والأرضية تعكسها ----- */
 @media (min-width:1024px){
@@ -157,11 +159,15 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   .door.fate{transform:rotateY(-3deg)}
   .door.films{transform:rotateY(3deg)}
   .door.games{transform:rotateY(9deg)}
-  /* على الشاشة الكبيرة يملأ أحمر الغلاف بوابة عريضة فيصير فاقعاً يتعب العين: يُعمَّق إلى أحمر داكن (بلا شد للتباين، فالتباين الزائد
-     يُظهر تكسّر الصورة ويطمس تفاصيل الظل)، وتطبق العتمة من الحواف والأعلى فيبقى ظل باتمان واضحاً بأذنيه وكتفيه. والصورة نفسها
-     بدقتها الأصلية على الشاشات الكبيرة (hub.js). الجوال يبقى كما هو */
-  .door.dc .art img{filter:contrast(1.1) brightness(.76) saturate(.88)}
-  .door.dc .art::after{background:radial-gradient(78% 60% at 50% 30%,transparent 40%,rgba(5,3,4,.9)),linear-gradient(180deg,rgba(5,3,4,.45),rgba(5,3,4,.08) 24%,transparent 42%,rgba(5,3,4,.6) 62%,#050304 82%)}
+  /* على الشاشة الكبيرة يملأ أحمر الغلاف بوابة طويلة، وكان فاقعاً ومغبشاً: الخلفية 1280×720 تُكبَّر نحو ضعفيها لتملأ ارتفاع البوابة
+     (وأكثر على شاشات 4K بتكبير 175٪)، وشد التباين يُظهر تكسّرها. فهنا: الصورة بدقتها الأصلية (hub.js)، والأحمر أعمق قليلاً لا أبهت،
+     والتباين خفيف، والإطار أعلى قليلاً فتظهر الأذنان كاملتين، والعتمة من الحواف فيبقى الضوء خلف باتمان وظله الأسود واضحاً. الجوال كما هو */
+  .door.dc .art img{filter:contrast(1.12) brightness(.85) saturate(.87);object-position:center 18%}
+  .door.dc .art::after{background:radial-gradient(90% 68% at 50% 30%,transparent 46%,rgba(5,3,4,.9)),linear-gradient(180deg,rgba(5,3,4,.2),transparent 14%,transparent 46%,rgba(5,3,4,.58) 63%,#050304 83%)}
+  /* حبيبات دقيقة ثابتة فوق الغلاف كحبيبات الفيلم: تكسر تدرج الأحمر إلى السواد فلا يظهر بدرجات متكسرة على شاشات الأوليد،
+     ومزجها «تراكب» فلا ترفع السواد ولا تغيّر اللون. صورة واحدة تُرسم مرة، بلا حركة */
+  .door.dc .art::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.4;mix-blend-mode:overlay;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px}
   .hall-nav{display:none}
 }
 @media (min-width:1024px) and (hover:hover){

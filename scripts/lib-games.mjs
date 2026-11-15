@@ -24,8 +24,9 @@ const TYPE = { 'main game': 'main', 'dlc': 'dlc', 'dlc/addon': 'dlc', 'dlc addon
   remake: 'remake', remaster: 'remaster', 'expanded game': 'expanded', port: 'port', fork: 'fork', pack: 'pack', update: 'update' };
 const STATUS = { released: 'released', alpha: 'early', beta: 'early', 'early access': 'early', offline: 'offline', cancelled: 'cancelled', rumored: 'rumored', delisted: 'delisted' };
 let META = null;
-export const meta = () => META ??= Promise.all([igdb('game_types', 'fields type; limit 50;').catch(() => []), igdb('game_statuses', 'fields status; limit 50;').catch(() => [])])
-  .then(([t, s]) => ({ type: new Map(t.map(x => [x.id, TYPE[String(x.type).toLowerCase()] || 'main'])), status: new Map(s.map(x => [x.id, STATUS[String(x.status).toLowerCase()] || 'released'])) }))
+// تُحفظ في الذاكرة مرة، إلا إن فشل جلبها (مفاتيح خاطئة أو انقطاع) فتُطلب ثانية في المرة القادمة، فلا يعلق فشل عابر في دالة دافئة
+export const meta = () => META ??= Promise.all([igdb('game_types', 'fields type; limit 50;'), igdb('game_statuses', 'fields status; limit 50;').catch(() => [])])
+  .then(([t, s]) => { if (!s.length) META = null; return { type: new Map(t.map(x => [x.id, TYPE[String(x.type).toLowerCase()] || 'main'])), status: new Map(s.map(x => [x.id, STATUS[String(x.status).toLowerCase()] || 'released'])) }; })
   .catch(e => { META = null; throw e; });
 // الأنواع التي تُعد «لعبة» في القوائم والاقتراحات (لا الإضافات والحزم والتعديلات)
 export const GAMEY = new Set(['main', 'remake', 'remaster', 'expanded', 'standalone', 'port']);
