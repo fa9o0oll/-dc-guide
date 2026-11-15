@@ -16,6 +16,12 @@ async function auth() {
   const j = await r.json(); token = j.access_token; until = Date.now() + Math.max(60, (j.expires_in || 3600) - 300) * 1000;
   return token;
 }
+// فحص المفتاحين بلا كشف أي قيمة: ok، أو missing (غير موجودين)، أو secret (تويتش رفض السر)، أو id (رفض المعرّف)، أو down (تويتش لا يرد)
+export async function igdbHealth() {
+  if (!hasIgdb()) return 'missing';
+  try { await auth(); return 'ok'; }
+  catch (e) { return /invalid client secret/.test(e.message) ? 'secret' : /twitch auth 4\d\d/.test(e.message) && /invalid client/.test(e.message) ? 'id' : 'down'; }
+}
 // طابور بسيط: لا يبدأ أكثر من أربعة طلبات في كل ثانية، ولا يُفتح أكثر من ثمانية معاً
 const starts = [], waiting = []; let open = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));

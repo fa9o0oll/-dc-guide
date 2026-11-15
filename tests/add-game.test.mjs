@@ -46,11 +46,19 @@ check('المساران /api/add-game و/api/game-accounts', config.path === '/a
 check('كلمة سر خاطئة تُرفض', (await call(add, { action: 'suggest', q: 'x', password: 'no' })).status === 401);
 const nokey = await call(add, { action: 'suggest', q: 'witcher', password: PW });
 check('بلا مفاتيح IGDB: رسالة واضحة بالعربي ونوع النقص (igdb)، بلا طلب إلى تويتش', nokey.status === 503 && nokey.body.need === 'igdb' && /IGDB_CLIENT_ID/.test(nokey.body.error) && twitch === 0, nokey);
+// الفحص بلا كلمة سر (GET): حالة المفتاحين فقط، بلا أي قيمة
+const health = async h => { const r = await h(new Request('https://site.test/api/add-game')); return { status: r.status, text: await r.text() }; };
+const h0 = await health(add);
+check('الفحص بلا كلمة سر: «missing» بلا مفاتيح، بلا طلب إلى تويتش', h0.status === 200 && JSON.parse(h0.text).igdb === 'missing' && twitch === 0, h0);
 process.env.IGDB_CLIENT_ID = ' cid\n'; process.env.IGDB_CLIENT_SECRET = 'sec \n';
 secretOk = false;
+const h1 = await health(add), t1 = twitch, h1b = await health(add);
+check('الفحص: «secret» حين يرفض تويتش السر، ولا يكشف قيمة أي مفتاح، والجواب يُحفظ قليلاً فلا يُستنزف تويتش', JSON.parse(h1.text).igdb === 'secret' && !/cid|sec\b/.test(h1.text) && JSON.parse(h1b.text).igdb === 'secret' && twitch === t1, [h1, h1b, twitch, t1]);
 const bad = await call(add, { action: 'suggest', q: 'witcher', password: PW });
 check('سر IGDB مرفوض من تويتش: يقول أي المفتاحين المرفوض (السر) بلا تفاصيل سرية', bad.status === 502 && bad.body.need === 'igdb' && /رفض السر/.test(bad.body.error) && /IGDB_CLIENT_SECRET/.test(bad.body.error), bad);
 secretOk = true;
+const { default: add2 } = await import('../netlify/functions/add-game.mjs?fresh'), h2 = await health(add2);
+check('الفحص: «ok» حين يقبل تويتش المفتاحين', JSON.parse(h2.text).igdb === 'ok', h2);
 const sg = await call(add, { action: 'suggest', q: 'witcher', password: PW });
 check('الاقتراحات: من IGDB بعائلات منصاتها، بلا المحتوى الإباحي، والمفتاحان بلا مسافات زائدة', sg.status === 200 && sg.body.items.length === 2 && sg.body.items[0].igdb === 1942 && sg.body.items[0].fams === (8 | 1) && !sg.body.items.some(x => x.igdb === 666), sg.body);
 const se = await call(add, { action: 'search', q: 'The Witcher 3 2015', password: PW });

@@ -4,7 +4,7 @@
 //   IGDB_CLIENT_ID وIGDB_CLIENT_SECRET  تطبيق في لوحة مطوري تويتش        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع
 //   ADD_GAME_PASSWORD  كلمة السر (وإن لم توجد فكلمة سر «أضف فيلماً» ADD_FILM_PASSWORD)
 import { createHash, timingSafeEqual } from 'node:crypto';
-import { igdb, hasIgdb, quote, year } from '../../scripts/lib-igdb.mjs';
+import { igdb, igdbHealth, hasIgdb, quote, year } from '../../scripts/lib-igdb.mjs';
 import { meta, gameyIds, gamesFor, famOf, codeOf, ABBR, EROTIC } from '../../scripts/lib-games.mjs';
 import story from '../../data/games/story-orders.mjs';
 
@@ -47,7 +47,13 @@ const abbrs = (ids, P) => [...new Set((ids || []).map(id => P.get(id)).filter(Bo
 export const parseLine = s => { s = String(s || '').replace(/\s+/g, ' ').trim(); const m = s.match(/^(.*?)[\s(]+((?:19[5-9]|20[0-4])\d)\)?$/); return m && m[1].trim() ? { title: m[1].trim(), year: +m[2] } : { title: s, year: null }; };
 const norm = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 
+// فحص بلا كلمة سر (GET /api/add-game): هل مفتاحا IGDB في Netlify صالحان؟ لا يكشف أي قيمة، والجواب السلبي يُحفظ عشرين ثانية فلا يُستنزف تويتش
+let health = null;
 export default async req => {
+  if (req.method === 'GET') {
+    if (!health || Date.now() > health.until) { const v = await igdbHealth(); health = v === 'missing' ? null : { v, until: Date.now() + (v === 'ok' ? 600e3 : 20e3) }; if (!health) return json(200, { igdb: v }); }
+    return json(200, { igdb: health.v });
+  }
   if (req.method !== 'POST') return json(405, { error: 'POST only' });
   if (!password()) return json(500, { error: 'إعدادات الخادم ناقصة: كلمة السر (ADD_GAME_PASSWORD أو ADD_FILM_PASSWORD) غير موجودة في Netlify.' });
   let b; try { b = await req.json(); } catch { return json(400, { error: 'طلب غير صالح.' }); }
