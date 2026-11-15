@@ -16,7 +16,7 @@ const browser = await chromium.launch();
 for (const [name, width, height] of SCREENS) {
   const ctx = await browser.newContext({ viewport: { width, height }, isMobile: true, hasTouch: true, deviceScaleFactor: 2.625, locale: 'ar-SA' });
   const page = await ctx.newPage(); const req = {};
-  await page.route(/image\.tmdb\.org|images\.igdb\.com/, r => { const m = /\/t\/p\/(\w+)\//.exec(r.request().url()) || /\/upload\/(t_\w+)\//.exec(r.request().url()) || [0, 'other']; req[m[1]] = (req[m[1]] || 0) + 1;
+  await page.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com/, r => { const m = /\/t\/p\/(\w+)\//.exec(r.request().url()) || /\/upload\/(t_\w+)\//.exec(r.request().url()) || [0, 'other']; req[m[1]] = (req[m[1]] || 0) + 1;
     return r.fulfill({ contentType: 'image/svg+xml', body: /w300|w780|w1280|original|t_720p|t_1080p/.test(m[1]) ? svg(640, 360) : svg(342, 513) }); });
   const cdp = await ctx.newCDPSession(page); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await page.goto(url); await page.waitForSelector('.card'); await page.waitForTimeout(1500);

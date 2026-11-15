@@ -85,21 +85,28 @@ addEventListener('pageshow', () => { document.querySelectorAll('.curtain,.curtai
 initSync(id => { const door = document.querySelector(`.door[data-guide="${id}"]`); if (door) stat(door); });
 await Promise.all([...document.querySelectorAll('.door[data-key]')].map(async door => {
   try {
-    // الصورة: على الشاشات العريضة لبوابة دي سي غلاف طولي خاص بها (data-art-desk) بدقته الأصلية، فالبوابة هناك طويلة والشاشات
-    // كبيرة (4K بتكبير 175٪)؛ وغيرها خلفية العمل بالدقة التي تحتاجها البوابة. وألعابي صورتها ثابتة (data-art-igdb): Tekken 8
+    // الصورة: على الشاشات العريضة لكل بوابة غلاف طولي بلا كتابة خاص بها (data-art-desk: مسار في TMDB بدقته الأصلية، أو بمقاس مسمّى
+    // مثل w1280/… إن كان الأصل أكبر مما تحتاجه البوابة بكثير، أو رابط كامل)،
+    // فالبوابة هناك طويلة والشاشات كبيرة (4K بتكبير 175٪). وحين يحمل تُعلَّم البوابة (data-poster) فتأخذ هيئة الغلاف الكاملة؛
+    // وإن تعذّر رجعت إلى صورتها العادية بهيئتها. وعلى الأضيق: خلفية العمل بالدقة التي تحتاجها البوابة، وألعابي لوحتها من IGDB
     const cat = await (await fetch(`${door.dataset.guide}/data/${door.dataset.file || 'catalog.json'}?v=${BUILD}`)).json(), big = innerWidth * devicePixelRatio > 1000;
     const tmdbSize = !narrow.matches && door.offsetHeight * devicePixelRatio * 1.2 > 720 ? 'original' : big ? 'w1280' : 'w780';
-    let src = null;
+    const own = door.dataset.artDesk, desk = !narrow.matches && own ? (/^https:\/\//.test(own) ? own : (cat.imageBase || 'https://image.tmdb.org/t/p/') + (own[0] === '/' ? 'original' + own : own)) : null;
+    let usual = null;
     if (cat.games) {
-      if (door.dataset.artIgdb) src = `${cat.img || 'https://images.igdb.com/igdb/image/upload/'}t_${big ? '1080p' : '720p'}/${door.dataset.artIgdb}.jpg`;
+      if (door.dataset.artIgdb) usual = `${cat.img || 'https://images.igdb.com/igdb/image/upload/'}t_${big ? '1080p' : '720p'}/${door.dataset.artIgdb}.jpg`;
       if (cat.games.length) door.dataset.total = games(cat.games.length); else door.querySelector('[data-stat]').textContent = 'قائمتك تنتظر أول لعبة';
     } else {
       const items = cat.works || cat.films, art = items.find(w => w.id === door.dataset.art) || items.find(w => w.backdrop);
-      if (!narrow.matches && door.dataset.artDesk) src = cat.imageBase + 'original' + door.dataset.artDesk;
-      else if (art?.backdrop) src = cat.imageBase + tmdbSize + art.backdrop;
+      if (art?.backdrop) usual = cat.imageBase + tmdbSize + art.backdrop;
       door.dataset.total = cat.works ? works(items.length) : films(items.length);
     }
-    if (src) { const img = new Image(); img.decoding = 'async'; img.alt = ''; img.src = src; img.onload = () => img.classList.add('in'); door.querySelector('.art').append(img); }
+    if (desk || usual) {
+      const img = new Image(); let poster = !!desk; img.decoding = 'async'; img.alt = '';
+      img.onload = () => { if (poster) door.dataset.poster = ''; img.classList.add('in'); };
+      img.onerror = () => { if (poster && usual) { poster = false; img.src = usual; } };
+      img.src = desk || usual; door.querySelector('.art').append(img);
+    }
     stat(door);
   } catch { door.querySelector('[data-stat]').textContent = ''; }
 }));

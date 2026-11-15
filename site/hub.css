@@ -170,6 +170,26 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
      فلا ترفع السواد ولا تغيّر اللون. صورة واحدة تُرسم مرة، بلا حركة */
   .door.dc .art::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.22;mix-blend-mode:overlay;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px}
+  /* والثلاث الباقية على طريقة دي سي نفسها: غلاف طولي بلا كتابة بدقته الأصلية، بحضوره كاملاً (بلا تعتيم ولا مرشحات)، والعتمة من
+     الحواف والقاعدة للنص فقط، وحبيبات الفيلم نفسها. تُطبَّق حين يحمل الغلاف فعلاً (data-poster)، وإن تعذّر بقيت البوابة على صورتها السابقة.
+     Fate: سيبر ترفع إكسكاليبر ذهباً، وخلفها خدم الحرب الكبرى في العتمة (Fate/Zero، بمقاس 1280×1920 من أصل 2000×3000: أكبر مما تحتاجه البوابة، وبربع الوزن)، ودائرة الاستدعاء تنزل إلى الأرض تحت قدميها.
+     الأفلام: وجه K يرفع عينيه في المطر (Blade Runner 2049)، وشعاع آلة العرض يعبره.
+     ألعابي: كازويا وجين في نار الجين الشيطاني، لوحة Tekken 8 الرسمية بدقة 4K، كاملة بارتفاع البوابة إلا قاعدتها، وأرضية الحلبة تحتهما */
+  .door[data-poster]:is(.fate,.films,.games) .art img{filter:none}
+  .door[data-poster]:is(.fate,.films,.games) .art img.in{opacity:1}
+  .door[data-poster].fate .art img{object-position:center 30%;transform-origin:50% 30%}
+  .door[data-poster].films .art img{object-position:center 30%;transform-origin:50% 15%}
+  .door[data-poster].games .art img{position:absolute;top:0;left:50%;width:auto;max-width:none;height:90%;translate:-28% 0;transform-origin:28% 30%}
+  .door[data-poster]:is(.fate,.films,.games) .art::after{background:radial-gradient(100% 75% at 50% 32%,transparent 55%,color-mix(in srgb,var(--bg) 75%,transparent)),
+    linear-gradient(180deg,color-mix(in srgb,var(--bg) 10%,transparent),transparent 12%,transparent 52%,color-mix(in srgb,var(--bg) 55%,transparent) 66%,var(--bg) 86%)}
+  .door[data-poster]:is(.fate,.films,.games)::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;opacity:.2;mix-blend-mode:overlay;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px}
+  .door[data-poster].fate .fx::before{top:84%;opacity:.45}
+  .door[data-poster].fate .fx::after{background:radial-gradient(48% 14% at 50% 84%,rgba(230,182,92,.3),transparent 72%)}
+  .door[data-poster].fate .motif{translate:0 30%}
+  .door[data-poster].games .art::before{opacity:.4}
+  .door[data-poster].games .motif>i{height:80cqh}
+  .door[data-poster].games .motif::before{top:calc(72% - 40px);opacity:.8}
   .hall-nav{display:none}
 }
 @media (min-width:1024px) and (hover:hover){
@@ -177,6 +197,7 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   .doors:has(a.door:hover) a.door:not(:hover){filter:brightness(.62) saturate(.8)}
   a.door:hover .art{transform:translate(calc(var(--mx,0) * -18px),calc(var(--my,0) * -14px))}
   a.door:hover .art img.in{transform:scale(1.2);opacity:.78}
+  a.door[data-poster]:hover .art img.in{opacity:1}
   a.door:hover strong{translate:0 -6px}
 }
 @media (hover:hover){a.door:active{scale:.985;transition-duration:.12s}}

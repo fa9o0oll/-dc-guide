@@ -28,7 +28,7 @@ const browser = await chromium.launch();
 async function open(width, height, mobile, extra = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, locale: 'ar-SA', ...extra }), page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => m.type() === 'error' && !/favicon|404|Failed to load/.test(m.text()) && errs.push(m.text()));
-  await page.route(/image\.tmdb\.org|images\.igdb\.com/, r => r.fulfill({ contentType: 'image/svg+xml', body: ph }));
+  await page.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com/, r => r.fulfill({ contentType: 'image/svg+xml', body: ph }));
   return { ctx, page, errs };
 }
 
@@ -136,6 +136,13 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
   check(`${name}: لا ظل مائل يميز بوابة عن غيرها، وبوابة دي سي سوداء وغلافها بألوانه (بلا رمادي)`, !d.slab && /^#0[0-9a-f]0[0-9a-f]0[0-9a-f]$/i.test(d.dcBg) && !/grayscale/.test(d.dcGrade), d);
   check(`${name}: فوق البوابات نقشها «بوابات العوالم» بخطه، وتحته «لكل عالمٍ بوابة، ولكل حكايةٍ ترتيبها.»`, d.title === 'بوابات العوالم' && /Inscribe/.test(d.font) && d.fontOk && d.tag === 'لكل عالمٍ بوابة، ولكل حكايةٍ ترتيبها.', d);
   check(`${name}: «دي سي» لا تنقسم على سطرين، وبلا تمدد أفقي`, d.dcTitle && d.sw <= d.iw, d);
+  // على الشاشات العريضة كل بوابة بغلافها الطولي بحضوره كاملاً؛ وعلى الأضيق صورتها العادية
+  await page.waitForTimeout(900);
+  const art = await page.evaluate(() => [...document.querySelectorAll('.door')].map(x => { const i = x.querySelector('.art img'); return { g: x.dataset.guide, poster: x.hasAttribute('data-poster'), src: i?.src || '', op: i ? getComputedStyle(i).opacity : '', filter: i ? getComputedStyle(i).filter : '' }; }));
+  if (w >= 1024) check(`${name}: كل بوابة بغلافها الطولي بدقته الأصلية (دي سي وFate وأفلامي من TMDB، وألعابي لوحة Tekken 8 بدقة 4K)، والثلاث بحضورها كاملاً بلا تعتيم ولا مرشحات`,
+    art.every(a => a.poster) && /original\/mhOo2k/.test(art[0].src) && /w1280\/qwThyB/.test(art[1].src) && /original\/xWRahw/.test(art[2].src) && /store-images\.s-microsoft\.com\/.*w=2880/.test(art[3].src)
+    && art.slice(1).every(a => a.op === '1' && a.filter === 'none'), art);
+  else check(`${name}: على الأضيق كل بوابة بصورتها العادية، لا غلاف الشاشات العريضة`, art.every(a => !a.poster) && /images\.igdb\.com\/.*ar5zhb/.test(art[3].src) && !/qwThyB|xWRahw|mhOo2k|s-microsoft/.test(art.map(a => a.src).join()), art);
   // الجاران مائلان قليلاً في القوس فيُسقَط موضع أسطرهما بفارق بكسلات قليلة
   if (w >= 1024) check(`${name}: البوابات الأربع ظاهرة في قوس يواجهك (الطرفان أكثر ميلاً من الوسطيين)، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, d.flat.length === 4 && [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 4) && (a => a[0] < a[1] && a[1] < 0 && 0 < a[2] && a[2] < a[3])(d.flat.map(rotY)) && !d.nav.length, { ...d, angles: d.flat.map(rotY) });
   else {
@@ -168,6 +175,16 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
     check(`${name}: والضغط على التي في الوسط يدخلها`, /\/dc\/$/.test(page.url()), page.url());
   }
   check(`hub ${name}: بلا أخطاء برمجية`, !errs.length, errs);
+  await ctx.close(); }
+
+// إن تعذّر غلاف الشاشات العريضة رجعت البوابة إلى صورتها العادية بهيئتها العادية
+{ console.log('== hub poster fallback');
+  const { ctx, page, errs } = await open(1440, 900, false);
+  await page.route(/store-images\.s-microsoft\.com/, r => r.abort());
+  await page.goto(`${base}/`); await page.waitForTimeout(1500);
+  const g = await page.evaluate(() => { const x = document.querySelector('.door.games'), i = x.querySelector('.art img'); return { poster: x.hasAttribute('data-poster'), src: i?.src, in: i?.classList.contains('in'), full: !!i && i.offsetHeight === x.querySelector('.art').offsetHeight }; });
+  check('ألعابي: إن تعذّرت لوحة Tekken 8 بدقة 4K رجعت إلى لوحة IGDB بهيئة البوابة العادية', !g.poster && /images\.igdb\.com\/.*ar5zhb/.test(g.src) && g.in && g.full, g);
+  check('hub poster fallback: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
 
 // ---------- الكمبيوتر: البوستر يميل مع المؤشر ويُضغط ----------
