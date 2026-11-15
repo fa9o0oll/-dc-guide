@@ -42,7 +42,7 @@ async function bySteam(appids) {
   }
   return out;
 }
-async function byName(items, T) {
+export async function byName(items, T) {
   const out = new Map();
   for (let i = 0; i < items.length; i += 10) {
     const part = items.slice(i, i + 10), body = part.map((x, k) => `query games "${k}" { search ${quote(clean(x.name))}; fields name,first_release_date,platforms,total_rating_count; where version_parent = null${T}; limit 6; };`).join('\n');

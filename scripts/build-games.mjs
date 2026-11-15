@@ -27,6 +27,15 @@ if (process.env.GAMES_PROBE) {
   show('top by rating_count', await igdb('games', 'fields name,game_type,rating_count; where rating_count != null; sort rating_count desc; limit 12;').catch(e => e.message));
   show('popularity types', await igdb('popularity_types', 'fields name,external_popularity_source; limit 50;').catch(e => e.message));
   show('popularity top (type 1)', await igdb('popularity_primitives', 'fields game_id,value,popularity_type; where popularity_type = 1; sort value desc; limit 10;').catch(e => e.message));
+  // مطابقة أسماء PlayStation وXbox بـ IGDB كما تفعلها دالة «حساباتي»: الطلب الخام أولاً (ليظهر الخطأ إن وُجد)، ثم المطابقة نفسها
+  const { meta, gameyIds } = await import('./lib-games.mjs'), { byName } = await import('../netlify/functions/game-accounts.mjs');
+  const m = await meta(), T = (t => t.length ? ` & game_type = (${t.join(',')})` : '')(gameyIds(m));
+  show('multiquery raw (search)', await igdb('multiquery', `query games "0" { search "ELDEN RING"; fields name; limit 3; };\nquery games "1" { search "Halo Infinite"; fields name; limit 3; };`).catch(e => e.message));
+  show('multiquery raw (search + where)', await igdb('multiquery', `query games "0" { search "ELDEN RING"; fields name,first_release_date,platforms,total_rating_count; where version_parent = null${T}; limit 6; };`).catch(e => e.message));
+  show('single search + where', await igdb('games', `search "ELDEN RING"; fields name; where version_parent = null${T}; limit 3;`).catch(e => e.message));
+  const sample = ["Marvel's Spider-Man 2", 'God of War Ragnarök', 'ELDEN RING', "Ghost of Tsushima DIRECTOR'S CUT", 'Grand Theft Auto V', 'The Last of Us Part I', 'Call of Duty: Modern Warfare III', 'EA SPORTS FC 24', 'TEKKEN 8', 'FINAL FANTASY VII REBIRTH', 'Forza Horizon 5', 'Halo Infinite', 'Hogwarts Legacy', 'Resident Evil 4', 'Cyberpunk 2077'].map((name, i) => ({ key: 'p' + i, name }));
+  const t0 = Date.now(), hits = await byName(sample, T);
+  show(`byName ${hits.size}/${sample.length} in ${Date.now() - t0}ms`, sample.map(x => x.name + ' => ' + JSON.stringify(hits.get(x.key) || null)));
 }
 
 if (!added.length) { await writeFile(OUT, JSON.stringify(empty)); console.log('games: the list is empty'); process.exit(0); }
