@@ -1,5 +1,6 @@
 // دالة «أضف لعبة» (/api/add-game): تقترح أثناء الكتابة (suggest)، وتبحث في IGDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي لعبة للاطلاع (preview)،
 // ثم تضيف المختارة إلى data/games/added.json في المستودع (add)، أو دفعة ألعاب سُحبت من حساباتك في المنصات (import) بإيداع واحد، فيعاد بناء القائمة وتظهر على كل الأجهزة.
+// وتحذف لعبة منه (remove) فتختفي من كل الأجهزة مع البناء القادم.
 // محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
 //   IGDB_CLIENT_ID وIGDB_CLIENT_SECRET  تطبيق في لوحة مطوري تويتش        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع
 //   ADD_GAME_PASSWORD  كلمة السر (وإن لم توجد فكلمة سر «أضف فيلماً» ADD_FILM_PASSWORD)
@@ -37,6 +38,24 @@ export async function record(entries, message) {
   throw new Error('GitHub conflict');
 }
 
+// يحذف لعبة من ملف المضافات (حذف «أضف لعبة»). يعيد المحذوفة، أو null إن لم تكن فيه
+export async function unrecord(id, message) {
+  const api = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
+  const headers = { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'watch-guide-add-game' };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const cur = await fetch(`${api}?ref=${BRANCH}`, { headers }); if (cur.status === 404) return null;
+    if (cur.status !== 200) throw Object.assign(new Error('GitHub read ' + cur.status), { gh: cur.status });
+    const j = await cur.json(), doc = JSON.parse(Buffer.from(j.content, 'base64').toString('utf8')), list = doc.games || [], gone = list.find(g => +g.igdb === id);
+    if (!gone) return null;
+    doc.games = list.filter(g => +g.igdb !== id);
+    const put = await fetch(api, { method: 'PUT', headers, body: JSON.stringify({ message: message(gone), branch: BRANCH, sha: j.sha, content: Buffer.from(JSON.stringify(doc, null, 1) + '\n').toString('base64') }) });
+    if (put.ok) return gone;
+    if (put.status !== 409 && put.status !== 422) throw Object.assign(new Error('GitHub write ' + put.status), { gh: put.status });
+    await wait(400);
+  }
+  throw new Error('GitHub conflict');
+}
+
 // عائلات المنصات (بتات) لنتائج البحث: 1 بلايستيشن، 2 إكس بوكس، 4 نينتندو، 8 كمبيوتر، 16 جوال
 let PLAT = null;
 const plats = () => PLAT ??= igdb('platforms', 'fields name,abbreviation,slug; limit 500;').then(list => new Map(list.map(p => [p.id, p]))).catch(e => { PLAT = null; throw e; });
@@ -63,6 +82,13 @@ export default async req => {
   if (!password()) return json(500, { error: 'إعدادات الخادم ناقصة: كلمة السر (ADD_GAME_PASSWORD أو ADD_FILM_PASSWORD) غير موجودة في Netlify.' });
   let b; try { b = await req.json(); } catch { return json(400, { error: 'طلب غير صالح.' }); }
   if (!b?.password || !same(b.password, password())) { await wait(700); return json(401, { error: 'password' }); }
+  // الحذف لا يحتاج IGDB: من ملف المضافات في المستودع مباشرة
+  if (b.action === 'remove') {
+    const id = +b.igdb; if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
+    if (!process.env.GH_TOKEN) return json(500, { error: 'إعدادات الخادم ناقصة: GH_TOKEN غير موجود في Netlify.' });
+    try { const gone = await unrecord(id, g => `games: remove ${g.title || id}${g.year ? ` (${g.year})` : ''}`); return json(200, { state: gone ? 'removed' : 'absent' }); }
+    catch (e) { if (e.gh === 401 || e.gh === 403 || e.gh === 404) return json(502, { error: 'تعذّر الحذف من GitHub: الرمز GH_TOKEN غير صالح أو بلا صلاحية الكتابة على المستودع.' }); console.error(e); return json(502, { error: 'تعذّر إكمال الحذف الآن. حاول بعد قليل.' }); }
+  }
   if (!hasIgdb()) return json(503, { error: 'مفاتيح IGDB غير موجودة في Netlify بعد (IGDB_CLIENT_ID وIGDB_CLIENT_SECRET). أضفها ثم أعد نشر الموقع.', need: 'igdb' });
   try {
     const m = await meta(), types = gameyIds(m), T = types.length ? ` & game_type = (${types.join(',')})` : '';

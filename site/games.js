@@ -9,7 +9,7 @@ import { clock, spoken } from './count.js?v=__BUILD__';
 import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
-const BUILD = '__BUILD__', KEY = 'gamesg.progress', PEND = 'gamesg.pending', PASS = 'gamesg.pass', IGN = 'gamesg.ignored', STEAM = 'gamesg.steam';
+const BUILD = '__BUILD__', KEY = 'gamesg.progress', PEND = 'gamesg.pending', PASS = 'gamesg.pass', IGN = 'gamesg.ignored', STEAM = 'gamesg.steam', REM = 'gamesg.removed';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -48,17 +48,19 @@ const FAMBIT = { 1: 'PS', 2: 'Xbox', 4: 'Nintendo', 8: 'PC', 16: 'جوال' };
 const famsText = b => Object.entries(FAMBIT).filter(([k]) => b & +k).map(([, v]) => v).join(' · ');
 
 // ---------- القوائم
+// t اسم القائمة في القائمة الرئيسية، وact اسم زرها في بطاقة اللعبة: بوظيفته مباشرة («ألعبها الآن»)، واسم القائمة تحته تلميحاً
 const LISTS = {
-  play: { t: 'متابعة', s: 'تلعبها الآن', badge: 'تلعبها', ic: 'play', on: 'تلعبها على' },
-  new: { t: 'لعبة جديدة', s: 'تنتظر دورها', badge: 'جديدة', ic: 'star', on: 'ستلعبها على' },
-  done: { t: 'شارة النهاية', s: 'ختمتها', badge: 'ختمتها', ic: 'trophy', on: 'ختمتها على' },
-  seen: { t: 'وضع المتفرج', s: 'شاهدتها ولم تلعبها', badge: 'شاهدتها', ic: 'eye', on: 'شاهدتها على' },
+  play: { t: 'متابعة', s: 'تلعبها الآن', act: 'ألعبها الآن', badge: 'تلعبها', ic: 'play', on: 'ألعبها على' },
+  new: { t: 'لعبة جديدة', s: 'تنتظر دورها', act: 'سألعبها لاحقاً', badge: 'جديدة', ic: 'star', on: 'سألعبها على' },
+  done: { t: 'شارة النهاية', s: 'ختمتها', act: 'ختمتها', badge: 'ختمتها', ic: 'trophy', on: 'ختمتها على' },
+  seen: { t: 'وضع المتفرج', s: 'شاهدتها ولم تلعبها', act: 'شاهدتها فقط', badge: 'شاهدتها', ic: 'eye', on: 'شاهدتها على' },
 };
 const ORDER = ['play', 'new', 'done', 'seen', 'all'];
 const TYPES = { remake: 'ريميك', remaster: 'ريماستر', expanded: 'إصدار موسّع', standalone: 'توسعة مستقلة', port: 'منفذ', dlc: 'محتوى إضافي', expansion: 'توسعة', bundle: 'حزمة', episode: 'حلقة', season: 'موسم', mod: 'تعديل', pack: 'حزمة', update: 'تحديث', fork: 'نسخة' };
 const XKIND = { film: 'فيلم', films: 'سلسلة أفلام', tv: 'مسلسل', anime: 'أنمي', novel: 'رواية', novels: 'سلسلة روايات', book: 'كتاب', books: 'سلسلة كتب', comic: 'قصص مصورة', manga: 'مانغا', game: 'لعبة', games: 'سلسلة ألعاب', board: 'لعبة لوحية', tabletop: 'لعبة طاولة' };
 
 const ic = n => `<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const listBtn = k => `${ic(LISTS[k].ic)}<span><b>${LISTS[k].act}</b><small>في «${LISTS[k].t}»</small></span>`;
 const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
@@ -69,6 +71,7 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 <symbol id="i-dots" viewBox="0 0 24 24"><path stroke-width="3" d="M12 5.5h.01M12 12h.01M12 18.5h.01"/></symbol>
 <symbol id="i-pad" viewBox="0 0 24 24"><path d="M7 8.5h10a4 4 0 013.9 4.9l-.8 3.4a2.4 2.4 0 01-4 1.2L14 16h-4l-2.1 2a2.4 2.4 0 01-4-1.2l-.8-3.4A4 4 0 017 8.5zM8.5 11v3M7 12.5h3"/><path stroke-width="2.6" d="M15.5 12h.01M17.5 13.6h.01"/></symbol>
 <symbol id="i-roll" viewBox="0 0 24 24"><path d="M4 7.5h3c2 0 3.2 1.2 4.5 4.5s2.5 4.5 4.5 4.5h4M4 16.5h3c1.1 0 1.9-.4 2.7-1.3M20 7.5h-4c-1.1 0-1.9.4-2.7 1.3M17.5 5L20 7.5 17.5 10M17.5 14l2.5 2.5-2.5 2.5"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4.5h4V7M7 7l.9 12.5h8.2L17 7M10 11v5M14 11v5"/></symbol>
 <symbol id="i-ext" viewBox="0 0 24 24"><path d="M8 16l8-8M9.5 8H16v6.5"/></symbol><symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4.5 9.5 9 5M5 9.5h9a5.5 5.5 0 010 11h-3"/></symbol>
 </defs></svg>`;
 
@@ -115,8 +118,8 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <div class="toast" id="toast" role="status"></div>`);
 portalBack('games');
 
-const toast = (t, undo) => { const el = $('#toast'); el.textContent = t; if (undo) el.append(Object.assign(document.createElement('button'), { textContent: 'تراجع', onclick: () => { el.classList.remove('on', 'act'); el.textContent = ''; undo(); } }));
-  el.classList.toggle('act', !!undo); el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => { el.classList.remove('on', 'act'); setTimeout(() => { if (!el.classList.contains('on')) el.textContent = ''; }, 300); }, undo ? 5000 : 2800); };
+const toast = (t, undo, ms) => { const el = $('#toast'); el.textContent = t; if (undo) el.append(Object.assign(document.createElement('button'), { textContent: 'تراجع', onclick: () => { el.classList.remove('on', 'act'); el.textContent = ''; undo(); } }));
+  el.classList.toggle('act', !!undo); el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => { el.classList.remove('on', 'act'); setTimeout(() => { if (!el.classList.contains('on')) el.textContent = ''; }, 300); }, ms || (undo ? 5000 : 2800)); };
 const get = f => fetch(`data/${f}?v=${BUILD}`).then(r => { if (!r.ok) throw new Error(f); return r.json(); });
 
 // ---------- أجزاء البطاقة في الشبكة: غلاف اللعبة كعلبتها، وفوقه شريط المنصة بلونها، وملصق القائمة، ولوحة العدّ لما لم يصدر
@@ -134,7 +137,7 @@ const metaLine = g => { const r = rec(g.id); return [soon(g) ? '<span class="up"
 function card(g) { const s = rec(g.id).s || 'new';
   return `<article class="gc s-${s}${g.fresh ? ' fresh' : ''}" id="g-${g.id}" data-id="${g.id}"><div class="case">${band(g)}
 <button class="cover" data-act="open" ${g.cover ? `data-zoom-pinch data-zoom-title="${esc(g.title)}" ` : ''}aria-label="افتح بطاقة ${esc(g.title)}">${coverImg(g.cover, '(max-width:520px) 45vw, 200px') || cart(g)}${badge(g)}${chip(g)}</button></div>
-<div class="info"><h3 dir="ltr">${esc(g.title)}</h3><p class="meta">${metaLine(g)}</p><button class="qm-b" data-act="qm" aria-haspopup="menu" aria-label="انقل «${esc(g.title)}» إلى قائمة">${ic('dots')}</button></div></article>`; }
+<div class="info"><h3 dir="ltr">${esc(g.title)}</h3><p class="meta">${metaLine(g)}</p><button class="qm-b" data-act="qm" aria-haspopup="menu" aria-label="حالة «${esc(g.title)}» عندي وحذفها">${ic('dots')}</button></div></article>`; }
 
 // ---------- التصفية والترتيب والبحث
 const SORTS = { list: ['ترتيب قائمتي', (a, b) => (a.ord ?? -1) - (b.ord ?? -1) || a.title.localeCompare(b.title, 'en')], recent: ['آخر ما حدّثته', (a, b) => (rec(b.id).at || '').localeCompare(rec(a.id).at || '')],
@@ -242,10 +245,14 @@ function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribut
 const sheet = $('#sheet'), addDlg = $('#add'), accDlg = $('#acc'), ibDlg = $('#inbox');
 let openId = null;
 const ext = (name, url, sub = '') => `<a href="${esc(url)}" target="_blank" rel="noopener"><b dir="ltr">${esc(name)}</b>${sub ? `<small>${sub}</small>` : ''}</a>`;
-function saveHTML(g) { const r = rec(g.id), s = r.s || 'new', opts = s === 'seen' ? WATCH : (g.plats || []);
-  return `<section class="save" aria-labelledby="save-h"><h3 id="save-h">ملف الحفظ</h3><div class="lists" role="radiogroup" aria-label="القائمة">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" role="radio" class="li m-${k}" data-act="set" data-v="${k}" aria-checked="${s === k}">${ic(LISTS[k].ic)}<span><b>${LISTS[k].t}</b><small>${LISTS[k].s}</small></span></button>`).join('')}</div>
+function saveHTML(g) { const r = rec(g.id), s = r.s || 'new', opts = s === 'seen' ? WATCH : [...new Set([...(g.plats || []), ...(r.on && !WATCH.includes(r.on) ? [r.on] : [])])];
+  return `<section class="save" aria-labelledby="save-h"><h3 id="save-h">حالتها عندي</h3><div class="lists" role="radiogroup" aria-label="حالتها عندي">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" role="radio" class="li m-${k}" data-act="set" data-v="${k}" aria-checked="${s === k}">${listBtn(k)}</button>`).join('')}</div>
 ${opts.length ? `<div class="q"><b>${LISTS[s].on}</b><div class="pl" role="radiogroup" aria-label="${LISTS[s].on}">${opts.map(c => `<button type="button" role="radio" class="pc f-${famOf(c)}" data-act="on" data-v="${c}" aria-checked="${r.on === c}"><bdi dir="${WATCH.includes(c) ? 'rtl' : 'ltr'}">${esc(abbr(c))}</bdi></button>`).join('')}</div></div>` : ''}
-${s === 'done' || s === 'play' ? `<div class="q more"><label>${s === 'done' ? 'متى ختمتها؟' : 'بدأتها في'}<input type="month" data-k="at" value="${r.at ? r.at.slice(0, 7) : ''}" max="${today.slice(0, 7)}"></label><label>كم ساعة لعبتها؟<input type="number" data-k="h" min="0" max="99999" step="1" inputmode="numeric" value="${r.h ?? ''}" placeholder="${g.ttb?.n ? Math.round(g.ttb.n) : ''}"></label></div>` : ''}</section>`; }
+${s === 'done' || s === 'play' ? `<div class="q more"><label>${s === 'done' ? 'متى ختمتها؟' : 'بدأتها في'}<input type="month" data-k="at" value="${r.at ? r.at.slice(0, 7) : ''}" max="${today.slice(0, 7)}"></label><label>كم ساعة لعبتها؟<input type="number" data-k="h" min="0" max="99999" step="1" inputmode="numeric" value="${r.h ?? ''}" placeholder="${g.ttb?.n ? Math.round(g.ttb.n) : ''}"></label></div>` : ''}
+<div class="rm"><button type="button" class="rm-b" data-act="rm-ask">${ic('trash')}احذفها من مكتبتي</button></div></section>`; }
+// الحذف بتأكيد في مكانه (بلا نوافذ المتصفح): يقول ما سيحدث، ويطلب كلمة السر إن لم تُحفظ على هذا الجهاز
+const rmAsk = g => `<p>تُحذف <bdi dir="ltr">«${esc(g.title)}»</bdi> من قوائمك كلها وعلى كل أجهزتك. ويمكنك إضافتها من جديد متى شئت.</p>${pass() ? '' : '<label class="pass-wrap">كلمة السر<input class="rm-pass" type="password" autocomplete="current-password"></label>'}
+<div class="acts"><button type="button" class="btn danger" data-act="rm-go" data-id="${g.id}">${ic('trash')}احذفها</button><button type="button" class="btn sec" data-act="rm-no">تراجع</button></div><p class="msg" aria-live="polite"></p>`;
 function board(o) { if (!soon(o)) return '';
   if (exact(o)) return `<section class="sec"><h3>موعد الصدور</h3><div class="board" data-until="${o.date}" data-now="تصدر اليوم"><p class="b-k">تصدر بعد</p><span class="ck" aria-hidden="true">${clock(o.date, 'تصدر اليوم')}</span><span class="sr sr-time">${spoken(o.date)}</span>
 <p class="note">تصدر في <bdi>${dateAr(o.date)}</bdi> حسب <bdi dir="ltr">IGDB</bdi>، والموعد قابل للتغيير.</p></div></section>`;
@@ -303,7 +310,7 @@ async function sheetHTML(g, pv) { if (g.from?.some(w => w.tmdb) || g.into?.some(
   return `<div class="sh-hero">${art ? `<img alt="" src="${img(art, '720p')}" srcset="${img(art, '720p')} 1280w, ${img(art, '1080p')} 1920w" sizes="(max-width:900px) 100vw, 900px">` : ''}</div>
 <div class="sh-head">${g.cover ? `<button type="button" class="cover" data-zoom="${img(g.cover, '1080p')}" data-zoom-title="${esc(g.title)}" aria-label="كبّر غلاف ${esc(g.title)}">${coverImg(g.cover, '180px', false)}</button>` : `<div class="cover">${cart(g)}</div>`}
 <div class="txt"><h2 dir="ltr">${esc(g.title)}</h2>${g.titleAr ? `<p class="ar">${esc(g.titleAr)}</p>` : ''}<p class="facts">${facts.map(x => `<span>${x}</span>`).join('')}</p><div class="tags">${(g.genres || []).map(x => `<span>${esc(x)}</span>`).join('')}${(g.modes || []).slice(0, 2).map(x => `<span class="m">${esc(x)}</span>`).join('')}</div></div></div>
-${pv ? `<section class="save pv"><h3>أضفها إلى</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${ic(LISTS[k].ic)}<span><b>${LISTS[k].t}</b><small>${LISTS[k].s}</small></span></button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
+${pv ? `<section class="save pv"><h3>أضفها إلى مكتبتي</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${listBtn(k)}</button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
 ${g.src === 'added' ? '<section class="sec"><p class="ask">أُضيفت بزر «أضف لعبة»: معلوماتها آلية من <bdi dir="ltr">IGDB</bdi>، وعالمها واقتباساتها تكتمل في البناء القادم.</p></section>' : ''}
 ${board(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${mediaSec(g)}${linksSec(g)}`; }
 const filmsReady = () => D.filmsReady ??= fetch(`../films/data/films.json?v=${BUILD}`).then(r => r.ok ? r.json() : { films: [] }).then(j => { D.films = new Set((j.films || []).map(f => f.id)); }).catch(() => { D.films = new Set(); });
@@ -333,10 +340,11 @@ function setList1(id, v, quiet) { const r = rec(id), was = r.s || 'new'; if (was
 // ---------- القائمة السريعة تحت الغلاف (⋮): نقل اللعبة بين القوائم دون فتح بطاقتها
 const qm = $('#qm'); let qmFor = null, qmY = 0;
 function openQm(btn) { const id = +btn.closest('[data-id]').dataset.id, s = lst(id); qmFor = { id, btn };
-  qm.innerHTML = `<p>انقلها إلى</p>${['play', 'new', 'done', 'seen'].map(k => `<button type="button" role="menuitemradio" class="m-${k}" data-act="qm-set" data-v="${k}" aria-checked="${s === k}">${ic(LISTS[k].ic)}${LISTS[k].t}</button>`).join('')}`;
-  qm.hidden = false; const r = btn.getBoundingClientRect(), w = qm.offsetWidth, h = qm.offsetHeight;
-  qm.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.right - w)) + 'px'; qm.style.top = (r.bottom + h + 8 > innerHeight ? Math.max(8, r.top - h - 6) : r.bottom + 6) + 'px';
+  qm.classList.remove('ask'); qm.innerHTML = `<p>حالتها عندي</p>${['play', 'new', 'done', 'seen'].map(k => `<button type="button" role="menuitemradio" class="m-${k}" data-act="qm-set" data-v="${k}" aria-checked="${s === k}">${ic(LISTS[k].ic)}${LISTS[k].act}</button>`).join('')}<hr><button type="button" role="menuitem" class="m-rm" data-act="qm-rm">${ic('trash')}احذفها من مكتبتي</button>`;
+  qm.hidden = false; placeQm();
   btn.setAttribute('aria-expanded', 'true'); qmY = scrollY; (qm.querySelector('[aria-checked=true]') || qm.querySelector('button')).focus({ preventScroll: true }); }
+function placeQm() { const r = qmFor.btn.getBoundingClientRect(), w = qm.offsetWidth, h = qm.offsetHeight;
+  qm.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.right - w)) + 'px'; qm.style.top = (r.bottom + h + 8 > innerHeight ? Math.max(8, r.top - h - 6) : r.bottom + 6) + 'px'; }
 function closeQm(back) { if (qm.hidden) return; qm.hidden = true; qmFor?.btn.setAttribute('aria-expanded', 'false'); if (back) qmFor?.btn.focus(); qmFor = null; }
 // تُغلق إن مُرّرت الصفحة فعلاً (لا لتمرير صغير يسبق اللمسة نفسها)، أو تغيّر حجم النافذة
 addEventListener('scroll', () => { if (!qm.hidden && Math.abs(scrollY - qmY) > 30) closeQm(); }, { passive: true }); addEventListener('resize', () => closeQm());
@@ -364,13 +372,33 @@ $('#add-form').addEventListener('submit', async e => { e.preventDefault(); const
   } catch (err) { msg.textContent = err.message; } });
 // اختيار القائمة قبل الإضافة: تحت المرشحة نفسها
 function askList(btn) { const row = btn.closest('.cand'); $$('.cand .pickl').forEach(x => x.remove());
-  row.insertAdjacentHTML('beforeend', `<div class="pickl" role="group" aria-label="إلى أي قائمة؟"><b>إلى أي قائمة؟</b>${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="chip m-${k}" data-act="add-to" data-v="${k}" data-igdb="${row.dataset.igdb}">${ic(LISTS[k].ic)}${LISTS[k].t}</button>`).join('')}</div>`);
+  row.insertAdjacentHTML('beforeend', `<div class="pickl" role="group" aria-label="ما وضعها عندك؟"><b>ما وضعها عندك؟</b>${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="chip m-${k}" data-act="add-to" data-v="${k}" data-igdb="${row.dataset.igdb}">${ic(LISTS[k].ic)}${LISTS[k].act}</button>`).join('')}</div>`);
   row.querySelector('.pickl [data-v=new]').focus(); }
 async function addGame(igdb, list, btn) { const msg = $('#add-msg'), label = btn?.innerHTML; if (btn) { btn.disabled = true; btn.textContent = 'تُضاف…'; }
   try { const r = await api('/api/add-game', { action: 'add', igdb }); adopt(r.game, r, true); setRec(r.game.id, { s: list, at: today }); keep(r);
     if (addDlg.open) addDlg.close(); toast(`أُضيفت «${r.game.title}» إلى «${LISTS[list].t}»`); refresh(r.game.id); openGame(r.game.id, !sheet.open);
   } catch (err) { if (addDlg.open) msg.textContent = err.message; else toast(err.message); if (btn) { btn.disabled = false; btn.innerHTML = label; } } }
 const keep = r => { try { const p = JSON.parse(store.get(PEND) || '[]'); p.push(r); store.set(PEND, JSON.stringify(p.slice(-400))); } catch {} };
+// ---------- احذف لعبة: تُحذف من ملف المضافات في المستودع (فتختفي من كل الأجهزة مع البناء القادم)، ومن هذا الجهاز فوراً، وسجلها يُلغى ويُزامَن.
+// ما حُذف هنا يُحفظ في gamesg.removed حتى يلحق البناء، فلا يعود للظهور من ملف القائمة القديم. والتراجع يعيدها بسجلها كما كان
+const removedMap = () => { try { const m = JSON.parse(store.get(REM) || '{}'); return m && typeof m === 'object' ? m : {}; } catch { return {}; } };
+function drop(id) { const g = D.byId.get(id); if (!g) return; D.byId.delete(id); D.games = D.games.filter(x => x.id !== id); stale(); document.getElementById('g-' + id)?.remove();
+  const m = removedMap(); m[id] = Date.now(); store.set(REM, JSON.stringify(m));
+  try { store.set(PEND, JSON.stringify(JSON.parse(store.get(PEND) || '[]').map(r => r?.game ? (r.game.id === id ? null : r) : { ...r, games: (r?.games || []).filter(x => x.id !== id) }).filter(r => r && (r.game || r.games?.length)))); } catch {}
+  if (P.games[id]) { delete P.games[id]; save(); }
+  if (slotId === id) slotId = null; if (tonightId === id) tonightId = null;
+  $('#chips').innerHTML = chipsHTML(); renderMenu(false); soonHTML(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); apply(false); }
+async function removeGame(id, pw, box, btn) { const g = D.byId.get(id), msg = box?.querySelector('.msg'), label = btn?.innerHTML; if (!g) return;
+  if (!pw) { if (msg) msg.textContent = 'اكتب كلمة السر أولاً.'; box?.querySelector('.rm-pass')?.focus(); return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'تُحذف…'; }
+  try { await api('/api/add-game', { action: 'remove', igdb: id }, pw); if (!pass()) remember(pw);
+    const prev = P.games[id] ? { ...P.games[id] } : null; closeQm(); if (sheet.open && openId === id) closeGame(); drop(id);
+    toast(`حُذفت «${g.title}» من مكتبتك`, () => restore(g, prev), 8000);
+  } catch (e) { if (btn) { btn.disabled = false; btn.innerHTML = label; } if (msg) msg.textContent = e.message; else toast(e.message); } }
+async function restore(g, prev) { try { const r = await api('/api/add-game', { action: 'add', igdb: g.id });
+    const m = removedMap(); delete m[g.id]; store.set(REM, JSON.stringify(m)); adopt(r.game, r, true); keep(r); if (prev) { P.games[g.id] = prev; save(); }
+    refresh(g.id); toast(`عادت «${g.title}» إلى مكتبتك`);
+  } catch (e) { toast('تعذّرت إعادتها: ' + e.message); } }
 // لعبة عادت من الخادم (أو محفوظة بانتظار البناء القادم) تدخل القائمة المعروضة
 function adopt(g, r, draw) { if (!g || D.byId.has(g.id)) return false; merge(r || {}); g.fresh = true; g.ord = -Date.now(); register(g); stale();
   if (draw) { $('#grid').insertAdjacentHTML('afterbegin', card(g)); $('#chips').innerHTML = chipsHTML(); } return true; }
@@ -506,6 +534,10 @@ document.addEventListener('click', e => { if (!qm.hidden && !e.target.closest('#
   else if (act === 'on') { if (!openId) return; const v = rec(openId).on === t.dataset.v ? '' : t.dataset.v; setRec(openId, { on: v }); refresh(openId); }
   else if (act === 'qm') { if (qmFor?.btn === t) closeQm(); else openQm(t); }
   else if (act === 'qm-set') { const f = qmFor; closeQm(true); if (f) setList1(f.id, t.dataset.v); }
+  else if (act === 'qm-rm') { const g = qmFor && D.byId.get(qmFor.id); if (!g) return; qm.classList.add('ask'); qm.innerHTML = rmAsk(g); placeQm(); (qm.querySelector('.rm-pass') || qm.querySelector('[data-act=rm-no]')).focus({ preventScroll: true }); }
+  else if (act === 'rm-ask') { const g = D.byId.get(openId), box = t.closest('.rm'); if (!g || !box) return; box.classList.add('ask'); box.innerHTML = rmAsk(g); (box.querySelector('.rm-pass') || box.querySelector('[data-act=rm-no]')).focus({ preventScroll: true }); box.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' }); }
+  else if (act === 'rm-no') { if (t.closest('#qm')) closeQm(true); else { const g = D.byId.get(openId), sv = $('#sheet-body .save'); if (g && sv) { sv.outerHTML = saveHTML(g); $('#sheet-body .rm-b')?.focus({ preventScroll: true }); } } }
+  else if (act === 'rm-go') { const box = t.closest('.rm, #qm'); removeGame(+t.dataset.id, box?.querySelector('.rm-pass')?.value || pass(), box, t); }
   else if (act === 'quick') setList1(+t.dataset.id, t.dataset.v);
   else if (act === 'reroll') { pickTonight(true); renderMenu(true); }
   else if (act === 'shuffle') { const pool = D.games.filter(g => g.id !== slotId && (g.art || g.cover)); slotId = pool[Math.floor(Math.random() * pool.length)]?.id ?? slotId; renderMenu(true); }
@@ -550,10 +582,17 @@ function route() { const h = location.hash.slice(1); let m;
   else if ((m = h.match(/^steam=(\d{17})$/))) { store.set(STEAM, m[1]); history.replaceState(null, '', location.pathname); toast('رُبط حسابك في Steam'); openAccounts(); }
   else if (h === 'steam-fail') { history.replaceState(null, '', location.pathname); toast('لم يكتمل الدخول عبر Steam. حاول ثانية.'); openAccounts(); } }
 try {
-  const cat = await get('games.json'); IMGB = cat.img || IMGB; D.built = cat.built; merge(cat); for (const g of cat.games || []) register(g);
+  const cat = await get('games.json'); IMGB = cat.img || IMGB; D.built = cat.built; merge(cat);
+  // ما حذفته من هذا الجهاز يبقى مخفياً حتى يصل بناء أحدث من حذفه بعشرين دقيقة (فإن بقي فيه فقد أُعيدت إضافته من جهاز آخر)
+  const builtAt = Date.parse(cat.built || '') || 0, rm = removedMap(), LAG = 20 * 6e4; let rmN = Object.keys(rm).length;
+  for (const id of Object.keys(rm)) if (!(+rm[id] > 0) || builtAt >= +rm[id] + LAG) delete rm[id];
+  if (rmN !== Object.keys(rm).length) store.set(REM, JSON.stringify(rm));
+  for (const g of cat.games || []) if (!rm[g.id]) register(g);
   // ما أُضيف بالزر أو سُحب من الحسابات ولم يصل البناء بعد يبقى ظاهراً من الحفظ المحلي، ويُحذف منه عند وصوله
   try { const pend = JSON.parse(store.get(PEND) || '[]'), left = [];
-    for (const r of pend) { const list = r?.games || (r?.game ? [r.game] : []), rest = list.filter(g => !D.byId.has(g.id)); if (!rest.length) continue; for (const g of rest) adopt(g, r, false); left.push(r.game ? r : { ...r, games: rest }); }
+    // لعبة في الحفظ المحلي ليست في بناء أحدث من إضافتها بعشرين دقيقة: حُذفت من جهاز آخر، فلا تعود
+    const gone = g => rm[g.id] || (g.at && builtAt - Date.parse(g.at) > LAG);
+    for (const r of pend) { const list = r?.games || (r?.game ? [r.game] : []), rest = list.filter(g => g && !D.byId.has(g.id) && !gone(g)); if (!rest.length) continue; for (const g of rest) adopt(g, r, false); left.push(r.game ? r : { ...r, games: rest }); }
     store.set(PEND, JSON.stringify(left)); } catch {}
   const last = store.get('games.list'); ui.list = ORDER.includes(last) ? last : inL('play').length ? 'play' : inL('new').length ? 'new' : 'all';
   renderGrid(); renderMenu(false); soonHTML(); liftVeil();

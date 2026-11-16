@@ -82,6 +82,15 @@ check('الإضافة: تُكتب في data/games/added.json بإيداع واح
 check('إضافتها مرة ثانية لا تكررها', (await call(add, { action: 'add', igdb: 1942, password: PW })).body.state === 'exists' && JSON.parse(stored).games.length === 1);
 const im = await call(add, { action: 'import', items: [{ igdb: 1942 }, { igdb: 1942 }, { igdb: 'x' }], source: 'steam', password: PW });
 check('الدفعة من الحسابات: إيداع واحد بلا تكرار ولا قيم غير صالحة', im.status === 200 && im.body.state.added === 0 && im.body.state.exists === 1, im.body.state);
+// الحذف: من ملف المضافات بإيداع واحد، وما ليس فيه لا يكتب شيئاً، ولا يحتاج مفاتيح IGDB
+{ const before = puts.length, n0 = igdbAsked.length, tw0 = twitch;
+  const noPw = await call(add, { action: 'remove', igdb: 1942, password: 'wrong' });
+  const rm = await call(add, { action: 'remove', igdb: 1942, password: PW });
+  check('الحذف: بكلمة السر فقط، ويُكتب الملف بلا اللعبة بإيداع واحد اسمه «games: remove …»', noPw.status === 401 && rm.status === 200 && rm.body.state === 'removed' && JSON.parse(stored).games.length === 0 && puts.length === before + 1 && /^games: remove The Witcher 3/.test(puts.at(-1).message), { rm: rm.body, stored, msg: puts.at(-1)?.message });
+  const again = await call(add, { action: 'remove', igdb: 1942, password: PW }), bad = await call(add, { action: 'remove', igdb: 'x', password: PW });
+  check('حذف ما ليس في القائمة لا يكتب شيئاً، والمعرّف غير الصالح مرفوض، وبلا أي طلب إلى IGDB', again.body.state === 'absent' && puts.length === before + 1 && bad.status === 400 && igdbAsked.length === n0 && twitch === tw0, { again: again.body, bad: bad.status });
+  const back = await call(add, { action: 'add', igdb: 1942, password: PW });
+  check('التراجع عن الحذف: إضافتها من جديد تعيدها إلى الملف', back.body.state === 'added' && JSON.parse(stored).games.length === 1, back.body.state); }
 // حساباتي
 const st = await call(acc, { action: 'status', password: PW }, '/api/game-accounts');
 check('حساباتي: الحالة تقول ما المهيأ في Netlify (IGDB نعم، Steam وPSN وXbox لا)', st.body.igdb === true && st.body.steam === false && !st.body.psn && !st.body.xbox, st.body);

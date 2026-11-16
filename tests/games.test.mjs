@@ -31,7 +31,8 @@ async function mockApi(page) {
     const J = o => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
     if (b.action === 'suggest') return J({ items: [{ igdb: 999123, title: 'Obscure Gem', year: 2019, fams: 8, cover: null }] });
     if (b.action === 'search') return J({ parsed: { title: b.q.replace(/\s+\d{4}$/, ''), year: +(b.q.match(/(\d{4})$/)?.[1] || 0) || null }, candidates: [{ igdb: 7346, title: newGame.title, year: 2017, cover: 'c7346', plats: ['Switch', 'Wii U'], type: 'main' }, { igdb: 1942, title: 'The Witcher 3: Wild Hunt', year: 2015, cover: 'c1942', plats: ['PC'], type: 'main' }] });
-    if (b.action === 'add') return J({ state: 'added', game: { ...newGame, src: 'added', at: new Date().toISOString() }, series: {}, plats: { switch: FX.plats.switch }, franchises: {} });
+    if (b.action === 'add') return J({ state: 'added', game: { ...(FX.games.find(g => g.id === b.igdb) || newGame), src: 'added', at: new Date().toISOString() }, series: {}, plats: { switch: FX.plats.switch }, franchises: {} });
+    if (b.action === 'remove') return J({ state: 'removed' });
     if (b.action === 'preview') return J({ game: { ...FX.series[5].members[0], ...FX.games[0], id: b.igdb, title: 'Preview Game', series: [5] }, series: {}, plats: {}, franchises: {} });
     if (b.action === 'import') return J({ state: { added: b.items.length, exists: 0 }, games: b.items.map(x => ({ ...FX.games[3], id: x.igdb, title: 'Imported ' + x.igdb, slug: 'imp-' + x.igdb, series: [], src: 'added' })), series: {}, plats: {}, franchises: {} });
     return r.fulfill({ status: 400, body: '{}' }); });
@@ -96,7 +97,9 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   // النقل السريع
   await page.click('#g-1942 .qm-b'); await page.waitForTimeout(150);
   const q = await page.evaluate(() => ({ open: !document.getElementById('qm').hidden, items: [...document.querySelectorAll('#qm button')].map(b => [b.dataset.v, b.getAttribute('aria-checked')]), focus: document.activeElement?.dataset.v }));
-  check('⋮ يفتح «انقلها إلى» بالقوائم الأربع، والحالية محددة والتركيز عليها', q.open && q.items.length === 4 && q.items.find(x => x[0] === 'new')[1] === 'true' && q.focus === 'new', q);
+  const qn = await page.evaluate(() => [...document.querySelectorAll('#qm button')].map(b => b.textContent.trim()));
+  check('⋮ يفتح «حالتها عندي» بأربعة أزرار بوظيفتها، والحالية محددة والتركيز عليها، وتحتها «احذفها من مكتبتي»', q.open && q.items.filter(x => x[0]).length === 4 && q.items.find(x => x[0] === 'new')[1] === 'true' && q.focus === 'new'
+    && qn.join('|') === 'ألعبها الآن|سألعبها لاحقاً|ختمتها|شاهدتها فقط|احذفها من مكتبتي', { q, qn });
   await page.click('#qm [data-v=done]'); await page.waitForTimeout(250);
   const after = await page.evaluate(() => ({ s: JSON.parse(localStorage.getItem('gamesg.progress')).games[1942], badge: document.querySelector('#g-1942 .badge b')?.textContent, toast: document.getElementById('toast').textContent, n: document.querySelector('#mm-menu [data-v=done] .n').textContent }));
   check('النقل إلى «شارة النهاية» يحفظ ويضع الملصق ويحدّث العدد، مع تراجع', after.s?.s === 'done' && after.badge === 'ختمتها' && /شارة النهاية/.test(after.toast) && after.n === '4', after);
@@ -120,7 +123,10 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
       story: [...b.querySelectorAll('.order[data-ov=story] li .t b')].map(x => x.textContent), storyHidden: b.querySelector('.order[data-ov=story]').hidden, src: b.querySelector('.ordv')?.closest('.sec')?.querySelector('.note a')?.href,
       tv: [...b.querySelectorAll('.adapt a')].map(a => a.getAttribute('href')), dlc: b.querySelector('.relg .part b')?.textContent, links: [...b.querySelectorAll('.links a b')].map(x => x.textContent) }; });
   check('البطاقة: العنوان والاسم العربي، والغلاف يُكبَّر بدقة 1080p، ورابطها #g112875', sh.title === 'God of War Ragnarök' && sh.ar === 'إله الحرب: راغناروك' && /t_1080p\/c112875\.jpg$/.test(sh.zoom) && sh.hash === '#g112875', sh);
-  check('ملف الحفظ: «شارة النهاية» محددة، وعلى PS5 من بين منصاتها، وشهرها وساعاتها', sh.checked === 'done' && sh.on === 'ps5' && sh.plats.join() === 'PS5,PS4,PC' && sh.at === '2026-10' && sh.h === '45', sh);
+  check('حالتها عندي: «ختمتها» محددة، وعلى PS5 من بين منصاتها، وشهرها وساعاتها', sh.checked === 'done' && sh.on === 'ps5' && sh.plats.join() === 'PS5,PS4,PC' && sh.at === '2026-10' && sh.h === '45', sh);
+  const names = await page.evaluate(() => ({ h: document.querySelector('#sheet .save h3').textContent, b: [...document.querySelectorAll('#sheet .save .li')].map(x => x.querySelector('b').textContent + ' / ' + x.querySelector('small').textContent), rm: document.querySelector('#sheet .save .rm-b')?.textContent.trim() }));
+  check('أزرار البطاقة بوظيفتها (ألعبها الآن، سألعبها لاحقاً، ختمتها، شاهدتها فقط)، وتحت كل زر اسم قائمته، وفي آخرها «احذفها من مكتبتي»',
+    names.h === 'حالتها عندي' && names.b.join('|') === 'ألعبها الآن / في «متابعة»|سألعبها لاحقاً / في «لعبة جديدة»|ختمتها / في «شارة النهاية»|شاهدتها فقط / في «وضع المتفرج»' && names.rm === 'احذفها من مكتبتي', names);
   check('كم تأخذ لتختمها: ثلاثة أشرطة وشريط ساعاتك', sh.ttb.join() === 't-h,t-n,t-c,t-m', sh.ttb);
   check('السلسلة بترتيب الصدور وهذه اللعبة في موضعها (8 من 8)، وترتيب القصة الرسمي مخفي حتى يُختار ويبدأ بـ Ascension، ومصدره رابط', sh.ord.length === 8 && sh.ord[7] === '8*' && sh.storyHidden && sh.story[0] === 'God of War: Ascension' && sh.story[7] === 'God of War Ragnarök' && /playstation/.test(sh.src || ''), sh);
   check('المحتوى الإضافي، والاقتباس إلى مسلسل (خارج أفلامي): TMDB و«أضفه إلى أفلامي»، وروابط المتاجر والتختيم', sh.dlc === 'God of War Ragnarök: Valhalla' && sh.tv.includes('https://www.themoviedb.org/tv/999001') && sh.tv.some(h => /^\.\.\/films\/#add=God%20of%20War%202027$/.test(h)) && sh.links.includes('YouTube') && sh.links.includes('HowLongToBeat'), sh);
@@ -153,13 +159,43 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   const cands = await page.evaluate(() => [...document.querySelectorAll('#cands .cand')].map(c => [c.querySelector('b').textContent, !!c.querySelector('[data-act=add-pick]'), c.querySelector('.cbtns small')?.textContent || '']));
   check('المرشحات: الجديدة بزري «التفاصيل» و«أضفها»، وما في قائمتك «في قائمتك»', cands[0][0] === newGame.title && cands[0][1] && cands[1][2] === 'في قائمتك', cands);
   await page.click('#cands .cand:first-child [data-act=add-pick]'); await page.waitForTimeout(150);
-  check('«أضفها» يسأل «إلى أي قائمة؟» بالقوائم الأربع', await page.locator('#cands .pickl [data-act=add-to]').count() === 4);
+  check('«أضفها» يسأل «ما وضعها عندك؟» بالأزرار الأربعة بوظيفتها', await page.locator('#cands .pickl [data-act=add-to]').count() === 4 && await page.evaluate(() => document.querySelector('#cands .pickl b').textContent === 'ما وضعها عندك؟' && document.querySelector('#cands .pickl [data-v=new]').textContent.trim() === 'سألعبها لاحقاً'));
   await page.click('#cands .pickl [data-v=play]'); await page.waitForSelector('#sheet[open]'); await page.waitForTimeout(300);
   const added = await page.evaluate(() => ({ card: !!document.getElementById('g-7346'), fresh: document.getElementById('g-7346')?.classList.contains('fresh'), s: JSON.parse(localStorage.getItem('gamesg.progress')).games[7346], pend: JSON.parse(localStorage.getItem('gamesg.pending') || '[]').length, title: document.querySelector('#sheet h2').textContent, note: /البناء القادم/.test(document.getElementById('sheet-body').textContent) }));
   check('الإضافة: علبتها في القائمة فوراً، في «متابعة»، ومحفوظة محلياً حتى يصلها البناء، وتُفتح بطاقتها', added.card && added.fresh && added.s?.s === 'play' && added.pend === 1 && added.title === newGame.title && added.note, added);
   await page.keyboard.press('Escape'); await page.waitForTimeout(300);
   await page.reload(); await page.waitForSelector('#grid .gc:not([hidden])');
   check('بعد التحديث تبقى اللعبة المضافة ظاهرة من الحفظ المحلي', await page.evaluate(() => !!document.getElementById('g-7346')));
+  // الحذف من البطاقة: تأكيد في مكانه، ثم تختفي من القائمة والسجل والحفظ المحلي، مع تراجع يعيدها بسجلها
+  await page.evaluate(() => document.querySelector('#mm-menu [data-v=all]').click()); await page.click('#g-7346 .cover'); await page.waitForSelector('#sheet[open] .rm-b');
+  await page.click('#sheet .rm-b'); await page.waitForTimeout(150);
+  const ask = await page.evaluate(() => ({ t: document.querySelector('#sheet .rm.ask p')?.textContent || '', go: !!document.querySelector('#sheet [data-act=rm-go]'), pw: !!document.querySelector('#sheet .rm-pass') }));
+  check('«احذفها من مكتبتي» يسأل أولاً في مكانه، باسم اللعبة وما سيحدث، وبلا كلمة سر ما دامت محفوظة', /Breath of the Wild/.test(ask.t) && /كل أجهزتك/.test(ask.t) && ask.go && !ask.pw && !asked.some(a => a.startsWith('remove')), ask);
+  await page.click('#sheet [data-act=rm-no]'); await page.waitForTimeout(100);
+  check('«تراجع» في التأكيد يعيد الزر ولا يحذف شيئاً', await page.evaluate(() => !!document.querySelector('#sheet .rm-b') && !document.querySelector('#sheet .rm.ask') && !!document.getElementById('g-7346')) && !asked.some(a => a.startsWith('remove')));
+  await page.click('#sheet .rm-b'); await page.click('#sheet [data-act=rm-go]'); await page.waitForFunction(() => !document.getElementById('g-7346'));
+  await page.waitForTimeout(400);
+  const gone = await page.evaluate(() => ({ sheet: document.getElementById('sheet').open, rec: JSON.parse(localStorage.getItem('gamesg.progress')).games[7346], pend: JSON.parse(localStorage.getItem('gamesg.pending') || '[]').length, rm: Object.keys(JSON.parse(localStorage.getItem('gamesg.removed') || '{}')), toast: document.getElementById('toast').textContent, all: document.querySelector('#mm-menu [data-v=all] .n').textContent }));
+  check('الحذف: طلب واحد إلى الخادم، وتختفي علبتها وسجلها وحفظها المحلي، وتُغلق بطاقتها، وتنبيه فيه «تراجع»', asked.includes('remove:7346') && !gone.sheet && !gone.rec && gone.pend === 0 && gone.rm.join() === '7346' && /حُذفت «The Legend of Zelda/.test(gone.toast) && /تراجع/.test(gone.toast) && gone.all === '10', gone);
+  await page.click('#toast button'); await page.waitForFunction(() => !!document.getElementById('g-7346'));
+  const back = await page.evaluate(() => ({ rec: JSON.parse(localStorage.getItem('gamesg.progress')).games[7346], rm: localStorage.getItem('gamesg.removed'), pend: JSON.parse(localStorage.getItem('gamesg.pending') || '[]').length }));
+  check('التراجع عن الحذف يعيدها بسجلها كما كان («ألعبها الآن»)', asked.filter(a => a === 'add:7346').length === 2 && back.rec?.s === 'play' && back.rm === '{}' && back.pend === 1, back);
+  // الحذف من ⋮، ثم التحديث: لعبة في ملف القائمة حُذفت من هذا الجهاز تبقى مخفية حتى يلحق البناء
+  await page.waitForTimeout(300); await page.click('#g-1942 .qm-b'); await page.click('#qm [data-act=qm-rm]'); await page.waitForTimeout(150);
+  check('⋮ ثم «احذفها»: التأكيد داخل القائمة نفسها باسم اللعبة', await page.evaluate(() => { const q = document.getElementById('qm'); return !q.hidden && q.classList.contains('ask') && /Witcher 3/.test(q.textContent) && !!q.querySelector('[data-act=rm-go]') && q.getBoundingClientRect().right <= innerWidth && q.getBoundingClientRect().bottom <= innerHeight; }));
+  await page.click('#qm [data-act=rm-go]'); await page.waitForFunction(() => !document.getElementById('g-1942')); await page.waitForTimeout(200);
+  await page.reload(); await page.waitForSelector('#grid .gc');
+  check('بعد التحديث: المحذوفة لا تعود من ملف القائمة القديم، والعدد ينقصها', asked.includes('remove:1942') && await page.evaluate(() => !document.getElementById('g-1942') && document.querySelector('#mm-menu [data-v=all] .n').textContent === '10' && !!document.getElementById('g-7346')));
+  // بناء أحدث من الحذف بعشرين دقيقة وما زالت فيه: أُعيدت من جهاز آخر فتظهر؛ ولعبة في الحفظ المحلي أقدم من البناء وليست فيه: حُذفت من جهاز آخر فلا تعود
+  await page.evaluate(() => { localStorage.setItem('gamesg.removed', JSON.stringify({ 1942: Date.now() - 30 * 6e4 })); const p = JSON.parse(localStorage.getItem('gamesg.pending')); p[0].game.at = new Date(Date.now() - 40 * 6e4).toISOString(); localStorage.setItem('gamesg.pending', JSON.stringify(p)); });
+  await page.reload(); await page.waitForSelector('#grid .gc');
+  check('بناء أحدث من الحذف يُصدَّق: ما بقي فيه يظهر، وما أُضيف قبله وليس فيه لا يعود من الحفظ المحلي', await page.evaluate(() => !!document.getElementById('g-1942') && localStorage.getItem('gamesg.removed') === '{}' && !document.getElementById('g-7346') && localStorage.getItem('gamesg.pending') === '[]'));
+  // منصة السحب تظهر بين المنصات ولو لم يذكرها IGDB (لعبة سُحبت من Xbox 360 وIGDB يذكر لها الكمبيوتر فقط)
+  await page.evaluate(() => { const P = JSON.parse(localStorage.getItem('gamesg.progress')); P.games[1942] = { s: 'done', on: 'x360' }; localStorage.setItem('gamesg.progress', JSON.stringify(P)); });
+  await page.reload(); await page.waitForSelector('#grid .gc'); await page.evaluate(() => document.querySelector('#mm-menu [data-v=all]').click()); await page.click('#g-1942 .cover'); await page.waitForSelector('#sheet[open] .pl');
+  const pl = await page.evaluate(() => ({ all: [...document.querySelectorAll('#sheet .pl .pc')].map(x => x.dataset.v), on: document.querySelector('#sheet .pl [aria-checked=true]')?.dataset.v }));
+  check('المنصة المحفوظة تظهر محددة بين منصات اللعبة ولو لم تكن في بياناتها', pl.all.includes('x360') && pl.on === 'x360' && pl.all.length === new Set(pl.all).size, pl);
+  await page.keyboard.press('Escape'); await page.waitForTimeout(300);
   // حساباتي: الرجوع من Steam، ثم السحب وصندوق الأسئلة
   await page.goto(`${base}/games/#steam=76561198000000001`); await page.waitForSelector('#acc[open] [data-act=pull][data-src=steam]');
   check('الرجوع من «ادخل عبر Steam» يحفظ الحساب ويفتح «حساباتي» مرتبطاً، ويزيل الرقم من الرابط', await page.evaluate(() => localStorage.getItem('gamesg.steam') === '76561198000000001' && !location.hash && /مرتبط/.test(document.querySelector('#acc .s-steam').textContent)));
@@ -192,6 +228,18 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   await page.click('#g-119133 .cover'); await page.waitForSelector('#sheet[open]'); await page.waitForTimeout(400);
   const s = await page.evaluate(() => { const r = document.getElementById('sheet').getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height), sw: document.getElementById('sheet-body').scrollWidth <= document.getElementById('sheet-body').clientWidth + 1, cols: getComputedStyle(document.querySelector('#sheet .lists')).gridTemplateColumns.split(' ').length }; });
   check('الجوال: البطاقة تملأ الشاشة بلا تمدد، وقوائم ملف الحفظ عمودان', s.w === 369 && s.h === 905 && s.sw && s.cols === 2, s);
+  // الحذف على جهاز لم تُحفظ فيه كلمة السر: التأكيد يطلبها، والخاطئة لا تحذف
+  await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  await page.evaluate(() => { localStorage.removeItem('gamesg.pass'); localStorage.setItem('gamesg.nofilm', '1'); }); await page.reload(); await page.waitForSelector('#grid .gc:not([hidden])');
+  await page.goto(`${base}/games/#g119133`); await page.waitForSelector('#sheet[open] .rm-b'); await page.click('#sheet .rm-b'); await page.waitForSelector('#sheet .rm-pass');
+  await page.click('#sheet [data-act=rm-go]'); await page.waitForTimeout(150);
+  const np1 = await page.evaluate(() => document.querySelector('#sheet .rm .msg').textContent);
+  await page.fill('#sheet .rm-pass', 'wrong'); await page.click('#sheet [data-act=rm-go]'); await page.waitForFunction(() => /غير صحيحة/.test(document.querySelector('#sheet .rm .msg')?.textContent || ''));
+  const np2 = await page.evaluate(() => ({ there: !!document.getElementById('g-119133'), btn: document.querySelector('#sheet [data-act=rm-go]').disabled }));
+  await page.fill('#sheet .rm-pass', 'test'); await page.click('#sheet [data-act=rm-go]'); await page.waitForFunction(() => !document.getElementById('g-119133')); await page.waitForTimeout(450);
+  check('الحذف بلا كلمة سر محفوظة: يطلبها في التأكيد، والفارغة والخاطئة لا تحذفان، والصحيحة تحذف وتُحفظ للمرات القادمة', /كلمة السر أولاً/.test(np1) && np2.there && !np2.btn && await page.evaluate(() => localStorage.getItem('gamesg.pass') === 'test' && !document.getElementById('sheet').open), { np1, np2 });
+  const tap = await page.evaluate(() => { const b = document.querySelector('#toast button').getBoundingClientRect(); return b.height >= 40 && b.width >= 40; });
+  check('الجوال: زر «تراجع» بعد الحذف بمساحة لمس كافية', tap);
   check('cover: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
 
