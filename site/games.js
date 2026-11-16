@@ -44,6 +44,8 @@ const ABBR = { ps5: 'PS5', ps4: 'PS4', ps3: 'PS3', ps2: 'PS2', ps1: 'PS1', psp: 
 const FAMN = { ps: 'بلايستيشن', xbox: 'إكس بوكس', nin: 'نينتندو', pc: 'الكمبيوتر', mobile: 'الجوال', other: 'منصات أخرى' };
 const WATCH = ['yt', 'twitch', 'web'];
 const abbr = c => D.plats[c]?.abbr || ABBR[c] || String(c).toUpperCase();
+// منصات اللعبة: ما في سجلها، وما في سجلات IGDB الشقيقة بالاسم نفسه (نسخة الأركيد سجل، ونسخ الأجهزة المنزلية سجل آخر)
+const platsOf = g => [...new Set([...(g.plats || []), ...(g.also || [])])];
 const famOf = c => D.plats[c]?.fam || (/^(ps|vita|psp)/.test(c) ? 'ps' : /^x/.test(c) ? 'xbox' : /^(switch|wii|3ds|nds|gcn|n64|snes|nes|gb)/.test(c) ? 'nin' : /^(pc|mac|linux)$/.test(c) ? 'pc' : /^(android|ios)$/.test(c) ? 'mobile' : WATCH.includes(c) ? 'web' : 'other');
 const FAMBIT = { 1: 'PS', 2: 'Xbox', 4: 'Nintendo', 8: 'PC', 16: 'جوال' };
 const famsText = b => Object.entries(FAMBIT).filter(([k]) => b & +k).map(([, v]) => v).join(' · ');
@@ -154,14 +156,14 @@ function fuzzyFor(q) { if (fz?.q === q) return fz; const ws = fold(q).split(' ')
   if (!ws.length || D.games.some(g => literal(g, ws))) return fz = { q, ws, ids: null };
   const r = find(FP ??= prepare(D.games, g => [g.title, g.titleAr, ...(g.alt || [])]), q, { limit: 6, min: 55, spread: 8 });
   return fz = { q, ws, ids: new Set(r.hits.map(h => h.id)), meant: r.hits[0] || null }; }
-const onPlat = (g, v) => { const [k, x] = v.split(':'), on = rec(g.id).on; return k === 'f' ? [...(g.plats || []), on].some(c => c && famOf(c) === x) : (g.plats || []).includes(x) || on === x; };
+const onPlat = (g, v) => { const [k, x] = v.split(':'), on = rec(g.id).on; return k === 'f' ? [...platsOf(g), on].some(c => c && famOf(c) === x) : platsOf(g).includes(x) || on === x; };
 function match(g) { if (ui.list !== 'all' && lst(g.id) !== ui.list) return false;
   if (ui.plat && !onPlat(g, ui.plat)) return false;
   if (ui.genre && !(g.genres || []).includes(ui.genre)) return false;
   if (ui.q) { const z = fuzzyFor(ui.q); if (z.ids ? !z.ids.has(g.id) : !literal(g, z.ws)) return false; }
   return true; }
 function chipsHTML() { const sel = (k, label, opts) => `<select class="pick${ui[k] ? ' on' : ''}" data-k="${k}" aria-label="${label}"><option value="">${label}</option>${opts}</select>`, op = (v, t) => `<option value="${esc(v)}"${ui.plat === v || ui.genre === v ? ' selected' : ''}>${esc(t)}</option>`;
-  const fam = {}, code = {}, genres = {}; for (const g of D.games) { const on = rec(g.id).on, ps = new Set([...(g.plats || []), ...(on && !WATCH.includes(on) ? [on] : [])]);
+  const fam = {}, code = {}, genres = {}; for (const g of D.games) { const on = rec(g.id).on, ps = new Set([...platsOf(g), ...(on && !WATCH.includes(on) ? [on] : [])]);
     for (const c of ps) { code[c] = (code[c] || 0) + 1; fam[famOf(c)] = 1; } for (const x of g.genres || []) genres[x] = (genres[x] || 0) + 1; }
   const plats = `<optgroup label="العائلة">${Object.keys(FAMN).filter(f => fam[f]).map(f => op('f:' + f, FAMN[f])).join('')}</optgroup><optgroup label="المنصة">${Object.entries(code).sort((a, b) => b[1] - a[1]).map(([c]) => op('c:' + c, abbr(c))).join('')}</optgroup>`;
   return sel('plat', 'المنصة', plats) + sel('genre', 'النوع', Object.entries(genres).sort((a, b) => b[1] - a[1]).map(([x]) => op(x, x)).join(''))
@@ -247,7 +249,7 @@ function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribut
 const sheet = $('#sheet'), addDlg = $('#add'), accDlg = $('#acc'), ibDlg = $('#inbox');
 let openId = null;
 const ext = (name, url, sub = '') => `<a href="${esc(url)}" target="_blank" rel="noopener"><b dir="ltr">${esc(name)}</b>${sub ? `<small>${sub}</small>` : ''}</a>`;
-function saveHTML(g) { const r = rec(g.id), s = r.s || 'new', opts = s === 'seen' ? WATCH : [...new Set([...(g.plats || []), ...(r.on && !WATCH.includes(r.on) ? [r.on] : [])])];
+function saveHTML(g) { const r = rec(g.id), s = r.s || 'new', opts = s === 'seen' ? WATCH : [...new Set([...platsOf(g), ...(r.on && !WATCH.includes(r.on) ? [r.on] : [])])];
   return `<section class="save" aria-labelledby="save-h"><h3 id="save-h">حالتها عندي</h3><div class="lists" role="radiogroup" aria-label="حالتها عندي">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" role="radio" class="li m-${k}" data-act="set" data-v="${k}" aria-checked="${s === k}">${listBtn(k)}</button>`).join('')}</div>
 ${opts.length ? `<div class="q"><b>${LISTS[s].on}</b><div class="pl" role="radiogroup" aria-label="${LISTS[s].on}">${opts.map(c => `<button type="button" role="radio" class="pc f-${famOf(c)}" data-act="on" data-v="${c}" aria-checked="${r.on === c}"><bdi dir="${WATCH.includes(c) ? 'rtl' : 'ltr'}">${esc(abbr(c))}</bdi></button>`).join('')}</div></div>` : ''}
 ${s === 'done' || s === 'play' ? `<div class="q more"><label>${s === 'done' ? 'متى ختمتها؟' : 'بدأتها في'}<input type="month" data-k="at" value="${r.at ? r.at.slice(0, 7) : ''}" max="${today.slice(0, 7)}"></label><label>كم ساعة لعبتها؟<input type="number" data-k="h" min="0" max="99999" step="1" inputmode="numeric" value="${r.h ?? ''}" placeholder="${g.ttb?.n ? Math.round(g.ttb.n) : ''}"></label></div>` : ''}
@@ -291,7 +293,7 @@ function adaptSec(g) { if (!g.from?.length && !g.into?.length) return '';
 <p class="note">العلاقات من ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.wd)}، وما فيها من أفلام ومسلسلات موصول ببوابة أفلامي.</p></section>`; }
 function platsSec(g) { if (!g.plats?.length) return ''; const at = new Map((g.dates || []).map(d => [d.p, d]));
   return `<section class="sec"><h3>المنصات</h3><ul class="pls">${g.plats.map(c => { const d = at.get(c), when = d ? (precOfHuman(d.human) === 'd' && d.date ? dateAr(d.date) : d.human ? esc(d.human) : '') : '';
-    return `<li class="f-${famOf(c)}"><b dir="ltr">${esc(abbr(c))}</b>${when ? `<small>${when}</small>` : ''}</li>`; }).join('')}</ul></section>`; }
+    return `<li class="f-${famOf(c)}"><b dir="ltr">${esc(abbr(c))}</b>${when ? `<small>${when}</small>` : ''}</li>`; }).join('')}</ul>${g.also?.length ? `<p class="note">ولها نسخ بالاسم نفسه على <bdi dir="ltr">${g.also.map(c => esc(abbr(c))).join(' · ')}</bdi>، في سجلات أخرى من <bdi dir="ltr">IGDB</bdi>.</p>` : ''}</section>`; }
 const precOfHuman = h => { h = String(h || '').trim(); return !h ? null : /^tb[ad]$/i.test(h) ? 'tbd' : /^q[1-4]\s+\d{4}$/i.test(h) ? 'q' : /^\d{4}$/.test(h) ? 'y' : /^[a-z]{3,}\.?\s+\d{4}$/i.test(h) ? 'm' : 'd'; };
 function mediaSec(g) { const shots = (g.shots || []).slice(0, 8), vids = g.videos || []; if (!shots.length && !vids.length) return '';
   return `<section class="sec"><h3>من داخل اللعبة</h3>${shots.length ? `<div class="reel shots">${shots.map((s, i) => `<button type="button" class="shot" data-zoom="${img(s, '1080p')}" data-zoom-title="${esc(g.title)} · ${i + 1}" aria-label="كبّر اللقطة ${i + 1}"><img loading="lazy" decoding="async" alt="" src="${img(s, 'screenshot_med')}" srcset="${img(s, 'screenshot_med')} 569w, ${img(s, 'screenshot_big')} 889w" sizes="260px"></button>`).join('')}</div>` : ''}

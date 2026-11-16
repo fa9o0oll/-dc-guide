@@ -61,5 +61,6 @@ const TR = await read('data/games/translations.json', {}), PLACES = await read('
 const built = new Date().toISOString(), { texts, n } = applyCare(r.games, {}, TR, PLACES);
 await writeFile(TEXTS, JSON.stringify({ built, texts }));
 await writeFile(OUT, JSON.stringify({ built, img: IMG, ...r, ...(Object.keys(moved).length ? { moved } : {}) }));
+{ const sib = r.games.filter(g => g.also?.length); if (sib.length) console.log(`games: ${sib.length} with platforms from same-named sibling records: ` + sib.slice(0, 12).map(g => `${g.title} (${g.plats.join('.')} + ${g.also.join('.')})`).join(' | ')); }
 console.log(`games: wrote ${OUT}: ${r.games.length} games, ${Object.keys(r.series).length} series, ${Object.values(r.series).filter(s => s.story).length} with a story order`);
 console.log(`games: wrote ${TEXTS}: ${n.text} with text, ${n.ar} in Arabic${n.old ? ` (${n.old} whose English changed since)` : ''}, ${n.place} with a place in their world`);

@@ -16,6 +16,8 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.
 const FX = fixture();
 // العناية: نبذة مترجمة وموقع من الأحداث للعبة (God of War Ragnarök)، ونبذة إنجليزية فقط لأخرى (Elden Ring)، ورقمان صُحّحا (555001 ← 990001، و555002 ← 1942 التي لها سجل)
 const TX = { 112875: { s: 'Ragnarök is coming.\n\nKratos and Atreus must journey to each of the Nine Realms.', t: 'Fimbulwinter is well underway.', sa: 'راغناروك قادم.\n\nعلى كريتوس وابنه أتريوس أن يجوبا العوالم التسعة، في God of War Ragnarök.', ta: 'شتاء فيمبولوينتر في ذروته.' }, 119133: { s: 'Rise, Tarnished.' } };
+// منصات سجل شقيق في IGDB (نسخة الأجهزة المنزلية من لعبة سجلها الرئيسي للأركيد مثلاً)
+FX.games.find(g => g.id === 1942).also = ['ps3'];
 FX.games.find(g => g.id === 112875).place = { k: 'sequel', after: 'God of War (2018)', line: 'تكمل أحداث God of War بعد ثلاث سنوات: الشتاء العظيم يوشك أن ينتهي.', when: 'بعد ثلاث سنوات من الجزء السابق', where: 'العوالم التسعة', src: 'igdb' };
 FX.moved = { 555001: 990001, 555002: 1942 };
 const server = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]);
@@ -199,8 +201,10 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   // منصة السحب تظهر بين المنصات ولو لم يذكرها IGDB (لعبة سُحبت من Xbox 360 وIGDB يذكر لها الكمبيوتر فقط)
   await page.evaluate(() => { const P = JSON.parse(localStorage.getItem('gamesg.progress')); P.games[1942] = { s: 'done', on: 'x360' }; localStorage.setItem('gamesg.progress', JSON.stringify(P)); });
   await page.reload(); await page.waitForSelector('#grid .gc'); await page.evaluate(() => document.querySelector('#mm-menu [data-v=all]').click()); await page.click('#g-1942 .cover'); await page.waitForSelector('#sheet[open] .pl');
-  const pl = await page.evaluate(() => ({ all: [...document.querySelectorAll('#sheet .pl .pc')].map(x => x.dataset.v), on: document.querySelector('#sheet .pl [aria-checked=true]')?.dataset.v }));
+  const pl = await page.evaluate(() => ({ all: [...document.querySelectorAll('#sheet .pl .pc')].map(x => x.dataset.v), on: document.querySelector('#sheet .pl [aria-checked=true]')?.dataset.v,
+    note: [...document.querySelectorAll('#sheet .sec')].find(x => x.querySelector('.pls'))?.querySelector('.note')?.textContent || '', listed: [...document.querySelectorAll('#sheet .pls li b')].map(x => x.textContent) }));
   check('المنصة المحفوظة تظهر محددة بين منصات اللعبة ولو لم تكن في بياناتها', pl.all.includes('x360') && pl.on === 'x360' && pl.all.length === new Set(pl.all).size, pl);
+  check('منصات السجل الشقيق في IGDB تُعرض للاختيار، وتُذكر تحت منصات اللعبة دون أن تُخلط بتواريخ صدورها', pl.all.includes('ps3') && /PS3/.test(pl.note) && /IGDB/.test(pl.note) && !pl.listed.includes('PS3'), pl);
   await page.keyboard.press('Escape'); await page.waitForTimeout(300);
   // حساباتي: الرجوع من Steam، ثم السحب وصندوق الأسئلة
   await page.goto(`${base}/games/#steam=76561198000000001`); await page.waitForSelector('#acc[open] [data-act=pull][data-src=steam]');

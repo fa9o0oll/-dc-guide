@@ -131,6 +131,17 @@ const SITE = [[/store\.steampowered\.com/, 'steam'], [/store\.playstation\.com|p
   [/epicgames\.com/, 'epic'], [/gog\.com/, 'gog'], [/apps\.apple\.com/, 'appstore'], [/play\.google\.com/, 'gplay'], [/wikipedia\.org/, 'wiki'], [/twitter\.com|x\.com|facebook\.com|instagram\.com|youtube\.com|twitch\.tv|discord\.(gg|com)|reddit\.com|tiktok\.com|fandom\.com/, '']];
 const siteOf = u => { const hit = SITE.find(([re]) => re.test(u)); return hit ? hit[1] : 'official'; };
 
+// منصات السجلات الشقيقة: لكل سلسلة تُجمع السجلات بالاسم نفسه، وما كان منها «نقلاً» أو «موسّعاً» تذهب منصاته إلى السجل الأساسي الأقرب صدوراً قبله (أو أول أساسي إن لم يُعرف التاريخ).
+// يعيد Map من رقم اللعبة الأساسية إلى مجموعة أرقام المنصات
+const SAME_GAME = new Set(['port', 'expanded']);
+export function alsoPlatforms(groups, typeOf) { const out = new Map();
+  for (const list of groups) { const byName = new Map(); for (const x of list) { const k = norm(x.name); if (k) (byName.get(k) || byName.set(k, []).get(k)).push(x); }
+    for (const same of byName.values()) { const bases = same.filter(x => !SAME_GAME.has(typeOf(x))).sort((a, b) => (a.first_release_date || 0) - (b.first_release_date || 0)); if (!bases.length || bases.length === same.length) continue;
+      for (const v of same) { if (!SAME_GAME.has(typeOf(v))) continue; const t = v.first_release_date;
+        const base = (t ? bases.filter(b => (b.first_release_date || 0) <= t).pop() : null) || bases[0], set = out.get(base.id) || out.set(base.id, new Set()).get(base.id);
+        for (const p of v.platforms || []) set.add(p); } } }
+  return out; }
+
 // يجلب الألعاب المطلوبة ويشكّلها. opt.wikidata: يُثرى من Wikidata (البناء الليلي، وبمهلة قصيرة في الدالة)، opt.story: ترتيبات القصة، opt.log: سجل
 export async function gamesFor(ids, opt = {}) {
   const log = opt.log || (() => {}), m = await meta(), now = Date.now();
@@ -144,6 +155,9 @@ export async function gamesFor(ids, opt = {}) {
   const plats = {}, code = new Map();
   for (const p of await igdbIn('platforms', 'name,abbreviation,slug', [...raw, ...light.values()].flatMap(g => g.platforms || []))) { const c = codeOf(p); code.set(p.id, c); plats[c] ||= { name: p.name, abbr: ABBR[c] || p.abbreviation || p.name, fam: famOf(p.name) }; }
   const codes = list => [...new Set((list || []).map(id => code.get(id)).filter(Boolean))].sort(byRank);
+  // IGDB يفرد أحياناً لنسخة الأركيد سجلاً ولنسخ الأجهزة المنزلية سجلات أخرى بالاسم نفسه (Tekken 6: الأركيد 2007 سجل رئيسي، وPS3 وXbox 360 سجل «موسّع» 2009، وPSP وPS5 سجلا «نقل»).
+  // منصات تلك السجلات تُضم (also) إلى اللعبة الأساسية التي تحمل الاسم نفسه في السلسلة، وهي الأقرب صدوراً قبلها. والأساسيتان بالاسم نفسه (God of War 2005 و2018) لا تُخلطان
+  const also = alsoPlatforms(cols.map(c => (c.games || []).map(id => light.get(id)).filter(Boolean)), g => m.type.get(g.game_type) || 'main');
   const lightOf = g => { const w = when(g); return { id: g.id, slug: g.slug, title: g.name, ...w, year: year(g.first_release_date), cover: g.cover?.image_id || null, type: m.type.get(g.game_type) || 'main', status: stage(g, m, w), plats: codes(g.platforms), hype: g.hypes || 0 }; };
   // السلسلة: كل أجزائها الرئيسية (لا الإضافات) بترتيب الصدور، وما لا موعد له آخراً، وترتيب القصة إن وُجد له مصدر
   const series = {};
@@ -166,7 +180,7 @@ export async function gamesFor(ids, opt = {}) {
       id: g.id, slug: g.slug, title: g.name, titleAr: x.ar && x.ar !== g.name ? x.ar : '', alt: [...new Set((g.alternative_names || []).map(a => a.name))].filter(n => n && n !== g.name).slice(0, 6),
       type: m.type.get(g.game_type) || 'main', status: stage(g, m, w), early: m.status.get(g.game_status) === 'early' || undefined, ...w, year: year(g.first_release_date),
       cover: g.cover?.image_id || null, art, shots: (g.screenshots || []).slice(0, 8).map(s => s.image_id),
-      plats: codes(g.platforms), dates: (g.release_dates || []).filter(d => d.platform && code.get(d.platform)).map(d => ({ p: code.get(d.platform), date: ymd(d.date), human: d.human || '' }))
+      plats: codes(g.platforms), also: (l => l.length ? l : undefined)(codes([...(also.get(g.id) || [])]).filter(c => !codes(g.platforms).includes(c))), dates: (g.release_dates || []).filter(d => d.platform && code.get(d.platform)).map(d => ({ p: code.get(d.platform), date: ymd(d.date), human: d.human || '' }))
         .sort((a, b) => (a.date || '9999') < (b.date || '9999') ? -1 : 1).filter((d, i, all) => all.findIndex(o => o.p === d.p) === i),
       genres: (g.genres || []).map(x => ar(x.name)), themes: (g.themes || []).map(x => ar(x.name)).filter(Boolean), modes: (g.game_modes || []).map(x => ar(x.name)), persp: (g.player_perspectives || []).map(x => ar(x.name)),
       dev: [...new Set((g.involved_companies || []).filter(c => c.developer).map(c => c.company?.name).filter(Boolean))], pub: [...new Set((g.involved_companies || []).filter(c => c.publisher).map(c => c.company?.name).filter(Boolean))],
