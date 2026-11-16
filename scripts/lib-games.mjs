@@ -132,12 +132,12 @@ const SITE = [[/store\.steampowered\.com/, 'steam'], [/store\.playstation\.com|p
 const siteOf = u => { const hit = SITE.find(([re]) => re.test(u)); return hit ? hit[1] : 'official'; };
 
 // منصات السجلات الشقيقة: لكل سلسلة تُجمع السجلات بالاسم نفسه، وما كان منها «نقلاً» أو «موسّعاً» تذهب منصاته إلى السجل الأساسي الأقرب صدوراً قبله (أو أول أساسي إن لم يُعرف التاريخ).
-// يعيد Map من رقم اللعبة الأساسية إلى مجموعة أرقام المنصات
+// skip: ما لا يُحسب من السجلات الشقيقة (ملغاة أو لم تصدر). يعيد Map من رقم اللعبة الأساسية إلى مجموعة أرقام المنصات
 const SAME_GAME = new Set(['port', 'expanded']);
-export function alsoPlatforms(groups, typeOf) { const out = new Map();
+export function alsoPlatforms(groups, typeOf, skip = () => false) { const out = new Map();
   for (const list of groups) { const byName = new Map(); for (const x of list) { const k = norm(x.name); if (k) (byName.get(k) || byName.set(k, []).get(k)).push(x); }
     for (const same of byName.values()) { const bases = same.filter(x => !SAME_GAME.has(typeOf(x))).sort((a, b) => (a.first_release_date || 0) - (b.first_release_date || 0)); if (!bases.length || bases.length === same.length) continue;
-      for (const v of same) { if (!SAME_GAME.has(typeOf(v))) continue; const t = v.first_release_date;
+      for (const v of same) { if (!SAME_GAME.has(typeOf(v)) || skip(v)) continue; const t = v.first_release_date;
         const base = (t ? bases.filter(b => (b.first_release_date || 0) <= t).pop() : null) || bases[0], set = out.get(base.id) || out.set(base.id, new Set()).get(base.id);
         for (const p of v.platforms || []) set.add(p); } } }
   return out; }
@@ -157,7 +157,9 @@ export async function gamesFor(ids, opt = {}) {
   const codes = list => [...new Set((list || []).map(id => code.get(id)).filter(Boolean))].sort(byRank);
   // IGDB يفرد أحياناً لنسخة الأركيد سجلاً ولنسخ الأجهزة المنزلية سجلات أخرى بالاسم نفسه (Tekken 6: الأركيد 2007 سجل رئيسي، وPS3 وXbox 360 سجل «موسّع» 2009، وPSP وPS5 سجلا «نقل»).
   // منصات تلك السجلات تُضم (also) إلى اللعبة الأساسية التي تحمل الاسم نفسه في السلسلة، وهي الأقرب صدوراً قبلها. والأساسيتان بالاسم نفسه (God of War 2005 و2018) لا تُخلطان
-  const also = alsoPlatforms(cols.map(c => (c.games || []).map(id => light.get(id)).filter(Boolean)), g => m.type.get(g.game_type) || 'main');
+  // نسخة أُلغيت أو لم تصدر بعد (Mortal Kombat X على PS3 أُلغيت، وسجلها باقٍ في IGDB) لا تُضم منصاتها
+  const out = g => ['cancelled', 'rumored'].includes(m.status.get(g.game_status)) || !g.first_release_date || g.first_release_date * 1000 > now;
+  const also = alsoPlatforms(cols.map(c => (c.games || []).map(id => light.get(id)).filter(Boolean)), g => m.type.get(g.game_type) || 'main', out);
   const lightOf = g => { const w = when(g); return { id: g.id, slug: g.slug, title: g.name, ...w, year: year(g.first_release_date), cover: g.cover?.image_id || null, type: m.type.get(g.game_type) || 'main', status: stage(g, m, w), plats: codes(g.platforms), hype: g.hypes || 0 }; };
   // السلسلة: كل أجزائها الرئيسية (لا الإضافات) بترتيب الصدور، وما لا موعد له آخراً، وترتيب القصة إن وُجد له مصدر
   const series = {};
