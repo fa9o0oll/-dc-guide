@@ -30,18 +30,18 @@ if (process.env.GAMES_PROBE) {
   // مطابقة أسماء PlayStation وXbox بـ IGDB كما تفعلها دالة «حساباتي»: الطلب الخام أولاً (ليظهر الخطأ إن وُجد)، ثم المطابقة نفسها
   const { meta, gameyIds } = await import('./lib-games.mjs'), { byName, clean } = await import('../netlify/functions/game-accounts.mjs');
   const m = await meta(), B = [...m.type].find(([, v]) => v === 'bundle')?.[0], T = (t => t.length ? ` & game_type = (${[...t, ...(B != null ? [B] : [])].join(',')})` : '')(gameyIds(m));
-  show('multiquery raw (search)', await igdb('multiquery', `query games "0" { search "ELDEN RING"; fields name; limit 3; };\nquery games "1" { search "Halo Infinite"; fields name; limit 3; };`).catch(e => e.message));
-  show('multiquery raw (search + where)', await igdb('multiquery', `query games "0" { search "ELDEN RING"; fields name,first_release_date,platforms,total_rating_count; where version_parent = null${T}; limit 6; };`).catch(e => e.message));
-  show('single search + where', await igdb('games', `search "ELDEN RING"; fields name; where version_parent = null${T}; limit 3;`).catch(e => e.message));
-  const sample = [["Marvel's Spider-Man 2", 'ps5', '2024-02-01'], ['God of War Ragnarök', 'ps5', '2023-05-01'], ['ELDEN RING', 'ps5', '2024-07-01'], ["Ghost of Tsushima DIRECTOR’S CUT", 'ps5', '2022-01-01'], ['Grand Theft Auto V', 'ps5', '2023-01-01'],
-    ['The Last of Us Part I', 'ps5', '2023-01-01'], ['Call of Duty: Modern Warfare III', 'ps5', '2024-01-01'], ['EA SPORTS FC 24', 'ps5', '2024-03-01'], ['TEKKEN 8', 'ps5', '2024-06-01'], ['FINAL FANTASY VII REBIRTH', 'ps5', '2024-04-01'],
-    ['Forza Horizon 5', 'xsx', '2023-01-01'], ['Halo Infinite', 'xsx', '2022-01-01'], ['Hogwarts Legacy', 'ps5', '2023-03-01'], ['Resident Evil 4', 'ps5', '2024-01-01'], ['Resident Evil 4', 'ps4', '2018-01-01'], ['Cyberpunk 2077', 'ps5', '2023-10-01'],
-    ['UNCHARTED: Legacy of Thieves Collection', 'ps5', '2022-03-01'], ['Gran Turismo 7', 'ps5', '2022-05-01'], ['Batman: Arkham Knight', 'ps4', '2016-01-01'], ['Crash Bandicoot N. Sane Trilogy', 'ps4', '2018-01-01']]
+  // مطابقات خاطئة ظهرت في سحب PlayStation: ما المداخل التي في IGDB بهذه الأسماء؟ (بلا أي تصفية)
+  for (const n of ['Hitman', 'Never Alone', 'Batman', 'Tekken 6']) {
+    const rows = await igdb('games', `fields name,game_type,version_parent,parent_game,platforms,first_release_date,total_rating_count; where name ~ ${JSON.stringify(n)}; limit 30;`).catch(e => [{ name: e.message }]);
+    for (const g of rows) console.log(`probe exact "${n}": #${g.id} ${g.name} type=${m.type.get(g.game_type) ?? g.game_type} vp=${g.version_parent ?? '-'} parent=${g.parent_game ?? '-'} y=${g.first_release_date ? new Date(g.first_release_date * 1000).getUTCFullYear() : '-'} plats=${(g.platforms || []).join('.')} rc=${g.total_rating_count ?? 0}`);
+    const sr = await igdb('games', `search ${JSON.stringify(n)}; fields name,game_type,version_parent,platforms,first_release_date,total_rating_count; limit 12;`).catch(e => [{ name: e.message }]);
+    for (const g of sr) console.log(`probe search "${n}": #${g.id} ${g.name} type=${m.type.get(g.game_type) ?? g.game_type} vp=${g.version_parent ?? '-'} y=${g.first_release_date ? new Date(g.first_release_date * 1000).getUTCFullYear() : '-'} plats=${(g.platforms || []).join('.')} rc=${g.total_rating_count ?? 0}`);
+  }
+  const sample = [['HITMAN', 'ps4', '2019-01-01'], ['Never Alone', 'ps4', '2017-01-01'], ['Batman', 'ps4', '2018-01-01'], ['Tekken 6', 'x360', '2012-01-01'], ['Tekken 6', 'ps5', '2024-01-01'], ['Far Cry', 'x360', '2015-01-01'], ['Hades', 'pc', '2022-01-01'], ['ELDEN RING', 'ps5', '2024-07-01'], ['Resident Evil 4', 'ps4', '2018-01-01']]
     .map(([name, plat, last], i) => ({ key: 'p' + i, name: clean(name), plat, last }));
-  show('multiquery exact (name ~)', await igdb('multiquery', `query games "0" { fields name; where name ~ "ELDEN RING" & version_parent = null${T}; limit 3; };`).catch(e => e.message));
   const t0 = Date.now(), { how, todo } = await byName(sample, T, Date.now() + 7000), ids = [...new Set([...how.values()].map(x => x.id))];
   const names = new Map((ids.length ? await igdb('games', `fields name,first_release_date; where id = (${ids.join(',')}); limit 100;`) : []).map(g => [g.id, g.name + ' (' + (g.first_release_date ? new Date(g.first_release_date * 1000).getUTCFullYear() : '?') + ')']));
-  console.log(`probe byName ${how.size}/${sample.length} in ${Date.now() - t0}ms, todo ${todo.size}`); for (const x of sample) console.log(`probe   ${x.name} [${x.plat}] => ${how.has(x.key) ? names.get(how.get(x.key).id) + (how.get(x.key).sure ? '' : ' ~') : '—'}`);
+  console.log(`probe byName ${how.size}/${sample.length} in ${Date.now() - t0}ms, todo ${todo.size}`); for (const x of sample) console.log(`probe   ${x.name} [${x.plat}] => ${how.has(x.key) ? '#' + how.get(x.key).id + ' ' + names.get(how.get(x.key).id) + (how.get(x.key).sure ? '' : ' ~') : '—'}`);
 }
 
 if (!added.length) { await writeFile(OUT, JSON.stringify(empty)); console.log('games: the list is empty'); process.exit(0); }
