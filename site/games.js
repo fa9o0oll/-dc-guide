@@ -8,8 +8,9 @@ import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { clock, spoken } from './count.js?v=__BUILD__';
 import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
+import { ar } from './bidi.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
-const BUILD = '__BUILD__', KEY = 'gamesg.progress', PEND = 'gamesg.pending', PASS = 'gamesg.pass', IGN = 'gamesg.ignored', STEAM = 'gamesg.steam', REM = 'gamesg.removed';
+const BUILD = '__BUILD__', KEY = 'gamesg.progress', PEND = 'gamesg.pending', PASS = 'gamesg.pass', IGN = 'gamesg.ignored', STEAM = 'gamesg.steam', REM = 'gamesg.removed', ASK = 'gamesg.asked';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -71,6 +72,7 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 <symbol id="i-dots" viewBox="0 0 24 24"><path stroke-width="3" d="M12 5.5h.01M12 12h.01M12 18.5h.01"/></symbol>
 <symbol id="i-pad" viewBox="0 0 24 24"><path d="M7 8.5h10a4 4 0 013.9 4.9l-.8 3.4a2.4 2.4 0 01-4 1.2L14 16h-4l-2.1 2a2.4 2.4 0 01-4-1.2l-.8-3.4A4 4 0 017 8.5zM8.5 11v3M7 12.5h3"/><path stroke-width="2.6" d="M15.5 12h.01M17.5 13.6h.01"/></symbol>
 <symbol id="i-roll" viewBox="0 0 24 24"><path d="M4 7.5h3c2 0 3.2 1.2 4.5 4.5s2.5 4.5 4.5 4.5h4M4 16.5h3c1.1 0 1.9-.4 2.7-1.3M20 7.5h-4c-1.1 0-1.9.4-2.7 1.3M17.5 5L20 7.5 17.5 10M17.5 14l2.5 2.5-2.5 2.5"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3.2 3.4 3.2 12.6 0 16M12 4c-3.2 3.4-3.2 12.6 0 16"/></symbol>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4.5h4V7M7 7l.9 12.5h8.2L17 7M10 11v5M14 11v5"/></symbol>
 <symbol id="i-ext" viewBox="0 0 24 24"><path d="M8 16l8-8M9.5 8H16v6.5"/></symbol><symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4.5 9.5 9 5M5 9.5h9a5.5 5.5 0 010 11h-3"/></symbol>
 </defs></svg>`;
@@ -263,7 +265,7 @@ function ttbHTML(g) { const t = g.ttb, mine = rec(g.id).h; if (!t || !(t.h || t.
 <p class="note">متوسطات لاعبي <bdi dir="ltr">IGDB</bdi>${t.count ? ` من ${t.count} إجابة` : ''}. وللتفصيل: ${ext('HowLongToBeat', 'https://howlongtobeat.com/?q=' + encodeURIComponent(g.title))}</p></section>`; }
 function orderRow(m, i, here) { const g = D.byId.get(m.id), s = g ? lst(m.id) : '';
   return `<li data-n="${i + 1}" class="${[m.id === here ? 'here' : '', g ? 's-' + s : 'out'].join(' ')}"><span class="th">${m.cover ? `<img loading="lazy" alt="" src="${img(m.cover, 'cover_small')}">` : ''}</span>
-<span class="t"><b dir="ltr">${esc(m.title)}</b><small>${[TYPES[m.type], yearOrWhen(m)].filter(Boolean).map(esc).join(' · ')}</small></span><span class="st">${g ? (s === 'new' ? 'في قائمتك' : esc(LISTS[s].badge)) : 'خارج قائمتك'}${exact(m) ? `<i class="cd-mini" data-until="${m.date}" data-now="اليوم"><span class="ck" aria-hidden="true">${clock(m.date, 'اليوم')}</span></i>` : ''}</span>
+<span class="t"><b dir="ltr">${esc(m.title)}</b><small>${[TYPES[m.type], yearOrWhen(m), PK[g?.place?.k]].filter(Boolean).map(esc).join(' · ')}</small></span><span class="st">${g ? (s === 'new' ? 'في قائمتك' : esc(LISTS[s].badge)) : 'خارج قائمتك'}${exact(m) ? `<i class="cd-mini" data-until="${m.date}" data-now="اليوم"><span class="ck" aria-hidden="true">${clock(m.date, 'اليوم')}</span></i>` : ''}</span>
 ${m.id === here ? '' : `<button class="go" data-act="${g ? 'open' : 'peek'}" data-id="${m.id}" data-q="${esc(m.title)}${m.year ? ' ' + m.year : ''}" aria-label="${g ? 'افتح' : 'اعرض'} ${esc(m.title)}"></button>`}</li>`; }
 function seriesSec(g) { const list = (g.series || []).map(id => ({ id, ...D.series[id] })).filter(s => s.members?.length);
   const uni = g.universe ? `<p class="uni">تجري أحداثها في عالم <b>${g.universe.ar ? esc(g.universe.ar) : `<bdi dir="ltr">${esc(g.universe.en)}</bdi>`}</b>${g.universe.ar && g.universe.en ? ` <bdi dir="ltr">(${esc(g.universe.en)})</bdi>` : ''}، حسب ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + g.universe.q)}.</p>` : '';
@@ -306,13 +308,50 @@ function linksSec(g) { const a = [], q = encodeURIComponent(g.title);
 async function sheetHTML(g, pv) { if (g.from?.some(w => w.tmdb) || g.into?.some(w => w.tmdb)) await filmsReady();
   const art = g.art || g.shots?.[0], facts = [TYPES[g.type], soon(g) ? (exact(g) ? 'قادمة' : whenText(g)) : g.year && `<bdi>${g.year}</bdi>`, g.early && 'وصول مبكر', g.dev?.length && `<bdi dir="ltr">${esc(g.dev.slice(0, 2).join(', '))}</bdi>`,
     g.critic && `<span class="rate">النقاد <bdi>${g.critic}</bdi></span>`, g.users && `<span class="rate">اللاعبون <bdi>${g.users}</bdi></span>`, g.status === 'cancelled' && 'أُلغيت'].filter(Boolean);
-  const story = g.summary || g.story ? `<section class="sec"><h3>عن اللعبة</h3>${g.summary ? `<p dir="ltr" lang="en" class="en">${esc(g.summary)}</p>` : ''}${g.story ? `<details class="more-t"><summary>القصة</summary><p dir="ltr" lang="en" class="en">${esc(g.story)}</p></details>` : ''}<p class="note">النبذة من <bdi dir="ltr">IGDB</bdi> بالإنجليزية كما هي.</p></section>` : '';
+  const story = aboutSec(g, pv ? {} : (await texts())[g.id] || {}, pv);
   return `<div class="sh-hero">${art ? `<img alt="" src="${img(art, '720p')}" srcset="${img(art, '720p')} 1280w, ${img(art, '1080p')} 1920w" sizes="(max-width:900px) 100vw, 900px">` : ''}</div>
 <div class="sh-head">${g.cover ? `<button type="button" class="cover" data-zoom="${img(g.cover, '1080p')}" data-zoom-title="${esc(g.title)}" aria-label="كبّر غلاف ${esc(g.title)}">${coverImg(g.cover, '180px', false)}</button>` : `<div class="cover">${cart(g)}</div>`}
 <div class="txt"><h2 dir="ltr">${esc(g.title)}</h2>${g.titleAr ? `<p class="ar">${esc(g.titleAr)}</p>` : ''}<p class="facts">${facts.map(x => `<span>${x}</span>`).join('')}</p><div class="tags">${(g.genres || []).map(x => `<span>${esc(x)}</span>`).join('')}${(g.modes || []).slice(0, 2).map(x => `<span class="m">${esc(x)}</span>`).join('')}</div></div></div>
 ${pv ? `<section class="save pv"><h3>أضفها إلى مكتبتي</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${listBtn(k)}</button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
 ${g.src === 'added' ? '<section class="sec"><p class="ask">أُضيفت بزر «أضف لعبة»: معلوماتها آلية من <bdi dir="ltr">IGDB</bdi>، وعالمها واقتباساتها تكتمل في البناء القادم.</p></section>' : ''}
-${board(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${mediaSec(g)}${linksSec(g)}`; }
+${board(g)}${placeSec(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${mediaSec(g)}${linksSec(g)}`; }
+// ---------- عن اللعبة. النصوص الطويلة (النبذة والقصة بلغتيهما) في ملف مستقل يُجلب مرة واحدة (ويُسبق جلبه بعد الإقلاع)، وما أُضيف للتو نصه في سجله.
+// المترجَم يُعرض بالعربية وتحته الأصل الإنجليزي لمن أراده؛ وغير المترجَم بالإنجليزية مع زر «ترجمها لي» يوصل الطلب إلى المترجم (فرع requests في المستودع)
+let TXP = null; const texts = () => TXP ??= get('texts.json').then(j => j.texts || {}).catch(() => ({}));
+const askedMap = () => { try { const m = JSON.parse(store.get(ASK) || '{}'); return m && typeof m === 'object' ? m : {}; } catch { return {}; } };
+const paras = (s, f) => String(s || '').split(/\n\s*\n/).map(x => x.trim()).filter(Boolean).map(f).join('');
+const enP = x => paras(x, p => `<p dir="ltr" lang="en" class="en">${esc(p)}</p>`), arP = x => paras(x, p => `<p class="ar-t">${ar(p)}</p>`);
+const trBox = id => askedMap()[id] ? `<p class="tr-ok">${ic('check')}<span>وصل طلب ترجمتها. تُترجم مع أول مرور للمترجم، وتظهر هنا بالعربية.</span></p>`
+  : `<button type="button" class="btn sec" data-act="tr-ask">${ic('globe')}ترجمها لي</button><p class="note">نبذتها بالإنجليزية كما في <bdi dir="ltr">IGDB</bdi>، ولم تُترجم بعد.</p>`;
+function aboutSec(g, T, pv) { const s = T.s || g.summary || '', t = T.t || g.story || '', sa = T.sa || '', ta = T.ta || ''; if (!s && !t) return '';
+  const full = (sa || !s) && (ta || !t); if (full && askedMap()[g.id]) { const m = askedMap(); delete m[g.id]; store.set(ASK, JSON.stringify(m)); }
+  const body = `${sa ? arP(sa) : enP(s)}${t ? `<details class="more-t"><summary>القصة</summary>${ta ? arP(ta) : enP(t)}</details>` : ''}`;
+  const foot = pv ? `<p class="note">النبذة من <bdi dir="ltr">IGDB</bdi> بالإنجليزية كما هي.</p>`
+    : full ? `<details class="orig"><summary>النص الأصلي بالإنجليزية</summary>${enP(s)}${t ? `<p class="kh">القصة</p>${enP(t)}` : ''}</details><p class="note">ترجمتنا عن نبذتها في <bdi dir="ltr">IGDB</bdi>.</p>`
+    : `<div class="tr" data-id="${g.id}" data-t="${esc(g.title)}">${trBox(g.id)}</div>`;
+  return `<section class="sec about"><h3>عن اللعبة</h3>${body}${foot}</section>`; }
+async function askTr(btn) { const box = btn.closest('.tr'), id = +box.dataset.id, pw = box.querySelector('.tr-pass')?.value || pass(), label = btn.innerHTML;
+  if (!pw) { if (!box.querySelector('.tr-pass')) { box.innerHTML = `<label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة»)<input class="tr-pass" type="password" autocomplete="current-password"></label><button type="button" class="btn sec" data-act="tr-ask">${ic('globe')}ترجمها لي</button><p class="msg" aria-live="polite"></p>`; }
+    else box.querySelector('.msg').textContent = 'اكتب كلمة السر أولاً.'; box.querySelector('.tr-pass').focus(); return; }
+  btn.disabled = true; btn.textContent = 'يُرسل الطلب…';
+  try { await api('/api/add-game', { action: 'ask', igdb: id, title: box.dataset.t || '' }, pw); if (!pass()) remember(pw);
+    const m = askedMap(); m[id] = Date.now(); store.set(ASK, JSON.stringify(m)); box.innerHTML = trBox(id);
+  } catch (e) { btn.disabled = false; btn.innerHTML = label; const msg = box.querySelector('.msg'); if (msg) msg.textContent = e.message; else toast(e.message); } }
+
+// ---------- موقع اللعبة من أحداث عالمها (data/games/places.json، مكتوب لكل لعبة): نوعه بلونه، وجملته، ومسار «قبلها ← هذه اللعبة ← بعدها» كمسار
+// مراحل (ما كان منها في سلسلتها يُفتح بلمسة)، وزمن الأحداث ومكانها
+const PK = { first: 'بداية الحكاية', sequel: 'تكملة', prequel: 'قبل الأحداث', between: 'بين جزأين', side: 'قصة جانبية', alone: 'قصة مستقلة', reboot: 'بداية جديدة', remake: 'إعادة صنع',
+  same: 'الأحداث نفسها', alt: 'عالم بديل', retell: 'تروي الأصل', nostory: 'بلا حكاية متصلة', bundle: 'مجموعة أجزاء' };
+const sameTitle = (a, b) => fold(a) === fold(b);
+function placeSec(g) { const p = g.place; if (!p || !PK[p.k]) return '';
+  // «God of War (2018)»: السنة بين قوسين تميّز بين جزأين بالاسم نفسه
+  const members = (g.series || []).flatMap(id => D.series[id]?.members || []), find1 = t => { const m = String(t || '').match(/^(.*?)\s*\((\d{4})\)$/), name = m ? m[1] : t, ok = x => sameTitle(x.title, name) && (!m || x.year === +m[2]); return t && (members.find(ok) || D.games.find(ok)); };
+  const stop = (cls, label, title) => { const m = cls === 'here' ? null : find1(title), own = m && D.byId.has(m.id), inner = `<small>${label}</small><b dir="ltr">${esc(title)}</b>`;
+    return `<li class="${cls}">${cls === 'here' ? '<i aria-hidden="true"></i>' : ''}${m ? `<button type="button" data-act="${own ? 'open' : 'peek'}" data-id="${m.id}" data-q="${esc(m.title)}${m.year ? ' ' + m.year : ''}">${inner}</button>` : `<span>${inner}</span>`}</li>`; };
+  const track = p.after || p.before ? `<ol class="pl-track" aria-label="موضعها بين ما قبلها وما بعدها في الأحداث">${p.after ? stop('was', 'قبلها في الأحداث', p.after) : ''}${stop('here', 'هذه اللعبة', g.title)}${p.before ? stop('next', 'بعدها في الأحداث', p.before) : ''}</ol>` : '';
+  const facts = [p.when && `<span><small>زمن الأحداث</small><b>${ar(p.when)}</b></span>`, p.where && `<span><small>مكانها</small><b>${ar(p.where)}</b></span>`].filter(Boolean).join('');
+  const src = p.src === 'igdb' ? `<p class="note">عن وصفها الرسمي في <bdi dir="ltr">IGDB</bdi>.</p>` : Array.isArray(p.src) ? `<p class="note">المصدر: ${p.src.map(x => ext(x.name, x.url)).join('، ')}.</p>` : '';
+  return `<section class="sec place k-${p.k}"><h3>موقعها من أحداث عالمها</h3><div class="pl-card"><p class="pl-k"><i aria-hidden="true"></i>${PK[p.k]}</p><p class="pl-line">${ar(p.line)}</p>${track}${facts ? `<p class="pl-facts">${facts}</p>` : ''}${src}</div></section>`; }
 const filmsReady = () => D.filmsReady ??= fetch(`../films/data/films.json?v=${BUILD}`).then(r => r.ok ? r.json() : { films: [] }).then(j => { D.films = new Set((j.films || []).map(f => f.id)); }).catch(() => { D.films = new Set(); });
 async function openGame(id, push = true) { const g = D.byId.get(+id); if (!g) return; openId = g.id; $('#sheet-body').innerHTML = await sheetHTML(g); $('#sheet-body').scrollTop = 0; showSheet(push ? { game: g.id } : null, '#g' + g.id); }
 function showSheet(state, hash) { if (!sheet.open) { sheet.showModal(); if (!calm) sheet.animate(innerWidth <= 640 ? { transform: ['translateY(6%)', 'none'], opacity: [0, 1] } : { transform: ['scale(.97)', 'none'], opacity: [0, 1] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
@@ -535,6 +574,7 @@ document.addEventListener('click', e => { if (!qm.hidden && !e.target.closest('#
   else if (act === 'qm') { if (qmFor?.btn === t) closeQm(); else openQm(t); }
   else if (act === 'qm-set') { const f = qmFor; closeQm(true); if (f) setList1(f.id, t.dataset.v); }
   else if (act === 'qm-rm') { const g = qmFor && D.byId.get(qmFor.id); if (!g) return; qm.classList.add('ask'); qm.innerHTML = rmAsk(g); placeQm(); (qm.querySelector('.rm-pass') || qm.querySelector('[data-act=rm-no]')).focus({ preventScroll: true }); }
+  else if (act === 'tr-ask') askTr(t);
   else if (act === 'rm-ask') { const g = D.byId.get(openId), box = t.closest('.rm'); if (!g || !box) return; box.classList.add('ask'); box.innerHTML = rmAsk(g); (box.querySelector('.rm-pass') || box.querySelector('[data-act=rm-no]')).focus({ preventScroll: true }); box.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' }); }
   else if (act === 'rm-no') { if (t.closest('#qm')) closeQm(true); else { const g = D.byId.get(openId), sv = $('#sheet-body .save'); if (g && sv) { sv.outerHTML = saveHTML(g); $('#sheet-body .rm-b')?.focus({ preventScroll: true }); } } }
   else if (act === 'rm-go') { const box = t.closest('.rm, #qm'); removeGame(+t.dataset.id, box?.querySelector('.rm-pass')?.value || pass(), box, t); }
@@ -583,6 +623,8 @@ function route() { const h = location.hash.slice(1); let m;
   else if (h === 'steam-fail') { history.replaceState(null, '', location.pathname); toast('لم يكتمل الدخول عبر Steam. حاول ثانية.'); openAccounts(); } }
 try {
   const cat = await get('games.json'); IMGB = cat.img || IMGB; D.built = cat.built; merge(cat);
+  // لعبة صُحّح رقمها (مطابقة خاطئة من سحب قديم): سجلها ينتقل إلى رقمها الصحيح مرة واحدة ويُزامَن
+  { let mv = false; for (const [o, n] of Object.entries(cat.moved || {})) if (P.games[o]) { P.games[n] ||= P.games[o]; delete P.games[o]; mv = true; } if (mv) save(); }
   // ما حذفته من هذا الجهاز يبقى مخفياً حتى يصل بناء أحدث من حذفه بعشرين دقيقة (فإن بقي فيه فقد أُعيدت إضافته من جهاز آخر)
   const builtAt = Date.parse(cat.built || '') || 0, rm = removedMap(), LAG = 20 * 6e4; let rmN = Object.keys(rm).length;
   for (const id of Object.keys(rm)) if (!(+rm[id] > 0) || builtAt >= +rm[id] + LAG) delete rm[id];
@@ -598,5 +640,5 @@ try {
   renderGrid(); renderMenu(false); soonHTML(); liftVeil();
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }
   initSync(id => { if (id !== 'games') return; load(); renderGrid(); renderMenu(false); soonHTML(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); if (openId) { const sv = $('#sheet-body .save'), g = D.byId.get(openId); if (sv && g) sv.outerHTML = saveHTML(g); } });
-  route();
+  route(); setTimeout(texts, 1200);
 } catch (err) { $('#grid').innerHTML = '<p class="load">تعذّر تحميل القائمة. حدّث الصفحة.</p>'; liftVeil(); console.error(err); }

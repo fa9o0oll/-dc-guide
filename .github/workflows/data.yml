@@ -69,6 +69,7 @@ jobs:
             data/generated/films/worlds-report.json
             site/films/data/titles.json
             site/games/data/games.json
+            site/games/data/texts.json
             site/games/data/titles.json
           if-no-files-found: ignore
       - name: Report announced DC titles missing from the catalog

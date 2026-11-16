@@ -280,6 +280,44 @@ section.sec{padding:22px clamp(14px,3vw,30px) 0}
 .sec .note{color:var(--mute);font-size:.86rem;margin-top:8px}
 .sec .ask{border-inline-start:3px solid var(--cy);padding:8px 12px;background:var(--card);border-radius:8px;color:var(--dim);font-size:.9rem}
 .more-t{margin-top:8px}.more-t summary{cursor:pointer;min-height:40px;display:flex;align-items:center;color:#9cefff;font-weight:600}
+/* عن اللعبة بالعربية، والأصل الإنجليزي مطوياً تحتها، وطلب الترجمة لما لم يُترجم */
+.sec p.ar-t{font-size:1rem;line-height:1.9;text-wrap:pretty}.sec p.ar-t+p.ar-t,.sec p.en+p.en{margin-top:.7em}
+/* سهم صغير يدل على أن «القصة» و«النص الأصلي» يُفتحان */
+.more-t summary,.orig summary{list-style:none}.more-t summary::-webkit-details-marker,.orig summary::-webkit-details-marker{display:none}
+.more-t summary::after,.orig summary::after{content:"";width:7px;height:7px;margin-inline-start:10px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s ease}
+.more-t[open] summary::after,.orig[open] summary::after{transform:translateY(2px) rotate(-135deg)}
+.orig{margin-top:10px}.orig summary{cursor:pointer;min-height:40px;display:flex;align-items:center;color:var(--mute);font-size:.86rem;font-weight:600}
+.orig[open] summary{color:var(--dim)}.orig p.en{color:var(--dim);font-size:.9rem}.orig .kh{margin:.8em 0 .3em;color:var(--mute);font-size:.82rem;font-weight:600}
+.tr{display:grid;justify-items:start;gap:6px;margin-top:12px}.tr .btn .ic{width:18px;height:18px}.tr .note{margin-top:0}
+.tr .pass-wrap{width:min(100%,320px)}
+.tr-ok{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:9px;background:color-mix(in srgb,var(--ok) 10%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 35%,transparent);color:var(--ink);font-size:.9rem;line-height:1.6}
+.tr-ok .ic{flex:none;width:18px;height:18px;margin-top:3px;color:var(--ok)}
+/* موقعها من أحداث عالمها: لون لكل نوع، وعقدة «بكسل»، ومسار مراحل منقّط: قبلها ← هذه اللعبة ← بعدها */
+.place{--pc:var(--cy)}.place.k-prequel,.place.k-first{--pc:var(--au)}.place.k-side,.place.k-alt,.place.k-between{--pc:var(--vi)}.place.k-alone,.place.k-nostory,.place.k-bundle{--pc:var(--ok)}.place.k-reboot,.place.k-remake,.place.k-same,.place.k-retell{--pc:var(--co)}
+.pl-card{padding:14px 16px 12px;border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--pc) 9%,var(--card)),var(--card) 70%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 30%,var(--line))}
+.pl-k{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:1.6rem;line-height:1;color:var(--pc)}
+.pl-k i{flex:none;width:12px;height:12px;background:var(--pc);box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 25%,transparent),0 0 14px color-mix(in srgb,var(--pc) 70%,transparent)}
+.sec p.pl-line{margin-top:8px;font-size:1rem;line-height:1.85;text-wrap:pretty}
+.pl-track{display:flex;margin-top:14px;padding:0;list-style:none}
+.pl-track li{flex:1 1 0;min-width:0;position:relative;padding-top:24px;text-align:center}
+.pl-track li::before{content:"";position:absolute;top:7px;inset-inline:0;border-top:2px dotted color-mix(in srgb,var(--pc) 50%,var(--line))}
+.pl-track li:first-child::before{inset-inline-start:50%}.pl-track li:last-child::before{inset-inline-end:50%}
+.pl-track li::after{content:"";position:absolute;top:2px;left:50%;translate:-50% 0;width:12px;height:12px;background:var(--bg2);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--pc) 65%,var(--line))}
+.pl-track li.here::after{background:var(--pc);box-shadow:0 0 0 4px color-mix(in srgb,var(--pc) 22%,transparent),0 0 16px var(--pc)}
+.pl-track li>:is(span,button){display:grid;gap:1px;width:100%;padding:4px 6px 6px;border-radius:9px;justify-items:center}
+.pl-track small{font-size:.74rem;color:var(--mute);line-height:1.4}
+.pl-track b{font-size:.9rem;font-weight:600;line-height:1.35;overflow-wrap:anywhere;text-wrap:balance}
+.pl-track li.here b{color:var(--pc)}
+.pl-track button{min-height:44px;transition:background-color .15s ease}.pl-track button b{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--pc) 50%,transparent);text-underline-offset:3px}
+.pl-track button:active{background:rgba(255,255,255,.06)}
+@media (hover:hover){.pl-track button:hover{background:rgba(255,255,255,.06)}}
+.pl-facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.pl-facts span{display:grid;gap:1px;padding:7px 12px;border-radius:9px;background:var(--bg2);box-shadow:inset 0 0 0 1px var(--line)}
+.pl-facts small{font-size:.72rem;color:var(--mute)}.pl-facts b{font-size:.9rem;font-weight:600}
+.pl-card .note{margin-top:10px}
+.pl-track li.here>i{position:absolute;top:2px;left:50%;width:12px;height:12px;margin-left:-6px;padding:0;background:var(--pc);opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){.pl-track li.here>i{animation:pl-ping 2.2s ease-out infinite}}
+@keyframes pl-ping{0%{transform:scale(1);opacity:.6}70%,100%{transform:scale(2.8);opacity:0}}
 .uni{margin-bottom:8px}.uni b{color:var(--ink);font-weight:600}
 /* كم تأخذ لتختمها: أشرطة خبرة مقسّمة */
 .ttb{list-style:none;padding:0;display:grid;gap:8px;max-width:620px}

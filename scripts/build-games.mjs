@@ -1,12 +1,16 @@
 // بناء بيانات «ألعابي» (site/games/data/games.json) من قائمة الألعاب المضافة (data/games/added.json) ومن IGDB وWikidata (scripts/lib-games.mjs):
 // معلومات كل لعبة، وغلافها وصورها بأعلى دقة، ومنصاتها، وكم تأخذ لتختمها، وسلسلتها كاملة بترتيب الصدور (ومعها المعلن الذي لم يصدر لعدّه التنازلي)،
 // وترتيب القصة الموصى به حيث ثبت له مصدر رسمي (data/games/story-orders.mjs)، وعالمها القصصي، وما اقتُبست منه وما اقتُبس منها.
+// النبذة والقصة (بالإنجليزية من IGDB، وبترجمتنا العربية من data/games/translations.json) تُكتب في ملف مستقل تجلبه البطاقة عند فتحها
+// (site/games/data/texts.json) فلا يثقل بها ملف القائمة. وموقع كل لعبة من أحداث عالمها (data/games/places.json) يدخل في سجلها (place).
+// وما صُحّح رقمه بعد مطابقة خاطئة (data/games/moved.json: القديم ← الصحيح) يُكتب في الملف (moved) لينقل المتصفح سجل اللعبة إلى رقمها الصحيح.
 // بلا مفاتيح IGDB يبقى الملف السابق كما هو (أو يُكتب ملف فارغ صالح أول مرة). GAMES_PROBE=1 يطبع عينة من استجابات IGDB للتحقق من الحقول.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { applyCare } from './lib-care.mjs';
 import { hasIgdb, igdb } from './lib-igdb.mjs';
 import { gamesFor, IMG } from './lib-games.mjs';
 
-const ADDED = 'data/games/added.json', OUT = 'site/games/data/games.json';
+const ADDED = 'data/games/added.json', OUT = 'site/games/data/games.json', TEXTS = 'site/games/data/texts.json';
 const read = (f, d) => readFile(f, 'utf8').then(JSON.parse).catch(() => d);
 const added = (await read(ADDED, { games: [] })).games || [];
 await mkdir('site/games/data', { recursive: true });
@@ -44,7 +48,7 @@ if (process.env.GAMES_PROBE) {
   console.log(`probe byName ${how.size}/${sample.length} in ${Date.now() - t0}ms, todo ${todo.size}`); for (const x of sample) console.log(`probe   ${x.name} [${x.plat}] => ${how.has(x.key) ? '#' + how.get(x.key).id + ' ' + names.get(how.get(x.key).id) + (how.get(x.key).sure ? '' : ' ~') : '—'}`);
 }
 
-if (!added.length) { await writeFile(OUT, JSON.stringify(empty)); console.log('games: the list is empty'); process.exit(0); }
+if (!added.length) { await writeFile(OUT, JSON.stringify(empty)); await writeFile(TEXTS, JSON.stringify({ built: empty.built, texts: {} })); console.log('games: the list is empty'); process.exit(0); }
 const story = (await import('../data/games/story-orders.mjs')).default.series || [];
 const ids = added.map(g => +g.igdb).filter(Boolean);
 let r; try { r = await gamesFor(ids, { wikidata: true, story, log: m => console.log('games: ' + m) }); } catch (e) { console.log(`games: IGDB failed (${e.message}), keeping the previous file`); process.exit(0); }
@@ -53,5 +57,9 @@ if (!r.games.length) { console.log('games: IGDB returned nothing, keeping the pr
 const at = new Map(added.map((g, i) => [+g.igdb, { ord: i, at: g.at || null }]));
 for (const g of r.games) Object.assign(g, at.get(g.id) || {});
 r.games.sort((a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9));
-await writeFile(OUT, JSON.stringify({ built: new Date().toISOString(), img: IMG, ...r }));
+const TR = await read('data/games/translations.json', {}), PLACES = await read('data/games/places.json', {}), moved = await read('data/games/moved.json', {});
+const built = new Date().toISOString(), { texts, n } = applyCare(r.games, {}, TR, PLACES);
+await writeFile(TEXTS, JSON.stringify({ built, texts }));
+await writeFile(OUT, JSON.stringify({ built, img: IMG, ...r, ...(Object.keys(moved).length ? { moved } : {}) }));
 console.log(`games: wrote ${OUT}: ${r.games.length} games, ${Object.keys(r.series).length} series, ${Object.values(r.series).filter(s => s.story).length} with a story order`);
+console.log(`games: wrote ${TEXTS}: ${n.text} with text, ${n.ar} in Arabic${n.old ? ` (${n.old} whose English changed since)` : ''}, ${n.place} with a place in their world`);

@@ -1,6 +1,6 @@
 // دالة «أضف لعبة» (/api/add-game): تقترح أثناء الكتابة (suggest)، وتبحث في IGDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي لعبة للاطلاع (preview)،
 // ثم تضيف المختارة إلى data/games/added.json في المستودع (add)، أو دفعة ألعاب سُحبت من حساباتك في المنصات (import) بإيداع واحد، فيعاد بناء القائمة وتظهر على كل الأجهزة.
-// وتحذف لعبة منه (remove) فتختفي من كل الأجهزة مع البناء القادم.
+// وتحذف لعبة منه (remove) فتختفي من كل الأجهزة مع البناء القادم. وتسجّل طلب ترجمة نبذة (ask) على فرع requests ليبدأ به المترجم.
 // محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
 //   IGDB_CLIENT_ID وIGDB_CLIENT_SECRET  تطبيق في لوحة مطوري تويتش        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع
 //   ADD_GAME_PASSWORD  كلمة السر (وإن لم توجد فكلمة سر «أضف فيلماً» ADD_FILM_PASSWORD)
@@ -56,6 +56,31 @@ export async function unrecord(id, message) {
   throw new Error('GitHub conflict');
 }
 
+// طلب ترجمة نبذة لعبة (زر «ترجمها لي»): يُكتب في data/games/requests.json على فرع requests، لا على main، فلا يعيد بناء الموقع ولا نشره.
+// المترجم (docs/GAMES-CARE.md) يقرأ الفرع ويبدأ بما طُلب. يعيد true إن سُجّل، وfalse إن كان مطلوباً من قبل
+const REQ_BRANCH = 'requests', REQ_FILE = 'data/games/requests.json';
+export async function request(id, title) {
+  const api = `https://api.github.com/repos/${REPO}`, file = `${api}/contents/${REQ_FILE}`, gh = st => Object.assign(new Error('GitHub ' + st), { gh: st });
+  const headers = { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'watch-guide-add-game' };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const cur = await fetch(`${file}?ref=${REQ_BRANCH}`, { headers }); let doc = { ar: [] }, sha;
+    if (cur.status === 200) { const j = await cur.json(); sha = j.sha; try { doc = JSON.parse(Buffer.from(j.content, 'base64').toString('utf8')); } catch {} if (!Array.isArray(doc.ar)) doc.ar = []; }
+    else if (cur.status === 404) { // الملف غير موجود، أو الفرع نفسه: يُنشأ الفرع من رأس main
+      const br = await fetch(`${api}/git/ref/heads/${REQ_BRANCH}`, { headers });
+      if (br.status === 404) { const main = await fetch(`${api}/git/ref/heads/${BRANCH}`, { headers }); if (!main.ok) throw gh(main.status);
+        const mk = await fetch(`${api}/git/refs`, { method: 'POST', headers, body: JSON.stringify({ ref: `refs/heads/${REQ_BRANCH}`, sha: (await main.json()).object.sha }) }); if (!mk.ok && mk.status !== 422) throw gh(mk.status); }
+      else if (!br.ok) throw gh(br.status);
+    } else throw gh(cur.status);
+    if (doc.ar.some(x => +x.igdb === id)) return false;
+    doc.ar = [...doc.ar, { igdb: id, title, at: new Date().toISOString() }].slice(-500);
+    const put = await fetch(file, { method: 'PUT', headers, body: JSON.stringify({ message: `games: translate ${title || '#' + id}`, branch: REQ_BRANCH, ...(sha ? { sha } : {}), content: Buffer.from(JSON.stringify(doc, null, 1) + '\n').toString('base64') }) });
+    if (put.ok) return true;
+    if (put.status !== 409 && put.status !== 422) throw gh(put.status);
+    await wait(400);
+  }
+  throw new Error('GitHub conflict');
+}
+
 // عائلات المنصات (بتات) لنتائج البحث: 1 بلايستيشن، 2 إكس بوكس، 4 نينتندو، 8 كمبيوتر، 16 جوال
 let PLAT = null;
 const plats = () => PLAT ??= igdb('platforms', 'fields name,abbreviation,slug; limit 500;').then(list => new Map(list.map(p => [p.id, p]))).catch(e => { PLAT = null; throw e; });
@@ -88,6 +113,14 @@ export default async req => {
     if (!process.env.GH_TOKEN) return json(500, { error: 'إعدادات الخادم ناقصة: GH_TOKEN غير موجود في Netlify.' });
     try { const gone = await unrecord(id, g => `games: remove ${g.title || id}${g.year ? ` (${g.year})` : ''}`); return json(200, { state: gone ? 'removed' : 'absent' }); }
     catch (e) { if (e.gh === 401 || e.gh === 403 || e.gh === 404) return json(502, { error: 'تعذّر الحذف من GitHub: الرمز GH_TOKEN غير صالح أو بلا صلاحية الكتابة على المستودع.' }); console.error(e); return json(502, { error: 'تعذّر إكمال الحذف الآن. حاول بعد قليل.' }); }
+  }
+  // طلب الترجمة لا يحتاج IGDB كذلك
+  if (b.action === 'ask') {
+    const id = +b.igdb, title = String(b.title || '').replace(/[^\p{L}\p{N} .,:;!?'’&()+\-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 80);
+    if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
+    if (!process.env.GH_TOKEN) return json(500, { error: 'إعدادات الخادم ناقصة: GH_TOKEN غير موجود في Netlify.' });
+    try { return json(200, { state: await request(id, title) ? 'asked' : 'exists' }); }
+    catch (e) { if (e.gh === 401 || e.gh === 403 || e.gh === 404) return json(502, { error: 'تعذّر تسجيل الطلب في GitHub: الرمز GH_TOKEN غير صالح أو بلا صلاحية الكتابة على المستودع.' }); console.error(e); return json(502, { error: 'تعذّر تسجيل الطلب الآن. حاول بعد قليل.' }); }
   }
   if (!hasIgdb()) return json(503, { error: 'مفاتيح IGDB غير موجودة في Netlify بعد (IGDB_CLIENT_ID وIGDB_CLIENT_SECRET). أضفها ثم أعد نشر الموقع.', need: 'igdb' });
   try {

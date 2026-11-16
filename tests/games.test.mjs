@@ -14,8 +14,13 @@ import { fixture, progress, titles } from './fixtures/games.mjs';
 const siteDir = path.resolve(new URL('../site', import.meta.url).pathname);
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2' };
 const FX = fixture();
+// العناية: نبذة مترجمة وموقع من الأحداث للعبة (God of War Ragnarök)، ونبذة إنجليزية فقط لأخرى (Elden Ring)، ورقمان صُحّحا (555001 ← 990001، و555002 ← 1942 التي لها سجل)
+const TX = { 112875: { s: 'Ragnarök is coming.\n\nKratos and Atreus must journey to each of the Nine Realms.', t: 'Fimbulwinter is well underway.', sa: 'راغناروك قادم.\n\nعلى كريتوس وابنه أتريوس أن يجوبا العوالم التسعة، في God of War Ragnarök.', ta: 'شتاء فيمبولوينتر في ذروته.' }, 119133: { s: 'Rise, Tarnished.' } };
+FX.games.find(g => g.id === 112875).place = { k: 'sequel', after: 'God of War (2018)', line: 'تكمل أحداث God of War بعد ثلاث سنوات: الشتاء العظيم يوشك أن ينتهي.', when: 'بعد ثلاث سنوات من الجزء السابق', where: 'العوالم التسعة', src: 'igdb' };
+FX.moved = { 555001: 990001, 555002: 1942 };
 const server = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]);
   if (u === '/games/data/games.json') { r.writeHead(200, { 'content-type': 'application/json' }); return r.end(JSON.stringify(FX)); }
+  if (u === '/games/data/texts.json') { r.writeHead(200, { 'content-type': 'application/json' }); return r.end(JSON.stringify({ built: FX.built, texts: TX })); }
   if (u === '/games/data/titles.json') { r.writeHead(200, { 'content-type': 'application/json' }); return r.end(JSON.stringify(titles)); }
   let f = path.join(siteDir, u); if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
   fs.readFile(f, (e, b) => e ? (r.writeHead(404), r.end()) : (r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'text/plain' }), r.end(b))); }).listen(0);
@@ -33,6 +38,7 @@ async function mockApi(page) {
     if (b.action === 'search') return J({ parsed: { title: b.q.replace(/\s+\d{4}$/, ''), year: +(b.q.match(/(\d{4})$/)?.[1] || 0) || null }, candidates: [{ igdb: 7346, title: newGame.title, year: 2017, cover: 'c7346', plats: ['Switch', 'Wii U'], type: 'main' }, { igdb: 1942, title: 'The Witcher 3: Wild Hunt', year: 2015, cover: 'c1942', plats: ['PC'], type: 'main' }] });
     if (b.action === 'add') return J({ state: 'added', game: { ...(FX.games.find(g => g.id === b.igdb) || newGame), src: 'added', at: new Date().toISOString() }, series: {}, plats: { switch: FX.plats.switch }, franchises: {} });
     if (b.action === 'remove') return J({ state: 'removed' });
+    if (b.action === 'ask') return J({ state: 'asked' });
     if (b.action === 'preview') return J({ game: { ...FX.series[5].members[0], ...FX.games[0], id: b.igdb, title: 'Preview Game', series: [5] }, series: {}, plats: {}, franchises: {} });
     if (b.action === 'import') return J({ state: { added: b.items.length, exists: 0 }, games: b.items.map(x => ({ ...FX.games[3], id: x.igdb, title: 'Imported ' + x.igdb, slug: 'imp-' + x.igdb, series: [], src: 'added' })), series: {}, plats: {}, franchises: {} });
     return r.fulfill({ status: 400, body: '{}' }); });
@@ -241,6 +247,38 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   const tap = await page.evaluate(() => { const b = document.querySelector('#toast button').getBoundingClientRect(); return b.height >= 40 && b.width >= 40; });
   check('الجوال: زر «تراجع» بعد الحذف بمساحة لمس كافية', tap);
   check('cover: بلا أخطاء برمجية', !errs.length, errs);
+  await ctx.close(); }
+
+// ---------- العناية: النبذة بالعربية وزر «ترجمها لي»، وموقع اللعبة من أحداث عالمها، وتصحيح رقم لعبة
+{ console.log('== care');
+  const { ctx, page, errs } = await open(1280, 900, false);
+  await page.addInitScript(() => { if (!sessionStorage.getItem('seeded2')) { sessionStorage.setItem('seeded2', '1'); const P = JSON.parse(localStorage.getItem('gamesg.progress')); P.games[555001] = { s: 'done', on: 'pc', h: 90 }; P.games[555002] = { s: 'play' }; localStorage.setItem('gamesg.progress', JSON.stringify(P)); } });
+  await page.goto(`${base}/games/#g112875`); await page.waitForSelector('#sheet[open] .about');
+  const mv = await page.evaluate(() => { const g = JSON.parse(localStorage.getItem('gamesg.progress')).games; return { old: g[555001], now: g[990001], old2: g[555002], kept: g[1942] }; });
+  check('لعبة صُحّح رقمها: سجلها ينتقل إلى رقمها الصحيح ولا يبقى على القديم، وإن كان للصحيح سجل بقي سجله', !mv.old && mv.now?.s === 'done' && mv.now.on === 'pc' && mv.now.h === 90 && !mv.old2 && mv.kept?.s === 'new', mv);
+  const ab = await page.evaluate(() => { const a = document.querySelector('#sheet .about'); return { ar: [...a.querySelectorAll(':scope > p.ar-t')].map(p => p.textContent), bdi: a.querySelector('p.ar-t bdi[dir=ltr]')?.textContent, dir: getComputedStyle(a.querySelector('p.ar-t')).direction,
+    story: a.querySelector('.more-t p.ar-t')?.textContent, orig: [...a.querySelectorAll('.orig p.en')].map(p => p.textContent), origOpen: a.querySelector('.orig').open, note: a.querySelector(':scope > .note').textContent, tr: !!a.querySelector('.tr'), en: a.querySelectorAll(':scope > p.en').length }; });
+  check('النبذة المترجمة تُعرض بالعربية بفقراتها، والاسم الإنجليزي فيها معزول الاتجاه، والقصة بالعربية تحت «القصة»', ab.ar.length === 2 && ab.ar[0] === 'راغناروك قادم.' && ab.bdi === 'God of War Ragnarök' && ab.dir === 'rtl' && ab.story === 'شتاء فيمبولوينتر في ذروته.' && !ab.en, ab);
+  check('الأصل الإنجليزي مطويّ تحتها لمن أراده، ومصدر الترجمة مذكور، وبلا زر ترجمة', !ab.origOpen && ab.orig.length === 3 && ab.orig[0] === 'Ragnarök is coming.' && /ترجمتنا/.test(ab.note) && !ab.tr, ab);
+  const pl = await page.evaluate(() => { const s = document.querySelector('#sheet .place'); return { cls: s.className, k: s.querySelector('.pl-k').textContent, line: s.querySelector('.pl-line').textContent, stops: [...s.querySelectorAll('.pl-track li')].map(li => [li.className, li.querySelector('small').textContent, li.querySelector('b').textContent, li.querySelector('button')?.dataset.act || '', li.querySelector('button')?.dataset.id || '']),
+    facts: [...s.querySelectorAll('.pl-facts span')].map(x => x.textContent), note: s.querySelector('.note').textContent, before: !!(s.compareDocumentPosition(document.querySelector('#sheet .about')) & Node.DOCUMENT_POSITION_FOLLOWING),
+    row: document.querySelector('#sheet .order li.here .t small').textContent, w: s.querySelector('.pl-track').scrollWidth <= s.querySelector('.pl-track').clientWidth + 1 }; });
+  check('موقعها من أحداث عالمها: نوعه «تكملة» بلونه، وجملته، قبل «عن اللعبة»', /k-sequel/.test(pl.cls) && pl.k === 'تكملة' && /بعد ثلاث سنوات/.test(pl.line) && pl.before, pl);
+  check('مسار الأحداث: «قبلها» God of War (2018) زراً يفتح بطاقة ذلك الجزء بعينه (لا جزء 2005 بالاسم نفسه)، ثم «هذه اللعبة»', pl.stops.length === 2 && pl.stops[0][0] === 'was' && pl.stops[0][2] === 'God of War (2018)' && pl.stops[0][3] === 'peek' && pl.stops[0][4] === '19560' && pl.stops[1][0] === 'here' && pl.stops[1][2] === 'God of War Ragnarök' && pl.w, pl.stops);
+  check('زمن الأحداث ومكانها ومصدرها، ونوع موقعها بجانب سنتها في قائمة السلسلة', pl.facts.length === 2 && /زمن الأحداث/.test(pl.facts[0]) && /العوالم التسعة/.test(pl.facts[1]) && /IGDB/.test(pl.note) && /تكملة/.test(pl.row), pl);
+  await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  // لعبة لم تُترجم: نبذتها بالإنجليزية وزر «ترجمها لي»، والطلب يُحفظ
+  await page.goto(`${base}/games/#g119133`); await page.waitForSelector('#sheet[open] .about .tr');
+  const en = await page.evaluate(() => { const a = document.querySelector('#sheet .about'); return { en: a.querySelector(':scope > p.en')?.textContent, btn: a.querySelector('[data-act=tr-ask]')?.textContent.trim(), orig: !!a.querySelector('.orig'), place: !!document.querySelector('#sheet .place') }; });
+  check('غير المترجمة: نبذتها بالإنجليزية كما هي، وتحتها زر «ترجمها لي»، وبلا قسم موقع لما لم يُكتب موقعه', en.en === 'Rise, Tarnished.' && en.btn === 'ترجمها لي' && !en.orig && !en.place, en);
+  await page.click('#sheet [data-act=tr-ask]'); await page.waitForSelector('#sheet .tr-ok');
+  check('«ترجمها لي»: طلب واحد إلى الخادم برقم اللعبة، ثم «وصل طلب ترجمتها» ويُحفظ على الجهاز', asked.includes('ask:119133') && await page.evaluate(() => /وصل طلب ترجمتها/.test(document.querySelector('#sheet .tr-ok').textContent) && !!JSON.parse(localStorage.getItem('gamesg.asked'))[119133]));
+  await page.reload(); await page.waitForSelector('#sheet[open] .about .tr-ok');
+  check('بعد التحديث يبقى الطلب مذكوراً ولا يُطلب ثانية', asked.filter(a => a === 'ask:119133').length === 1 && await page.evaluate(() => !document.querySelector('#sheet [data-act=tr-ask]')));
+  // لعبة نصها في سجلها (بلا ملف نصوص): تُعرض منه
+  await page.goto(`${base}/games/#g11208`); await page.waitForSelector('#sheet[open]'); await page.waitForTimeout(300);
+  check('لعبة نبذتها في سجلها لا في ملف النصوص (أُضيفت للتو) تُعرض منه مع زر الترجمة', await page.evaluate(() => { const a = document.querySelector('#sheet .about'); return !a || (!!a.querySelector('p.en') && !!a.querySelector('[data-act=tr-ask]')); }));
+  check('care: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
 
 // ---------- تقليل الحركة

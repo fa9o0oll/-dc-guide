@@ -38,20 +38,22 @@ export const isoHours = d => { const m = String(d || '').match(/P(?:(\d+)D)?T?(?
 // وبين أكثر من لعبة بالاسم نفسه (Resident Evil 4 الأصلية والجديدة مثلاً): التي على منصتك، ولا لعبة صدرت بعد آخر مرة لعبتها
 const PID = { ps5: 167, ps4: 48, xsx: 169, xone: 49, x360: 12, pc: 6 }, FAM = { ps5: [167, 48], ps4: [48, 167], xsx: [169, 49], xone: [49, 169], x360: [12], pc: [6] };
 let BUNDLE = null;
-// لعبة ليست على منصتك ولا عائلتها تُقبل فقط إن كان لها تاريخ صدور لا يسبق منصتك بأكثر من ثلاث سنوات: «Hitman» على PS4 ليست لعبة 1984 بالاسم نفسه،
-// ولا مدخلاً بلا تاريخ ولا منصات. (IGDB يفصل بعض المنافذ في مداخل مستقلة، فلعبة أصلها أركيد 2007 تُقبل لـ Xbox 360)
+// متى تُقبل لعبة بالاسم نفسه؟ التي على منصتك أو عائلتها تُقبل. وما ليست عليها يلزمها ثلاثة: تاريخ صدور، لا يسبق منصتك بأكثر من ثلاث سنوات،
+// وأن تكون لعبة معروفة (عشرون تقييماً فأكثر) أو اسمها مميّز (كلمتان فأكثر): «Hitman» على PS4 ليست لعبة 1984 بالاسم نفسه، و«Batman» ليست لعبة
+// كمبيوتر مجهولة من 2010، ولا مدخلاً بلا تاريخ ولا منصات. (IGDB يفصل بعض المنافذ في مداخل مستقلة، فلعبة أصلها أركيد 2007 تُقبل لـ Xbox 360)
 const LAUNCH = { x360: 2005, ps4: 2013, xone: 2013, ps5: 2020, xsx: 2020 };
 const plausible = (x, g) => { const ps = g.platforms || [];
   if (x.plat && (ps.includes(PID[x.plat]) || ps.some(p => (FAM[x.plat] || []).includes(p)))) return true;
-  const y = g.first_release_date ? new Date(g.first_release_date * 1000).getUTCFullYear() : null;
-  return y != null && (!LAUNCH[x.plat] || y >= LAUNCH[x.plat] - 3); };
-const pick = (x, list, base) => { const last = x.last ? Date.parse(x.last) / 1000 + 86400 : Infinity, want = norm(x.name);
+  const y = g.first_release_date ? new Date(g.first_release_date * 1000).getUTCFullYear() : null, n = norm(g.name);
+  return y != null && (!LAUNCH[x.plat] || y >= LAUNCH[x.plat] - 3) && ((g.total_rating_count || 0) >= 20 || (n.includes(' ') && n.length >= 8)); };
+// لعبة صدرت بعد آخر مرة لعبتها بأكثر من أربعة أشهر ليست هي (Resident Evil 4 الجديدة لمن لعبها في 2018)؛ وما دون ذلك يُقبل: نسخ تجريبية ووصول مبكر
+const pick = (x, list, base) => { const last = x.last ? Date.parse(x.last) / 1000 + 120 * 86400 : Infinity, want = norm(x.name);
   return list.filter(g => !(g.first_release_date > last) && plausible(x, g)).map(g => ({ g, s: base(g, want) + ((g.platforms || []).includes(PID[x.plat]) ? 30 : (g.platforms || []).some(p => (FAM[x.plat] || []).includes(p)) ? 20 : 0)
     + Math.min(10, Math.log10((g.total_rating_count || 0) + 1) * 4) - (g.game_type === BUNDLE ? 15 : 0) })).sort((a, b) => b.s - a.s)[0]; };
 const F = 'fields name,first_release_date,platforms,total_rating_count,game_type;';
 async function byExact(items, T) {
   const out = new Map(), parts = []; for (let i = 0; i < items.length; i += 10) parts.push(items.slice(i, i + 10));
-  await Promise.all(parts.map(async part => { const body = part.map((x, k) => `query games "${k}" { ${F} where name ~ ${quote(x.name)} & version_parent = null${T}; limit 8; };`).join('\n');
+  await Promise.all(parts.map(async part => { const body = part.map((x, k) => `query games "${k}" { ${F} where name ~ ${quote(x.name)} & version_parent = null${T}; limit 15; };`).join('\n');
     for (const r of await igdb('multiquery', body)) { const x = part[+r.name], best = x && pick(x, r.result || [], () => 100); if (best) out.set(x.key, { id: best.g.id, sure: true }); } }));
   return out;
 }
