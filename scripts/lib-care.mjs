@@ -48,7 +48,9 @@ export function checkCare(TR = {}, PLACES = {}, texts = null) {
     if (!str(t.s) && !str(t.t)) bad.push(`${at}: بلا نبذة ولا قصة`);
     for (const [k, e] of [['s', en?.s], ['t', en?.t]]) { const v = t[k]; if (v == null) continue;
       if (!str(v)) { bad.push(`${at}.${k}: نص فارغ أو حوله فراغ`); continue; }
-      if (!AR.test(v) || arShare(v) < .6) bad.push(`${at}.${k}: ليس نصاً عربياً (حصة الحروف العربية ${Math.round(arShare(v) * 100)}%)`);
+      // أسماء الألعاب تبقى باللاتينية، فنبذة قصيرة قد يكون نصف حروفها لاتينياً؛ أما جملة إنجليزية كاملة (اثنتا عشرة كلمة لاتينية متتالية) فترجمة ناقصة
+      if (!AR.test(v) || arShare(v) < .35) bad.push(`${at}.${k}: ليس نصاً عربياً (حصة الحروف العربية ${Math.round(arShare(v) * 100)}%)`);
+      else if (/(?:[A-Za-z][A-Za-z'’\-]*[\s,:;.!?]+){12,}/.test(v)) bad.push(`${at}.${k}: فيه جملة بقيت بالإنجليزية`);
       if (/[‎‏‪-‮⁦-⁩]/.test(v)) bad.push(`${at}.${k}: فيه علامات اتجاه خفية`);
       if (/ {2,}|\t| \n|\n{3,}/.test(v)) bad.push(`${at}.${k}: فراغات زائدة`);
       if (e && (v.length < e.length * .35 || v.length > e.length * 1.9)) bad.push(`${at}.${k}: طولها ${v.length} حرفاً والأصل ${e.length} (ناقصة أو زائدة؟)`); }

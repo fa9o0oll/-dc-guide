@@ -345,7 +345,8 @@ const PK = { first: 'بداية الحكاية', sequel: 'تكملة', prequel: 
 const sameTitle = (a, b) => fold(a) === fold(b);
 function placeSec(g) { const p = g.place; if (!p || !PK[p.k]) return '';
   // «God of War (2018)»: السنة بين قوسين تميّز بين جزأين بالاسم نفسه
-  const members = (g.series || []).flatMap(id => D.series[id]?.members || []), find1 = t => { const m = String(t || '').match(/^(.*?)\s*\((\d{4})\)$/), name = m ? m[1] : t, ok = x => sameTitle(x.title, name) && (!m || x.year === +m[2]); return t && (members.find(ok) || D.games.find(ok)); };
+  const members = (g.series || []).flatMap(id => D.series[id]?.members || []), find1 = t => { const m = String(t || '').match(/^(.*?)\s*\((\d{4})\)$/), name = m ? m[1] : t, ok = x => sameTitle(x.title, name) && (!m || x.year === +m[2]), hits = t ? [...members, ...D.games].filter(ok) : [];
+    return hits.find(x => D.byId.has(x.id)) || hits[0]; };   // IGDB يفرد لنسخة الأركيد ونسخة المنزل سجلّين بالاسم نفسه أحياناً: المملوكة أولى
   const stop = (cls, label, title) => { const m = cls === 'here' ? null : find1(title), own = m && D.byId.has(m.id), inner = `<small>${label}</small><b dir="ltr">${esc(title)}</b>`;
     return `<li class="${cls}">${cls === 'here' ? '<i aria-hidden="true"></i>' : ''}${m ? `<button type="button" data-act="${own ? 'open' : 'peek'}" data-id="${m.id}" data-q="${esc(m.title)}${m.year ? ' ' + m.year : ''}">${inner}</button>` : `<span>${inner}</span>`}</li>`; };
   const track = p.after || p.before ? `<ol class="pl-track" aria-label="موضعها بين ما قبلها وما بعدها في الأحداث">${p.after ? stop('was', 'قبلها في الأحداث', p.after) : ''}${stop('here', 'هذه اللعبة', g.title)}${p.before ? stop('next', 'بعدها في الأحداث', p.before) : ''}</ol>` : '';

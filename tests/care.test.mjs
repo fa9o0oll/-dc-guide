@@ -21,7 +21,9 @@ console.log('== الفحص');
 { const en = { 1: { s: 'A reasonably long English summary about a game and its world.', t: 'x' } }, ok = 'نبذة عربية معقولة الطول عن لعبة وعالمها وما يجري فيها.';
   const bad = (TR, PL = {}) => checkCare(TR, PL, en).join(' | ');
   check('ترجمة سليمة وموقع سليم يمران', !bad({ 1: { s: ok, h: 'abcdef12' } }, { 1: { k: 'sequel', after: 'Game One (2018)', line: 'تكمل أحداث Game One.', when: 'بعد عام', where: 'مدينة', src: [{ name: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/X' }] }, 2: { k: 'none' }, 3: { k: 'alone', line: 'قصة مستقلة.', src: 'igdb' } }));
-  check('نص غير عربي مرفوض', /ليس نصاً عربياً/.test(bad({ 1: { s: 'Still English text here.' } })) && /ليس نصاً عربياً/.test(bad({ 1: { s: 'كلمة and the rest of this sentence is left in English' } })));
+  check('نص غير عربي مرفوض، وكذا ترجمة بقيت فيها جملة إنجليزية كاملة؛ وأسماء الألعاب اللاتينية الكثيرة في نبذة قصيرة مقبولة', /ليس نصاً عربياً/.test(bad({ 1: { s: 'Still English text here.' } })) && /ليس نصاً عربياً/.test(bad({ 1: { s: 'كلمة and the rest of this sentence is left in English' } }))
+    && /بقيت بالإنجليزية/.test(bad({ 1: { s: ok + ' The game follows a monster hunter searching for his adopted daughter across a war torn land. ' + ok + ' ' + ok } }))
+    && !checkCare({ 1: { s: 'تقدّم Batman: Arkham Origins مدينة غوثام أوسع، وحكاية أصلية تسبق أحداث Batman: Arkham Asylum وBatman: Arkham City بسنوات.' } }, {}, null).length);
   check('ترجمة مبتورة أو أطول من الأصل بكثير مرفوضة، وكذا الفراغات الزائدة وعلامات الاتجاه الخفية', /ناقصة أو زائدة/.test(bad({ 1: { s: 'قصيرة.' } })) && /فراغات زائدة/.test(bad({ 1: { s: ok.replace(' ', '  ') } })) && /علامات اتجاه/.test(bad({ 1: { s: ok + '‏' } })) && /فارغ أو حوله فراغ/.test(bad({ 1: { s: ok + ' ' } })));
   check('حقل غير معروف وبصمة غير صالحة ومفتاح ليس رقماً مرفوضة', /حقل غير معروف/.test(bad({ 1: { s: ok, x: 1 } })) && /بصمة/.test(bad({ 1: { s: ok, h: 'zz' } })) && /ليس رقم لعبة/.test(bad({ abc: { s: ok } })));
   check('موقع: نوع غير معروف، وجملة غير عربية أو طويلة، و«between» بلا طرفيه، ومصدر بلا رابط https، و«none» بحقول: كلها مرفوضة',
