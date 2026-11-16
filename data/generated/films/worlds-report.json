@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-16T09:43:09.328Z",
+ "generatedAt": "2026-11-16T10:21:59.468Z",
  "counts": {
   "works": 628,
   "withEntry": 375,
@@ -18,7 +18,7 @@
   "chronoAuto": 31,
   "infoEntries": 467,
   "bytes": 203250,
-  "seconds": 20
+  "seconds": 16
  },
  "missing": [
   {
@@ -4640,6 +4640,15 @@
    ]
   },
   {
+   "g": "Q56070713",
+   "name": "Walt Disney Animation Studios feature film",
+   "why": "catalog",
+   "size": 66,
+   "types": [
+    "animated film series"
+   ]
+  },
+  {
    "g": "Q2732470",
    "name": "list of Pixar films",
    "why": "list",
@@ -4653,15 +4662,6 @@
    "name": "Studio Ghibli Feature Films",
    "why": "catalog",
    "size": 23,
-   "types": [
-    "animated film series"
-   ]
-  },
-  {
-   "g": "Q56070713",
-   "name": "Walt Disney Animation Studios feature film",
-   "why": "catalog",
-   "size": 66,
    "types": [
     "animated film series"
    ]
