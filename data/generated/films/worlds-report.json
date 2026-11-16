@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-16T07:49:38.221Z",
+ "generatedAt": "2026-11-16T08:23:53.492Z",
  "counts": {
   "works": 628,
   "withEntry": 375,
@@ -2537,8 +2537,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "novel:The Wonderful Wizard of Oz",
     "musical:Wicked",
+    "novel:The Wonderful Wizard of Oz",
     "novel:Wicked"
    ]
   },
@@ -4640,15 +4640,6 @@
    ]
   },
   {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
-   "why": "catalog",
-   "size": 23,
-   "types": [
-    "animated film series"
-   ]
-  },
-  {
    "g": "Q56070713",
    "name": "Walt Disney Animation Studios feature film",
    "why": "catalog",
@@ -4664,6 +4655,15 @@
    "size": 28,
    "types": [
     "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
+   "why": "catalog",
+   "size": 23,
+   "types": [
+    "animated film series"
    ]
   }
  ],
