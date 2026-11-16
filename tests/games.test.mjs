@@ -5,6 +5,7 @@
 //   • النقل السريع بين القوائم (⋮) مع التراجع، والبحث المتسامح («ذا ويتشر»، «eldin ring») بـ«هل تقصد»
 //   • «أضف لعبة»: اقتراحات قبل Enter، ثم المرشحات، ثم اختيار القائمة والإضافة
 //   • «حساباتي»: ربط Steam من رجوع الدخول، وسحب الألعاب، وصندوق الأسئلة بالأزرار ولوحة المفاتيح، والحفظ بدفعة واحدة
+//   • المكرر: تنبيه «لعبتان بالاسم نفسه» و«نسختان من لعبة واحدة» بجوابيه، والمراجعة، والإسكات الدائم، والتوأم في البطاقة ولحظة الإضافة
 //   • الجوال (غطاء الفولد) بلا تمدد أفقي، وتقليل الحركة، وبلا أخطاء برمجية
 // NODE_PATH=$(npm root -g) node tests/games.test.mjs
 import { createRequire } from 'node:module';
@@ -290,6 +291,129 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   TX[112875].ta = taWas;
   check('care: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
+
+// ---------- المكرر: لعبتان بالاسم نفسه، ونسختان من لعبة واحدة. التنبيه سؤال بجوابين، و«لا» يُسكته نهائياً
+{ console.log('== duplicates');
+  const mk = (m, x = {}) => ({ ...FX.games[3], ...m, slug: 'd-' + m.id, titleAr: '', alt: [], series: [], rel: {}, from: [], into: [], art: null, shots: [], genres: ['قتال'], ord: 40, summary: '', at: '2026-02-01T00:00:00Z', ...x });
+  const gowS = FX.series[5].members, tl = FX.series[7].members, RM = { ...tl[0], id: 6036, title: 'The Last of Us Remastered', date: '2014-07-29', year: 2014, plats: ['ps4'], type: 'remaster', cover: 'c6036' };
+  // God of War (2005) وGod of War (2018): بالاسم نفسه. The Last of Us وريماسترها: نسختان. وPart I ريميك أصله في المكتبة: لعبة أخرى، فلا يدخل المجموعة
+  const FXD = { ...FX, games: [...FX.games.map(g => g.id === 205780 ? { ...g, rel: { parent_game: tl[0] } } : g), mk(gowS[0], { series: [5], at: '2026-03-02T00:00:00Z' }), mk(gowS[6], { series: [5], at: '2026-03-03T00:00:00Z' }),
+    mk(tl[0], { series: [7], rel: { remasters: [RM] } }), mk(RM, { series: [7], rel: { parent_game: tl[0] } })] };
+  const erTwin = () => ({ ...mk({ ...FX.games[1], id: 555123, cover: 'c555123', date: '2025-06-05', year: 2025, plats: ['switch2'], type: 'port' }), src: 'added', at: new Date().toISOString() });
+  const routes = async page => {
+    await page.route('**/games/data/games.json*', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(FXD) }));
+    await page.route('**/api/add-game', async r => { const b = JSON.parse(r.request().postData() || '{}'), J = o => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) }), more = { series: {}, plats: {}, franchises: {} };
+      if (b.action === 'search' && /elden/i.test(b.q)) return J({ parsed: { title: 'Elden Ring', year: null }, candidates: [{ igdb: 555123, title: 'Elden Ring', year: 2025, cover: 'c555123', plats: ['Switch 2'], type: 'port' }, { igdb: 119133, title: 'Elden Ring', year: 2022, cover: 'c119133', plats: ['PC'], type: 'main' }] });
+      if (b.action === 'add' && b.igdb === 555123) { asked.push('add:555123'); return J({ state: 'added', game: erTwin(), ...more }); }
+      if (b.action === 'add' && b.igdb === 19560) { asked.push('add:19560'); return J({ state: 'added', game: { ...mk(gowS[6], { series: [5] }), src: 'added', at: new Date().toISOString() }, ...more }); }
+      if (b.action === 'preview' && b.igdb === 550) return J({ game: mk({ ...gowS[1], title: 'God of War' }, { series: [5] }), ...more });
+      return r.fallback(); });
+    await page.route('**/api/game-accounts', async r => { const b = JSON.parse(r.request().postData() || '{}');
+      if (b.action === 'steam') return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ source: 'steam', total: 1, matched: 1, todo: 0, items: [{ key: 'steam:77', name: 'Minecraft', plat: 'pc', hours: 5, last: '2026-01-01', igdb: 777001, sure: true, title: 'Minecraft', year: 2011, cover: 'c777001' }] }) });
+      return r.fallback(); });
+    await page.addInitScript(() => { if (!sessionStorage.getItem('seeded3')) { sessionStorage.setItem('seeded3', '1'); const P = JSON.parse(localStorage.getItem('gamesg.progress')); P.games[549] = { s: 'done', on: 'ps2', h: 12 }; localStorage.setItem('gamesg.progress', JSON.stringify(P)); } }); };
+  const note = (page, sel) => page.evaluate(s => { const d = document.querySelector(s + ' .dup'); return d ? { h: d.querySelector('h2').textContent, names: [...d.querySelectorAll('.dup-n > span')].map(x => x.textContent), name: d.querySelector('.dup-n').textContent.replace(/\s+/g, ' ').trim(), q: d.querySelector('.dup-x > p:last-child').textContent.replace(/\s+/g, ' ').trim(), btns: [...d.querySelectorAll('.btn')].map(b => b.textContent), covers: d.querySelectorAll('.dup-st img').length } : null; }, sel);
+  const inView = page => page.waitForFunction(() => { const r = document.getElementById('dupbar').getBoundingClientRect(); return r.height > 0 && r.top >= 0 && r.bottom <= innerHeight && (window.__y === scrollY || ((window.__y = scrollY), false)); }, null, { timeout: 4000, polling: 120 }).then(() => true).catch(() => false);
+  const dups = page => page.evaluate(() => JSON.parse(localStorage.getItem('gamesg.progress')).dups || {});
+  const ids = async page => (await shown(page)).sort((a, b) => a - b).join();
+  const { ctx, page, errs } = await open(1440, 900, false); await routes(page);
+  await page.goto(`${base}/games/`); await page.waitForSelector('#grid .gc:not([hidden])'); await page.waitForTimeout(400);
+  const n1 = await note(page, '#dup'), at1 = await page.evaluate(() => ({ bar: document.getElementById('dupbar').hidden, above: !!(document.getElementById('dup').compareDocumentPosition(document.getElementById('mm')) & Node.DOCUMENT_POSITION_FOLLOWING), top: document.getElementById('dup').getBoundingClientRect().top < innerHeight }));
+  check('عند الفتح: تنبيه فوق القائمة الرئيسية «في مكتبتك لعبتان بالاسم نفسه» بالاسم وسنتيهما وغلافيهما، وسؤال بجوابين، وأن بعده تنبيهاً آخر',
+    n1 && n1.h === 'في مكتبتك لعبتان بالاسم نفسه' && n1.name === 'God of War (2005 و2018)' && /^هل تريد تعديلهما؟/.test(n1.q) && /وبعده تنبيه آخر\.$/.test(n1.q) && n1.btns.join('|') === 'نعم، اعرضهما|لا، أبقِهما' && n1.covers === 2 && at1.bar && at1.above && at1.top, { n1, at1 });
+  await page.click('#dup [data-act=dup-go]'); const v1 = await inView(page);
+  const r1 = await page.evaluate(() => ({ top: document.getElementById('dup').hidden, h: document.querySelector('#dupbar h2')?.textContent, btns: [...document.querySelectorAll('#dupbar .btn')].map(x => x.textContent), count: document.getElementById('count').textContent, list: document.querySelector('#mm-menu [aria-pressed=true]').dataset.v,
+    card: document.getElementById('g-549').getBoundingClientRect().top < innerHeight, hint: document.querySelector('#dupbar .dup-x > p:last-child').textContent.replace(/\s+/g, ' ').trim(), dots: !!document.querySelector('#dupbar .dup-x .ic') }));
+  check('«نعم» يعرض اللعبتين وحدهما في الشبكة مهما كانت القائمة المختارة، وفوقهما شريط المراجعة في مرمى النظر بما يُفعل',
+    await ids(page) === '549,19560' && v1 && r1.top && r1.h === 'مراجعة: لعبتان بالاسم نفسه' && r1.btns.join('|') === 'أبقِهما معاً|رجوع إلى قائمتي' && !r1.count && r1.list === 'play' && r1.card && /^احذف ما لا تريده من زر/.test(r1.hint) && /أو أبقِهما معاً\.$/.test(r1.hint) && r1.dots, { r1, v1, ids: await ids(page) });
+  // بطاقة كل منهما تذكر توأمها
+  const twin = () => page.evaluate(() => { const t = document.querySelector('#sheet .twin'); return t ? { head: t.querySelector('.twin-t').textContent, rows: [...t.querySelectorAll('.twin-g')].map(b => [b.dataset.id, b.querySelector('b').textContent, [...b.querySelectorAll('small span')].map(s => s.textContent).join('|'), b.querySelector('.go').textContent]), no: t.querySelector('.twin-no')?.textContent || '', first: t.parentNode.firstElementChild === t, pv: t.parentNode.classList.contains('pv') } : null; });
+  await page.click('#g-549 .cover'); await page.waitForSelector('#sheet[open] .twin'); await page.waitForTimeout(300);
+  const t1 = await twin();
+  check('في بطاقة كل منهما: «في مكتبتك لعبة أخرى بالاسم نفسه» أعلى «حالتها عندي»، وصف توأمها بسنته ومنصاته وقائمته', t1.head === 'في مكتبتك لعبة أخرى بالاسم نفسه' && t1.rows.length === 1 && t1.rows[0].join('~') === '19560~God of War~2018|PS4 · PC|في «لعبة جديدة»~افتح بطاقتها' && t1.no === 'أبقِهما معاً' && t1.first && !t1.pv, t1);
+  await page.click('#sheet .twin-g'); await page.waitForFunction(() => location.hash === '#g19560'); await page.waitForTimeout(250);
+  const t2 = await twin();
+  check('صف التوأم يفتح بطاقته، وفيها صف الأولى بما سُجّل لها: منصتها وقائمتها وساعاتها', t2?.rows[0].join('~') === '549~God of War~2005|PS2|في «شارة النهاية»|12 ساعة~افتح بطاقتها', t2);
+  // التنبيه العابر يُرى ويُلمس والبطاقة مفتوحة
+  await page.click('#sheet [data-act=set][data-v=play]'); await page.waitForTimeout(250);
+  const ts = await page.evaluate(() => { const t = document.getElementById('toast'), b = t.querySelector('button'), r = b.getBoundingClientRect(); return { host: t.parentNode.id, hit: document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === b, s: JSON.parse(localStorage.getItem('gamesg.progress')).games[19560]?.s }; });
+  await page.click('#toast button', { timeout: 3000 }).catch(() => {}); await page.waitForTimeout(250);
+  check('التنبيه العابر يسكن البطاقة المفتوحة: زر «تراجع» فيه ظاهر فوقها ويعمل', ts.host === 'sheet' && ts.hit && ts.s === 'play' && await page.evaluate(() => !JSON.parse(localStorage.getItem('gamesg.progress')).games[19560]), ts);
+  // حذف إحداهما ينهي المراجعة، والتراجع يعيد التنبيه
+  await page.click('#sheet .rm-b'); await page.click('#sheet [data-act=rm-go]'); await page.waitForFunction(() => !document.getElementById('g-19560')); await page.waitForTimeout(450);
+  const d1 = await note(page, '#dupbar'), d1x = await page.evaluate(() => ({ top: document.getElementById('dup').hidden, toast: document.getElementById('toast').textContent, host: document.getElementById('toast').parentNode.tagName }));
+  check('حذف إحداهما ينهي المراجعة: الشبكة تعود إلى قائمتك، والتنبيه التالي (نسختان من لعبة واحدة، كل اسم في سطره بسنته، بلا الريميك) يُسأل عنه فوق الشبكة',
+    await ids(page) === '119133' && d1 && d1.h === 'في مكتبتك نسختان من لعبة واحدة' && d1.names.join('|') === 'The Last of Us (2013)|The Last of Us Remastered (2014)' && !/وبعده/.test(d1.q) && d1x.top && /حُذفت «God of War»/.test(d1x.toast) && d1x.host === 'BODY', { d1, d1x, ids: await ids(page) });
+  await page.click('#toast button'); await page.waitForFunction(() => !!document.getElementById('g-19560')); await page.waitForTimeout(300);
+  const d2 = await note(page, '#dupbar');
+  check('التراجع عن الحذف يعيد اللعبة والتنبيه عنهما', asked.includes('add:19560') && d2?.h === 'في مكتبتك لعبتان بالاسم نفسه' && d2.name === 'God of War (2005 و2018)' && /وبعده تنبيه آخر/.test(d2.q), d2);
+  // «لا»: يُسكت ويُحفظ، مع تراجع، ولا يعود بعد التحديث
+  await page.click('#dupbar [data-act=dup-no]'); await page.waitForTimeout(250);
+  const no1 = { dups: await dups(page), toast: await page.textContent('#toast'), next: (await note(page, '#dupbar'))?.h };
+  check('«لا» يُسكت التنبيه عنهما ويحفظه في السجل، ويقول إنه لن يظهر ثانية مع «تراجع»، ويأتي التنبيه التالي', no1.dups['549-19560'] === 1 && /لن يظهر التنبيه عنهما ثانية/.test(no1.toast) && /تراجع/.test(no1.toast) && no1.next === 'في مكتبتك نسختان من لعبة واحدة', no1);
+  await page.click('#toast button'); await page.waitForTimeout(250);
+  check('«تراجع» يعيد التنبيه كما كان', !(await dups(page))['549-19560'] && (await note(page, '#dupbar'))?.name === 'God of War (2005 و2018)');
+  await page.click('#dupbar [data-act=dup-no]'); await page.waitForTimeout(200); await page.reload(); await page.waitForSelector('#grid .gc:not([hidden])'); await page.waitForTimeout(400);
+  const rl = await note(page, '#dup');
+  check('بعد التحديث: ما أُسكت لا يعود، والتنبيه الباقي وحده فوق القائمة الرئيسية', rl?.h === 'في مكتبتك نسختان من لعبة واحدة' && !/وبعده/.test(rl.q) && await page.evaluate(() => document.getElementById('dupbar').hidden), rl);
+  await page.evaluate(() => document.querySelector('#mm-menu [data-v=all]').click()); await page.click('#g-549 .cover'); await page.waitForSelector('#sheet[open] .save'); await page.waitForTimeout(250);
+  check('وما أُسكت لا يُذكر في بطاقتيهما', await page.evaluate(() => !document.querySelector('#sheet .twin')));
+  await page.keyboard.press('Escape'); await page.waitForTimeout(350);
+  // مراجعة النسختين: الرجوع بلا قرار، والخروج باختيار قائمة، ثم «أبقِهما معاً»
+  await page.click('#dup [data-act=dup-go]'); await inView(page);
+  const e1 = await ids(page); await page.click('#dupbar [data-act=dup-back]'); await page.waitForTimeout(200);
+  const e2 = { n: (await shown(page)).length, ask: (await note(page, '#dupbar'))?.btns.join('|'), top: await page.evaluate(() => document.getElementById('dup').hidden) };
+  check('مراجعة النسختين تعرضهما وحدهما، و«رجوع إلى قائمتي» يعيد القائمة ويبقي السؤال فوق الشبكة بلا قرار', e1 === '1009,6036' && e2.n === 14 && e2.ask === 'نعم، اعرضهما|لا، أبقِهما' && e2.top, { e1, e2 });
+  await page.click('#dupbar [data-act=dup-go]'); await page.waitForTimeout(250); await page.evaluate(() => document.querySelector('#mm-menu [data-v=done]').click()); await page.waitForTimeout(250);
+  check('اختيار قائمة أثناء المراجعة يخرج منها إلى تلك القائمة', await ids(page) === '549,1020,14593,112875' && (await note(page, '#dupbar'))?.btns[0] === 'نعم، اعرضهما', await ids(page));
+  await page.click('#dupbar [data-act=dup-go]'); await page.waitForTimeout(250); await page.click('#dupbar [data-act=dup-no]'); await page.waitForTimeout(300);
+  const e3 = await page.evaluate(() => ({ top: document.getElementById('dup').hidden, bar: document.getElementById('dupbar').hidden, dups: JSON.parse(localStorage.getItem('gamesg.progress')).dups, n: [...document.querySelectorAll('#grid .gc')].filter(e => !e.hidden).length }));
+  check('«أبقِهما معاً» في المراجعة يُسكت التنبيه وينهيها، ولا يبقى تنبيه', e3.top && e3.bar && e3.dups['1009-6036'] === 1 && e3.dups['549-19560'] === 1 && e3.n === 4, e3);
+  // «أضف لعبة»: التنبيه قبل الإضافة، ولحظتها في بطاقة المضافة، وبعدها في الصفحة
+  await page.click('.top [data-act=add]'); await page.waitForSelector('#add[open]'); await page.fill('#add-q', 'elden ring'); await page.press('#add-q', 'Enter'); await page.waitForSelector('#cands .cand');
+  const cd = await page.evaluate(() => [...document.querySelectorAll('#cands .cand')].map(c => ({ tw: c.querySelector('small.tw')?.textContent || '', has: c.querySelector('.cbtns small')?.textContent || '', add: !!c.querySelector('[data-act=add-pick]') })));
+  check('«أضف لعبة»: مرشحة ليست في القائمة وفيها لعبة بالاسم نفسه يُنبَّه عنها قبل الإضافة (وتبقى إضافتها ممكنة)، والتي في القائمة «في قائمتك» بلا تنبيه', cd[0].tw === 'في مكتبتك لعبة بهذا الاسم (2022)' && cd[0].add && cd[1].has === 'في قائمتك' && !cd[1].tw, cd);
+  await page.click('#cands .cand:first-child [data-act=add-pick]'); await page.click('#cands .pickl [data-v=new]'); await page.waitForSelector('#sheet[open] .twin'); await page.waitForTimeout(600);
+  const ad = { t: await twin(), toast: await page.evaluate(() => { const t = document.getElementById('toast'), r = t.getBoundingClientRect(); return { text: t.textContent, host: t.parentNode.id, on: getComputedStyle(t).opacity === '1' && r.width > 100, low: Math.abs(innerHeight - r.bottom - 18) < 2 }; }), title: await page.textContent('#sheet h2') };
+  check('لحظة الإضافة: بطاقة المضافة تُفتح وفي أعلاها توأمها بما سُجّل له، و«أُضيفت…» ظاهر فوق البطاقة لا تحتها',
+    ad.title === 'Elden Ring' && ad.t?.head === 'في مكتبتك لعبة أخرى بالاسم نفسه' && ad.t.rows[0].join('~') === '119133~Elden Ring~2022|PC|في «متابعة»|80 ساعة~افتح بطاقتها' && /أُضيفت «Elden Ring»/.test(ad.toast.text) && ad.toast.host === 'sheet' && ad.toast.on && ad.toast.low, ad);
+  await page.keyboard.press('Escape'); await page.waitForTimeout(400);
+  const ad2 = await note(page, '#dupbar');
+  check('وبعد إغلاقها: التنبيه عن المضافة وتوأمها في الصفحة', ad2?.h === 'في مكتبتك لعبتان بالاسم نفسه' && ad2.name === 'Elden Ring (2022 و2025)', ad2);
+  // إسكات ثم حذف ثم إضافة من جديد: المكرر جديد فيُنبَّه عنه، والمضافة تبقى بعد التحديث
+  await page.click('#dupbar [data-act=dup-no]'); await page.waitForTimeout(200); const k1 = (await dups(page))['119133-555123'];
+  await page.evaluate(() => document.querySelector('#mm-menu [data-v=all]').click()); await page.click('#g-555123 .qm-b'); await page.click('#qm [data-act=qm-rm]'); await page.click('#qm [data-act=rm-go]'); await page.waitForFunction(() => !document.getElementById('g-555123')); await page.waitForTimeout(300);
+  await page.click('.top [data-act=add]'); await page.waitForSelector('#add[open]'); await page.fill('#add-q', 'elden ring'); await page.press('#add-q', 'Enter'); await page.waitForSelector('#cands .cand [data-act=add-pick]');
+  await page.click('#cands .cand:first-child [data-act=add-pick]'); await page.click('#cands .pickl [data-v=new]'); await page.waitForSelector('#sheet[open] .twin'); await page.waitForTimeout(300);
+  const rn = { k1, dups: await dups(page), rm: await page.evaluate(() => localStorage.getItem('gamesg.removed')), adds: asked.filter(a => a === 'add:555123').length };
+  await page.keyboard.press('Escape'); await page.waitForTimeout(350); await page.reload(); await page.waitForSelector('#grid .gc:not([hidden])'); await page.waitForTimeout(400);
+  const rn2 = { card: await page.evaluate(() => !!document.getElementById('g-555123')), n: await note(page, '#dup') };
+  check('لعبة أُسكت تنبيهها ثم حُذفت ثم أُضيفت من جديد: الإسكات القديم لا يسري عليها فيعود التنبيه، وتبقى ظاهرة بعد التحديث (لا يخفيها حذفها السابق)',
+    rn.k1 === 1 && !rn.dups['119133-555123'] && rn.dups['549-19560'] === 1 && rn.adds === 2 && !/555123/.test(rn.rm || '') && rn2.card && rn2.n?.name === 'Elden Ring (2022 و2025)', { rn, rn2 });
+  // بطاقة الاطلاع وصندوق الأسئلة: ما في المكتبة بهذا الاسم يُذكر قبل الإضافة
+  await page.goto(`${base}/games/#g112875`); await page.waitForSelector('#sheet[open] .order:not([hidden])'); await page.click('#sheet .order[data-ov=release] li:nth-child(2) .go'); await page.waitForSelector('#sheet .save.pv');
+  const pv = await twin();
+  check('بطاقة الاطلاع للعبة ليست في القائمة: «في مكتبتك لعبتان بهذا الاسم» بصفّيهما، وبلا زر إسكات', pv?.pv && pv.head === 'في مكتبتك لعبتان بهذا الاسم' && pv.rows.map(r => r[0]).join() === '549,19560' && !pv.no && pv.first, pv);
+  await page.keyboard.press('Escape'); await page.waitForTimeout(350);
+  await page.evaluate(() => localStorage.setItem('gamesg.steam', '76561198000000001')); await page.click('.top [data-act=accounts]'); await page.waitForSelector('#acc[open] [data-act=pull][data-src=steam]'); await page.click('#acc [data-act=pull][data-src=steam]'); await page.waitForSelector('#inbox[open] .ib-card.top');
+  const ibh = await page.evaluate(() => ({ t: document.querySelector('.ib-card.top h3').textContent, tw: document.querySelector('.ib-card.top .hints .tw')?.textContent || '' }));
+  check('صندوق الأسئلة: لعبة مسحوبة وفي المكتبة لعبة باسمها تُعلَّم بذلك قبل أن تُضاف', ibh.t === 'Minecraft' && ibh.tw === 'في مكتبتك لعبة بهذا الاسم (2011)', ibh);
+  await page.click('#inbox [data-act=ib-close]'); await page.waitForTimeout(200);
+  check('duplicates: بلا أخطاء برمجية', !errs.length, errs);
+  await ctx.close();
+  // الجوال: التنبيه داخل الشاشة وأزراره بحجم اللمس، والمراجعة تظهر تحت الشريط الثابت
+  const m = await open(369, 905, true); await routes(m.page);
+  await m.page.goto(`${base}/games/`); await m.page.waitForSelector('#grid .gc:not([hidden])'); await m.page.waitForTimeout(400);
+  const mb = await m.page.evaluate(() => { const d = document.querySelector('#dup .dup').getBoundingClientRect(); return { sw: document.documentElement.scrollWidth, iw: innerWidth, fits: d.left >= 0 && d.right <= innerWidth, top: d.top < innerHeight, tap: [...document.querySelectorAll('#dup .btn')].every(b => b.getBoundingClientRect().height >= 44 && b.getBoundingClientRect().width >= 90), over: document.querySelector('#dup .dup').scrollWidth <= document.querySelector('#dup .dup').clientWidth + 1 }; });
+  check('الجوال: التنبيه داخل الشاشة بلا تمدد أفقي، ظاهر عند الفتح، وزراه بحجم اللمس', mb.sw <= mb.iw && mb.fits && mb.top && mb.tap && mb.over, mb);
+  await m.page.tap('#dup [data-act=dup-go]'); const mv = await inView(m.page);
+  const mr = await m.page.evaluate(() => { const bar = document.querySelector('.bar').getBoundingClientRect(), d = document.getElementById('dupbar').getBoundingClientRect(), c = document.getElementById('g-549').getBoundingClientRect(); return { under: d.top >= bar.bottom - 1, card: c.top < innerHeight, n: [...document.querySelectorAll('#grid .gc')].filter(e => !e.hidden).length, sw: document.documentElement.scrollWidth <= innerWidth, tap: [...document.querySelectorAll('#dupbar .btn')].every(b => b.getBoundingClientRect().height >= 44) }; });
+  check('الجوال: «نعم» ينزل إلى شريط المراجعة تحت الشريط الثابت لا خلفه، واللعبتان ظاهرتان تحته', mv && mr.under && mr.card && mr.n === 2 && mr.sw && mr.tap, { mr, mv });
+  await m.page.tap('#g-549 .cover'); await m.page.waitForSelector('#sheet[open] .twin'); await m.page.waitForTimeout(350);
+  const ms = await m.page.evaluate(() => { const t = document.querySelector('#sheet .twin'), r = t.getBoundingClientRect(), b = document.getElementById('sheet-body'); return { seen: r.top < innerHeight, fits: r.left >= 0 && r.right <= innerWidth && b.scrollWidth <= b.clientWidth + 1, tap: t.querySelector('.twin-g').getBoundingClientRect().height >= 44 && t.querySelector('.twin-no').getBoundingClientRect().height >= 40 }; });
+  check('الجوال: توأمها ظاهر في بطاقتها عند فتحها بلا تمرير ولا تمدد، وأزراره بحجم اللمس', ms.seen && ms.fits && ms.tap, ms);
+  check('duplicates (cover): بلا أخطاء برمجية', !m.errs.length, m.errs);
+  await m.ctx.close(); }
 
 // ---------- تقليل الحركة
 { console.log('== reduced-motion');

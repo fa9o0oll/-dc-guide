@@ -4,6 +4,7 @@
 import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright');
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
+import { fixture } from './fixtures/games.mjs';
 const siteDir = path.resolve(new URL('../site', import.meta.url).pathname), shots = process.argv[2];
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json' };
 const site = http.createServer((q, r) => { const f = path.join(siteDir, decodeURIComponent(q.url.split('?')[0]).replace(/\/$/, '/index.html'));
@@ -150,6 +151,30 @@ await B.tap('#toast button'); // تراجع عن تعليم الفيلم
 await A.page.waitForFunction(() => !/شاهدت/.test(document.querySelector('.door.films [data-stat]')?.textContent || 'شاهدت'));
 check('التراجع على الجوال يحدّث عدّاد الباب على الكمبيوتر حيّاً', true);
 await A.open('/films/'); check('صفحة الأفلام على الكمبيوتر تفتح بلا أخطاء والمزامنة تعمل', (await A.page.textContent('.foot [data-sync-label]')).includes('تعمل'));
+
+console.log('\n== الألعاب: إسكات تنبيه المكرر وحالة اللعبة يصلان الجهاز الآخر');
+// قائمة فيها لعبتان بالاسم نفسه (Minecraft وسجل آخر لها): «لا» على جهاز يُسكت التنبيه على الجهازين (علامة k في القاعدة)
+const GX = fixture(); GX.games.push({ ...GX.games.find(g => g.id === 11208), id: 880001, slug: 'minecraft-ps4', plats: ['ps4'], date: '2014-09-04', year: 2014, type: 'port', cover: 'c880001', ord: 20 });
+for (const d of [A, B]) await d.ctx.route('**/games/data/games.json*', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(GX) }));
+const KD = 'k|11208-880001', goGames = async d => { await d.page.goto(base + '/games/'); await d.page.waitForSelector('#grid .gc'); };
+await goGames(A); await A.page.waitForSelector('#dup .dup');
+check('صفحة الألعاب: تنبيه «لعبتان بالاسم نفسه» ظاهر، والمزامنة تعمل', (await A.page.textContent('#dup h2')) === 'في مكتبتك لعبتان بالاسم نفسه' && (await A.page.textContent('.foot [data-sync-label]')).includes('تعمل'));
+await A.tap('#dup [data-act=dup-no]'); await new Promise(r => setTimeout(r, 400));
+check('«لا» على الكمبيوتر: الإسكات يُكتب في القاعدة علامةً مستقلة', tree[R + '/games']?.[KD]?.v === 1 && (await A.local('gamesg.progress')).dups?.['11208-880001'] === 1 && await A.page.isHidden('#dup'));
+tree[R + '/games']['k|not-a-key'] = { v: 1, t: ++clock }; tree[R + '/games']['k|12'] = { v: 1, t: ++clock }; // قيم ليست مفاتيح مجموعات: تُهمل
+await goGames(B);
+await B.page.waitForFunction(() => document.getElementById('dup').hidden && JSON.parse(localStorage.getItem('gamesg.progress') || '{}').dups?.['11208-880001'] === 1, null, { timeout: 8000 }).catch(() => {});
+const bd = await B.local('gamesg.progress');
+check('الجوال يفتح الصفحة فلا يُسأل عمّا أُسكت على الكمبيوتر، وما ليس مفتاح مجموعة في القاعدة لا يدخل سجله', await B.page.isHidden('#dup') && await B.page.isHidden('#dupbar') && JSON.stringify(bd?.dups) === '{"11208-880001":1}', JSON.stringify(bd?.dups));
+await B.tap('#g-11208 .qm-b'); await B.tap('#qm [data-v=done]');
+await A.page.waitForFunction(() => document.querySelector('#g-11208 .badge b')?.textContent === 'ختمتها', null, { timeout: 8000 }).catch(() => {});
+check('لعبة خُتمت على الجوال تظهر مختومة على الكمبيوتر حيّاً', tree[R + '/games']?.['g|11208']?.v === 'done' && (await A.local('gamesg.progress')).games?.[11208]?.s === 'done' && (await A.page.textContent('#g-11208 .badge b').catch(() => '')) === 'ختمتها');
+// التراجع عن الإسكات (v:0 في القاعدة) يعيد التنبيه على الجهاز الآخر
+await A.page.evaluate(() => { const t = document.querySelector('#toast button'); if (t) t.click(); });
+const undone = (await A.local('gamesg.progress')).dups?.['11208-880001'] !== 1;
+if (!undone) { await A.page.reload(); await A.page.waitForSelector('#grid .gc'); await A.page.evaluate(() => { const P = JSON.parse(localStorage.getItem('gamesg.progress')); delete P.dups['11208-880001']; localStorage.setItem('gamesg.progress', JSON.stringify(P)); }); await A.page.reload(); await A.page.waitForSelector('#grid .gc'); }
+await B.page.waitForFunction(() => !document.getElementById('dup').hidden || !document.getElementById('dupbar').hidden, null, { timeout: 8000 }).catch(() => {});
+check('إلغاء الإسكات على جهاز يعيد التنبيه على الآخر', tree[R + '/games']?.[KD]?.v === 0 && !(await B.local('gamesg.progress')).dups?.['11208-880001'] && (await B.page.isVisible('#dup .dup') || await B.page.isVisible('#dupbar .dup')));
 
 console.log('\n== الأعطال والإيقاف');
 const C = await device('جهاز ثالث', { width: 390, height: 844 }, true); deny = true;

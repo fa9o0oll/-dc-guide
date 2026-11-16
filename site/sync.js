@@ -8,6 +8,7 @@
 //   وبه نعرف ما تغيّر محلياً ولم يُرسل بعد، حتى لو تغيّر والمزامنة متوقفة أو الصفحة مغلقة.
 // - كل صفحة تزامن الأدلة كلها معاً، فالواجهة الرئيسية وكل دليل يقرآن سجلاً محدَّثاً دائماً.
 // - الألعاب: لكل لعبة أربع علامات مستقلة: قائمتها g، والمنصة التي خُتمت عليها n، وتاريخ الختم d، والساعات h.
+//   ومعها علامة k لكل تنبيه «لعبتان مكررتان» أسكته صاحبه (مفتاحها أرقام ألعاب المجموعة مرتبة)، فلا يعود التنبيه على جهاز آخر.
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-', CFG = 'guides.fb', META = 'guides.sync', LEGACY = 'guides';
 const GUIDES = { dc: 'dcg.progress', fate: 'fateg.progress', films: 'filmsg.progress', games: 'gamesg.progress' };
 const OK = { w: ['watched', 'watching', 'list', 'skip'], f: ['watched', 'next'], g: ['play', 'new', 'done', 'seen'] };
@@ -24,18 +25,20 @@ const json = (k, d) => { try { return JSON.parse(ls.get(k)) ?? d; } catch { retu
 const blank = id => id === 'films' ? { films: {} } : id === 'games' ? { games: {} } : { v: 1, works: {}, eps: {}, shield: true };
 function flat(id, s) { const o = {};
   if (id === 'films') { for (const [k, v] of Object.entries(s.films || {})) if (v) o['f|' + k] = v; return o; }
-  if (id === 'games') { for (const [k, g] of Object.entries(s.games || {})) for (const [p, f] of Object.entries(GAME)) if (g?.[f] != null && g[f] !== '') o[`${p}|${k}`] = String(g[f]); return o; }
+  if (id === 'games') { for (const [k, g] of Object.entries(s.games || {})) for (const [p, f] of Object.entries(GAME)) if (g?.[f] != null && g[f] !== '') o[`${p}|${k}`] = String(g[f]);
+    for (const [k, v] of Object.entries(s.dups || {})) if (v) o['k|' + k] = 1; return o; }
   for (const [k, v] of Object.entries(s.works || {})) if (v) o['w|' + k] = v;
   for (const [w, eps] of Object.entries(s.eps || {})) for (const e of Object.keys(eps || {})) o[`e|${w}|${e}`] = 1;
   return o; }
 function put(s, p, v) { const [k, a, b] = p.split('|');
   if (k === 'f') { s.films ||= {}; if (v) s.films[a] = v; else delete s.films[a]; }
   else if (GAME[k]) { s.games ||= {}; const g = s.games[a] ||= {}; if (v) g[GAME[k]] = k === 'h' ? +v : v; else delete g[GAME[k]]; if (!Object.keys(g).length) delete s.games[a]; }
+  else if (k === 'k') { s.dups ||= {}; if (v) s.dups[a] = 1; else delete s.dups[a]; }
   else if (k === 'w') { s.works ||= {}; if (v) s.works[a] = v; else delete s.works[a]; }
   else if (k === 'e') { s.eps ||= {}; if (v) (s.eps[a] ||= {})[b] = 1; else if (s.eps[a]) { delete s.eps[a][b]; if (!Object.keys(s.eps[a]).length) delete s.eps[a]; } } }
 // ما يأتي من القاعدة بيانات لا أكثر: لا نقبل إلا القيم المعروفة، وما عداها يُعامل كأنه إلغاء
-const clean = (p, v) => p[0] === 'e' ? (v ? 1 : undefined) : FORM[p[0]] ? (FORM[p[0]].test(String(v)) ? String(v) : undefined) : OK[p[0]]?.includes(v) ? v : undefined;
-const valid = p => /^([fwgndh]\|[^|]+|e\|[^|]+\|\d+-\d+)$/.test(p);
+const clean = (p, v) => p[0] === 'e' || p[0] === 'k' ? (v ? 1 : undefined) : FORM[p[0]] ? (FORM[p[0]].test(String(v)) ? String(v) : undefined) : OK[p[0]]?.includes(v) ? v : undefined;
+const valid = p => /^([fwgndh]\|[^|]+|k\|\d{1,9}(-\d{1,9}){1,15}|e\|[^|]+\|\d+-\d+)$/.test(p);
 // مفاتيح Firebase لا تقبل . # $ [ ] /
 const enc = p => p.replace(/[.#$\[\]\/%]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
 const dec = k => k.replace(/%([0-9A-F]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
