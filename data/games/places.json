@@ -127,8 +127,9 @@
  "1968": {
   "k": "sequel",
   "after": "Rayman Origins",
-  "line": "تكملة Rayman Origins: «رايمان» ورفاقه يستيقظون من سبات دام قرناً، وقد تكاثرت الكوابيس في «فسحة الأحلام».",
-  "where": "«فسحة الأحلام»"
+  "line": "تكملة Rayman Origins بعد قرن: «رايمان» ورفاقه يستيقظون من سبات طويل، وقد ازدادت كوابيس «حالم الفقاعات» قوة.",
+  "when": "بعد قرن من Rayman Origins",
+  "src": "igdb"
  },
  "2003": {
   "k": "prequel",
@@ -141,6 +142,7 @@
  "2112": {
   "k": "reboot",
   "line": "بداية جديدة: تعيد حكاية «فيث» من أولها وتستكشف ماضيها، ولا تحتاج Mirror's Edge الأولى.",
+  "where": "مدينة «غلاس»",
   "src": "igdb"
  },
  "2118": {
@@ -227,7 +229,8 @@
   "k": "between",
   "after": "Street Fighter II",
   "before": "Street Fighter V",
-  "line": "النسخة الأخيرة من Street Fighter IV، وأحداثها بين Street Fighter II وStreet Fighter V، قبل الجزء الثالث بزمن."
+  "line": "النسخة الأخيرة من Street Fighter IV، وأحداثها بعد Street Fighter II بأشهر، وقبل Street Fighter V والجزء الثالث.",
+  "when": "بعد أشهر من Street Fighter II"
  },
  "6705": {
   "k": "alone",
