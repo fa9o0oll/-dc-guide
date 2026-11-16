@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 export const textKey = (s, t) => createHash('sha1').update(String(s || '').trim() + '\n' + String(t || '').trim()).digest('hex').slice(0, 8);
 
 // أنواع الموقع من الأحداث. none: لا موقع يُذكر (لعبة بلا حكاية ولا عالم متصل)، فلا يظهر القسم في بطاقتها
-export const KINDS = ['first', 'sequel', 'prequel', 'between', 'side', 'alone', 'reboot', 'remake', 'same', 'alt', 'retell', 'nostory', 'bundle', 'none'];
+export const KINDS = ['first', 'sequel', 'prequel', 'between', 'parallel', 'side', 'alone', 'reboot', 'remake', 'same', 'alt', 'retell', 'nostory', 'bundle', 'none'];
 
 const AR = /[؀-ۿ]/, arShare = s => { const letters = s.replace(/[^A-Za-z؀-ۿ]/g, ''); return letters ? letters.replace(/[^؀-ۿ]/g, '').length / letters.length : 0; };
 

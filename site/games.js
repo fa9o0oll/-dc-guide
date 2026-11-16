@@ -321,14 +321,15 @@ let TXP = null; const texts = () => TXP ??= get('texts.json').then(j => j.texts 
 const askedMap = () => { try { const m = JSON.parse(store.get(ASK) || '{}'); return m && typeof m === 'object' ? m : {}; } catch { return {}; } };
 const paras = (s, f) => String(s || '').split(/\n\s*\n/).map(x => x.trim()).filter(Boolean).map(f).join('');
 const enP = x => paras(x, p => `<p dir="ltr" lang="en" class="en">${esc(p)}</p>`), arP = x => paras(x, p => `<p class="ar-t">${ar(p)}</p>`);
-const trBox = id => askedMap()[id] ? `<p class="tr-ok">${ic('check')}<span>وصل طلب ترجمتها. تُترجم مع أول مرور للمترجم، وتظهر هنا بالعربية.</span></p>`
-  : `<button type="button" class="btn sec" data-act="tr-ask">${ic('globe')}ترجمها لي</button><p class="note">نبذتها بالإنجليزية كما في <bdi dir="ltr">IGDB</bdi>، ولم تُترجم بعد.</p>`;
+// part: نبذتها مترجمة وبقيت قصتها (IGDB أضاف القصة بعد ترجمة النبذة مثلاً)، فالزر والملاحظة يقولان ما بقي بعينه
+const trBox = (id, part) => askedMap()[id] ? `<p class="tr-ok">${ic('check')}<span>وصل طلب ترجمتها. تُترجم مع أول مرور للمترجم، وتظهر هنا بالعربية.</span></p>`
+  : `<button type="button" class="btn sec" data-act="tr-ask">${ic('globe')}${part ? 'ترجم لي قصتها' : 'ترجمها لي'}</button><p class="note">${part ? 'نبذتها مترجمة، وقصتها ما زالت بالإنجليزية كما في <bdi dir="ltr">IGDB</bdi>.' : 'نبذتها بالإنجليزية كما في <bdi dir="ltr">IGDB</bdi>، ولم تُترجم بعد.'}</p>`;
 function aboutSec(g, T, pv) { const s = T.s || g.summary || '', t = T.t || g.story || '', sa = T.sa || '', ta = T.ta || ''; if (!s && !t) return '';
   const full = (sa || !s) && (ta || !t); if (full && askedMap()[g.id]) { const m = askedMap(); delete m[g.id]; store.set(ASK, JSON.stringify(m)); }
   const body = `${sa ? arP(sa) : enP(s)}${t ? `<details class="more-t"><summary>القصة</summary>${ta ? arP(ta) : enP(t)}</details>` : ''}`;
   const foot = pv ? `<p class="note">النبذة من <bdi dir="ltr">IGDB</bdi> بالإنجليزية كما هي.</p>`
     : full ? `<details class="orig"><summary>النص الأصلي بالإنجليزية</summary>${enP(s)}${t ? `<p class="kh">القصة</p>${enP(t)}` : ''}</details><p class="note">ترجمتنا عن نبذتها في <bdi dir="ltr">IGDB</bdi>.</p>`
-    : `<div class="tr" data-id="${g.id}" data-t="${esc(g.title)}">${trBox(g.id)}</div>`;
+    : `<div class="tr" data-id="${g.id}" data-t="${esc(g.title)}">${trBox(g.id, !!(sa || ta))}</div>`;
   return `<section class="sec about"><h3>عن اللعبة</h3>${body}${foot}</section>`; }
 async function askTr(btn) { const box = btn.closest('.tr'), id = +box.dataset.id, pw = box.querySelector('.tr-pass')?.value || pass(), label = btn.innerHTML;
   if (!pw) { if (!box.querySelector('.tr-pass')) { box.innerHTML = `<label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة»)<input class="tr-pass" type="password" autocomplete="current-password"></label><button type="button" class="btn sec" data-act="tr-ask">${ic('globe')}ترجمها لي</button><p class="msg" aria-live="polite"></p>`; }
@@ -340,7 +341,7 @@ async function askTr(btn) { const box = btn.closest('.tr'), id = +box.dataset.id
 
 // ---------- موقع اللعبة من أحداث عالمها (data/games/places.json، مكتوب لكل لعبة): نوعه بلونه، وجملته، ومسار «قبلها ← هذه اللعبة ← بعدها» كمسار
 // مراحل (ما كان منها في سلسلتها يُفتح بلمسة)، وزمن الأحداث ومكانها
-const PK = { first: 'بداية الحكاية', sequel: 'تكملة', prequel: 'قبل الأحداث', between: 'بين جزأين', side: 'قصة جانبية', alone: 'قصة مستقلة', reboot: 'بداية جديدة', remake: 'إعادة صنع',
+const PK = { first: 'بداية الحكاية', sequel: 'تكملة', prequel: 'قبل الأحداث', between: 'بين جزأين', parallel: 'أحداث متزامنة', side: 'قصة جانبية', alone: 'قصة مستقلة', reboot: 'بداية جديدة', remake: 'إعادة صنع',
   same: 'الأحداث نفسها', alt: 'عالم بديل', retell: 'تروي الأصل', nostory: 'بلا حكاية متصلة', bundle: 'مجموعة أجزاء' };
 const sameTitle = (a, b) => fold(a) === fold(b);
 function placeSec(g) { const p = g.place; if (!p || !PK[p.k]) return '';

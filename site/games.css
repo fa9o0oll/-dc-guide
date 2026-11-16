@@ -293,7 +293,7 @@ section.sec{padding:22px clamp(14px,3vw,30px) 0}
 .tr-ok{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:9px;background:color-mix(in srgb,var(--ok) 10%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 35%,transparent);color:var(--ink);font-size:.9rem;line-height:1.6}
 .tr-ok .ic{flex:none;width:18px;height:18px;margin-top:3px;color:var(--ok)}
 /* موقعها من أحداث عالمها: لون لكل نوع، وعقدة «بكسل»، ومسار مراحل منقّط: قبلها ← هذه اللعبة ← بعدها */
-.place{--pc:var(--cy)}.place.k-prequel,.place.k-first{--pc:var(--au)}.place.k-side,.place.k-alt,.place.k-between{--pc:var(--vi)}.place.k-alone,.place.k-nostory,.place.k-bundle{--pc:var(--ok)}.place.k-reboot,.place.k-remake,.place.k-same,.place.k-retell{--pc:var(--co)}
+.place{--pc:var(--cy)}.place.k-prequel,.place.k-first{--pc:var(--au)}.place.k-side,.place.k-alt,.place.k-between,.place.k-parallel{--pc:var(--vi)}.place.k-alone,.place.k-nostory,.place.k-bundle{--pc:var(--ok)}.place.k-reboot,.place.k-remake,.place.k-same,.place.k-retell{--pc:var(--co)}
 .pl-card{padding:14px 16px 12px;border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--pc) 9%,var(--card)),var(--card) 70%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 30%,var(--line))}
 .pl-k{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:1.6rem;line-height:1;color:var(--pc)}
 .pl-k i{flex:none;width:12px;height:12px;background:var(--pc);box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 25%,transparent),0 0 14px color-mix(in srgb,var(--pc) 70%,transparent)}

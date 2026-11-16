@@ -278,6 +278,12 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   // لعبة نصها في سجلها (بلا ملف نصوص): تُعرض منه
   await page.goto(`${base}/games/#g11208`); await page.waitForSelector('#sheet[open]'); await page.waitForTimeout(300);
   check('لعبة نبذتها في سجلها لا في ملف النصوص (أُضيفت للتو) تُعرض منه مع زر الترجمة', await page.evaluate(() => { const a = document.querySelector('#sheet .about'); return !a || (!!a.querySelector('p.en') && !!a.querySelector('[data-act=tr-ask]')); }));
+  // نبذة مترجمة وقصة لم تُترجم بعد: النبذة بالعربية والقصة بالإنجليزية، والزر يطلب القصة بعينها
+  const taWas = TX[112875].ta; delete TX[112875].ta;
+  await page.goto(`${base}/games/#g112875`); await page.reload(); await page.waitForSelector('#sheet[open] .about .tr');
+  const part = await page.evaluate(() => { const a = document.querySelector('#sheet .about'); return { ar: a.querySelectorAll(':scope > p.ar-t').length, story: a.querySelector('.more-t p.en')?.textContent, btn: a.querySelector('[data-act=tr-ask]')?.textContent.trim(), note: a.querySelector('.tr .note')?.textContent, orig: !!a.querySelector('.orig') }; });
+  check('نبذة مترجمة وقصة لم تُترجم: النبذة بالعربية والقصة بالإنجليزية، والزر «ترجم لي قصتها» والملاحظة تقول ما بقي', part.ar === 2 && part.story === 'Fimbulwinter is well underway.' && part.btn === 'ترجم لي قصتها' && /قصتها ما زالت بالإنجليزية/.test(part.note) && !part.orig, part);
+  TX[112875].ta = taWas;
   check('care: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
 

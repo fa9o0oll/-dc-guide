@@ -29,7 +29,7 @@ console.log('== الفحص');
   check('موقع: نوع غير معروف، وجملة غير عربية أو طويلة، و«between» بلا طرفيه، ومصدر بلا رابط https، و«none» بحقول: كلها مرفوضة',
     /نوع غير معروف/.test(bad({}, { 1: { k: 'next', line: 'س' } })) && /جملة عربية/.test(bad({}, { 1: { k: 'alone', line: 'standalone' } })) && /أطول من 260/.test(bad({}, { 1: { k: 'alone', line: 'س'.repeat(261) } }))
     && /between يلزمه/.test(bad({}, { 1: { k: 'between', after: 'A', line: 'س' } })) && /src/.test(bad({}, { 1: { k: 'alone', line: 'س', src: [{ name: 'x', url: 'http://x' }] } })) && /none لا يحمل/.test(bad({}, { 1: { k: 'none', line: 'س' } })));
-  check('الأنواع أربعة عشر، منها none', KINDS.length === 14 && KINDS.includes('none') && new Set(KINDS).size === 14); }
+  check('الأنواع خمسة عشر، منها none وparallel (أحداث متزامنة مع جزء آخر)', KINDS.length === 15 && KINDS.includes('none') && KINDS.includes('parallel') && new Set(KINDS).size === 15); }
 
 console.log('== الملفات الحقيقية');
 { const TR = rd('data/games/translations.json', null), PL = rd('data/games/places.json', null), cat = rd('site/games/data/games.json', { games: [] }), texts = rd('site/games/data/texts.json', { texts: null }).texts;
