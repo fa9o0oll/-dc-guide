@@ -96,9 +96,35 @@ bdi[dir=ltr]{direction:ltr;unicode-bidi:isolate}
   .mood{flex-direction:column;align-items:stretch;gap:6px}
 }
 
-/* قادم في سلاسلك */
+/* قادم في سلاسلك: مصغَّر إلى سطر واحد (عددها، وأقربها بعدّه) يفتحه زرّه ويصغّره، وشريطه تحته حين يُفتح. السطر كله زر */
 .soon{margin-top:22px}
-.soon h2{padding:0 var(--pad);font-family:var(--display);font-weight:600;font-size:1.55rem;color:var(--cy)}
+.soon.shut{margin-top:14px}
+.soon h2{padding:0 var(--pad)}
+.soon-b{display:flex;align-items:center;flex-wrap:wrap;gap:2px 12px;width:100%;min-height:52px;padding:4px 0;text-align:start}
+.soon.shut .soon-b{padding:6px 16px 6px 8px;border-radius:14px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+.sb-t{font-family:var(--display);font-weight:600;font-size:1.55rem;line-height:1.2;color:var(--cy)}
+.sb-n{flex:none;min-width:28px;padding:0 8px;border-radius:999px;background:color-mix(in srgb,var(--cy) 15%,transparent);color:#9cefff;font-family:var(--display);font-weight:600;font-size:1.1rem;line-height:1.45;text-align:center}
+.sb-near{flex:1 1 0;min-width:0;display:flex;align-items:baseline;gap:0 8px;overflow:hidden;color:var(--mute);font-size:.9rem;line-height:1.6;white-space:nowrap}
+.sb-near small{font-size:inherit}
+.sb-near b{min-width:0;overflow:hidden;text-overflow:ellipsis;color:var(--ink);font-weight:600}
+.sb-cd{flex:none;display:inline-flex;align-items:baseline;gap:6px;color:var(--dim)}
+.sb-cd .ck{display:inline-flex;align-items:baseline;gap:6px}
+.sb-cd .ck-d{display:inline-flex;align-items:baseline;gap:4px}
+.sb-cd .dg{font-family:var(--display);font-variation-settings:"ELSH" 8,"ELGR" 2;font-weight:600;font-size:1.3rem;line-height:1;color:var(--cy)}
+.sb-cd .ck-d i{font-style:normal;font-family:var(--display);font-size:1.05rem;color:#9cefff}
+.sb-cd .ck-t{font-family:var(--display);font-weight:600;color:var(--cy)}
+.sb-cd .ck-t u{text-decoration:none;color:#9cefff}
+.sb-cd .ck-d:not([hidden])+.ck-t{display:none}   /* الأيام تكفي ما بقي يوم فأكثر، وفي يومها الأخير تظهر الساعات */
+.sb-cd .ck-now{font-family:var(--display);font-weight:600;font-size:1.1rem;color:var(--cy)}
+.sb-cd:has(.ck-now) small{display:none}
+.sb-cd.tba{font-family:var(--display);font-weight:600;font-size:1.05rem;color:#9cefff}
+.sb-go{flex:none;margin-inline-start:auto;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;background:var(--card2);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink);font-size:.9rem;font-weight:600;transition:box-shadow .15s ease}
+.sb-go .ic{transition:rotate .2s var(--ease)}
+.soon-b[aria-expanded=true] .sb-go .ic{rotate:180deg}
+.soon-b[aria-expanded=true] .sb-near{display:none}
+.soon-b:active .sb-go{box-shadow:inset 0 0 0 1px var(--cy)}
+@media (hover:hover){.soon-b:hover .sb-go{box-shadow:inset 0 0 0 1px var(--cy)}}
+@media (max-width:640px){.sb-near{order:4;flex:1 1 100%;padding-bottom:4px}.sb-t{font-size:1.4rem}}
 .soon .part{width:150px}
 
 /* شريط التحكم */

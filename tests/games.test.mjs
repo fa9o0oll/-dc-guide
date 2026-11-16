@@ -5,6 +5,7 @@
 //   • النقل السريع بين القوائم (⋮) مع التراجع، والبحث المتسامح («ذا ويتشر»، «eldin ring») بـ«هل تقصد»
 //   • «أضف لعبة»: اقتراحات قبل Enter، ثم المرشحات، ثم اختيار القائمة والإضافة
 //   • «حساباتي»: ربط Steam من رجوع الدخول، وسحب الألعاب، وصندوق الأسئلة بالأزرار ولوحة المفاتيح، والحفظ بدفعة واحدة
+//   • «قادم في سلاسلك»: مصغَّر إلى سطر واحد، يُفتح ويُصغَّر بزرّه، والاختيار يُحفظ
 //   • المكرر: تنبيه «لعبتان بالاسم نفسه» و«نسختان من لعبة واحدة» بجوابيه، والمراجعة، والإسكات الدائم، والتوأم في البطاقة ولحظة الإضافة
 //   • الجوال (غطاء الفولد) بلا تمدد أفقي، وتقليل الحركة، وبلا أخطاء برمجية
 // NODE_PATH=$(npm root -g) node tests/games.test.mjs
@@ -100,6 +101,15 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   check('GTA VI (موعد محدد): عدّ تنازلي حي بأيامه وساعاته، ونص مقروء لقارئ الشاشة', c.gta && c.gta.dg === 4 && /^باقٍ \d+ يوماً/.test(c.gta.sr), c.gta);
   check('لعبة بلا غلاف: خرطوشة باسمها', c.cart);
   check('سطر العلبة: السنة وساعات لعبك', /2022/.test(c.meta) && /لعبتها 45 ساعة/.test(c.meta), c.meta);
+  // «قادم في سلاسلك»: مطويّ إلى سطر حتى يفتحه زرّه
+  const snap = () => page.evaluate(() => { const b = document.getElementById('soon-b'), s = document.getElementById('soon'), near = b.querySelector('.sb-near'); return { on: !s.hidden, exp: b.getAttribute('aria-expanded'), ctl: b.getAttribute('aria-controls'), reel: document.getElementById('soon-reel').hidden, parts: s.querySelectorAll('.part').length, imgs: s.querySelectorAll('img').length,
+    n: b.querySelector('.sb-n').textContent, near: near.querySelector('b').textContent, nearOn: near.getBoundingClientRect().width > 0, cd: !!b.querySelector('.sb-cd[data-until] .ck .dg'), sr: b.querySelector('.sb-cd .sr-time')?.textContent || '', go: b.querySelector('.sb-go').textContent.trim(), h: Math.round(s.getBoundingClientRect().height), shut: s.classList.contains('shut'), stored: localStorage.getItem('games.soon') }; });
+  const sn0 = await snap();
+  check('«قادم في سلاسلك» مطويّ عند الفتح إلى سطر واحد: عددها، وأقربها بعدّه الحي، وزر «افتحها»؛ وشريطه لا يُرسم ولا تُحمَّل أغلفته',
+    sn0.on && sn0.exp === 'false' && sn0.ctl === 'soon-reel' && sn0.reel && !sn0.parts && !sn0.imgs && sn0.n === '2' && sn0.near === 'Grand Theft Auto VI' && sn0.nearOn && sn0.cd && /^باقٍ /.test(sn0.sr) && sn0.go === 'افتحها' && sn0.h < 80 && sn0.shut, sn0);
+  await page.click('#soon-b'); await page.waitForTimeout(350);
+  const sn1 = await snap();
+  check('زرّه يفتحه: الشريط يظهر، وسطر «أقربها» يغيب، والزر يصير «صغّرها»، والاختيار يُحفظ على الجهاز', sn1.exp === 'true' && !sn1.reel && sn1.parts === 2 && !sn1.nearOn && sn1.go === 'صغّرها' && !sn1.shut && sn1.stored === 'open' && sn1.h > sn0.h + 150, sn1);
   const soon = await page.evaluate(() => ({ on: !document.getElementById('soon').hidden, items: [...document.querySelectorAll('#soon .part')].map(p => [p.querySelector(':scope>b').textContent, p.querySelector('.cd')?.dataset.until ? 'count' : p.querySelector('.cd.tba b')?.textContent, p.classList.contains('out')]) }));
   check('«قادم في سلاسلك»: GTA VI بعدّها (في قائمتك)، وSilksong من سلسلة Hollow Knight «الربع الأول» بلا عدّ (خارج قائمتك)',
     soon.on && soon.items.length === 2 && soon.items[0][0] === 'Grand Theft Auto VI' && soon.items[0][1] === 'count' && !soon.items[0][2] && soon.items[1][0] === 'Hollow Knight: Silksong' && /^الربع الأول من \d{4}$/.test(soon.items[1][1]) && soon.items[1][2], soon);
@@ -291,6 +301,31 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   TX[112875].ta = taWas;
   check('care: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
+
+// ---------- «قادم في سلاسلك»: يبقى كما تُرك (مفتوحاً أو مطوياً) بعد التحديث، ويعمل بلوحة المفاتيح، وعلى الجوال سطران بلا تمدد
+{ console.log('== soon drawer');
+  const st = page => page.evaluate(() => { const b = document.getElementById('soon-b'), s = document.getElementById('soon'), r = s.getBoundingClientRect(); return { exp: b.getAttribute('aria-expanded'), parts: s.querySelectorAll('.part').length, go: b.querySelector('.sb-go').textContent.trim(), stored: localStorage.getItem('games.soon'), h: Math.round(r.height), bh: Math.round(b.getBoundingClientRect().height), fits: r.left >= 0 && r.right <= innerWidth, sw: document.documentElement.scrollWidth <= innerWidth, grid: Math.round(document.getElementById('grid').getBoundingClientRect().top) }; });
+  const { ctx, page, errs } = await open(1440, 900, false); await page.goto(`${base}/games/`); await page.waitForSelector('#grid .gc:not([hidden])'); await page.waitForTimeout(300);
+  const a0 = await st(page); await page.focus('#soon-b'); await page.keyboard.press('Enter'); await page.waitForTimeout(350);
+  const a1 = await st(page), foc = await page.evaluate(() => document.activeElement?.id);
+  check('بلوحة المفاتيح: Enter على السطر يفتحه، والتركيز يبقى على الزر', a0.exp === 'false' && a1.exp === 'true' && a1.parts === 2 && foc === 'soon-b', { a0, a1, foc });
+  await page.reload(); await page.waitForSelector('#grid .gc:not([hidden])'); await page.waitForTimeout(300);
+  const a2 = await st(page);
+  check('بعد التحديث يبقى مفتوحاً كما تُرك', a2.exp === 'true' && a2.parts === 2 && a2.go === 'صغّرها' && a2.stored === 'open', a2);
+  await page.click('#soon-b'); await page.waitForTimeout(250); const a3 = await st(page);
+  await page.reload(); await page.waitForSelector('#grid .gc:not([hidden])'); await page.waitForTimeout(300);
+  const a4 = await st(page);
+  check('«صغّرها» يصغّره ويُحفظ، وبعد التحديث يبقى مصغَّراً والشبكة أقرب إلى أعلى الصفحة', a3.exp === 'false' && !a3.parts && a3.stored === 'shut' && a4.exp === 'false' && !a4.parts && a4.go === 'افتحها' && a4.grid < a2.grid - 150, { a3, a4, open: a2.grid });
+  // عدّ «أقربها» حيّ: يتغير مع الوقت كعدّ الشريط
+  const t0 = await page.evaluate(() => document.querySelector('#soon-b .sb-cd .ck').textContent); await page.waitForTimeout(2100);
+  const t1 = await page.evaluate(() => document.querySelector('#soon-b .sb-cd .ck').textContent);
+  check('عدّ «أقربها» في السطر المطويّ حيّ', t0 && t1 && t0 !== t1, { t0, t1 });
+  check('soon drawer: بلا أخطاء برمجية', !errs.length, errs); await ctx.close();
+  const m = await open(369, 905, true); await m.page.goto(`${base}/games/`); await m.page.waitForSelector('#grid .gc:not([hidden])'); await m.page.waitForTimeout(300);
+  const m0 = await st(m.page); await m.page.tap('#soon-b'); await m.page.waitForTimeout(350); const m1 = await st(m.page);
+  await m.page.tap('#soon-b'); await m.page.waitForTimeout(250); const m2 = await st(m.page);
+  check('الجوال: السطر المطويّ داخل الشاشة بلا تمدد، قصير، وكله زر بحجم اللمس؛ يُفتح ويُطوى باللمس', m0.exp === 'false' && m0.fits && m0.sw && m0.h <= 110 && m0.bh >= 48 && m1.exp === 'true' && m1.parts === 2 && m1.sw && m2.exp === 'false' && !m2.parts, { m0, m1, m2 });
+  check('soon drawer (cover): بلا أخطاء برمجية', !m.errs.length, m.errs); await m.ctx.close(); }
 
 // ---------- المكرر: لعبتان بالاسم نفسه، ونسختان من لعبة واحدة. التنبيه سؤال بجوابين، و«لا» يُسكته نهائياً
 { console.log('== duplicates');

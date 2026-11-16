@@ -72,7 +72,7 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 4l2.4 5 5.4.6-4 3.7 1.1 5.4L12 16l-4.9 2.7 1.1-5.4-4-3.7 5.4-.6z"/></symbol>
 <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7.5 4h9v5a4.5 4.5 0 01-9 0zM7.5 6H5v1.5a3 3 0 003 3M16.5 6H19v1.5a3 3 0 01-3 3M12 13.5v4M8.5 20h7"/></symbol>
 <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
-<symbol id="i-dots" viewBox="0 0 24 24"><path stroke-width="3" d="M12 5.5h.01M12 12h.01M12 18.5h.01"/></symbol>
+<symbol id="i-dots" viewBox="0 0 24 24"><path stroke-width="3" d="M12 5.5h.01M12 12h.01M12 18.5h.01"/></symbol><symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
 <symbol id="i-pad" viewBox="0 0 24 24"><path d="M7 8.5h10a4 4 0 013.9 4.9l-.8 3.4a2.4 2.4 0 01-4 1.2L14 16h-4l-2.1 2a2.4 2.4 0 01-4-1.2l-.8-3.4A4 4 0 017 8.5zM8.5 11v3M7 12.5h3"/><path stroke-width="2.6" d="M15.5 12h.01M17.5 13.6h.01"/></symbol>
 <symbol id="i-roll" viewBox="0 0 24 24"><path d="M4 7.5h3c2 0 3.2 1.2 4.5 4.5s2.5 4.5 4.5 4.5h4M4 16.5h3c1.1 0 1.9-.4 2.7-1.3M20 7.5h-4c-1.1 0-1.9.4-2.7 1.3M17.5 5L20 7.5 17.5 10M17.5 14l2.5 2.5-2.5 2.5"/></symbol>
 <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3.2 3.4 3.2 12.6 0 16M12 4c-3.2 3.4-3.2 12.6 0 16"/></symbol>
@@ -100,7 +100,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <div class="dupw" id="dup" hidden></div>
 <section class="mm" id="mm" aria-label="القائمة الرئيسية"><div class="mm-art" id="mm-art" aria-hidden="true"></div>
   <nav class="mm-menu" id="mm-menu" aria-label="قوائمي"></nav><div class="mm-slot" id="slot"></div></section>
-<section class="soon" id="soon" hidden aria-labelledby="soon-h"><h2 id="soon-h">قادم في سلاسلك</h2><div class="reel" id="soon-reel"></div></section>
+<section class="soon shut" id="soon" hidden aria-label="قادم في سلاسلك"><h2><button type="button" class="soon-b" id="soon-b" data-act="soon" aria-expanded="false" aria-controls="soon-reel"></button></h2><div class="reel" id="soon-reel" hidden></div></section>
 <nav class="bar" aria-label="البحث والتصفية"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a>
   <label class="search">${ic('search')}<span class="sr">ابحث في ألعابي</span><input id="q" type="search" placeholder="ابحث: لعبة، مطوّر، سلسلة، سنة" autocomplete="off" enterkeyhint="search"></label>
   <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الألعاب</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
@@ -284,13 +284,21 @@ function renderMenu(swap) { $('#mm-menu').innerHTML = menuHTML(); const g = feat
 function setList(k, focus) { ui.list = k; store.set('games.list', k); $$('#mm-menu .mi').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === k))); renderMenu(true); apply(false);
   if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); if (focus) $(`#mm-menu .mi[data-v="${k}"]`)?.focus(); }
 
-// ---------- قادم في سلاسلك: الأجزاء المعلنة التي لم تصدر من سلاسل ألعابك، وألعابك القادمة، بعدّها التنازلي
+// ---------- قادم في سلاسلك: الأجزاء المعلنة التي لم تصدر من سلاسل ألعابك، وألعابك القادمة، بعدّها التنازلي.
+// القسم مصغَّر إلى سطر واحد (عددها، وأقربها بعدّه) ما لم يفتحه صاحبه بزرّه («افتحها» ثم «صغّرها»)، واختياره يُحفظ على الجهاز. وشريطه لا يُرسم ولا تُحمَّل أغلفته وهو مصغَّر
+let soonOpen = store.get('games.soon') === 'open';
 function upcoming() { const out = new Map();
   for (const g of D.games) { if (soon(g)) out.set(g.id, g); for (const sid of g.series || []) for (const m of D.series[sid]?.members || []) if (soon(m) && m.status !== 'cancelled' && !out.has(m.id)) out.set(m.id, D.byId.get(m.id) || m); }
   return [...out.values()].sort((a, b) => (exact(b) - exact(a)) || (a.date || '9999').localeCompare(b.date || '9999')); }
-function soonHTML() { const list = upcoming(); $('#soon').hidden = !list.length; if (!list.length) return;
-  $('#soon-reel').innerHTML = list.map(o => { const mine = D.byId.has(o.id);
+function soonHTML() { const list = upcoming(), box = $('#soon'), btn = $('#soon-b'), reel = $('#soon-reel'), o = list[0]; box.hidden = !list.length; if (!o) return;
+  // أقربها: المؤرَّخة بعدّها الحي (أيامه، ثم ساعاته في يومها الأخير)، وغير المؤرَّخة بموعدها التقريبي
+  const near = exact(o) ? `<span class="sb-cd" data-until="${o.date}" data-now="تصدر اليوم"><small>تصدر بعد</small><span class="ck" aria-hidden="true">${clock(o.date, 'تصدر اليوم')}</span><span class="sr sr-time">${spoken(o.date)}</span></span>` : `<span class="sb-cd tba">${esc(whenText(o))}</span>`;
+  btn.innerHTML = `<span class="sb-t">قادم في سلاسلك</span><span class="sb-n">${list.length}</span><span class="sb-near"><small>أقربها</small><b dir="ltr">${esc(o.title)}</b>${near}</span><span class="sb-go"><span>${soonOpen ? 'صغّرها' : 'افتحها'}</span>${ic('chev')}</span>`;
+  btn.setAttribute('aria-expanded', String(soonOpen)); box.classList.toggle('shut', !soonOpen); reel.hidden = !soonOpen;
+  reel.innerHTML = !soonOpen ? '' : list.map(o => { const mine = D.byId.has(o.id);
     return `<button class="part${mine ? '' : ' out'}" data-act="${mine ? 'open' : 'peek'}" data-id="${o.id}" data-q="${esc(o.title)}"><span class="p">${coverImg(o.cover, '150px') || cart(o)}${chip(o)}</span><b dir="ltr">${esc(o.title)}</b><small>${mine ? 'في قائمتك' : 'من سلسلة ' + esc(seriesOfMember(o.id)?.name || '')}</small></button>`; }).join(''); }
+function soonFlip() { soonOpen = !soonOpen; store.set('games.soon', soonOpen ? 'open' : 'shut'); soonHTML();
+  if (soonOpen && !calm) $('#soon-reel').animate?.([{ opacity: 0, transform: 'translateY(-8px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' }); }
 const seriesOfMember = id => Object.values(D.series).find(s => s.members.some(m => m.id === id) && s.members.some(m => D.byId.has(m.id)));
 
 // ---------- السلاسل
@@ -660,6 +668,7 @@ document.addEventListener('click', e => { if (!qm.hidden && !e.target.closest('#
   else if (act === 'view') { ui.dup = null; setView(t.dataset.v); }
   else if (act === 'meant') { $('#q').value = t.dataset.q; ui.q = t.dataset.q; apply(false); $('#q').focus(); }
   else if (act === 'meant-add') { $('#add-q').value = t.dataset.q; $('#add-form').requestSubmit(); }
+  else if (act === 'soon') soonFlip();
   else if (act === 'reset') { Object.assign(ui, { q: '', plat: '', genre: '' }); $('#q').value = ''; $('#chips').innerHTML = chipsHTML(); apply(false); }
   else if (act === 'add') { if (accDlg.open) accDlg.close(); openAdd(); }
   else if (act === 'accounts') openAccounts();
