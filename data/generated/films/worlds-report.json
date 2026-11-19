@@ -1,7 +1,7 @@
 {
- "generatedAt": "2026-11-19T10:59:13.697Z",
+ "generatedAt": "2026-11-19T11:25:59.936Z",
  "counts": {
-  "works": 628,
+  "works": 629,
   "withEntry": 375,
   "inWorld": 230,
   "worlds": 111,
@@ -18,7 +18,7 @@
   "chronoAuto": 31,
   "infoEntries": 467,
   "bytes": 203250,
-  "seconds": 14
+  "seconds": 22
  },
  "missing": [
   {
@@ -2537,8 +2537,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "novel:The Wonderful Wizard of Oz",
     "musical:Wicked",
+    "novel:The Wonderful Wizard of Oz",
     "novel:Wicked"
    ]
   },
@@ -4618,6 +4618,11 @@
    "k": "m450001",
    "t": "Master Z: Ip Man Legacy",
    "y": 2018
+  },
+  {
+   "k": "m1263337",
+   "t": "Heart of the Beast",
+   "y": 2026
   }
  ],
  "excludedGroups": [
@@ -4649,21 +4654,21 @@
    ]
   },
   {
-   "g": "Q56070713",
-   "name": "Walt Disney Animation Studios feature film",
-   "why": "catalog",
-   "size": 66,
-   "types": [
-    "animated film series"
-   ]
-  },
-  {
    "g": "Q2732470",
    "name": "list of Pixar films",
    "why": "list",
    "size": 28,
    "types": [
     "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q56070713",
+   "name": "Walt Disney Animation Studios feature film",
+   "why": "catalog",
+   "size": 66,
+   "types": [
+    "animated film series"
    ]
   }
  ],
