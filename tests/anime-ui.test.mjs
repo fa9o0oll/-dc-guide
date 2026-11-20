@@ -141,7 +141,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('نافذة السلسلة: أعمالها بترتيب الصدور وحالة كل منها', (await page.$$eval('#wsheet .orow', r => r.map(x => x.dataset.id + ':' + x.querySelector('.chip').textContent))).join('|') === '136:أكملته · 10|137:ليس في قائمتك|11061:أكملته · 10|13271:سأشاهده', await page.$$eval('#wsheet .orow', r => r.map(x => x.dataset.id + ':' + x.querySelector('.chip').textContent)));
   await page.waitForSelector('#wintro .ov');
   check('نافذة السلسلة: حكايتها نبذة العمل الذي تحمل اسمه، وأرقامها (أعمالها وحلقاتها ومدتها وسنواتها وما شاهدته منها)', await page.evaluate(() => { const t = document.querySelector('#wsheet-body').textContent, i = document.querySelector('#wintro');
-    return i.querySelector('h3').textContent === 'الحكاية' && /نبذة Hunter x Hunter \(2011\)/.test(i.textContent) && /Gon Freecss/.test(i.querySelector('.ov').textContent) && /4 أعمال/.test(t) && /219 حلقة/.test(t) && /1999 إلى 2013/.test(t) && /في قائمتك 3/.test(t) && /أكملت 2/.test(t) && /شاهدت منها 210 حلقات/.test(t); }), await page.textContent('#wsheet-body .facts'));
+    const [about, tale] = i.querySelectorAll('.sec');
+    return about.classList.contains('wabout') && about.querySelector('h3').textContent === 'عن هذا العالم' && /يوشيهيرو توغاشي/.test(about.querySelector('.ov').textContent) && /نسخة 2011/.test(about.querySelector('.ov').textContent)
+      && tale.querySelector('h3').textContent === 'الحكاية' && /نبذة Hunter x Hunter \(2011\)/.test(tale.textContent) && /Gon Freecss/.test(tale.querySelector('.ov').textContent) && /4 أعمال/.test(t) && /219 حلقة/.test(t) && /1999 إلى 2013/.test(t) && /في قائمتك 3/.test(t) && /أكملت 2/.test(t) && /شاهدت منها 210 حلقات/.test(t); }), await page.textContent('#wsheet-body .facts'));
   check('سلسلة ترتيب قصتها هو ترتيب صدورها: ترتيب واحد بلا تبديل', await page.locator('#wsheet [data-act=worder]').count() === 0 && /ترتيب القصة في هذه السلسلة هو ترتيب صدورها نفسه/.test(await page.textContent('#worder')));
   await snap('6-world'); await tap('#wsheet .orow[data-id="137"]'); await page.waitForSelector('#sheet[open]');
   await tap('#sheet [data-act=status][data-s=plan]');
@@ -152,6 +154,8 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   const ord = () => page.$$eval('#wsheet .orow', r => r.map(x => x.dataset.id).join());
   const o1 = await ord(); await tap('#wsheet [data-act=worder][data-o=release]'); const o2 = await ord();
   check('سلسلة لها ترتيب قصة: تفتح عليه، وزر «ترتيب الصدور» يبدّله، وفيها مدخل دليل Fate', o1 === '22297,356' && o2 === '356,22297' && await page.getAttribute('#wsheet [data-o=release]', 'aria-pressed') === 'true' && await page.locator('#wsheet a.fate[href="../fate/"]').count() === 1, [o1, o2]);
+  check('ترتيب مُراجَع: ملاحظته تظهر في الترتيبين، ويُقال إنه روجع حين يُعرض ترتيب القصة', /من يشاهد أول مرة يبدأ بترتيب الصدور/.test(await page.textContent('#wsheet .wnote')) && !/راجعناه/.test(await page.textContent('#worder'))
+    && await (async () => { await tap('#wsheet [data-act=worder][data-o=story]'); const t = await page.textContent('#worder'); await tap('#wsheet [data-act=worder][data-o=release]'); return /راجعناه عملاً عملاً/.test(t) && /من يشاهد أول مرة/.test(t) && !/علاقات الأعمال/.test(t); })(), await page.textContent('#worder'));
   await page.goBack(); await page.waitForSelector('#wsheet', { state: 'hidden' });
   await tap('[data-act=view][data-v=list]');
 

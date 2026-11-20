@@ -13,7 +13,7 @@ import net from 'node:net';
 net.setDefaultAutoSelectFamilyAttemptTimeout(5000);
 import { tmdb, hasKey } from './lib-tmdb.mjs';
 import { COUNTRY } from './lib-films.mjs';
-import { shapeMal, shapeMalApi, MAL_FIELDS, worldsOf, pickTmdb, LINKS } from './lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, worldsOf, curatedOrder, pickTmdb, LINKS } from './lib-anime.mjs';
 
 const root = new URL('../', import.meta.url), SRC = new URL('data/anime/', root), OUT = new URL('site/anime/data/', root), GEN = new URL('data/generated/anime/', root), MAL = new URL('mal/', GEN);
 for (const d of [OUT, GEN, MAL, new URL('texts/', OUT)]) fs.mkdirSync(d, { recursive: true });
@@ -78,6 +78,10 @@ try { const res = await fetch('https://raw.githubusercontent.com/Fribb/anime-lis
   for (const e of arr) if (want.has(e.mal_id)) { const t = pickTmdb(e); if (t || e.simkl_id || e.anilist_id) fribb[e.mal_id] = { ...(t ? { tm: t } : {}), ...(e.simkl_id ? { simkl: e.simkl_id } : {}), ...(e.anilist_id ? { anilist: e.anilist_id } : {}), ...(e.imdb_id?.[0] ? { imdb: [].concat(e.imdb_id)[0] } : {}) }; }
   wr(new URL('map.json', GEN), fribb);
 } catch (e) { report.problems.push(`خريطة Fribb/anime-lists: ${e.message}، تُستعمل الخريطة السابقة`); fribb = rd(new URL('map.json', GEN), {}); }
+// تصحيح يدوي لمطابقة TMDB (data/anime/tmdb.json): { "<رقم العمل>": { k: 'tv'|'movie', id, s?, o? } }، وnull يلغي مطابقة خاطئة. الخريطة تتبع بنية TVDB،
+// وبعض ما هو موسم هناك مسلسل مستقل في TMDB (KanColle: Itsuka Ano Umi de)، وبعض الأعمال لا مطابقة لها فيها أصلاً. يُطبَّق على نسخة، فملف الخريطة يبقى كما جاء
+const tmdbFix = rd(new URL('tmdb.json', SRC), {}); report.tmdbFixed = 0; fribb = { ...fribb };
+for (const [id, t] of Object.entries(tmdbFix)) { if (!/^\d+$/.test(id)) continue; const m = { ...(fribb[id] || {}) }; if (t && (t.k === 'tv' || t.k === 'movie') && Number.isInteger(t.id)) m.tm = { k: t.k, id: t.id, ...(Number.isInteger(t.s) ? { s: t.s } : {}), ...(t.o > 0 ? { o: t.o } : {}) }; else if (t === null) delete m.tm; else continue; fribb[id] = m; report.tmdbFixed++; }
 
 const providers = {}, provIds = l => [...new Set((l || []).map(p => { providers[p.provider_id] = { name: p.provider_name, logo: p.logo_path }; return p.provider_id; }))];
 const provOf = wp => wp ? { link: wp.link || undefined, stream: provIds(wp.flatrate), free: provIds([...(wp.free || []), ...(wp.ads || [])]), rent: provIds(wp.rent), buy: provIds(wp.buy) } : null;
@@ -107,6 +111,13 @@ if (prevCat && tmdbOk && !tv.size && !movie.size) { tmdbOk = false; Object.assig
 
 // ---------- 3) السلاسل
 const worlds = worldsOf(all.map(id => { const d = cache.get(id)?.d, b = basics.get(id); return { id, rel: d?.rel || [], from: d?.from || null, type: d?.type || b?.type || '', eps: d ? d.eps : b?.eps || 0, title: d?.title || b?.title || '', en: d?.en || null, mine: inList.has(id) }; }));
+// ترتيب القصة المُراجَع (data/anime/orders.json): { "<رقم العمل الذي تحمل السلسلة اسمه>": { order: [أرقام الأعمال], note: "ملاحظة تظهر تحت الترتيب" } }.
+// الترتيب المحسوب من علاقات MyAnimeList يكفي أكثر السلاسل؛ وهذا لما يخالف فيه الترتيبُ الزمني المعروف تلك العلاقات (Dragon Ball GT بعد Super، Hanamonogatari في آخر Monogatari)
+const orders = rd(new URL('orders.json', SRC), {}); report.ordersApplied = 0; report.ordersLoose = [];
+for (const w of worlds) { const o = orders[w.head] || orders[w.id]; if (!o) continue; report.ordersApplied++;
+  if (Array.isArray(o.order) && o.order.length) { const c = curatedOrder(w.story || w.ids, o.order); if (c.loose.length) report.ordersLoose.push(`${w.name}: ${c.loose.join(' ')}`);
+    if (c.order.join() !== w.ids.join()) w.story = c.order; else delete w.story; w.sv = 1; }
+  if (typeof o.note === 'string' && o.note.trim()) w.sn = o.note.trim(); }
 const worldOf = new Map(); for (const w of worlds) for (const id of w.ids) worldOf.set(id, w.id);
 
 // ---------- الكتالوج الخفيف (ما تحتاجه القوائم) والنصوص (ما تحتاجه بطاقة العمل)، موزعةً على 32 ملفاً
@@ -131,7 +142,10 @@ const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(
     texts[id % 32][id] = x; }
   return a; });
 wr(new URL('catalog.json', OUT), { generatedAt: report.generatedAt, imageBase: 'https://image.tmdb.org/t/p/', malImages: 'https://cdn.myanimelist.net/images/anime/', country: COUNTRY, providers, genres, anime,
-  worlds: worlds.map(w => ({ id: w.id, name: w.name, ...(w.en ? { en: w.en } : {}), head: w.head, ids: w.ids, ...(w.story ? { story: w.story } : {}) })), ...(door ? { door } : {}) });
+  worlds: worlds.map(w => ({ id: w.id, name: w.name, ...(w.en ? { en: w.en } : {}), head: w.head, ids: w.ids, ...(w.story ? { story: w.story } : {}), ...(w.sv ? { sv: 1 } : {}), ...(w.sn ? { sn: w.sn } : {}) })), ...(door ? { door } : {}) });
+// نبذة العالم المكتوبة (data/anime/worlds.json: رقم العمل الذي تحمل السلسلة اسمه ← النص) تُحمل مع نصوص ذلك العمل (wa)، فتُقرأ حين تُفتح نافذة السلسلة
+const about = rd(new URL('worlds.json', SRC), {}); report.worldsAbout = 0;
+for (const w of worlds) { const t = about[w.head] || about[w.id], x = texts[w.head % 32][w.head]; if (typeof t === 'string' && t.trim() && x) { x.wa = t.trim(); report.worldsAbout++; } }
 texts.forEach((t, i) => wr(new URL(`texts/${i}.json`, OUT), t));
 
 const mine = anime.filter(a => !a.x);

@@ -83,6 +83,13 @@ export function worldsOf(items) {
 // ترتيب القصة داخل سلسلة (g مرتبة بالصدور): كل عمل يأتي بعد كل ما تقول العلاقات إنه قبله، ومن بين المتاح يُقدَّم الأقدم صدوراً.
 // صفحات MyAnimeList تتناقض أحياناً (العمل «متفرع» من الثاني والثاني «متفرع» منه): بين عملين يغلب «السابق/اللاحق» على غيره، وعند التساوي يغلب ترتيب الصدور.
 // وما بقي من دوران أطول يُكسر عند أقدم أعماله صدوراً.
+// ترتيب قصة مُراجَع لسلسلة (data/anime/orders.json): ما ذكره الملف بترتيبه، وما لم يذكره من أعمالها (دخل السلسلة بعد كتابته) يوضع بعد الذي
+// يسبقه في الترتيب المحسوب. يعيد الترتيب، وما لم يُذكر (يُكتب في التقرير ليُضاف إلى الملف)
+export function curatedOrder(computed, listed) { const have = new Set(computed), out = listed.filter((id, i) => have.has(id) && listed.indexOf(id) === i), seen = new Set(out), loose = [];
+  for (let i = 0; i < computed.length; i++) { const id = computed[i]; if (seen.has(id)) continue; loose.push(id);
+    let j = i - 1; while (j >= 0 && !seen.has(computed[j])) j--;
+    out.splice(j < 0 ? 0 : out.indexOf(computed[j]) + 1, 0, id); seen.add(id); }
+  return { order: out, loose }; }
 function storyOrder(g) { const ids = new Set(g.map(x => x.id)), at = new Map(g.map((x, i) => [x.id, i])), edge = new Map(), pre = new Map(g.map(x => [x.id, new Set()]));
   const say = (a, b, w) => { const k = a + '>' + b; if ((edge.get(k) || 0) < w) edge.set(k, w); };
   for (const x of g) for (const r of x.rel || []) { if (!ids.has(r.id) || r.id === x.id) continue; const w = HARD.has(r.r) ? 2 : 1; if (BEFORE[r.r]) say(x.id, r.id, w); else if (AFTER[r.r]) say(r.id, x.id, w); }

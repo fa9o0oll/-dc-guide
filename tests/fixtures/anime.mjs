@@ -21,8 +21,9 @@ export const catalog = () => ({ generatedAt: new Date().toISOString(), imageBase
     { id: 60000, t: 'Brand New Show', type: 'TV', eps: 12, ord: 11, pending: 1 },
     { id: 61000, t: 'Upcoming Thing', type: 'TV', eps: 0, ord: 12, y: 2027, st: 'soon', from: '2027-04', img: '1/1', tm: { k: 'tv', id: 999 }, pv: null },
   ],
-  worlds: [{ id: 136, name: 'Hunter x Hunter', head: 11061, ids: [136, 137, 11061, 13271] }, { id: 356, name: 'Fate/stay night', ids: [356, 22297], story: [22297, 356] }] });
-export const texts = { 11061: { en: 'Hunters devote themselves to accomplishing hazardous tasks.', ar: 'الصيادون يكرّسون أنفسهم لمهام خطرة، وGon Freecss يخرج ليصير صياداً ويجد أباه.', jp: 'HUNTER×HUNTER', source: 'Manga', anilist: 11061 },
+  worlds: [{ id: 136, name: 'Hunter x Hunter', head: 11061, ids: [136, 137, 11061, 13271] }, { id: 356, name: 'Fate/stay night', ids: [356, 22297], story: [22297, 356], sv: 1, sn: 'ترتيب القصة هنا يبدأ بالمسار الأحدث. من يشاهد أول مرة يبدأ بترتيب الصدور.' }] });
+export const texts = { 11061: { en: 'Hunters devote themselves to accomplishing hazardous tasks.', ar: 'الصيادون يكرّسون أنفسهم لمهام خطرة، وGon Freecss يخرج ليصير صياداً ويجد أباه.', jp: 'HUNTER×HUNTER', source: 'Manga', anilist: 11061,
+    wa: 'مانغا يوشيهيرو توغاشي في عالم الصيادين.\n\nحُوّلت إلى الأنمي مرتين: نسخة 1999 وأوفاتها، ثم نسخة 2011 التي تعيد الحكاية من أولها.' },
   52701: { en: 'After the Golden Kingdom is sunk underground by an insane magician, its king emerges.', jp: 'ダンジョン飯', source: 'Manga' } };
 // ملف التصدير: 13 عملاً. يشاهد 3، أكمل 4، مؤجَّل 1، ترك 1، سيشاهد 4
 const R = (id, title, type, eps, status, w = 0, score = 0, start = '0000-00-00', finish = '0000-00-00') => `<anime><series_animedb_id>${id}</series_animedb_id><series_title><![CDATA[${title}]]></series_title><series_type>${type}</series_type><series_episodes>${eps}</series_episodes><my_id>0</my_id>

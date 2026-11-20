@@ -3,7 +3,7 @@
 import zlib from 'node:zlib';
 import { parseMal, readMalFile, malDate, STATUSES } from '../site/anime-mal.js';
 import { shapeSimkl, bulkDays, simklAhead } from '../site/anime-simkl.js';
-import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, pickSpecials, epFit, epKey, epPrint } from '../scripts/lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, pickSpecials, epFit, epKey, epPrint, curatedOrder } from '../scripts/lib-anime.mjs';
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -149,6 +149,9 @@ check('مشاهدة على أيام: البداية أول يوم، ولا إك�
 check('«الأبعد تقدّماً»: حلقات أكثر تغلب، والحلقات نفسها مع الإكمال هناك تغلب، وما تُرك يبقى متروكاً ما لم تزد حلقاته', simklAhead({ s: 'watching', p: 8 }, { s: 'completed', p: 12 }) && simklAhead({ s: 'watching', p: 12 }, { s: 'completed', p: 12 })
   && simklAhead({ s: 'plan' }, { s: 'completed', p: 10 }) && simklAhead({ s: 'dropped', p: 3 }, { s: 'watching', p: 5 }) && !simklAhead({ s: 'dropped', p: 3, r: 4 }, { s: 'completed', p: 3 }) && !simklAhead({ s: 'completed', p: 12 }, { s: 'watching', p: 12 })
   && !simklAhead({ s: 'plan' }, { s: 'hold' }) && !simklAhead({ s: 'completed', p: 15 }, { s: 'completed', p: 12 }));
+
+check('ترتيب قصة مُراجَع: ما في الملف بترتيبه، وعمل دخل السلسلة بعد كتابته يوضع بعد الذي يسبقه في المحسوب، وما ليس من السلسلة يُهمل', same(curatedOrder([1, 2, 3, 4, 5], [3, 1, 99, 5, 3]), { order: [3, 4, 1, 2, 5], loose: [2, 4] })
+  && same(curatedOrder([1, 2, 3], [2, 3]), { order: [1, 2, 3], loose: [1] }) && same(curatedOrder([7, 8, 9], [9, 8, 7]), { order: [9, 8, 7], loose: [] }));
 
 // ---------- الحلقات: موضع حلقات العمل في مواسم TMDB (scripts/lib-anime.mjs)، والتاريخ هو الحكم
 console.log('\nالحلقات');

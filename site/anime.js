@@ -297,7 +297,7 @@ function orderHTML(w) { return orderOf(w).map(id => D.by.get(id)).filter(Boolean
     ${m ? `<span class="chip" data-l="${m.s}">${LNAME[m.s]}${m.r ? ` · ${m.r}` : ''}</span>` : '<span class="chip no">ليس في قائمتك</span>'}</button>`; }).join(''); }
 function worderHTML(w) { const story = ui.worder !== 'release' && !!w.story;
   return `<h3>ترتيب المشاهدة</h3>${w.story ? `<div class="views" role="group" aria-label="الترتيب"><button data-act="worder" data-o="story" aria-pressed="${story}">ترتيب القصة</button><button data-act="worder" data-o="release" aria-pressed="${!story}">ترتيب الصدور</button></div>` : ''}
-    <p class="lbl">${story ? `أحداث القصة بتسلسلها: الجزء السابق قبل اللاحق ولو صدر بعده، والقصة الجانبية بعد أصلها. مأخوذ من علاقات الأعمال في ${ltr('MyAnimeList')}.` : w.story ? 'كما صدرت الأعمال، وهو الترتيب الآمن للمشاهدة الأولى: لا يحرق عملٌ ما قبله.' : 'ترتيب القصة في هذه السلسلة هو ترتيب صدورها نفسه.'}</p><div class="order">${orderHTML(w)}</div>`; }
+    <p class="lbl">${story ? (w.sv ? 'أحداث القصة بتسلسلها الزمني: الجزء السابق قبل اللاحق ولو صدر بعده. ترتيب هذه السلسلة راجعناه عملاً عملاً.' : `أحداث القصة بتسلسلها: الجزء السابق قبل اللاحق ولو صدر بعده، والقصة الجانبية بعد أصلها. مأخوذ من علاقات الأعمال في ${ltr('MyAnimeList')}.`) : w.story ? 'كما صدرت الأعمال، وهو الترتيب الآمن للمشاهدة الأولى: لا يحرق عملٌ ما قبله.' : 'ترتيب القصة في هذه السلسلة هو ترتيب صدورها نفسه.'}</p>${w.sn ? `<p class="wnote">${esc(w.sn)}</p>` : ''}<div class="order">${orderHTML(w)}</div>`; }
 // مدة السلسلة كلها: مجموع حلقات كل عمل في مدة حلقته (والفيلم بطوله)
 const span = min => { const h = Math.round(min / 60); return h >= 48 ? `${nDays(Math.floor(h / 24))}${h % 24 ? ` و${count(h % 24, ['ساعة', 'ساعتان', 'ساعات', 'ساعة', 'ساعة'])}` : ''}` : count(Math.max(1, h), ['ساعة واحدة', 'ساعتان', 'ساعات', 'ساعة', 'ساعة']); };
 function openWorld(wid, push = true) { const w = D.wby.get(wid); if (!w) return; wopen = wid; const d = $('#wsheet'), im = wArt(w), n = w.ids.length, all = w.ids.map(id => D.by.get(id)).filter(Boolean), eps = all.reduce((s, a) => s + (a.eps || 0), 0);
@@ -309,10 +309,11 @@ function openWorld(wid, push = true) { const w = D.wby.get(wid); if (!w) return;
     ${isFate(w) ? `<a class="wc fate in" href="../fate/"><h3>${ltr('Fate')}</h3><p>لهذا العالم دليل كامل بخطوط قصته وترتيب مشاهدته. افتحه.</p></a>` : ''}
     <section class="sec" id="worder">${worderHTML(w)}</section></div>`;
   $('#wsheet-body').scrollTop = 0; if (!d.open) { d.showModal(); if (push) history.pushState({ w: wid }, '', `#w${wid}`); }
-  // حكاية السلسلة: نبذة العمل الذي تحمل اسمه (يحدده البناء)، وإن غاب فأول عمل رئيسي فيها (مسلسل، أو ما زاد على ثلاث حلقات، أو فيلم طويل)
+  // «عن هذا العالم»: نبذة السلسلة المكتوبة (wa، تُحمل مع نصوص العمل الذي تحمل اسمه). و«الحكاية»: نبذة ذلك العمل (يحدده البناء)، وإن غاب فأول عمل رئيسي
+  // فيها (مسلسل، أو ما زاد على ثلاث حلقات، أو فيلم طويل)
   const first = D.by.get(w.head) || all.find(a => a.type === 'TV' || (a.eps || 1) > 3 || (a.type === 'Movie' && (a.dur || 0) >= 45)) || all[0];
-  if (first) texts(first.id).then(x => { const box = $('#wintro'); if (wopen !== wid || !box || !(x?.ar || x?.en)) return;
-    box.innerHTML = `<section class="sec"><h3>الحكاية</h3><p class="lbl">نبذة ${ltr(title(first))}، العمل الذي تحمل السلسلة اسمه.</p>${x.ar ? `<p class="ov">${esc(x.ar)}</p>` : `<span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')} (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(x.en)}</p>`}</section>`; }); }
+  if (first) texts(first.id).then(x => { const box = $('#wintro'); if (wopen !== wid || !box || !(x?.wa || x?.ar || x?.en)) return;
+    box.innerHTML = `${x.wa ? `<section class="sec wabout"><h3>عن هذا العالم</h3><p class="ov">${esc(x.wa)}</p></section>` : ''}${x.ar || x.en ? `<section class="sec"><h3>الحكاية</h3><p class="lbl">نبذة ${ltr(title(first))}، العمل الذي تحمل السلسلة اسمه.</p>${x.ar ? `<p class="ov">${esc(x.ar)}</p>` : `<span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')} (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(x.en)}</p>`}</section>` : ''}`; }); }
 
 // ---------- «قائمتي وحساباتي»: الاستيراد من ملف MyAnimeList، والربط بـSIMKL، ونسخة احتياطية
 const IMP = { mal: null, msg: '', ok: false, simkl: null, sk: null };
