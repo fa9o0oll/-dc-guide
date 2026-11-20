@@ -174,7 +174,7 @@ export async function gamesFor(ids, opt = {}) {
   const ttbOf = new Map(ttbs.map(t => [t.game_id, { h: hours(t.hastily), n: hours(t.normally), c: hours(t.completely), count: t.count || 0 }]));
   const games = raw.map(g => {
     const w = when(g), x = wd.get(g.slug) || {}, art = (g.artworks || []).slice().sort((a, b) => (b.width || 0) - (a.width || 0))[0]?.image_id || g.screenshots?.[0]?.image_id || null;
-    const ext = {}; for (const e of g.external_games || []) { const s = e.external_game_source; if (!e.uid) continue; if (s === STEAM) ext.steam ||= e.uid; else if (s === GOG) ext.gog ||= e.uid; else if (s === PSN) ext.psn ||= e.uid; else if (s === MS || s === XBOX) ext.xbox ||= e.uid; else if (s === EPIC) ext.epic ||= e.uid; }
+    const ext = {}; for (const e of g.external_games || []) { const s = e.external_game_source; if (!e.uid) continue; if (s === STEAM) ext.steam ||= e.uid; else if (s === GOG) ext.gog ||= e.uid; else if (s === PSN) ext.psn ||= e.uid; else if (s === MS || s === XBOX) { ext.xbox ||= e.uid; if (/^[A-Z0-9]{12}$/.test(e.uid) && !(ext.ms ||= []).includes(e.uid)) ext.ms.push(e.uid); } else if (s === EPIC) ext.epic ||= e.uid; }
     const r = {}; for (const k of ['dlcs', 'expansions', 'standalone_expansions', 'remakes', 'remasters', 'ports']) { const list = (g[k] || []).map(id => light.get(id)).filter(Boolean).map(lightOf); if (list.length) r[k] = list.sort((a, b) => (a.date || '9999') < (b.date || '9999') ? -1 : 1); }
     for (const k of ['parent_game', 'version_parent']) if (g[k] && light.get(g[k])) r[k] = lightOf(light.get(g[k]));
     const sites = []; for (const s of g.websites || []) { const t = siteOf(s.url || ''); if (t && !sites.some(o => o.t === t)) sites.push({ t, url: s.url }); }
