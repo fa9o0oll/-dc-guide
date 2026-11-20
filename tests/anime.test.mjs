@@ -3,7 +3,7 @@
 import zlib from 'node:zlib';
 import { parseMal, readMalFile, malDate, STATUSES } from '../site/anime-mal.js';
 import { shapeSimkl, bulkDays, simklAhead } from '../site/anime-simkl.js';
-import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS } from '../scripts/lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, epKey, epPrint } from '../scripts/lib-anime.mjs';
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -149,6 +149,24 @@ check('مشاهدة على أيام: البداية أول يوم، ولا إك�
 check('«الأبعد تقدّماً»: حلقات أكثر تغلب، والحلقات نفسها مع الإكمال هناك تغلب، وما تُرك يبقى متروكاً ما لم تزد حلقاته', simklAhead({ s: 'watching', p: 8 }, { s: 'completed', p: 12 }) && simklAhead({ s: 'watching', p: 12 }, { s: 'completed', p: 12 })
   && simklAhead({ s: 'plan' }, { s: 'completed', p: 10 }) && simklAhead({ s: 'dropped', p: 3 }, { s: 'watching', p: 5 }) && !simklAhead({ s: 'dropped', p: 3, r: 4 }, { s: 'completed', p: 3 }) && !simklAhead({ s: 'completed', p: 12 }, { s: 'watching', p: 12 })
   && !simklAhead({ s: 'plan' }, { s: 'hold' }) && !simklAhead({ s: 'completed', p: 15 }, { s: 'completed', p: 12 }));
+
+// ---------- الحلقات: موضع حلقات العمل في مواسم TMDB (scripts/lib-anime.mjs)، والتاريخ هو الحكم
+console.log('\nالحلقات');
+const wk = (from, n, se = 1, e0 = 1) => Array.from({ length: n }, (_, i) => ({ se, ep: e0 + i, d: from ? new Date(Date.parse(from) + i * 7 * 864e5).toISOString().slice(0, 10) : null }));
+const S1 = wk('2024-01-05', 12), S2 = wk('2024-07-05', 12, 2), both = [...S1, ...S2], cour2 = [...wk('2023-04-06', 11), ...wk('2023-10-12', 11, 1, 12)];
+check('موضع الخريطة يُقبل حين يوافقه تاريخ البداية، أو تاريخ النهاية وحده (عرض مسبق للحلقة الأولى)', same(placeEpisodes(S1, { start: 0, eps: 12, from: '2024-01-06', to: '2024-03-22' }), { at: 0, how: 'map' })
+  && same(placeEpisodes(S1, { start: 0, eps: 12, from: '2023-12-20', to: '2024-03-23' }), { at: 0, how: 'map' }) && same(placeEpisodes(cour2, { start: 11, eps: 11, from: '2023-10-12' }), { at: 11, how: 'map' }));
+check('خريطة خالفها التاريخ: تُؤخذ الحلقة التي عُرضت يوم بدأ العمل', same(placeEpisodes(both, { start: 0, eps: 12, from: '2024-07-05', to: '2024-09-20' }), { at: 12, how: 'date' })
+  && same(placeEpisodes(cour2, { start: 0, eps: 11, from: '2023-10-12', to: '2023-12-21' }), { at: 11, how: 'date' }) && same(placeEpisodes(both, { start: -1, eps: 12, from: '2024-01-05' }), { at: 0, how: 'date' }));
+check('حلقتان عُرضتا في يوم واحد: الأولى منهما', same(placeEpisodes([{ se: 1, ep: 1, d: '2024-01-05' }, { se: 1, ep: 2, d: '2024-01-05' }, { se: 1, ep: 3, d: '2024-01-12' }], { start: 5, eps: 3, from: '2024-01-05' }), { at: 0, how: 'date' }));
+check('لا تاريخ يُحتكم إليه، أو فرق أيام قليلة: يبقى موضع الخريطة بعلامته', same(placeEpisodes(wk(null, 12), { start: 0, eps: 12, from: '2024-01-05' }), { at: 0, how: 'map?' })
+  && same(placeEpisodes(S1, { start: 0, eps: 12, from: '2024' }), { at: 0, how: 'map?' }) && same(placeEpisodes(S1, { start: 0, eps: 12, from: '2023-12-18', to: '2024-04-20' }), { at: 0, how: 'map?' }));
+check('خريطة بعيدة عن تاريخ العمل ولا بديل، أو خارج الحلقات: لا حلقات', placeEpisodes(S1, { start: 0, eps: 12, from: '2019-04-01', to: '2019-06-20' }) === null && placeEpisodes(S1, { start: 40, eps: 12, from: '2030-01-01' }) === null && placeEpisodes([], { start: 0 }) === null);
+const E = shapeEpisode({ season_number: 2, episode_number: 5, name: ' The Promise ', overview: 'Line one.\n\nLine two. ', air_date: '2024-02-03', runtime: 24, still_path: '/a.jpg', vote_average: 8.46, vote_count: 12 });
+check('حلقة TMDB ← ما نحفظه، والاسم الآلي ليس عنواناً، والتقييم بأصوات قليلة لا يُحفظ', same(E, { se: 2, ep: 5, t: 'The Promise', d: '2024-02-03', r: 24, ov: 'Line one. Line two.', st: '/a.jpg', ra: 8.5 }) && epKey(E) === '2x5'
+  && shapeEpisode({ season_number: 1, episode_number: 3, name: 'Episode 3', vote_average: 9, vote_count: 2 }).t === null && shapeEpisode({ season_number: 1, episode_number: 3, name: '第3話' }).t === null && shapeEpisode({ season_number: 1, episode_number: 3, name: 'Episode 3: Dawn', vote_average: 9, vote_count: 2 }).ra === null && shapeEpisode({ season_number: 1, episode_number: 3, name: 'Episode 3: Dawn' }).t === 'Episode 3: Dawn');
+const fp = s => s.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7).toString(16).padStart(12, '0');
+check('بصمة الحلقة تتبدل بتبدل عنوانها أو ملخصها', epPrint(fp, E).length === 10 && epPrint(fp, E) !== epPrint(fp, { ...E, ov: 'Other.' }) && epPrint(fp, E) !== epPrint(fp, { ...E, t: 'Else' }) && epPrint(fp, E) === epPrint(fp, { ...E, st: null }));
 
 console.log(fail ? `\n❌ فشل ${fail}` : '\n✅ كل فحوص أنمياتي نجحت');
 process.exit(fail ? 1 : 0);

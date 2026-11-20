@@ -44,6 +44,11 @@ jobs:
           ANIME_MAL_MAX: ${{ inputs.anime_max }}
         run: node scripts/build-anime.mjs
         continue-on-error: true
+      - name: Build the episodes of «أنمياتي» (TMDB seasons, placed by the catalog mapping and checked against air dates; keeps the previous files when TMDB is unreachable)
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: node scripts/build-anime-episodes.mjs
+        continue-on-error: true
       - name: Build the films list (match in TMDB, details, where to watch, collections)
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
@@ -89,6 +94,8 @@ jobs:
             site/games/data/titles.json
             site/anime/data/catalog.json
             data/generated/anime/report.json
+            data/generated/anime/episodes-report.json
+            site/anime/data/eps/
             data/generated/build-report.json
           if-no-files-found: ignore
       - name: Report announced DC titles missing from the catalog

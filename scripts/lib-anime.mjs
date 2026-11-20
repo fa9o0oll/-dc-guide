@@ -99,3 +99,27 @@ function stemOf(g, head) { const names = g.map(x => [x, norm(worldName(x.title))
   const starts = (long, short) => long === short || long.startsWith(short + ' '), share = n => names.filter(([, m]) => starts(m, n)).length, h = norm(worldName(head.title));
   const stem = names.filter(([, n]) => share(n) >= need).sort((a, b) => a[1].length - b[1].length)[0]; if (!stem) return null;
   return starts(h, stem[1]) || share(h) < g.length / 3 ? stem[0] : null; }
+
+// ---------- الحلقات: من مواسم المسلسل في TMDB إلى حلقات كل عمل
+// حلقة TMDB ← ما نحفظه. الاسم الآلي («Episode 5»، «第5話») ليس عنواناً، والتقييم يُحفظ حين يكفي عدد أصواته
+const autoName = n => /^(?:episode|episodio|épisode|folge|capítulo)\s*#?\d+$/i.test(n) || /^第?\s*\d+\s*話$/.test(n) || /^\d+$/.test(n);
+export const shapeEpisode = e => { const name = (e.name || '').trim();
+  return { se: e.season_number, ep: e.episode_number, t: name && !autoName(name) ? name : null, d: day(e.air_date), r: e.runtime || null, ov: (e.overview || '').replace(/\s+/g, ' ').trim() || null,
+    st: e.still_path || null, ra: e.vote_count >= 5 && e.vote_average ? Math.round(e.vote_average * 10) / 10 : null }; };
+const gap = (a, b) => Math.round((Date.parse(a) - Date.parse(b)) / 864e5), exact = d => /^\d{4}-\d{2}-\d{2}$/.test(d || '') ? d : null;
+// أين تقع حلقات العمل في حلقات المسلسل على TMDB. flat: حلقات الموسم (أو المواسم العادية كلها) بترتيبها، start: الموضع الذي تقوله الخريطة
+// (بداية الموسم + الإزاحة)، eps: عدد حلقات العمل في MyAnimeList (0: لم يُعلن)، from وto: تاريخا بدايته ونهايته هناك. التاريخ هو الحكم:
+//   'map'  موضع الخريطة وافقه تاريخ البداية أو تاريخ النهاية (±3 أيام)
+//   'date' الخريطة خالفها التاريخ (أو لا موضع لها)، ووُجدت حلقة عُرضت يوم بدأ العمل
+//   'map?' لا تاريخ يُحتكم إليه، أو الفرق أيام قليلة (عرض مسبق أو تأجيل): يبقى موضع الخريطة بعلامته
+//   null   الخريطة خارج الحلقات، أو بعيدة عن تاريخ العمل أكثر من 45 يوماً ولا بديل: لا حلقات خير من حلقات عمل آخر
+export function placeEpisodes(flat, { start = 0, eps = 0, from, to }) { const N = flat.length; if (!N) return null;
+  const f = exact(from), t = exact(to), near = (i, d) => i >= 0 && i < N && !!flat[i].d && !!d && Math.abs(gap(flat[i].d, d)) <= 3, inside = start >= 0 && start < N;
+  if (inside && (near(start, f) || (eps > 1 && near(start + eps - 1, t)))) return { at: start, how: 'map' };
+  if (f) { const c = []; for (let i = 0; i < N; i++) if (near(i, f)) c.push(i);
+    if (c.length) return { at: c.sort((a, b) => Math.abs(gap(flat[a].d, f)) - Math.abs(gap(flat[b].d, f)) || a - b)[0], how: 'date' }; }
+  if (!inside || (f && flat[start].d && Math.abs(gap(flat[start].d, f)) > 45)) return null;
+  return { at: start, how: 'map?' }; }
+// بصمة النص الإنجليزي للحلقة (عنوانها وملخصها): تُحفظ مع ترجمتها، فإن تغيّر النص أو تبدّل موضع الحلقة عُرف ولم تُلصق ترجمة بغير حلقتها
+export const epPrint = (hash, e) => hash(`${e.t || ''}\n${e.ov || ''}`).slice(0, 10);
+export const epKey = e => `${e.se}x${e.ep}`;
