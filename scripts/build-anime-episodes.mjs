@@ -87,18 +87,18 @@ async function buildShow(tvId, works) { const seasons = new Map();
     if (fit === 'loose') report.loose.push(`${tag(a)}${a.id} ${a.t}: ${list.length} هنا و${eps} في MyAnimeList`);
     emit(a, how, list, fit); } }
 
-const queue = [...shows], gone = []; let failed = 0;   // gone: أعمال القائمة التي حُذف مسلسلها من TMDB (404)، يُبحث لها عن مطابقة جديدة
+const queue = [...shows], gone = []; let failed = 0;   // gone: أعمال حُذف مسلسلها من TMDB (404)، يُبحث لها عن مطابقة جديدة
 await Promise.all(Array.from({ length: 10 }, async () => { for (let job; (job = queue.shift());) { const [tvId, works] = job;
-  try { await buildShow(tvId, works); } catch (e) { failed++; works.forEach(keep); if (e.status === 404) gone.push(...works.filter(inList).map(w => w.id)); if (report.problems.length < 40) report.problems.push(`TMDB tv/${tvId} (${works.map(w => w.t).join('، ').slice(0, 80)}): ${e.message}`); } } }));
+  try { await buildShow(tvId, works); } catch (e) { failed++; works.forEach(keep); if (e.status === 404) gone.push(...works.map(w => w.id)); if (report.problems.length < 40) report.problems.push(`TMDB tv/${tvId} (${works.map(w => w.t).join('، ').slice(0, 80)}): ${e.message}`); } } }));
 // ملف عمل لم يعد يُبنى (خرج من القائمة أو تغيّرت مطابقته) يُحذف. وما تعذّر مسلسله في هذا التشغيل يبقى
 for (const f of fs.readdirSync(EPS)) { const id = +f.replace('.json', ''); if (id && !index[id]) fs.unlinkSync(new URL(f, EPS)); }
 fs.writeFileSync(new URL('index.json', EPS), JSON.stringify(Object.fromEntries(Object.entries(index).sort((a, b) => a[0] - b[0]))) + '\n');
 Object.assign(report, { shows: shows.size, showsFailed: failed, wanted: wanted.filter(inList).length, relWanted: wanted.length - wanted.filter(inList).length });
 
-// ---------- مرشحو المطابقة: أعمال القائمة التي لا مطابقة لها (فيلم أو مسلسل أو ONA أو OVA، لا الحلقات الخاصة والملخصات: مكانها الموسم 0 في مسلسلها)، وما سقط،
-// وما حُذف مسلسله من TMDB. يُبحث بالاسم وبالاسم الإنجليزي وبهما بلا لاحقة الموسم وبالعنوان الفرعي، والعمل ذو الحلقة الواحدة يُبحث عنه فيلماً أيضاً
-const fixed = rd(new URL('data/anime/tmdb.json', root), {}), lost = new Set([...report.dropped.filter(l => !l.startsWith('~')).map(l => +l.split(' ')[0]), ...gone]);
-const orphans = cat.anime.filter(a => inList(a) && a.st !== 'soon' && ((!a.tm && !(a.id in fixed) && ['Movie', 'TV', 'ONA', 'OVA'].includes(a.type)) || lost.has(a.id)));
+// ---------- مرشحو المطابقة: أعمال القائمة التي لا مطابقة لها (فيلم أو مسلسل أو ONA أو OVA، لا الحلقات الخاصة والملخصات: مكانها الموسم 0 في مسلسلها)، وما سقط
+// من القائمة أو من أقربائها، وما حُذف مسلسله من TMDB. يُبحث بالاسم وبالاسم الإنجليزي وبهما بلا لاحقة الموسم وبالعنوان الفرعي، والعمل ذو الحلقة الواحدة يُبحث عنه فيلماً أيضاً
+const fixed = rd(new URL('data/anime/tmdb.json', root), {}), lost = new Set([...report.dropped.map(l => +l.replace(/^~/, '').split(' ')[0]), ...gone]);
+const orphans = cat.anime.filter(a => lost.has(a.id) || (inList(a) && a.st !== 'soon' && !a.tm && !(a.id in fixed) && ['Movie', 'TV', 'ONA', 'OVA'].includes(a.type)));
 const yearOf = d => +(d || '').slice(0, 4) || 0, cands = [];
 const variants = names => { const out = []; for (const n of names.filter(Boolean)) { out.push(n);
     const base = n.replace(/\s*[:\-–]?\s*(?:\d+(?:st|nd|rd|th) Season|Season \d+|Part \d+|\(\d{4}\)|\(TV\))\s*$/i, '').trim(); if (base && base !== n) out.push(base);

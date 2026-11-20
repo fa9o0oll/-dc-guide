@@ -122,6 +122,8 @@ const gap = (a, b) => Math.round((Date.parse(a) - Date.parse(b)) / 864e5), exact
 //          بعدد حلقات العمل ولا يبعد أكثر من 400 يوم (تأريخ عرض أجنبي؛ وما زاد فمسلسل آخر بالاسم نفسه)، ومسلسل طويل (30 حلقة فأكثر) كله
 //          بعدد حلقات العمل يُقبل مهما بعد تاريخه: لا يتفق عددٌ كهذا مصادفةً (Bobobo-bo Bo-bobo: 76 حلقة مؤرَّخة بعرضها الأمريكي بعد سنتين)
 //   'date' حلقة عُرضت يوم بدأ العمل وتنتهي حلقاته بعدها يوم انتهى: مواسم MyAnimeList التي يدمجها TMDB في موسم واحد، وخريطة تشير إلى غير موسمها
+//   'date' ثم موسم يبدأ يوم بدأ العمل وينتهي يوم انتهى وإن خالفه العدد (Full Metal Panic? Fumoffu: 12 حلقة في MyAnimeList و11 في موسمه، والخريطة
+//          تبدأ من حلقته الثانية)
 //   'map'  ثم موضع الخريطة إن أزيح طرفاه إزاحة واحدة لا تزيد على أسبوعين (تسبق المنصةُ التلفزيونَ بأسبوع في موسم مدموج). وهذه بعد التي قبلها:
 //          إزاحة أسبوع هي نفسها خطأ حلقة واحدة في الخريطة، والحلقة التي توافق الطرفين معاً أولى
 //   'date' ثم أي حلقة عُرضت يوم بدأ العمل، ويُقدَّم ما تسع حلقاتُ العمل بعده وما قارب آخرُه نهايتَه؛ وما خالف آخرُه النهايةَ يُترك حين تكون الخريطة معقولة
@@ -137,6 +139,8 @@ export function placeEpisodes(flat, { start = 0, eps = 0, from, to }) { const N 
   const c = []; if (f) for (let i = 0; i < N; i++) if (within(A(i), 3)) c.push(i);
   const near = (x, y) => Math.abs(A(x)) - Math.abs(A(y)) || x - y, both = c.filter(i => within(B(i), 3)).sort(near);
   if (both.length) return { at: both[0], how: 'date' };
+  const last = i => { let j = i; while (j + 1 < N && flat[j + 1].se === flat[i].se) j++; return j; }, whole = c.filter(i => (i === 0 || flat[i - 1].se !== flat[i].se) && within(dif(last(i), t), 3)).sort(near);
+  if (whole.length) return { at: whole[0], how: 'date' };
   if (a != null && b != null && Math.abs(a - b) <= 3 && Math.abs(a) <= 14) return { at: start, how: 'map' };
   // وحلقة وافقت البداية وخالف آخرُها نهايةَ العمل لا تغلب خريطة معقولة (في حدود 45 يوماً): منصة تنزّل الجزء كله في يوم يوافق مصادفةً عرض حلقة
   // من الجزء الذي قبله في التلفزيون (JoJo no Kimyou na Bouken Part 6: Stone Ocean Part 3 على Netflix)
