@@ -216,7 +216,32 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
     note: [...document.querySelectorAll('#sheet .sec')].find(x => x.querySelector('.pls'))?.querySelector('.note')?.textContent || '', listed: [...document.querySelectorAll('#sheet .pls li b')].map(x => x.textContent) }));
   check('المنصة المحفوظة تظهر محددة بين منصات اللعبة ولو لم تكن في بياناتها', pl.all.includes('x360') && pl.on === 'x360' && pl.all.length === new Set(pl.all).size, pl);
   check('منصات السجل الشقيق في IGDB تُعرض للاختيار، وتُذكر تحت منصات اللعبة دون أن تُخلط بتواريخ صدورها', pl.all.includes('ps3') && /PS3/.test(pl.note) && /IGDB/.test(pl.note) && !pl.listed.includes('PS3'), pl);
+  await page.evaluate(() => { document.getElementById('sheet-body').scrollTop = 99999; }); const yA = await page.evaluate(() => document.getElementById('sheet-body').scrollTop);
+  await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
+  await page.click('#g-112875 .cover'); await page.waitForSelector('#sheet[open] .save'); await page.waitForTimeout(300);
+  check('بطاقة تُفتح بعد أخرى أُغلقت وهي ممرَّرة: تبدأ من أعلاها لا من موضع السابقة', yA > 0 && await page.evaluate(() => document.getElementById('sheet-body').scrollTop) === 0, yA);
   await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  // ---------- أين تلعبها على الكمبيوتر، وهل هي مجانية الآن
+  { const pcOf = async id => { await page.click(`#g-${id} .cover`); await page.waitForSelector('#sheet[open] .pcsec, #sheet[open] .save'); await page.waitForTimeout(250);
+      const r = await page.evaluate(() => { const x = document.querySelector('#sheet .pcsec'); if (!x) return null; const f = x.querySelector('.pcf');
+        return { h: x.querySelector('h3').textContent, f: f ? f.className.replace('pcf', '').trim() + '|' + f.textContent : '', tiles: [...x.querySelectorAll('.pcs a')].map(a => `${a.dataset.s}${a.className.replace('st', '').trim() ? '.' + a.className.replace('st', '').trim() : ''}:${a.querySelector('b').textContent}:${a.querySelector('small').textContent}`),
+          hrefs: [...x.querySelectorAll('.pcs a')].map(a => a.getAttribute('href') + '|' + a.target + '|' + a.rel), note: x.querySelector('.note')?.textContent || '', after: x.previousElementSibling?.querySelector('h3')?.textContent,
+          links: [...document.querySelectorAll('#sheet .sec:last-child .links a b')].map(b => b.textContent) }; });
+      await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(250); return r; };
+    let r = await pcOf(112875);
+    check('هدية جارية: سطر الحال يقول أين وإلى متى، وبلاطة Epic تحملها، والقسم بعد «المنصات»', r.h === 'أين تلعبها على الكمبيوتر' && r.after === 'المنصات' && /^on\|مجانية الآن على Epic Games Store، حتى (الأحد|الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت) \d+ \S+ الساعة \d+(:\d\d)? [صم]\.$/.test(r.f)
+      && r.tiles[0] === 'steam:Steam:المتجر' && /^epic\.free:Epic Games Store:مجانية الآن حتى /.test(r.tiles[1]) && r.hrefs[1] === 'https://store.epicgames.com/p/god-of-war-ragnarok|_blank|noopener', r);
+    check('ملاحظة القسم: أين تُفحص المجانية وبأي أسعار ومتى آخر فحص، ومتاجر الكمبيوتر لا تتكرر في «صفحتها في المواقع»', /تُفحص كل يوم في Steam وEpic Games Store وGOG وXbox بأسعار متجر السعودية\. آخر فحص: /.test(r.note) && !r.links.includes('Steam') && !r.links.includes('Epic Games') && r.links.includes('IGDB'), r);
+    check('علبة اللعبة في المكتبة تقول «مجانية الآن»، وغيرها لا', await page.locator('#g-112875 .meta .gift').count() === 1 && await page.textContent('#g-112875 .meta .gift') === 'مجانية الآن' && await page.locator('.gc .meta .gift').count() === 1);
+    r = await pcOf(119133); check('ليست مجانية: يقال ذلك، وبلاطة Xbox تقول إنها ضمن PC Game Pass', r.f === '|ليست مجانية الآن.' && r.tiles.join(' ~ ') === 'steam:Steam:المتجر ~ xbox.pass:Xbox:ضمن PC Game Pass', r);
+    r = await pcOf(1942); check('هدية قادمة ومتجر لا يعرضها في السعودية: سطر الحال يذكر موعدها، وكل بلاطة بحالها', /^soon\|ليست مجانية الآن، وتصير مجانية على Epic Games Store من \S+ \d+ \S+ إلى \S+ \d+ \S+\.$/.test(r.f)
+      && r.tiles[0] === 'steam.off:Steam:ليست في متجر السعودية' && /^epic\.soon:Epic Games Store:مجانية من /.test(r.tiles[1]) && r.tiles[2] === 'gog:GOG:المتجر', r);
+    r = await pcOf(14593); check('مجانية اللعب: سطر الحال وكل بلاطاتها', r.f === 'on|مجانية اللعب: تُحمَّل وتُلعب بلا ثمن.' && r.tiles.join(' ~ ') === 'steam.free:Steam:مجانية اللعب ~ epic.free:Epic Games Store:مجانية اللعب', r);
+    r = await pcOf(1020); check('مشغّل الناشر ومتجر أُضيف باليد باسمه', r.tiles.slice(2).join(' ~ ') === 'rockstar:Rockstar Games Launcher:مشغّل الناشر ~ other:Fan Launcher:مشغّل الناشر' && r.f === '|ليست مجانية الآن.', r);
+    r = await pcOf(11208); check('لعبة كمبيوتر لم يُعثر لها على متجر: يقال ذلك بلا بلاطات', !r.tiles.length && /لم نجد لها صفحة في متاجر الكمبيوتر الآن/.test(r.note) && !r.f, r);
+    r = await pcOf(990001); check('لعبة لم تُفحص متاجرها بعد: بلاطاتها من روابط IGDB، بلا حكم على المجانية، ومتاجر غير الكمبيوتر تبقى في «صفحتها في المواقع»', r.tiles.join(' ~ ') === 'steam:Steam:المتجر ~ gog:GOG:المتجر' && !r.f && /المتاجر من روابط IGDB\. المجانية وبقية المشغّلات تُفحص في البناء القادم\./.test(r.note) && r.links.includes('PlayStation Store') && !r.links.includes('GOG'), r);
+    r = await pcOf(117170); check('لعبة كمبيوتر بلا روابط متاجر ولم تُفحص: تُفحص في البناء القادم', !r.tiles.length && /متاجرها على الكمبيوتر تُفحص في البناء القادم/.test(r.note), r);
+    r = await pcOf(136625); check('لعبة ليست على الكمبيوتر: يقال ذلك', !r.tiles.length && /لم تصدر على الكمبيوتر/.test(r.note) && !r.f, r); }
   // حساباتي: الرجوع من Steam، ثم السحب وصندوق الأسئلة
   await page.goto(`${base}/games/#steam=76561198000000001`); await page.waitForSelector('#acc[open] [data-act=pull][data-src=steam]');
   check('الرجوع من «ادخل عبر Steam» يحفظ الحساب ويفتح «حساباتي» مرتبطاً، ويزيل الرقم من الرابط', await page.evaluate(() => localStorage.getItem('gamesg.steam') === '76561198000000001' && !location.hash && /مرتبط/.test(document.querySelector('#acc .s-steam').textContent)));

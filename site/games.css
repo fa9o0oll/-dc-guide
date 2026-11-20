@@ -198,6 +198,7 @@ bdi[dir=ltr]{direction:ltr;unicode-bidi:isolate}
 .gc .meta>span{position:relative}
 .gc .meta>span::before{content:"·";position:absolute;inset-inline-start:-9px;opacity:.6;color:var(--mute);font-weight:400}   /* كما في صف التوأم: لا يبدأ سطر بفاصل */
 .gc .meta .rate,.gc .meta .up{color:#9cefff;font-weight:600}
+.gc .meta .gift{color:var(--ok);font-weight:600}
 .qm-b{grid-column:2;grid-row:1/3;align-self:start;width:40px;height:40px;margin-top:-4px;border-radius:50%;display:grid;place-items:center;color:var(--mute);transition:background-color .2s ease,color .2s ease}
 .qm-b[aria-expanded=true],.qm-b:active{background:var(--card2);color:var(--ink)}
 @media (hover:hover){.qm-b:hover{background:var(--card2);color:var(--ink)}}
@@ -438,6 +439,17 @@ section.sec{padding:22px clamp(14px,3vw,30px) 0}
 .links b{font-weight:600}.links b[dir=ltr]{text-align:right}
 .links small{color:var(--mute);font-size:.78rem}
 .vids{margin-top:10px}
+/* أين تُلعب على الكمبيوتر: سطر الحال (مجانية الآن أم لا) ثم بلاطات المتاجر، وكل بلاطة تقول حالها بالنص ولونها يتبعه */
+.pcf{position:relative;margin:2px 0 12px;padding-inline-start:18px;color:var(--dim);font-size:.95rem}
+.pcf::before{content:"";position:absolute;inset-inline-start:0;top:.62em;width:9px;height:9px;border-radius:2px;background:var(--mute)}
+.pcf.on{color:var(--ok);font-weight:600}.pcf.on::before{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 22%,transparent)}
+.pcf.soon{color:var(--au)}.pcf.soon::before{background:var(--au)}
+.pcs a.st{box-shadow:inset 3px 0 0 var(--f-pc),inset 0 0 0 1px var(--line)}
+.pcs a.free{box-shadow:inset 3px 0 0 var(--ok),inset 0 0 0 1px color-mix(in srgb,var(--ok) 45%,var(--line))}.pcs a.free small{color:var(--ok)}
+.pcs a.soon{box-shadow:inset 3px 0 0 var(--au),inset 0 0 0 1px var(--line)}.pcs a.soon small{color:var(--au)}
+.pcs a.pass{box-shadow:inset 3px 0 0 var(--f-xbox),inset 0 0 0 1px var(--line)}.pcs a.pass small{color:var(--dim)}
+.pcs a.off{box-shadow:inset 0 0 0 1px var(--line);background:none}.pcs a.off b{color:var(--dim)}
+@media (hover:hover){.pcs a.st:hover{background:var(--card2)}}
 @media (hover:hover){.links a:hover{box-shadow:inset 0 0 0 1px var(--cy)}}
 
 /* القائمة السريعة (⋮) */

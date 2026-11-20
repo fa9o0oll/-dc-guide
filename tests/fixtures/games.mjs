@@ -33,10 +33,19 @@ export function fixture() {
     G({ ...L(11208, 'Minecraft', '2011-11-18', { plats: ['android', 'ios', 'pc', 'switch'] }) }, { genres: ['ساحة حرة'] }),
     G({ ...L(990001, 'Tiny Obscure Indie', '2021-05-01', { plats: ['pc'], cover: null }) }, { art: null, shots: [], genres: ['مستقلة'], critic: null, users: null, ttb: null }),
   ].map((g, i) => ({ ...g, ord: i, at: '2026-01-01T00:00:00Z' }));
+  // أين تُلعب على الكمبيوتر (ما يحسبه scripts/lib-stores.mjs): هدية جارية على Epic، وضمن PC Game Pass، وغير متاحة في السعودية مع هدية قادمة، ومجانية اللعب، ومشغّل ناشر، وبلا متجر.
+  // Tiny Obscure Indie بلا g.pc (أُضيفت للتو): متاجرها من روابط IGDB وحدها
+  const at = h => new Date(Date.now() + h * 36e5).toISOString(), pcOf = { 112875: [{ s: 'steam', u: 'https://store.steampowered.com/app/2322010' }, { s: 'epic', u: 'https://store.epicgames.com/p/god-of-war-ragnarok', free: 'gift', from: at(-48), until: at(72) }],
+    119133: [{ s: 'steam', u: 'https://store.steampowered.com/app/1245620' }, { s: 'xbox', u: 'https://www.xbox.com/games/store/elden-ring/9P3J32CTXLRZ', pass: 1 }],
+    1942: [{ s: 'steam', u: 'https://store.steampowered.com/app/292030', off: 1 }, { s: 'epic', u: 'https://store.epicgames.com/p/the-witcher-3-wild-hunt', free: 'gift', from: at(120), until: at(288) }, { s: 'gog', u: 'https://www.gog.com/game/the_witcher_3_wild_hunt' }],
+    14593: [{ s: 'steam', u: 'https://store.steampowered.com/app/367520', free: 'f2p' }, { s: 'epic', u: 'https://store.epicgames.com/p/hollow-knight' }],
+    1020: [{ s: 'steam', u: 'https://store.steampowered.com/app/271590' }, { s: 'epic', u: 'https://store.epicgames.com/p/grand-theft-auto-v' }, { s: 'rockstar', u: 'https://www.rockstargames.com/gta-v', how: 'pub' }, { s: 'other', n: 'Fan Launcher', u: 'https://example.com/launcher', how: 'fix' }],
+    11208: [] };
+  for (const g of games) { if (pcOf[g.id]) g.pc = pcOf[g.id]; if (g.id === 14593) g.f2p = 1; if (g.id === 990001) { g.ext = { steam: '990001' }; g.sites = [{ t: 'steam', url: 'https://store.steampowered.com/app/990001' }, { t: 'gog', url: 'https://www.gog.com/game/tiny' }, { t: 'psstore', url: 'https://store.playstation.com/x' }]; } }
   const plats = { ps5: { name: 'PlayStation 5', abbr: 'PS5', fam: 'ps' }, ps4: { name: 'PlayStation 4', abbr: 'PS4', fam: 'ps' }, ps3: { name: 'PlayStation 3', abbr: 'PS3', fam: 'ps' }, ps2: { name: 'PlayStation 2', abbr: 'PS2', fam: 'ps' },
     psp: { name: 'PlayStation Portable', abbr: 'PSP', fam: 'ps' }, pc: { name: 'PC (Microsoft Windows)', abbr: 'PC', fam: 'pc' }, xsx: { name: 'Xbox Series X|S', abbr: 'Xbox Series', fam: 'xbox' }, xone: { name: 'Xbox One', abbr: 'Xbox One', fam: 'xbox' },
     switch: { name: 'Nintendo Switch', abbr: 'Switch', fam: 'nin' }, switch2: { name: 'Nintendo Switch 2', abbr: 'Switch 2', fam: 'nin' }, android: { name: 'Android', abbr: 'Android', fam: 'mobile' }, ios: { name: 'iOS', abbr: 'iOS', fam: 'mobile' } };
-  return { built: new Date().toISOString(), img: 'https://images.igdb.com/igdb/image/upload/', games, series, plats, franchises: {} };
+  return { built: new Date().toISOString(), img: 'https://images.igdb.com/igdb/image/upload/', games, series, plats, franchises: {}, stores: { at: new Date().toISOString() } };
 }
 // السجل المقابل: ختمت Ragnarök على PS5 وHollow Knight وGTA V، وألعب Elden Ring، وشاهدت Spider-Man 2 عند يوتيوبر
 export const progress = { games: { 112875: { s: 'done', on: 'ps5', at: '2026-10-01', h: 45 }, 119133: { s: 'play', on: 'pc', at: '2026-11-10', h: 80 }, 117170: { s: 'seen', on: 'yt', at: '2026-09-01' },

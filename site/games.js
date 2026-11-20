@@ -81,7 +81,7 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 </defs></svg>`;
 
 // ---------- البيانات والسجل
-const D = { games: [], byId: new Map(), series: {}, plats: {}, fr: {}, films: null, built: null };
+const D = { games: [], byId: new Map(), series: {}, plats: {}, fr: {}, films: null, built: null, stores: null };
 let P = { games: {} };
 const load = () => { try { P = { games: {}, ...JSON.parse(store.get(KEY) || '{}') }; P.games ||= {}; if (P.dups && typeof P.dups !== 'object') delete P.dups; } catch { P = { games: {} }; } };
 load();
@@ -144,7 +144,7 @@ const badge = g => { const s = rec(g.id).s; return s && s !== 'new' ? `<span cla
 function chip(o) { if (!soon(o)) return '';
   if (exact(o)) return `<span class="cd" data-until="${o.date}" data-now="تصدر اليوم"><small>تصدر بعد</small><span class="ck" aria-hidden="true">${clock(o.date, 'تصدر اليوم')}</span><span class="sr sr-time">${spoken(o.date)}</span></span>`;
   return `<span class="cd tba"><small>قريباً</small><b>${esc(whenText(o))}</b></span>`; }
-const metaLine = g => { const r = rec(g.id); return [soon(g) ? '<span class="up">قادمة</span>' : g.year ? `<span><bdi>${g.year}</bdi></span>` : '', r.h ? `<span>لعبتها ${hrs(r.h)}</span>` : g.ttb?.n && !soon(g) ? `<span>تُختم في ${hrs(g.ttb.n)}</span>` : ''].filter(Boolean).join(''); };
+const metaLine = g => { const r = rec(g.id), now = Date.now(); return [(g.pc || []).some(x => giftNow(x, now)) ? '<span class="gift">مجانية الآن</span>' : '', soon(g) ? '<span class="up">قادمة</span>' : g.year ? `<span><bdi>${g.year}</bdi></span>` : '', r.h ? `<span>لعبتها ${hrs(r.h)}</span>` : g.ttb?.n && !soon(g) ? `<span>تُختم في ${hrs(g.ttb.n)}</span>` : ''].filter(Boolean).join(''); };
 function card(g) { const s = rec(g.id).s || 'new';
   return `<article class="gc s-${s}${g.fresh ? ' fresh' : ''}" id="g-${g.id}" data-id="${g.id}"><div class="case">${band(g)}
 <button class="cover" data-act="open" ${g.cover ? `data-zoom-pinch data-zoom-title="${esc(g.title)}" ` : ''}aria-label="افتح بطاقة ${esc(g.title)}">${coverImg(g.cover, '(max-width:520px) 45vw, 200px') || cart(g)}${badge(g)}${chip(g)}</button></div>
@@ -362,6 +362,32 @@ function adaptSec(g) { if (!g.from?.length && !g.into?.length) return '';
 function platsSec(g) { if (!g.plats?.length) return ''; const at = new Map((g.dates || []).map(d => [d.p, d]));
   return `<section class="sec"><h3>المنصات</h3><ul class="pls">${g.plats.map(c => { const d = at.get(c), when = d ? (precOfHuman(d.human) === 'd' && d.date ? dateAr(d.date) : d.human ? esc(d.human) : '') : '';
     return `<li class="f-${famOf(c)}"><b dir="ltr">${esc(abbr(c))}</b>${when ? `<small>${when}</small>` : ''}</li>`; }).join('')}</ul>${g.also?.length ? `<p class="note">ولها نسخ بالاسم نفسه على <bdi dir="ltr">${g.also.map(c => esc(abbr(c))).join(' · ')}</bdi>، في سجلات أخرى من <bdi dir="ltr">IGDB</bdi>.</p>` : ''}</section>`; }
+// ---------- أين تُلعب على الكمبيوتر، وهل هي مجانية الآن. الصفوف من البناء (g.pc، scripts/lib-stores.mjs): متاجرها ومشغّلاتها، وكل صف يحمل حاله
+// (free: مجانية اللعب أو هدية لمدة، pass: ضمن PC Game Pass، off: ليست في متجر السعودية). ما أُضيف للتو وبطاقة الاطلاع بلا g.pc: متاجرها من روابط IGDB وحدها
+const STN = { steam: 'Steam', epic: 'Epic Games Store', gog: 'GOG', xbox: 'Xbox', battlenet: 'Battle.net', ea: 'EA app', ubi: 'Ubisoft Connect', rockstar: 'Rockstar Games Launcher', itch: 'itch.io' }, PCS = ['steam', 'epic', 'gog'], LAUNCH = ['battlenet', 'ea', 'ubi', 'rockstar'];
+const DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+const dayAr = iso => { const d = new Date(iso); return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; };
+const clockAr = iso => { const d = new Date(iso), h = d.getHours(), m = d.getMinutes(); return `${h % 12 || 12}${m ? ':' + String(m).padStart(2, '0') : ''} ${h < 12 ? 'ص' : 'م'}`; };
+const onPc = g => !!(g.plats?.includes('pc') || g.also?.includes('pc'));
+const giftNow = (r, now) => r.free === 'gift' && (!r.from || Date.parse(r.from) <= now) && (!r.until || now < Date.parse(r.until));
+const giftSoon = (r, now) => r.free === 'gift' && !!r.from && Date.parse(r.from) > now;
+const pcRows = g => { if (g.pc) return g.pc; const site = t => g.sites?.find(x => x.t === t)?.url, a = [];
+  if (g.ext?.steam) a.push({ s: 'steam', u: 'https://store.steampowered.com/app/' + g.ext.steam }); for (const t of ['epic', 'gog']) if (site(t)) a.push({ s: t, u: site(t) }); return a; };
+const stName = r => r.n || STN[r.s] || r.s;
+function pcSec(g) { if (!g.plats?.length) return '';
+  if (!onPc(g)) return '<section class="sec pcsec"><h3>أين تلعبها على الكمبيوتر</h3><p class="note">لم تصدر على الكمبيوتر. منصاتها أعلاه.</p></section>';
+  const rows = pcRows(g), built = !!g.pc, now = Date.now(), free = rows.filter(r => giftNow(r, now)), soon = rows.filter(r => !giftNow(r, now) && giftSoon(r, now)), names = l => l.map(r => `<bdi dir="ltr">${esc(stName(r))}</bdi>`).join(' و');
+  if (!rows.length) return `<section class="sec pcsec"><h3>أين تلعبها على الكمبيوتر</h3><p class="note">${built ? 'لم نجد لها صفحة في متاجر الكمبيوتر الآن. قد تكون أُزيلت من البيع.' : 'متاجرها على الكمبيوتر تُفحص في البناء القادم.'}</p></section>`;
+  const head = !built ? '' : free.length ? `<p class="pcf on">مجانية الآن على ${names(free)}${free[0].until ? `، حتى ${dayAr(free[0].until)} الساعة ${clockAr(free[0].until)}` : ''}.</p>`
+    : g.f2p ? '<p class="pcf on">مجانية اللعب: تُحمَّل وتُلعب بلا ثمن.</p>'
+    : soon.length ? `<p class="pcf soon">ليست مجانية الآن، وتصير مجانية على ${names(soon)} من ${dayAr(soon[0].from)}${soon[0].until ? ` إلى ${dayAr(soon[0].until)}` : ''}.</p>`
+    : rows.some(r => ['steam', 'epic', 'gog', 'xbox'].includes(r.s)) ? '<p class="pcf">ليست مجانية الآن.</p>' : '';
+  const tile = r => { const [k, t] = giftNow(r, now) ? ['free', r.until ? `مجانية الآن حتى ${dayAr(r.until)}` : 'مجانية الآن'] : giftSoon(r, now) ? ['soon', `مجانية من ${dayAr(r.from)}`] : r.off ? ['off', 'ليست في متجر السعودية']
+      : r.free === 'f2p' || (g.f2p && !r.pass) ? ['free', 'مجانية اللعب'] : r.pass ? ['pass', `ضمن <bdi dir="ltr">PC Game Pass</bdi>`] : ['', r.s === 'xbox' ? '<bdi dir="ltr">Microsoft Store</bdi>' : LAUNCH.includes(r.s) || r.s === 'other' ? 'مشغّل الناشر' : 'المتجر'];
+    return `<a class="st${k ? ' ' + k : ''}" data-s="${esc(r.s)}" href="${esc(r.u)}" target="_blank" rel="noopener"><b dir="ltr">${esc(stName(r))}</b><small>${t}</small></a>`; };
+  const at = D.stores?.at ? new Date(D.stores.at) : null, fresh = at ? ` آخر فحص: ${dayAr(at)} الساعة ${clockAr(at)}.` : '';
+  return `<section class="sec pcsec"><h3>أين تلعبها على الكمبيوتر</h3>${head}<div class="links pcs">${rows.map(tile).join('')}</div>
+<p class="note">${built ? `المجانية تُفحص كل يوم في <bdi dir="ltr">Steam</bdi> و<bdi dir="ltr">Epic Games Store</bdi> و<bdi dir="ltr">GOG</bdi> و<bdi dir="ltr">Xbox</bdi> بأسعار متجر السعودية.${fresh}` : 'المتاجر من روابط <bdi dir="ltr">IGDB</bdi>. المجانية وبقية المشغّلات تُفحص في البناء القادم.'}</p></section>`; }
 const precOfHuman = h => { h = String(h || '').trim(); return !h ? null : /^tb[ad]$/i.test(h) ? 'tbd' : /^q[1-4]\s+\d{4}$/i.test(h) ? 'q' : /^\d{4}$/.test(h) ? 'y' : /^[a-z]{3,}\.?\s+\d{4}$/i.test(h) ? 'm' : 'd'; };
 function mediaSec(g) { const shots = (g.shots || []).slice(0, 8), vids = g.videos || []; if (!shots.length && !vids.length) return '';
   return `<section class="sec"><h3>من داخل اللعبة</h3>${shots.length ? `<div class="reel shots" data-zoom-set>${shots.map((s, i) => `<button type="button" class="shot" data-zoom="${img(s, '1080p')}" data-zoom-title="${esc(g.title)}" aria-label="كبّر اللقطة ${i + 1}"><img loading="lazy" decoding="async" alt="" src="${img(s, 'screenshot_med')}" srcset="${img(s, 'screenshot_med')} 569w, ${img(s, 'screenshot_big')} 889w" sizes="260px"></button>`).join('')}</div>` : ''}
@@ -369,8 +395,9 @@ ${vids.length ? `<div class="links vids">${vids.map(v => ext(v.name || 'Trailer'
 const SITEN = { steam: ['Steam', 'المتجر'], psstore: ['PlayStation Store', 'المتجر'], xstore: ['Microsoft Store', 'المتجر'], eshop: ['Nintendo eShop', 'المتجر'], epic: ['Epic Games', 'المتجر'], gog: ['GOG', 'المتجر'], appstore: ['App Store', 'المتجر'], gplay: ['Google Play', 'المتجر'], wiki: ['Wikipedia', 'الموسوعة'], official: ['الموقع الرسمي', ''] };
 function linksSec(g) { const a = [], q = encodeURIComponent(g.title);
   if (g.igdb) a.push(ext('IGDB', g.igdb, 'مصدر البيانات'));
-  if (g.ext?.steam && !g.sites?.some(s => s.t === 'steam')) a.push(ext('Steam', 'https://store.steampowered.com/app/' + g.ext.steam, 'المتجر'));
-  for (const s of g.sites || []) { const n = SITEN[s.t]; if (n) a.push(`<a href="${esc(s.url)}" target="_blank" rel="noopener"><b${s.t === 'official' ? '' : ' dir="ltr"'}>${n[0]}</b>${n[1] ? `<small>${n[1]}</small>` : ''}</a>`); }
+  const pc = onPc(g);   // متاجر الكمبيوتر (Steam وEpic وGOG) في قسم «أين تلعبها على الكمبيوتر» فوق، فلا تتكرر هنا
+  if (!pc && g.ext?.steam && !g.sites?.some(s => s.t === 'steam')) a.push(ext('Steam', 'https://store.steampowered.com/app/' + g.ext.steam, 'المتجر'));
+  for (const s of g.sites || []) { const n = SITEN[s.t]; if (n && !(pc && PCS.includes(s.t))) a.push(`<a href="${esc(s.url)}" target="_blank" rel="noopener"><b${s.t === 'official' ? '' : ' dir="ltr"'}>${n[0]}</b>${n[1] ? `<small>${n[1]}</small>` : ''}</a>`); }
   a.push(ext('YouTube', `https://www.youtube.com/results?search_query=${encodeURIComponent(g.title + ' full game walkthrough no commentary')}`, 'تختيم كامل بلا تعليق'));
   a.push(ext('HowLongToBeat', 'https://howlongtobeat.com/?q=' + q, 'مدة الختم بالتفصيل'));
   return `<section class="sec"><h3>صفحتها في المواقع</h3><div class="links">${a.join('')}</div></section>`; }
@@ -384,7 +411,7 @@ async function sheetHTML(g, pv) { if (g.from?.some(w => w.tmdb) || g.into?.some(
 <div class="txt"><h2 dir="ltr">${esc(g.title)}</h2>${g.titleAr ? `<p class="ar">${esc(g.titleAr)}</p>` : ''}<p class="facts">${facts.map(x => `<span>${x}</span>`).join('')}</p><div class="tags">${(g.genres || []).map(x => `<span>${esc(x)}</span>`).join('')}${(g.modes || []).slice(0, 2).map(x => `<span class="m">${esc(x)}</span>`).join('')}</div></div></div>
 ${pv ? `<section class="save pv">${twinHTML(g, true)}<h3>أضفها إلى مكتبتي</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${listBtn(k)}</button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
 ${g.src === 'added' ? '<section class="sec"><p class="ask">أُضيفت بزر «أضف لعبة»: معلوماتها آلية من <bdi dir="ltr">IGDB</bdi>، وعالمها واقتباساتها تكتمل في البناء القادم.</p></section>' : ''}
-${board(g)}${placeSec(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${mediaSec(g)}${linksSec(g)}`; }
+${board(g)}${placeSec(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${pcSec(g)}${mediaSec(g)}${linksSec(g)}`; }
 // ---------- عن اللعبة. النصوص الطويلة (النبذة والقصة بلغتيهما) في ملف مستقل يُجلب مرة واحدة (ويُسبق جلبه بعد الإقلاع)، وما أُضيف للتو نصه في سجله.
 // المترجَم يُعرض بالعربية وتحته الأصل الإنجليزي لمن أراده؛ وغير المترجَم بالإنجليزية مع زر «ترجمها لي» يوصل الطلب إلى المترجم (فرع requests في المستودع).
 // لا مرور آلي للمترجم (قرار صاحب الموقع): الطلبات تنتظر حتى يقول «ترجم الجديد»، فتُترجم بدورة docs/GAMES-CARE.md
@@ -427,7 +454,8 @@ function placeSec(g) { const p = g.place; if (!p || !PK[p.k]) return '';
   return `<section class="sec place k-${p.k}"><h3>موقعها من أحداث عالمها</h3><div class="pl-card"><p class="pl-k"><i aria-hidden="true"></i>${PK[p.k]}</p><p class="pl-line">${ar(p.line)}</p>${track}${facts ? `<p class="pl-facts">${facts}</p>` : ''}${src}</div></section>`; }
 const filmsReady = () => D.filmsReady ??= fetch(`../films/data/films.json?v=${BUILD}`).then(r => r.ok ? r.json() : { films: [] }).then(j => { D.films = new Set((j.films || []).map(f => f.id)); }).catch(() => { D.films = new Set(); });
 async function openGame(id, push = true) { const g = D.byId.get(+id); if (!g) return; openId = g.id; $('#sheet-body').innerHTML = await sheetHTML(g); $('#sheet-body').scrollTop = 0; showSheet(push ? { game: g.id } : null, '#g' + g.id); }
-function showSheet(state, hash) { if (!sheet.open) { showM(sheet); if (!calm) sheet.animate(innerWidth <= 640 ? { transform: ['translateY(6%)', 'none'], opacity: [0, 1] } : { transform: ['scale(.97)', 'none'], opacity: [0, 1] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
+function showSheet(state, hash) { if (!sheet.open) { showM(sheet); $('#sheet-body').scrollTop = 0;   // بعد العرض: المتصفح يعيد للنافذة موضع تمرير البطاقة السابقة حين تُعرض، وتصفيره وهي مخفية لا يؤثر
+    if (!calm) sheet.animate(innerWidth <= 640 ? { transform: ['translateY(6%)', 'none'], opacity: [0, 1] } : { transform: ['scale(.97)', 'none'], opacity: [0, 1] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
     setTimeout(host, calm ? 0 : 260);   // تنبيه عابر سبق فتح البطاقة (كـ«أُضيفت…») يصعد إليها بعد أن تستقر حركتها
     if (state) history.pushState(state, '', hash || location.pathname + location.search); } else if (state) history.replaceState(state, '', hash || location.pathname + location.search); }
 function closeGame(fromPop) { if (!sheet.open) return; openId = null; sheet.dataset.out = '1'; const done = () => sheet.close();   // out: تُغلق الآن، فلا يسكنها تنبيه عابر
@@ -703,7 +731,7 @@ function route() { const h = location.hash.slice(1); let m;
   else if ((m = h.match(/^steam=(\d{17})$/))) { store.set(STEAM, m[1]); history.replaceState(null, '', location.pathname); toast('رُبط حسابك في Steam'); openAccounts(); }
   else if (h === 'steam-fail') { history.replaceState(null, '', location.pathname); toast('لم يكتمل الدخول عبر Steam. حاول ثانية.'); openAccounts(); } }
 try {
-  const cat = await get('games.json'); IMGB = cat.img || IMGB; D.built = cat.built; merge(cat);
+  const cat = await get('games.json'); IMGB = cat.img || IMGB; D.built = cat.built; D.stores = cat.stores || null; merge(cat);
   // لعبة صُحّح رقمها (مطابقة خاطئة من سحب قديم): سجلها ينتقل إلى رقمها الصحيح مرة واحدة ويُزامَن
   { let mv = false; for (const [o, n] of Object.entries(cat.moved || {})) if (P.games[o]) { P.games[n] ||= P.games[o]; delete P.games[o]; mv = true; } if (mv) save(); }
   // ما حذفته من هذا الجهاز يبقى مخفياً حتى يصل بناء أحدث من حذفه بعشرين دقيقة (فإن بقي فيه فقد أُعيدت إضافته من جهاز آخر)

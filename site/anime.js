@@ -193,7 +193,7 @@ function setDate(id, k, v) { const before = me(id) ? { ...me(id) } : null; if (!
 function removeEntry(id) { const a = D.by.get(id), before = me(id) ? { ...me(id) } : null; if (!before) return; delete P.a[id]; commit(id, before, `أُزيل ${ltr(a.t)} من قائمتك`); }
 
 // ---------- بطاقة العمل
-let open = 0, wopen = 0;
+let open = 0, wopen = 0, kept = null;   // kept: بطاقة أُغلقت لتُفتح سلسلتها أو بالرجوع، ومحتواها باقٍ: رقمها وموضع تمريرها
 const texts = async id => { const k = id % 32; if (!D.texts.has(k)) D.texts.set(k, get(`texts/${k}.json`).catch(() => ({}))); return (await D.texts.get(k))[id] || null; };
 function mineHTML(a) { const m = me(a.id);
   if (!m) return `<section class="sec mine"><h3>سجلّي</h3><p class="lbl">ليس في قائمتك.</p><div class="acts"><button class="btn pri" data-act="status" data-id="${a.id}" data-s="plan">${ic('mark')}<span>أضفه إلى «سأشاهده»</span></button><button class="btn ghost" data-act="status" data-id="${a.id}" data-s="watching">${ic('play')}<span>أشاهده الآن</span></button></div></section>`;
@@ -232,9 +232,24 @@ function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `
     ${(a.g || []).length ? `<div class="facts">${a.g.map(i => `<span>${genreOf(D.genres[i])}</span>`).join('')}</div>` : ''}
     ${whereHTML(a)}${worldStrip(a)}
     <section class="sec"><h3>صفحاته</h3><div class="links">${links.map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}${ic('ext')}</a>`).join('')}</div></section></div>`; }
-async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; const d = $('#sheet'), body = $('#sheet-body'); body.innerHTML = sheetHTML(a, null); body.scrollTop = 0; showEps(a);
-  if (!d.open) { d.showModal(); if (push) history.pushState({ a: id }, '', `#a${id}`); } else history.replaceState({ a: id }, '', `#a${id}`);
-  const x = await texts(id); if (open === id && x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; showEps(a); } }
+// السجل: كل نافذة يفتحها الموقع خطوة فيه، وحالتها تصف ما هو مفتوح عندها: a العمل، وw السلسلة التي تحته إن فُتح منها، وp أنها خطوة أضافها الموقع فإغلاق نافذتها رجوع.
+// الرابط المباشر والعنوان المكتوب أو الملصوق باليد خطوة بلا حالة: يُقرأ ما يُفتح من الرابط نفسه (at)، وإغلاق نافذتها يغلقها وينظف الرابط (shut).
+// والبطاقة فوق سلسلتها دائماً، ولا تُفتح سلسلة فوق بطاقة: فتح السلسلة من بطاقة يطويها (stash) والرجوع يعيدها كما كانت (reshow)
+async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; kept = null; const d = $('#sheet'), body = $('#sheet-body'); delete body.dataset.full; body.innerHTML = sheetHTML(a, null); body.scrollTop = 0; showEps(a);
+  if (!d.open) { d.showModal(); body.scrollTop = 0; if (push) history.pushState({ a: id, w: $('#wsheet').open ? wopen : 0, p: 1 }, '', `#a${id}`); }   // التصفير بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
+  else if (push) history.replaceState(history.state?.p ? { ...history.state, a: id } : null, '', `#a${id}`);
+  const x = await texts(id); if (open !== id) return; if (x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; showEps(a); } body.dataset.full = id; }
+const stash = () => { const d = $('#sheet'); if (!d.open) return; kept = { id: open, y: $('#sheet-body').scrollTop }; d.close(); };
+function reshow() { const a = D.by.get(kept.id), body = $('#sheet-body'), y = kept.y; kept = null; open = a.id; $('#sheet').showModal(); body.scrollTop = y; const box = body.querySelector('.mine'); if (box) box.outerHTML = mineHTML(a); drawXs(a); }
+const at = () => { const st = history.state; if (st && (st.a || st.w || st.imp)) return st; const h = location.hash.slice(1); let m; return (m = h.match(/^a(\d+)$/)) ? { a: +m[1] } : (m = h.match(/^w(\d+)$/)) ? { w: +m[1] } : {}; };
+// يجعل النوافذ المفتوحة كما تصفها خطوة السجل
+function apply(st) { const sh = $('#sheet'), ws = $('#wsheet'), a = D.by.has(+st.a) ? +st.a : 0, w = D.wby.has(+st.w) ? +st.w : 0;
+  if (!st.imp && $('#imp').open) $('#imp').close();
+  if (sh.open && (!a || (w && !ws.open))) stash();
+  if (ws.open && !w) ws.close();
+  if (w && (wopen !== w || !ws.open)) openWorld(w, false);
+  if (a && (open !== a || !sh.open)) { if (!sh.open && kept?.id === a && +$('#sheet-body').dataset.full === a) reshow(); else openWork(a, false); } }
+const shut = d => { if (history.state?.p) return history.back(); d.close(); if (/^#[aw]\d+$/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); };
 
 // ---------- ورقة التوقيت: حلقات العمل. تفتح على الحلقة التالية وما حولها، و«كل الحلقات» تفتح الورقة كلها صفحةً صفحة.
 // fit من البناء: 'odd' عدد الحلقات هنا أقل بقليل من عدد MyAnimeList (تنبيه)، و'loose' المصدر يعدّها عدّاً آخر، فلا يقابل رقمُ الخانة رقمَ الحلقة
@@ -336,7 +351,7 @@ function openWorld(wid, push = true) { const w = D.wby.get(wid); if (!w) return;
     <div id="wintro"></div>
     ${isFate(w) ? `<a class="wc fate in" href="../fate/"><h3>${ltr('Fate')}</h3><p>لهذا العالم دليل كامل بخطوط قصته وترتيب مشاهدته. افتحه.</p></a>` : ''}
     <section class="sec" id="worder">${worderHTML(w)}</section></div>`;
-  $('#wsheet-body').scrollTop = 0; if (!d.open) { d.showModal(); if (push) history.pushState({ w: wid }, '', `#w${wid}`); }
+  $('#wsheet-body').scrollTop = 0; if (!d.open) { d.showModal(); $('#wsheet-body').scrollTop = 0; if (push) history.pushState({ a: 0, w: wid, p: 1 }, '', `#w${wid}`); } else if (push) history.replaceState(history.state?.p ? { ...history.state, a: 0, w: wid } : null, '', `#w${wid}`);
   // «عن هذا العالم»: نبذة السلسلة المكتوبة (wa، تُحمل مع نصوص العمل الذي تحمل اسمه). و«الحكاية»: نبذة ذلك العمل (يحدده البناء)، وإن غاب فأول عمل رئيسي
   // فيها (مسلسل، أو ما زاد على ثلاث حلقات، أو فيلم طويل)
   const first = D.by.get(w.head) || all.find(a => a.type === 'TV' || (a.eps || 1) > 3 || (a.type === 'Movie' && (a.dur || 0) >= 45)) || all[0];
@@ -373,7 +388,7 @@ function impHTML() { const m = IMP.mal, log = hasLog(), n = Object.keys(P.a).len
     <section class="sec"><h3>نسخة من سجلّي</h3><p class="lbl">${log ? `في سجلّك ${nWorks(n)}.` : 'سجلّك فارغ على هذا الجهاز.'} النسخة ملف ${ltr('JSON')} فيه حالاتك وحلقاتك وتقييماتك وتواريخك.</p>
       <div class="acts"><button class="btn ghost" data-act="backup" ${log ? '' : 'disabled'}>نزّل نسخة</button>${store.get(KEY + '.bak') ? '<button class="btn quiet" data-act="restore">تراجع عن آخر استيراد</button>' : ''}</div></section>`; }
 function drawImp() { $('#imp-body').innerHTML = impHTML(); }
-function openImport() { IMP.msg = ''; drawImp(); const d = $('#imp'); if (!d.open) { d.showModal(); history.pushState({ imp: 1 }, '', '#import'); } }
+function openImport() { IMP.msg = ''; drawImp(); const d = $('#imp'); if (!d.open) { d.showModal(); history.pushState({ imp: 1, p: 1 }, '', '#import'); } }
 async function readFile(f) { if (!f) return; IMP.msg = ''; try { IMP.mal = await readMalFile(f); if (!IMP.mal.entries.length) { IMP.mal = null; IMP.msg = 'الملف سليم لكنه بلا أعمال.'; } }
   catch (e) { IMP.mal = null; IMP.ok = false; IMP.msg = esc(e.message || 'تعذّرت قراءة الملف.'); } drawImp(); }
 // كل استيراد يحفظ قبله نسخة من السجل (animeg.progress.bak) يُرجع إليها بزر «تراجع عن آخر استيراد»
@@ -404,9 +419,9 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'ep-page': X.from = +d.from; X.open = 0; drawXs(D.by.get(open)); $('#xs')?.scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' }); break;
     case 'list': ui.list = d.l; keep(); if (ui.view !== 'list') setView('list'); renderLists(); renderGrid(); if (t.closest('.rail')) $('.bar').scrollIntoView({ behavior: calm ? 'auto' : 'smooth' }); break;
     case 'view': setView(d.v); break;
-    case 'world': openWorld(+d.w); break;
+    case 'world': if ($('#sheet').open && $('#wsheet').open && wopen === +d.w) shut($('#sheet')); else { stash(); openWorld(+d.w); } break;   // سلسلته هي المفتوحة تحته: إغلاق البطاقة يكشفها
     case 'worder': { ui.worder = d.o; const w = D.wby.get(wopen), box = $('#worder'); if (w && box) box.innerHTML = worderHTML(w); break; }
-    case 'close': history.state && (history.state.a || history.state.w || history.state.imp) ? history.back() : t.closest('dialog').close(); break;
+    case 'close': shut(t.closest('dialog')); break;
     case 'import': openImport(); break;
     case 'imp-clear': IMP.mal = null; IMP.msg = ''; drawImp(); break;
     case 'imp-apply': { const { n } = applyEntries(IMP.mal.entries, 'file'); IMP.ok = true; IMP.msg = `دخل سجلّك: ${nWorks(n)}. المزامنة تنقله إلى بقية أجهزتك.`; IMP.mal = null; ui.list = inList('watching').length ? 'watching' : 'all'; renderAll(); drawImp(); break; }
@@ -438,15 +453,14 @@ document.addEventListener('dragover', e => { const z = e.target.closest?.('#drop
 document.addEventListener('dragleave', e => e.target.closest?.('#drop')?.classList.remove('over'));
 document.addEventListener('drop', e => { const z = e.target.closest?.('#drop'); if (z) { e.preventDefault(); z.classList.remove('over'); readFile(e.dataTransfer.files[0]); } });
 // الرجوع (زر المتصفح أو إيماءة الجوال) يغلق النافذة المفتوحة، وEsc مثله
-for (const d of $$('dialog')) { d.addEventListener('cancel', e => { e.preventDefault(); history.state && (history.state.a || history.state.w || history.state.imp) ? history.back() : d.close(); });
-  d.addEventListener('close', () => { if (d.id === 'sheet') open = 0; if (d.id === 'wsheet') wopen = 0; if (d.id === 'imp') IMP.simkl = null; });
-  d.addEventListener('click', e => { if (e.target === d) history.state && (history.state.a || history.state.w || history.state.imp) ? history.back() : d.close(); }); }
-addEventListener('popstate', () => { const st = history.state || {}; if (!st.a && $('#sheet').open) $('#sheet').close(); if (!st.w && !st.a && $('#wsheet').open) $('#wsheet').close(); if (!st.imp && $('#imp').open) $('#imp').close();
-  if (st.a && !$('#sheet').open) openWork(st.a, false); });
+for (const d of $$('dialog')) { d.addEventListener('cancel', e => { e.preventDefault(); shut(d); });
+  d.addEventListener('close', () => { if (d.open) return; if (d.id === 'sheet') open = 0; if (d.id === 'wsheet') wopen = 0; if (d.id === 'imp') IMP.simkl = null; });   // ما أُغلق وأُعيد فتحه في اللحظة نفسها مفتوح
+  d.addEventListener('click', e => { if (e.target === d) shut(d); }); }
+addEventListener('popstate', () => apply(at()));
 
 // ---------- الإقلاع
 const liftVeil = () => { const v = $('#veil'); if (!v || v.hidden) return; requestAnimationFrame(() => requestAnimationFrame(() => { v.classList.add('lift'); setTimeout(() => v.remove(), calm ? 0 : 800); })); };
-function route() { const h = location.hash.slice(1); let m; if ((m = h.match(/^a(\d+)$/)) && D.by.has(+m[1])) openWork(+m[1], false); else if ((m = h.match(/^w(\d+)$/)) && D.wby.has(+m[1])) { setView('worlds'); openWorld(+m[1], false); } else if (h === 'worlds') setView('worlds'); else if (h === 'import') { history.replaceState(null, '', location.pathname); openImport(); } }
+function route() { const h = location.hash.slice(1), st = at(); if (st.a || st.w) { if (st.w && !st.a && D.wby.has(+st.w)) setView('worlds'); apply(st); } else if (h === 'worlds') setView('worlds'); else if (h === 'import') { history.replaceState(null, '', location.pathname); openImport(); } }
 try {
   const [cat, epi] = await Promise.all([get('catalog.json'), get('eps/index.json').catch(() => ({}))]); D.eps = epi || {}; D.base = cat.imageBase || D.base; D.mal = cat.malImages || D.mal; D.prov = cat.providers || {}; D.genres = cat.genres || [];
   D.list = cat.anime || []; for (const a of D.list) D.by.set(a.id, a);

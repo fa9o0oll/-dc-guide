@@ -9,8 +9,9 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { applyCare } from './lib-care.mjs';
 import { hasIgdb, igdb } from './lib-igdb.mjs';
 import { gamesFor, IMG } from './lib-games.mjs';
+import { storesFor } from './lib-stores.mjs';
 
-const ADDED = 'data/games/added.json', OUT = 'site/games/data/games.json', TEXTS = 'site/games/data/texts.json';
+const ADDED = 'data/games/added.json', OUT = 'site/games/data/games.json', TEXTS = 'site/games/data/texts.json', STORES = 'data/generated/games/stores-report.json';
 const read = (f, d) => readFile(f, 'utf8').then(JSON.parse).catch(() => d);
 const added = (await read(ADDED, { games: [] })).games || [];
 await mkdir('site/games/data', { recursive: true });
@@ -54,11 +55,17 @@ const story = (await import('../data/games/story-orders.mjs')).default.series ||
 const ids = added.map(g => +g.igdb).filter(Boolean);
 let r; try { r = await gamesFor(ids, { wikidata: true, story, log: m => console.log('games: ' + m) }); } catch (e) { console.log(`games: IGDB failed (${e.message}), keeping the previous file`); process.exit(0); }
 if (!r.games.length) { console.log('games: IGDB returned nothing, keeping the previous file'); process.exit(0); }
-if (process.env.GAMES_PROBE) { try { await (await import('./lib-stores.mjs')).probe(r.games); } catch (e) { console.log('stores probe failed: ' + e.message); } }   // مسبار المتاجر (فروع العمل)
 // ترتيب القائمة وتاريخ الإضافة من ملف المضافات
 const at = new Map(added.map((g, i) => [+g.igdb, { ord: i, at: g.at || null }]));
 for (const g of r.games) Object.assign(g, at.get(g.id) || {});
 r.games.sort((a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9));
+// أين تُلعب على الكمبيوتر وهل هي مجانية الآن (scripts/lib-stores.mjs). ما تعذّر من مصادره يبقى له ما كان في الملف السابق، وإن تعذّر كله بقيت متاجر الملف السابق كما هي
+{ const prev = new Map(((await read(OUT, null))?.games || []).map(g => [g.id, { pc: g.pc, f2p: g.f2p }]));
+  try { const st = await storesFor(r.games, { prev, fix: await read('data/games/pc.json', {}), log: m => console.log('games: ' + m) });
+    for (const g of r.games) { if (st.rows.has(g.id)) g.pc = st.rows.get(g.id); if (st.f2p.has(g.id)) g.f2p = 1; }
+    r.stores = st.meta; await mkdir('data/generated/games', { recursive: true }); await writeFile(STORES, JSON.stringify(st.report, null, 1) + '\n');
+    if (process.env.GAMES_PROBE) { for (const [n, v] of Object.entries(st.report.games)) console.log(`stores: ${n} => ${v}`); console.log('stores: pass by title: ' + st.report.passByTitle.join(' | ')); console.log('stores: epic free: ' + st.report.epicFree.join(' | ')); console.log('stores: none: ' + st.report.none.join(' | ')); }   // فروع العمل: الجدول كله في سجل البناء للمراجعة
+  } catch (e) { console.log(`games: stores failed (${e.message}), keeping the previous stores`); for (const g of r.games) { const o = prev.get(g.id); if (o?.pc) g.pc = o.pc; if (o?.f2p) g.f2p = 1; } } }
 const TR = await read('data/games/translations.json', {}), PLACES = await read('data/games/places.json', {}), moved = await read('data/games/moved.json', {});
 const built = new Date().toISOString(), { texts, n } = applyCare(r.games, {}, TR, PLACES);
 await writeFile(TEXTS, JSON.stringify({ built, texts }));

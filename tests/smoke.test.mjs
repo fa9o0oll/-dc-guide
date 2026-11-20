@@ -101,6 +101,10 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   check('الأفلام: النافذة فيها أين يُعرض وترتيب السلسلة والروابط', await page.evaluate(([t, imdb]) => { const h = [...document.querySelectorAll('#sheet .links a')].map(a => a.href), o = document.querySelectorAll('#sheet .order li');
     return o.length >= 2 && [...document.querySelectorAll('#sheet .order li.here')].filter(li => li.offsetParent).length === 1 && h.includes(`https://letterboxd.com/tmdb/${t}`) && h.includes(`https://www.imdb.com/title/${imdb}/`) && h.some(x => /whattawatch/.test(x)) && document.querySelectorAll('#sheet .wgroup').length >= 1; }, [inCol.tmdb, inCol.imdb]));
   check('الأفلام: رابط الفيلم في العنوان', (await page.evaluate(() => location.hash)) === '#' + inCol.id);
+  { await page.evaluate(() => { document.getElementById('sheet-body').scrollTop = 99999; }); const y = await page.evaluate(() => document.getElementById('sheet-body').scrollTop);
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
+    await tap(`#f-${inCol.id} .poster`); await page.waitForSelector('#sheet[open] .sh-head'); await page.waitForTimeout(350);
+    check('الأفلام: نافذة تُفتح بعد أخرى أُغلقت وهي ممرَّرة تبدأ من أعلاها', y > 0 && await page.evaluate(() => document.getElementById('sheet-body').scrollTop) === 0, y); }
   // تكبير البوستر (zoom.js المشترك): يُرفع من مكانه فوق النافذة، وEsc والرجوع والسحب تغلقه وحده وتبقى نافذة الفيلم ورابطها
   await tap('#sheet .sh-head [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(950);
   check('الأفلام: البوستر يُكبَّر فوق النافذة بعنوانه وبدقة أعلى، ومكانه فارغ', await page.evaluate(t => { const d = document.querySelector('dialog.pz'), r = d.querySelector('.pz-card').getBoundingClientRect();

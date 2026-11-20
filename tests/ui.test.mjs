@@ -91,7 +91,11 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('الرجوع يغلق البوستر المكبّر فقط ويعيده مكانه', await page.isVisible('#sheet') && !(await page.$('.pz-lifted')));
   await tap('#sheet [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(400); await page.keyboard.press('Escape');
   await page.waitForSelector('dialog.pz', { state: 'hidden' }); await page.waitForTimeout(350); check('Esc يغلق البوستر المكبّر وحده', await page.isVisible('#sheet'));
-  await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' }); check('الرجوع يغلق النافذة', await page.isHidden('#sheet'));
+  { await page.evaluate(() => { document.getElementById('sheetBody').scrollTop = 99999; }); const y = await page.evaluate(() => document.getElementById('sheetBody').scrollTop);
+    await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' }); check('الرجوع يغلق النافذة', await page.isHidden('#sheet'));
+    await tap('#c-nolan-the-dark-knight-2008 [data-act=open]'); await page.waitForSelector('#sheet:not([hidden])'); await page.waitForTimeout(300);
+    check('نافذة تُفتح بعد أخرى أُغلقت وهي ممرَّرة تبدأ من أعلاها', y > 0 && await page.evaluate(() => document.getElementById('sheetBody').scrollTop) === 0, y);
+    await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' }); }
   // نافذة مسلسل + حلقات
   await tap('#c-dcu-peacemaker-2022-s2 [data-act=open]'); await page.waitForSelector('.ep:not(.skel)');
   check('نافذة المسلسل تفتح على الموسم الصحيح', (await page.textContent('#seasonTabs .on')).includes('2') && await page.locator('.ep').count() === 8);

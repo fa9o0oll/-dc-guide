@@ -267,6 +267,40 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await tap('[data-act=sk-forget]'); check('فصل الحساب يمحو رمزه من المتصفح', await page.evaluate(() => localStorage.getItem('animeg.simkl') === null));
     await page.keyboard.press('Escape'); await page.waitForSelector('#imp', { state: 'hidden' });
   }
+  // ---------- السجل والنوافذ: الرجوع يغلق ما فُتح آخراً، والبطاقة فوق سلسلتها دائماً، والرابط المباشر والعنوان المكتوب باليد يفتحان ويُغلقان بلا خروج من البوابة
+  { const st = () => page.evaluate(() => ({ a: document.querySelector('#sheet').open ? document.querySelector('#sheet h2').textContent : 0, w: document.querySelector('#wsheet').open ? 1 : 0, h: location.hash, y: Math.round(document.querySelector('#sheet-body').scrollTop), path: location.pathname }));
+    const full = id => page.waitForFunction(id => document.querySelector('#sheet').open && document.querySelector('#sheet-body').dataset.full === String(id), id), shut = sel => page.waitForSelector(sel, { state: 'hidden' });
+    await tap('#lists [data-l=all]'); await tap('#grid .cel[data-id="136"] [data-act=open]'); await full(136);
+    const y0 = await page.evaluate(() => { const b = document.querySelector('#sheet-body'); b.scrollTop = 99999; return Math.round(b.scrollTop); });
+    await tap('#sheet [data-act=world]'); await page.waitForSelector('#wsheet[open]'); let s = await st();
+    check('«افتح السلسلة بترتيبها» من بطاقة: تُطوى البطاقة وتُفتح السلسلة وحدها', !s.a && s.w && s.h === '#w136', s);
+    await page.goBack(); await shut('#wsheet'); await page.waitForSelector('#sheet[open]'); s = await st();
+    check('الرجوع من السلسلة يعيد البطاقة كما كانت وبموضع تمريرها', s.a === 'Hunter x Hunter' && !s.w && s.h === '#a136' && y0 > 0 && s.y === y0, [s, y0]);
+    await tap('#sheet [data-act=world]'); await page.waitForSelector('#wsheet[open]'); await tap('#wsheet .orow[data-id="137"]'); await full(137); s = await st();
+    check('عمل آخر من السلسلة: بطاقته فوقها، وتبدأ من أعلاها لا من موضع البطاقة السابقة', s.a === 'Hunter x Hunter: Original Video Animation' && s.w && s.y === 0 && s.h === '#a137'
+      && await page.evaluate(() => { const r = document.querySelector('#sheet h2').getBoundingClientRect(); return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)?.closest('dialog')?.id === 'sheet'; }), s);
+    await tap('#sheet [data-act=world]'); await shut('#sheet'); s = await st();
+    check('«افتح السلسلة» وسلسلته هي المفتوحة تحته: تُغلق البطاقة وتبقى السلسلة', !s.a && s.w && s.h === '#w136', s);
+    await page.goBack(); await shut('#wsheet'); await page.waitForSelector('#sheet[open]'); s = await st(); const s2 = (await page.goBack(), await shut('#sheet'), await st());
+    check('رجوع يعيد البطاقة الأولى، ورجوع آخر يغلقها', s.a === 'Hunter x Hunter' && !s.w && !s2.a && !s2.w && s2.h === '', [s, s2]);
+    await tap('#grid .cel[data-id="136"] [data-act=open]'); await full(136); await page.evaluate(() => { document.querySelector('#sheet-body').scrollTop = 99999; }); await page.keyboard.press('Escape'); await shut('#sheet');
+    await tap('#grid .cel[data-id="11061"] [data-act=open]'); await full(11061); s = await st();
+    check('بطاقة تُفتح بعد أخرى أُغلقت وهي ممرَّرة: تبدأ من أعلاها', s.a === 'Hunter x Hunter (2011)' && s.y === 0, s); await page.keyboard.press('Escape'); await shut('#sheet');
+    // رابط مباشر إلى عمل: شقيقه من الشريط ثم ✕ يغلق البطاقة ويبقى في البوابة برابط نظيف
+    await page.goto('about:blank'); await page.goto(base + '/anime/#a136'); await full(136); await tap('#sheet .strip [data-id="137"]'); await full(137);
+    await tap('#sheet [data-act=close]'); await shut('#sheet'); s = await st();
+    check('رابط مباشر ثم عمل شقيق ثم ✕: تُغلق البطاقة ولا يخرج من البوابة، والرابط بلا علامتها', !s.a && s.path === '/anime/' && s.h === '' && await page.locator('#grid .cel').count() > 0, s);
+    await tap('#grid .cel[data-id="11061"] [data-act=open]'); await full(11061); await tap('#sheet [data-act=close]'); await shut('#sheet'); s = await st();
+    check('وبعده عمل آخر ثم ✕: يُغلق ولا يعود العمل الأول', !s.a && s.h === '' && s.path === '/anime/', s);
+    // رابط مباشر إلى سلسلة: عمل منها ثم رجوع يبقي السلسلة، و✕ يغلقها
+    await page.goto('about:blank'); await page.goto(base + '/anime/#w136'); await page.waitForSelector('#wsheet[open]'); await tap('#wsheet .orow[data-id="136"]'); await full(136);
+    await page.goBack(); await shut('#sheet'); s = await st(); await tap('#wsheet [data-act=close]'); await shut('#wsheet'); const s3 = await st();
+    check('رابط مباشر إلى سلسلة: الرجوع من عمل فيها يبقيها، و✕ يغلقها برابط نظيف', !s.a && s.w && s.h === '#w136' && !s3.w && s3.h === '' && s3.path === '/anime/', [s, s3]);
+    // عنوان كُتب أو لُصق والصفحة مفتوحة
+    await page.evaluate(() => { location.hash = '#a136'; }); await full(136); await page.evaluate(() => { location.hash = '#a11061'; }); await full(11061); s = await st();
+    await page.keyboard.press('Escape'); await shut('#sheet'); const s4 = await st();
+    check('عنوان عمل كُتب باليد والصفحة مفتوحة يفتحه، وعنوان آخر يبدّله، وEsc يغلقه', s.a === 'Hunter x Hunter (2011)' && s.h === '#a11061' && !s4.a && s4.h === '' && s4.path === '/anime/', [s, s4]);
+    await page.goto('about:blank'); await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel'); }
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3));
   await ctx.close();
 }

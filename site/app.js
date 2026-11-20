@@ -434,7 +434,7 @@ function openSheet(title, html, tag, o = {}) {
   if (closing) { closing.forEach(a => a.cancel()); closing = null; }
   $('#sheetTitle').innerHTML = title; $('#sheetBody').innerHTML = html; $('#sheetBody').scrollTop = 0;
   sh.className = 'sheet' + (o.wide ? ' wide' : '') + (o.tall ? ' tall' : ''); sh.style.cssText = o.uni && THEMES[o.uni] ? themeVars(o.uni) : '';
-  sh.hidden = false; bd.hidden = false; root.classList.add('sheet-open');
+  sh.hidden = false; bd.hidden = false; root.classList.add('sheet-open'); $('#sheetBody').scrollTop = 0;   // بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
   if (!was) history.pushState({ sheet: 1 }, '');
   ui.sheet = tag || 'x';
   if (!was && !reduce.matches) {
