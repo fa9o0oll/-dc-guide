@@ -23,6 +23,7 @@ if (process.env.GAMES_PROBE) {
   show('game_types', await igdb('game_types', 'fields type; limit 50;').catch(e => e.message));
   show('game_statuses', await igdb('game_statuses', 'fields status; limit 50;').catch(e => e.message));
   show('external_game_sources', await igdb('external_game_sources', 'fields name; limit 60;').catch(e => e.message));
+  show('website_types', await igdb('website_types', 'fields type; limit 80;').catch(e => e.message));
   show('steam 292030 (Witcher 3)', await igdb('external_games', 'fields game,uid,external_game_source; where uid = "292030" & external_game_source = 1; limit 5;').catch(e => e.message));
   show('search', await igdb('games', 'search "god of war"; fields name,slug,first_release_date,game_type,collections,release_dates.human; limit 5;').catch(e => e.message));
   show('upcoming', await igdb('games', `fields name,first_release_date,release_dates.human,game_status,hypes; where first_release_date > ${Math.floor(Date.now() / 1000)} & hypes > 50; sort hypes desc; limit 5;`).catch(e => e.message));
@@ -53,6 +54,7 @@ const story = (await import('../data/games/story-orders.mjs')).default.series ||
 const ids = added.map(g => +g.igdb).filter(Boolean);
 let r; try { r = await gamesFor(ids, { wikidata: true, story, log: m => console.log('games: ' + m) }); } catch (e) { console.log(`games: IGDB failed (${e.message}), keeping the previous file`); process.exit(0); }
 if (!r.games.length) { console.log('games: IGDB returned nothing, keeping the previous file'); process.exit(0); }
+if (process.env.GAMES_PROBE) { try { await (await import('./lib-stores.mjs')).probe(r.games); } catch (e) { console.log('stores probe failed: ' + e.message); } }   // مسبار المتاجر (فروع العمل)
 // ترتيب القائمة وتاريخ الإضافة من ملف المضافات
 const at = new Map(added.map((g, i) => [+g.igdb, { ord: i, at: g.at || null }]));
 for (const g of r.games) Object.assign(g, at.get(g.id) || {});
