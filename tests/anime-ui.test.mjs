@@ -50,7 +50,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   const lists = () => page.$$eval('#lists button', b => b.map(x => x.textContent.replace(/\s+/g, ' ').trim()));
   const toastText = () => page.evaluate(() => { const t = document.querySelector('#toast'); return t.classList.contains('on') ? t.textContent : ''; });
   const snap = async n => { if (shots) await page.screenshot({ path: `${shots}/anime-${name}-${n}.png` }); };
-  const overflow = async label => { const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: document.documentElement.clientWidth })); check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw, o); };
+  // لا تمدد أفقي للصفحة، ولا عنصر في نافذة مفتوحة يخرج عن عرضها فيُقصّ (إلا ما في شريط يُمرَّر أفقياً)
+  const overflow = async label => { const o = await page.evaluate(() => { const out = { sw: document.documentElement.scrollWidth, iw: document.documentElement.clientWidth, cut: [] };
+    for (const d of document.querySelectorAll('dialog[open] > .scroll')) { const b = d.getBoundingClientRect();
+      for (const e of d.querySelectorAll('*')) { const r = e.getBoundingClientRect(); if (!r.width || !r.height || (r.right <= b.right + 1 && r.left >= b.left - 1)) continue;
+        let p = e.parentElement, strip = false; while (p && p !== d) { if (/auto|scroll/.test(getComputedStyle(p).overflowX)) { strip = true; break; } p = p.parentElement; }
+        if (!strip && out.cut.length < 6) out.cut.push(`${e.className || e.tagName} ${Math.round(r.left - b.left)}..${Math.round(r.right - b.right)}`); } }
+    return out; }); check(`${label}: بلا تمدد أفقي ولا عنصر مقصوص`, o.sw <= o.iw && !o.cut.length, o); };
 
   await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel');
   check('قبل الاستيراد: القائمة العامة كلها بلا سجل، ودعوة الاستيراد', await page.evaluate(() => !!document.querySelector('.invite [data-act=import]') && document.querySelectorAll('#grid .cel').length === 13 && !document.querySelector('.prog') && !document.querySelector('.rail')
