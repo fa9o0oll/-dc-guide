@@ -115,7 +115,7 @@ const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(
     const g = [...r.genres, ...r.themes, ...r.demo].map(gi); if (g.length) a.g = g; if (r.studios[0]) a.studio = r.studios[0]; if (r.rating) a.rating = r.rating; if (r.day) a.day = r.day; }
   else a.pending = 1;                                             // معلوماته تُسحب في بناء قادم
   if (worldOf.has(id)) a.w = worldOf.get(id);
-  if (t) a.tm = t;
+  if (t) a.tm = t; if (m.simkl) a.sk = m.simkl;                    // رقم العمل في SIMKL: به يُطابَق سجل SIMKL حين لا يحمل رقم MyAnimeList
   if (tmdbOk) { const poster = (t?.k === 'tv' && t.s > 0 && S?.poster) || T?.poster; if (poster) a.tp = poster; if (T?.backdrop) a.bd = T.backdrop; if (T) a.pv = T.prov;
     if (T?.next && r?.status === 'airing' && (t.s == null || T.next.season === t.s)) a.nx = { ep: T.next.episode - (t.o || 0), date: T.next.date }; }
   else if (prev) for (const k of ['tp', 'bd', 'pv', 'nx']) if (prev[k] !== undefined) a[k] = prev[k];
