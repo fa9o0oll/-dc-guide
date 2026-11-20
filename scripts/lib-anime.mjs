@@ -124,7 +124,7 @@ const gap = (a, b) => Math.round((Date.parse(a) - Date.parse(b)) / 864e5), exact
 //   'date' حلقة عُرضت يوم بدأ العمل وتنتهي حلقاته بعدها يوم انتهى: مواسم MyAnimeList التي يدمجها TMDB في موسم واحد، وخريطة تشير إلى غير موسمها
 //   'map'  ثم موضع الخريطة إن أزيح طرفاه إزاحة واحدة لا تزيد على أسبوعين (تسبق المنصةُ التلفزيونَ بأسبوع في موسم مدموج). وهذه بعد التي قبلها:
 //          إزاحة أسبوع هي نفسها خطأ حلقة واحدة في الخريطة، والحلقة التي توافق الطرفين معاً أولى
-//   'date' ثم أي حلقة عُرضت يوم بدأ العمل، ويُقدَّم ما تسع حلقاتُ العمل بعده وما قارب آخرُه نهايتَه
+//   'date' ثم أي حلقة عُرضت يوم بدأ العمل، ويُقدَّم ما تسع حلقاتُ العمل بعده وما قارب آخرُه نهايتَه؛ وما خالف آخرُه النهايةَ يُترك حين تكون الخريطة معقولة
 //   'map?' لا تاريخ يُحتكم إليه، أو الفرق أيام: يبقى موضع الخريطة بعلامته
 //   null   الخريطة خارج الحلقات، أو بعيدة عن تاريخ العمل أكثر من 45 يوماً ولا بديل: لا حلقات خير من حلقات عمل آخر
 export function placeEpisodes(flat, { start = 0, eps = 0, from, to }) { const N = flat.length; if (!N) return null;
@@ -138,9 +138,12 @@ export function placeEpisodes(flat, { start = 0, eps = 0, from, to }) { const N 
   const near = (x, y) => Math.abs(A(x)) - Math.abs(A(y)) || x - y, both = c.filter(i => within(B(i), 3)).sort(near);
   if (both.length) return { at: both[0], how: 'date' };
   if (a != null && b != null && Math.abs(a - b) <= 3 && Math.abs(a) <= 14) return { at: start, how: 'map' };
-  if (c.length) { const rank = i => { const e = B(i); return (eps && i + eps > N ? 4 : 0) + (e == null ? 1 : Math.abs(e) <= 7 ? 0 : 2); };
-    return { at: c.sort((x, y) => rank(x) - rank(y) || near(x, y))[0], how: 'date' }; }
-  if (!inside || (a != null && Math.abs(a) > 45)) return null;
+  // وحلقة وافقت البداية وخالف آخرُها نهايةَ العمل لا تغلب خريطة معقولة (في حدود 45 يوماً): منصة تنزّل الجزء كله في يوم يوافق مصادفةً عرض حلقة
+  // من الجزء الذي قبله في التلفزيون (JoJo no Kimyou na Bouken Part 6: Stone Ocean Part 3 على Netflix)
+  const sane = inside && !(a != null && Math.abs(a) > 45), fair = c.filter(i => { const e = B(i); return !sane || e == null || Math.abs(e) <= 7; });
+  if (fair.length) { const rank = i => { const e = B(i); return (eps && i + eps > N ? 4 : 0) + (e == null ? 1 : Math.abs(e) <= 7 ? 0 : 2); };
+    return { at: fair.sort((x, y) => rank(x) - rank(y) || near(x, y))[0], how: 'date' }; }
+  if (!sane) return null;
   return { at: start, how: 'map?' }; }
 // عمل لا مكان له في المواسم العادية (OVA من حلقات، أو حلقات ختامية طويلة): حلقاته في «الحلقات الخاصة» (الموسم 0) هي ما عُرض بين بدايته ونهايته
 // (±3 أيام)، وتُقبل فقط حين يساوي عددُها عددَ حلقاته تماماً. الموسم 0 يجمع كل شيء بلا ترتيب يُعتمد، فلا شاهد فيه إلا التاريخ والعدد معاً

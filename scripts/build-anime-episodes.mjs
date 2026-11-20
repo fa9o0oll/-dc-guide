@@ -87,24 +87,30 @@ async function buildShow(tvId, works) { const seasons = new Map();
     if (fit === 'loose') report.loose.push(`${tag(a)}${a.id} ${a.t}: ${list.length} هنا و${eps} في MyAnimeList`);
     emit(a, how, list, fit); } }
 
-const queue = [...shows]; let failed = 0;
+const queue = [...shows], gone = []; let failed = 0;   // gone: أعمال القائمة التي حُذف مسلسلها من TMDB (404)، يُبحث لها عن مطابقة جديدة
 await Promise.all(Array.from({ length: 10 }, async () => { for (let job; (job = queue.shift());) { const [tvId, works] = job;
-  try { await buildShow(tvId, works); } catch (e) { failed++; works.forEach(keep); if (report.problems.length < 40) report.problems.push(`TMDB tv/${tvId} (${works.map(w => w.t).join('، ').slice(0, 80)}): ${e.message}`); } } }));
+  try { await buildShow(tvId, works); } catch (e) { failed++; works.forEach(keep); if (e.status === 404) gone.push(...works.filter(inList).map(w => w.id)); if (report.problems.length < 40) report.problems.push(`TMDB tv/${tvId} (${works.map(w => w.t).join('، ').slice(0, 80)}): ${e.message}`); } } }));
 // ملف عمل لم يعد يُبنى (خرج من القائمة أو تغيّرت مطابقته) يُحذف. وما تعذّر مسلسله في هذا التشغيل يبقى
 for (const f of fs.readdirSync(EPS)) { const id = +f.replace('.json', ''); if (id && !index[id]) fs.unlinkSync(new URL(f, EPS)); }
 fs.writeFileSync(new URL('index.json', EPS), JSON.stringify(Object.fromEntries(Object.entries(index).sort((a, b) => a[0] - b[0]))) + '\n');
 Object.assign(report, { shows: shows.size, showsFailed: failed, wanted: wanted.filter(inList).length, relWanted: wanted.length - wanted.filter(inList).length });
 
-// ---------- مرشحو المطابقة: أعمال القائمة التي لا مطابقة لها (فيلم أو مسلسل أو ONA أو OVA، لا الحلقات الخاصة والملخصات: مكانها الموسم 0 في مسلسلها)، وما سقط
-const fixed = rd(new URL('data/anime/tmdb.json', root), {}), lost = new Set(report.dropped.filter(l => !l.startsWith('~')).map(l => +l.split(' ')[0]));
-const orphans = cat.anime.filter(a => inList(a) && a.st !== 'soon' && !fixed[a.id] && ((!a.tm && ['Movie', 'TV', 'ONA', 'OVA'].includes(a.type)) || lost.has(a.id)));
+// ---------- مرشحو المطابقة: أعمال القائمة التي لا مطابقة لها (فيلم أو مسلسل أو ONA أو OVA، لا الحلقات الخاصة والملخصات: مكانها الموسم 0 في مسلسلها)، وما سقط،
+// وما حُذف مسلسله من TMDB. يُبحث بالاسم وبالاسم الإنجليزي وبهما بلا لاحقة الموسم وبالعنوان الفرعي، والعمل ذو الحلقة الواحدة يُبحث عنه فيلماً أيضاً
+const fixed = rd(new URL('data/anime/tmdb.json', root), {}), lost = new Set([...report.dropped.filter(l => !l.startsWith('~')).map(l => +l.split(' ')[0]), ...gone]);
+const orphans = cat.anime.filter(a => inList(a) && a.st !== 'soon' && ((!a.tm && !(a.id in fixed) && ['Movie', 'TV', 'ONA', 'OVA'].includes(a.type)) || lost.has(a.id)));
 const yearOf = d => +(d || '').slice(0, 4) || 0, cands = [];
-await Promise.all(Array.from({ length: 6 }, async () => { for (let a; (a = orphans.shift());) { const m = mal(a.id) || {}, film = a.type === 'Movie', kind = film ? 'movie' : 'tv', y = yearOf(m.from || a.from), seen = new Map();
-  for (const q of [...new Set([a.t, a.en, m.en].filter(Boolean))].slice(0, 2)) { try { for (const x of ((await call(`/search/${kind}`, { query: q, language: 'en-US', include_adult: 'false' })).results || []).slice(0, 6)) if (!seen.has(x.id)) seen.set(x.id, x); } catch {} }
-  const near = x => Math.abs(yearOf(x.first_air_date || x.release_date) - y), top = [...seen.values()].sort((x, z) => near(x) - near(z) || z.popularity - x.popularity).slice(0, 4), out = [];
-  for (const x of top) { try { const d = await call(`/${kind}/${x.id}`, { language: 'en-US' });
-    out.push(film ? { id: x.id, name: d.title, orig: d.original_title, date: d.release_date, min: d.runtime, genres: (d.genres || []).map(g => g.name).join('/') }
-      : { id: x.id, name: d.name, orig: d.original_name, date: d.first_air_date, eps: d.number_of_episodes, genres: (d.genres || []).map(g => g.name).join('/'), seasons: (d.seasons || []).map(s => `${s.season_number}:${s.episode_count}(${s.air_date || '?'})`).join(' ') }); } catch {} }
+const variants = names => { const out = []; for (const n of names.filter(Boolean)) { out.push(n);
+    const base = n.replace(/\s*[:\-–]?\s*(?:\d+(?:st|nd|rd|th) Season|Season \d+|Part \d+|\(\d{4}\)|\(TV\))\s*$/i, '').trim(); if (base && base !== n) out.push(base);
+    const m = /^(.*?)(?: Movie(?: \d+)?)?:\s+(.+)$/.exec(n); if (m) out.push(m[2], m[1]); }
+  return [...new Set(out)].slice(0, 5); };
+await Promise.all(Array.from({ length: 6 }, async () => { for (let a; (a = orphans.shift());) { const m = mal(a.id) || {}, y = yearOf(m.from || a.from), out = [];
+  for (const kind of a.type === 'Movie' ? ['movie'] : a.eps === 1 ? ['tv', 'movie'] : ['tv']) { const seen = new Map();
+    for (const q of variants([a.t, a.en, m.en])) { try { for (const x of ((await call(`/search/${kind}`, { query: q, language: 'en-US', include_adult: 'false' })).results || []).slice(0, 6)) if (!seen.has(x.id)) seen.set(x.id, x); } catch {} }
+    const near = x => Math.abs(yearOf(x.first_air_date || x.release_date) - y);
+    for (const x of [...seen.values()].sort((x, z) => near(x) - near(z) || z.popularity - x.popularity).slice(0, 4)) { try { const d = await call(`/${kind}/${x.id}`, { language: 'en-US' });
+      out.push(kind === 'movie' ? { k: 'movie', id: x.id, name: d.title, orig: d.original_title, date: d.release_date, min: d.runtime, genres: (d.genres || []).map(g => g.name).join('/') }
+        : { k: 'tv', id: x.id, name: d.name, orig: d.original_name, date: d.first_air_date, eps: d.number_of_episodes, genres: (d.genres || []).map(g => g.name).join('/'), seasons: (d.seasons || []).map(s => `${s.season_number}:${s.episode_count}(${s.air_date || '?'})`).join(' ') }); } catch {} } }
   cands.push({ id: a.id, t: a.t, en: a.en || m.en || null, type: a.type, eps: m.eps ?? a.eps ?? 0, from: m.from || a.from || null, to: m.to || null, was: a.tm || null, cands: out }); } }));
 fs.writeFileSync(new URL('tmdb-candidates.json', GEN), JSON.stringify(cands.sort((a, b) => a.id - b.id), null, 1) + '\n'); report.candidates = cands.length;
 done();

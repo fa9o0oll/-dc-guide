@@ -52,7 +52,16 @@ else if (cmd === 'check') { const bad = [], raw = fs.readFileSync(new URL('data/
     for (const [k, x] of Object.entries(T)) { eps++; const e = en.get(`${tv}:${k}`), w = [x.t || '', x.o || ''].map(v => v && badText(v)).find(Boolean);
       if (!/^[0-9a-f]{10}$/.test(x.h || '') || !(x.t || x.o)) bad.push(`${f} ${k}: بلا بصمة أو بلا نص`); if (w) bad.push(`${f} ${k}: ${w}`);
       if (e && x.h !== epPrint(sha, e)) stale++; else if (e?.ov && x.o) { const r = x.o.length / e.ov.length; if (r < .3 || r > 2.2) bad.push(`${f} ${k}: طول الملخص ${Math.round(r * 100)}% من الأصل`); } } }
-  console.log(bad.length ? bad.join('\n') : `✅ ${Object.keys(tr).length} ترجمة سليمة${eps ? `، و${eps} حلقة${stale ? ` (${stale} تغيّر نصها الإنجليزي بعد ترجمتها)` : ''}` : ''}`); process.exit(bad.length ? 1 : 0); }
+  // الملفات المحرَّرة باليد: نبذات العوالم (worlds.json)، وترتيب القصة المُراجَع (orders.json)، وتصحيح مطابقة TMDB (tmdb.json)
+  const heads = new Map((cat.worlds || []).map(w => [w.head, w])), about = rd('data/anime/worlds.json', {}), orders = rd('data/anime/orders.json', {}), fix = rd('data/anime/tmdb.json', {});
+  for (const [k, v] of Object.entries(about)) { if (!heads.has(+k)) bad.push(`worlds.json ${k}: ليس العمل الذي تحمل سلسلةٌ اسمه`); const w = typeof v === 'string' ? badText(v) : 'ليس نصاً'; if (w) bad.push(`worlds.json ${k}: ${w}`); }
+  for (const [k, o] of Object.entries(orders)) { const w = heads.get(+k); if (!w) { bad.push(`orders.json ${k}: ليس العمل الذي تحمل سلسلةٌ اسمه`); continue; }
+    const ids = new Set(w.ids), out = (o.order || []).filter(id => !ids.has(id)), miss = o.order ? w.ids.filter(id => !o.order.includes(id)) : [];
+    if (out.length) bad.push(`orders.json ${k} (${w.name}): ليست من السلسلة: ${out.join(' ')}`); if (miss.length) bad.push(`orders.json ${k} (${w.name}): لم تُذكر: ${miss.join(' ')}`);
+    if (o.order && new Set(o.order).size !== o.order.length) bad.push(`orders.json ${k}: عمل مكرر`); if (o.note != null && (typeof o.note !== 'string' || badText(o.note))) bad.push(`orders.json ${k}: الملاحظة: ${badText(String(o.note))}`); }
+  for (const [k, t] of Object.entries(fix)) { if (!by.has(+k)) bad.push(`tmdb.json ${k}: ليس في الكتالوج`); if (t !== null && !((t.k === 'tv' || t.k === 'movie') && Number.isInteger(t.id))) bad.push(`tmdb.json ${k}: الشكل { k: 'tv'|'movie', id, s?, o? } أو null`); }
+  const extra = [Object.keys(about).length && `${Object.keys(about).length} نبذة عالم`, Object.keys(orders).length && `${Object.keys(orders).length} ترتيب مُراجَع`, Object.keys(fix).length && `${Object.keys(fix).length} تصحيح مطابقة`].filter(Boolean).join('، و');
+  console.log(bad.length ? bad.join('\n') : `✅ ${Object.keys(tr).length} ترجمة سليمة${eps ? `، و${eps} حلقة${stale ? ` (${stale} تغيّر نصها الإنجليزي بعد ترجمتها)` : ''}` : ''}${extra ? '، و' + extra : ''}`); process.exit(bad.length ? 1 : 0); }
 else if (cmd === 'eps') { const id = +args[0], j = epsOf(id), a = by.get(id); if (!j) { console.error('لا ملف حلقات لهذا العمل'); process.exit(1); } const T = trOf(j.tv), from = +args[1] || 0, to = +args[2] || 0;
   const todo = j.eps.filter(e => hasText(e) && !done(e, T) && (!from || e.n >= from) && (!to || e.n <= to)), pick = from ? todo : todo.slice(0, 12);
   console.log(JSON.stringify({ id, title: a?.t, tv: j.tv, episodes: j.eps.length, translated: j.eps.filter(e => done(e, T)).length, noText: j.eps.filter(e => !hasText(e)).length, shown: pick.length }));
