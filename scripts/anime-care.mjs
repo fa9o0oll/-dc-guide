@@ -8,7 +8,11 @@
 // بمفتاح «الموسمxالحلقة» في TMDB ومعها بصمة النص الإنجليزي (h): إن تغيّر النص أو تبدّل موضع الحلقة لم تُلصق الترجمة بغير حلقتها.
 //   node scripts/anime-care.mjs eps <رقم العمل> [من] [إلى]   حلقات العمل التي لم تُترجم، بنصها الإنجليزي (من الحلقة «من» إلى «إلى»، وإلا أول 12 غير مترجمة)
 //   node scripts/anime-care.mjs eps-add <ملف.json>           يدمج { "رقم العمل": { "رقم الحلقة": { "t": "العنوان", "o": "الملخص" } } } في ملفات الترجمة ببصماتها
+//                                                        ("t": "=" لعنوان هو اسم عمل آخر يبقى بحروفه اللاتينية، كعناوين Akudama Drive بأسماء أفلام)
 //   node scripts/anime-care.mjs eps-left [رقم…]              كم بقي من حلقات كل عمل بلا ترجمة (الأعمال المذكورة، وإلا كل ما له حلقات)
+//   node scripts/anime-care.mjs eps-next [أعمال] [حلقات]     الدفعة التالية: الأعمال التي بدأت ترجمة حلقاتها ولم تكتمل، الأقل تقدّماً أولاً، ولكل عمل حلقاته
+//                                                        التالية بعد آخر ما تُرجم (الافتراضي 10 أعمال × 3 حلقات)، ومعه الأسماء التي بين «» في نبذته لتوحيدها.
+//                                                        سجله الشخصي ليس في المستودع، فما بدأته دفعة سابقة (مما سمّاه أو مما يشاهده) هو الدليل على ما يُكمَل
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { epPrint, epKey } from './lib-anime.mjs';
@@ -55,11 +59,11 @@ else if (cmd === 'eps') { const id = +args[0], j = epsOf(id), a = by.get(id); if
   for (const e of pick) console.log(`\n## ${e.n} | ${e.t || '(بلا عنوان)'}\n${e.ov || '(بلا ملخص)'}`); }
 else if (cmd === 'eps-add') { const add = JSON.parse(fs.readFileSync(args[0], 'utf8')); let n = 0, changed = 0; const bad = [];
   for (const [id, eps] of Object.entries(add)) { const j = epsOf(+id); if (!j) { bad.push(`${id}: لا ملف حلقات`); continue; } const T = trOf(j.tv);
-    for (const [num, x] of Object.entries(eps)) { const e = j.eps.find(z => z.n === +num), t = (x.t || '').trim(), o = (x.o || '').trim();
+    for (const [num, x] of Object.entries(eps)) { const e = j.eps.find(z => z.n === +num), same = (x.t || '').trim() === '=', t = same ? '' : (x.t || '').trim(), o = (x.o || '').trim();   // "t": "=" عنوان هو اسم عمل (فيلم، أغنية): يبقى بحروفه
       if (!e) { bad.push(`${id} الحلقة ${num}: ليست في ملف الحلقات`); continue; } if (!t && !o) { bad.push(`${id} الحلقة ${num}: فارغة`); continue; }
       if (o && !e.ov) { bad.push(`${id} الحلقة ${num}: ملخص لحلقة لا ملخص لها في المصدر`); continue; } if (t && !e.t) { bad.push(`${id} الحلقة ${num}: عنوان لحلقة لا عنوان لها في المصدر`); continue; }
-      if ((e.t && !t) || (e.ov && !o)) { bad.push(`${id} الحلقة ${num}: ينقصها ${e.t && !t ? 'العنوان' : 'الملخص'}`); continue; }
-      const w = [t, o].map(badText).find(Boolean); if (w) { bad.push(`${id} الحلقة ${num}: ${w}`); continue; }
+      if ((e.t && !t && !same) || (e.ov && !o)) { bad.push(`${id} الحلقة ${num}: ينقصها ${e.t && !t && !same ? 'العنوان' : 'الملخص'}`); continue; }
+      const w = [t, o].filter(Boolean).map(badText).find(Boolean); if (w) { bad.push(`${id} الحلقة ${num}: ${w}`); continue; }
       const k = epKey(e), v = { ...(t ? { t } : {}), ...(o ? { o } : {}), h: epPrint(sha, e) }; if (!T[k]) n++; else if (JSON.stringify(T[k]) !== JSON.stringify(v)) changed++; T[k] = v; }
     saveTr(j.tv, T); }
   console.log(`حلقات جديدة ${n}، معدَّلة ${changed}${bad.length ? '\n' + bad.join('\n') : ''}`); process.exit(bad.length ? 1 : 0); }
@@ -67,4 +71,13 @@ else if (cmd === 'eps-left') { const ids = args.map(Number).filter(Boolean), ind
   for (const id of ids.length ? ids : Object.keys(index).map(Number)) { const j = epsOf(id); if (!j) continue; const T = trOf(j.tv), text = j.eps.filter(hasText), ok = text.filter(e => done(e, T)).length; rows.push([id, by.get(id)?.t || '', j.eps.length, text.length, ok]); }
   const sum = k => rows.reduce((s, r) => s + r[k], 0); console.log(JSON.stringify({ works: rows.length, episodes: sum(2), withText: sum(3), translated: sum(4) }));
   if (ids.length) for (const r of rows) console.log(`${r[0]}\t${r[1]}\t${r[4]} من ${r[3]} (حلقاته ${r[2]})`); }
-else console.log('الأوامر: pending [عدد] [--full] [--ids 1,2] | heads [عدد] | show <رقم> | check | eps <رقم العمل> [من] [إلى] | eps-add <ملف> | eps-left [رقم…]');
+else if (cmd === 'eps-next') { const works = +args[0] || 10, each = +args[1] || 3, rows = [];
+  for (const id of Object.keys(rd('site/anime/data/eps/index.json', {})).map(Number)) { const j = epsOf(id); if (!j || j.fit === 'loose') continue; const T = trOf(j.tv); if (!Object.keys(T).length) continue;
+    const text = j.eps.filter(hasText), ok = text.filter(e => done(e, T)); if (!ok.length || ok.length === text.length) continue;
+    const last = ok.at(-1).n, next = text.filter(e => e.n > last && !done(e, T)).slice(0, each); if (next.length) rows.push({ id, j, ok: ok.length, next }); }
+  rows.sort((a, b) => a.ok - b.ok || a.id - b.id);
+  console.log(JSON.stringify({ started: rows.length, shown: Math.min(works, rows.length), episodes: rows.slice(0, works).reduce((n, r) => n + r.next.length, 0) }));
+  for (const r of rows.slice(0, works)) { const names = [...new Set((tr[r.id] || '').match(/«[^»]+»/g) || [])].join(' ');
+    console.log(`\n# ${r.id} | ${by.get(r.id)?.t || ''} | تُرجم ${r.ok} من ${r.j.eps.filter(hasText).length}${names ? '\n' + names : ''}`);
+    for (const e of r.next) console.log(`${e.n} | ${e.t || '—'} | ${e.ov || '—'}`); } }
+else console.log('الأوامر: pending [عدد] [--full] [--ids 1,2] | heads [عدد] | show <رقم> | check | eps <رقم العمل> [من] [إلى] | eps-add <ملف> | eps-left [رقم…] | eps-next [أعمال] [حلقات]');
