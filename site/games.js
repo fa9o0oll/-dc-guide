@@ -363,7 +363,7 @@ function platsSec(g) { if (!g.plats?.length) return ''; const at = new Map((g.da
   return `<section class="sec"><h3>المنصات</h3><ul class="pls">${g.plats.map(c => { const d = at.get(c), when = d ? (precOfHuman(d.human) === 'd' && d.date ? dateAr(d.date) : d.human ? esc(d.human) : '') : '';
     return `<li class="f-${famOf(c)}"><b dir="ltr">${esc(abbr(c))}</b>${when ? `<small>${when}</small>` : ''}</li>`; }).join('')}</ul>${g.also?.length ? `<p class="note">ولها نسخ بالاسم نفسه على <bdi dir="ltr">${g.also.map(c => esc(abbr(c))).join(' · ')}</bdi>، في سجلات أخرى من <bdi dir="ltr">IGDB</bdi>.</p>` : ''}</section>`; }
 // ---------- أين تُلعب على الكمبيوتر، وهل هي مجانية الآن. الصفوف من البناء (g.pc، scripts/lib-stores.mjs): متاجرها ومشغّلاتها، وكل صف يحمل حاله
-// (free: مجانية اللعب أو هدية لمدة، pass: ضمن PC Game Pass، off: ليست في متجر السعودية). ما أُضيف للتو وبطاقة الاطلاع بلا g.pc: متاجرها من روابط IGDB وحدها
+// (free: مجانية اللعب أو هدية لمدة، pass: ضمن PC Game Pass، off: ليست في متجر السعودية، gone: لا تُباع فيه الآن). ما أُضيف للتو وبطاقة الاطلاع بلا g.pc: متاجرها من روابط IGDB وحدها
 const STN = { steam: 'Steam', epic: 'Epic Games Store', gog: 'GOG', xbox: 'Xbox', battlenet: 'Battle.net', ea: 'EA app', ubi: 'Ubisoft Connect', rockstar: 'Rockstar Games Launcher', itch: 'itch.io' }, PCS = ['steam', 'epic', 'gog'], LAUNCH = ['battlenet', 'ea', 'ubi', 'rockstar'];
 const DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 const dayAr = iso => { const d = new Date(iso); return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; };
@@ -382,7 +382,7 @@ function pcSec(g) { if (!g.plats?.length) return '';
     : g.f2p ? '<p class="pcf on">مجانية اللعب: تُحمَّل وتُلعب بلا ثمن.</p>'
     : soon.length ? `<p class="pcf soon">ليست مجانية الآن، وتصير مجانية على ${names(soon)} من ${dayAr(soon[0].from)}${soon[0].until ? ` إلى ${dayAr(soon[0].until)}` : ''}.</p>`
     : rows.some(r => ['steam', 'epic', 'gog', 'xbox'].includes(r.s)) ? '<p class="pcf">ليست مجانية الآن.</p>' : '';
-  const tile = r => { const [k, t] = giftNow(r, now) ? ['free', r.until ? `مجانية الآن حتى ${dayAr(r.until)}` : 'مجانية الآن'] : giftSoon(r, now) ? ['soon', `مجانية من ${dayAr(r.from)}`] : r.off ? ['off', 'ليست في متجر السعودية']
+  const tile = r => { const [k, t] = giftNow(r, now) ? ['free', r.until ? `مجانية الآن حتى ${dayAr(r.until)}` : 'مجانية الآن'] : giftSoon(r, now) ? ['soon', `مجانية من ${dayAr(r.from)}`] : r.off ? ['off', 'ليست في متجر السعودية'] : r.gone ? ['off', 'لا تُباع فيه الآن']
       : r.free === 'f2p' || (g.f2p && !r.pass) ? ['free', 'مجانية اللعب'] : r.pass ? ['pass', `ضمن <bdi dir="ltr">PC Game Pass</bdi>`] : ['', r.s === 'xbox' ? '<bdi dir="ltr">Microsoft Store</bdi>' : LAUNCH.includes(r.s) || r.s === 'other' ? 'مشغّل الناشر' : 'المتجر'];
     return `<a class="st${k ? ' ' + k : ''}" data-s="${esc(r.s)}" href="${esc(r.u)}" target="_blank" rel="noopener"><b dir="ltr">${esc(stName(r))}</b><small>${t}</small></a>`; };
   const at = D.stores?.at ? new Date(D.stores.at) : null, fresh = at ? ` آخر فحص: ${dayAr(at)} الساعة ${clockAr(at)}.` : '';

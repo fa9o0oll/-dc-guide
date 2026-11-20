@@ -12,8 +12,8 @@ export const STORES = ['steam', 'epic', 'gog', 'xbox', 'battlenet', 'ea', 'ubi',
 const HOME = { ubi: 'https://store.ubisoft.com/', ea: 'https://www.ea.com/games', rockstar: 'https://www.rockstargames.com/games', battlenet: 'https://shop.battle.net/' };
 const OWN = { ubi: /(^|\.)(ubisoft|ubi)\.com$/, ea: /(^|\.)ea\.com$/, rockstar: /(^|\.)rockstargames\.com$/, battlenet: /(^|\.)(blizzard\.com|battle\.net|callofduty\.com)$/ };
 // الناشر الذي له مشغّله: ألعابه على الكمبيوتر كلها فيه. Battle.net ليس هنا إلا لألعاب Blizzard نفسها، فألعاب Activision بعضها فيه وبعضها لا (يأتي من Wikidata أو من ملف التصحيح)
-const RULES = [['ubi', /^ubisoft\b/i], ['ea', /^(electronic arts|ea (sports|games|originals))\b/i], ['rockstar', /^rockstar games\b/i], ['battlenet', /^blizzard entertainment\b/i]];
-const WD = { Q725130: 'battlenet', Q94582474: 'ubi', Q7898372: 'ubi', Q31708: 'ea', Q121327575: 'ea', Q59510068: 'epic', Q1486288: 'gog' };
+const RULES = [['ubi', /^ubisoft\b/i], ['ea', /^(electronic arts|ea)\b/i], ['rockstar', /^rockstar\b/i], ['battlenet', /^blizzard\b/i]];
+const WD = { Q725130: 'battlenet', Q59510068: 'epic', Q1486288: 'gog' };   // Battle.net وEpic Games Store وGOG.com: تلميح يُتحقق منه في المتجر نفسه (Epic وGOG)، أو يُقبل لألعاب مجموعة المتجر (Battle.net)
 const PASS_PC = 'fdd9e2a7-0fee-49f6-ad69-4354098401ff';   // قائمة PC Game Pass في فهرس Game Pass
 
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -34,19 +34,25 @@ function client(opt) { const f = opt.fetch || fetch, pause = opt.pause ?? 500;
       return { status: r.status, body: await r.json().catch(() => null) };
     } catch (e) { if (i >= (o.tries ?? 2)) return { status: e.status || 0, body: null, error: String(e?.message || e) }; await wait(pause * (i + 1) * 2); } } }; }
 
-// ---------- Steam: رقم التطبيق ← {} (في المتجر) | {free:'f2p'} | {free:'gift'} | {off:1} (ليست في متجر السعودية) | null (أُزيلت). ما لم يُعرف لا يدخل الخريطة
+// ---------- Steam: حكم كل رقم تطبيق بأسعار السعودية. k: paid (يُباع) | gift (خصم كامل الآن) | f2p (مجانية اللعب) | plain (في المتجر بلا سعر منفرد: ضمن حزمة) |
+// off (لا يُعرض في متجر السعودية ويُعرض في غيره) | gone (لم يعد يُباع) | none (أُزيل، أو ليس لعبة: نسخة تجريبية أو إضافة). ما لم يُعرف لا يدخل الخريطة
 async function steam(ids, get, pause) { const out = new Map(), odd = []; let ok = true;
   for (const part of chunks(ids, 40)) { const r = await get(`https://store.steampowered.com/api/appdetails?appids=${part.join(',')}&cc=sa&filters=price_overview`);
     if (r.status !== 200 || !r.body || typeof r.body !== 'object') { ok = false; continue; }
-    for (const id of part) { const v = r.body[id], p = v?.success && !Array.isArray(v.data) ? v.data?.price_overview : null; if (p) out.set(id, p.final === 0 ? { free: 'gift' } : {}); else odd.push(id); }
+    for (const id of part) { const v = r.body[id], pr = v?.success && !Array.isArray(v.data) ? v.data?.price_overview : null; if (pr) out.set(id, { k: pr.final === 0 ? 'gift' : 'paid' }); else odd.push(id); }
     await wait(pause); }
-  // ما لا سعر له: مجانية اللعب (في المتجرين السعودي والأمريكي معاً، فبعض ما لا يُباع في السعودية يظهر «مجاناً» فيها وحدها)، أو غير متاحة في السعودية، أو أُزيلت، أو تُباع ضمن حزمة
+  // ما لا سعر له يُسأل عنه وحده في المتجرين السعودي والأمريكي: «مجانية» في السعودية وحدها ليست مجانية اللعب (قد لا تُباع فيها)، وما لا حزمة له ولا سعر في أي منهما لم يعد يُباع
   const one = async (id, cc) => { const r = await get(`https://store.steampowered.com/api/appdetails?appids=${id}&cc=${cc}&l=en`), v = r.body?.[id]; return r.status === 200 && v ? v : null; };
   for (const id of odd) { const sa = await one(id, 'sa'); await wait(pause / 2); if (!sa) { ok = false; continue; }
-    if (sa.success && !sa.data?.is_free) { out.set(id, {}); continue; }
+    if (sa.success && sa.data?.type && sa.data.type !== 'game') { out.set(id, { k: 'none' }); continue; }
+    if (sa.success && !sa.data?.is_free && (sa.data?.packages || []).length) { out.set(id, { k: 'plain' }); continue; }
     const us = await one(id, 'us'); await wait(pause / 2); if (!us) { ok = false; continue; }
-    out.set(id, sa.success ? (us.success && us.data?.is_free ? { free: 'f2p' } : {}) : us.success ? { off: 1 } : null); }
+    const sold = us.success && !!us.data?.price_overview, free = us.success && !!us.data?.is_free;
+    out.set(id, { k: !sa.success ? (us.success ? 'off' : 'none') : sa.data?.is_free ? (free ? 'f2p' : 'plain') : sold ? 'off' : free ? 'plain' : 'gone' }); }
   return { out, ok, n: ids.length, odd: odd.length }; }
+const STEAM_RANK = { paid: 6, gift: 6, f2p: 5, plain: 4, off: 3, gone: 2, none: 0 };
+// أرقام Steam المرشحة للعبة: رقم رابطها في IGDB أولاً (صفحتها الأساسية)، ثم أرقامها الخارجية (وفيها أحياناً نسخة تجريبية أو بيتا)
+const steamIds = g => [...new Set([((g.sites || []).find(x => x.t === 'steam')?.url || '').match(/\/app\/(\d+)/)?.[1], ...(g.ext?.sts || []), g.ext?.steam].filter(Boolean).map(String))];
 
 // ---------- Epic: الهدايا الحالية والقادمة في متجر السعودية (خصم كامل لمدة). كل عنصر: الاسم والمسارات والأرقام والمدد
 async function epicFree(get) { const r = await get('https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=SA&allowCountries=SA'), els = r.body?.data?.Catalog?.searchStore?.elements;
@@ -60,15 +66,28 @@ async function epicFree(get) { const r = await get('https://store-site-backend-s
 // المدة التي تهم الآن: الجارية، وإلا أقرب قادمة
 const windowAt = (win, now) => win.find(w => Date.parse(w.from) <= now && now < Date.parse(w.until)) || win.find(w => Date.parse(w.from) > now) || null;
 
-// ---------- GOG: رقم المنتج ← {u, free?} | null (ليس في المتجر)
+// ---------- GOG. بالرقم: رقم المنتج ← {u, free?, priced} | null (ليس في المتجر). priced: له سعر في متجر السعودية (وإلا فصفحته باقية ولا يُباع بهذا الرقم)
 async function gog(ids, get, pause) { const out = new Map(); let ok = true;
   for (const id of ids) { const a = await get(`https://api.gog.com/products/${id}`); await wait(pause / 3);
     if (a.status === 404) { out.set(id, null); continue; } if (a.status !== 200 || !a.body) { ok = false; continue; }
-    const row = { u: a.body.links?.product_card || '' }, p = await get(`https://api.gog.com/products/${id}/prices?countryCode=SA`); await wait(pause / 3);
-    if (p.status === 200) { const list = p.body?._embedded?.prices || [], x = list.find(q => q.currency?.code === 'SAR') || list[0], fin = parseInt(x?.finalPrice), base = parseInt(x?.basePrice);
-      if (x && fin === 0) row.free = base > 0 ? 'gift' : 'f2p'; } else if (p.status !== 400 && p.status !== 404) ok = false;   // 400: منتج بلا سعر في هذا البلد (صفحته باقية)
+    const row = { u: a.body.links?.product_card || '', priced: false }, pr = await get(`https://api.gog.com/products/${id}/prices?countryCode=SA`); await wait(pause / 3);
+    if (pr.status === 200) { const list = pr.body?._embedded?.prices || [], x = list.find(q => q.currency?.code === 'SAR') || list[0], fin = parseInt(x?.finalPrice), base = parseInt(x?.basePrice);
+      if (x) { row.priced = true; if (fin === 0) row.free = base > 0 ? 'gift' : 'f2p'; } } else if (pr.status !== 400 && pr.status !== 404) ok = false;
     out.set(id, row); }
   return { out, ok, n: ids.length }; }
+// اللعبة نفسها باسمها أو بطبعة منها («Far Cry 2: Fortune's Edition»، «Sleeping Dogs: Definitive Edition»)، لا جزء آخر يبدأ باسمها
+const EDITION = /^(the )?(definitive|complete|gold|enhanced|deluxe|digital deluxe|ultimate|special|legendary|anniversary|game of the year|goty|premium|royal|standard|fortune s|director s cut|directors cut|remastered|reloaded)( edition)?( remastered)?$/;
+export const sameGame = (title, cand) => { const a = norm(title), b = norm(cand); return !!a && (a === b || (b.startsWith(a + ' ') && EDITION.test(b.slice(a.length + 1)))); };
+// بالبحث في فهرس متجر السعودية: الاسم ← {u, free?} | null (ليس فيه). لما رقمه في IGDB لم يعد يُباع، ولما يقول Wikidata إنه في GOG ولا رقم له
+async function gogFind(titles, get, pause) { const out = new Map(); let ok = true;
+  for (const t of titles) { const r = await get(`https://catalog.gog.com/v1/catalog?limit=8&query=like:${encodeURIComponent(t)}&order=desc:score&productType=in:game,pack&countryCode=SA&locale=en-US&currencyCode=SAR`); await wait(pause / 2);
+    if (r.status !== 200 || !Array.isArray(r.body?.products)) { ok = false; continue; }
+    const hit = r.body.products.filter(x => sameGame(t, x.title)).sort((a, b) => (a.productType === 'game' ? 0 : 1) - (b.productType === 'game' ? 0 : 1) || norm(a.title).length - norm(b.title).length)[0];
+    if (!hit) { out.set(t, null); continue; } const fin = parseFloat(hit.price?.finalMoney?.amount), base = parseFloat(hit.price?.baseMoney?.amount);
+    out.set(t, { u: String(hit.storeLink || `https://www.gog.com/game/${hit.slug}`).replace('gog.com/en/game/', 'gog.com/game/'), ...(fin === 0 ? { free: base > 0 ? 'gift' : 'f2p' } : {}) }); }
+  return { out, ok }; }
+// ---------- Epic: صفحة منتج بمسار مأخوذ من اسمها (للصفحات القديمة التي مسارها اسم اللعبة). true: موجودة، false: لا، null: لم يُعرف
+async function epicPage(slug, get) { const r = await get(`https://store-content.ak.epicgames.com/api/en-US/content/products/${slug}`); return r.status === 200 && r.body?.productName ? true : r.status === 404 ? false : null; }
 
 // ---------- Microsoft: المنتجات بأرقامها (حزمة للكمبيوتر؟ تُشترى؟ سعرها)، وقائمة PC Game Pass
 const msProduct = p => { const skus = p.DisplaySkuAvailabilities || [], full = skus.find(s => s.Sku?.SkuType === 'full') || skus[0], buy = (full?.Availabilities || []).find(a => (a.Actions || []).includes('Purchase') && a.OrderManagementData?.Price), pr = buy?.OrderManagementData?.Price;
@@ -88,18 +107,38 @@ async function wikidata(slugs, get) { const out = new Map();
     for (const b of r.body.results.bindings) { const s = b.slug.value; if (!out.has(s)) out.set(s, new Set()); out.get(s).add(b.dist.value.split('/').pop()); } }
   return out; }
 
-// ---------- الجمع. يعيد: rows (رقم اللعبة ← صفوف متاجرها مرتبة)، f2p (ألعاب مجانية اللعب)، meta (متى فُحصت وأي المصادر أجاب)، report (للمراجعة)
-// الصف: { s: المتجر, u: الرابط, free?: 'f2p' | 'gift', from?, until? (مدة الهدية), pass?: 1 (ضمن PC Game Pass), off?: 1 (ليست في متجر السعودية), how?: 'pub' | 'wd' | 'fix' (من أين عُرف حين ليس من المتجر نفسه), n?: الاسم (للمتاجر الأخرى) }
+// يفحص ملف التصحيح (data/games/pc.json) ويعيد مشاكله
+export function checkFix(fix, known = null) { const bad = [], url = u => u === 'official' || /^https:\/\/[^\s"<>]+$/.test(u || '');
+  for (const [id, f] of Object.entries(fix || {})) { const at = `pc.json ${id}`;
+    if (!/^\d+$/.test(id)) bad.push(`${at}: المفتاح ليس رقم لعبة`); else if (known && !known.has(id)) bad.push(`${at}: ليست في القائمة`);
+    for (const k of Object.keys(f)) if (!['ids', 'add', 'drop', 'why'].includes(k)) bad.push(`${at}: حقل غير معروف «${k}»`);
+    if (!f.why || typeof f.why !== 'string') bad.push(`${at}: بلا سبب (why)`);
+    for (const [k, v] of Object.entries(f.ids || {})) { if (!['steam', 'gog', 'ms', 'epic'].includes(k)) bad.push(`${at}: رقم لمتجر غير معروف «${k}»`); else if (k === 'ms' ? ![].concat(v).every(x => /^[A-Z0-9]{12}$/.test(x)) : k === 'epic' ? !epicSlug(v) : !/^\d+$/.test(String(v))) bad.push(`${at}: رقم ${k} غير صالح`); }
+    for (const a of f.add || []) { if (!STORES.includes(a.s)) bad.push(`${at}: متجر غير معروف «${a.s}»`); if (!url(a.u)) bad.push(`${at}: رابط غير صالح`); if (a.s === 'other' && !a.n) bad.push(`${at}: متجر آخر بلا اسم`); if (a.free && !['f2p'].includes(a.free)) bad.push(`${at}: حال غير معروف «${a.free}»`); }
+    for (const k of f.drop || []) if (!STORES.includes(k)) bad.push(`${at}: متجر غير معروف «${k}»`); }
+  return bad; }
+
+// ---------- الجمع. يعيد: rows (رقم اللعبة ← صفوف متاجرها مرتبة)، f2p (ألعاب مجانية اللعب)، meta (متى فُحصت وأي المصادر لم يُجب)، report (للمراجعة)
+// الصف: { s: المتجر, u: الرابط, free?: 'f2p' | 'gift', from?, until? (مدة الهدية), pass?: 1 (ضمن PC Game Pass), off?: 1 (ليست في متجر السعودية), gone?: 1 (لا تُباع فيه الآن),
+//         how?: 'pub' | 'wd' | 'fix' (من أين عُرف حين ليس من المتجر نفسه), n?: الاسم (للمتاجر الأخرى) }
+// التصحيح باليد (opt.fix، مفتاحه رقم اللعبة): ids {steam, gog, ms: [..], epic: رابط} تُفحص كأنها من IGDB، وadd [{s, u ('official' = موقعها الرسمي), n?, free?}] يُضاف كما هو، وdrop [..] يُحذف
 export async function storesFor(games, opt = {}) {
   const get = client(opt), pause = opt.pause ?? 400, now = opt.now ?? Date.now(), log = opt.log || (() => {}), prev = opt.prev || new Map(), fix = opt.fix || {};
-  const pc = games.filter(isPc), old = (id, s) => (prev.get(id)?.pc || []).find(r => r.s === s) || null, failed = [];
+  const view = g => { const f = fix[g.id]?.ids; if (!f) return g; const ext = { ...g.ext }, sites = (g.sites || []).filter(x => !(f.steam && x.t === 'steam') && !(f.epic && x.t === 'epic'));
+    if (f.steam) { ext.steam = String(f.steam); ext.sts = [String(f.steam)]; } if (f.gog) ext.gog = String(f.gog); if (f.ms) ext.ms = [...new Set([...(ext.ms || []), ...[].concat(f.ms)])]; if (f.epic) sites.push({ t: 'epic', url: f.epic });
+    return { ...g, ext, sites }; };
+  const pc = games.filter(isPc).map(view), old = (id, s) => (prev.get(id)?.pc || []).find(r => r.s === s) || null, failed = [];
   const site = (g, t) => (g.sites || []).find(s => s.t === t)?.url || '';
-  const msIds = g => [...new Set([g.ext?.xbox, ...(g.ext?.ms || [])].filter(x => /^[A-Z0-9]{12}$/.test(x || '')))];
+  const msIds = g => [...new Set([g.ext?.xbox, ...(g.ext?.ms || []), site(g, 'xstore').split(/[/?#]/).filter(Boolean).pop()?.toUpperCase()].filter(x => /^[A-Z0-9]{12}$/.test(x || '')))];   // ومنها رقم رابط المتجر في IGDB
 
   const [st, ep, gg, wd, pass] = await Promise.all([
-    steam([...new Set(pc.map(g => g.ext?.steam).filter(Boolean))], get, pause), epicFree(get),
+    steam([...new Set(pc.flatMap(steamIds))], get, pause), epicFree(get),
     gog([...new Set(pc.map(g => g.ext?.gog).filter(Boolean))].map(String), get, pause), wikidata(pc.map(g => g.slug).filter(Boolean), get), gamePass(get)]);
   if (!st.ok) failed.push('steam'); if (!ep) failed.push('epic'); if (!gg.ok) failed.push('gog'); if (!wd) failed.push('wikidata'); if (!pass) failed.push('gamepass');
+  const viaWd = (g, k) => [...(wd?.get(g.slug) || [])].some(q => WD[q] === k), names = g => [...(g.pub || []), ...(g.dev || [])];
+  // GOG بالبحث: ما رقمه لم يعد يُباع أو زال، وما يقول IGDB أو Wikidata إنه في GOG ولا رقم له
+  const gogOf = g => g.ext?.gog ? gg.out.get(String(g.ext.gog)) : undefined;
+  const seek = pc.filter(g => g.ext?.gog ? (gg.out.has(String(g.ext.gog)) && !gogOf(g)?.priced) : (!!site(g, 'gog') || viaWd(g, 'gog'))), found = await gogFind([...new Set(seek.map(g => g.title))], get, pause); if (!found.ok) failed.push('gog-search');
   // Microsoft: أرقام القائمة، ثم ما في PC Game Pass وليس من أرقامها (ليُطابَق باسمه)
   const own = new Map(); for (const g of pc) for (const id of msIds(g)) own.set(id, g.id);
   const cat = await msCatalog([...own.keys()], get, pause); if (!cat.ok) failed.push('microsoft');
@@ -108,39 +147,44 @@ export async function storesFor(games, opt = {}) {
   if (pass) { const rest = await msCatalog([...pass].filter(id => !own.has(id)), get, pause); if (!rest.ok) failed.push('gamepass-titles');
     for (const p of rest.out.values()) { const k = norm(p.title), g = byName.get(k); if (g && !dup.has(k)) { passByTitle.set(g.id, p); titled.push(`${p.id} "${p.title}" → ${g.title}`); } } }
 
-  const rows = new Map(), f2p = new Set(), report = { at: new Date(now).toISOString(), failed, games: {}, passByTitle: titled, none: [], steam: { n: st.n, odd: st.odd }, epicFree: (ep || []).map(e => `${e.title}: ${e.win.map(w => w.from.slice(0, 10) + '→' + w.until.slice(0, 10)).join(', ')}`) };
-  for (const g of pc) { const list = [], add = r => { if (r && !list.some(x => x.s === r.s && r.s !== 'other')) list.push(r); }, dist = wd?.get(g.slug) || new Set(), viaWd = k => [...dist].some(q => WD[q] === k), f = fix[g.id] || {};
-    // Steam
-    if (g.ext?.steam) { const id = String(g.ext.steam), u = `https://store.steampowered.com/app/${id}`;
-      if (st.out.has(id)) { const v = st.out.get(id); if (v) add({ s: 'steam', u, ...v }); } else add(old(g.id, 'steam') || { s: 'steam', u }); }
-    // Epic: الرابط من IGDB أو من عرض مجاني يطابق اسمها، ثم Wikidata (بلا رابط دقيق: بحث المتجر)
+  const rows = new Map(), f2p = new Set(), report = { at: new Date(now).toISOString(), failed, games: {}, passByTitle: titled, none: [], steam: { n: st.n, odd: st.odd }, gogSearch: [...found.out].map(([t, v]) => `${t} → ${v ? v.u : '—'}`), epicGuess: [],
+    epicFree: (ep || []).map(e => `${e.title}: ${e.win.map(w => w.from.slice(0, 10) + '→' + w.until.slice(0, 10)).join(', ')}`) };
+  for (const g of pc) { const list = [], add = r => { if (r && !list.some(x => x.s === r.s && r.s !== 'other')) list.push(r); }, f = fix[g.id] || {};
+    // Steam: أصلح أرقامها (ما يُباع، ثم المجاني، ثم ما في المتجر بلا سعر، ثم ما لا يُعرض في السعودية، ثم ما لم يعد يُباع)
+    { const ids = steamIds(g), known = ids.filter(id => st.out.has(id)), best = known.sort((a, b) => STEAM_RANK[st.out.get(b).k] - STEAM_RANK[st.out.get(a).k])[0], k = best ? st.out.get(best).k : '';
+      if (best && k !== 'none') add({ s: 'steam', u: `https://store.steampowered.com/app/${best}`, ...(k === 'gift' ? { free: 'gift' } : k === 'f2p' ? { free: 'f2p' } : k === 'off' ? { off: 1 } : k === 'gone' ? { gone: 1 } : {}) });
+      else if (ids.length && known.length < ids.length) add(old(g.id, 'steam') || { s: 'steam', u: `https://store.steampowered.com/app/${ids[0]}` }); }   // لم يُجب المتجر عن بعض أرقامها: يبقى ما كان
+    // Epic: رابطها من IGDB، أو عرض مجاني يطابق اسمها، أو صفحة بمسار من اسمها حين يقول IGDB أو Wikidata إنها فيه بلا رابط
     { const slug = epicSlug(site(g, 'epic'))?.slug, hit = (ep || []).find(e => (slug && e.slugs.includes(slug)) || (g.ext?.epic && (e.ns === g.ext.epic || e.id === g.ext.epic)) || (e.type !== 'ADD_ON' && e.type !== 'DLC' && norm(e.title) === norm(g.title)));
       const w = hit ? windowAt(hit.win, now) : null, gift = w ? { free: 'gift', from: w.from, until: w.until } : {};
       if (site(g, 'epic')) add({ s: 'epic', u: epicUrl(site(g, 'epic')), ...gift }); else if (hit && w && hit.url) add({ s: 'epic', u: hit.url, ...gift });
-      else if (g.ext?.epic || viaWd('epic')) add({ s: 'epic', u: `https://store.epicgames.com/browse?q=${encodeURIComponent(g.title)}&sortBy=relevancy&sortDir=DESC`, ...(g.ext?.epic ? {} : { how: 'wd' }) });
+      else if (g.ext?.epic || viaWd(g, 'epic')) { const guess = slugify(g.title), there = await epicPage(guess, get); await wait(pause / 3); report.epicGuess.push(`${g.title}: ${guess} ${there === true ? '✓' : there === false ? '✗' : '?'}`);
+        if (there) add({ s: 'epic', u: `https://store.epicgames.com/p/${guess}` }); else if (there === null) add(old(g.id, 'epic')); }
       if (!ep) { const o = old(g.id, 'epic'), r = list.find(x => x.s === 'epic'); if (o?.free && r && Date.parse(o.until) > now) Object.assign(r, { free: o.free, from: o.from, until: o.until }); } }
-    // GOG
-    if (g.ext?.gog) { const id = String(g.ext.gog);
-      if (gg.out.has(id)) { const v = gg.out.get(id); if (v) add({ s: 'gog', u: v.u || site(g, 'gog') || `https://www.gog.com/games?query=${encodeURIComponent(g.title)}`, ...(v.free ? { free: v.free } : {}) }); }
-      else add(old(g.id, 'gog') || (site(g, 'gog') ? { s: 'gog', u: site(g, 'gog') } : null)); }
-    else if (site(g, 'gog')) add({ s: 'gog', u: site(g, 'gog') }); else if (viaWd('gog')) add({ s: 'gog', u: `https://www.gog.com/games?query=${encodeURIComponent(g.title)}`, how: 'wd' });
+    // GOG: برقمها إن كان يُباع، وإلا بما وجده البحث، وإلا فصفحتها باقية ولا تُباع فيه الآن
+    { const v = gogOf(g), hit = found.out.get(g.title), searched = found.out.has(g.title);
+      if (g.ext?.gog && v === undefined) add(old(g.id, 'gog') || (site(g, 'gog') ? { s: 'gog', u: site(g, 'gog') } : null));   // المتجر لم يُجب
+      else if (v?.priced) add({ s: 'gog', u: v.u || site(g, 'gog'), ...(v.free ? { free: v.free } : {}) });
+      else if (hit) add({ s: 'gog', u: hit.u, ...(hit.free ? { free: hit.free } : {}) });
+      else if (!searched && (v || site(g, 'gog') || viaWd(g, 'gog'))) add(old(g.id, 'gog') || (v?.u || site(g, 'gog') ? { s: 'gog', u: v?.u || site(g, 'gog') } : null));   // البحث لم يُجب
+      else if (v && (v.u || site(g, 'gog'))) add({ s: 'gog', u: v.u || site(g, 'gog'), gone: 1 }); }
     // Xbox: منتج له حزمة كمبيوتر ويُشترى، أو ضمن PC Game Pass (برقمه أو باسمه)
-    { const mine = msIds(g).map(id => cat.out.get(id)).filter(Boolean), inPass = p => !!pass?.has(p.id), best = mine.filter(p => p.pc && (p.price || inPass(p))).sort((a, b) => inPass(b) - inPass(a))[0] || passByTitle.get(g.id);
+    { const mine = msIds(g).map(id => cat.out.get(id)).filter(Boolean), inPass = p => !!pass?.has(p.id), best = mine.filter(p => (p.pc && p.price) || inPass(p)).sort((a, b) => inPass(b) - inPass(a))[0] || passByTitle.get(g.id);
       if (best) { const x = site(g, 'xstore'), u = x && x.toUpperCase().includes(best.id) ? x : `https://www.xbox.com/games/store/${slugify(best.title || g.title)}/${best.id}`;
         add({ s: 'xbox', u, ...(inPass(best) || passByTitle.get(g.id) === best ? { pass: 1 } : {}), ...(best.price && best.price.list === 0 ? { free: best.price.msrp > 0 ? 'gift' : 'f2p' } : {}) }); }
       else if (!cat.ok || !pass || failed.includes('gamepass-titles')) add(old(g.id, 'xbox')); }   // مصدر لم يُجب: يبقى ما كان
-    // مشغّلات الناشرين: من اسم الناشر، أو من Wikidata
-    for (const [k, re] of RULES) { const pubs = g.pub || [], valve = [...pubs, ...(g.dev || [])].some(n => /^valve\b/i.test(n));   // ما تطوّره Valve وتنشره على Steam يُوزَّع في المتاجر باسم ناشر آخر (Half-Life 2)
-      if (pubs.some(n => re.test(n)) && !valve) add({ s: k, u: OWN[k].test(host(site(g, 'official'))) ? site(g, 'official') : HOME[k], how: 'pub' }); }
-    for (const k of ['battlenet', 'ubi', 'ea']) if (viaWd(k)) add({ s: k, u: OWN[k].test(host(site(g, 'official'))) ? site(g, 'official') : HOME[k], how: 'wd' });
+    // مشغّلات الناشرين: من اسم الناشر أو المطوّر. وBattle.net لغير ألعاب Blizzard من Wikidata، ولألعاب مجموعتها وحدها (فهو يذكر متاجر قديمة لألعاب غيرها)
+    { const valve = names(g).some(n => /^valve\b/i.test(n)), link = k => OWN[k].test(host(site(g, 'official'))) ? site(g, 'official') : HOME[k];   // ما تطوّره Valve يُوزَّع أحياناً باسم ناشر آخر (Half-Life 2 وElectronic Arts)
+      for (const [k, re] of RULES) if (!valve && names(g).some(n => re.test(n))) add({ s: k, u: link(k), how: 'pub' });
+      if (viaWd(g, 'battlenet') && names(g).some(n => /activision|blizzard|xbox game studios|microsoft|bethesda/i.test(n))) add({ s: 'battlenet', u: link('battlenet'), how: 'wd' }); }
     // التصحيح باليد
-    for (const s of f.drop || []) { const i = list.findIndex(r => r.s === s); if (i >= 0) list.splice(i, 1); }
-    for (const a of f.add || []) { const i = list.findIndex(r => r.s === a.s && a.s !== 'other'); if (i >= 0) list.splice(i, 1); list.push({ s: a.s, u: a.u, ...(a.n ? { n: a.n } : {}), how: 'fix' }); }
+    for (const k of f.drop || []) { const i = list.findIndex(r => r.s === k); if (i >= 0) list.splice(i, 1); }
+    for (const a of f.add || []) { const i = list.findIndex(r => r.s === a.s && a.s !== 'other'); if (i >= 0) list.splice(i, 1); const u = a.u === 'official' ? site(g, 'official') : a.u; if (u) list.push({ s: a.s, u, ...(a.n ? { n: a.n } : {}), ...(a.free ? { free: a.free } : {}), how: 'fix' }); }
     list.sort((a, b) => STORES.indexOf(a.s) - STORES.indexOf(b.s));
     if (list.some(r => r.free === 'f2p')) f2p.add(g.id);
     rows.set(g.id, list); if (!list.length) report.none.push(g.title);
-    report.games[g.title] = list.map(r => r.s + (r.n ? `(${r.n})` : '') + (r.free ? ':' + r.free + (r.until ? '→' + r.until.slice(0, 10) : '') : '') + (r.pass ? ':pass' : '') + (r.off ? ':off' : '') + (r.how ? '~' + r.how : '')).join(' ') || '—'; }
-  const count = k => [...rows.values()].filter(l => l.some(r => r.s === k)).length;
-  log(`stores: ${pc.length} PC games: steam ${count('steam')}, epic ${count('epic')}, gog ${count('gog')}, xbox ${count('xbox')} (${[...rows.values()].filter(l => l.some(r => r.pass)).length} in PC Game Pass, ${titled.length} matched by title), publisher launchers ${['ubi', 'ea', 'rockstar', 'battlenet'].map(k => `${k} ${count(k)}`).join(', ')}; free to play ${f2p.size}, gifts ${[...rows.values()].filter(l => l.some(r => r.free === 'gift')).length}, not in the Saudi store ${[...rows.values()].filter(l => l.some(r => r.off)).length}, with no store ${report.none.length}${failed.length ? '; FAILED: ' + failed.join(', ') : ''}`);
+    report.games[g.title] = list.map(r => r.s + (r.n ? `(${r.n})` : '') + (r.free ? ':' + r.free + (r.until ? '→' + r.until.slice(0, 10) : '') : '') + (r.pass ? ':pass' : '') + (r.off ? ':off' : '') + (r.gone ? ':gone' : '') + (r.how ? '~' + r.how : '')).join(' ') || '—'; }
+  const count = k => [...rows.values()].filter(l => l.some(r => r.s === k)).length, some = fn => [...rows.values()].filter(l => l.some(fn)).length;
+  log(`stores: ${pc.length} PC games: steam ${count('steam')}, epic ${count('epic')}, gog ${count('gog')}, xbox ${count('xbox')} (${some(r => r.pass)} in PC Game Pass, ${titled.length} matched by title), publisher launchers ${['ubi', 'ea', 'rockstar', 'battlenet'].map(k => `${k} ${count(k)}`).join(', ')}; free to play ${f2p.size}, gifts ${some(r => r.free === 'gift')}, not in the Saudi store ${some(r => r.off)}, not sold now ${some(r => r.gone)}, with no store ${report.none.length}${failed.length ? '; FAILED: ' + failed.join(', ') : ''}`);
   return { rows, f2p, meta: { at: report.at, ...(failed.length ? { failed } : {}) }, report };
 }
