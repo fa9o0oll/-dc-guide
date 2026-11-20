@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-20T17:44:20.079Z",
+ "generatedAt": "2026-11-20T18:12:34.883Z",
  "total": 196,
  "enriched": 196,
  "pending": 0,
@@ -7,7 +7,7 @@
  "withPoster": 192,
  "withBackdrop": 192,
  "withImdbId": 193,
- "withRtLink": 167,
+ "withRtLink": 0,
  "withArabicOverview": 153,
  "withArabicTitle": 94,
  "withProviders": 75,
@@ -16,5 +16,7 @@
  "series": 65,
  "episodes": 3537,
  "arabicEpisodeOverviews": 425,
- "problems": []
+ "problems": [
+  "روابط التقييم من ويكي‌داتا: Wikidata 502"
+ ]
 }
