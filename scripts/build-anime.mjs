@@ -99,6 +99,15 @@ else {
     catch (e) { fails++; if (e.status !== 404 && report.problems.length < 60) report.problems.push(`TMDB ${k}/${id}: ${e.message}`); } }));
   report.tmdb = { tv: tv.size, movie: movie.size, failed: fails };
 }
+// «وين أشاهد» بدقة الموسم: منصات TMDB المرفقة بالمسلسل تجمع مواسمه كلها. فحين يكون له أكثر من موسم عادي وله منصات في بلدنا، تُسأل منصات موسم العمل نفسه
+// (/tv/<id>/season/<n>/watch/providers). للموسم منصات هنا: هي ما يُعرض (pvs). للموسم بيانات في بلدان أخرى ولا شيء هنا: لا منصة لهذا الموسم، وتُذكر
+// منصات المسلسل «مواسم أخرى» (pvo). لا بيانات للموسم أصلاً، أو تعذّر السؤال: منصات المسلسل كما كانت
+const hasProv = p => !!p && ['stream', 'free', 'rent', 'buy'].some(k => p[k].length), seasonProv = new Map();
+if (tmdbOk) { const keys = new Set(); for (const id of all) { const t = fribb[id]?.tm, T = t?.k === 'tv' ? tv.get(t.id) : null; if (T && t.s >= 1 && hasProv(T.prov) && Object.keys(T.seasons).filter(n => +n >= 1).length > 1) keys.add(`${t.id}:${t.s}`); }
+  const list = PROBE ? [...keys].slice(0, 10) : [...keys], c = report.seasonProviders = { asked: list.length, here: 0, elsewhere: 0, none: 0, failed: 0 };
+  await Promise.all(list.map(async key => { const [id, n] = key.split(':'); try { const res = (await tmdb(`/tv/${id}/season/${n}/watch/providers`)).results || {}, here = provOf(res[COUNTRY]);
+      if (hasProv(here)) { seasonProv.set(key, { here }); c.here++; } else if (Object.keys(res).length) { seasonProv.set(key, { away: true }); c.elsewhere++; } else c.none++; }
+    catch { c.failed++; } })); }
 // غلاف بوابة «أنمياتي» في القاعة: للعمل المسمّى في data/anime/door.json بوستر بلا كتابة (الأعلى تقييماً بين بوسترات TMDB التي لا لغة لها) وخلفيته
 let door = null;
 if (tmdbOk) try { const t = fribb[rd(new URL('door.json', SRC), {}).mal]?.tm, T = t && (t.k === 'tv' ? tv : movie).get(t.id);
@@ -133,9 +142,10 @@ const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(
   else a.pending = 1;                                             // معلوماته تُسحب في بناء قادم
   if (worldOf.has(id)) a.w = worldOf.get(id);
   if (t) a.tm = t; if (m.simkl) a.sk = m.simkl;                    // رقم العمل في SIMKL: به يُطابَق سجل SIMKL حين لا يحمل رقم MyAnimeList
-  if (tmdbOk) { const poster = (t?.k === 'tv' && t.s > 0 && S?.poster) || T?.poster; if (poster) a.tp = poster; if (T?.backdrop) a.bd = T.backdrop; if (T) a.pv = T.prov;
+  if (tmdbOk) { const poster = (t?.k === 'tv' && t.s > 0 && S?.poster) || T?.poster; if (poster) a.tp = poster; if (T?.backdrop) a.bd = T.backdrop; if (T) { a.pv = T.prov; const sp = t.k === 'tv' && t.s >= 1 ? seasonProv.get(`${t.id}:${t.s}`) : null;
+      if (sp?.here) { a.pv = sp.here; a.pvs = 1; } else if (sp?.away) { a.pvo = T.prov; a.pv = { stream: [], free: [], rent: [], buy: [] }; a.pvs = 1; } }
     if (T?.next && r?.status === 'airing' && (t.s == null || T.next.season === t.s)) a.nx = { ep: T.next.episode - (t.o || 0), date: T.next.date }; }
-  else if (prev) for (const k of ['tp', 'bd', 'pv', 'nx']) if (prev[k] !== undefined) a[k] = prev[k];
+  else if (prev) for (const k of ['tp', 'bd', 'pv', 'pvs', 'pvo', 'nx']) if (prev[k] !== undefined) a[k] = prev[k];
   if (r) { const x = { en: r.synopsis || null }; if (translations[id]) x.ar = translations[id]; if (r.jp) x.jp = r.jp; if (r.syn.length) x.syn = r.syn; if (r.studios.length > 1) x.studios = r.studios; if (r.source) x.source = r.source;
     if (r.to) x.to = r.to; if (r.rank) x.rank = r.rank; if (r.trailer) x.trailer = r.trailer; if (r.stream.length) x.stream = r.stream; if (r.time) x.time = r.time;
     const rl = r.rel.filter(z => !isAdult(cache.get(z.id))); if (rl.length) x.rel = rl; if (m.simkl) x.simkl = m.simkl; if (m.anilist) x.anilist = m.anilist; if (m.imdb) x.imdb = m.imdb;

@@ -134,6 +134,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await tap('#toast [data-act=undo]'); check('والتراجع يعيد سجله كله', JSON.stringify((await log())[52701]) === `{"s":"hold","p":10,"b":"${today}","e":"2026-11-01"}`, (await log())[52701]);
   await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' });
   check('الرجوع يغلق البطاقة ويعيد العنوان', await page.evaluate(() => !document.querySelector('#sheet').open && location.hash === ''));
+  // «وين أشاهد» بدقة الموسم: منصات الموسم نفسه، أو «لا منصة لهذا الموسم» ومعها منصات المواسم الأخرى من مسلسله
+  await page.goto('about:blank'); await page.goto(base + '/anime/#a5114'); await page.waitForSelector('#sheet[open] .where');
+  check('منصات لموسم العمل نفسه: تُعرض ويقال إنها لهذا الموسم', await page.evaluate(() => { const w = document.querySelector('#sheet .where'); return w.querySelector('.wl a').textContent === 'Crunchyroll' && /وهي لهذا الموسم بعينه/.test(w.textContent) && !/للمسلسل كله/.test(w.textContent); }));
+  await page.goto('about:blank'); await page.goto(base + '/anime/#a37989'); await page.waitForSelector('#sheet[open] .where');
+  check('لا منصة لهذا الموسم هنا: يقال ذلك، وتُذكر منصات المواسم الأخرى برابط صفحة المسلسل', await page.evaluate(() => { const w = document.querySelector('#sheet .where'), r = w.querySelector('.wrow'); return /منصة تعرض هذا الموسم في السعودية حالياً/.test(w.textContent)
+    && r?.querySelector('b').textContent === 'مواسم أخرى من المسلسل' && r.querySelector('a').textContent === 'Netflix' && r.querySelector('a').href === 'https://www.themoviedb.org/tv/1/watch?locale=SA'; }));
+  await overflow('أين تشاهده بدقة الموسم');
   await page.goto('about:blank'); await page.goto(base + '/anime/#a11061'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => !!document.querySelector('#sheet-body .ov:not(.en)'));
   check('نبذة مترجمة: لا زر طلب', await page.evaluate(() => !document.querySelector('#sheet .tr[data-what=about]')));
   check('رابط مباشر يفتح العمل بنبذته العربية وسلسلته', await page.evaluate(() => /Gon Freecss/.test(document.querySelector('#sheet-body .ov').textContent) && /من سلسلة Hunter x Hunter/.test(document.querySelector('#sheet-body').textContent) && /العمل 3 من 4/.test(document.querySelector('#sheet-body').textContent)

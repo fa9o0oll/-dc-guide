@@ -206,10 +206,13 @@ function mineHTML(a) { const m = me(a.id);
     <div class="dates"><label>بدأته${part('b')}<input type="date" data-id="${a.id}" data-k="b" value="${full('b')}" max="${today}"></label><label>أكملته${part('e')}<input type="date" data-id="${a.id}" data-k="e" value="${full('e')}" max="${today}"></label></div>
     <div class="acts"><button class="btn quiet" data-act="remove" data-id="${a.id}">أزله من قائمتي</button></div></section>`; }
 const PROV = [['stream', 'باشتراك'], ['free', 'مجاناً'], ['rent', 'إيجار'], ['buy', 'شراء']];
-function whereHTML(a) { if (a.pv === undefined || a.st === 'soon') return ''; const p = a.pv, link = p?.link || `https://www.themoviedb.org/${a.tm.k}/${a.tm.id}/watch?locale=SA`;
-  const rows = p ? PROV.map(([k, t]) => { const ids = (p[k] || []).filter(id => D.prov[id]); return ids.length ? `<div class="wrow"><b>${t}</b><span class="wl">${ids.map(id => `<a href="${esc(link)}" target="_blank" rel="noopener">${D.prov[id].logo ? `<img loading="lazy" width="32" height="32" alt="" src="${D.base}w92${D.prov[id].logo}">` : ''}${ltr(D.prov[id].name)}</a>`).join('')}</span></div>` : ''; }).join('') : '';
-  return `<section class="sec where"><h3>أين تشاهده في السعودية</h3>${rows ? rows + `<p class="lbl">الأزرار تفتح صفحة أماكن العرض على ${ltr('TMDB')}، ومنها إلى المنصة. البيانات من ${ltr('JustWatch')} وتتحدث يومياً${a.tm.k === 'tv' && a.tm.s == null ? '' : a.tm.k === 'tv' ? '، وهي للمسلسل كله لا لهذا الموسم وحده' : ''}.</p>`
-    : `<p class="lbl">لا تذكر بيانات ${ltr('JustWatch')} منصة تعرضه في السعودية حالياً.</p>`}</section>`; }
+function whereHTML(a) { if (a.pv === undefined || a.st === 'soon') return ''; const p = a.pv, show = `https://www.themoviedb.org/${a.tm.k}/${a.tm.id}/watch?locale=SA`, link = p?.link || show;
+  const chip = (id, href) => `<a href="${esc(href)}" target="_blank" rel="noopener">${D.prov[id].logo ? `<img loading="lazy" width="32" height="32" alt="" src="${D.base}w92${D.prov[id].logo}">` : ''}${ltr(D.prov[id].name)}</a>`;
+  const rows = p ? PROV.map(([k, t]) => { const ids = (p[k] || []).filter(id => D.prov[id]); return ids.length ? `<div class="wrow"><b>${t}</b><span class="wl">${ids.map(id => chip(id, link)).join('')}</span></div>` : ''; }).join('') : '';
+  // pvs: المنصات لموسم العمل نفسه. pvo: لا منصة لهذا الموسم هنا، وهذه منصات مواسم أخرى من مسلسله
+  const season = a.tm.k === 'tv' && a.tm.s != null, other = a.pvo ? [...new Set(PROV.flatMap(([k]) => a.pvo[k] || []))].filter(id => D.prov[id]) : [];
+  return `<section class="sec where"><h3>أين تشاهده في السعودية</h3>${rows ? rows + `<p class="lbl">الأزرار تفتح صفحة أماكن العرض على ${ltr('TMDB')}، ومنها إلى المنصة. البيانات من ${ltr('JustWatch')} وتتحدث يومياً${!season ? '' : a.pvs ? '، وهي لهذا الموسم بعينه' : '، وهي للمسلسل كله لا لهذا الموسم وحده'}.</p>`
+    : `<p class="lbl">لا تذكر بيانات ${ltr('JustWatch')} منصة تعرض${a.pvs ? ' هذا الموسم' : 'ه'} في السعودية حالياً.</p>${other.length ? `<div class="wrow"><b>مواسم أخرى من المسلسل</b><span class="wl">${other.map(id => chip(id, a.pvo.link || show)).join('')}</span></div>` : ''}`}</section>`; }
 const dot = id => { const s = me(id)?.s; return s ? `<i class="dot" data-l="${s}"></i>` : ''; };
 function worldStrip(a) { const w = D.wby.get(a.w); if (!w) return ''; const order = w.story || w.ids, at = order.indexOf(a.id) + 1;
   return `<section class="sec"><h3>من سلسلة ${ltr(w.name)}</h3><p class="lbl">العمل ${at} من ${order.length} بترتيب ${w.story ? 'القصة' : 'الصدور'}</p>
