@@ -42,7 +42,7 @@ try { const raw = JSON.parse(localStorage.getItem(KEY) || 'null'); if (raw && ra
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch { toast('تعذّر الحفظ في هذا المتصفح'); } syncTouch(G.id); };
 
 // ---------- البيانات
-const D = { universes: [], works: new Map(), placements: [], bridges: [], legacyMap: {}, base: '', arrow: null, order: null, mal: {}, episodes: new Map() };
+const D = { universes: [], works: new Map(), placements: [], bridges: [], legacyMap: {}, base: '', arrow: null, order: null, mal: {}, prov: {}, episodes: new Map() };
 const ui = { view: 'cards', uni: 'all', sheet: null };
 const getJSON = async u => { const r = await fetch(u + '?v=' + BUILD); if (!r.ok) throw new Error(u + ' → ' + r.status); return r.json(); };
 
@@ -51,7 +51,7 @@ async function boot() {
     const [base, cat, arrow, mal] = await Promise.all([getJSON('data/base.json'), getJSON('data/catalog.json'), G.order?.kind === 'arrow' ? getJSON(G.order.file) : null, G.malScore ? getJSON('data/mal.json').catch(() => ({})) : {}]);
     const extra = new Map(cat.works.map(w => [w.id, w]));
     for (const w of base.works) D.works.set(w.id, { ...w, ...(extra.get(w.id) || {}) });
-    Object.assign(D, { universes: base.universes, placements: base.placements, bridges: base.bridges || [], legacyMap: base.legacyMap || {}, base: cat.imageBase, arrow, order: base.order, mal: mal.anime || {} });
+    Object.assign(D, { universes: base.universes, placements: base.placements, bridges: base.bridges || [], legacyMap: base.legacyMap || {}, base: cat.imageBase, arrow, order: base.order, mal: mal.anime || {}, prov: cat.providers || {} });
     $('#builtAt').textContent = 'آخر تحديث للبيانات: ' + fmtDate(cat.generatedAt.slice(0, 10));
   } catch (e) {
     $('#veil')?.remove();
@@ -129,6 +129,23 @@ const xlinks = (w, p) => { const list = G.links.map(k => LINKS[k](w, p)).filter(
   return list.length ? `<div class="xlinks">${list.join('')}</div>` : ''; };
 const rateBlock = (w, p) => { const r = rating(w, p), v = isSoon(w) ? null : verdict(r?.v); return `<div class="rates wide">${gaugeRow(w, p)}${v && r ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${xlinks(w, p)}</div>`; };
 const daysTo = d => Math.ceil((new Date(d) - new Date(TODAY)) / 864e5);
+// ---------- أين يُشاهد العمل رسمياً في السعودية: منصات TMDB (بياناتها من JustWatch) كما في بوابة الأفلام، مجموعةً بطريقة الإتاحة.
+// كل زر يفتح صفحة أماكن العرض على TMDB ومنها إلى المنصة. prov غير معرَّف: بيانات بُنيت قبل الميزة فلا يُقال شيء؛ null: لا بيانات للسعودية.
+// للموسم الصادر منصاته هو إن خالفت منصات المسلسل (منصة عندها مواسم دون أخرى)
+const PROV = [['stream', 'باشتراك'], ['free', 'مجاناً'], ['rent', 'إيجار'], ['buy', 'شراء']];
+const provOf = (w, season) => { const s = season ? w.seasons?.find(x => x.n === season) : null; return s && s.prov !== undefined && s.date && s.date <= TODAY ? s.prov : w.prov; };
+const provOwn = (w, season) => provOf(w, season) !== w.prov;
+const provLink = (w, p) => esc(p.link || tmdbUrl(w) + '/watch');
+const provLogo = id => `<img loading="lazy" decoding="async" width="32" height="32" alt="${esc(D.prov[id].name)}" title="${esc(D.prov[id].name)}" src="${img(D.prov[id].logo, 'w92')}">`;
+function whereBlock(w, season) { if (w.prov === undefined || isSoon(w)) return ''; const p = provOf(w, season);
+  const rows = p ? PROV.map(([k, t]) => { const ids = p[k].filter(id => D.prov[id]); return ids.length ? `<div class="wrow"><b>${t}</b><span class="wl">${ids.map(id => `<a href="${provLink(w, p)}" target="_blank" rel="noopener">${D.prov[id].logo ? provLogo(id) : ''}${ltr(D.prov[id].name)}</a>`).join('')}</span></div>` : ''; }).join('') : '';
+  return `<section class="where"><h4>${provOwn(w, season) ? `أين تشاهد الموسم ${season} في السعودية` : 'أين تشاهده في السعودية'}</h4>${rows ? rows + `<p class="lbl">الأزرار تفتح صفحة أماكن العرض على ${ltr('TMDB')}، ومنها إلى المنصة. البيانات من ${ltr('JustWatch')} وتتحدث يومياً.</p>`
+    : `<p class="lbl">غير متاح على منصات السعودية حالياً حسب بيانات ${ltr('JustWatch')}.</p>`}</section>`; }
+// وعلى البطاقة سطر واحد: شعارات ما يُعرض عليه باشتراك أو مجاناً، وإن لم يوجد فما يؤجَّر أو يُشترى منه
+function whereLine(w, season) { const p = provOf(w, season); if (!p || isSoon(w)) return '';
+  const sub = [...new Set([...p.stream, ...p.free])], ids = (sub.length ? sub : [...new Set([...p.rent, ...p.buy])]).filter(id => D.prov[id]?.logo); if (!ids.length) return '';
+  const say = sub.length ? 'يُعرض على' : 'إيجار أو شراء';
+  return `<a class="wline" href="${provLink(w, p)}" target="_blank" rel="noopener" title="صفحة أماكن العرض على TMDB" aria-label="${sub.length ? say : 'للإيجار أو الشراء على'} ${esc(ids.map(id => D.prov[id].name).join('، '))}. يفتح صفحة أماكن العرض على TMDB"><small>${say}</small><span>${ids.slice(0, 5).map(provLogo).join('')}${ids.length > 5 ? `<i>+${ids.length - 5}</i>` : ''}</span></a>`; }
 // ما القادم لمسلسل صادر: حلقة بموعد، موسم بموعد، موسم معلن بلا موعد، أو مستمر بلا إعلان
 function nextInfo(w) {
   if (!w.seasons || isSoon(w)) return null;
@@ -146,7 +163,10 @@ function nextBlock(w, cls = '', uni) {
 }
 const nextTag = w => { const k = nextInfo(w)?.kind; return k === 'episode' ? '<span class="tag soon">يُعرض الآن</span>' : k === 'season' || k === 'announced' ? '<span class="tag soon">موسم قادم</span>' : ''; };
 const verdict = r => r == null ? null : r >= 7.5 ? ['ممتاز', '#35d07f'] : r >= 6.8 ? ['جيد', '#57abff'] : r >= 6 ? ['متوسط', '#f2b84b'] : ['ضعيف', '#ef5d57'];
-function toast(msg) { const t = $('#toast'); t.classList.remove('ask'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); }
+// undo: دالة تُلغي ما أُعلن عنه، فيظهر معه زر «تراجع» ويبقى أطول
+function toast(msg, undo) { const t = $('#toast'); clearTimeout(toast.t); ask.fn = undo || null; t.classList.toggle('ask', !!undo);
+  if (undo) t.innerHTML = `<span>${msg}</span><span class="ask-btns"><button data-act="askyes">تراجع</button></span>`; else t.textContent = msg;
+  t.hidden = false; toast.t = setTimeout(() => { t.hidden = true; if (undo) ask.fn = null; }, undo ? 7000 : 2600); }
 const posterTag = (w, uni) => w.poster
   ? `<img loading="lazy" decoding="async" src="${img(w.poster, 'w342')}" srcset="${img(w.poster, 'w185')} 185w, ${img(w.poster, 'w342')} 342w, ${img(w.poster, 'w500')} 500w" sizes="128px" alt="بوستر ${esc(w.title)}">`
   : teaser(w, uni);
@@ -252,7 +272,7 @@ function card(p) {
     ${p.order ? `<p class="canon wide">${ar(p.order.note)} <a href="${esc(p.order.source)}" target="_blank" rel="noopener">المصدر</a></p>` : ''}${p.news ? `<p class="canon wide"><b>قادم:</b> ${ar(p.news.note)} ${p.news.sources.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener">المصدر${p.news.sources.length > 1 ? ' ' + (i + 1) : ''}</a>`).join(' ')}</p>` : ''}
     ${p.canon ? `<div class="canon wide">يظهر في عالمين: ${ar(p.canon.note)} <a href="${esc(p.canon.source)}" target="_blank" rel="noopener">المصدر</a></div>` : ''}
     ${p.spoiler ? (store.shield ? `<details class="vault wide"><summary>${ic('lock')}<span>معلومة ارتباط فيها حرق</span><b>اكشفها</b></summary><p>${esc(p.spoiler)}</p></details>` : `<p class="note wide">${esc(p.spoiler)}</p>`) : ''}</div>
-    <div class="cfoot">${xlinks(w, p)}${soon ? '' : `<div class="status wide">${Object.entries(STATUS).map(([k, l]) => `<button data-act="status" data-s="${k}" aria-pressed="${st === k}">${ic(STATUS_IC[k])}<span>${l}</span></button>`).join('')}</div>`}
+    <div class="cfoot">${whereLine(w, p.season)}${xlinks(w, p)}${soon ? '' : `<div class="status wide">${Object.entries(STATUS).map(([k, l]) => `<button data-act="status" data-s="${k}" aria-pressed="${st === k}">${ic(STATUS_IC[k])}<span>${l}</span></button>`).join('')}</div>`}
     <div class="actions wide"><button class="cta" data-act="open" data-id="${w.id}" ${p.season ? `data-season="${p.season}"` : ''} ${tot ? `style="--p:${Math.round(dn / tot * 100)}%"` : ''}>${w.seasons?.length ? `${ic('eps')}<span>الحلقات</span>${tot ? `<span class="epprog" title="شاهدت ${dn} من ${tot}"><bdi>${dn}/${tot}</bdi></span>` : ''}` : '<span>التفاصيل</span>'}</button>
       <button class="alt" data-act="goto" data-to="t" data-target="${domId('t', p)}" data-uni="${p.universe}" aria-label="موقعه في الخط الزمني">${ic('line')}<span>الخط الزمني</span></button></div></div>
   </article>`;
@@ -471,11 +491,12 @@ function openWork(id, season, from) {
     <div class="actions">${places.map(p => `<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">البطاقة في ${esc(uniOf(p.universe).name)}${p.season ? `، الموسم ${p.season}` : ''}</button>`).join('')}</div>
     ${soon ? soonBlock(w, uni, pl.upcoming) : ''}
     ${rateBlock(w, pl)}
+    ${whereBlock(w, season)}
     ${nextBlock(w, '', uni)}
     ${series ? `<div class="seasons" id="seasonTabs">${tabs.map(s => `<button data-act="season" data-id="${id}" data-season="${s.n}">${s.n ? 'الموسم ' + s.n : 'خاصة'}</button>`).join('')}</div><div id="eps" class="dw" style="padding:0" aria-busy="true">${'<div class="ep skel"><span class="epthumb"><span class="ph"></span></span><div><i></i><i></i></div></div>'.repeat(4)}</div>` : ''}</div>`, 'work', { uni, tall: series, from: from?.querySelector('img') });
   if (series) showSeason(id, tabs.some(s => s.n === season) ? season : w.seasons[0].n);
 }
-async function showSeason(id, n) {
+async function showSeason(id, n) { prevClose();
   $$('#seasonTabs button').forEach(b => b.classList.toggle('on', +b.dataset.season === n));
   $('#seasonTabs .on')?.scrollIntoView({ block: 'nearest', inline: 'center' });
   const box = $('#eps');
@@ -484,6 +505,7 @@ async function showSeason(id, n) {
   const s = D.episodes.get(id).seasons.find(x => x.n === n); if (!s || !box.isConnected) return;
   box.removeAttribute('aria-busy');
   if (G.malScore && n) { const pl = D.placements.find(p => p.work === id && p.season === n), r = $('#sheet .rates'); if (pl && r) r.outerHTML = rateBlock(D.works.get(id), pl); } // لكل موسم صفحته وتقييمه
+  { const w = D.works.get(id), wb = $('#sheet .where'); if (wb && (w.seasons || []).some(x => x.prov !== undefined)) wb.outerHTML = whereBlock(w, n); } // ولكل موسم منصاته إن خالفت منصات المسلسل
   const all = s.episodes.every(e => epDone(id, n, e.n));
   const rated = s.episodes.filter(e => e.rating != null && (e.votes ?? 5) >= 5), avg = rated.length ? Math.round(rated.reduce((x, e) => x + e.rating, 0) / rated.length * 10) / 10 : null;
   box.innerHTML = `<div class="season-bar"><span class="lbl">${!n ? 'حلقات خاصة خارج ترقيم المواسم. ملاحظة كل بطاقة تذكر متى تُشاهد المهم منها.' : avg != null ? `متوسط تقييم الموسم ${avg} من 10 على ${ltr('TMDB')}، محسوب من ${cnt(rated.length, 'ep', true)}` : 'لا يوجد تقييم كافٍ لحلقات هذا الموسم بعد'}</span>
@@ -500,6 +522,45 @@ async function showSeason(id, n) {
         <div class="foot2"><span></span>${fut ? '' : `<button class="tick" aria-pressed="${!!d}" data-act="ep" data-id="${id}" data-season="${n}" data-ep="${e.n}">${tick(d, 'شاهدتها', 'علّمها كمشاهَدة')}</button>`}</div></div>`; }).join('');
 }
 const unblur = ov => { ov.classList.remove('blur'); ov.removeAttribute('data-act'); ov.removeAttribute('title'); ov.nextElementSibling?.remove(); };
+const seasonBtn = (id, n) => { const sa = $('#eps [data-act=seasonall]'), s = D.episodes.get(id)?.seasons.find(x => x.n === n); if (sa && s) sa.textContent = s.episodes.every(e => epDone(id, n, e.n)) ? 'ألغِ تعليم حلقات الموسم' : 'علّم حلقات الموسم كلها'; };
+
+// ---------- «وما قبلها؟»: تعليم حلقة وقبلها حلقات بلا علامة يسأل عنها داخل بطاقة الحلقة نفسها، تحت الإصبع، لا في إشعار بعيد.
+// شريط النقاط يرسم حلقات الموسم حتى هذه الحلقة (الممتلئة مشاهَدة والفارغة لا)، و«نعم» يعلّمها موجةً تسري من هذه الحلقة رجوعاً إلى الأولى.
+// السجل يُحفظ كله قبل أن تبدأ الموجة، فهي عرض لما تم لا شرط له. «لا» يُحفظ على الجهاز (KEY.pvno) لكل موسم سُئل فيه: ما رُفض لا يُعرض ثانية،
+// ويُسأل عن فجوة جديدة وحدها إن ظهرت. والتجاهل لا يغيّر شيئاً. الحلقات الخاصة وما لم يُعرض بعد خارج السؤال.
+const pv = { cur: null, no: new Map(), t: 0 };
+try { for (const [k, l] of Object.entries(JSON.parse(localStorage.getItem(KEY + '.pvno') || '{}'))) pv.no.set(k, new Set(l)); } catch {}
+const aired = e => e.date && e.date <= TODAY;
+function prevLeft(id, season, ep) { const ss = D.episodes.get(id)?.seasons || [];
+  return { same: (ss.find(s => s.n === season)?.episodes || []).filter(e => e.n < ep && aired(e) && !epDone(id, season, e.n)).map(e => [season, e.n]),
+    before: ss.filter(s => s.n > 0 && s.n < season).flatMap(s => s.episodes.filter(e => aired(e) && !epDone(id, s.n, e.n)).map(e => [s.n, e.n])) }; }
+const pvFold = el => { el.classList.remove('on'); el.inert = true; reduce.matches ? el.remove() : setTimeout(() => el.remove(), 360); };
+function prevClose() { clearTimeout(pv.t); pv.cur = null; $$('.pv').forEach(pvFold); }
+function prevAsk(id, season, ep, row) { prevClose(); if (!season) return;
+  const no = pv.no.get(`${id}#${season}`), open = l => no ? l.filter(([s, e]) => !no.has(`${s}-${e}`)) : l, left = prevLeft(id, season, ep), same = open(left.same), before = open(left.before), n = same.length, m = before.length; if (!n && !m) return;
+  const eps = D.episodes.get(id).seasons.find(s => s.n === season).episodes.filter(e => e.n <= ep && aired(e)), cut = eps.slice(-28);   // موسم طويل: آخر ما قبلها يكفي الشريط
+  const q = k => k === 1 ? 'هل شاهدتها أيضاً؟' : k === 2 ? 'هل شاهدتهما أيضاً؟' : 'هل شاهدتها كلها؟', mark = k => k === 2 ? 'نعم، علّمهما' : 'نعم، علّمها';
+  const text = n && m ? `قبلها <b>${cnt(n, 'ep')}</b> بلا علامة في هذا الموسم، و<b>${cnt(m, 'ep')}</b> في المواسم السابقة.` : n ? `قبلها <b>${cnt(n, 'ep')}</b> بلا علامة مشاهدة. ${q(n)}` : `في المواسم السابقة <b>${cnt(m, 'ep')}</b> بلا علامة مشاهدة. ${q(m)}`;
+  const btns = n && m ? `<button data-act="pvyes" data-scope="season">علّم حلقات الموسم</button><button data-act="pvyes" data-scope="all">علّم كل ما قبلها</button>` : `<button data-act="pvyes" data-scope="${n ? 'season' : 'all'}">${mark(n || m)}</button>`;
+  row.insertAdjacentHTML('beforeend', `<div class="pv" role="group" aria-label="الحلقات التي قبلها"><div class="pv-in"><div class="pv-box">
+    <span class="pv-dots" aria-hidden="true">${cut.length < eps.length ? '<u>…</u>' : ''}${cut.map(e => `<i class="${e.n === ep ? 'now' : epDone(id, season, e.n) ? 'on' : ''}" data-e="${e.n}"></i>`).join('')}</span>
+    <p role="status">${text}</p><span class="pv-btns">${btns}<button data-act="pvno">لا، هذه فقط</button></span></div></div></div>`);
+  const el = row.lastElementChild; pv.cur = { id, season, ep, same, before }; void el.offsetHeight; el.classList.add('on');
+  // السؤال قد ينفتح تحت حافة النافذة (الحلقة الأخيرة في آخرها): يُنزَّل إليه بعد أن يكتمل انفتاحه
+  setTimeout(() => { if (el.isConnected && pv.cur) row.scrollIntoView({ block: 'nearest', behavior: reduce.matches ? 'auto' : 'smooth' }); }, reduce.matches ? 0 : 380);
+  pv.t = setTimeout(prevClose, 16000); }
+function prevYes(scope) { const a = pv.cur, box = $('.pv.on'); if (!a) return; clearTimeout(pv.t); pv.cur = null;
+  const { id, season } = a, list = scope === 'all' ? [...a.same, ...a.before] : a.same.length ? a.same : a.before;
+  for (const [s, e] of list) setEp(id, s, e, true); save(); stats(); syncEps(id); ui.dirty = true;
+  // الموجة: من أقرب حلقة إلى هذه رجوعاً إلى الأولى، وتُضغط خطوتها إن كثرت الحلقات حتى لا تطول
+  const btn = new Map($$('#eps [data-act=ep]').map(b => [+b.dataset.ep, b])), here = list.filter(([s]) => s === season).map(([, e]) => e).sort((x, y) => y - x), step = reduce.matches ? 0 : Math.min(70, 900 / Math.max(here.length, 1));
+  for (const b of box ? $$('button', box) : []) b.disabled = true;
+  here.forEach((e, i) => setTimeout(() => { const b = btn.get(e); if (!b?.isConnected) return; const r = b.closest('.ep'), ov = $('.ov.blur', r);
+    r.classList.add('done', 'swept'); b.innerHTML = tick(true, 'شاهدتها', 'علّمها كمشاهَدة'); b.setAttribute('aria-pressed', 'true'); if (ov) unblur(ov); $(`.pv-dots [data-e="${e}"]`)?.classList.add('on', 'pop'); }, i * step));
+  setTimeout(() => { if (box?.isConnected) pvFold(box); seasonBtn(id, season);   // سؤالٌ جديد فُتح أثناء الموجة يبقى
+    toast(`عُلّمت ${cnt(list.length, 'ep')} قبلها`, () => { for (const [s, e] of list) setEp(id, s, e, false); save(); stats(); syncEps(id); ui.dirty = true; const sa = $('#eps [data-act=seasonall]'); if (sa?.dataset.id === id) showSeason(id, +sa.dataset.season); }); }, here.length * step + (reduce.matches ? 0 : 520)); }
+function prevNo() { const a = pv.cur; if (a) { const k = `${a.id}#${a.season}`, set = pv.no.get(k) || pv.no.set(k, new Set()).get(k); for (const [s, e] of [...a.same, ...a.before]) set.add(`${s}-${e}`);
+    try { localStorage.setItem(KEY + '.pvno', JSON.stringify(Object.fromEntries([...pv.no].map(([k, v]) => [k, [...v]])))); } catch {} } prevClose(); }
 function setEp(id, s, e, on) { const o = store.eps[id] ||= {}; if (on) o[`${s}-${e}`] = 1; else delete o[`${s}-${e}`]; if (!Object.keys(o).length) delete store.eps[id]; }
 
 // ---------- الفهرس، السجل، الدليل
@@ -572,9 +633,11 @@ document.addEventListener('click', ev => {
       syncStatus(k); stats(); refreshProgress(); break; }
     case 'goto': { const force = d.force; if (ui.sheet) closeSheet(); if (force) ui.uni = d.uni; setTimeout(() => goTo(d.to === 't' ? 'timeline' : 'cards', d.uni, d.target), force ? 60 : 0); break; }
     case 'ep': { const on = !epDone(id, season, +d.ep), row = b.closest('.ep'), ov = $('.ov.blur', row); setEp(id, season, +d.ep, on); save();
-      row.classList.toggle('done', on); b.innerHTML = tick(on, 'شاهدتها', 'علّمها كمشاهَدة'); b.setAttribute('aria-pressed', on); if (on && ov) unblur(ov);
-      const sa = $('#eps [data-act=seasonall]'), s = D.episodes.get(id).seasons.find(x => x.n === season); if (sa) sa.textContent = s.episodes.every(e => epDone(id, season, e.n)) ? 'ألغِ تعليم حلقات الموسم' : 'علّم حلقات الموسم كلها';
-      stats(); syncEps(id); ui.dirty = true; break; }
+      row.classList.remove('swept'); row.classList.toggle('done', on); b.innerHTML = tick(on, 'شاهدتها', 'علّمها كمشاهَدة'); b.setAttribute('aria-pressed', on); if (on && ov) unblur(ov);
+      seasonBtn(id, season); stats(); syncEps(id); ui.dirty = true;
+      if (on) prevAsk(id, season, +d.ep, row); else prevClose(); break; }
+    case 'pvyes': prevYes(d.scope); break;
+    case 'pvno': prevNo(); break;
     case 'seasonall': { const s = D.episodes.get(id).seasons.find(x => x.n === season), on = !s.episodes.every(e => epDone(id, season, e.n)); s.episodes.filter(e => e.date && e.date <= TODAY).forEach(e => setEp(id, season, e.n, on)); save(); showSeason(id, season); stats(); syncEps(id); ui.dirty = true; break; }
     case 'askyes': { const fn = ask.fn; ask.fn = null; $('#toast').hidden = true; fn?.(); break; }
     case 'askno': ask.fn = null; $('#toast').hidden = true; break;

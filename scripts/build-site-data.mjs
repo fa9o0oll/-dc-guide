@@ -6,6 +6,7 @@ import net from 'node:net';
 net.setDefaultAutoSelectFamilyAttemptTimeout(5000);
 import { tmdb, hasKey } from './lib-tmdb.mjs';
 import { guide, root, rdSrc, OUT, GEN } from './lib-guide.mjs';
+import { COUNTRY } from './lib-films.mjs';
 const works = rdSrc('works.json');
 const outDir = OUT, epDir = new URL('episodes/', OUT);
 fs.mkdirSync(epDir, { recursive: true });
@@ -15,16 +16,23 @@ if (!hasKey()) { console.error('missing TMDB_API_KEY'); process.exit(1); }
 const tr = (d, lang) => (d.translations?.translations || []).filter(t => t.iso_639_1 === lang).map(t => t.data || {});
 const pickTr = (d, lang, field) => tr(d, lang).map(x => (x[field] || '').trim()).find(Boolean) || null;
 const problems = [];
+// أين يُشاهد العمل رسمياً في السعودية: منصات TMDB (بياناتها من JustWatch) كما في بوابة الأفلام. providers قاموس أسماء المنصات وشعاراتها
+const providers = {}, provIds = list => [...new Set((list || []).map(p => { providers[p.provider_id] = { name: p.provider_name, logo: p.logo_path }; return p.provider_id; }))];
+const PROV_KEYS = ['stream', 'free', 'rent', 'buy'];
+const provOf = wp => wp ? { link: wp.link || undefined, stream: provIds(wp.flatrate), free: provIds([...(wp.free || []), ...(wp.ads || [])]), rent: provIds(wp.rent), buy: provIds(wp.buy) } : null;
+const provSame = (a, b) => !a === !b && (!a || PROV_KEYS.every(k => a[k].join() === b[k].join()));
 
 async function buildWork(w) {
   if (!w.ids?.tmdb) return { id: w.id, pending: true };
   const kind = w.ids.tmdbKind || (w.kind === 'series' ? 'tv' : 'movie'), tv = kind === 'tv';
-  const d = await tmdb(`/${kind}/${w.ids.tmdb}`, { language: 'en-US', append_to_response: 'external_ids,translations' });
+  const d = await tmdb(`/${kind}/${w.ids.tmdb}`, { language: 'en-US', append_to_response: 'external_ids,translations,watch/providers' });
+  const wp = d['watch/providers']?.results?.[COUNTRY];
   const o = { id: w.id, tmdb: d.id, imdb: d.imdb_id || d.external_ids?.imdb_id || w.ids.imdb || null,
     date: d.release_date || d.first_air_date || null, status: d.status || null,
     poster: d.poster_path || null, backdrop: d.backdrop_path || null,
     titleAr: pickTr(d, 'ar', tv ? 'name' : 'title'), overviewAr: pickTr(d, 'ar', 'overview'), overviewEn: (d.overview || '').trim() || null,
-    tmdbRating: d.vote_count >= 10 ? Math.round(d.vote_average * 10) / 10 : null, tmdbVotes: d.vote_count || 0 };
+    tmdbRating: d.vote_count >= 10 ? Math.round(d.vote_average * 10) / 10 : null, tmdbVotes: d.vote_count || 0,
+    prov: provOf(wp) };
   if (!tv) o.runtime = d.runtime || null;
   if (w.ids.imdb && o.imdb && w.ids.imdb !== o.imdb) problems.push(`${w.id}: معرّف IMDb المثبّت ${w.ids.imdb} يخالف TMDB ${o.imdb}`);
   if (tv) {
@@ -34,7 +42,9 @@ async function buildWork(w) {
     o.seasons = seasons.map(s => ({ n: s.season_number, episodes: s.episode_count, date: s.air_date || null, poster: s.poster_path || null }));
     o.episodeCount = seasons.reduce((a, s) => a + (s.episode_count || 0), 0);
     const full = await Promise.all(seasons.map(async s => {
-      const [en, ar] = await Promise.all(['en-US', 'ar'].map(language => tmdb(`/tv/${d.id}/season/${s.season_number}`, { language }).catch(() => null)));
+      const [en, ar] = await Promise.all([['en-US', 'watch/providers'], ['ar']].map(([language, append_to_response]) => tmdb(`/tv/${d.id}/season/${s.season_number}`, { language, append_to_response }).catch(() => null)));
+      // منصات الموسم نفسه تُحفظ فقط إن خالفت منصات المسلسل (منصة عندها مواسم دون أخرى). null: الموسم بلا منصات في السعودية
+      const sw = en?.['watch/providers']; if (sw) { const sp = provOf(sw.results?.[COUNTRY]); if (!provSame(sp, o.prov)) o.seasons.find(x => x.n === s.season_number).prov = sp; }
       const arBy = new Map((ar?.episodes || []).map(e => [e.episode_number, e]));
       return { n: s.season_number, episodes: (en?.episodes || []).map(e => { const a = arBy.get(e.episode_number) || {};
         const arName = (a.name || '').trim(), arOv = (a.overview || '').trim();
@@ -95,11 +105,12 @@ if (malIds.length) {
   write(prevPath, { generatedAt: new Date().toISOString(), anime });
 }
 const cfg = await tmdb('/configuration');
-write(new URL('catalog.json', outDir), { generatedAt: new Date().toISOString(), imageBase: cfg.images.secure_base_url, works: rows });
+write(new URL('catalog.json', outDir), { generatedAt: new Date().toISOString(), imageBase: cfg.images.secure_base_url, country: COUNTRY, providers, works: rows });
 const ok = rows.filter(r => r.tmdb), series = ok.filter(r => r.seasons);
 const summary = { generatedAt: new Date().toISOString(), total: rows.length, enriched: ok.length, pending: rows.filter(r => r.pending).length, errors: rows.filter(r => r.error).length,
   withPoster: ok.filter(r => r.poster).length, withBackdrop: ok.filter(r => r.backdrop).length, withImdbId: ok.filter(r => r.imdb).length, withRtLink: ok.filter(r => r.rt).length,
   withArabicOverview: ok.filter(r => r.overviewAr).length, withArabicTitle: ok.filter(r => r.titleAr).length,
+  withProviders: ok.filter(r => r.prov && PROV_KEYS.some(k => r.prov[k].length)).length, providers: Object.keys(providers).length, seasonsWithOwnProviders: series.reduce((a, r) => a + r.seasons.filter(s => s.prov !== undefined).length, 0),
   series: series.length, episodes: series.reduce((a, r) => a + r.episodeCount, 0), arabicEpisodeOverviews: series.reduce((a, r) => a + (r.arabicEpisodeOverviews || 0), 0), problems };
 fs.mkdirSync(GEN, { recursive: true });
 fs.writeFileSync(new URL('build-report.json', GEN), JSON.stringify(summary, null, 1) + '\n');

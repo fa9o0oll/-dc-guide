@@ -27,7 +27,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     return r.fulfill({ contentType: 'image/svg+xml', body: wide ? ph(640, 360, seed) : ph(342, 513, seed) }); });
   // بيانات مُعدَّلة للاختبار فقط: مسلسل له حلقة قادمة بعد 5 أيام
   await page.route(/data\/catalog\.json/, async r => { const res = await r.fetch(), j = await res.json(), w = j.works.find(x => x.id === 'lanterns-2026');
-    w.nextEpisode = { season: 1, episode: 9, date: new Date(Date.now() + 5 * 864e5).toISOString().slice(0, 10) }; return r.fulfill({ response: res, json: j }); });
+    w.nextEpisode = { season: 1, episode: 9, date: new Date(Date.now() + 5 * 864e5).toISOString().slice(0, 10) };
+    // «أين تشاهده»: منصات محقونة لخمس حالات (اشتراك وإيجار وشراء، إيجار وشراء فقط، لا شيء في السعودية، موسم له منصته، وباقي الأعمال بلا الحقل كبيانات قبل الميزة)
+    const P = (stream = [], free = [], rent = [], buy = []) => ({ link: 'https://www.themoviedb.org/movie/155/watch?locale=SA', stream, free, rent, buy }), set = (id, v) => { j.works.find(x => x.id === id).prov = v; };
+    j.country = 'SA'; j.providers = { 8: { name: 'Netflix', logo: '/n.jpg' }, 629: { name: 'OSN+', logo: '/o.jpg' }, 2: { name: 'Apple TV', logo: '/a.jpg' }, 3: { name: 'Google Play Movies', logo: '/g.jpg' } };
+    set('the-dark-knight-2008', P([8, 629], [], [2], [2, 3])); set('batman-begins-2005', P([], [], [2, 3], [2])); set('the-dark-knight-rises-2012', null); set('peacemaker-2022', P([629]));
+    j.works.find(x => x.id === 'peacemaker-2022').seasons[1].prov = P([8]);
+    return r.fulfill({ response: res, json: j }); });
   // العنصر الذي دخل الشاشة للتو يتحرك نصف ثانية؛ ننتظر استقراره قبل الضغط كما يفعل المستخدم
   const settle = l => l.evaluate(async el => { await new Promise(r => setTimeout(r, 80)); const host = el.closest('.card,.node,.step'); if (host) await Promise.all(host.getAnimations().map(a => a.finished.catch(() => {}))); });
   const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); await settle(l); return mobile ? l.tap() : l.click(); };
@@ -70,6 +76,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   // نافذة فيلم
   await tap('#c-nolan-the-dark-knight-2008 [data-act=open]'); await page.waitForSelector('#sheet:not([hidden])');
   check('نافذة الفيلم: نبذة عربية وروابط دقيقة', await page.locator('#sheet .ov').count() === 1 && (await page.getAttribute('#sheet .rates a[href*="imdb.com/title/tt0468569"]', 'href')) !== null && await page.locator('#sheet .rates a[href*="rottentomatoes.com/m/"]').count() === 1);
+  check('نافذة الفيلم: أين تشاهده في السعودية بصفوف الإتاحة', await page.evaluate(() => { const w = document.querySelector('#sheet .where'); if (!w) return false;
+    const rows = [...w.querySelectorAll('.wrow')].map(r => r.querySelector('b').textContent + ':' + [...r.querySelectorAll('a')].map(a => a.textContent).join('+'));
+    return w.querySelector('h4').textContent === 'أين تشاهده في السعودية' && rows.join(' | ') === 'باشتراك:Netflix+OSN+ | إيجار:Apple TV | شراء:Apple TV+Google Play Movies' && [...w.querySelectorAll('a')].every(a => a.href === 'https://www.themoviedb.org/movie/155/watch?locale=SA' && a.target === '_blank' && a.querySelector('img')) && /JustWatch/.test(w.querySelector('.lbl').textContent); }));
   await overflow('نافذة الفيلم'); await snap('2-film');
   // تكبير البوستر (zoom.js المشترك بين البوابات)
   await tap('#sheet [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(950);
@@ -84,10 +93,29 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   // نافذة مسلسل + حلقات
   await tap('#c-dcu-peacemaker-2022-s2 [data-act=open]'); await page.waitForSelector('.ep:not(.skel)');
   check('نافذة المسلسل تفتح على الموسم الصحيح', (await page.textContent('#seasonTabs .on')).includes('2') && await page.locator('.ep').count() === 8);
+  { const wh = () => page.evaluate(() => { const w = document.querySelector('#sheet .where'); return w && w.querySelector('h4').textContent + ':' + [...w.querySelectorAll('.wl a')].map(a => a.textContent).join('+'); });
+    const s2 = await wh(); await tap('#seasonTabs [data-season="1"]'); await page.waitForSelector('#seasonTabs [data-season="1"].on'); await page.waitForTimeout(250); const s1 = await wh();
+    await tap('#seasonTabs [data-season="2"]'); await page.waitForSelector('#seasonTabs [data-season="2"].on'); await page.waitForTimeout(250); const back = await wh();
+    check('موسم له منصته: الصندوق يتبدل مع تبويب الموسم', s2 === 'أين تشاهد الموسم 2 في السعودية:Netflix' && s1 === 'أين تشاهده في السعودية:OSN+' && back === s2 && await page.locator('#sheet .where').count() === 1, JSON.stringify([s2, s1, back])); }
   check('درع الحرق يموّه ملخصات غير المشاهَد', await page.locator('.ep .ov.blur').count() > 0);
   check('تقييم الحلقات ظاهر على صورها مع متوسط الموسم', await page.locator('.ep .eprate').count() >= 6 && (await page.textContent('.season-bar')).includes('متوسط تقييم الموسم'));
   check('ملخصات الحلقات بترجمتنا العربية', await page.locator('.ep .ov.en').count() === 0 && (await page.textContent('.ep .ov')).includes('جاستس غانغ'));
   await tap('.ep [data-act=ep]'); check('تعليم حلقة', await page.locator('.ep.done').count() === 1);
+  // «وما قبلها؟»: السؤال داخل بطاقة الحلقة التي عُلّمت، بعدد ما قبلها بلا علامة. أول حلقة في الموسم الثاني قبلها حلقات الموسم الأول
+  const pvRead = () => page.evaluate(() => { const p = document.querySelector('.pv.on'); if (!p) return null; const r = p.getBoundingClientRect(), i = [...p.querySelectorAll('.pv-dots i')]; return { text: p.querySelector('p').textContent, btns: [...p.querySelectorAll('button')].map(b => b.textContent).join('|'), dots: i.map(x => x.className || '-').join(','), inCard: !!p.closest('.ep.done'), seen: r.height > 40 && r.top >= 0 && r.bottom <= innerHeight, tap: [...p.querySelectorAll('button')].every(b => b.getBoundingClientRect().height >= 42) }; });
+  await page.waitForSelector('.pv.on'); await page.waitForTimeout(900); const pv1 = await pvRead();
+  check('تعليم حلقة قبلها حلقات بلا علامة يسأل عنها داخل بطاقتها (هنا حلقات الموسم السابق بعددها)، والسؤال في مرمى النظر وأزراره بحجم اللمس', pv1 && /^في المواسم السابقة 8 حلقات بلا علامة مشاهدة\. هل شاهدتها كلها؟$/.test(pv1.text) && pv1.btns === 'نعم، علّمها|لا، هذه فقط' && pv1.dots === 'now' && pv1.inCard && pv1.seen && pv1.tap, JSON.stringify(pv1));
+  await overflow('سؤال «وما قبلها؟»'); await snap('3a-prev-ask');
+  await tap('.pv [data-act=pvno]'); await page.waitForSelector('.pv', { state: 'detached' });
+  check('«لا، هذه فقط» يطوي السؤال ولا يعلّم شيئاً، ويُحفظ الرفض على الجهاز', await page.locator('.ep.done').count() === 1 && await page.evaluate(() => { const s = JSON.parse(localStorage.getItem('dcg.progress')), no = JSON.parse(localStorage.getItem('dcg.progress.pvno')); return Object.keys(s.eps['peacemaker-2022']).join() === '2-1' && no['peacemaker-2022#2'].length === 8; }));
+  await page.locator('.ep [data-act=ep]').nth(3).evaluate(b => b.click()); await page.waitForSelector('.pv.on'); await page.waitForTimeout(900); const pv2 = await pvRead();
+  check('فجوة جديدة يُسأل عنها وحدها (ما رُفض لا يُعرض ثانية)، وشريط النقاط يرسم حلقات الموسم حتى هذه', pv2 && /^قبلها حلقتان بلا علامة مشاهدة\. هل شاهدتهما أيضاً؟$/.test(pv2.text) && pv2.btns === 'نعم، علّمهما|لا، هذه فقط' && pv2.dots === 'on,-,-,now' && pv2.seen, JSON.stringify(pv2));
+  await tap('.pv [data-act=pvyes]'); await page.waitForSelector('#toast.ask:not([hidden])'); await page.waitForSelector('.pv', { state: 'detached' });
+  check('«نعم» يعلّم ما قبلها (موجة من هذه الحلقة رجوعاً) ويكشف ملخصاتها، ويعلن العدد مع «تراجع»', await page.locator('.ep.done').count() === 4 && (await page.textContent('#toast')).includes('عُلّمت حلقتان قبلها') && (await page.textContent('#toast button')) === 'تراجع' && await page.evaluate(() => [...document.querySelectorAll('.ep')].slice(0, 4).every(e => !e.querySelector('.ov.blur')) && Object.keys(JSON.parse(localStorage.getItem('dcg.progress')).eps['peacemaker-2022']).sort().join() === '2-1,2-2,2-3,2-4'));
+  await tap('#toast [data-act=askyes]'); await page.waitForTimeout(250);
+  check('«تراجع» يلغي ما علّمته الموجة وحده', await page.locator('.ep.done').count() === 2 && await page.isHidden('#toast') && await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('dcg.progress')).eps['peacemaker-2022']).sort().join() === '2-1,2-4'));
+  await page.locator('.ep [data-act=ep]').nth(3).evaluate(b => b.click()); await page.waitForTimeout(120);
+  check('إلغاء تعليم الحلقة لا يسأل', await page.locator('.ep.done').count() === 1 && await page.locator('.pv.on').count() === 0);
   await overflow('نافذة المسلسل'); await snap('3-series');
   await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' });
   check('تقدم الحلقات يظهر على البطاقة', (await page.textContent('#c-dcu-peacemaker-2022-s2 .epprog')).trim() === '1/8');
@@ -162,8 +190,17 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('روابط المواقع: فيلم له Letterboxd وTrakt، ومسلسل له Trakt فقط', await page.evaluate(() => { const h = id => [...document.querySelectorAll(`#${id} .xlinks a`)].map(x => x.href);
     const f = h('c-nolan-the-dark-knight-2008'), t = h('c-dcu-peacemaker-2022-s1');
     return f.includes('https://letterboxd.com/tmdb/155') && f.includes('https://trakt.tv/movies/tt0468569') && t.includes('https://trakt.tv/shows/tt13146488') && !t.some(u => u.includes('letterboxd')); }));
+  check('سطر «يُعرض على» في البطاقة: شعارات الاشتراك، أو «إيجار أو شراء»، ولكل موسم منصته، ولا سطر بلا منصات', await page.evaluate(() => { const l = id => { const a = document.querySelector(`#${id} .wline`); return a && a.querySelector('small').textContent + ':' + [...a.querySelectorAll('img')].map(i => i.alt).join('+'); };
+    const a = document.querySelector('#c-nolan-the-dark-knight-2008 .wline');
+    return l('c-nolan-the-dark-knight-2008') === 'يُعرض على:Netflix+OSN+' && a.href === 'https://www.themoviedb.org/movie/155/watch?locale=SA' && /^يُعرض على Netflix، OSN\+\./.test(a.getAttribute('aria-label')) && a.getBoundingClientRect().height >= 40
+      && l('c-nolan-batman-begins-2005') === 'إيجار أو شراء:Apple TV+Google Play Movies' && l('c-dcu-peacemaker-2022-s1') === 'يُعرض على:OSN+' && l('c-dcu-peacemaker-2022-s2') === 'يُعرض على:Netflix'
+      && l('c-nolan-the-dark-knight-rises-2012') === null && l('c-dcu-superman-2025') === null && document.querySelectorAll('.wline').length === 5; }));
+  await tap('#c-dcu-superman-2025 [data-act=open]'); await page.waitForSelector('#sheet:not([hidden])');
+  check('عمل بلا بيانات منصات (بناء قبل الميزة): لا صندوق في نافذته', await page.locator('#sheet .where').count() === 0 && await page.locator('#sheet .rates').count() === 1);
+  await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
   // رابط مباشر من قائمة الأفلام إلى بطاقة عمل في الدليل
   await page.goto(url + '#w=the-dark-knight-rises-2012'); await page.waitForSelector('#sheet:not([hidden])'); await page.waitForTimeout(300);
+  check('عمل بلا منصات في السعودية: يُقال ذلك صراحة', (await page.textContent('#sheet .where')).includes('غير متاح على منصات السعودية حالياً') && await page.locator('#sheet .where a').count() === 0);
   check('رابط #w= يفتح بطاقة العمل ثم يُزال من العنوان', (await page.textContent('#sheetTitle')).includes('The Dark Knight Rises') && (await page.evaluate(() => location.hash)) === '');
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3).join(' | '));
   await ctx.close();

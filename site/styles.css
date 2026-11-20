@@ -171,6 +171,22 @@ main:focus{outline:none}
 .rates .xlinks{flex:1 1 100%;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
 .chead>div{display:flex;flex-direction:column;align-self:stretch;min-width:0}
 .chead .rates{margin-top:auto;padding-top:10px;flex-wrap:nowrap}
+/* أين تشاهده في السعودية: في نافذة العمل صفوف بطريقة الإتاحة، وعلى البطاقة سطر شعارات واحد يفتح صفحة أماكن العرض */
+.where{display:grid;gap:8px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--hair)}
+.where h4{font-size:.94rem;font-weight:600}
+.wrow{display:grid;grid-template-columns:4.4em minmax(0,1fr);gap:6px 10px;align-items:start}
+.wrow>b{padding-top:10px;font-size:.82rem;font-weight:600;color:var(--dim)}
+.wl{display:flex;flex-wrap:wrap;gap:8px}
+.wl a{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:4px 12px 4px 5px;direction:ltr;border-radius:10px;text-decoration:none;color:var(--ink);font-size:.86rem;font-weight:600;border:1px solid color-mix(in srgb,var(--c1) 26%,rgba(255,255,255,.1));background:color-mix(in srgb,var(--c1) 10%,rgba(255,255,255,.05))}
+.wl a:not(:has(img)){padding-inline:12px}
+.wl img{width:32px;height:32px;border-radius:8px;flex:none}
+.wline{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:6px 12px;border-radius:10px;text-decoration:none;color:var(--ink);border:1px solid color-mix(in srgb,var(--c1) 26%,rgba(255,255,255,.1));background:color-mix(in srgb,var(--c1) 10%,rgba(255,255,255,.05))}
+.wline small{font-size:.76rem;font-weight:600;color:var(--dim);white-space:nowrap}
+.wline span{display:flex;align-items:center;gap:6px;min-width:0}
+.wline img{width:30px;height:30px;border-radius:7px;flex:none}
+.wline i{font-style:normal;font-size:.76rem;font-weight:600;color:var(--dim)}
+@media (hover:hover){.wl a:hover,.wline:hover{border-color:var(--c1)}}
+@media (max-width:560px){.wrow{grid-template-columns:minmax(0,1fr)}.wrow>b{padding-top:0}}
 /* روابط المواقع: شبكة بعمودين في البطاقة، وإن كان العدد فردياً تمتد الأخيرة على العرض كله */
 .xlinks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .cfoot .xlinks a:last-child:nth-child(odd){grid-column:1/-1}
@@ -259,6 +275,7 @@ main:focus{outline:none}
 .seasons button.on{background:var(--c1);color:#0b0b0b;border-color:transparent}
 .ep{display:grid;grid-template-columns:136px minmax(0,1fr);gap:10px 12px;padding:10px;border-radius:8px;background:var(--surface);border:1px solid var(--hair)}
 .ep.done{border-color:var(--ok)}
+.ep{scroll-margin-block:16px}
 .ep :is(img,.ph){width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:3px;background:#1b2130}
 .ep h4{font-size:.94rem;font-weight:600}
 .ep h4 bdi{display:block;text-align:left;color:var(--c1)}
@@ -267,6 +284,27 @@ main:focus{outline:none}
 .ep .ov.blur{color:transparent;text-shadow:0 0 9px rgba(230,223,210,.8);cursor:pointer;user-select:none;-webkit-user-select:none}
 .ep .foot2{grid-column:1/-1;display:flex;justify-content:flex-end}
 .ep.done .foot2 button{background:var(--ok);color:#0b0b0b;border-color:transparent}
+/* «وما قبلها؟»: سؤال ينفتح في بطاقة الحلقة التي عُلّمت للتو. النقاط حلقات الموسم حتى هذه (الممتلئة مشاهَدة)، وتمتلئ الفارغة موجةً حين يُجاب بنعم */
+.pv{grid-column:1/-1;display:grid;grid-template-rows:0fr;margin-top:-10px;opacity:0;transition:grid-template-rows .34s cubic-bezier(.2,.8,.2,1),margin-top .34s cubic-bezier(.2,.8,.2,1),opacity .22s ease}   /* الهامش السالب يلغي فجوة الشبكة وهو مطويّ، فلا تقفز البطاقة */
+.pv.on{grid-template-rows:1fr;margin-top:0;opacity:1;transition-delay:.14s}
+.pv-in{min-height:0;overflow:hidden}
+.pv-box{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px 14px;margin-top:2px;padding:12px;border-radius:10px;background:color-mix(in srgb,var(--ok) 8%,rgba(255,255,255,.035));border:1px dashed color-mix(in srgb,var(--ok) 46%,transparent)}
+.pv-dots{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.pv-dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--ok) 50%,var(--dim));transition:background .2s ease,border-color .2s ease}
+.pv-dots i.on{background:var(--ok);border-color:var(--ok)}
+.pv-dots i.now{width:14px;height:14px;background:var(--ok);border-color:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 26%,transparent)}
+.pv-dots i.pop{animation:pv-pop .42s cubic-bezier(.3,1.7,.5,1)}
+.pv-dots u{text-decoration:none;color:var(--dim);line-height:1}
+.pv p{font-size:.9rem;line-height:1.7}
+.pv p b{font-weight:600;color:var(--ok)}
+.pv-btns{display:flex;flex-wrap:wrap;gap:8px}
+.pv-btns button{display:inline-flex;align-items:center;justify-content:center}
+.pv-btns [data-act=pvyes]{background:var(--ok);color:#0b0b0b;border-color:transparent}
+.pv-btns [data-act=pvyes]+[data-act=pvyes]{background:color-mix(in srgb,var(--ok) 16%,rgba(255,255,255,.05));color:var(--ink);border-color:color-mix(in srgb,var(--ok) 50%,transparent)}
+.ep.swept{animation:ep-sweep .7s ease-out}
+@keyframes ep-sweep{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 70%,transparent);background:color-mix(in srgb,var(--ok) 16%,var(--surface))}100%{box-shadow:0 0 0 10px transparent;background:var(--surface)}}
+@keyframes pv-pop{0%{scale:.4}60%{scale:1.5}100%{scale:1}}
+@media (max-width:560px){.pv-box{grid-template-columns:minmax(0,1fr)}.pv-btns button{flex:1 1 auto}}
 .list-btn{display:flex;width:100%;text-align:start;gap:10px;align-items:center;justify-content:space-between;margin-bottom:6px}
 .list-btn small{color:var(--dim);font-weight:400}
 textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;border:1px solid var(--hair);border-radius:8px;padding:10px;direction:ltr;font-size:.76rem}
