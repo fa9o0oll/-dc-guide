@@ -1,0 +1,941 @@
+[
+ {
+  "id": 210,
+  "t": "Ranma ½",
+  "en": null,
+  "type": "TV",
+  "eps": 161,
+  "from": "1989-04-15",
+  "to": "1992-09-25",
+  "was": null,
+  "cands": [
+   {
+    "id": 57706,
+    "name": "Ranma ½",
+    "orig": "らんま1/2",
+    "date": "1989-04-15",
+    "eps": 161,
+    "genres": "Comedy/Action & Adventure/Animation/Sci-Fi & Fantasy",
+    "seasons": "0:16(1990-11-07) 1:161(1989-04-15)"
+   },
+   {
+    "id": 259140,
+    "name": "Ranma1/2",
+    "orig": "らんま1/2",
+    "date": "2024-10-06",
+    "eps": 36,
+    "genres": "Animation/Action & Adventure/Comedy/Sci-Fi & Fantasy",
+    "seasons": "1:36(2024-10-06)"
+   }
+  ]
+ },
+ {
+  "id": 395,
+  "t": "Gantz 2nd Stage",
+  "en": "Gantz: Second Stage",
+  "type": "TV",
+  "eps": 13,
+  "from": "2004-08-26",
+  "to": "2004-11-18",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 2593,
+  "t": "Kara no Kyoukai Movie 1: Fukan Fuukei",
+  "en": "The Garden of Sinners Chapter 1: Overlooking View",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2007-12-01",
+  "to": "2007-12-01",
+  "was": null,
+  "cands": [
+   {
+    "id": 23150,
+    "name": "The Garden of Sinners: Overlooking View",
+    "orig": "劇場版「空の境界」第一章 俯瞰風景",
+    "date": "2007-12-01",
+    "min": 50,
+    "genres": "Animation/Crime/Action/Fantasy/Mystery"
+   }
+  ]
+ },
+ {
+  "id": 6904,
+  "t": "Hellsing: Digest for Freaks",
+  "en": null,
+  "type": "OVA",
+  "eps": 1,
+  "from": "2006-01-22",
+  "to": "2006-01-22",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 8888,
+  "t": "Code Geass: Boukoku no Akito 1 - Yokuryuu wa Maiorita",
+  "en": "Code Geass: Akito the Exiled - The Wyvern Arrives",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2012-07-16",
+  "to": "2012-07-16",
+  "was": null,
+  "cands": [
+   {
+    "id": 185526,
+    "name": "Code Geass: Akito the Exiled 1: The Wyvern Arrives",
+    "orig": "コードギアス 亡国のアキト 第1章「翼竜は舞い降りた」",
+    "date": "2012-08-04",
+    "min": 51,
+    "genres": "Action/Science Fiction/Animation/War"
+   },
+   {
+    "id": 212161,
+    "name": "Code Geass: Akito the Exiled 2: The Wyvern Divided",
+    "orig": "コードギアス 亡国のアキト 第2章「引き裂かれし翼竜」",
+    "date": "2013-09-14",
+    "min": 60,
+    "genres": "Action/Animation/Science Fiction"
+   }
+  ]
+ },
+ {
+  "id": 9260,
+  "t": "Kizumonogatari I: Tekketsu-hen",
+  "en": "Kizumonogatari Part 1: Iron-Blooded",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2016-01-08",
+  "to": "2016-01-08",
+  "was": null,
+  "cands": [
+   {
+    "id": 357786,
+    "name": "Kizumonogatari Part 1: Tekketsu",
+    "orig": "傷物語〈Ⅰ鉄血篇〉",
+    "date": "2016-01-08",
+    "min": 63,
+    "genres": "Animation/Fantasy/Drama/Mystery/Action"
+   }
+  ]
+ },
+ {
+  "id": 18393,
+  "t": "Fairy Tail x Rave",
+  "en": null,
+  "type": "OVA",
+  "eps": 1,
+  "from": "2013-08-16",
+  "to": "2013-08-16",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 23201,
+  "t": "Sengoku Basara: Judge End",
+  "en": "Sengoku BASARA: End of Judgement",
+  "type": "TV",
+  "eps": 12,
+  "from": "2014-07-06",
+  "to": "2014-09-28",
+  "was": {
+   "k": "tv",
+   "id": 25492,
+   "s": 3
+  },
+  "cands": [
+   {
+    "id": 227456,
+    "name": "Sengoku BASARA - End of Judgement",
+    "orig": "戦国BASARA Judge End",
+    "date": "2014-07-06",
+    "eps": 12,
+    "genres": "Animation",
+    "seasons": "1:12(2014-07-06)"
+   },
+   {
+    "id": 25492,
+    "name": "Sengoku BASARA: Samurai Kings",
+    "orig": "戦国BASARA",
+    "date": "2009-04-02",
+    "eps": 24,
+    "genres": "Animation/Action & Adventure/War & Politics",
+    "seasons": "0:16(2009-07-01) 1:12(2009-04-02) 2:12(2010-07-11)"
+   }
+  ]
+ },
+ {
+  "id": 25537,
+  "t": "Fate/stay night Movie: Heaven's Feel - I. Presage Flower",
+  "en": "Fate/stay night: Heaven's Feel - I. Presage Flower",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2017-10-14",
+  "to": "2017-10-14",
+  "was": null,
+  "cands": [
+   {
+    "id": 283984,
+    "name": "Fate/stay night: Heaven's Feel I. Presage Flower",
+    "orig": "劇場版「Fate/stay night [Heaven’s Feel]」Ⅰ.presage flower",
+    "date": "2017-10-14",
+    "min": 120,
+    "genres": "Action/Animation/Drama/Fantasy/Romance"
+   },
+   {
+    "id": 390634,
+    "name": "Fate/stay night: Heaven's Feel II. Lost Butterfly",
+    "orig": "劇場版「Fate/stay night [Heaven’s Feel]」Ⅱ.lost butterfly",
+    "date": "2019-01-12",
+    "min": 117,
+    "genres": "Animation/Action/Fantasy/Drama/Romance"
+   },
+   {
+    "id": 390635,
+    "name": "Fate/stay night: Heaven's Feel III. Spring Song",
+    "orig": "劇場版「Fate/stay night [Heaven’s Feel]」Ⅲ.spring song",
+    "date": "2020-08-15",
+    "min": 120,
+    "genres": "Animation/Romance/Fantasy/Action/Drama"
+   }
+  ]
+ },
+ {
+  "id": 27943,
+  "t": "Nano Invaders",
+  "en": null,
+  "type": "TV",
+  "eps": 52,
+  "from": "2014-10-10",
+  "to": "2015-10-04",
+  "was": null,
+  "cands": [
+   {
+    "id": 214823,
+    "name": "Nano Invaders",
+    "orig": "纳米神兵",
+    "date": "2014-05-06",
+    "eps": 52,
+    "genres": "Kids/Animation/Sci-Fi & Fantasy/Action & Adventure",
+    "seasons": "1:52(2014-05-06)"
+   }
+  ]
+ },
+ {
+  "id": 29089,
+  "t": "Yaoguai Mingdan",
+  "en": "Monster List",
+  "type": "ONA",
+  "eps": 18,
+  "from": "2014-12-13",
+  "to": "2015-09-11",
+  "was": null,
+  "cands": [
+   {
+    "id": 74335,
+    "name": "Monster List",
+    "orig": "妖怪名单",
+    "date": "2014-12-12",
+    "eps": 39,
+    "genres": "Animation/Comedy/Action & Adventure/Sci-Fi & Fantasy",
+    "seasons": "0:1(2020-09-30) 1:18(2014-12-12) 2:21(2017-08-03)"
+   }
+  ]
+ },
+ {
+  "id": 29755,
+  "t": "Haikyuu!! Movie 1: Owari to Hajimari",
+  "en": "Haikyu!! the Movie: The End and the Beginning",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2015-07-03",
+  "to": "2015-07-03",
+  "was": null,
+  "cands": [
+   {
+    "id": 347183,
+    "name": "Haikyu!! the Movie: The End and the Beginning",
+    "orig": "ハイキュー!! 終わりと始まり",
+    "date": "2015-07-03",
+    "min": 89,
+    "genres": "Animation/Drama"
+   }
+  ]
+ },
+ {
+  "id": 30364,
+  "t": "Haikyuu!! Movie 2: Shousha to Haisha",
+  "en": "Haikyuu!! the Movie: The Winner and the Loser",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2015-09-18",
+  "to": "2015-09-18",
+  "was": null,
+  "cands": [
+   {
+    "id": 347186,
+    "name": "Haikyu!! the Movie: The Winner and the Loser",
+    "orig": "ハイキュー!! 勝者と敗者",
+    "date": "2015-09-18",
+    "min": 88,
+    "genres": "Animation"
+   }
+  ]
+ },
+ {
+  "id": 30455,
+  "t": "KanColle: Itsuka Ano Umi de",
+  "en": "KanColle Season 2: Let's Meet at Sea",
+  "type": "TV",
+  "eps": 8,
+  "from": "2022-11-04",
+  "to": "2023-03-25",
+  "was": {
+   "k": "tv",
+   "id": 65711,
+   "s": 2
+  },
+  "cands": [
+   {
+    "id": 203192,
+    "name": "KanColle: See You Again on Another Quiet Blue Sea",
+    "orig": "「艦これ」いつかあの海で",
+    "date": "2022-11-04",
+    "eps": 8,
+    "genres": "Animation/Action & Adventure/Sci-Fi & Fantasy",
+    "seasons": "1:8(2022-11-04)"
+   }
+  ]
+ },
+ {
+  "id": 30458,
+  "t": "Tokyo Ghoul: \"Jack\"",
+  "en": "Tokyo Ghoul: Jack",
+  "type": "OVA",
+  "eps": 1,
+  "from": "2015-09-30",
+  "to": "2015-09-30",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 31227,
+  "t": "Kindaichi Shounen no Jikenbo Returns 2nd Season",
+  "en": "The File of Young Kindaichi Returns 2nd Season",
+  "type": "TV",
+  "eps": 22,
+  "from": "2015-10-03",
+  "to": "2016-03-26",
+  "was": {
+   "k": "tv",
+   "id": 23587,
+   "s": 3
+  },
+  "cands": []
+ },
+ {
+  "id": 31297,
+  "t": "Tokyo Ghoul: \"Pinto\"",
+  "en": "Tokyo Ghoul: Pinto",
+  "type": "OVA",
+  "eps": 1,
+  "from": "2015-12-25",
+  "to": "2015-12-25",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 31757,
+  "t": "Kizumonogatari II: Nekketsu-hen",
+  "en": "Kizumonogatari Part 2: Hot-Blooded",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2016-08-19",
+  "to": "2016-08-19",
+  "was": null,
+  "cands": [
+   {
+    "id": 362584,
+    "name": "Kizumonogatari Part 2: Nekketsu",
+    "orig": "傷物語〈Ⅱ熱血篇〉",
+    "date": "2016-08-19",
+    "min": 68,
+    "genres": "Animation/Fantasy/Mystery"
+   }
+  ]
+ },
+ {
+  "id": 31758,
+  "t": "Kizumonogatari III: Reiketsu-hen",
+  "en": "Kizumonogatari Part 3: Cold-Blooded",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2017-01-06",
+  "to": "2017-01-06",
+  "was": null,
+  "cands": [
+   {
+    "id": 362585,
+    "name": "Kizumonogatari Part 3: Reiketsu",
+    "orig": "傷物語〈Ⅲ冷血篇〉",
+    "date": "2017-01-06",
+    "min": 83,
+    "genres": "Animation/Fantasy/Mystery"
+   }
+  ]
+ },
+ {
+  "id": 33049,
+  "t": "Fate/stay night Movie: Heaven's Feel - II. Lost Butterfly",
+  "en": "Fate/stay night: Heaven's Feel - II. Lost Butterfly",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2019-01-12",
+  "to": "2019-01-12",
+  "was": null,
+  "cands": [
+   {
+    "id": 390634,
+    "name": "Fate/stay night: Heaven's Feel II. Lost Butterfly",
+    "orig": "劇場版「Fate/stay night [Heaven’s Feel]」Ⅱ.lost butterfly",
+    "date": "2019-01-12",
+    "min": 117,
+    "genres": "Animation/Action/Fantasy/Drama/Romance"
+   },
+   {
+    "id": 390635,
+    "name": "Fate/stay night: Heaven's Feel III. Spring Song",
+    "orig": "劇場版「Fate/stay night [Heaven’s Feel]」Ⅲ.spring song",
+    "date": "2020-08-15",
+    "min": 120,
+    "genres": "Animation/Romance/Fantasy/Action/Drama"
+   },
+   {
+    "id": 283984,
+    "name": "Fate/stay night: Heaven's Feel I. Presage Flower",
+    "orig": "劇場版「Fate/stay night [Heaven’s Feel]」Ⅰ.presage flower",
+    "date": "2017-10-14",
+    "min": 120,
+    "genres": "Action/Animation/Drama/Fantasy/Romance"
+   }
+  ]
+ },
+ {
+  "id": 33050,
+  "t": "Fate/stay night Movie: Heaven's Feel - III. Spring Song",
+  "en": "Fate/stay night: Heaven's Feel - III. Spring Song",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2020-08-15",
+  "to": "2020-08-15",
+  "was": null,
+  "cands": [
+   {
+    "id": 390635,
+    "name": "Fate/stay night: Heaven's Feel III. Spring Song",
+    "orig": "劇場版「Fate/stay night [Heaven’s Feel]」Ⅲ.spring song",
+    "date": "2020-08-15",
+    "min": 120,
+    "genres": "Animation/Romance/Fantasy/Action/Drama"
+   },
+   {
+    "id": 390634,
+    "name": "Fate/stay night: Heaven's Feel II. Lost Butterfly",
+    "orig": "劇場版「Fate/stay night [Heaven’s Feel]」Ⅱ.lost butterfly",
+    "date": "2019-01-12",
+    "min": 117,
+    "genres": "Animation/Action/Fantasy/Drama/Romance"
+   },
+   {
+    "id": 283984,
+    "name": "Fate/stay night: Heaven's Feel I. Presage Flower",
+    "orig": "劇場版「Fate/stay night [Heaven’s Feel]」Ⅰ.presage flower",
+    "date": "2017-10-14",
+    "min": 120,
+    "genres": "Action/Animation/Drama/Fantasy/Romance"
+   }
+  ]
+ },
+ {
+  "id": 33783,
+  "t": "Godzilla 1: Kaijuu Wakusei",
+  "en": "Godzilla: Planet of the Monsters",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2017-11-17",
+  "to": "2017-11-17",
+  "was": null,
+  "cands": [
+   {
+    "id": 449574,
+    "name": "Godzilla: Planet of the Monsters",
+    "orig": "GODZILLA 怪獣惑星",
+    "date": "2017-11-17",
+    "min": 89,
+    "genres": "Animation/Action/Science Fiction"
+   },
+   {
+    "id": 19333,
+    "name": "Terror of Mechagodzilla",
+    "orig": "メカゴジラの逆襲",
+    "date": "1975-03-15",
+    "min": 83,
+    "genres": "Science Fiction/Action/Drama"
+   }
+  ]
+ },
+ {
+  "id": 37440,
+  "t": "Psycho-Pass: Sinners of the System Case.1 - Tsumi to Batsu",
+  "en": "Psycho-Pass: Sinners of the System Case.1 - Crime and Punishment",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2019-01-25",
+  "to": "2019-01-25",
+  "was": null,
+  "cands": [
+   {
+    "id": 559566,
+    "name": "Psycho-Pass: Sinners of the System - Case.3 On the Other Side of Love and Hate",
+    "orig": "PSYCHO-PASS サイコパス Sinners of the System Case.3「恩讐の彼方に＿＿」",
+    "date": "2019-03-18",
+    "min": 70,
+    "genres": "Animation/Science Fiction/Crime"
+   },
+   {
+    "id": 559562,
+    "name": "Psycho-Pass: Sinners of the System - Case.2 First Guardian",
+    "orig": "PSYCHO-PASS サイコパス Sinners of the System Case.2「First Guardian」",
+    "date": "2019-02-15",
+    "min": 60,
+    "genres": "Animation/Science Fiction/Crime"
+   },
+   {
+    "id": 510242,
+    "name": "Psycho-Pass: Sinners of the System - Case.1 Crime and Punishment",
+    "orig": "PSYCHO-PASS サイコパス Sinners of the System Case.1「罪と罰」",
+    "date": "2019-01-25",
+    "min": 60,
+    "genres": "Animation/Science Fiction/Crime"
+   }
+  ]
+ },
+ {
+  "id": 37514,
+  "t": "Made in Abyss Movie 1: Tabidachi no Yoake",
+  "en": "Made in Abyss: Journey's Dawn",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2019-01-04",
+  "to": "2019-01-04",
+  "was": null,
+  "cands": [
+   {
+    "id": 526426,
+    "name": "Made in Abyss: Journey's Dawn",
+    "orig": "劇場版総集編【前編】メイドインアビス 旅立ちの夜明け",
+    "date": "2019-01-04",
+    "min": 119,
+    "genres": "Animation/Adventure/Mystery/Fantasy/Science Fiction"
+   }
+  ]
+ },
+ {
+  "id": 37515,
+  "t": "Made in Abyss Movie 2: Hourou Suru Tasogare",
+  "en": "Made in Abyss: Wandering Twilight",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2019-01-18",
+  "to": "2019-01-18",
+  "was": null,
+  "cands": [
+   {
+    "id": 526429,
+    "name": "Made in Abyss: Wandering Twilight",
+    "orig": "劇場版総集編【後編】メイドインアビス 放浪する黄昏",
+    "date": "2019-01-18",
+    "min": 105,
+    "genres": "Animation/Adventure/Fantasy/Mystery/Science Fiction"
+   }
+  ]
+ },
+ {
+  "id": 37651,
+  "t": "Fate/Extra: Last Encore - Illustrias Tendousetsu",
+  "en": "Fate/Extra: Last Encore - Illustrias Geocentric Theory",
+  "type": "TV",
+  "eps": 3,
+  "from": "2018-07-29",
+  "to": "2018-07-29",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 37760,
+  "t": "Mecha-ude",
+  "en": "Mechanical Arms",
+  "type": "ONA",
+  "eps": 1,
+  "from": "2018-09-30",
+  "to": "2018-09-30",
+  "was": null,
+  "cands": [
+   {
+    "id": 85426,
+    "name": "Mechanical Arms",
+    "orig": "メカウデ",
+    "date": "2018-09-30",
+    "eps": 1,
+    "genres": "Action & Adventure/Sci-Fi & Fantasy/Animation/Comedy",
+    "seasons": "1:1(2018-09-30)"
+   },
+   {
+    "id": 210355,
+    "name": "Mecha-Ude: Mechanical Arms",
+    "orig": "メカウデ",
+    "date": "2024-10-04",
+    "eps": 12,
+    "genres": "Animation/Sci-Fi & Fantasy/Action & Adventure",
+    "seasons": "0:1(2018-09-30) 1:12(2024-10-04)"
+   }
+  ]
+ },
+ {
+  "id": 38325,
+  "t": "Yi Ren Zhi Xia: Fanwai Pian",
+  "en": null,
+  "type": "ONA",
+  "eps": 2,
+  "from": "2018-09-30",
+  "to": "2019-04-14",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 40453,
+  "t": "Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka II OVA",
+  "en": "Is It Wrong to Try to Pick Up Girls in a Dungeon? II: Is It Wrong to go Searching for Herbs on a Deserted Island?",
+  "type": "OVA",
+  "eps": 1,
+  "from": "2020-01-29",
+  "to": "2020-01-29",
+  "was": null,
+  "cands": [
+   {
+    "id": 70590,
+    "name": "Is It Wrong to Try to Pick Up Girls in a Dungeon? On the Side: Sword Oratoria",
+    "orig": "ソード・オラトリア ダンジョンに出会いを求めるのは間違っているだろうか外伝",
+    "date": "2017-04-15",
+    "eps": 12,
+    "genres": "Animation/Action & Adventure",
+    "seasons": "1:12(2017-04-15)"
+   },
+   {
+    "id": 62745,
+    "name": "Is It Wrong to Try to Pick Up Girls in a Dungeon?",
+    "orig": "ダンジョンに出会いを求めるのは間違っているだろうか",
+    "date": "2015-04-04",
+    "eps": 74,
+    "genres": "Animation/Sci-Fi & Fantasy/Comedy/Action & Adventure",
+    "seasons": "0:5(2016-12-07) 1:13(2015-04-04) 2:12(2019-07-13) 3:12(2020-10-03) 4:22(2022-07-23) 5:15(2024-10-05)"
+   }
+  ]
+ },
+ {
+  "id": 44388,
+  "t": "Biao Ren",
+  "en": "Blades of the Guardians",
+  "type": "ONA",
+  "eps": 15,
+  "from": "2023-06-01",
+  "to": "2023-08-17",
+  "was": null,
+  "cands": [
+   {
+    "id": 107463,
+    "name": "Blades of the Guardians",
+    "orig": "镖人",
+    "date": "2023-06-01",
+    "eps": 23,
+    "genres": "Animation/Action & Adventure",
+    "seasons": "1:15(2023-06-01) 2:8(2026-06-11)"
+   },
+   {
+    "id": 275516,
+    "name": "Punch Out Life",
+    "orig": "狂飙人生",
+    "date": "2024-11-08",
+    "eps": 23,
+    "genres": "Comedy/Sci-Fi & Fantasy",
+    "seasons": "1:23(2024-11-08)"
+   },
+   {
+    "id": 291066,
+    "name": "顾总你的保镖是夫人",
+    "orig": "顾总你的保镖是夫人",
+    "date": "2024-11-27",
+    "eps": 2,
+    "genres": "Drama",
+    "seasons": "1:2(2024-11-27)"
+   },
+   {
+    "id": 252939,
+    "name": "我的保镖是世外高人",
+    "orig": "我的保镖是世外高人",
+    "date": "2024-04-18",
+    "eps": 1,
+    "genres": "",
+    "seasons": "1:1(2024-04-18)"
+   }
+  ]
+ },
+ {
+  "id": 44983,
+  "t": "Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka III OVA",
+  "en": "Is It Wrong to Try to Pick Up Girls in a Dungeon? III: Is It Wrong to Try to Find a Hot Spring in Orario?",
+  "type": "OVA",
+  "eps": 1,
+  "from": "2021-04-28",
+  "to": "2021-04-28",
+  "was": null,
+  "cands": [
+   {
+    "id": 70590,
+    "name": "Is It Wrong to Try to Pick Up Girls in a Dungeon? On the Side: Sword Oratoria",
+    "orig": "ソード・オラトリア ダンジョンに出会いを求めるのは間違っているだろうか外伝",
+    "date": "2017-04-15",
+    "eps": 12,
+    "genres": "Animation/Action & Adventure",
+    "seasons": "1:12(2017-04-15)"
+   },
+   {
+    "id": 62745,
+    "name": "Is It Wrong to Try to Pick Up Girls in a Dungeon?",
+    "orig": "ダンジョンに出会いを求めるのは間違っているだろうか",
+    "date": "2015-04-04",
+    "eps": 74,
+    "genres": "Animation/Sci-Fi & Fantasy/Comedy/Action & Adventure",
+    "seasons": "0:5(2016-12-07) 1:13(2015-04-04) 2:12(2019-07-13) 3:12(2020-10-03) 4:22(2022-07-23) 5:15(2024-10-05)"
+   }
+  ]
+ },
+ {
+  "id": 46735,
+  "t": "Chocomatsu-san: Valentine's Day-hen",
+  "en": null,
+  "type": "ONA",
+  "eps": 3,
+  "from": "2021-02-13",
+  "to": "2021-02-15",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 48409,
+  "t": "Chocomatsu-san: White Day-hen",
+  "en": null,
+  "type": "ONA",
+  "eps": 3,
+  "from": "2021-03-13",
+  "to": "2021-03-15",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 53911,
+  "t": "Nanatsu no Taizai: Ensa no Edinburgh Part 2",
+  "en": "The Seven Deadly Sins: Grudge of Edinburgh Part 2",
+  "type": "ONA",
+  "eps": 1,
+  "from": "2023-08-08",
+  "to": "2023-08-08",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 54250,
+  "t": "Made in Abyss: Mezameru Shinpi",
+  "en": "Made in Abyss: Awakening Mystery",
+  "type": "Movie",
+  "eps": 1,
+  "from": "2026-10-23",
+  "to": "2026-10-23",
+  "was": null,
+  "cands": [
+   {
+    "id": 1526917,
+    "name": "Made in Abyss: Mezameru Shinpi",
+    "orig": "メイドインアビス 目覚める神秘",
+    "date": "2026-10-23",
+    "min": 71,
+    "genres": "Animation/Science Fiction/Fantasy/Adventure"
+   },
+   {
+    "id": 1814642,
+    "name": "Made in Abyss: Mezameru Shinpi Part 2",
+    "orig": "メイドインアビス 目覚める神秘 第二部",
+    "date": "",
+    "min": 0,
+    "genres": "Adventure/Drama/Fantasy/Mystery/Science Fiction/Animation"
+   }
+  ]
+ },
+ {
+  "id": 56765,
+  "t": "Zhengjing Shao Zhu de Xingfu Shenghuo",
+  "en": "The Little Master's Better Life",
+  "type": "ONA",
+  "eps": 12,
+  "from": "2023-10-22",
+  "to": "2023-12-31",
+  "was": null,
+  "cands": [
+   {
+    "id": 237421,
+    "name": "The Little Master's Better Life",
+    "orig": "正经少主的幸福生活",
+    "date": "2023-10-22",
+    "eps": 12,
+    "genres": "Animation/Sci-Fi & Fantasy/Action & Adventure",
+    "seasons": "1:12(2023-10-22)"
+   }
+  ]
+ },
+ {
+  "id": 60057,
+  "t": "Chao Neng Lifang: Chaofan Pian",
+  "en": "Super Cube",
+  "type": "ONA",
+  "eps": 12,
+  "from": "2025-03-21",
+  "to": "2025-05-23",
+  "was": null,
+  "cands": [
+   {
+    "id": 279182,
+    "name": "Super Cube",
+    "orig": "超能立方",
+    "date": "2025-03-21",
+    "eps": 12,
+    "genres": "Animation/Action & Adventure/Sci-Fi & Fantasy",
+    "seasons": "1:12(2025-03-21)"
+   }
+  ]
+ },
+ {
+  "id": 60108,
+  "t": "One Piece: Gyojin Tou-hen",
+  "en": "One Piece Log: Fish-Man Island Saga",
+  "type": "TV",
+  "eps": 21,
+  "from": "2024-11-03",
+  "to": "2025-03-30",
+  "was": null,
+  "cands": [
+   {
+    "id": 334601,
+    "name": "One Piece Log: Fish-Man Island Saga",
+    "orig": "SPECIAL EDITED VERSION『ONE PIECE』魚人島編",
+    "date": "2024-11-03",
+    "eps": 21,
+    "genres": "Action & Adventure",
+    "seasons": "1:21(2024-11-03)"
+   },
+   {
+    "id": 37854,
+    "name": "One Piece",
+    "orig": "ワンピース",
+    "date": "1999-10-20",
+    "eps": 1180,
+    "genres": "Action & Adventure/Comedy/Animation",
+    "seasons": "0:39(1999-12-15) 1:61(1999-10-20) 2:16(?) 3:14(?) 4:39(?) 5:13(?) 6:52(?) 7:33(?) 8:35(?) 9:73(?) 10:45(?) 11:26(?) 12:14(?) 13:101(?) 14:58(?) 15:62(?) 16:50(?) 17:56(?) 18:55(2016-07-13) 19:74(2017-09-05) 20:14(2019-04-01) 21:197(2019-07-08) 22:67(?) 23:25(?)"
+   }
+  ]
+ },
+ {
+  "id": 60572,
+  "t": "Kun Tun Tianxia Zhi Zhang Men Guilai",
+  "en": "The All-devouring Whale: Homecoming",
+  "type": "ONA",
+  "eps": 12,
+  "from": "2025-05-01",
+  "to": "2025-07-11",
+  "was": null,
+  "cands": [
+   {
+    "id": 280078,
+    "name": "The All-Devouring Whale: Homecoming",
+    "orig": "鲲吞天下之掌门归来",
+    "date": "2025-05-01",
+    "eps": 13,
+    "genres": "Animation/Action & Adventure/Sci-Fi & Fantasy/Comedy",
+    "seasons": "0:11(2025-05-11) 1:13(2025-05-01)"
+   }
+  ]
+ },
+ {
+  "id": 61361,
+  "t": "7Fates: Chakho",
+  "en": null,
+  "type": "ONA",
+  "eps": 1,
+  "from": "2025-04-03",
+  "to": "2025-04-03",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 62387,
+  "t": "Meitantei Conan Movie 29: Highway no Datenshi",
+  "en": null,
+  "type": "Movie",
+  "eps": 1,
+  "from": "2026-04-10",
+  "to": "2026-04-10",
+  "was": null,
+  "cands": []
+ },
+ {
+  "id": 62957,
+  "t": "Bai Ri Cheng Wang",
+  "en": "Crowned in a Hundred Days",
+  "type": "ONA",
+  "eps": 25,
+  "from": "2026-07-03",
+  "to": "2026-09-15",
+  "was": null,
+  "cands": [
+   {
+    "id": 326844,
+    "name": "Crowned in a Hundred Days",
+    "orig": "百日成王",
+    "date": "2026-07-03",
+    "eps": 25,
+    "genres": "Animation/Action & Adventure/Sci-Fi & Fantasy",
+    "seasons": "1:25(2026-07-03)"
+   }
+  ]
+ },
+ {
+  "id": 63987,
+  "t": "Li Xiongmao",
+  "en": "Raised by Demons: Panda Li",
+  "type": "ONA",
+  "eps": 18,
+  "from": "2026-07-29",
+  "to": "2026-11-11",
+  "was": null,
+  "cands": [
+   {
+    "id": 329026,
+    "name": "Raised by Demons: Panda Li",
+    "orig": "李熊猫",
+    "date": "2026-07-29",
+    "eps": 18,
+    "genres": "Animation/Action & Adventure/Sci-Fi & Fantasy",
+    "seasons": "1:18(2026-07-29) 2:0(?)"
+   }
+  ]
+ }
+]
