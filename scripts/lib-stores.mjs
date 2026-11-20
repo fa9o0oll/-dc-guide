@@ -24,7 +24,7 @@ export const norm = s => String(s || '').replace(/[™®©]/g, '').normalize('NF
 export const isPc = g => (g.plats || []).includes('pc') || (g.also || []).includes('pc');
 export const epicSlug = u => { const m = String(u || '').match(/epicgames\.com\/(?:store\/)?(?:[a-z]{2}(?:-[A-Za-z]{2})?\/)?(p|product|bundles)\/([^/?#]+)/); return m ? { kind: m[1] === 'bundles' ? 'bundles' : 'p', slug: m[2] } : null; };
 const epicUrl = u => { const s = epicSlug(u); return s ? `https://store.epicgames.com/${s.kind}/${s.slug}` : u; };
-const slugify = t => norm(t).replace(/ /g, '-') || '-';
+const slugify = t => norm(String(t || '').replace(/['’]/g, '')).replace(/ /g, '-') || '-';   // «Assassin's Creed» ← assassins-creed، كما تكتبه المتاجر
 const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
 
 function client(opt) { const f = opt.fetch || fetch, pause = opt.pause ?? 500;
@@ -167,7 +167,8 @@ export async function storesFor(games, opt = {}) {
       else if (v?.priced) add({ s: 'gog', u: v.u || site(g, 'gog'), ...(v.free ? { free: v.free } : {}) });
       else if (hit) add({ s: 'gog', u: hit.u, ...(hit.free ? { free: hit.free } : {}) });
       else if (!searched && (v || site(g, 'gog') || viaWd(g, 'gog'))) add(old(g.id, 'gog') || (v?.u || site(g, 'gog') ? { s: 'gog', u: v?.u || site(g, 'gog') } : null));   // البحث لم يُجب
-      else if (v && (v.u || site(g, 'gog'))) add({ s: 'gog', u: v.u || site(g, 'gog'), gone: 1 }); }
+      else if (v && (v.u || site(g, 'gog'))) add({ s: 'gog', u: v.u || site(g, 'gog'), gone: 1 });
+      else if (!g.ext?.gog && site(g, 'gog')) add({ s: 'gog', u: site(g, 'gog') }); }   // رابط من IGDB بلا رقم، ولم يجدها البحث باسمها (قد تُسمّى في المتجر بغيره): يبقى رابطها
     // Xbox: منتج له حزمة كمبيوتر ويُشترى، أو ضمن PC Game Pass (برقمه أو باسمه)
     { const mine = msIds(g).map(id => cat.out.get(id)).filter(Boolean), inPass = p => !!pass?.has(p.id), best = mine.filter(p => (p.pc && p.price) || inPass(p)).sort((a, b) => inPass(b) - inPass(a))[0] || passByTitle.get(g.id);
       if (best) { const x = site(g, 'xstore'), u = x && x.toUpperCase().includes(best.id) ? x : `https://www.xbox.com/games/store/${slugify(best.title || g.title)}/${best.id}`;

@@ -65,6 +65,8 @@ r.games.sort((a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9));
     for (const g of r.games) { if (st.rows.has(g.id)) g.pc = st.rows.get(g.id); if (st.f2p.has(g.id)) g.f2p = 1; }
     r.stores = st.meta; await mkdir('data/generated/games', { recursive: true }); await writeFile(STORES, JSON.stringify(st.report, null, 1) + '\n');
     if (process.env.GAMES_PROBE) {   // فروع العمل: الجدول كله في سجل البناء للمراجعة
+      for (const [id, f] of Object.entries(await read('data/games/pc.json', {}))) if (f.ids?.steam) { const j = await fetch(`https://store.steampowered.com/api/appdetails?appids=${f.ids.steam}&cc=us&l=en`).then(x => x.json()).catch(() => null), d = j?.[f.ids.steam]?.data;
+        console.log(`stores: fix ${id} (${r.games.find(g => String(g.id) === id)?.title}) steam ${f.ids.steam} = ${d?.name ?? '?'} [${d?.type ?? '?'}]`); }   // ما صُحّح باليد يُرى اسمه في المتجر
       for (const [n, v] of Object.entries(st.report.games)) console.log(`stores: ${n} => ${v}`); console.log('stores: pass by title: ' + st.report.passByTitle.join(' | ')); console.log('stores: epic free: ' + st.report.epicFree.join(' | ')); console.log('stores: none: ' + st.report.none.join(' | ')); console.log('stores: gog search: ' + st.report.gogSearch.join(' | ')); console.log('stores: epic guess: ' + st.report.epicGuess.join(' | ')); }
   } catch (e) { console.log(`games: stores failed (${e.message}), keeping the previous stores`); for (const g of r.games) { const o = prev.get(g.id); if (o?.pc) g.pc = o.pc; if (o?.f2p) g.f2p = 1; } } }
 const TR = await read('data/games/translations.json', {}), PLACES = await read('data/games/places.json', {}), moved = await read('data/games/moved.json', {});

@@ -1,5 +1,6 @@
 {
- "1020": { "ids": { "steam": "3240220" }, "why": "رقم Steam في IGDB للنسخة القديمة (Grand Theft Auto V Legacy) التي لم تعد تُباع منفردة. اللعبة تُباع برقم Grand Theft Auto V Enhanced، وشراؤها يعطي النسختين" },
+ "1020": { "ids": { "steam": "3240220" }, "why": "رقم Steam في IGDB للنسخة القديمة (Grand Theft Auto V Legacy) التي لم تعد تُباع منفردة. اللعبة تُباع اليوم برقم Grand Theft Auto V Enhanced" },
  "10267": { "ids": { "steam": "278080" }, "why": "نسخة الكمبيوتر في Steam هي Dynasty Warriors 8: Xtreme Legends Complete Edition، ولا رقم لها في سجل اللعبة في IGDB" },
+ "11157": { "ids": { "steam": "1659040" }, "why": "Hitman (2016) لم تعد تُباع منفردة في Steam. محتواها اليوم داخل HITMAN World of Assassination، وهذا رقمها" },
  "188574": { "add": [{ "s": "other", "n": "Netmarble Launcher", "u": "official", "free": "f2p" }], "why": "على الكمبيوتر بمشغّل ناشرها، وهي مجانية اللعب. لا رابط متجر لها في IGDB" }
 }
