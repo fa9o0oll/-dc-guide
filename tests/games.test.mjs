@@ -241,7 +241,12 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
     r = await pcOf(11208); check('لعبة كمبيوتر لم يُعثر لها على متجر: يقال ذلك بلا بلاطات', !r.tiles.length && /لم نجد لها صفحة في متاجر الكمبيوتر الآن/.test(r.note) && !r.f, r);
     r = await pcOf(990001); check('لعبة لم تُفحص متاجرها بعد: بلاطاتها من روابط IGDB، بلا حكم على المجانية، ومتاجر غير الكمبيوتر تبقى في «صفحتها في المواقع»', r.tiles.join(' ~ ') === 'steam:Steam:المتجر ~ gog:GOG:المتجر' && !r.f && /المتاجر من روابط IGDB\. المجانية وبقية المشغّلات تُفحص في البناء القادم\./.test(r.note) && r.links.includes('PlayStation Store') && !r.links.includes('GOG'), r);
     r = await pcOf(117170); check('لعبة كمبيوتر بلا روابط متاجر ولم تُفحص: تُفحص في البناء القادم', !r.tiles.length && /متاجرها على الكمبيوتر تُفحص في البناء القادم/.test(r.note), r);
-    r = await pcOf(136625); check('لعبة ليست على الكمبيوتر: يقال ذلك', !r.tiles.length && /لم تصدر على الكمبيوتر/.test(r.note) && !r.f, r); }
+    r = await pcOf(136625); check('لعبة ليست على الكمبيوتر: يقال ذلك', !r.tiles.length && /لم تصدر على الكمبيوتر/.test(r.note) && !r.f, r);
+    await page.evaluate(() => 0); }
+  { // مصدر لم يُجب في آخر فحص: الملاحظة تقول ذلك
+    const p2 = await ctx.newPage(); await mockApi(p2); await p2.route(/\/games\/data\/games\.json/, async r => { const j = JSON.parse(JSON.stringify(FX)); j.stores = { at: j.stores.at, failed: ['steam', 'gamepass', 'wikidata'] }; await r.fulfill({ contentType: 'application/json', body: JSON.stringify(j) }); });
+    await p2.goto(`${base}/games/#g119133`); await p2.waitForSelector('#sheet[open] .pcsec .note');
+    check('مصدر لم يُجب في آخر فحص: الملاحظة تسمّيه وتقول إن حاله من الفحص السابق', /تعذّر فيه الوصول إلى Steam وXbox، فحاله هنا من الفحص الذي قبله\./.test(await p2.textContent('#sheet .pcsec .note')), await p2.textContent('#sheet .pcsec .note')); await p2.close(); }
   // حساباتي: الرجوع من Steam، ثم السحب وصندوق الأسئلة
   await page.goto(`${base}/games/#steam=76561198000000001`); await page.waitForSelector('#acc[open] [data-act=pull][data-src=steam]');
   check('الرجوع من «ادخل عبر Steam» يحفظ الحساب ويفتح «حساباتي» مرتبطاً، ويزيل الرقم من الرابط', await page.evaluate(() => localStorage.getItem('gamesg.steam') === '76561198000000001' && !location.hash && /مرتبط/.test(document.querySelector('#acc .s-steam').textContent)));
