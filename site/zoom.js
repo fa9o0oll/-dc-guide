@@ -7,6 +7,9 @@
 // يكبّر عند موضع النقر ويعيده (وعلى الكمبيوتر العجلة، و+ و- و0 والأسهم). يُغلق بالسحب لأعلى أو لأسفل، أو بقرصه للداخل، أو بالضغط خارجه أو ✕ أو Esc أو زر الرجوع،
 // فيعود طائراً إلى مكانه. صور TMDB تُطلب بالدقة التي تحتاجها الشاشة، والأصلية عند التكبير.
 // تفضيل «تقليل الحركة» في النظام: تلاشٍ بسيط، بلا طيران ولا ميلان مع الجوال (القرص والسحب يبقيان لأنهما بيد المستخدم).
+// مجموعة الصور: حاوية تحمل data-zoom-set (لقطات اللعبة مثلاً) تجعل صورها مجموعة واحدة في المكبَّر: السحب يميناً ويساراً ينقل إلى الصورة
+// المجاورة وهي تدخل من جهتها (كما هي مصفوفة في الصفحة: في صفحة عربية التاليةُ على اليسار)، ومثله السهمان وزرّا التنقل تحت العنوان وتمرير
+// لوحة اللمس أفقياً، وبين الزرّين موضع الصورة («3 من 8»). الإغلاق يعيد الصورة الحالية إلى مكانها في الصفحة. والسحب لأعلى أو لأسفل يغلق كما هو.
 const TMDB = /(\/t\/p\/)(?:w\d+|original)(\/)/, IGDB = /(\/igdb\/image\/upload\/)t_([a-z0-9_]+)(\/)/, reduce = matchMedia('(prefers-reduced-motion: reduce)'), SEL = '[data-zoom],[data-zoom-pinch]', MAX = 5;
 const ICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5'/%3E%3C/svg%3E";
 const CSS = `
@@ -39,6 +42,19 @@ dialog.pz::backdrop{background:none}
 .pz-x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .pz-x:focus-visible{outline:2px solid #fff;outline-offset:3px}
 @media (hover:hover){.pz-x:hover{background:rgba(255,255,255,.16)}}
+/* مجموعة صور: الصورة المجاورة ورقة ثانية تدخل من جهتها مع السحب، وتحت العنوان زرّا التنقل وبينهما الموضع (الترتيب مكاني: الأيسر لما على اليسار) */
+.pz-side{position:absolute;z-index:1;margin:0;overflow:hidden;background:#15151b;box-shadow:0 36px 80px -18px rgba(0,0,0,.85),0 10px 28px rgba(0,0,0,.45);pointer-events:none;will-change:transform}
+.pz-side[hidden]{display:none}
+.pz-side img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pz-pager{display:none;align-items:center;gap:14px;direction:ltr;transition:opacity .25s ease}
+.pz-set .pz-pager{display:flex}
+.pz-zoomed .pz-pager{opacity:0;pointer-events:none}
+.pz-n{min-width:5.5em;text-align:center;font-weight:600;font-size:.92rem;color:rgba(255,255,255,.82);font-variant-numeric:tabular-nums;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+.pz-go{width:44px;height:44px;display:grid;place-items:center;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(18,18,24,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;cursor:pointer;transition:opacity .2s ease}
+.pz-go svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pz-go:disabled{opacity:.28;cursor:default}
+.pz-go:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media (hover:hover){.pz-go:not(:disabled):hover{background:rgba(255,255,255,.16)}}
 [data-zoom],[data-zoom-pinch]{position:relative;touch-action:pan-x pan-y;-webkit-tap-highlight-color:transparent}
 [data-zoom]{cursor:zoom-in}
 [data-zoom]:focus-visible{outline:2px solid currentColor;outline-offset:3px}
@@ -56,9 +72,10 @@ dialog.pz::backdrop{background:none}
 
 const clamp = (v, a) => Math.max(-a, Math.min(a, v)), lim = (v, a, b) => Math.max(a, Math.min(b, v));
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y), mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
-// أكبر مقاس يسعه العرض والارتفاع بنسبة البوستر الصغير نفسها، مع مكان للعنوان تحته
-const fit = ar => { const vw = document.documentElement.clientWidth || innerWidth, vh = innerHeight, pad = Math.max(16, Math.min(40, vw * .05));
-  let w = Math.min(vw - pad * 2, 600), h = w / ar; const mh = vh - pad * 2 - 64; if (h > mh) { h = mh; w = h * ar; } return [w, h]; };
+// أكبر مقاس يسعه العرض والارتفاع بنسبة البوستر الصغير نفسها، مع مكان للعنوان تحته (extra: مكان شريط التنقل في مجموعة الصور).
+// البوستر الطولي يقف عند 600 بكسل عرضاً، والصورة العريضة (لقطة لعبة 16:9) تتسع حتى 1280 فلا تبقى صغيرة على شاشة الكمبيوتر
+const fit = (ar, extra = 0) => { const vw = document.documentElement.clientWidth || innerWidth, vh = innerHeight, pad = Math.max(16, Math.min(40, vw * .05));
+  let w = Math.min(vw - pad * 2, ar > 1.2 ? 1280 : 600), h = w / ar; const mh = vh - pad * 2 - 64 - extra; if (h > mh) { h = mh; w = h * ar; } return [w, h]; };
 // صورة TMDB أو IGDB (أغلفة ألعابي) بالدقة التي تحتاجها الشاشة، وأي رابط آخر كما هو
 const sized = (u, px) => TMDB.test(u) ? u.replace(TMDB, `$1${px > 900 ? 'original' : px > 560 ? 'w780' : 'w500'}$2`)
   : IGDB.test(u) ? u.replace(IGDB, (m, a, t, b) => a + (px > 560 || !/^cover/.test(t) ? 't_1080p' : 't_cover_big_2x') + b) : u;
@@ -68,33 +85,43 @@ const radius = (el, k) => { const cs = getComputedStyle(el), c = ['TopLeft', 'To
   const f = v => v.endsWith('px') ? `${(parseFloat(v) * k).toFixed(1)}px` : v; return `${c.map(p => f(p[0])).join(' ')} / ${c.map(p => f(p[1] ?? p[0])).join(' ')}`; };
 const shapeOf = (t, im) => [t, im].find(e => ['TopLeft', 'BottomLeft'].some(c => parseFloat(getComputedStyle(e)[`border${c}Radius`]))) || t;
 const titleOf = (t, im) => t.dataset.zoomTitle || im?.alt.replace(/^بوستر\s+/, '') || '';
+// مجموعة الصور التي ينتمي إليها العنصر: كل ما يقبل التكبير داخل أقرب حاوية تحمل data-zoom-set، بترتيبها في الصفحة
+const okThumb = t => { const im = t.querySelector('img'); return !!im && !!(im.currentSrc || im.src) && !im.dataset.failed; };
+function setOf(t) { const box = t.closest('[data-zoom-set]'); if (!box) return null; const all = [...box.querySelectorAll(SEL)].filter(okThumb), i = all.indexOf(t);
+  return all.length > 1 && i >= 0 ? { set: all, i, rtl: getComputedStyle(box).direction === 'rtl' } : null; }
+const PAGER = 60;   // ارتفاع شريط التنقل وفراغه تحت العنوان
 
 // ================= المكبَّر =================
 let D = null, S = 'closed', cur = null, anims = [], skipPop = false, Z = { s: 1, x: 0, y: 0 };
+let nav = null, pend = 0, sideTok = 0, wacc = 0, wlast = 0, wlock = false;   // انتقال جارٍ بين صورتين، ورقم آخر ظهور للورقة الجانبية، وتراكم تمرير اللوحة أفقياً
 const P = new Map(); let G = null, tap = null, single = 0, hover = false, lastType = 'mouse';   // المؤشرات النشطة، والحركة الجارية، والنقر
 function build() {
   if (D) return D;
   const d = document.createElement('dialog'); d.className = 'pz'; d.setAttribute('aria-label', 'البوستر مكبّراً');
   d.innerHTML = `<div class="pz-scrim"></div><div class="pz-amb" aria-hidden="true"><img alt=""></div>
-<figure class="pz-fig"><div class="pz-fly"><div class="pz-zoom"><div class="pz-card"><img class="pz-lo" alt=""><img class="pz-hi" alt="" decoding="async"><i class="pz-sheen"></i></div></div></div><figcaption class="pz-cap"><bdi dir="auto"></bdi></figcaption></figure>
-<button class="pz-x" type="button" aria-label="إغلاق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
+<figure class="pz-fig"><div class="pz-fly"><div class="pz-zoom"><div class="pz-card"><img class="pz-lo" alt=""><img class="pz-hi" alt="" decoding="async"><i class="pz-sheen"></i></div></div></div><figcaption class="pz-cap"><bdi dir="auto"></bdi></figcaption>
+<div class="pz-pager"><button class="pz-go" type="button" data-side="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg></button><span class="pz-n" dir="rtl" aria-live="polite"></span><button class="pz-go" type="button" data-side="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg></button></div></figure>
+<figure class="pz-side" hidden><img class="pz-slo" alt=""><img class="pz-hi pz-shi" alt="" decoding="async"></figure>
+<button class="pz-x" type="button" aria-label="إغلاق" autofocus><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
   document.body.append(d);
   const q = s => d.querySelector(s);
-  D = { d, scrim: q('.pz-scrim'), amb: q('.pz-amb'), ambImg: q('.pz-amb img'), fly: q('.pz-fly'), zoom: q('.pz-zoom'), card: q('.pz-card'), lo: q('.pz-lo'), hi: q('.pz-hi'), sheen: q('.pz-sheen'), cap: q('.pz-cap'), capT: q('.pz-cap bdi'), x: q('.pz-x') };
-  D.hi.addEventListener('load', () => D.hi.classList.add('in'));
+  D = { d, scrim: q('.pz-scrim'), amb: q('.pz-amb'), ambImg: q('.pz-amb img'), fly: q('.pz-fly'), zoom: q('.pz-zoom'), card: q('.pz-card'), lo: q('.pz-lo'), hi: q('.pz-hi'), sheen: q('.pz-sheen'), cap: q('.pz-cap'), capT: q('.pz-cap bdi'), x: q('.pz-x'),
+    side: q('.pz-side'), sideLo: q('.pz-slo'), sideHi: q('.pz-shi'), pager: q('.pz-pager'), n: q('.pz-n'), goL: q('.pz-go[data-side="-1"]'), goR: q('.pz-go[data-side="1"]') };
+  D.hi.addEventListener('load', () => D.hi.classList.add('in')); D.sideHi.addEventListener('load', () => D.sideHi.classList.add('in'));
+  for (const b of [D.goL, D.goR]) b.addEventListener('click', () => slide(+b.dataset.side));
   d.addEventListener('cancel', e => { e.preventDefault(); unzoom(); });
   // Esc هنا لا يصل إلى البوابة (حتى لا تُغلق نافذتها تحته). ومن لوحة المفاتيح: + و- للتكبير والتصغير، و0 للمقاس، والأسهم للتنقل
   d.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); return unzoom(); } keys(e); });
   D.x.addEventListener('click', () => unzoom());
   d.addEventListener('wheel', wheel, { passive: false });
   // النقر المزدوج بالفأرة فقط: متصفح الجوال يرسل dblclick بعد نقرتي اللمس أيضاً، وهاتان تُعالَجان في up فلا يتكرر التبديل
-  d.addEventListener('dblclick', e => { if (e.target.closest('.pz-x') || lastType !== 'mouse') return; e.preventDefault(); toggleZoom(e.clientX, e.clientY); });
+  d.addEventListener('dblclick', e => { if (e.target.closest('.pz-x,.pz-pager') || lastType !== 'mouse') return; e.preventDefault(); toggleZoom(e.clientX, e.clientY); });
   d.addEventListener('pointerdown', down); d.addEventListener('pointermove', move); d.addEventListener('pointerup', up); d.addEventListener('pointercancel', up);
   d.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && !G) { hover = false; flat(); } });
   addEventListener('resize', () => { if (S === 'open') { size(); snapZ(false); } });
   return D;
 }
-function size() { const [w, h] = fit(cur.ar); D.card.style.width = `${w}px`; D.card.style.height = `${h}px`; D.card.style.borderRadius = radius(cur.shape, w / cur.w0); cur.w = w; cur.h = h; cur.c = null; return w; }
+function size() { const [w, h] = fit(cur.ar, cur.set ? PAGER : 0); D.card.style.width = `${w}px`; D.card.style.height = `${h}px`; D.card.style.borderRadius = radius(cur.shape, w / cur.w0); cur.w = w; cur.h = h; cur.c = null; return w; }
 const setZ = (z, ease = false) => { Z = z; D.zoom.classList.toggle('pz-ease', ease); D.zoom.style.transform = z.s === 1 && !z.x && !z.y ? '' : `translate(${z.x.toFixed(1)}px,${z.y.toFixed(1)}px) scale(${z.s.toFixed(4)})`;
   D.d.classList.toggle('pz-zoomed', z.s > 1.01); if (z.s > 1.25) original(); };
 // مركز البوستر وهو بلا تكبير (نقطة الأصل للتكبير)، يُقاس مرة ويُحفظ حتى يتغير المقاس
@@ -110,28 +137,92 @@ function snapZ(ease = true) { if (!D || S === 'closed') return; const s = lim(Z.
 const around = (s, p, from = Z, at = p) => { const c = center(), k = s / from.s; return { s, x: at.x - c.x - k * (p.x - c.x - from.x), y: at.y - c.y - k * (p.y - c.y - from.y) }; };
 function toggleZoom(x, y) { if (S !== 'open') return; if (Z.s > 1.01) return setZ({ s: 1, x: 0, y: 0 }, true); flat(); const z = around(2.5, { x, y }), b = bounds(2.5);
   setZ({ s: 2.5, x: lim(z.x, ...b.x), y: lim(z.y, ...b.y) }, true); }
-function wheel(e) { e.preventDefault(); if (S !== 'open') return; flat();
+function wheel(e) { e.preventDefault(); if (S !== 'open') return;
+  // تمرير أفقي (لوحة اللمس بإصبعين) والصورة بمقاسها: ينقل إلى المجاورة من جهة التمرير، مرة لكل حركة. أحداث الحركة الواحدة سيل متصل
+  // (ومعها قصورها الذاتي)، فلا يُقبل انتقال آخر حتى ينقطع السيل
+  if (cur.set && Z.s <= 1.01 && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.5) { if (e.timeStamp - wlast > 180) { wacc = 0; wlock = false; } wlast = e.timeStamp; if (wlock) return;
+    wacc += e.deltaX; if (Math.abs(wacc) > 60) { wlock = true; slide(wacc > 0 ? 1 : -1); } return; }
+  flat();
   const s = lim(Z.s * Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0025)), 1, MAX), z = around(s, { x: e.clientX, y: e.clientY }), b = bounds(s);
   setZ(s <= 1.01 ? { s: 1, x: 0, y: 0 } : { s, x: lim(z.x, ...b.x), y: lim(z.y, ...b.y) }); }
 function zoomBy(k) { const s = lim(Z.s * k, 1, MAX), z = around(s, { x: innerWidth / 2, y: innerHeight / 2 }), b = bounds(s); flat();
   setZ(s <= 1.01 ? { s: 1, x: 0, y: 0 } : { s, x: lim(z.x, ...b.x), y: lim(z.y, ...b.y) }, true); }
 const STEP = { ArrowLeft: [1, 0], ArrowRight: [-1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] };
-function keys(e) { if (S !== 'open' || e.altKey || e.ctrlKey || e.metaKey) return; const k = e.key, m = STEP[k];
+function keys(e) { if (e.altKey || e.ctrlKey || e.metaKey) return; const k = e.key, m = STEP[k]; if (S === 'opening' && m?.[0] && cur?.set) settle(); if (S !== 'open') return;
   if (k === '+' || k === '=') zoomBy(1.5); else if (k === '-' || k === '_') zoomBy(1 / 1.5); else if (k === '0') setZ({ s: 1, x: 0, y: 0 }, true);
-  else if (m && Z.s > 1.01) { const b = bounds(Z.s); setZ({ s: Z.s, x: lim(Z.x + m[0] * 90, ...b.x), y: lim(Z.y + m[1] * 90, ...b.y) }, true); } else return;
+  else if (m && Z.s > 1.01) { const b = bounds(Z.s); setZ({ s: Z.s, x: lim(Z.x + m[0] * 90, ...b.x), y: lim(Z.y + m[1] * 90, ...b.y) }, true); }
+  else if (m && m[0] && cur.set) slide(k === 'ArrowLeft' ? -1 : 1);   // بمقاسها وفي مجموعة: السهم ينقل إلى الصورة التي في جهته
+  else return;
   e.preventDefault(); }
 // الصورة الأصلية عند التكبير (حين تصل تحل محل w780 بصمت)
 function original() { const u = cur?.src; if (!u || !(TMDB.test(u) || IGDB.test(u)) || cur.orig) return; cur.orig = true; const o = TMDB.test(u) ? u.replace(TMDB, '$1original$2') : u.replace(IGDB, '$1t_1080p$3'); if (D.hi.src === o) return;
   const i = new Image(); i.decoding = 'async'; i.onload = () => { if (cur?.src === u) { D.hi.src = o; D.hi.classList.add('in'); } }; i.src = o; }
 
+// يملأ المكبَّر بصورة العنصر t: المقاس والشكل، والصورة الصغيرة فوراً والكبيرة حين تصل، والعنوان
+function fill(t, lo) { const im = t.querySelector('img'), rt = t.getBoundingClientRect(); lo ||= im.currentSrc || im.src;
+  Object.assign(cur, { t, shape: shapeOf(t, im), w0: rt.width || 1, ar: rt.width && rt.height ? rt.width / rt.height : 2 / 3, src: srcOf(t), orig: false });
+  const w = size(), hi = sized(cur.src, w * (devicePixelRatio || 1));
+  D.lo.src = lo; D.ambImg.src = lo; D.hi.classList.remove('in'); D.hi.removeAttribute('src'); if (hi && hi !== lo) D.hi.src = hi;
+  D.capT.textContent = titleOf(t, im); D.cap.hidden = !D.capT.textContent; D.lo.alt = D.capT.textContent ? `بوستر ${D.capT.textContent}` : ''; }
+
+// ---------- مجموعة الصور: التنقل بين صور العمل ----------
+// الجهة مكانية: -1 الصورة التي على اليسار، 1 التي على اليمين. وخطوتها في ترتيب المجموعة تتبع اتجاه الصفحة (في العربية: اليسرى هي التالية)
+const stepOf = side => side * (cur.rtl ? -1 : 1), span = () => document.documentElement.clientWidth || innerWidth;
+function pager() { if (!cur?.set) return; const n = cur.set.length, has = side => { const j = cur.i + stepOf(side); return j >= 0 && j < n; };
+  D.n.textContent = `${cur.i + 1} من ${n}`; D.goL.disabled = !has(-1); D.goR.disabled = !has(1);
+  D.goL.setAttribute('aria-label', cur.rtl ? 'الصورة التالية' : 'الصورة السابقة'); D.goR.setAttribute('aria-label', cur.rtl ? 'الصورة السابقة' : 'الصورة التالية'); }
+// الصورتان المجاورتان تُطلبان مسبقاً (الصغيرة والكبيرة)، فتدخلان جاهزتين
+function warm() { if (!cur?.set) return; for (const j of [cur.i - 1, cur.i + 1]) { const n = cur.set[j], im = n?.querySelector('img'); if (!im || n.dataset.pzSet) continue; n.dataset.pzSet = '1';
+    const r = n.getBoundingClientRect(), u = [im.currentSrc || im.src, sized(srcOf(n), fit(r.width && r.height ? r.width / r.height : 16 / 9, PAGER)[0] * (devicePixelRatio || 1))];
+    for (const x of new Set(u)) if (x) { const i = new Image(); i.decoding = 'async'; i.src = x; } } }
+function hideSide() { if (!D) return; sideTok++; for (const a of D.side.getAnimations()) a.cancel(); D.side.hidden = true; D.side.style.transform = ''; if (cur) cur.side = null; }
+// الورقة الجانبية: الصورة المجاورة من جهة side بمقاسها وشكلها في المكبَّر، موضوعة حيث سيستقر مركزها (مركز الصورة لا يتبدل بتبدل مقاسها)
+function sideFor(side) { const n = cur.set?.[cur.i + stepOf(side)]; if (!n?.isConnected || !okThumb(n)) return null; if (cur.side?.n === n && !D.side.hidden) return cur.side;
+  sideTok++; for (const a of D.side.getAnimations()) a.cancel(); flatNow(n);
+  const im = n.querySelector('img'), r = n.getBoundingClientRect(), [w, h] = fit(r.width && r.height ? r.width / r.height : cur.ar, PAGER), c = center(), lo = im.currentSrc || im.src, hi = sized(srcOf(n), w * (devicePixelRatio || 1));
+  Object.assign(D.side.style, { width: `${w}px`, height: `${h}px`, left: `${c.x - w / 2}px`, top: `${c.y - h / 2}px`, borderRadius: radius(shapeOf(n, im), w / (r.width || 1)), transform: `translateX(${side * span()}px)` });
+  D.sideLo.src = lo; D.sideHi.classList.remove('in'); D.sideHi.removeAttribute('src'); if (hi && hi !== lo) D.sideHi.src = hi; D.side.hidden = false;
+  return cur.side = { n, side, lo }; }
+// السحب الأفقي: الصورة تتبع الإصبع والمجاورة تدخل من جهتها. وحيث لا مجاورة (أول المجموعة وآخرها) تقاوم الصورة السحب
+function swipeMove(dx) { const side = dx > 0 ? -1 : 1, s = sideFor(side);
+  if (!s) { if (cur.side) hideSide(); D.fly.style.transform = `translateX(${(dx * .28).toFixed(1)}px)`; return; }
+  D.fly.style.transform = `translateX(${dx.toFixed(1)}px)`; D.side.style.transform = `translateX(${(dx + side * span()).toFixed(1)}px)`; }
+// سحب لم يبلغ حدّ الانتقال: الصورة ترتد إلى مكانها والمجاورة تعود من حيث جاءت
+function swipeBack() { const f = D.fly.style.transform; D.fly.style.transform = ''; if (f && !reduce.matches) D.fly.animate({ transform: [f, 'none'] }, { duration: 340, easing: 'cubic-bezier(.2,1.2,.4,1)' });
+  if (D.side.hidden) return; const side = cur.side?.side || 1, from = D.side.style.transform || 'none', tok = ++sideTok;
+  if (reduce.matches) return hideSide();
+  D.side.animate({ transform: [from, `translateX(${side * span()}px)`] }, { duration: 240, easing: 'ease-in', fill: 'forwards' }).finished.then(() => { if (tok === sideTok) hideSide(); }, () => {}); }
+// الانتقال إلى الصورة المجاورة من جهة side (من حيث ترك الإصبع الصورة، أو من مكانها بالسهم والزر): الحالية تخرج والمجاورة تستقر في الوسط،
+// ثم تصير هي صورة المكبَّر (مقاسها ودقتها العالية وعنوانها)، ويُرفع عنصرها في الصفحة بدل السابق فيعود الإغلاق إليه
+// السهم أو الزر في أثناء طيران الفتح: يُنهى الطيران فوراً ويُنتقل، فلا تضيع الضغطة
+function settle() { if (S !== 'opening') return; for (const a of anims) { try { a.finish(); } catch {} } S = 'open'; snapZ(false); }
+function slide(side, dx0 = 0) { settle(); if (nav && !dx0 && S === 'open') { pend = side; return true; }   // ضغطة أثناء انتقال جارٍ: تُنفَّذ بعده، فالضغطات المتتالية لا تضيع
+  if (S !== 'open' || !cur?.set || nav || Z.s > 1.01) return false; const s = sideFor(side); if (!s) { if (!dx0) bump(side); return false; }
+  const W = span(), ms = reduce.matches ? 0 : 320, E = 'cubic-bezier(.22,.8,.24,1)', tok = Symbol(); nav = tok; hover = false; flat(); G = null; D.d.classList.remove('pz-on');
+  const run = ms ? [D.fly.animate({ transform: [`translateX(${dx0}px)`, `translateX(${-side * W}px)`], opacity: [1, .4] }, { duration: ms, easing: E, fill: 'forwards' }),
+    D.side.animate({ transform: [`translateX(${dx0 + side * W}px)`, 'none'] }, { duration: ms, easing: E, fill: 'forwards' })] : [];
+  D.fly.style.transform = ''; D.side.style.transform = '';
+  const land = () => { if (nav !== tok) return; nav = null; if (S !== 'open' || !cur) return;
+    const old = cur.t, n = s.n; cur.i += stepOf(side); cur.side = null; fill(n, s.lo); cur.c = null; setZ({ s: 1, x: 0, y: 0 });
+    old.classList.remove('pz-lifted'); n.classList.add('pz-lifted'); reveal(n);
+    for (const a of run) a.cancel(); pager(); warm();
+    // الورقة الجانبية تبقى فوق الصورة حتى تجهز هذه للرسم، فلا تومض بينهما
+    const t2 = ++sideTok, off = () => { if (t2 === sideTok) hideSide(); }; (D.lo.decode ? D.lo.decode() : Promise.resolve()).then(off, off);
+    if (!ms) D.fly.animate({ opacity: [.3, 1] }, { duration: 160, easing: 'ease-out' });
+    if (pend) { const p = pend; pend = 0; slide(p); } };
+  if (run.length) Promise.all(run.map(a => a.finished)).then(land, land); else land();
+  return true; }
+// يُظهر عنصر الصورة الحالية في شريطه الأفقي في الصفحة (بلا تحريك الصفحة عمودياً)، فيعود الإغلاق إلى مكان ظاهر
+function reveal(n) { for (let p = n.parentElement; p && p !== document.body; p = p.parentElement) { if (p.scrollWidth <= p.clientWidth + 1 || !/auto|scroll/.test(getComputedStyle(p).overflowX)) continue;
+    const a = n.getBoundingClientRect(), b = p.getBoundingClientRect(); p.scrollLeft += a.left + a.width / 2 - (b.left + b.width / 2); return; } }
+// لا صورة في هذه الجهة: هزّة صغيرة تقول إن المجموعة انتهت
+function bump(side) { if (reduce.matches || nav) return; D.fly.animate({ transform: ['none', `translateX(${-side * 18}px)`, 'none'] }, { duration: 260, easing: 'ease-out' }); }
+
 export function zoom(t, opt = {}) {
   const im = t?.querySelector('img'); if (S !== 'closed' || !im || !(im.currentSrc || im.src) || im.dataset.failed) return false;
   build(); S = 'opening'; askMotion();
   flatNow(t); const rt = t.getBoundingClientRect(), r0 = opt.from || rt, lo = opt.src || im.currentSrc || im.src; // الإطار لا الصورة: الصورة قد تكون مائلة
-  cur = { t, shape: shapeOf(t, im), w0: rt.width || 1, ar: rt.width && rt.height ? rt.width / rt.height : 2 / 3, src: srcOf(t), orig: false };
-  const w = size(), hi = sized(cur.src, w * (devicePixelRatio || 1));
-  setZ({ s: 1, x: 0, y: 0 }); D.lo.src = lo; D.ambImg.src = lo; D.hi.classList.remove('in'); D.hi.removeAttribute('src'); if (hi && hi !== lo) D.hi.src = hi;
-  D.capT.textContent = titleOf(t, im); D.cap.hidden = !D.capT.textContent; D.lo.alt = D.capT.textContent ? `بوستر ${D.capT.textContent}` : '';
+  cur = { ...setOf(t) }; D.d.classList.toggle('pz-set', !!cur.set); fill(t, lo); setZ({ s: 1, x: 0, y: 0 }); pager(); warm();
   D.d.showModal(); t.classList.add('pz-lifted'); gyro.rebase(8);
   history.pushState({ ...(history.state || {}), pz: 1 }, '');
   const E = 'cubic-bezier(.16,1,.3,1)', fade = (el, ms, delay = 0, from = 'none') => el.animate({ opacity: [0, 1], transform: [from, 'none'] }, { duration: ms, delay, easing: E, fill: 'backwards' });
@@ -150,12 +241,13 @@ export function zoom(t, opt = {}) {
 
 export function unzoom(fromPop = false) {
   if (!D || S === 'closed' || S === 'closing') return; S = 'closing'; G = null; P.clear(); clearTimeout(single); D.d.classList.remove('pz-on', 'pz-gyro');
+  pend = 0; if (nav) { nav = null; for (const a of [...D.fly.getAnimations(), ...D.side.getAnimations()]) a.cancel(); } hideSide();   // انتقال لم يكتمل: تبقى الصورة التي كانت
   for (const a of anims) { try { a.commitStyles(); } catch {} a.cancel(); } anims = [];
   if (!fromPop && history.state?.pz) { skipPop = true; history.back(); }
   const t = cur?.t, im = t?.isConnected ? t.querySelector('img') : null, r0 = im && t.getBoundingClientRect(), els = [D.d, D.fly, D.zoom, D.card, D.scrim, D.amb, D.cap, D.x, D.sheen];
   const seen = r0 && r0.width > 0 && r0.bottom > 0 && r0.top < innerHeight && r0.right > 0 && r0.left < innerWidth;
   const done = () => { if (S !== 'closing') return; t?.classList.remove('pz-lifted'); D.d.close(); for (const a of anims) a.cancel(); anims = [];
-    for (const e of els) { e.style.transform = ''; e.style.opacity = ''; e.style.translate = ''; } D.zoom.classList.remove('pz-ease'); D.d.classList.remove('pz-zoomed'); Z = { s: 1, x: 0, y: 0 }; cur = null; S = 'closed'; gyro.rebase(2.5); };
+    for (const e of els) { e.style.transform = ''; e.style.opacity = ''; e.style.translate = ''; } D.zoom.classList.remove('pz-ease'); D.d.classList.remove('pz-zoomed', 'pz-set'); Z = { s: 1, x: 0, y: 0 }; cur = null; S = 'closed'; gyro.rebase(2.5); };
   if (reduce.matches) { anims = [D.d.animate({ opacity: [getComputedStyle(D.d).opacity, 0] }, { duration: 140, easing: 'ease-in', fill: 'forwards' })]; anims[0].finished.then(done, done); return; }
   // يعود طائراً إلى مكانه إن كان مكانه ظاهراً، وإلا يهبط ويتلاشى. والتكبير يعود معه في الطريق
   const from = D.fly.style.transform || 'none', zf = getComputedStyle(D.zoom).transform; D.zoom.classList.remove('pz-ease');
@@ -178,9 +270,9 @@ export const zoomed = () => S !== 'closed';
 // نقرة خارجه تغلقه، ونقرتان تكبّران عند موضعهما. والمؤشر فوقه (على الكمبيوتر) يميله ويلمّعه
 const pts = () => [...P.values()];
 function down(e) {
-  lastType = e.pointerType; if ((S !== 'open' && S !== 'opening') || e.button > 0 || e.target.closest('.pz-x')) return;
+  lastType = e.pointerType; if ((S !== 'open' && S !== 'opening') || e.button > 0 || nav || e.target.closest('.pz-x,.pz-pager')) return;
   P.set(e.pointerId, { x: e.clientX, y: e.clientY }); try { D.d.setPointerCapture(e.pointerId); } catch {}
-  if (P.size === 2 && S === 'open') { const [a, b] = pts(); rest(); G = { k: 'pinch', d0: Math.max(10, dist(a, b)), m0: mid(a, b), z0: { ...Z } }; D.d.classList.add('pz-on'); flat(); return; }
+  if (P.size === 2 && S === 'open') { const [a, b] = pts(); if (G?.k === 'swipe') hideSide(); rest(); G = { k: 'pinch', d0: Math.max(10, dist(a, b)), m0: mid(a, b), z0: { ...Z } }; D.d.classList.add('pz-on'); flat(); return; }
   if (P.size === 1) G = { k: 'tap', x: e.clientX, y: e.clientY, t: e.timeStamp, z0: { ...Z }, card: !!e.target.closest('.pz-card'), type: e.pointerType };
 }
 function move(e) {
@@ -192,7 +284,9 @@ function move(e) {
     if (s < 1) { const p = lim((1 - s) / .35, 0, 1); D.scrim.style.opacity = (1 - p * .6).toFixed(3); D.amb.style.opacity = (1 - p * .7).toFixed(3); } else D.scrim.style.opacity = D.amb.style.opacity = '';
     return; }
   const dx = e.clientX - G.x, dy = e.clientY - G.y;
-  if (G.k === 'tap') { if (Math.hypot(dx, dy) < 8) return; G.k = Z.s > 1.01 ? 'pan' : 'drag'; D.d.classList.add('pz-on'); hover = false; }
+  // بمقاسها: السحب الأفقي في مجموعة صور ينقل بينها، والعمودي (أو أي سحب لصورة مفردة) يغلق
+  if (G.k === 'tap') { if (Math.hypot(dx, dy) < 8) return; G.k = Z.s > 1.01 ? 'pan' : cur.set && Math.abs(dx) > Math.abs(dy) * 1.15 ? 'swipe' : 'drag'; D.d.classList.add('pz-on'); hover = false; if (G.k === 'swipe') flat(); }
+  if (G.k === 'swipe') { const dt = Math.max(1, e.timeStamp - (G.lt ?? G.t)); G.vx = (e.clientX - (G.lx ?? G.x)) / dt; G.lx = e.clientX; G.lt = e.timeStamp; swipeMove(dx); return; }
   if (G.k === 'pan') { const dt = Math.max(1, e.timeStamp - (G.lt ?? G.t)); G.vx = (e.clientX - (G.lx ?? G.x)) / dt; G.vy = (e.clientY - (G.ly ?? G.y)) / dt;
     G.lx = e.clientX; G.ly = e.clientY; G.lt = e.timeStamp; const b = bounds(Z.s); setZ({ s: Z.s, x: rubber(G.z0.x + dx, b.x), y: rubber(G.z0.y + dy, b.y) }); return; }
   if (G.k === 'drag') { const p = Math.min(Math.abs(dy) / 360, 1); shine(e.clientX, e.clientY);
@@ -210,6 +304,9 @@ function up(e) {
     if (g.type === 'mouse') { if (!g.card) unzoom(); return; }
     if (tap && e.timeStamp - tap.t < 300 && Math.hypot(g.x - tap.x, g.y - tap.y) < 40) { clearTimeout(single); tap = null; return toggleZoom(g.x, g.y); }
     tap = { x: g.x, y: g.y, t: e.timeStamp }; clearTimeout(single); if (!g.card && Z.s <= 1.01) single = setTimeout(() => { tap = null; unzoom(); }, 280); return; }
+  if (g.k === 'swipe') { const dx = e.clientX - g.x, v = g.vx || 0, side = dx > 0 ? -1 : 1;   // يكفي ربع العرض تقريباً، أو نفضة سريعة في الاتجاه نفسه
+    const far = Math.abs(dx) > Math.min(140, span() * .22) || (Math.abs(dx) > 28 && Math.abs(v) > .45 && Math.sign(v) === Math.sign(dx));
+    if (!(e.type === 'pointerup' && far && cur.side?.side === side && slide(side, dx))) swipeBack(); return; }
   if (g.k === 'pan') { const b = bounds(Z.s), k = 160; setZ({ s: Z.s, x: lim(Z.x + (g.vx || 0) * k, ...b.x), y: lim(Z.y + (g.vy || 0) * k, ...b.y) }, true); return; }
   if (g.k === 'drag') { const dy = e.clientY - g.y, v = Math.abs(dy) / Math.max(16, e.timeStamp - g.t);
     if (e.type === 'pointerup' && (Math.abs(dy) > 120 || (Math.abs(dy) > 40 && v > .5))) unzoom(); else rest(); }

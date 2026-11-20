@@ -144,7 +144,7 @@ if (!only || only === 'desktop') { console.log('== desktop');
   await page.mouse.move(cx, cy); await page.mouse.down(); await page.mouse.move(cx + 80, cy + 40, { steps: 6 }); await page.mouse.up(); await pause(450);
   check('الأفلام: السحب بالفأرة يتنقل في المكبَّر ولا يغلقه', await page.evaluate(t => getComputedStyle(document.querySelector('.pz-zoom')).transform !== t && document.querySelector('dialog.pz').open, t0));
   await page.mouse.move(cx + 40, cy + 20); await pause(100); check('الأفلام: لا ميلان والبوستر مكبَّر', await page.evaluate(() => !document.querySelector('.pz-card').style.transform));
-  await page.keyboard.press('0'); await pause(450); const k0 = await page.evaluate(() => ({ s: __zs(), t: getComputedStyle(document.querySelector('.pz-zoom')).transform }));
+  await page.keyboard.press('0'); await pause(700); const k0 = await page.evaluate(() => ({ s: __zs(), t: getComputedStyle(document.querySelector('.pz-zoom')).transform }));
   check('الأفلام: المفتاح 0 يعيده إلى مقاسه', Math.abs(k0.s - 1) < .005, k0);
   await page.keyboard.press('+'); await pause(450); const zk = await page.evaluate(() => __zs()); check('الأفلام: المفتاح + يكبّره', Math.abs(zk - 1.5) < .01, zk);
   const tk = await page.evaluate(() => getComputedStyle(document.querySelector('.pz-zoom')).transform);
@@ -155,6 +155,139 @@ if (!only || only === 'desktop') { console.log('== desktop');
   await page.keyboard.press('Escape'); await shut(); await pause(350);
   check('الأفلام: Esc يغلق المكبَّر (ولو مكبَّراً) وتبقى البطاقة وبوسترها مكانه', await page.evaluate(id => document.querySelector('#sheet').open && location.hash === '#' + id && !document.querySelector('.pz-lifted') && getComputedStyle(document.querySelector('.pz-zoom')).transform === 'none', fid));
   check('desktop: بلا أخطاء برمجية', errs.length === 0, errs);
+  await ctx.close(); }
+
+// مجموعة الصور (data-zoom-set): التنقل بين صور العمل في المكبَّر بالسحب يميناً ويساراً، وبالسهمين، وبالزرّين، وبتمرير اللوحة أفقياً.
+// المجموعة هنا مصنوعة في الصفحة (خمس صور بألوان مختلفة) فلا تعتمد على بيانات، وتُفحص بعدها لقطات لعبة حقيقية
+const COLORS = ['#c33333', '#33aa33', '#3333cc', '#cccc33', '#33cccc'];
+const gallery = (page, dir = 'rtl') => page.evaluate(([colors, dir]) => { document.querySelector('#zset')?.remove();
+  const svg = c => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="${c}"/></svg>`);
+  const box = document.createElement('div'); box.id = 'zset'; box.dir = dir; box.setAttribute('data-zoom-set', '');
+  box.style.cssText = 'position:fixed;z-index:50;top:90px;left:10px;right:10px;display:flex;gap:8px;overflow-x:auto;background:#111;padding:6px';
+  box.innerHTML = colors.map(c => `<button type="button" data-zoom data-zoom-title="لقطة من اللعبة" style="flex:none;width:120px;aspect-ratio:16/9;padding:0;border:0;border-radius:8px;overflow:hidden"><img alt="" src="${svg(c)}" style="width:100%;height:100%;object-fit:cover;display:block"></button>`).join('');
+  document.body.append(box); }, [COLORS, dir]);
+const setState = page => page.evaluate(colors => { const d = document.querySelector('dialog.pz'), s = decodeURIComponent(d.querySelector('.pz-lo').src), th = [...document.querySelectorAll('#zset [data-zoom]')];
+  return { i: colors.findIndex(c => s.includes(c)), n: d.querySelector('.pz-n').textContent, set: d.classList.contains('pz-set'), pager: getComputedStyle(d.querySelector('.pz-pager')).display, L: d.querySelector('.pz-go[data-side="-1"]').disabled, R: d.querySelector('.pz-go[data-side="1"]').disabled,
+    lifted: th.map(t => t.classList.contains('pz-lifted')).indexOf(true), liftedN: th.filter(t => t.classList.contains('pz-lifted')).length, side: d.querySelector('.pz-side').hidden, fly: d.querySelector('.pz-fly').style.transform, w: Math.round(d.querySelector('.pz-card').getBoundingClientRect().width) }; }, COLORS);
+const thumbAt = (page, i) => page.evaluate(i => { const r = document.querySelectorAll('#zset [data-zoom]')[i].getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, i);
+
+// بعد كل مهلة طويلة يُنتظر أن يستقر المكبَّر (لا انتقال جارٍ ولا ورقة جانبية)، فلا يتأثر الفحص ببطء الجهاز
+const steady = (page, rest) => async ms => { await rest(ms); if (ms < 450) return;
+  await page.waitForFunction(() => { const d = document.querySelector('dialog.pz'); return !d || !d.open || (d.querySelector('.pz-side').hidden && ![...d.querySelectorAll('.pz-fly,.pz-zoom,.pz-side')].some(e => e.getAnimations().length)); }, null, { timeout: 6000 }).catch(() => {}); await rest(60); };
+if (!only || only === 'set-touch') { console.log('== set-touch');
+  const { ctx, page, errs, pause: rest, tapAt, swipe, pinch, open, shut } = await session('set-touch', 369, 905, true), pause = steady(page, rest);
+  await page.goto(base + '/films/'); await page.waitForSelector('.tk .poster img'); await pause(400); await gallery(page);
+  let t = await thumbAt(page, 1); await tapAt(t.x, t.y); await open(); await pause(900); let st = await setState(page);
+  check('مجموعة صور: الضغط على الثانية يفتحها ومعها موضعها «2 من 5» وزرّا التنقل', st.set && st.i === 1 && st.n === '2 من 5' && st.pager === 'flex' && !st.L && !st.R && st.lifted === 1, st);
+  const cx = 184, cy = 400;
+  await swipe(cx - 80, cy, 200, 6); await pause(700); st = await setState(page);
+  check('السحب يميناً في صفحة عربية ينقل إلى التالية (وهي على اليسار)، ويُرفع عنصرها بدل السابق', st.i === 2 && st.n === '3 من 5' && st.lifted === 2 && st.liftedN === 1 && st.side && !st.fly, st);
+  await swipe(cx + 80, cy, -200, -4); await pause(700); st = await setState(page);
+  check('والسحب يساراً يعيد السابقة', st.i === 1 && st.n === '2 من 5' && st.lifted === 1 && st.side, st);
+  await swipe(cx, cy, 34, 0, 14); await pause(700); st = await setState(page);
+  check('سحب قصير بطيء: ترتد الصورة وتبقى', st.i === 1 && !st.fly && st.side, st);
+  await swipe(cx - 20, cy, 60, 0, 2); await pause(700); st = await setState(page);
+  check('نفضة قصيرة سريعة تكفي للانتقال', st.i === 2, st);
+  await swipe(cx + 80, cy, -200, 0); await pause(650); await swipe(cx + 80, cy, -200, 0); await pause(650); st = await setState(page);
+  check('أول المجموعة: زر جهتها معطّل', st.i === 0 && st.n === '1 من 5' && st.R && !st.L, st);
+  await swipe(cx + 80, cy, -220, 0); await pause(700); st = await setState(page);
+  check('ولا صورة قبل الأولى: السحب يقاوم ثم ترتد', st.i === 0 && !st.fly && st.side && st.liftedN === 1, st);
+  // مكبَّرة: السحب يتنقل فيها ولا ينقل إلى غيرها، وشريط التنقل يختفي
+  await tapAt(cx, cy); await pause(60); await tapAt(cx, cy); await pause(600);
+  const z0 = await page.evaluate(() => ({ s: __zs(), t: getComputedStyle(document.querySelector('.pz-zoom')).transform, op: getComputedStyle(document.querySelector('.pz-pager')).opacity }));
+  await swipe(cx, cy, 120, 0); await pause(500); st = await setState(page);
+  check('وهي مكبَّرة: السحب الأفقي يتنقل داخلها ولا يبدّلها، والشريط مخفي', z0.s > 2 && z0.op === '0' && st.i === 0 && await page.evaluate(t => getComputedStyle(document.querySelector('.pz-zoom')).transform !== t, z0.t), [z0, st]);
+  await tapAt(cx, cy); await pause(60); await tapAt(cx, cy); await pause(600);
+  // زر التنقل الأيسر (التالية في العربية)
+  const gl = await page.evaluate(() => { const r = document.querySelector('.pz-go[data-side="-1"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; });
+  await tapAt(gl.x, gl.y); await pause(700); st = await setState(page);
+  check('زر التنقل هدف لمس كافٍ وينقل إلى الصورة التي في جهته', gl.w >= 44 && gl.h >= 44 && st.i === 1 && st.n === '2 من 5', [gl, st]);
+  // السحب لأسفل يغلق كما كان، والصورة الحالية تعود إلى مكانها
+  await swipe(cx, cy - 60, 10, 280); await shut(); await pause(350);
+  check('السحب لأسفل يغلق المجموعة، ولا يبقى عنصر مرفوعاً', await page.evaluate(() => !document.querySelector('.pz-lifted') && !document.querySelector('dialog.pz').open && document.querySelector('.pz-side').hidden));
+  // صفحة يسارية: السحب يساراً هو التالية
+  await gallery(page, 'ltr'); t = await thumbAt(page, 0); await tapAt(t.x, t.y); await open(); await pause(900);
+  await swipe(cx + 80, cy, -200, 0); await pause(700); st = await setState(page);
+  check('مجموعة في صفحة يسارية: السحب يساراً هو التالية', st.i === 1 && st.L === false && st.R === false, st);
+  await page.keyboard.press('Escape'); await shut(); await pause(300);
+  // بوستر مفرد: لا مجموعة ولا شريط
+  await page.evaluate(() => document.querySelector('#zset').remove()); await page.evaluate(() => document.querySelector('.tk .poster').click()); await page.waitForSelector('#sheet[open] .sh-head .poster[data-zoom]'); await pause(400);
+  await page.evaluate(() => document.querySelector('#sheet .sh-head .poster').click()); await open(); await pause(800);
+  check('بوستر مفرد: بلا شريط تنقل، والسحب الأفقي لا يفعل شيئاً', await page.evaluate(() => { const d = document.querySelector('dialog.pz'); return !d.classList.contains('pz-set') && getComputedStyle(d.querySelector('.pz-pager')).display === 'none'; }));
+  await swipe(cx - 60, cy, 180, 0); await pause(600);
+  check('والمكبَّر باقٍ مفتوحاً بعد سحب أفقي على بوستر مفرد', await page.evaluate(() => document.querySelector('dialog.pz').open && !document.querySelector('.pz-fly').style.transform));
+  await page.keyboard.press('Escape'); await shut();
+  check('set-touch: بلا أخطاء برمجية', errs.length === 0, errs);
+  await ctx.close(); }
+
+if (!only || only === 'set-desktop') { console.log('== set-desktop');
+  const { ctx, page, errs, pause: rest, open, shut } = await session('set-desktop', 1200, 900, false), pause = steady(page, rest);
+  await page.goto(base + '/films/'); await page.waitForSelector('.tk .poster img'); await pause(400); await gallery(page);
+  let t = await thumbAt(page, 0); await page.mouse.click(t.x, t.y); await open(); await pause(250); let st = await setState(page);
+  check('الكمبيوتر: اللقطة العريضة تتسع أكثر من 600 بكسل، وموضعها «1 من 5»', st.set && st.i === 0 && st.n === '1 من 5' && st.w > 900 && st.R && !st.L, st);
+  await page.keyboard.press('ArrowLeft'); await pause(600); st = await setState(page);
+  check('السهم الأيسر ينقل إلى الصورة التي على اليسار (التالية)، ولو ضُغط والصورة ما زالت تطير إلى مكانها', st.i === 1 && st.lifted === 1 && st.side, st);
+  await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowLeft'); await pause(1000); st = await setState(page);
+  check('ضغطتان متتاليتان: الثانية تُنفَّذ بعد الأولى ولا تضيع', st.i === 3 && st.n === '4 من 5' && st.liftedN === 1 && st.side, st);
+  await page.keyboard.press('ArrowRight'); await pause(600); await page.keyboard.press('ArrowRight'); await pause(600); st = await setState(page);
+  check('والسهم الأيمن يعيد السابقة', st.i === 1 && st.n === '2 من 5', st);
+  await page.click('.pz-go[data-side="-1"]'); await pause(600); await page.click('.pz-go[data-side="-1"]'); await pause(600); await page.click('.pz-go[data-side="-1"]'); await pause(600); st = await setState(page);
+  check('الزر الأيسر حتى آخر المجموعة، ثم يتعطل', st.i === 4 && st.n === '5 من 5' && st.L && !st.R, st);
+  await page.keyboard.press('ArrowLeft'); await pause(500); st = await setState(page);
+  check('لا صورة بعد الأخيرة: السهم لا يبدّل شيئاً', st.i === 4 && st.side && !st.fly, st);
+  // السحب بالفأرة
+  await page.mouse.move(500, 380); await page.mouse.down(); for (let i = 1; i <= 8; i++) { await page.mouse.move(500 - i * 40, 380 + i); await pause(16); } await page.mouse.up(); await pause(700); st = await setState(page);
+  check('السحب بالفأرة يساراً يعيد السابقة (التي على اليمين)', st.i === 3, st);
+  // تمرير أفقي بلوحة اللمس: انتقال واحد لكل حركة
+  await page.mouse.move(600, 380); await page.mouse.wheel(120, 0); await pause(700); st = await setState(page);
+  check('تمرير أفقي يميناً ينقل إلى الصورة التي على اليمين', st.i === 2, st);
+  await page.mouse.wheel(-30, 0); await pause(700); st = await setState(page);
+  check('وتمرير خفيف لا يبلغ الحد لا ينقل', st.i === 2, st);
+  await page.mouse.wheel(-120, 0); await pause(700); st = await setState(page);
+  check('وتمرير يساراً ينقل إلى التي على اليسار', st.i === 3, st);
+  await page.mouse.wheel(0, -200); await pause(450); const wz = await page.evaluate(() => __zs()); await page.keyboard.press('0'); await pause(450);
+  check('والعجلة العمودية تبقى للتكبير', wz > 1.2 && (await setState(page)).i === 3, wz);
+  // مكبَّرة: الأسهم تتنقل داخلها
+  await page.keyboard.press('+'); await pause(450); const zt = await page.evaluate(() => getComputedStyle(document.querySelector('.pz-zoom')).transform);
+  await page.keyboard.press('ArrowLeft'); await pause(450); st = await setState(page);
+  check('وهي مكبَّرة: السهم يتنقل داخلها ولا يبدّلها', st.i === 3 && await page.evaluate(t => getComputedStyle(document.querySelector('.pz-zoom')).transform !== t, zt), st);
+  await page.keyboard.press('0'); await pause(450);
+  // الإغلاق أثناء الانتقال لا يترك شيئاً معلقاً
+  await page.keyboard.press('ArrowLeft'); await pause(60); await page.keyboard.press('Escape'); await shut(); await pause(400);
+  check('الإغلاق أثناء الانتقال: لا عنصر مرفوع ولا ورقة جانبية', await page.evaluate(() => !document.querySelector('.pz-lifted') && document.querySelector('.pz-side').hidden && !document.querySelector('dialog.pz').classList.contains('pz-set')));
+  t = await thumbAt(page, 2); await page.mouse.click(t.x, t.y); await open(); await pause(900); st = await setState(page);
+  check('ويُفتح بعدها من جديد سليماً', st.i === 2 && st.n === '3 من 5' && st.side, st);
+  await page.keyboard.press('Escape'); await shut(); await pause(300);
+  // شريط أضيق من صوره: الانتقال يمرّر الشريط أفقياً إلى الصورة الحالية (ولا يحرّك الصفحة)، فيعود الإغلاق إلى مكان ظاهر
+  await page.evaluate(() => { const b = document.querySelector('#zset'); b.style.right = 'auto'; b.style.width = '300px'; b.scrollLeft = 0; scrollTo(0, 0); });
+  t = await thumbAt(page, 0); await page.mouse.click(t.x, t.y); await open(); await pause(300); for (let i = 0; i < 4; i++) { await page.keyboard.press('ArrowLeft'); await pause(450); } await page.waitForFunction(() => document.querySelector('.pz-n').textContent === '5 من 5', null, { timeout: 4000 }).catch(() => {}); await pause(250);
+  const rv = await page.evaluate(() => { const b = document.querySelector('#zset').getBoundingClientRect(), q = document.querySelectorAll('#zset [data-zoom]')[4].getBoundingClientRect(); return { n: document.querySelector('.pz-n').textContent, inside: q.left >= b.left - 1 && q.right <= b.right + 1, y: scrollY }; });
+  check('الانتقال يمرّر شريط الصور إلى الصورة الحالية ولا يحرّك الصفحة', rv.n === '5 من 5' && rv.inside && rv.y === 0, rv);
+  await page.keyboard.press('Escape'); await shut(); await pause(300);
+  // لقطات لعبة حقيقية: الشريط مجموعة واحدة
+  await page.goto(base + '/games/'); await page.waitForSelector('.cover img'); await pause(500);
+  const found = await page.evaluate(async () => { const cards = [...document.querySelectorAll('[data-act=open]')].slice(0, 14);
+    for (const c of cards) { c.click(); await new Promise(r => setTimeout(r, 350)); const reel = document.querySelector('dialog[open] .reel.shots'); if (reel && reel.querySelectorAll('[data-zoom]').length > 1) return { set: reel.hasAttribute('data-zoom-set'), n: reel.querySelectorAll('[data-zoom]').length };
+      document.querySelector('dialog[open] [data-act=close]')?.click(); await new Promise(r => setTimeout(r, 250)); } return null; });
+  if (found) { await page.evaluate(() => { const b = document.querySelector('dialog[open] .reel.shots [data-zoom]'); b.scrollIntoView({ block: 'center' }); }); await pause(400);
+    await page.evaluate(() => document.querySelector('dialog[open] .reel.shots [data-zoom]').click()); await open(); await pause(900);
+    const g = await page.evaluate(() => { const d = document.querySelector('dialog.pz'); return { set: d.classList.contains('pz-set'), n: d.querySelector('.pz-n').textContent, cap: d.querySelector('.pz-cap').textContent }; });
+    check('ألعابي: لقطات اللعبة مجموعة واحدة بموضعها، والعنوان اسم اللعبة بلا رقم', found.set && g.set && g.n === `1 من ${found.n}` && !/·\s*\d+$/.test(g.cap), [found, g]);
+    await page.keyboard.press('ArrowLeft'); await pause(600);
+    check('ألعابي: السهم ينقل إلى اللقطة التالية', await page.evaluate(() => document.querySelector('.pz-n').textContent.startsWith('2 من')));
+    await page.keyboard.press('Escape'); await shut(); }
+  else console.log('  · لا لعبة بلقطات في البيانات المحلية: فحص ألعابي الحقيقي تُرك');
+  check('set-desktop: بلا أخطاء برمجية', errs.length === 0, errs);
+  await ctx.close(); }
+
+if (!only || only === 'set-reduced') { console.log('== set-reduced');
+  const { ctx, page, errs, pause, open, shut } = await session('set-reduced', 1200, 900, false, { reducedMotion: 'reduce' });
+  await page.goto(base + '/films/'); await page.waitForSelector('.tk .poster img'); await pause(400); await gallery(page);
+  const t = await thumbAt(page, 1); await page.mouse.click(t.x, t.y); await open(); await pause(500);
+  await page.keyboard.press('ArrowLeft'); await pause(120); const st = await setState(page);
+  check('تقليل الحركة: الانتقال فوري بلا انزلاق', st.i === 2 && st.n === '3 من 5' && st.lifted === 2, st);
+  await page.keyboard.press('Escape'); await shut();
+  check('set-reduced: بلا أخطاء برمجية', errs.length === 0, errs);
   await ctx.close(); }
 
 // كل بوستر في كل عرض من البوابات يقبل التكبير (ما ليس بوستراً مستثنى: الخلفيات وشعارات المنصات وصور الحلقات ونتائج البحث)

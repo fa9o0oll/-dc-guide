@@ -27,7 +27,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     return r.fulfill({ contentType: 'image/svg+xml', body: wide ? ph(640, 360, seed) : ph(342, 513, seed) }); });
   // بيانات مُعدَّلة للاختبار فقط: مسلسل له حلقة قادمة بعد 5 أيام
   await page.route(/data\/catalog\.json/, async r => { const res = await r.fetch(), j = await res.json(), w = j.works.find(x => x.id === 'lanterns-2026');
-    w.nextEpisode = { season: 1, episode: 9, date: new Date(Date.now() + 5 * 864e5).toISOString().slice(0, 10) };
+    w.nextEpisode = { season: 1, episode: 9, date: new Date(Date.now() - new Date().getTimezoneOffset() * 6e4 + 5 * 864e5).toISOString().slice(0, 10) };   // بعد خمسة أيام بالتاريخ المحلي (تاريخ UTC يسبقه بيوم بين منتصف الليل والثالثة فجراً في الرياض، فيصير العدّاد 3 أيام)
     // «أين تشاهده»: منصات محقونة لخمس حالات (اشتراك وإيجار وشراء، إيجار وشراء فقط، لا شيء في السعودية، موسم له منصته، وباقي الأعمال بلا الحقل كبيانات قبل الميزة)
     const P = (stream = [], free = [], rent = [], buy = []) => ({ link: 'https://www.themoviedb.org/movie/155/watch?locale=SA', stream, free, rent, buy }), set = (id, v) => { j.works.find(x => x.id === id).prov = v; };
     // بيانات البناء الحقيقية فيها منصات لكل عمل وتتغير كل يوم، فتُنزع أولاً ليبقى الفحص على الحالات الخمس وحدها
