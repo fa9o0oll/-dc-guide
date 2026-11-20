@@ -140,7 +140,7 @@ const provLogo = id => `<img loading="lazy" decoding="async" width="32" height="
 function whereBlock(w, season) { if (w.prov === undefined || isSoon(w)) return ''; const p = provOf(w, season);
   const rows = p ? PROV.map(([k, t]) => { const ids = p[k].filter(id => D.prov[id]); return ids.length ? `<div class="wrow"><b>${t}</b><span class="wl">${ids.map(id => `<a href="${provLink(w, p)}" target="_blank" rel="noopener">${D.prov[id].logo ? provLogo(id) : ''}${ltr(D.prov[id].name)}</a>`).join('')}</span></div>` : ''; }).join('') : '';
   return `<section class="where"><h4>${provOwn(w, season) ? `أين تشاهد الموسم ${season} في السعودية` : 'أين تشاهده في السعودية'}</h4>${rows ? rows + `<p class="lbl">الأزرار تفتح صفحة أماكن العرض على ${ltr('TMDB')}، ومنها إلى المنصة. البيانات من ${ltr('JustWatch')} وتتحدث يومياً.</p>`
-    : `<p class="lbl">غير متاح على منصات السعودية حالياً حسب بيانات ${ltr('JustWatch')}.</p>`}</section>`; }
+    : `<p class="lbl">لا تذكر بيانات ${ltr('JustWatch')} منصة تعرضه في السعودية حالياً.</p>`}</section>`; }
 // وعلى البطاقة سطر واحد: شعارات ما يُعرض عليه باشتراك أو مجاناً، وإن لم يوجد فما يؤجَّر أو يُشترى منه
 function whereLine(w, season) { const p = provOf(w, season); if (!p || isSoon(w)) return '';
   const sub = [...new Set([...p.stream, ...p.free])], ids = (sub.length ? sub : [...new Set([...p.rent, ...p.buy])]).filter(id => D.prov[id]?.logo); if (!ids.length) return '';

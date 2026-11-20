@@ -200,7 +200,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
   // رابط مباشر من قائمة الأفلام إلى بطاقة عمل في الدليل
   await page.goto(url + '#w=the-dark-knight-rises-2012'); await page.waitForSelector('#sheet:not([hidden])'); await page.waitForTimeout(300);
-  check('عمل بلا منصات في السعودية: يُقال ذلك صراحة', (await page.textContent('#sheet .where')).includes('غير متاح على منصات السعودية حالياً') && await page.locator('#sheet .where a').count() === 0);
+  check('عمل بلا منصات في السعودية: يُقال ذلك صراحة', /لا تذكر بيانات JustWatch منصة تعرضه في السعودية حالياً/.test(await page.textContent('#sheet .where')) && await page.locator('#sheet .where a').count() === 0);
   check('رابط #w= يفتح بطاقة العمل ثم يُزال من العنوان', (await page.textContent('#sheetTitle')).includes('The Dark Knight Rises') && (await page.evaluate(() => location.hash)) === '');
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3).join(' | '));
   await ctx.close();
