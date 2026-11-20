@@ -8,7 +8,7 @@ import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
 import { readMalFile } from './anime-mal.js?v=__BUILD__';
-import { simklStart, simklPoll, simklPull, simklToken, simklForget } from './anime-simkl.js?v=__BUILD__';
+import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead } from './anime-simkl.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
 const BUILD = '__BUILD__', KEY = 'animeg.progress', UI = 'anime.ui';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -135,8 +135,8 @@ function tallyHTML() { const all = Object.entries(P.a); if (!all.length) return 
 // الأولوية لما بدأته (الأقرب إلى الإكمال أولاً)، ثم ما له حلقة قادمة، ثم الباقي بترتيب القائمة
 function nowList() { const l = inList('watching'), k = a => { const m = me(a.id), p = m.p || 0; return p ? 2 + (a.eps ? p / a.eps : .5) : a.nx ? 1 : 0; };
   return l.sort((a, b) => k(b) - k(a) || (a.ord ?? 1e9) - (b.ord ?? 1e9)); }
-function nowHTML() { if (!hasLog()) return D.list.length ? `<div class="invite"><h2>هذه قائمتك من ${ltr('MyAnimeList')}: ${nWorks(D.list.filter(a => a.ord != null).length)}</h2>
-    <p>سجلّك (ما شاهدته وما أكملته وتقييماتك وتواريخك) لا يُحفظ في الموقع العام. استورده من ملف التصدير مرة واحدة على أي جهاز، وتنقله المزامنة إلى بقية أجهزتك.</p>
+function nowHTML() { if (!hasLog()) return D.list.length ? `<div class="invite"><h2>هذه قائمتك: ${nWorks(D.list.filter(a => a.ord != null).length)}</h2>
+    <p>سجلّك (ما شاهدته وما أكملته وتقييماتك وتواريخك) لا يُحفظ في الموقع العام. استورده من ملف تصدير ${ltr('MyAnimeList')} مرة واحدة على أي جهاز، ثم اربط ${ltr('SIMKL')} ليكمله بما عنده، وتنقله المزامنة إلى بقية أجهزتك.</p>
     <button class="btn pri" data-act="import">${ic('in')}<span>استورد سجلّي</span></button></div>` : '';
   const l = nowList(); if (!l.length) return '';
   return `<div class="now"><h2>أكمل المشاهدة<small>${nWorks(l.length)}</small></h2><div class="rail" id="rail">${l.slice(0, 14).map((a, i) => celHTML(a, 'rail', i)).join('')}${l.length > 14 ? `<button class="rail-more" data-act="list" data-l="watching">كل ما أشاهده (${l.length})</button>` : ''}</div></div>`; }
@@ -281,9 +281,10 @@ function impHTML() { const m = IMP.mal, log = hasLog(), n = Object.keys(P.a).len
       <label class="drop" id="drop"><input class="sr" id="imp-file" type="file" accept=".gz,.xml,application/gzip,text/xml,application/xml"><b>اختر ملف التصدير</b><span>أو اسحبه إلى هنا. يُقرأ في متصفحك ولا يُرفع إلى أي مكان.</span></label>`;
   const sk = IMP.simkl ? `<p class="lbl">افتح صفحة ${ltr('SIMKL')} ووافق على الرمز، وهذه النافذة تكمل وحدها.</p><div class="sum"><div><b dir="ltr">${esc(IMP.simkl.user_code)}</b><span>رمز الربط</span></div></div>
       <div class="acts"><a class="btn pri" href="${esc(IMP.simkl.verification_uri_complete || IMP.simkl.verification_uri || 'https://simkl.com/pin')}" target="_blank" rel="noopener">افتح ${ltr('SIMKL')} للموافقة</a><button class="btn ghost" data-act="sk-cancel">ألغِ</button></div>`
-    : IMP.sk ? (() => { const d = IMP.sk; return `${sumHTML(d.totals)}<p class="lbl">طوبق ${nWorks(d.matched)} من ${ltr('SIMKL')} بأعمال الموقع${d.unmatched ? `، وبقي ${nWorks(d.unmatched)} بلا رقم في ${ltr('MyAnimeList')} فلم يُطابَق` : ''}. مقارنةً بسجلّك هنا: ${num(d.diff.add)} جديد، ${num(d.diff.change)} يختلف، ${num(d.diff.same)} مطابق.</p>
+    : IMP.sk ? (() => { const d = IMP.sk; return `${sumHTML(d.totals)}<p class="lbl">طوبق ${nWorks(d.matched)} من ${ltr('SIMKL')} بأعمال الموقع${d.unmatched ? `، وبقي ${nWorks(d.unmatched)} بلا رقم في ${ltr('MyAnimeList')} فلم يُطابَق` : ''}. مقارنةً بسجلّك هنا: ${num(d.diff.add)} جديد، ${num(d.diff.change)} يختلف، ${num(d.diff.same)} مطابق.${d.diff.unknown ? ` ${nWorks(d.diff.unknown)} ليست في كتالوج الموقع بعد: تُحفظ في سجلّك، وتظهر بعد أن تُضاف إلى الكتالوج.` : ''}</p>
       <div class="acts"><button class="btn pri" data-act="sk-apply" data-how="ahead">ادمج: الأبعد تقدّماً يغلب</button><button class="btn ghost" data-act="sk-apply" data-how="simkl">اعتمد ${ltr('SIMKL')} عند الاختلاف</button><button class="btn ghost" data-act="sk-apply" data-how="new">أضف الجديد فقط</button></div>
-      <p class="lbl">«الأبعد تقدّماً»: لكل عمل يختلف تؤخذ الحالة والحلقات ممن شاهد أكثر، ويبقى تقييمك وتاريخاك إن وُجدت. قبل أي دمج تُحفظ نسخة من سجلّك للتراجع.</p>
+      <p class="lbl">«الأبعد تقدّماً»: لكل عمل يختلف تؤخذ الحالة والحلقات ممن شاهد أكثر، ويبقى تقييمك وتاريخاك إن وُجدت، وما تركته يبقى متروكاً ما لم تزد حلقاته. قبل أي دمج تُحفظ نسخة من سجلّك للتراجع.</p>
+      <p class="lbl">عدد الحلقات لا يتجاوز حلقات العمل هنا (${ltr('SIMKL')} يجمع أحياناً أجزاء في مدخل واحد).${d.bulk ? ` وأيام نقل القائمة إلى ${ltr('SIMKL')} (${count(d.bulk, ['يوم واحد', 'يومان', 'أيام', 'يوماً', 'يوم'])}: أعمال كثيرة عُلّمت دفعة واحدة) لا تُحسب تواريخ مشاهدة.` : ''}</p>
       <div class="acts"><button class="btn quiet" data-act="sk-raw">نزّل ما أرسله ${ltr('SIMKL')} كاملاً (فيه تاريخ كل حلقة)</button></div>`; })()
     : tok ? `<p class="lbl">حسابك في ${ltr('SIMKL')} مربوط على هذا الجهاز.</p><div class="acts"><button class="btn pri" data-act="sk-pull">اسحب سجلّي من ${ltr('SIMKL')}</button><button class="btn quiet" data-act="sk-forget">افصل الحساب</button></div>`
     : `<p class="lbl">يسحب حالة كل عمل وحلقاته وتقييمه من حسابك، للقراءة فقط: الموقع لا يغيّر شيئاً في حسابك هناك. تضغط الزر، يظهر رمز، توافق عليه في صفحة ${ltr('SIMKL')}. رمز الدخول يبقى في هذا المتصفح فقط.</p><div class="acts"><button class="btn pri" data-act="sk-start">اربط ${ltr('SIMKL')}</button></div>`;
@@ -298,12 +299,12 @@ function openImport() { IMP.msg = ''; drawImp(); const d = $('#imp'); if (!d.ope
 async function readFile(f) { if (!f) return; IMP.msg = ''; try { IMP.mal = await readMalFile(f); if (!IMP.mal.entries.length) { IMP.mal = null; IMP.msg = 'الملف سليم لكنه بلا أعمال.'; } }
   catch (e) { IMP.mal = null; IMP.ok = false; IMP.msg = esc(e.message || 'تعذّرت قراءة الملف.'); } drawImp(); }
 // كل استيراد يحفظ قبله نسخة من السجل (animeg.progress.bak) يُرجع إليها بزر «تراجع عن آخر استيراد»
-function applyEntries(list, how) { store.set(KEY + '.bak', JSON.stringify(P)); let n = 0;
-  for (const e of list) { const o = toMine(e), m = P.a[e.id]; if (!o) continue;
-    if (!m) { P.a[e.id] = o; n++; continue; } if (how === 'new') continue;
-    if (how === 'ahead') { const ahead = (o.p || 0) > (m.p || 0) || ((o.p || 0) === (m.p || 0) && o.s === 'completed' && m.s !== 'completed'); if (ahead) { m.s = o.s; if (o.p) m.p = o.p; } for (const k of ['r', 'b', 'e']) if (!m[k] && o[k]) m[k] = o[k]; n++; continue; }
-    P.a[e.id] = how === 'simkl' ? { ...o, ...(o.r ? {} : m.r ? { r: m.r } : {}), ...(o.b ? {} : m.b ? { b: m.b } : {}), ...(o.e ? {} : m.e ? { e: m.e } : {}) } : o; n++; }
-  save(); renderAll(); return n; }
+function applyEntries(list, how) { store.set(KEY + '.bak', JSON.stringify(P)); const r = { n: 0, added: 0, moved: 0, filled: 0 };
+  for (const e of list) { const o = toMine(e), m = P.a[e.id]; if (!o) continue; r.n++;
+    if (!m) { P.a[e.id] = o; r.added++; continue; } if (how === 'new') continue;
+    if (how === 'ahead') { const go = simklAhead(m, o); if (go) { m.s = o.s; if (o.p) m.p = o.p; r.moved++; } let got = 0; for (const k of ['r', 'b', 'e']) if (!m[k] && o[k]) { m[k] = o[k]; got = 1; } if (got && !go) r.filled++; continue; }
+    const was = JSON.stringify(m); P.a[e.id] = how === 'simkl' ? { ...o, ...(o.r ? {} : m.r ? { r: m.r } : {}), ...(o.b ? {} : m.b ? { b: m.b } : {}), ...(o.e ? {} : m.e ? { e: m.e } : {}) } : o; if (JSON.stringify(P.a[e.id]) !== was) r.moved++; }
+  save(); renderAll(); return r; }
 
 // ---------- الأحداث
 document.addEventListener('click', async e => { const t = e.target.closest('[data-act]'); if (!t) return; const d = t.dataset, id = +d.id;
@@ -322,7 +323,7 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'close': history.state && (history.state.a || history.state.w || history.state.imp) ? history.back() : t.closest('dialog').close(); break;
     case 'import': openImport(); break;
     case 'imp-clear': IMP.mal = null; IMP.msg = ''; drawImp(); break;
-    case 'imp-apply': { const n = applyEntries(IMP.mal.entries, 'file'); IMP.ok = true; IMP.msg = `دخل سجلّك: ${nWorks(n)}. المزامنة تنقله إلى بقية أجهزتك.`; IMP.mal = null; ui.list = inList('watching').length ? 'watching' : 'all'; renderAll(); drawImp(); break; }
+    case 'imp-apply': { const { n } = applyEntries(IMP.mal.entries, 'file'); IMP.ok = true; IMP.msg = `دخل سجلّك: ${nWorks(n)}. المزامنة تنقله إلى بقية أجهزتك.`; IMP.mal = null; ui.list = inList('watching').length ? 'watching' : 'all'; renderAll(); drawImp(); break; }
     case 'backup': { const u = URL.createObjectURL(new Blob([JSON.stringify({ exported: new Date().toISOString(), source: 'أنمياتي', ...P }, null, 1)], { type: 'application/json' })); Object.assign(document.createElement('a'), { href: u, download: `anime-log-${today}.json` }).click(); setTimeout(() => URL.revokeObjectURL(u), 4000); break; }
     case 'restore': { const b = store.get(KEY + '.bak'); if (!b) break; const now = JSON.stringify(P); store.set(KEY, b); store.set(KEY + '.bak', now); load(); save(); renderAll(); IMP.ok = true; IMP.msg = 'رجع سجلّك كما كان قبل آخر استيراد.'; drawImp(); break; }
     case 'sk-start': await skStart(); break;
@@ -330,7 +331,9 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'sk-pull': await skPull(); break;
     case 'sk-raw': { const u = URL.createObjectURL(new Blob([JSON.stringify(IMP.sk.raw, null, 1)], { type: 'application/json' })); Object.assign(document.createElement('a'), { href: u, download: `simkl-anime-${today}.json` }).click(); setTimeout(() => URL.revokeObjectURL(u), 4000); break; }
     case 'sk-forget': simklForget(); IMP.sk = null; IMP.ok = true; IMP.msg = 'فُصل الحساب عن هذا الجهاز.'; drawImp(); break;
-    case 'sk-apply': { const n = applyEntries(IMP.sk.entries, d.how); IMP.ok = true; IMP.msg = `دُمج سجل ${ltr('SIMKL')}: ${nWorks(n)}.`; IMP.sk = null; drawImp(); break; }
+    case 'sk-apply': { const r = applyEntries(IMP.sk.entries, d.how), inWorks = n => count(n, ['عمل واحد', 'عملين', 'أعمال', 'عملاً', 'عمل']);
+      const did = [r.added && `أُضيف ${nWorks(r.added)}`, r.moved && `${d.how === 'ahead' ? 'تقدّم' : 'تغيّر'} ${nWorks(r.moved)}`, r.filled && `استُكمل تاريخ أو تقييم في ${inWorks(r.filled)}`].filter(Boolean);
+      IMP.ok = true; IMP.msg = did.length ? `دُمج سجل ${ltr('SIMKL')}: ${did.join('، و')}. الباقي كما هو.` : `سجلّك يطابق ما في ${ltr('SIMKL')}: لم يتغير شيء.`; IMP.sk = null; drawImp(); break; }
   } });
 // ---------- SIMKL: الربط بالرمز ثم السحب. كل طلب من المتصفح مباشرة (site/anime-simkl.js)
 async function skStart() { IMP.msg = ''; try { const s = IMP.simkl = await simklStart(); drawImp();

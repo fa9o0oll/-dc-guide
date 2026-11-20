@@ -2,6 +2,7 @@
 // الملف هنا مصنوع للاختبار (ليس قائمة أحد). تشغيل: node tests/anime.test.mjs
 import zlib from 'node:zlib';
 import { parseMal, readMalFile, malDate, STATUSES } from '../site/anime-mal.js';
+import { shapeSimkl, bulkDays, simklAhead } from '../site/anime-simkl.js';
 import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS } from '../scripts/lib-anime.mjs';
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -120,6 +121,34 @@ const mOf = n => more.find(w => w.name === n);
 check('علاقتان متناقضتان بين عملين تُحسمان بترتيب الصدور، فلا يتأخر المسلسل الأصلي عن أعمال لا علاقة ترتيب له بها', !('story' in mOf('Code Geass: Hangyaku no Lelouch')) && same(mOf('Code Geass: Hangyaku no Lelouch').ids, [1575, 2904, 12685, 8888]), mOf('Code Geass: Hangyaku no Lelouch'));
 check('سلسلة بدأت بـOVA تأخذ الاسم الذي تبدأ به أعمالها لا اسم أول مسلسلاتها، ومعها رقم العمل صاحب الاسم', !!mOf('Ginga Eiyuu Densetsu') && mOf('Ginga Eiyuu Densetsu').ids.length === 3 && mOf('Ginga Eiyuu Densetsu').head === 820 && wOf('Shingeki no Kyojin').head === 16498 && mOf('Steins;Gate').head === 9253, more.map(w => [w.name, w.head]));
 check('وعالم غلب عليه اسم آخر يأخذه، وما لأقدم مسلسلاته ثلثه يبقى باسمه', !!mOf('Steins;Gate') && mOf('Steins;Gate').ids.includes(4975) && !!mOf('Toaru Majutsu no Index') && mOf('Toaru Majutsu no Index').ids.length === 5, more.map(w => w.name));
+
+// ---------- SIMKL: تشكيل ما يرسله الحساب (site/anime-simkl.js). الأشكال هنا مما ظهر في أول سحب حقيقي: مداخل تجمع أجزاء، وأيام نقل جماعي، ورقم يخالف خريطة الموقع
+console.log('\nSIMKL');
+const SK = o => ({ status: o.status || 'completed', watched_episodes_count: o.w ?? 0, total_episodes_count: o.w ?? 0, user_rating: o.r ?? null, last_watched_at: o.last ? o.last + 'T10:00:00Z' : null,
+  show: { title: o.title || 'x', ids: { ...(o.sk ? { simkl: o.sk } : {}), ...(o.mal ? { mal: o.mal } : {}) } }, ...(o.days ? { seasons: [{ number: 1, episodes: o.days.map((d, i) => ({ number: i + 1, watched_at: d + 'T10:00:00Z' })) }] } : {}) });
+const skCat = [{ id: 9260, eps: 1, ord: 0 }, { id: 101, eps: 12, ord: 1 }, { id: 5081, eps: 15, ord: 2, sk: 45006 }, { id: 58302, eps: 12, ord: 3, sk: 2393806 }, { id: 60045, eps: 1 }, { id: 395, eps: 13, ord: 4 }, { id: 384, eps: 13, sk: 777 },
+  { id: 21, eps: 0, ord: 5 }, { id: 37105, eps: 12, ord: 6 }, { id: 31043, eps: 12, ord: 7 }, { id: 500, eps: 12, ord: 8 }, { id: 199, eps: 1, ord: 9 }, { id: 269, eps: 366, ord: 10 }];
+const skCx = (items = []) => ({ by: new Map(skCat.map(a => [a.id, a])), bySimkl: new Map(skCat.filter(a => a.sk).map(a => [a.sk, a.id])), bulk: bulkDays(items) });
+const sk1 = (o, items) => shapeSimkl(SK(o), skCx(items));
+check('مدخل يجمع أجزاء (ثلاثية أفلام بثلاث «حلقات») لا يتجاوز حلقات العمل، و«أكملته» تعني حلقاته كلها', sk1({ mal: 9260, w: 3 }).watched === 1 && sk1({ mal: 101, w: 13 }).watched === 12 && sk1({ mal: 101, w: 13, status: 'watching' }).watched === 12
+  && sk1({ sk: 45006, w: 12 }).watched === 15 && sk1({ mal: 5081, w: 4, status: 'watching' }).watched === 4, [sk1({ mal: 9260, w: 3 }), sk1({ sk: 45006, w: 12 })]);
+check('عمل لا يُعرف عدد حلقاته، أو ليس في الكتالوج، يبقى عدده كما أرسله SIMKL', sk1({ mal: 21, w: 1155, status: 'hold' }).watched === 1155 && sk1({ mal: 42976, w: 4 }).watched === 4 && sk1({ mal: 42976, w: 4 }).id === 42976);
+check('رقم SIMKL يخالف خريطة الموقع: يُؤخذ ما في القائمة منهما، وإلا رقم SIMKL', sk1({ mal: 60045, sk: 2393806, status: 'plantowatch' }).id === 58302 && sk1({ mal: 395, sk: 777, status: 'plantowatch' }).id === 395
+  && sk1({ sk: 45006 }).id === 5081 && sk1({ sk: 424242 }) === null && sk1({ mal: 101, status: 'weird' }) === null, [sk1({ mal: 60045, sk: 2393806 }), sk1({ mal: 395, sk: 777 })]);
+// يوم نقل جماعي: خمسة أعمال عُلّمت حلقاتها كلها في 2026-07-10. وGrand Blue بعده حلقات حقيقية، وBoku dake ga Inai Machi تاريخ إكماله الأصلي في last_watched_at
+const D12 = d => Array(12).fill(d), moved = [SK({ mal: 101, w: 12, days: D12('2026-07-10'), last: '2026-07-10' }), SK({ mal: 5081, w: 12, days: D12('2026-07-10'), last: '2026-07-10' }), SK({ mal: 395, w: 12, days: D12('2026-07-10'), last: '2026-07-10' }),
+  SK({ mal: 31043, w: 12, days: D12('2026-07-10'), last: '2018-08-10' }), SK({ mal: 37105, w: 12, days: [...Array(8).fill('2026-07-10'), '2026-10-18', '2026-10-19', '2026-10-20', '2026-10-21'], last: '2026-10-21' }),
+  SK({ mal: 500, w: 12, days: D12('2025-03-03'), last: '2025-03-03' }), SK({ mal: 199, w: 1, days: ['2024-09-11'], last: '2024-09-11' }), SK({ mal: 269, w: 366, days: Array(366).fill('2024-11-27'), last: '2024-11-27' })];
+const mv = moved.map(it => shapeSimkl(it, skCx(moved))), mvOf = id => mv.find(e => e.id === id);
+check('يوم عُلّمت فيه أعمال كثيرة، أو حلقات أكثر مما يُشاهَد في يوم، يوم نقل لا يوم مشاهدة', same([...bulkDays(moved)].sort(), ['2024-11-27', '2026-07-10']), [...bulkDays(moved)]);
+check('لا يؤخذ تاريخ من يوم النقل: لا بداية ولا إكمال', mvOf(101).start === null && mvOf(101).finish === null && mvOf(269).start === null && mvOf(269).finish === null, [mvOf(101), mvOf(269)]);
+check('تاريخ الإكمال الأصلي المحفوظ في last_watched_at يؤخذ، وحلقات شوهدت بعد النقل تعطي تاريخ الإكمال دون البداية', mvOf(31043).finish === '2018-08-10' && mvOf(31043).start === null && mvOf(37105).finish === '2026-10-21' && mvOf(37105).start === null, [mvOf(31043), mvOf(37105)]);
+check('عمل عُلّمت حلقاته الكثيرة كلها في يوم واحد يعطي الإكمال دون البداية، والفيلم يعطيهما', mvOf(500).start === null && mvOf(500).finish === '2025-03-03' && mvOf(199).start === '2024-09-11' && mvOf(199).finish === '2024-09-11', [mvOf(500), mvOf(199)]);
+const spread = sk1({ mal: 500, w: 5, status: 'watching', days: ['2026-11-11', '2026-11-12', '2026-11-13', '2026-11-14', '2026-11-15'], last: '2026-11-15' });
+check('مشاهدة على أيام: البداية أول يوم، ولا إكمال لما لم يكتمل', spread.start === '2026-11-11' && spread.finish === null && spread.watched === 5, spread);
+check('«الأبعد تقدّماً»: حلقات أكثر تغلب، والحلقات نفسها مع الإكمال هناك تغلب، وما تُرك يبقى متروكاً ما لم تزد حلقاته', simklAhead({ s: 'watching', p: 8 }, { s: 'completed', p: 12 }) && simklAhead({ s: 'watching', p: 12 }, { s: 'completed', p: 12 })
+  && simklAhead({ s: 'plan' }, { s: 'completed', p: 10 }) && simklAhead({ s: 'dropped', p: 3 }, { s: 'watching', p: 5 }) && !simklAhead({ s: 'dropped', p: 3, r: 4 }, { s: 'completed', p: 3 }) && !simklAhead({ s: 'completed', p: 12 }, { s: 'watching', p: 12 })
+  && !simklAhead({ s: 'plan' }, { s: 'hold' }) && !simklAhead({ s: 'completed', p: 15 }, { s: 'completed', p: 12 }));
 
 console.log(fail ? `\n❌ فشل ${fail}` : '\n✅ كل فحوص أنمياتي نجحت');
 process.exit(fail ? 1 : 0);

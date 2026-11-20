@@ -41,18 +41,32 @@ async function api(path, q) { const tok = await access(), { ok, status, j } = aw
 
 const STATUS = { watching: 'watching', plantowatch: 'plan', hold: 'hold', completed: 'completed', dropped: 'dropped', notinteresting: 'dropped' };
 const day = s => /^\d{4}-\d{2}-\d{2}/.test(s || '') ? s.slice(0, 10) : null;
-// عنصر من /sync/all-items/anime ← سجل بصيغتنا. رقم MyAnimeList من ids.mal، وإن غاب فمن رقم SIMKL في كتالوج الموقع
-export function shapeSimkl(it, bySimkl) { const sh = it.show || it.anime || it.movie || {}, ids = sh.ids || {}, id = +ids.mal || bySimkl.get(+ids.simkl) || 0, status = STATUS[it.status];
+const epDays = it => (it.seasons || []).flatMap(s => (s.episodes || []).map(e => day(e.watched_at))).filter(Boolean).sort();
+// أيام النقل الجماعي: يوم عُلّمت فيه حلقات أكثر من ثلاثة أعمال، أو أكثر من ثلاثين حلقة، هو يوم نُقلت فيه قائمة إلى SIMKL (كل حلقاتها تأخذ تاريخ النقل) لا يوم مشاهدة.
+// وُجد هذا في أول سحب حقيقي: 9,960 حلقة مؤرَّخة في 22 يوماً فقط، منها 6,280 في يوم واحد.
+export function bulkDays(items) { const works = new Map(), eps = new Map();
+  for (const it of items) { const ds = epDays(it), last = day(it.last_watched_at); for (const d of ds) eps.set(d, (eps.get(d) || 0) + 1);
+    for (const d of new Set(last ? [...ds, last] : ds)) works.set(d, (works.get(d) || 0) + 1); }
+  return new Set([...works.keys()].filter(d => works.get(d) > 3 || eps.get(d) > 30)); }
+// عنصر من /sync/all-items/anime ← سجل بصيغتنا. cx: by (رقم العمل ← العمل في كتالوج الموقع)، bySimkl (رقم SIMKL ← رقم العمل)، bulk (أيام النقل الجماعي).
+// - الرقم: ما يقوله SIMKL (ids.mal) وما تقوله خريطة الموقع لرقم SIMKL قد يختلفان (SIMKL يعطي موسماً رقمَ حلقته الخاصة مثلاً). عندها يُؤخذ ما في قائمة صاحب الموقع منهما، وإلا فرقم SIMKL.
+// - الحلقات: SIMKL يجمع أحياناً أجزاء في مدخل واحد (ثلاثية أفلام بثلاث «حلقات»، أو مسلسل مع حلقاته الخاصة)، فلا يتجاوز العدد حلقات العمل عندنا، و«أكملته» تعني حلقاته كلها.
+// - التاريخان: لا يؤخذ تاريخ من يوم نقل جماعي. الإكمال من last_watched_at (يحفظ تاريخ الإكمال الأصلي بعد النقل) ثم من آخر حلقة. والبداية لا تُعرف من عمل عُلّمت حلقاته الكثيرة كلها في يوم واحد.
+export function shapeSimkl(it, cx) { const sh = it.show || it.anime || it.movie || {}, ids = sh.ids || {}, a = +ids.mal || 0, b = cx.bySimkl.get(+ids.simkl) || 0, status = STATUS[it.status];
+  const listed = i => cx.by.get(i)?.ord != null, id = a && b && a !== b && listed(b) && !listed(a) ? b : a || b;
   if (!id || !status) return null;
-  const when = (it.seasons || []).flatMap(s => (s.episodes || []).map(e => day(e.watched_at))).filter(Boolean).sort(), seen = +it.watched_episodes_count || 0;
+  const eps = cx.by.get(id)?.eps || 0, when = epDays(it), first = when[0], end = when[when.length - 1], real = d => d && !cx.bulk.has(d) ? d : null;
+  let seen = +it.watched_episodes_count || 0; if (eps) seen = status === 'completed' ? eps : Math.min(seen, eps);
   return { id, title: sh.title || '', status, watched: seen, score: Math.min(10, Math.max(0, Math.round(+it.user_rating || 0))),
-    start: when[0] || null, finish: status === 'completed' ? when[when.length - 1] || day(it.last_watched_at) : null }; }
+    start: first !== end || when.length <= 3 ? real(first) : null, finish: status === 'completed' ? real(day(it.last_watched_at)) || real(end) : null }; }
+// «الأبعد تقدّماً يغلب»: هل ما في SIMKL (o) أبعد مما في السجل (m)؟ حلقات أكثر، أو الحلقات نفسها وقد أكمله هناك. وما تُرك يبقى متروكاً ما لم تزد حلقاته
+export const simklAhead = (m, o) => (o.p || 0) > (m.p || 0) || ((o.p || 0) === (m.p || 0) && o.s === 'completed' && m.s !== 'completed' && m.s !== 'dropped');
 // 3) السحب: لقطة النشاط أولاً، ثم قائمة الأنمي كلها بحلقاتها وتواريخها. إن رفضها SIMKL لكثرة الحلقات تُطلب بلا حلقات
-export async function simklPull(catalog) { const bySimkl = new Map(catalog.filter(a => a.sk).map(a => [a.sk, a.id]));
+export async function simklPull(catalog) { const by = new Map(catalog.map(a => [a.id, a])), bySimkl = new Map(catalog.filter(a => a.sk).map(a => [a.sk, a.id]));
   const act = await api('/sync/activities'); let raw;
   try { raw = await api('/sync/all-items/anime', { extended: 'full', episode_watched_at: 'yes', include_all_episodes: 'original', memos: 'yes' }); }
   catch (e) { if (e.code === 'unauthorized' || e.code === 'network' || e.code === 'no_token') throw e; raw = await api('/sync/all-items/anime'); }
-  const items = Array.isArray(raw) ? raw : raw?.anime || [], seen = new Map(); let unmatched = 0;
-  for (const it of items) { const e = shapeSimkl(it, bySimkl); if (!e) { unmatched++; continue; } const was = seen.get(e.id); if (!was || e.watched > was.watched) seen.set(e.id, e); }
+  const items = Array.isArray(raw) ? raw : raw?.anime || [], cx = { by, bySimkl, bulk: bulkDays(items) }, seen = new Map(); let unmatched = 0;
+  for (const it of items) { const e = shapeSimkl(it, cx); if (!e) { unmatched++; continue; } const was = seen.get(e.id); if (!was || e.watched > was.watched) seen.set(e.id, e); }
   const entries = [...seen.values()], n = s => entries.filter(e => e.status === s).length; ls.set(ACT, act);
-  return { entries, matched: entries.length, unmatched, raw, totals: { all: entries.length, watching: n('watching'), completed: n('completed'), hold: n('hold'), dropped: n('dropped'), plan: n('plan'), episodes: entries.reduce((s, e) => s + e.watched, 0), scored: entries.filter(e => e.score).length } }; }
+  return { entries, matched: entries.length, unmatched, bulk: cx.bulk.size, raw, totals: { all: entries.length, watching: n('watching'), completed: n('completed'), hold: n('hold'), dropped: n('dropped'), plan: n('plan'), episodes: entries.reduce((s, e) => s + e.watched, 0), scored: entries.filter(e => e.score).length } }; }

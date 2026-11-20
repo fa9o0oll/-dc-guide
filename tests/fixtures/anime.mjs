@@ -35,12 +35,15 @@ ${[R(11061, 'Hunter x Hunter (2011)', 'TV', 148, 'Completed', 148, 10, '2016-02-
     R(356, 'Fate/stay night', 'TV', 24, 'Dropped', 3, 4), R(199, 'Sen to Chihiro no Kamikakushi', 'Movie', 1, 'Completed', 1, 9, '0000-00-00', '2017-01-10'), R(60000, 'Brand New Show', 'TV', 12, 'Plan to Watch'), R(61000, 'Upcoming Thing', 'TV', 0, 'Plan to Watch')].join('\n')}\n</myanimelist>`;
 export const malGz = () => zlib.gzipSync(Buffer.from(malXml()));
 // رد SIMKL على /sync/all-items/anime: عمل تقدّم فيه أبعد من الملف (Dungeon Meshi 5 حلقات بتواريخها)، وعمل أكمله هناك (Golden Kamuy)، وعمل مطابق،
-// وعمل ليس في السجل (Fate/stay night UBW يشاهده)، وعمل بلا رقم MyAnimeList يُطابَق برقم SIMKL، وعمل لا يُعرف
+// وعمل ليس في السجل (Fate/stay night UBW يشاهده)، وعمل بلا رقم MyAnimeList يُطابَق برقم SIMKL، وعمل لا يُعرف.
+// وكما في الحسابات الحقيقية: يوم نقل جماعي (2026-07-10) عُلّمت فيه حلقات Hunter x Hunter كلها وحلقات UBW، ومدخل يجمع ثلاثة أجزاء في فيلم واحد (Spirited Away بثلاث «حلقات»)
+const MOVED = '2026-07-10T15:17:21Z', eps = (n, at) => [{ number: 1, episodes: Array.from({ length: n }, (_, i) => ({ number: i + 1, watched_at: at })) }];
 export const simklItems = () => ({ anime: [
   { status: 'watching', watched_episodes_count: 5, total_episodes_count: 24, user_rating: 9, last_watched_at: '2026-11-18T19:00:00Z', show: { title: 'Delicious in Dungeon', ids: { simkl: 1970434 } },
     seasons: [{ number: 1, episodes: [1, 2, 3, 4, 5].map(n => ({ number: n, watched_at: `2026-11-1${n}T18:00:00Z` })) }] },
   { status: 'completed', watched_episodes_count: 12, total_episodes_count: 12, user_rating: null, last_watched_at: '2026-10-02T20:00:00Z', show: { title: 'Golden Kamuy 2', ids: { simkl: 849475, mal: '37989' } } },
-  { status: 'completed', watched_episodes_count: 148, total_episodes_count: 148, user_rating: 10, show: { title: 'Hunter x Hunter', ids: { simkl: 39507, mal: 11061 } } },
-  { status: 'watching', watched_episodes_count: 4, total_episodes_count: 12, show: { title: 'Fate/stay night UBW', ids: { simkl: 5, mal: 22297 } } },
+  { status: 'completed', watched_episodes_count: 148, total_episodes_count: 148, user_rating: 10, last_watched_at: MOVED, show: { title: 'Hunter x Hunter', ids: { simkl: 39507, mal: 11061 } }, seasons: eps(148, MOVED) },
+  { status: 'watching', watched_episodes_count: 4, total_episodes_count: 12, last_watched_at: MOVED, show: { title: 'Fate/stay night UBW', ids: { simkl: 5, mal: 22297 } }, seasons: eps(4, MOVED) },
+  { status: 'completed', watched_episodes_count: 3, total_episodes_count: 3, last_watched_at: MOVED, show: { title: 'Spirited Away', ids: { simkl: 55, mal: 199 } }, seasons: eps(3, MOVED) },
   { status: 'plantowatch', watched_episodes_count: 0, show: { title: 'Unknown Thing', ids: { simkl: 424242 } } },
 ] });
