@@ -107,19 +107,43 @@ export const shapeEpisode = e => { const name = (e.name || '').trim();
   return { se: e.season_number, ep: e.episode_number, t: name && !autoName(name) ? name : null, d: day(e.air_date), r: e.runtime || null, ov: (e.overview || '').replace(/\s+/g, ' ').trim() || null,
     st: e.still_path || null, ra: e.vote_count >= 5 && e.vote_average ? Math.round(e.vote_average * 10) / 10 : null }; };
 const gap = (a, b) => Math.round((Date.parse(a) - Date.parse(b)) / 864e5), exact = d => /^\d{4}-\d{2}-\d{2}$/.test(d || '') ? d : null;
-// أين تقع حلقات العمل في حلقات المسلسل على TMDB. flat: حلقات الموسم (أو المواسم العادية كلها) بترتيبها، start: الموضع الذي تقوله الخريطة
-// (بداية الموسم + الإزاحة)، eps: عدد حلقات العمل في MyAnimeList (0: لم يُعلن)، from وto: تاريخا بدايته ونهايته هناك. التاريخ هو الحكم:
-//   'map'  موضع الخريطة وافقه تاريخ البداية أو تاريخ النهاية (±3 أيام)
-//   'date' الخريطة خالفها التاريخ (أو لا موضع لها)، ووُجدت حلقة عُرضت يوم بدأ العمل
-//   'map?' لا تاريخ يُحتكم إليه، أو الفرق أيام قليلة (عرض مسبق أو تأجيل): يبقى موضع الخريطة بعلامته
+// أين تقع حلقات العمل في حلقات المسلسل على TMDB. flat: المواسم العادية كلها بترتيبها قائمةً واحدة، start: الموضع الذي تقوله الخريطة
+// (بداية الموسم + الإزاحة؛ -1 حين لا وجود لموسمها)، eps: عدد حلقات العمل في MyAnimeList (0: لم يُعلن)، from وto: تاريخا بدايته ونهايته هناك.
+// القواعد بترتيبها، وكل واحدة وُضعت لحالة ظهرت في أول بناء حقيقي:
+//   'map'  موضع الخريطة، حين يوافق تاريخُ أوله بدايةَ العمل أو تاريخُ آخره نهايتَه (±3 أيام)؛ أو هو موسم كامل بعدد حلقات العمل تماماً ولا يبعد
+//          أوله عن بداية العمل أكثر من 75 يوماً (منصة تسبق التلفزيون: العدد شاهد كافٍ، وأقرب موسمين متتاليين بينهما 12 أسبوعاً)؛ أو المسلسل كله
+//          بعدد حلقات العمل ولا يبعد أكثر من 400 يوم (تأريخ عرض أجنبي؛ وما زاد فمسلسل آخر بالاسم نفسه)
+//   'date' حلقة عُرضت يوم بدأ العمل وتنتهي حلقاته بعدها يوم انتهى: مواسم MyAnimeList التي يدمجها TMDB في موسم واحد، وخريطة تشير إلى غير موسمها
+//   'map'  ثم موضع الخريطة إن أزيح طرفاه إزاحة واحدة لا تزيد على أسبوعين (تسبق المنصةُ التلفزيونَ بأسبوع في موسم مدموج). وهذه بعد التي قبلها:
+//          إزاحة أسبوع هي نفسها خطأ حلقة واحدة في الخريطة، والحلقة التي توافق الطرفين معاً أولى
+//   'date' ثم أي حلقة عُرضت يوم بدأ العمل، ويُقدَّم ما تسع حلقاتُ العمل بعده وما قارب آخرُه نهايتَه
+//   'map?' لا تاريخ يُحتكم إليه، أو الفرق أيام: يبقى موضع الخريطة بعلامته
 //   null   الخريطة خارج الحلقات، أو بعيدة عن تاريخ العمل أكثر من 45 يوماً ولا بديل: لا حلقات خير من حلقات عمل آخر
 export function placeEpisodes(flat, { start = 0, eps = 0, from, to }) { const N = flat.length; if (!N) return null;
-  const f = exact(from), t = exact(to), near = (i, d) => i >= 0 && i < N && !!flat[i].d && !!d && Math.abs(gap(flat[i].d, d)) <= 3, inside = start >= 0 && start < N;
-  if (inside && (near(start, f) || (eps > 1 && near(start + eps - 1, t)))) return { at: start, how: 'map' };
-  if (f) { const c = []; for (let i = 0; i < N; i++) if (near(i, f)) c.push(i);
-    if (c.length) return { at: c.sort((a, b) => Math.abs(gap(flat[a].d, f)) - Math.abs(gap(flat[b].d, f)) || a - b)[0], how: 'date' }; }
-  if (!inside || (f && flat[start].d && Math.abs(gap(flat[start].d, f)) > 45)) return null;
+  const f = exact(from), t = exact(to), inside = start >= 0 && start < N, dif = (i, d) => i >= 0 && i < N && flat[i].d && d ? gap(flat[i].d, d) : null;
+  const A = i => dif(i, f), B = i => eps > 1 ? dif(i + eps - 1, t) : null, within = (x, n) => x != null && Math.abs(x) <= n, a = inside ? A(start) : null, b = inside ? B(start) : null;
+  if (inside) { const se = flat[start].se, head = start === 0 || flat[start - 1].se !== se;
+    if (within(a, 3) || within(b, 3)) return { at: start, how: 'map' };
+    if (eps > 0 && head && !(a != null && Math.abs(a) > 75) && flat.filter(e => e.se === se).length === eps) return { at: start, how: 'map' };
+    if (start === 0 && N === eps && !(a != null && Math.abs(a) > 400)) return { at: start, how: 'map' }; }
+  const c = []; if (f) for (let i = 0; i < N; i++) if (within(A(i), 3)) c.push(i);
+  const near = (x, y) => Math.abs(A(x)) - Math.abs(A(y)) || x - y, both = c.filter(i => within(B(i), 3)).sort(near);
+  if (both.length) return { at: both[0], how: 'date' };
+  if (a != null && b != null && Math.abs(a - b) <= 3 && Math.abs(a) <= 14) return { at: start, how: 'map' };
+  if (c.length) { const rank = i => { const e = B(i); return (eps && i + eps > N ? 4 : 0) + (e == null ? 1 : Math.abs(e) <= 7 ? 0 : 2); };
+    return { at: c.sort((x, y) => rank(x) - rank(y) || near(x, y))[0], how: 'date' }; }
+  if (!inside || (a != null && Math.abs(a) > 45)) return null;
   return { at: start, how: 'map?' }; }
+// عمل لا مكان له في المواسم العادية (OVA من حلقات، أو حلقات ختامية طويلة): حلقاته في «الحلقات الخاصة» (الموسم 0) هي ما عُرض بين بدايته ونهايته
+// (±3 أيام)، وتُقبل فقط حين يساوي عددُها عددَ حلقاته تماماً. الموسم 0 يجمع كل شيء بلا ترتيب يُعتمد، فلا شاهد فيه إلا التاريخ والعدد معاً
+export function pickSpecials(s0, { eps = 0, from, to }) { const f = exact(from), t = exact(to); if (!f || !t || eps < 2) return null;
+  const l = s0.filter(e => e.d && gap(e.d, f) >= -3 && gap(e.d, t) <= 3).sort((x, y) => x.d < y.d ? -1 : x.d > y.d ? 1 : x.ep - y.ep);
+  return l.length === eps ? l : null; }
+// هل رقم الحلقة في ما بُني هو رقمها في MyAnimeList؟ built: ما أُخذ بعدد حلقات العمل، over: ما بقي بعده في موسمه وعُرض قبل نهاية العمل ولم يأخذه عمل آخر.
+//   'loose' المصدر يعدّ الحلقات عدّاً آخر: يزيد في المدة نفسها (أنصاف حلقات فُصلت، ملخص في وسط الموسم، حلقة ساعة عُدّت اثنتين)، أو ينقص كثيراً
+//           (حلقات قصيرة جُمعت). تُعرض الحلقات كلها للقراءة بلا تعليم: رقم الخانة لا يقابل رقم الحلقة في سجله
+//   'odd'   ينقص بحلقة أو بضع حلقات (حلقة خاصة أو ملخص يعدّه MyAnimeList وليس في مواسم المصدر): تنبيه، والتعليم باقٍ
+export const epFit = (eps, built, over = 0) => { if (!eps) return null; const short = Math.max(0, eps - built); return over > 0 || short > Math.max(4, eps * .3) ? 'loose' : short ? 'odd' : null; };
 // بصمة النص الإنجليزي للحلقة (عنوانها وملخصها): تُحفظ مع ترجمتها، فإن تغيّر النص أو تبدّل موضع الحلقة عُرف ولم تُلصق ترجمة بغير حلقتها
 export const epPrint = (hash, e) => hash(`${e.t || ''}\n${e.ov || ''}`).slice(0, 10);
 export const epKey = e => `${e.se}x${e.ep}`;

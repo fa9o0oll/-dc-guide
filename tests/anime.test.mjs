@@ -3,7 +3,7 @@
 import zlib from 'node:zlib';
 import { parseMal, readMalFile, malDate, STATUSES } from '../site/anime-mal.js';
 import { shapeSimkl, bulkDays, simklAhead } from '../site/anime-simkl.js';
-import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, epKey, epPrint } from '../scripts/lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, pickSpecials, epFit, epKey, epPrint } from '../scripts/lib-anime.mjs';
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -159,9 +159,23 @@ check('موضع الخريطة يُقبل حين يوافقه تاريخ الب�
 check('خريطة خالفها التاريخ: تُؤخذ الحلقة التي عُرضت يوم بدأ العمل', same(placeEpisodes(both, { start: 0, eps: 12, from: '2024-07-05', to: '2024-09-20' }), { at: 12, how: 'date' })
   && same(placeEpisodes(cour2, { start: 0, eps: 11, from: '2023-10-12', to: '2023-12-21' }), { at: 11, how: 'date' }) && same(placeEpisodes(both, { start: -1, eps: 12, from: '2024-01-05' }), { at: 0, how: 'date' }));
 check('حلقتان عُرضتا في يوم واحد: الأولى منهما', same(placeEpisodes([{ se: 1, ep: 1, d: '2024-01-05' }, { se: 1, ep: 2, d: '2024-01-05' }, { se: 1, ep: 3, d: '2024-01-12' }], { start: 5, eps: 3, from: '2024-01-05' }), { at: 0, how: 'date' }));
-check('لا تاريخ يُحتكم إليه، أو فرق أيام قليلة: يبقى موضع الخريطة بعلامته', same(placeEpisodes(wk(null, 12), { start: 0, eps: 12, from: '2024-01-05' }), { at: 0, how: 'map?' })
-  && same(placeEpisodes(S1, { start: 0, eps: 12, from: '2024' }), { at: 0, how: 'map?' }) && same(placeEpisodes(S1, { start: 0, eps: 12, from: '2023-12-18', to: '2024-04-20' }), { at: 0, how: 'map?' }));
-check('خريطة بعيدة عن تاريخ العمل ولا بديل، أو خارج الحلقات: لا حلقات', placeEpisodes(S1, { start: 0, eps: 12, from: '2019-04-01', to: '2019-06-20' }) === null && placeEpisodes(S1, { start: 40, eps: 12, from: '2030-01-01' }) === null && placeEpisodes([], { start: 0 }) === null);
+check('لا تاريخ يُحتكم إليه والعدد لا يشهد، أو فرق أيام قليلة: يبقى موضع الخريطة بعلامته', same(placeEpisodes(wk(null, 13), { start: 0, eps: 12, from: '2024-01-05' }), { at: 0, how: 'map?' })
+  && same(placeEpisodes(S1, { start: 0, eps: 13, from: '2024' }), { at: 0, how: 'map?' }) && same(placeEpisodes(S1, { start: 0, eps: 13, from: '2023-12-18', to: '2024-04-20' }), { at: 0, how: 'map?' }));
+check('خريطة بعيدة عن تاريخ العمل ولا بديل، أو خارج الحلقات: لا حلقات (ولو ساوى العددُ العددَ: مسلسل آخر بالاسم نفسه، أو موسم غير موسمه)', placeEpisodes(S1, { start: 0, eps: 12, from: '2019-04-01', to: '2019-06-20' }) === null
+  && placeEpisodes(S1, { start: 40, eps: 12, from: '2030-01-01' }) === null && placeEpisodes([], { start: 0 }) === null && placeEpisodes([...S1, ...wk(null, 12, 2)], { start: 0, eps: 12, from: '2024-07-05', to: '2024-09-20' }) === null);
+// حالات من أول بناء حقيقي: المنصة تسبق التلفزيون (Fuuto Tantei، Isekai Suicide Squad، Kaizoku Oujo)، وتأريخ عرض أجنبي (Afro Samurai)
+const ahead = wk('2022-08-01', 12), three = [...Array.from({ length: 3 }, (_, i) => ({ se: 1, ep: i + 1, d: '2024-06-27' })), ...wk('2024-07-04', 7, 1, 4)], merged = [...wk('2024-01-01', 12), ...wk('2024-07-01', 12, 1, 13)], run36 = wk('2024-01-05', 36);
+check('موسم كامل بعدد حلقات العمل: يبقى موضع الخريطة ولو سبقت المنصةُ التلفزيونَ بأسبوع أو بثلاث حلقات أو بسبعة أسابيع', same(placeEpisodes(ahead, { start: 0, eps: 12, from: '2022-08-08', to: '2022-10-24' }), { at: 0, how: 'map' })
+  && same(placeEpisodes(three, { start: 0, eps: 10, from: '2024-07-06', to: '2024-09-07' }), { at: 0, how: 'map' }) && same(placeEpisodes(wk('2021-08-14', 12), { start: 0, eps: 12, from: '2021-10-03', to: '2021-12-19' }), { at: 0, how: 'map' })
+  && same(placeEpisodes(wk(null, 12), { start: 0, eps: 12, from: '2024-01-05' }), { at: 0, how: 'map' }) && same(placeEpisodes([...S1, ...S2], { start: 12, eps: 12, from: '2024-06-28', to: '2024-09-13' }), { at: 12, how: 'map' }));
+check('المسلسل كله بعدد حلقات العمل وتأريخه أجنبي: يُقبل', same(placeEpisodes(wk('2007-01-04', 5), { start: 0, eps: 5, from: '2007-05-03' }), { at: 0, how: 'map' }));
+check('موسم مدموج تسبق فيه المنصةُ التلفزيونَ بأسبوع: إزاحة الطرفين معاً تُبقي موضع الخريطة، لا الحلقة الثانية', same(placeEpisodes(merged, { start: 0, eps: 12, from: '2024-01-08', to: '2024-03-25' }), { at: 0, how: 'map' }));
+check('خريطة أخطأت بحلقة واحدة في موسم طويل: الحلقة التي توافق البداية والنهاية معاً تغلب إزاحة الأسبوع', same(placeEpisodes(run36, { start: 13, eps: 12, from: '2024-03-29', to: '2024-06-14' }), { at: 12, how: 'date' })
+  && same(placeEpisodes(merged, { start: 13, eps: 12, from: '2024-07-01', to: '2024-09-16' }), { at: 12, how: 'date' }));
+const sp0 = [{ se: 0, ep: 1, d: '2013-07-17' }, { se: 0, ep: 31, d: '2023-11-05' }, { se: 0, ep: 30, d: '2023-03-04' }, { se: 0, ep: 32, d: null }];
+check('الحلقات الخاصة: ما عُرض بين بداية العمل ونهايته، ويُقبل حين يساوي عددَ حلقاته تماماً وبتاريخين كاملين', same(pickSpecials(sp0, { eps: 2, from: '2023-03-04', to: '2023-11-05' })?.map(epKey), ['0x30', '0x31'])
+  && pickSpecials(sp0, { eps: 3, from: '2023-03-04', to: '2023-11-05' }) === null && pickSpecials(sp0, { eps: 2, from: '2023-03', to: '2023-11-05' }) === null && pickSpecials(sp0, { eps: 1, from: '2023-03-04', to: '2023-03-04' }) === null && pickSpecials([], { eps: 2, from: '2023-03-04', to: '2023-11-05' }) === null);
+check('عدد الحلقات المبنية وعدد MyAnimeList: نقص قليل تنبيه، ونقص كبير أو زيادة في المدة نفسها عدٌّ آخر', epFit(12, 12) === null && epFit(0, 30) === null && epFit(15, 12) === 'odd' && epFit(16, 12) === 'odd' && epFit(203, 198) === 'odd' && epFit(23, 23, 1) === 'loose' && epFit(120, 24) === 'loose' && epFit(195, 195, 23) === 'loose');
 const E = shapeEpisode({ season_number: 2, episode_number: 5, name: ' The Promise ', overview: 'Line one.\n\nLine two. ', air_date: '2024-02-03', runtime: 24, still_path: '/a.jpg', vote_average: 8.46, vote_count: 12 });
 check('حلقة TMDB ← ما نحفظه، والاسم الآلي ليس عنواناً، والتقييم بأصوات قليلة لا يُحفظ', same(E, { se: 2, ep: 5, t: 'The Promise', d: '2024-02-03', r: 24, ov: 'Line one. Line two.', st: '/a.jpg', ra: 8.5 }) && epKey(E) === '2x5'
   && shapeEpisode({ season_number: 1, episode_number: 3, name: 'Episode 3', vote_average: 9, vote_count: 2 }).t === null && shapeEpisode({ season_number: 1, episode_number: 3, name: '第3話' }).t === null && shapeEpisode({ season_number: 1, episode_number: 3, name: 'Episode 3: Dawn', vote_average: 9, vote_count: 2 }).ra === null && shapeEpisode({ season_number: 1, episode_number: 3, name: 'Episode 3: Dawn' }).t === 'Episode 3: Dawn');
