@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-20T11:35:23.467Z",
+ "generatedAt": "2026-11-20T14:07:04.654Z",
  "total": 196,
  "enriched": 196,
  "pending": 0,
@@ -10,6 +10,9 @@
  "withRtLink": 167,
  "withArabicOverview": 153,
  "withArabicTitle": 94,
+ "withProviders": 75,
+ "providers": 7,
+ "seasonsWithOwnProviders": 12,
  "series": 65,
  "episodes": 3537,
  "arabicEpisodeOverviews": 425,
