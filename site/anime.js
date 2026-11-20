@@ -12,7 +12,7 @@ import { prepare, find, fold } from './find.js?v=__BUILD__';
 import { readMalFile } from './anime-mal.js?v=__BUILD__';
 import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead } from './anime-simkl.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
-const BUILD = '__BUILD__', KEY = 'animeg.progress', UI = 'anime.ui';
+const BUILD = '__BUILD__', KEY = 'animeg.progress', UI = 'anime.ui', ASK = 'animeg.asked', PASS = 'animeg.pass';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -50,7 +50,7 @@ const SPRITE = `<svg hidden aria-hidden="true"><defs>
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
 <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" stroke-width="1.6" d="M8.5 6v12l10-6z"/></symbol><symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
 <symbol id="i-drop" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><path d="M6.8 6.8l10.4 10.4"/></symbol><symbol id="i-mark" viewBox="0 0 24 24"><path d="M7 4.5h10v15l-5-3.5-5 3.5z"/></symbol>
-<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5L20 20"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol><symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.7 2.5 2.7 13.5 0 16M12 4c-2.7 2.5-2.7 13.5 0 16"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5L20 20"/></symbol>
 <symbol id="i-down" viewBox="0 0 24 24"><path d="M6.5 9.5l5.5 5.5 5.5-5.5"/></symbol><symbol id="i-in" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></symbol><symbol id="i-ext" viewBox="0 0 24 24"><path d="M8 16l8-8M9.5 8H16v6.5"/></symbol>
 </defs></svg>`;
 
@@ -215,7 +215,7 @@ function worldStrip(a) { const w = D.wby.get(a.w); if (!w) return ''; const orde
   return `<section class="sec"><h3>من سلسلة ${ltr(w.name)}</h3><p class="lbl">العمل ${at} من ${order.length} بترتيب ${w.story ? 'القصة' : 'الصدور'}</p>
     <div class="strip">${order.map(id => D.by.get(id)).filter(Boolean).map(x => `<button data-act="open" data-id="${x.id}" aria-current="${x.id === a.id}" aria-label="${esc(x.t)}">${dot(x.id)}${poster(x) ? `<img loading="lazy" alt="" src="${esc(poster(x))}">` : `<span class="ph">${esc(x.t[0])}</span>`}<span>${esc(title(x))}</span></button>`).join('')}</div>
     <div class="acts"><button class="btn ghost" data-act="world" data-w="${w.id}">افتح السلسلة بترتيبها</button></div></section>`; }
-function sheetHTML(a, x) { const big = a.tp ? `${D.base}w780${a.tp}` : poster(a, true), facts = [[typeOf(a)], a.type !== 'Movie' && a.eps ? [nEps(a.eps)] : a.eps === 0 && a.st === 'airing' ? ['مستمر'] : null, a.dur ? [`${a.dur} دقيقة${a.type === 'Movie' ? '' : ' للحلقة'}`] : null,
+function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `${D.base}w780${a.tp}` : poster(a, true), facts = [[typeOf(a)], a.type !== 'Movie' && a.eps ? [nEps(a.eps)] : a.eps === 0 && a.st === 'airing' ? ['مستمر'] : null, a.dur ? [`${a.dur} دقيقة${a.type === 'Movie' ? '' : ' للحلقة'}`] : null,
     a.se && a.y ? [`${SEASON[a.se]} ${a.y}`] : a.y ? [a.y] : null, a.st === 'airing' ? ['يُعرض الآن'] : a.st === 'soon' ? ['لم يُعرض بعد'] : null, a.studio ? [ltr(a.studio)] : null, x?.source ? [`المصدر: ${SOURCE[x.source] || ltr(x.source)}`] : null, a.rating ? [/^\+/.test(RATING[a.rating] || a.rating) ? ltr(RATING[a.rating] || a.rating) : RATING[a.rating] || ltr(a.rating)] : null].filter(Boolean);
   const alt = [a.en && a.en !== a.t ? a.en : '', ui.names === 'english' && a.en ? a.t : '', x?.jp || ''].filter(Boolean);
   const links = [['MyAnimeList', `https://myanimelist.net/anime/${a.id}`], a.sk ? ['SIMKL', `https://simkl.com/anime/${a.sk}`] : null, x?.anilist ? ['AniList', `https://anilist.co/anime/${x.anilist}`] : null, a.tm ? ['TMDB', `https://www.themoviedb.org/${a.tm.k}/${a.tm.id}`] : null].filter(Boolean);
@@ -225,7 +225,7 @@ function sheetHTML(a, x) { const big = a.tp ? `${D.base}w780${a.tp}` : poster(a,
       <div class="facts">${facts.map(f => `<span>${f[0]}</span>`).join('')}${a.sc ? `<span class="mal">${ltr('MyAnimeList')} <b>${a.sc.toFixed(2)}</b></span>${a.sv ? `<span>${num(a.sv)} تقييماً</span>` : ''}` : ''}</div></div></div>
     ${mineHTML(a)}
     ${D.eps[a.id] ? `<section class="sec xs" id="xs" aria-busy="true"><h3>الحلقات</h3><p class="lbl">تُحمَّل الحلقات…</p></section>` : ''}
-    ${a.pending ? '<p class="lbl">معلومات هذا العمل تُجلب في البناء القادم.</p>' : x?.ar ? `<section class="sec"><h3>القصة</h3><p class="ov">${esc(x.ar)}</p></section>` : x?.en ? `<section class="sec"><h3>القصة</h3><span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')} (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(x.en)}</p></section>` : ''}
+    ${a.pending ? '<p class="lbl">معلومات هذا العمل تُجلب في البناء القادم.</p>' : x?.ar ? `<section class="sec"><h3>القصة</h3><p class="ov">${esc(x.ar)}</p></section>` : x?.en ? `<section class="sec"><h3>القصة</h3><span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')}، ولم تُترجم بعد.</span><p class="ov en">${esc(x.en)}</p>${trHTML(a, 'about')}</section>` : ''}
     ${(a.g || []).length ? `<div class="facts">${a.g.map(i => `<span>${genreOf(D.genres[i])}</span>`).join('')}</div>` : ''}
     ${whereHTML(a)}${worldStrip(a)}
     <section class="sec"><h3>صفحاته</h3><div class="links">${links.map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}${ic('ext')}</a>`).join('')}</div></section></div>`; }
@@ -237,6 +237,30 @@ async function openWork(id, push = true) { const a = D.by.get(id); if (!a) retur
 // fit من البناء: 'odd' عدد الحلقات هنا أقل بقليل من عدد MyAnimeList (تنبيه)، و'loose' المصدر يعدّها عدّاً آخر، فلا يقابل رقمُ الخانة رقمَ الحلقة
 // في سجله: تُعرض للقراءة بلا تعليم، ويبقى تقدّمه من عدّاد البطاقة
 const X = { id: 0, list: null, tv: 0, fit: '', all: false, from: 1, open: 0, ask: 0, wave: null };
+// ---------- «ترجمها لي»: طلب ترجمة نبذة عمل (about) أو حلقاته (eps). يصل المترجم عبر فرع requests في المستودع (دالة /api/anime-ask بكلمة سر «أضف لعبة»
+// أو «أضف فيلماً»)، ولا يُرسل من السجل شيء: رقم العمل واسمه ونوع الطلب. لا مرور آلي للمترجم (قرار صاحب الموقع): الطلب ينتظر حتى يقول «ترجم الجديد»
+const askedMap = () => { try { const m = JSON.parse(store.get(ASK) || '{}'); return m && typeof m === 'object' ? m : {}; } catch { return {}; } };
+const askKey = (id, what) => `${id}:${what}`, unask = (id, what) => { const m = askedMap(); if (m[askKey(id, what)]) { delete m[askKey(id, what)]; store.set(ASK, JSON.stringify(m)); } };
+const pass = () => store.get(PASS) || store.get('gamesg.pass') || store.get('filmsg.pass') || '';
+const TRW = { about: ['ترجمها لي', 'نبذته'], eps: ['ترجم لي حلقاته', 'حلقاته'] };
+const trBtn = what => `<button type="button" class="btn quiet" data-act="tr-ask">${ic('globe')}${TRW[what][0]}</button>`;
+const trBox = (id, what) => askedMap()[askKey(id, what)] ? `<p class="tr-ok">${ic('check')}<span>وصل طلب ترجمة ${TRW[what][1]} وهو ينتظر. قل لـ${ltr('Claude')} «ترجم الجديد» فتُترجم، وتظهر هنا بالعربية.</span></p>` : trBtn(what);
+const trHTML = (a, what) => `<div class="tr" data-id="${a.id}" data-what="${what}">${trBox(a.id, what)}</div>`;
+async function askTr(btn) { const box = btn.closest('.tr'), id = +box.dataset.id, what = box.dataset.what, pw = box.querySelector('.tr-pass')?.value || pass(), label = btn.innerHTML;
+  const field = msg => { if (!box.querySelector('.tr-pass')) box.innerHTML = `<label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة» أو «أضف فيلماً»)<input class="tr-pass" type="password" autocomplete="current-password"></label>${trBtn(what)}<p class="msg" aria-live="polite"></p>`;
+    box.querySelector('.msg').textContent = msg; box.querySelector('.tr-pass').focus(); };
+  if (!pw) { field(box.querySelector('.tr-pass') ? 'اكتب كلمة السر أولاً.' : ''); return; }
+  btn.disabled = true; btn.textContent = 'يُرسل الطلب…';
+  try { const r = await fetch('/api/anime-ask', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw, mal: id, what, title: D.by.get(id)?.t || '' }) }), j = await r.json().catch(() => ({}));
+    if (r.status === 401 && j.error === 'password') { store.del(PASS); throw Object.assign(new Error('كلمة السر غير صحيحة.'), { pw: true }); }
+    if (r.status === 404 || r.status === 405) throw new Error(`طلب الترجمة يعمل من نسخة الموقع على ${ltr('Netlify')}، لا من هذه النسخة.`);
+    if (!r.ok) throw new Error(j.error || 'تعذّر إرسال الطلب الآن. حاول بعد قليل.');
+    store.set(PASS, pw); const m = askedMap(); m[askKey(id, what)] = Date.now(); store.set(ASK, JSON.stringify(m)); box.innerHTML = trBox(id, what);
+  } catch (e) { btn.disabled = false; btn.innerHTML = label; if (e.pw) { field(e.message); box.querySelector('.tr-pass').value = ''; return; }
+    let msg = box.querySelector('.msg'); if (!msg) { msg = Object.assign(document.createElement('p'), { className: 'msg' }); msg.setAttribute('aria-live', 'polite'); box.append(msg); }
+    msg.innerHTML = e instanceof TypeError ? 'تعذّر الاتصال. تحقق من الشبكة ثم حاول.' : e.message; } }
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches?.('.tr-pass')) { e.preventDefault(); e.target.closest('.tr').querySelector('[data-act=tr-ask]')?.click(); } });
+
 const pageOf = n => n <= 60 ? n : n <= 300 ? 25 : 50;
 // ما لم يُعرض بعد: بتاريخه إن عُرف، وإلا فما بعد آخر حلقة عُرضت في عمل ما زال يُعرض
 const lastAired = L => { let k = 0; for (const e of L) if (e.d && e.d <= today) k = e.n; return k; };
@@ -257,13 +281,14 @@ function xsHTML(a) { const L = X.list, tot = L.length, ro = X.fit === 'loose', p
       ${on ? `<div class="xd${e.st ? '' : ' bare'}">${e.st ? `<img loading="lazy" decoding="async" alt="" src="${D.base}w300${e.st}" srcset="${D.base}w300${e.st} 300w, ${D.base}original${e.st} 1280w" sizes="(max-width:560px) 92vw, 260px">` : ''}
         <div>${ov}<p class="lbl"><a href="https://www.themoviedb.org/tv/${X.tv}/season/${e.se}/episode/${e.ep}" target="_blank" rel="noopener">صفحة الحلقة في ${ltr('TMDB')}</a></p></div></div>` : ''}</li>`; };
   const pages = X.all && tot > size ? `<div class="xpages" role="group" aria-label="صفحات الحلقات">${Array.from({ length: Math.ceil(tot / size) }, (_, i) => { const f = i * size + 1, t = Math.min(tot, f + size - 1); return `<button data-act="ep-page" data-from="${f}" aria-pressed="${X.from === f}">${f}–${t}</button>`; }).join('')}</div>` : '';
+  const untr = L.some(e => e.ov ? !e.oa : e.t && !e.ta); if (!untr) unask(a.id, 'eps');   // حلقة لها ملخص تُعدّ مترجمة بملخصها، وما لا ملخص لها فبعنوانها
   const count = !a.eps || tot === a.eps ? nEps(tot) : X.fit ? `${nEps(tot)} هنا، و${num(a.eps)} في ${ltr('MyAnimeList')}` : tot < a.eps ? `${nEps(tot)} من ${num(a.eps)}` : nEps(tot);
   const note = ro ? `عناوين الحلقات وملخصاتها وصورها من ${ltr('TMDB')}، وهو يعدّ حلقات هذا العمل عدّاً غير عدّ ${ltr('MyAnimeList')}، فلا يقابل رقمُ الحلقة هنا رقمَها في سجلك. الحلقات هنا للقراءة، وتقدّمك يُعلَّم من العدّاد أعلاه.`
     : `عناوين الحلقات وملخصاتها وصورها من ${ltr('TMDB')}. الخانة التي تضغطها تصير آخر ما شاهدت.${X.fit === 'odd' ? ` ما زاد في ${ltr('MyAnimeList')} حلقات خاصة أو ملخصات ليست في مواسم المصدر، فقد يختلف رقم الحلقة هنا عن رقمها هناك قليلاً.` : ''}`;
   return `<section class="sec xs" id="xs"><h3>الحلقات<small>${count}${p ? ` · شاهدت ${num(p)}` : ''}</small></h3>
     ${pages}<ol class="xsheet${ro ? ' ro' : ''}">${rows.map(row).join('')}</ol>
     <div class="acts">${X.all ? `<button class="btn quiet" data-act="ep-less">${ro ? 'أول الحلقات فقط' : next ? 'الحلقة التالية وما حولها فقط' : 'آخر الحلقات فقط'}</button>` : tot > rows.length ? `<button class="btn ghost" data-act="ep-all">كل الحلقات (${num(tot)})</button>` : ''}</div>
-    <p class="lbl">${note}</p></section>`; }
+    <p class="lbl">${note}</p>${untr ? trHTML(a, 'eps') : ''}</section>`; }
 const drawXs = a => { const b = $('#xs'); if (!b || X.id !== a.id || !X.list) return; b.outerHTML = xsHTML(a);
   const on = $('#xs .xpages [aria-pressed=true]'), bar = on?.parentNode; if (on) bar.scrollLeft += on.getBoundingClientRect().left + on.offsetWidth / 2 - (bar.getBoundingClientRect().left + bar.clientWidth / 2); };   // صفحة الحلقات الحالية في وسط شريطها
 function showEps(a) { if (!$('#xs')) return; if (X.id === a.id && X.list) return drawXs(a);
@@ -367,6 +392,7 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'remove': removeEntry(id); break;
     case 'undo': { const f = undo; undo = null; $('#toast').classList.remove('on'); f?.(); break; }
     case 'ep-tick': tickEp(id, +d.n); break;
+    case 'tr-ask': askTr(t); break;
     case 'ep-back': { const n = +d.n; X.ask = 0; X.wave = [n + 1, me(id)?.p || n, me(id)?.p || n]; setProgress(id, n); break; }
     case 'ep-keep': X.ask = 0; drawXs(D.by.get(open)); break;
     case 'ep-open': X.open = X.open === +d.n ? 0 : +d.n; drawXs(D.by.get(open)); break;

@@ -4,7 +4,7 @@
 
 ## عبارات يقولها صاحب الموقع
 
-- **«ترجم الجديد»**: نفّذ «دورة العمل» في `docs/GAMES-CARE.md` مرة واحدة، واكتب تقريرها كما يصفه آخر الدليل. تبدأ بـ`node scripts/games-care.mjs pending`، وطلبات زر «ترجمها لي» (الفرع `requests`، الملف `data/games/requests.json`) لها الأولوية. لا مهمة مجدولة لهذا: اختار أن تنتظر الطلبات حتى يقولها. وبعد دورة الألعاب دفعة من نبذات «أنمياتي»: `node scripts/anime-care.mjs pending 15 --full` (قسم «أنمياتي» في الدليل نفسه)، ثم دفعة من حلقاتها: `node scripts/anime-care.mjs eps-next 10 3` (قسم «حلقات أنمياتي»). وما يسمّيه من أعمال يتقدم في الاثنتين.
+- **«ترجم الجديد»**: نفّذ «دورة العمل» في `docs/GAMES-CARE.md` مرة واحدة، واكتب تقريرها كما يصفه آخر الدليل. تبدأ بـ`node scripts/games-care.mjs pending`، وطلبات زر «ترجمها لي» (الفرع `requests`، الملف `data/games/requests.json`) لها الأولوية. لا مهمة مجدولة لهذا: اختار أن تنتظر الطلبات حتى يقولها. وبعد دورة الألعاب دفعة من نبذات «أنمياتي»: `node scripts/anime-care.mjs pending 15 --full` (قسم «أنمياتي» في الدليل نفسه)، ثم دفعة من حلقاتها: `node scripts/anime-care.mjs eps-next 10 3` (قسم «حلقات أنمياتي»). وما يسمّيه من أعمال يتقدم في الاثنتين، وكذلك ما طلبه بزر «ترجمها لي» و«ترجم لي حلقاته» في «أنمياتي» (الفرع نفسه، الملف `data/anime/requests.json`؛ يعرضه `node scripts/anime-care.mjs asked`، والأمران يبدآن به من نفسيهما).
 
 ## النشر
 
@@ -20,6 +20,7 @@
 - معرّف تطبيق SIMKL في `site/anime-simkl.js` عام بنص SIMKL. رمز الدخول ورمز التجديد لا يُقرآن ولا يُكتبان في ملف.
 - حلقات الأعمال يبنيها `scripts/build-anime-episodes.mjs` بعد الكتالوج (`site/anime/data/eps/`): مواسم المسلسل في TMDB قائمةً واحدة، وموضع العمل فيها من خريطة الكتالوج يحكم فيه تاريخ العرض وعدد الحلقات (القواعد وحالاتها فوق `placeEpisodes` في `scripts/lib-anime.mjs`). تقريره `data/generated/anime/episodes-report.json` يُقرأ بعد كل تعديل فيه: ما نُقل بالتاريخ، وما سقط ولماذا، وما يخالف عدده عدد MyAnimeList.
 - ملفات البناء لا تُنزَّل من GitHub في هذه البيئة (تخزينها محجوب). ما يُراد فحصه من بيانات مبنية: يُدفع السكربت بـ`[skip ci]` ثم `gh workflow run data.yml --ref main -f quiet=1` (يبني ويحفظ بلا نشر) ثم `git pull`.
+- ملفات تُحرَّر باليد ويقرؤها البناء (`anime-care.mjs check` يفحصها): `data/anime/tmdb.json` (تصحيح مطابقة عمل مع TMDB؛ المرشحون في `data/generated/anime/tmdb-candidates.json` بعد كل بناء، ولا يُضاف إلا ما وافق تاريخُه وعددُه)، و`data/anime/orders.json` (ترتيب قصة مُراجَع وملاحظة لسلسلة)، و`data/anime/worlds.json` (نبذة «عن هذا العالم»، مفتاحها رقم العمل الذي تحمل السلسلة اسمه).
 - البناء (`scripts/build-anime.mjs`) يسحب من واجهة MyAnimeList الرسمية بحصة لكل تشغيل؛ السحب الطويل: `gh workflow run data.yml --ref main -f anime_max=3000 -f quiet=1`، ولا يُدفع إلى `main` أثناءه (الدفع يلغي البناء الجاري).
 
 ## حدود

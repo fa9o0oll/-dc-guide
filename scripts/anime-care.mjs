@@ -1,6 +1,8 @@
 // عناية «أنمياتي»: ما لم تُترجم نبذته بعد، وفحص ما تُرجم. الترجمات في data/anime/translations.json (المفتاح رقم العمل في MyAnimeList، والقيمة النبذة العربية)،
 // والنص الإنجليزي من بناء الموقع: site/anime/data/texts/<الرقم % 32>.json. القواعد قواعد docs/GAMES-CARE.md نفسها (قسم «أنمياتي» فيه).
 //   node scripts/anime-care.mjs pending [عدد] [--full]   ما ينقصه ترجمة: المطلوب بأرقامه أولاً (--ids 1,2,3، ولو كان من أقرباء السلاسل)، ثم الأشهر في MyAnimeList
+//   node scripts/anime-care.mjs asked                    ما طُلب بزر «ترجمها لي» في الموقع ولم يُترجم بعد (فرع requests، الملف data/anime/requests.json): نبذات وحلقات.
+//                                                        والمطلوب يتقدم من نفسه في pending وeps-next
 //   node scripts/anime-care.mjs heads [عدد]              أرقام الأعمال التي تحمل أكبر السلاسل أسماءها ولم تُترجم (نبذتها «حكاية» السلسلة في نافذتها)
 //   node scripts/anime-care.mjs show <رقم>               عمل بعينه بنصه الإنجليزي وترجمته إن وُجدت
 //   node scripts/anime-care.mjs check                    يفحص الملف: الصيغة، والطول نسبةً إلى الأصل (35% إلى 190%)، وعلامات الترقيم. ويفحص ترجمات الحلقات
@@ -15,6 +17,8 @@
 //                                                        سجله الشخصي ليس في المستودع، فما بدأته دفعة سابقة (مما سمّاه أو مما يشاهده) هو الدليل على ما يُكمَل
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { epPrint, epKey } from './lib-anime.mjs';
 const root = new URL('../', import.meta.url), rd = (p, fb) => { try { return JSON.parse(fs.readFileSync(new URL(p, root), 'utf8')); } catch { return fb; } };
 const cat = rd('site/anime/data/catalog.json', { anime: [] }), tr = rd('data/anime/translations.json', {}), by = new Map(cat.anime.map(a => [a.id, a]));
@@ -24,16 +28,26 @@ const [cmd, ...args] = process.argv.slice(2), flag = n => { const i = args.index
 const sha = s => crypto.createHash('sha1').update(s).digest('hex'), epsOf = id => rd(`site/anime/data/eps/${id}.json`, null), trFile = tv => `data/anime/episodes/tv-${tv}.json`, trOf = tv => rd(trFile(tv), {});
 const done = (e, T) => { const x = T[epKey(e)]; return !!x && x.h === epPrint(sha, e); };
 const hasText = e => !!(e.t || e.ov);
+// ما طُلب بزر «ترجمها لي» (دالة /api/anime-ask تكتبه على فرع requests، لا على main)، إن أمكنت قراءته: [{ mal, what: 'about' | 'eps', title, at }]
+function requested() { const cwd = fileURLToPath(root); try { execFileSync('git', ['fetch', '-q', 'origin', 'requests'], { cwd, stdio: 'ignore', timeout: 30000 }); } catch {}
+  try { return (JSON.parse(execFileSync('git', ['show', 'origin/requests:data/anime/requests.json'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })).ar || []).map(x => ({ ...x, mal: +x.mal })).filter(x => Number.isInteger(x.mal) && (x.what === 'about' || x.what === 'eps')); } catch { return []; } }
+const askedFor = what => [...new Set(requested().filter(r => r.what === what).map(r => r.mal))];
+const epsTodo = id => { const j = epsOf(id); if (!j) return null; const T = trOf(j.tv), text = j.eps.filter(hasText), ok = text.filter(e => done(e, T)); return { j, T, text, ok, left: text.length - ok.length }; };
 // سطر لكل حلقة، بترتيب الموسم ثم الحلقة
 const saveTr = (tv, T) => { const keys = Object.keys(T).sort((a, b) => { const [s1, e1] = a.split('x').map(Number), [s2, e2] = b.split('x').map(Number); return s1 - s2 || e1 - e2; });
   fs.mkdirSync(new URL('data/anime/episodes/', root), { recursive: true }); fs.writeFileSync(new URL(trFile(tv), root), '{\n' + keys.map((k, i) => `${JSON.stringify(k)}: ${JSON.stringify(T[k])}${i < keys.length - 1 ? ',' : ''}`).join('\n') + '\n}\n'); };
 const badText = v => /"|  | [،؛؟.!:]/.test(v) ? 'علامة اقتباس لاتينية أو فراغان أو فراغ قبل علامة ترقيم' : !/[\u0600-\u06ff]/.test(v) ? 'بلا حروف عربية' : '';
-if (cmd === 'pending') { const n = +(args.find(a => /^\d+$/.test(a)) || 15), full = args.includes('--full'), asked = String(flag('ids') || '').split(',').map(Number).filter(Boolean);
+if (cmd === 'pending') { const n = +(args.find(a => /^\d+$/.test(a)) || 15), full = args.includes('--full'), asked = [...new Set([...String(flag('ids') || '').split(',').map(Number).filter(Boolean), ...askedFor('about')])];   // ما سُمّي بأرقامه، ثم ما طُلب بزر «ترجمها لي»
   // المطلوب بأرقامه قد يكون من أقرباء السلاسل (ليس في القائمة): نبذة العمل الذي تحمل السلسلة اسمه تظهر في نافذتها
   const pool = cat.anime.filter(a => !a.pending && !tr[a.id] && textOf(a.id)?.en), todo = pool.filter(a => a.ord != null), first = asked.map(id => pool.find(a => a.id === id)).filter(Boolean);
   const rest = todo.filter(a => !asked.includes(a.id)).sort((a, b) => (b.sv || 0) - (a.sv || 0));
   console.log(JSON.stringify({ translated: Object.keys(tr).length, pending: todo.length, noTextYet: cat.anime.filter(a => a.ord != null && (a.pending || !textOf(a.id)?.en)).length }));
   for (const a of [...first, ...rest].slice(0, n)) console.log(full ? `\n### ${a.id} | ${a.t}${a.en ? ' | ' + a.en : ''}\n${textOf(a.id).en}` : `${a.id}\t${a.t}`); }
+else if (cmd === 'asked') { const req = requested(), about = askedFor('about').filter(id => by.has(id) && !tr[id] && textOf(id)?.en), eps = askedFor('eps').map(id => [id, epsTodo(id)]).filter(([, x]) => x && x.left);
+  console.log(JSON.stringify({ requests: req.length, about: about.length, eps: eps.length }));
+  if (about.length) console.log(`\nنبذات مطلوبة (${about.length}): ${about.map(id => `${id} ${by.get(id).t}`).join(' ؛ ')}\n  node scripts/anime-care.mjs pending ${about.length} --full`);
+  for (const [id, x] of eps) console.log(`\nحلقات مطلوبة: ${id} ${by.get(id)?.t || ''}: تُرجم ${x.ok.length} من ${x.text.length}\n  node scripts/anime-care.mjs eps ${id}`);
+  if (!about.length && !eps.length) console.log(req.length ? 'كل ما طُلب تُرجم.' : 'لا طلبات.'); }
 else if (cmd === 'heads') { const n = +(args.find(a => /^\d+$/.test(a)) || 40), mine = w => w.ids.filter(id => by.get(id)?.ord != null).length;
   const need = (cat.worlds || []).slice().sort((a, b) => mine(b) - mine(a) || b.ids.length - a.ids.length).map(w => by.get(w.head)).filter(a => a && !tr[a.id] && textOf(a.id)?.en).slice(0, n);
   console.log(need.map(a => a.id).join(',')); for (const a of need) console.error(`${a.id}\t${a.t}`); }
@@ -84,9 +98,12 @@ else if (cmd === 'eps-next') { const works = +args[0] || 10, each = +args[1] || 
   for (const id of Object.keys(rd('site/anime/data/eps/index.json', {})).map(Number)) { const j = epsOf(id); if (!j || j.fit === 'loose') continue; const T = trOf(j.tv); if (!Object.keys(T).length) continue;
     const text = j.eps.filter(hasText), ok = text.filter(e => done(e, T)); if (!ok.length || ok.length === text.length) continue;
     const last = ok.at(-1).n, next = text.filter(e => e.n > last && !done(e, T)).slice(0, each); if (next.length) rows.push({ id, j, ok: ok.length, next }); }
-  rows.sort((a, b) => a.ok - b.ok || a.id - b.id);
+  // ما طُلبت حلقاته بزر «ترجم لي حلقاته» يتقدم، ولو لم تبدأ ترجمته: من أول حلقة لم تُترجم
+  const want = askedFor('eps'), front = []; for (const id of want) { const x = epsTodo(id); if (!x || !x.left) continue; const i = rows.findIndex(r => r.id === id); if (i >= 0) rows.splice(i, 1);
+    front.push({ id, j: x.j, ok: x.ok.length, next: x.text.filter(e => !done(e, x.T)).slice(0, Math.max(each, 12)), asked: true }); }
+  rows.sort((a, b) => a.ok - b.ok || a.id - b.id); rows.unshift(...front);
   console.log(JSON.stringify({ started: rows.length, shown: Math.min(works, rows.length), episodes: rows.slice(0, works).reduce((n, r) => n + r.next.length, 0) }));
   for (const r of rows.slice(0, works)) { const names = [...new Set((tr[r.id] || '').match(/«[^»]+»/g) || [])].join(' ');
-    console.log(`\n# ${r.id} | ${by.get(r.id)?.t || ''} | تُرجم ${r.ok} من ${r.j.eps.filter(hasText).length}${names ? '\n' + names : ''}`);
+    console.log(`\n# ${r.id} | ${by.get(r.id)?.t || ''} | تُرجم ${r.ok} من ${r.j.eps.filter(hasText).length}${r.asked ? ' | مطلوب بالزر' : ''}${names ? '\n' + names : ''}`);
     for (const e of r.next) console.log(`${e.n} | ${e.t || '—'} | ${e.ov || '—'}`); } }
-else console.log('الأوامر: pending [عدد] [--full] [--ids 1,2] | heads [عدد] | show <رقم> | check | eps <رقم العمل> [من] [إلى] | eps-add <ملف> | eps-left [رقم…] | eps-next [أعمال] [حلقات]');
+else console.log('الأوامر: pending [عدد] [--full] [--ids 1,2] | asked | heads [عدد] | show <رقم> | check | eps <رقم العمل> [من] [إلى] | eps-add <ملف> | eps-left [رقم…] | eps-next [أعمال] [حلقات]');

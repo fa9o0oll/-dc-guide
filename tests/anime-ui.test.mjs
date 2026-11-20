@@ -102,6 +102,20 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     && /مسلسل/.test(t) && /24 حلقة/.test(t) && /25 دقيقة للحلقة/.test(t) && /شتاء 2024/.test(t) && /Trigger/.test(t) && /8\.60/.test(t) && !!b.querySelector('.ov.en') && location.hash === '#a52701'; }));
   check('أين يُعرض في السعودية، وصفحاته في المواقع', await page.evaluate(() => { const w = document.querySelector('#sheet .where'); return w.querySelector('h3').textContent === 'أين تشاهده في السعودية' && w.querySelector('.wrow b').textContent === 'باشتراك' && w.querySelector('.wl a').textContent === 'Netflix'
     && [...document.querySelectorAll('#sheet .links a')].map(a => a.href).join(' ') === 'https://myanimelist.net/anime/52701 https://simkl.com/anime/1970434 https://www.themoviedb.org/tv/207784'; }));
+  // «ترجمها لي»: الزر تحت النبذة الإنجليزية، وكلمة السر تُسأل مرة وتُحفظ بعد نجاحها، والطلب يحمل رقم العمل واسمه ونوعه فقط (لا شيء من السجل)
+  const sent = []; let askOk = false;
+  await page.route('**/api/anime-ask', r => { sent.push(JSON.parse(r.request().postData() || '{}')); return askOk ? r.fulfill({ status: 200, contentType: 'application/json', body: '{"state":"asked"}' }) : r.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"password"}' }); });
+  const trBox = what => page.evaluate(w => { const b = document.querySelector(`#sheet .tr[data-what="${w}"]`); return b ? { btn: b.querySelector('[data-act=tr-ask]')?.textContent.trim() || '', field: !!b.querySelector('.tr-pass'), msg: b.querySelector('.msg')?.textContent || '', ok: b.querySelector('.tr-ok')?.textContent.trim() || '' } : null; }, what);
+  check('نبذة لم تُترجم: زر «ترجمها لي» تحتها', (await trBox('about'))?.btn === 'ترجمها لي' && !(await trBox('about')).field, await trBox('about'));
+  await tap('#sheet .tr[data-what=about] [data-act=tr-ask]');
+  check('لا كلمة سر محفوظة: يظهر حقلها ولا يُرسل شيء', (await trBox('about')).field && !sent.length && await page.evaluate(() => document.activeElement?.classList.contains('tr-pass')), [await trBox('about'), sent]);
+  await tap('#sheet .tr[data-what=about] [data-act=tr-ask]');
+  check('الحقل فارغ: تنبيه ولا إرسال', /اكتب كلمة السر أولاً/.test((await trBox('about')).msg) && !sent.length);
+  await page.fill('#sheet .tr-pass', 'wrong'); await tap('#sheet .tr[data-what=about] [data-act=tr-ask]'); await page.waitForFunction(() => /غير صحيحة/.test(document.querySelector('#sheet .tr .msg')?.textContent || ''));
+  check('كلمة سر خاطئة: رسالة، والحقل يُفرَّغ، ولا تُحفظ', sent.length === 1 && await page.inputValue('#sheet .tr-pass') === '' && await page.evaluate(() => !localStorage.getItem('animeg.pass') && !localStorage.getItem('animeg.asked')), sent);
+  askOk = true; await page.fill('#sheet .tr-pass', 'open-sesame'); await page.press('#sheet .tr-pass', 'Enter'); await page.waitForSelector('#sheet .tr[data-what=about] .tr-ok');
+  check('الطلب يصل: رقم العمل واسمه ونوع الطلب وكلمة السر لا غير، وتظهر «وصل طلب ترجمة نبذته»، وتُحفظ كلمة السر', JSON.stringify(sent[1]) === JSON.stringify({ password: 'open-sesame', mal: 52701, what: 'about', title: 'Dungeon Meshi' })
+    && /وصل طلب ترجمة نبذته وهو ينتظر/.test((await trBox('about')).ok) && !(await trBox('about')).btn && await page.evaluate(() => localStorage.getItem('animeg.pass') === 'open-sesame' && Object.keys(JSON.parse(localStorage.getItem('animeg.asked'))).join() === '52701:about'), [sent[1], await trBox('about')]);
   await snap('4-sheet'); await overflow('بطاقة العمل');
   await tap('#sheet [data-act=score][data-r="9"]');
   check('التقييم يُحفظ ويظهر ختماً على السِل', (await log())[52701].r === 9 && await page.getAttribute('#sheet [data-act=score][data-r="9"]', 'aria-pressed') === 'true' && await page.textContent('#grid .cel[data-id="52701"] .stamp') === '9');
@@ -121,6 +135,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' });
   check('الرجوع يغلق البطاقة ويعيد العنوان', await page.evaluate(() => !document.querySelector('#sheet').open && location.hash === ''));
   await page.goto('about:blank'); await page.goto(base + '/anime/#a11061'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => !!document.querySelector('#sheet-body .ov:not(.en)'));
+  check('نبذة مترجمة: لا زر طلب', await page.evaluate(() => !document.querySelector('#sheet .tr[data-what=about]')));
   check('رابط مباشر يفتح العمل بنبذته العربية وسلسلته', await page.evaluate(() => /Gon Freecss/.test(document.querySelector('#sheet-body .ov').textContent) && /من سلسلة Hunter x Hunter/.test(document.querySelector('#sheet-body').textContent) && /العمل 3 من 4/.test(document.querySelector('#sheet-body').textContent)
     && document.querySelectorAll('#sheet .strip button').length === 4 && document.querySelector('#sheet .strip [aria-current=true]').getAttribute('aria-label') === 'Hunter x Hunter (2011)'));
   check('السجل محفوظ بعد إعادة التحميل', (await log())[37989].p === 11 && (await lists())[0] === 'أشاهده الآن 2');
@@ -182,9 +197,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check('حلقة بلا ملخص ولا صورة في المصدر يُقال عنها ذلك', await page.evaluate(() => { const d = document.querySelector('#xs .xr[data-n="396"] .xd'); return !!d && d.classList.contains('bare') && !d.querySelector('img') && /لا ملخص لهذه الحلقة في المصدر/.test(d.textContent); }));
     await snap('8-episodes'); await overflow('ورقة التوقيت');
     check('خانة الحلقة هدف لمس كافٍ', await page.evaluate(() => [...document.querySelectorAll('#xs .xk')].every(b => { const r = b.getBoundingClientRect(); return r.width >= 44 && r.height >= 44; })));
+    check('حلقات لم تُترجم كلها: زر «ترجم لي حلقاته» تحت الورقة', (await trBox('eps'))?.btn === 'ترجم لي حلقاته', await trBox('eps'));
+    await tap('#sheet .tr[data-what=eps] [data-act=tr-ask]'); await page.waitForSelector('#sheet .tr[data-what=eps] .tr-ok');
+    check('كلمة السر محفوظة: يُرسل طلب الحلقات مباشرة باسم العمل ونوعه، ولا شيء عن موضع المشاهدة', JSON.stringify(sent.at(-1)) === JSON.stringify({ password: 'open-sesame', mal: 1735, what: 'eps', title: 'Naruto: Shippuuden' }) && /وصل طلب ترجمة حلقاته وهو ينتظر/.test((await trBox('eps')).ok), sent.at(-1));
     await tap('#xs .xr[data-n="394"] .xk');
     check('تعليم الحلقة التالية من خانتها: يتقدم العدّ، وتنتقل الورقة إلى ما بعدها، ومعه «تراجع»', (await rec(1735)).p === 394 && await xr() === '394✓ 395› 396 397 398' && /شاهدت الحلقة 394 من Naruto: Shippuuden/.test(await toastText()) && /394 من 500/.test(await page.textContent('#sheet .mine .tc span')), [await rec(1735), await xr(), await toastText()]);
     await undo(); check('والتراجع يعيد الورقة والعدّ', (await rec(1735)).p === 393 && await xr() === '393✓ 394› 395 396 397', await xr());
+    check('الطلب المسجَّل يبقى ظاهراً بعد إعادة رسم الورقة', /وصل طلب ترجمة حلقاته/.test((await trBox('eps'))?.ok || ''), await trBox('eps'));
     await tap('#xs .xr[data-n="396"] .xk');
     check('القفز إلى حلقة أبعد يعلّم ما بينهما', (await rec(1735)).p === 396 && await xr() === '396✓ 397› 398 399 400' && /الحلقات 396 من 500/.test(await toastText()), [await rec(1735), await xr()]);
     await undo();

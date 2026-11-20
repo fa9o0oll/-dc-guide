@@ -271,6 +271,12 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
 .sum b{font-family:var(--display);font-weight:700;font-size:1.3rem}
 .sum span{font-size:.78rem;color:var(--dim)}
 .msg{font-size:.88rem;color:var(--amber)}
+/* «ترجمها لي»: زر الطلب تحت النبذة الإنجليزية وتحت ورقة الحلقات، وحقل كلمة السر حين لا تكون محفوظة، وشريط «وصل الطلب» */
+.tr{display:grid;justify-items:start;gap:8px;margin-top:12px}.tr .btn .ic{width:18px;height:18px}
+.pass-wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;width:min(100%,320px);font-size:.88rem;color:var(--dim)}
+.pass-wrap input{width:100%;min-width:0;height:48px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:1rem}
+.tr-ok{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:10px;background:color-mix(in srgb,var(--ok) 10%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 35%,transparent);font-size:.9rem;line-height:1.7}
+.tr-ok .ic{flex:none;width:18px;height:18px;margin-top:4px;color:var(--ok)}
 .msg.ok{color:var(--ok)}
 .acts{display:flex;flex-wrap:wrap;gap:10px}
 .toast{position:fixed;inset-inline:0;bottom:max(18px,env(safe-area-inset-bottom));z-index:200;margin:auto;width:max-content;max-width:calc(100vw - 28px);padding:10px 18px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:600;font-size:.92rem;text-align:center;opacity:0;translate:0 12px;transition:opacity .25s ease,translate .25s ease;pointer-events:none}
