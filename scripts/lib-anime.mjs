@@ -112,7 +112,8 @@ const gap = (a, b) => Math.round((Date.parse(a) - Date.parse(b)) / 864e5), exact
 // القواعد بترتيبها، وكل واحدة وُضعت لحالة ظهرت في أول بناء حقيقي:
 //   'map'  موضع الخريطة، حين يوافق تاريخُ أوله بدايةَ العمل أو تاريخُ آخره نهايتَه (±3 أيام)؛ أو هو موسم كامل بعدد حلقات العمل تماماً ولا يبعد
 //          أوله عن بداية العمل أكثر من 75 يوماً (منصة تسبق التلفزيون: العدد شاهد كافٍ، وأقرب موسمين متتاليين بينهما 12 أسبوعاً)؛ أو المسلسل كله
-//          بعدد حلقات العمل ولا يبعد أكثر من 400 يوم (تأريخ عرض أجنبي؛ وما زاد فمسلسل آخر بالاسم نفسه)
+//          بعدد حلقات العمل ولا يبعد أكثر من 400 يوم (تأريخ عرض أجنبي؛ وما زاد فمسلسل آخر بالاسم نفسه)، ومسلسل طويل (30 حلقة فأكثر) كله
+//          بعدد حلقات العمل يُقبل مهما بعد تاريخه: لا يتفق عددٌ كهذا مصادفةً (Bobobo-bo Bo-bobo: 76 حلقة مؤرَّخة بعرضها الأمريكي بعد سنتين)
 //   'date' حلقة عُرضت يوم بدأ العمل وتنتهي حلقاته بعدها يوم انتهى: مواسم MyAnimeList التي يدمجها TMDB في موسم واحد، وخريطة تشير إلى غير موسمها
 //   'map'  ثم موضع الخريطة إن أزيح طرفاه إزاحة واحدة لا تزيد على أسبوعين (تسبق المنصةُ التلفزيونَ بأسبوع في موسم مدموج). وهذه بعد التي قبلها:
 //          إزاحة أسبوع هي نفسها خطأ حلقة واحدة في الخريطة، والحلقة التي توافق الطرفين معاً أولى
@@ -125,7 +126,7 @@ export function placeEpisodes(flat, { start = 0, eps = 0, from, to }) { const N 
   if (inside) { const se = flat[start].se, head = start === 0 || flat[start - 1].se !== se;
     if (within(a, 3) || within(b, 3)) return { at: start, how: 'map' };
     if (eps > 0 && head && !(a != null && Math.abs(a) > 75) && flat.filter(e => e.se === se).length === eps) return { at: start, how: 'map' };
-    if (start === 0 && N === eps && !(a != null && Math.abs(a) > 400)) return { at: start, how: 'map' }; }
+    if (start === 0 && N === eps && (eps >= 30 || !(a != null && Math.abs(a) > 400))) return { at: start, how: 'map' }; }
   const c = []; if (f) for (let i = 0; i < N; i++) if (within(A(i), 3)) c.push(i);
   const near = (x, y) => Math.abs(A(x)) - Math.abs(A(y)) || x - y, both = c.filter(i => within(B(i), 3)).sort(near);
   if (both.length) return { at: both[0], how: 'date' };

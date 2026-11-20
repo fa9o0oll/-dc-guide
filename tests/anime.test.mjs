@@ -168,7 +168,8 @@ const ahead = wk('2022-08-01', 12), three = [...Array.from({ length: 3 }, (_, i)
 check('موسم كامل بعدد حلقات العمل: يبقى موضع الخريطة ولو سبقت المنصةُ التلفزيونَ بأسبوع أو بثلاث حلقات أو بسبعة أسابيع', same(placeEpisodes(ahead, { start: 0, eps: 12, from: '2022-08-08', to: '2022-10-24' }), { at: 0, how: 'map' })
   && same(placeEpisodes(three, { start: 0, eps: 10, from: '2024-07-06', to: '2024-09-07' }), { at: 0, how: 'map' }) && same(placeEpisodes(wk('2021-08-14', 12), { start: 0, eps: 12, from: '2021-10-03', to: '2021-12-19' }), { at: 0, how: 'map' })
   && same(placeEpisodes(wk(null, 12), { start: 0, eps: 12, from: '2024-01-05' }), { at: 0, how: 'map' }) && same(placeEpisodes([...S1, ...S2], { start: 12, eps: 12, from: '2024-06-28', to: '2024-09-13' }), { at: 12, how: 'map' }));
-check('المسلسل كله بعدد حلقات العمل وتأريخه أجنبي: يُقبل', same(placeEpisodes(wk('2007-01-04', 5), { start: 0, eps: 5, from: '2007-05-03' }), { at: 0, how: 'map' }));
+check('المسلسل كله بعدد حلقات العمل وتأريخه أجنبي: يُقبل في حدود سنة، والطويل منه مهما بعد', same(placeEpisodes(wk('2007-01-04', 5), { start: 0, eps: 5, from: '2007-05-03' }), { at: 0, how: 'map' })
+  && same(placeEpisodes(wk('2005-10-01', 76), { start: 0, eps: 76, from: '2003-11-08', to: '2005-10-29' }), { at: 0, how: 'map' }) && placeEpisodes(wk('2005-10-01', 26), { start: 0, eps: 26, from: '2003-11-08' }) === null);
 check('موسم مدموج تسبق فيه المنصةُ التلفزيونَ بأسبوع: إزاحة الطرفين معاً تُبقي موضع الخريطة، لا الحلقة الثانية', same(placeEpisodes(merged, { start: 0, eps: 12, from: '2024-01-08', to: '2024-03-25' }), { at: 0, how: 'map' }));
 check('خريطة أخطأت بحلقة واحدة في موسم طويل: الحلقة التي توافق البداية والنهاية معاً تغلب إزاحة الأسبوع', same(placeEpisodes(run36, { start: 13, eps: 12, from: '2024-03-29', to: '2024-06-14' }), { at: 12, how: 'date' })
   && same(placeEpisodes(merged, { start: 13, eps: 12, from: '2024-07-01', to: '2024-09-16' }), { at: 12, how: 'date' }));

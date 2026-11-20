@@ -4,6 +4,8 @@
 // السجل الشخصي في المتصفح بالمفتاح animeg.progress: { v: 1, a: { رقم العمل في MyAnimeList: { s: القائمة, p: الحلقات, r: التقييم, b: البداية, e: النهاية } } }
 // ويُزامَن بين أجهزتك (site/sync.js). لا شيء منه في المستودع: يدخل باستيراد ملف تصدير MyAnimeList (site/anime-mal.js) أو بالربط بـSIMKL.
 // البيانات العامة (الأسماء والصور والعلاقات وأماكن العرض) تُبنى في scripts/build-anime.mjs من MyAnimeList وTMDB.
+// «ورقة التوقيت» في بطاقة العمل: حلقاته واحدة واحدة (data/eps/<رقم العمل>.json، يبنيها scripts/build-anime-episodes.mjs)، تبدأ من الحلقة التالية،
+// وخانة كل حلقة تُعلَّم منها فيتحدّث التقدّم نفسه: الخانة التي تضغطها تصير آخر ما شاهدته.
 import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
@@ -49,7 +51,7 @@ const SPRITE = `<svg hidden aria-hidden="true"><defs>
 <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" stroke-width="1.6" d="M8.5 6v12l10-6z"/></symbol><symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
 <symbol id="i-drop" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><path d="M6.8 6.8l10.4 10.4"/></symbol><symbol id="i-mark" viewBox="0 0 24 24"><path d="M7 4.5h10v15l-5-3.5-5 3.5z"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5L20 20"/></symbol>
-<symbol id="i-in" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></symbol><symbol id="i-ext" viewBox="0 0 24 24"><path d="M8 16l8-8M9.5 8H16v6.5"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M6.5 9.5l5.5 5.5 5.5-5.5"/></symbol><symbol id="i-in" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></symbol><symbol id="i-ext" viewBox="0 0 24 24"><path d="M8 16l8-8M9.5 8H16v6.5"/></symbol>
 </defs></svg>`;
 
 // ---------- السجل الشخصي
@@ -65,7 +67,7 @@ const hasLog = () => { for (const _ in P.a) return true; return false; };
 load();
 
 // ---------- البيانات
-const D = { list: [], by: new Map(), worlds: [], wby: new Map(), prov: {}, genres: [], base: 'https://image.tmdb.org/t/p/', mal: 'https://cdn.myanimelist.net/images/anime/', texts: new Map(), found: null };
+const D = { list: [], by: new Map(), worlds: [], wby: new Map(), prov: {}, genres: [], base: 'https://image.tmdb.org/t/p/', mal: 'https://cdn.myanimelist.net/images/anime/', texts: new Map(), found: null, eps: {}, epc: new Map() };
 const ui = { list: 'watching', view: 'list', q: '', sort: 'mal', type: '', shown: 60, names: 'romaji' };
 try { const u = JSON.parse(store.get(UI) || '{}'); for (const k of ['list', 'sort', 'names']) if (typeof u[k] === 'string') ui[k] = u[k]; } catch {}
 const keep = () => store.set(UI, JSON.stringify({ list: ui.list, sort: ui.sort, names: ui.names }));
@@ -174,7 +176,7 @@ function commit(id, before, say) { const m = P.a[id]; if (m) { if (!m.p) delete 
 // ما تغيّر مكانه (دخل قائمة أو خرج منها) يُعاد رسم الصفحة له، وما تغيّر تقدّمه فقط يُحدَّث سِله في مكانه
 function redraw(id, moved) { const a = D.by.get(id); if (moved) renderAll(true); else { renderLists(); $('#tally').innerHTML = tallyHTML();
     for (const c of $$(`.cel[data-id="${id}"]`)) { const rail = !!c.closest('.rail'), t = document.createElement('template'); t.innerHTML = celHTML(a, rail ? 'rail' : 'grid', +c.style.getPropertyValue('--i') || 0); const n = t.content.firstElementChild; n.style.animation = 'none'; c.replaceWith(n); } }
-  if (open === id) { const box = $('#sheet-body .mine'); if (box) box.outerHTML = mineHTML(a); }
+  if (open === id) { const box = $('#sheet-body .mine'); if (box) box.outerHTML = mineHTML(a); drawXs(a); }
   if (wopen && D.wby.get(wopen)?.ids.includes(id)) { const o = $('#wsheet-body .order'); if (o) o.innerHTML = orderHTML(D.wby.get(wopen)); } }
 function bump(id, d) { const a = D.by.get(id), before = me(id) ? { ...me(id) } : null, p0 = before?.p || 0, p = Math.max(0, a.eps ? Math.min(a.eps, p0 + d) : p0 + d); if (p === p0) return;
   const m = P.a[id] ||= {}; m.p = p; let say = d > 0 ? `شاهدت الحلقة ${num(p)} من ${ltr(a.t)}` : '';
@@ -222,13 +224,60 @@ function sheetHTML(a, x) { const big = a.tp ? `${D.base}w780${a.tp}` : poster(a,
     <div><h2>${esc(title(a))}</h2>${alt.map(t => `<p class="alt">${esc(t)}</p>`).join('')}
       <div class="facts">${facts.map(f => `<span>${f[0]}</span>`).join('')}${a.sc ? `<span class="mal">${ltr('MyAnimeList')} <b>${a.sc.toFixed(2)}</b>${a.sv ? ` · ${num(a.sv)} تقييماً` : ''}</span>` : ''}</div></div></div>
     ${mineHTML(a)}
+    ${D.eps[a.id] ? `<section class="sec xs" id="xs" aria-busy="true"><h3>الحلقات</h3><p class="lbl">تُحمَّل الحلقات…</p></section>` : ''}
     ${a.pending ? '<p class="lbl">معلومات هذا العمل تُجلب في البناء القادم.</p>' : x?.ar ? `<section class="sec"><h3>القصة</h3><p class="ov">${esc(x.ar)}</p></section>` : x?.en ? `<section class="sec"><h3>القصة</h3><span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')} (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(x.en)}</p></section>` : ''}
     ${(a.g || []).length ? `<div class="facts">${a.g.map(i => `<span>${genreOf(D.genres[i])}</span>`).join('')}</div>` : ''}
     ${whereHTML(a)}${worldStrip(a)}
     <section class="sec"><h3>صفحاته</h3><div class="links">${links.map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}${ic('ext')}</a>`).join('')}</div></section></div>`; }
-async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; const d = $('#sheet'), body = $('#sheet-body'); body.innerHTML = sheetHTML(a, null); body.scrollTop = 0;
+async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; const d = $('#sheet'), body = $('#sheet-body'); body.innerHTML = sheetHTML(a, null); body.scrollTop = 0; showEps(a);
   if (!d.open) { d.showModal(); if (push) history.pushState({ a: id }, '', `#a${id}`); } else history.replaceState({ a: id }, '', `#a${id}`);
-  const x = await texts(id); if (open === id && x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; } }
+  const x = await texts(id); if (open === id && x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; showEps(a); } }
+
+// ---------- ورقة التوقيت: حلقات العمل. تفتح على الحلقة التالية وما حولها، و«كل الحلقات» تفتح الورقة كلها صفحةً صفحة.
+// fit من البناء: 'odd' عدد الحلقات هنا أقل بقليل من عدد MyAnimeList (تنبيه)، و'loose' المصدر يعدّها عدّاً آخر، فلا يقابل رقمُ الخانة رقمَ الحلقة
+// في سجله: تُعرض للقراءة بلا تعليم، ويبقى تقدّمه من عدّاد البطاقة
+const X = { id: 0, list: null, tv: 0, fit: '', all: false, from: 1, open: 0, ask: 0, wave: null };
+const pageOf = n => n <= 60 ? n : n <= 300 ? 25 : 50;
+// ما لم يُعرض بعد: بتاريخه إن عُرف، وإلا فما بعد آخر حلقة عُرضت في عمل ما زال يُعرض
+const lastAired = L => { let k = 0; for (const e of L) if (e.d && e.d <= today) k = e.n; return k; };
+function xsHTML(a) { const L = X.list, tot = L.length, ro = X.fit === 'loose', p = ro ? 0 : Math.min(me(a.id)?.p || 0, tot), next = !ro && p < tot ? p + 1 : 0, size = pageOf(tot), aired = a.st === 'airing' ? lastAired(L) : tot;
+  const fut = e => e.d ? e.d > today : e.n > aired;
+  let rows; if (X.all) rows = L.slice(X.from - 1, X.from - 1 + size); else { const s = ro ? 1 : Math.max(1, Math.min(next || tot, tot) - 1); rows = L.slice(s - 1, s + 4); if (rows.length < 5) rows = L.slice(Math.max(0, tot - 5)); }
+  const wave = X.wave; X.wave = null;
+  const row = e => { const done = e.n <= p, nx = e.n === next, f = fut(e), on = X.open === e.n, k = wave && e.n >= wave[0] && e.n <= wave[1] ? Math.abs(e.n - wave[2]) : -1;
+    const when = !e.d ? (f ? 'لم يُحدَّد موعدها' : '') : f ? `${daysTo(e.d) <= 0 ? 'تُعرض اليوم' : daysTo(e.d) === 1 ? 'تُعرض غداً' : 'تُعرض بعد ' + nDays(daysTo(e.d))}، ${dateAr(e.d)}` : dateAr(e.d);
+    const ov = e.oa ? `<p class="ov">${esc(e.oa)}</p>` : e.ov ? `<span class="lbl">الملخص بالإنجليزية (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(e.ov)}</p>` : '<p class="lbl">لا ملخص لهذه الحلقة في المصدر.</p>';
+    return `<li class="xr${done ? ' done' : ''}${nx ? ' upnext' : ''}${f ? ' fut' : ''}${k >= 0 ? ' wave' : ''}" data-n="${e.n}"${k >= 0 ? ` style="--k:${Math.min(k, 14)}"` : ''}>
+      <span class="xn"${e.n > 999 ? ' data-w="4"' : ''}>${e.n}</span>
+      <button class="xb" data-act="ep-open" data-n="${e.n}" aria-expanded="${on}"><span class="xw"><span class="xt">${e.ta ? esc(e.ta) : e.t ? ltr(e.t) : `الحلقة ${num(e.n)}`}</span>${e.ta && e.t ? `<span class="xe">${esc(e.t)}</span>` : ''}
+        <span class="xm">${[nx ? '<b>التالية</b>' : '', when && `<span>${when}</span>`, e.r ? `<span>${e.r} د</span>` : '', e.ra ? `<bdi dir="ltr">★ ${e.ra.toFixed(1)}</bdi>` : ''].filter(Boolean).join(' · ')}</span></span>
+        ${e.st && !on ? `<img class="xi" loading="lazy" decoding="async" alt="" src="${D.base}w300${e.st}">` : ''}${ic('down')}</button>
+      ${ro ? '' : f ? '<span></span>' : `<button class="xk" data-act="ep-tick" data-id="${a.id}" data-n="${e.n}" aria-pressed="${done}" aria-label="${done ? `الحلقة ${e.n}: شاهدتها. اضغط لتجعلها آخر ما شاهدت` : `شاهدت حتى الحلقة ${e.n}`}">${ic('check')}</button>`}
+      ${X.ask === e.n ? `<div class="xask" role="group" aria-label="تأكيد"><p>ترجع إلى الحلقة ${num(e.n)}؟ يُلغى تعليم ${nEps(p - e.n)} بعدها.</p><div class="acts"><button class="btn pri" data-act="ep-back" data-id="${a.id}" data-n="${e.n}">نعم، ارجع إليها</button><button class="btn ghost" data-act="ep-keep">لا، أبقِها</button></div></div>` : ''}
+      ${on ? `<div class="xd${e.st ? '' : ' bare'}">${e.st ? `<img loading="lazy" decoding="async" alt="" src="${D.base}w300${e.st}" srcset="${D.base}w300${e.st} 300w, ${D.base}original${e.st} 1280w" sizes="(max-width:560px) 92vw, 260px">` : ''}
+        <div>${ov}<p class="lbl"><a href="https://www.themoviedb.org/tv/${X.tv}/season/${e.se}/episode/${e.ep}" target="_blank" rel="noopener">صفحة الحلقة في ${ltr('TMDB')}</a></p></div></div>` : ''}</li>`; };
+  const pages = X.all && tot > size ? `<div class="xpages" role="group" aria-label="صفحات الحلقات">${Array.from({ length: Math.ceil(tot / size) }, (_, i) => { const f = i * size + 1, t = Math.min(tot, f + size - 1); return `<button data-act="ep-page" data-from="${f}" aria-pressed="${X.from === f}">${f}–${t}</button>`; }).join('')}</div>` : '';
+  const count = !a.eps || tot === a.eps ? nEps(tot) : X.fit ? `${nEps(tot)} هنا، و${num(a.eps)} في ${ltr('MyAnimeList')}` : tot < a.eps ? `${nEps(tot)} من ${num(a.eps)}` : nEps(tot);
+  const note = ro ? `عناوين الحلقات وملخصاتها وصورها من ${ltr('TMDB')}، وهو يعدّ حلقات هذا العمل عدّاً غير عدّ ${ltr('MyAnimeList')}، فلا يقابل رقمُ الحلقة هنا رقمَها في سجلك. الحلقات هنا للقراءة، وتقدّمك يُعلَّم من العدّاد أعلاه.`
+    : `عناوين الحلقات وملخصاتها وصورها من ${ltr('TMDB')}. الخانة التي تضغطها تصير آخر ما شاهدت.${X.fit === 'odd' ? ` ما زاد في ${ltr('MyAnimeList')} حلقات خاصة أو ملخصات ليست في مواسم المصدر، فقد يختلف رقم الحلقة هنا عن رقمها هناك قليلاً.` : ''}`;
+  return `<section class="sec xs" id="xs"><h3>الحلقات<small>${count}${p ? ` · شاهدت ${num(p)}` : ''}</small></h3>
+    ${pages}<ol class="xsheet${ro ? ' ro' : ''}">${rows.map(row).join('')}</ol>
+    <div class="acts">${X.all ? `<button class="btn quiet" data-act="ep-less">${ro ? 'أول الحلقات فقط' : next ? 'الحلقة التالية وما حولها فقط' : 'آخر الحلقات فقط'}</button>` : tot > rows.length ? `<button class="btn ghost" data-act="ep-all">كل الحلقات (${num(tot)})</button>` : ''}</div>
+    <p class="lbl">${note}</p></section>`; }
+const drawXs = a => { const b = $('#xs'); if (!b || X.id !== a.id || !X.list) return; b.outerHTML = xsHTML(a);
+  const on = $('#xs .xpages [aria-pressed=true]'), bar = on?.parentNode; if (on) bar.scrollLeft += on.getBoundingClientRect().left + on.offsetWidth / 2 - (bar.getBoundingClientRect().left + bar.clientWidth / 2); };   // صفحة الحلقات الحالية في وسط شريطها
+function showEps(a) { if (!$('#xs')) return; if (X.id === a.id && X.list) return drawXs(a);
+  X.id = a.id; X.list = null; X.fit = ''; X.all = false; X.open = X.ask = 0; X.wave = null;
+  const got = j => { if (X.id !== a.id) return; X.list = j.eps || []; X.tv = j.tv; X.fit = j.fit || ''; if (open === a.id) drawXs(a); };
+  if (D.epc.has(a.id)) return got(D.epc.get(a.id));
+  get(`eps/${a.id}.json`).then(j => { D.epc.set(a.id, j); if (D.epc.size > 24) D.epc.delete(D.epc.keys().next().value); got(j); })
+    .catch(() => { if (X.id !== a.id) return; X.id = 0; const b = $('#xs'); if (b) { b.removeAttribute('aria-busy'); b.innerHTML = '<h3>الحلقات</h3><p class="lbl">تعذّر تحميل الحلقات. أغلق البطاقة وافتحها من جديد.</p>'; } }); }
+// الخانة التي تُضغط تصير آخر ما شوهد: التالية تُعلَّم كزر «+» (بتاريخ البداية والإكمال)، والقفز إلى الأمام يعلّم ما بينهما، وآخر ما شوهد يُلغى،
+// والرجوع إلى حلقة قديمة يُسأل عنه قبل أن يُلغى ما بعدها
+function tickEp(id, n) { const a = D.by.get(id), p = me(id)?.p || 0; X.ask = 0;
+  if (n === p) { X.wave = [n, n, n]; setProgress(id, n - 1); } else if (n === p + 1) { X.wave = [n, n, n]; bump(id, 1); }
+  else if (n > p) { X.wave = [p + 1, n, p + 1]; setProgress(id, n); } else if (p - n <= 3) { X.wave = [n + 1, p, p]; setProgress(id, n); }
+  else { X.ask = n; drawXs(a); } }
 
 // ---------- السلاسل
 const wArt = w => { const a = w.ids.map(id => D.by.get(id)).find(x => x?.bd); return a ? `${D.base}w780${a.bd}` : ''; };
@@ -316,6 +365,13 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'score': setScore(id, +d.r); break;
     case 'remove': removeEntry(id); break;
     case 'undo': { const f = undo; undo = null; $('#toast').classList.remove('on'); f?.(); break; }
+    case 'ep-tick': tickEp(id, +d.n); break;
+    case 'ep-back': { const n = +d.n; X.ask = 0; X.wave = [n + 1, me(id)?.p || n, me(id)?.p || n]; setProgress(id, n); break; }
+    case 'ep-keep': X.ask = 0; drawXs(D.by.get(open)); break;
+    case 'ep-open': X.open = X.open === +d.n ? 0 : +d.n; drawXs(D.by.get(open)); break;
+    case 'ep-all': { const a = D.by.get(open), tot = X.list.length, size = pageOf(tot), at = X.fit === 'loose' ? 1 : Math.min(tot, (me(open)?.p || 0) + 1); X.all = true; X.from = Math.floor((at - 1) / size) * size + 1; drawXs(a); break; }
+    case 'ep-less': X.all = false; drawXs(D.by.get(open)); $('#xs')?.scrollIntoView({ block: 'nearest' }); break;
+    case 'ep-page': X.from = +d.from; X.open = 0; drawXs(D.by.get(open)); $('#xs')?.scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' }); break;
     case 'list': ui.list = d.l; keep(); if (ui.view !== 'list') setView('list'); renderLists(); renderGrid(); if (t.closest('.rail')) $('.bar').scrollIntoView({ behavior: calm ? 'auto' : 'smooth' }); break;
     case 'view': setView(d.v); break;
     case 'world': openWorld(+d.w); break;
@@ -362,13 +418,13 @@ addEventListener('popstate', () => { const st = history.state || {}; if (!st.a &
 const liftVeil = () => { const v = $('#veil'); if (!v || v.hidden) return; requestAnimationFrame(() => requestAnimationFrame(() => { v.classList.add('lift'); setTimeout(() => v.remove(), calm ? 0 : 800); })); };
 function route() { const h = location.hash.slice(1); let m; if ((m = h.match(/^a(\d+)$/)) && D.by.has(+m[1])) openWork(+m[1], false); else if ((m = h.match(/^w(\d+)$/)) && D.wby.has(+m[1])) { setView('worlds'); openWorld(+m[1], false); } else if (h === 'worlds') setView('worlds'); else if (h === 'import') { history.replaceState(null, '', location.pathname); openImport(); } }
 try {
-  const cat = await get('catalog.json'); D.base = cat.imageBase || D.base; D.mal = cat.malImages || D.mal; D.prov = cat.providers || {}; D.genres = cat.genres || [];
+  const [cat, epi] = await Promise.all([get('catalog.json'), get('eps/index.json').catch(() => ({}))]); D.eps = epi || {}; D.base = cat.imageBase || D.base; D.mal = cat.malImages || D.mal; D.prov = cat.providers || {}; D.genres = cat.genres || [];
   D.list = cat.anime || []; for (const a of D.list) D.by.set(a.id, a);
   D.worlds = (cat.worlds || []).filter(w => w.ids.some(id => D.by.get(id)?.ord != null)); for (const w of D.worlds) D.wby.set(w.id, w);
   const types = [...new Set(D.list.filter(a => a.ord != null).map(a => a.type).filter(Boolean))]; $('#type').insertAdjacentHTML('beforeend', types.map(t => `<option value="${esc(t)}">${TYPE[t] || esc(t)}</option>`).join(''));
   $('#sort').value = ui.sort; $('#names').value = ui.names; if (!LNAME[ui.list] && ui.list !== 'all') ui.list = 'watching'; if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';
   renderAll(); liftVeil();
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }
-  initSync(id => { if (id !== 'anime') return; load(); renderAll(true); if (open) { const box = $('#sheet-body .mine'); if (box) box.outerHTML = mineHTML(D.by.get(open)); } });
+  initSync(id => { if (id !== 'anime') return; load(); renderAll(true); if (open) { const box = $('#sheet-body .mine'); if (box) box.outerHTML = mineHTML(D.by.get(open)); drawXs(D.by.get(open)); } });
   route();
 } catch (err) { $('#grid').innerHTML = '<p class="load">تعذّر تحميل القائمة. حدّث الصفحة.</p>'; liftVeil(); console.error(err); }

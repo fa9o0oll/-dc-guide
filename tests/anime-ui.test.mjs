@@ -5,19 +5,22 @@
 //   • بطاقة العمل: الحالة والحلقات والتقييم والتاريخان والإزالة، والنبذة العربية أو الإنجليزية، وأين يُعرض، وسلسلته؛ والرجوع يغلقها
 //   • البحث الحرفي والمتسامح («هل تقصد»)، والفرز، والنوع، والأسماء بالإنجليزية
 //   • السلاسل: مدخل دليل Fate أولاً، ونافذة السلسلة بترتيبها، وعمل ليس في القائمة يُضاف منها
+//   • ورقة التوقيت: حلقات العمل تبدأ من التالية، وملخصها العربي أو الإنجليزي المعلَّم، وتعليم الحلقة منها (التالية، والقفز، والرجوع بسؤال)، وصفحاتها، وما لم يُعرض
 //   • SIMKL: الربط بالرمز ثم السحب والمطابقة برقم MyAnimeList أو رقم SIMKL، والدمج «الأبعد تقدّماً يغلب»، و«تراجع عن آخر استيراد»
 //   • الكمبيوتر وشاشتا الفولد: بلا تمدد أفقي، وأهداف اللمس، وبلا أخطاء برمجية
 // NODE_PATH=$(npm root -g) node tests/anime-ui.test.mjs [مجلد اللقطات]
 import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright');
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
-import { catalog, texts, malGz, simklItems } from './fixtures/anime.mjs';
+import { catalog, texts, malGz, simklItems, epIndex, episodes } from './fixtures/anime.mjs';
 const siteDir = path.resolve(new URL('../site', import.meta.url).pathname), shots = process.argv[2];
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2' };
 const FX = catalog();
 const server = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]), J = o => { r.writeHead(200, { 'content-type': 'application/json' }); r.end(JSON.stringify(o)); };
   if (u === '/anime/data/catalog.json') return J(FX);
   const m = u.match(/^\/anime\/data\/texts\/(\d+)\.json$/); if (m) return J(Object.fromEntries(Object.entries(texts).filter(([id]) => id % 32 === +m[1])));
+  if (u === '/anime/data/eps/index.json') return J(epIndex());
+  const e = u.match(/^\/anime\/data\/eps\/(\d+)\.json$/); if (e) { const j = episodes(+e[1]); if (j) return J(j); r.writeHead(404); return r.end(); }
   let f = path.join(siteDir, u); if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
   fs.readFile(f, (e, b) => e ? (r.writeHead(404), r.end()) : (r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'text/plain' }), r.end(b))); }).listen(0);
 const base = `http://127.0.0.1:${server.address().port}`;
@@ -151,6 +154,64 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('سلسلة لها ترتيب قصة: تفتح عليه، وزر «ترتيب الصدور» يبدّله، وفيها مدخل دليل Fate', o1 === '22297,356' && o2 === '356,22297' && await page.getAttribute('#wsheet [data-o=release]', 'aria-pressed') === 'true' && await page.locator('#wsheet a.fate[href="../fate/"]').count() === 1, [o1, o2]);
   await page.goBack(); await page.waitForSelector('#wsheet', { state: 'hidden' });
   await tap('[data-act=view][data-v=list]');
+
+  // ---------- ورقة التوقيت: حلقات العمل في بطاقته
+  { const before = JSON.stringify(await log()), rec = async id => (await log())[id], xr = () => page.$$eval('#xs .xr', r => r.map(x => x.dataset.n + (x.classList.contains('done') ? '✓' : '') + (x.classList.contains('upnext') ? '›' : '') + (x.classList.contains('fut') ? '~' : '')).join(' '));
+    const undo = async () => { await tap('#toast [data-act=undo]'); await page.waitForTimeout(60); };
+    await tap('.rail .cel[data-id="1735"] [data-act=open]'); await page.waitForSelector('#sheet[open]'); await page.waitForSelector('#xs .xr');
+    check('ورقة التوقيت تفتح على الحلقة التالية وما حولها: آخر ما شوهد، ثم التالية، ثم ثلاث بعدها', await xr() === '393✓ 394› 395 396 397' && /500 حلقة · شاهدت 393/.test(await page.textContent('#xs h3')) && /كل الحلقات \(500\)/.test(await page.textContent('#xs [data-act=ep-all]')), await xr());
+    check('عنوان الحلقة المترجم بالعربية وتحته الأصل، وغير المترجم بحروفه، وما لا عنوان له برقمه', await page.evaluate(() => { const r = n => document.querySelector(`#xs .xr[data-n="${n}"]`);
+      return r(394).querySelector('.xt').textContent === 'اختبارات التشونين الجديدة' && r(394).querySelector('.xe').textContent === 'The New Chunin Exams' && /التالية/.test(r(394).querySelector('.xm').textContent) && /★ 8\.1/.test(r(394).querySelector('.xm').textContent)
+        && r(395).querySelector('.xt bdi').textContent === 'The Chunin Exams Begin!' && !r(395).querySelector('.xe') && r(396).querySelector('.xt').textContent === 'الحلقة 396' && /2014/.test(r(393).querySelector('.xm').textContent); }));
+    await tap('#xs .xr[data-n="394"] .xb');
+    check('فتح الحلقة يعرض صورتها وملخصها العربي ورابط صفحتها', await page.evaluate(() => { const d = document.querySelector('#xs .xr[data-n="394"] .xd'); return !!d && d.querySelector('.ov:not(.en)').textContent === 'يتذكر ناروتو الاختبارات التي أقيمت وهو غائب عن القرية.' && !/قيد الإعداد/.test(d.textContent)
+      && /\/w300\/still394\.jpg$/.test(d.querySelector('img').getAttribute('src')) && d.querySelector('a').href === 'https://www.themoviedb.org/tv/31910/season/16/episode/19' && document.querySelector('#xs .xr[data-n="394"] .xb').getAttribute('aria-expanded') === 'true'; }));
+    await tap('#xs .xr[data-n="395"] .xb');
+    check('ملخص لم يُترجم يُعرض بالإنجليزية معلَّماً، وفتح حلقة يطوي الأخرى', await page.evaluate(() => { const d = document.querySelector('#xs .xr[data-n="395"] .xd'); return !!d && /الملخص بالإنجليزية \(الترجمة العربية قيد الإعداد\)/.test(d.textContent) && !!d.querySelector('.ov.en') && document.querySelectorAll('#xs .xd').length === 1; }));
+    await tap('#xs .xr[data-n="396"] .xb');
+    check('حلقة بلا ملخص ولا صورة في المصدر يُقال عنها ذلك', await page.evaluate(() => { const d = document.querySelector('#xs .xr[data-n="396"] .xd'); return !!d && d.classList.contains('bare') && !d.querySelector('img') && /لا ملخص لهذه الحلقة في المصدر/.test(d.textContent); }));
+    await snap('8-episodes'); await overflow('ورقة التوقيت');
+    check('خانة الحلقة هدف لمس كافٍ', await page.evaluate(() => [...document.querySelectorAll('#xs .xk')].every(b => { const r = b.getBoundingClientRect(); return r.width >= 44 && r.height >= 44; })));
+    await tap('#xs .xr[data-n="394"] .xk');
+    check('تعليم الحلقة التالية من خانتها: يتقدم العدّ، وتنتقل الورقة إلى ما بعدها، ومعه «تراجع»', (await rec(1735)).p === 394 && await xr() === '394✓ 395› 396 397 398' && /شاهدت الحلقة 394 من Naruto: Shippuuden/.test(await toastText()) && /394 من 500/.test(await page.textContent('#sheet .mine .tc span')), [await rec(1735), await xr(), await toastText()]);
+    await undo(); check('والتراجع يعيد الورقة والعدّ', (await rec(1735)).p === 393 && await xr() === '393✓ 394› 395 396 397', await xr());
+    await tap('#xs .xr[data-n="396"] .xk');
+    check('القفز إلى حلقة أبعد يعلّم ما بينهما', (await rec(1735)).p === 396 && await xr() === '396✓ 397› 398 399 400' && /الحلقات 396 من 500/.test(await toastText()), [await rec(1735), await xr()]);
+    await undo();
+    await tap('#xs [data-act=ep-all]');
+    check('«كل الحلقات»: الورقة صفحات، تفتح على صفحة الحلقة التالية', await page.evaluate(() => { const r = [...document.querySelectorAll('#xs .xr')], t = [...document.querySelectorAll('#xs .xpages button')]; return r.length === 50 && r[0].dataset.n === '351' && r[49].dataset.n === '400' && t.length === 10
+      && t.filter(b => b.getAttribute('aria-pressed') === 'true').map(b => b.textContent).join() === '351–400' && document.querySelectorAll('#xs .xr.done').length === 43; }), await xr());
+    await tap('#xs .xr[data-n="393"] .xk');
+    check('خانة آخر ما شوهد تلغيه وحده', (await rec(1735)).p === 392 && /392 من 500/.test(await page.textContent('#sheet .mine .tc span')), await rec(1735)); await undo();
+    await tap('#xs .xpages [data-from="1"]'); await page.waitForFunction(() => document.querySelector('#xs .xr')?.dataset.n === '1');
+    await tap('#xs .xr[data-n="10"] .xk');
+    check('الرجوع إلى حلقة قديمة يُسأل عنه قبل أن يُلغى ما بعدها', (await rec(1735)).p === 393 && /ترجع إلى الحلقة 10؟ يُلغى تعليم 383 حلقة بعدها/.test(await page.textContent('#xs .xr[data-n="10"] .xask')));
+    await tap('#xs [data-act=ep-keep]'); check('«لا» تبقي كل شيء', (await rec(1735)).p === 393 && await page.locator('#xs .xask').count() === 0);
+    await tap('#xs .xr[data-n="10"] .xk'); await tap('#xs [data-act=ep-back]');
+    check('و«نعم» ترجع إليها، ومعها «تراجع»', (await rec(1735)).p === 10 && await page.locator('#xs .xr.done').count() === 10 && /الحلقات 10 من 500/.test(await toastText()), await rec(1735)); await undo();
+    await tap('#xs [data-act=ep-less]'); check('والعودة إلى الحلقة التالية وما حولها', await xr() === '393✓ 394› 395 396 397', await xr());
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    await tap('#lists [data-l=hold]'); await tap('#grid .cel[data-id="21"] [data-act=open]'); await page.waitForSelector('#xs .xr');
+    check('عمل لم يُعلن عدد حلقاته: حلقاته مما بُني، وما لم يُعرض بعد بموعده وبلا خانة', await xr() === '1155✓ 1156› 1157 1158~ 1159~' && /1,160 حلقة · شاهدت 1,155/.test(await page.textContent('#xs h3')) && await page.evaluate(() => { const r = n => document.querySelector(`#xs .xr[data-n="${n}"]`);
+      return !r(1158).querySelector('.xk') && /تُعرض بعد 3 أيام/.test(r(1158).textContent) && !!r(1157).querySelector('.xk') && r(1156).querySelector('.xn').dataset.w === '4'; }), await xr());
+    await tap('#xs [data-act=ep-all]'); check('والحلقة التي لا موعد لها بعد آخر ما عُرض لم تُعرض', await page.evaluate(() => { const r = document.querySelector('#xs .xr[data-n="1160"]'); return r.classList.contains('fut') && /لم يُحدَّد موعدها/.test(r.textContent) && document.querySelectorAll('#xs .xpages button').length === 24; }));
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    const head = () => page.$eval('#xs h3', h => h.textContent.replace(/\s+/g, ' ')), foot = () => page.$eval('#xs > .lbl', h => h.textContent);
+    await tap('#lists [data-l=completed]'); await tap('#grid .cel[data-id="5114"] [data-act=open]'); await page.waitForSelector('#xs .xr');
+    check('عدد الحلقات هنا أقل بقليل من عدد MyAnimeList: يُقال العددان وسببُ الفرق، والتعليم باقٍ', /62 حلقة هنا، و64 في MyAnimeList · شاهدت 62/.test(await head()) && await xr() === '58✓ 59✓ 60✓ 61✓ 62✓' && await page.locator('#xs .xk').count() === 5
+      && /حلقات خاصة أو ملخصات/.test(await foot()) && /الخانة التي تضغطها/.test(await foot()), [await head(), await xr(), await foot()]);
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    await tap('#lists [data-l=dropped]'); await tap('#grid .cel[data-id="356"] [data-act=open]'); await page.waitForSelector('#xs .xr');
+    check('المصدر يعدّ الحلقات عدّاً آخر: الورقة للقراءة من أولها، بلا خانات ولا علامات', await xr() === '1 2 3 4 5' && await page.locator('#xs .xk').count() === 0 && await page.locator('#xs .xsheet.ro').count() === 1 && /30 حلقة هنا، و24 في MyAnimeList$/.test((await head()).trim())
+      && /للقراءة/.test(await foot()) && /العدّاد أعلاه/.test(await foot()) && !/الخانة التي تضغطها/.test(await foot()), [await head(), await xr(), await foot()]);
+    await tap('#xs .xr[data-n="2"] .xb'); await tap('#xs [data-act=ep-all]');
+    check('وتُفتح حلقاتها وتُقرأ كلها', await page.locator('#xs .xr').count() === 30 && await page.locator('#xs .xr[data-n="2"] .xd .ov').count() === 1 && /أول الحلقات فقط/.test(await page.textContent('#xs [data-act=ep-less]')) && (await rec(356)).p === 3, await rec(356));
+    await snap('8-episodes-readonly'); await overflow('ورقة التوقيت للقراءة');
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    await tap('#lists [data-l=completed]'); await tap('#grid .cel[data-id="199"] [data-act=open]'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => !!document.querySelector('#sheet-body .where, #sheet-body .links'));
+    check('عمل بلا ملف حلقات (فيلم) بلا ورقة توقيت', await page.locator('#xs').count() === 0);
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await tap('#lists [data-l=watching]');
+    check('السجل بعد ورقة التوقيت كما كان قبلها', JSON.stringify(await log()) === before); }
 
   // ---------- SIMKL (على الكمبيوتر فقط: ينتظر ثواني الاستعلام)
   if (name === 'desktop') {

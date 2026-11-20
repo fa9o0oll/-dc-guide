@@ -47,3 +47,16 @@ export const simklItems = () => ({ anime: [
   { status: 'completed', watched_episodes_count: 3, total_episodes_count: 3, last_watched_at: MOVED, show: { title: 'Spirited Away', ids: { simkl: 55, mal: 199 } }, seasons: eps(3, MOVED) },
   { status: 'plantowatch', watched_episodes_count: 0, show: { title: 'Unknown Thing', ids: { simkl: 424242 } } },
 ] });
+// حلقات الأعمال كما يبنيها scripts/build-anime-episodes.mjs: ملف لكل عمل وفهرس. في Naruto: Shippuuden حلقة مترجمة (394)، وحلقة ملخصها بالإنجليزية (395)،
+// وحلقة بلا ملخص ولا صورة (396). وفي One Piece (عدد لم يُعلن) ثلاث حلقات لم تُعرض بعد، آخرها بلا موعد. وعملان لا يوافق عددُ حلقاتهما في المصدر
+// عددَ MyAnimeList: Fullmetal Alchemist: Brotherhood بفرق حلقتين (fit: odd)، وFate/stay night بعدّ آخر (fit: loose، للقراءة بلا تعليم)
+const wk = (from, i) => new Date(Date.parse(from) + i * 7 * 864e5).toISOString().slice(0, 10);
+export const epIndex = () => ({ 21: 1160, 356: 30, 1735: 500, 5114: 62, 37989: 12, 52701: 24 });
+export function episodes(id) { const mk = (n, from, tv, over = {}) => ({ id, tv, how: 'map', eps: Array.from({ length: n }, (_, i) => ({ n: i + 1, se: Math.floor(i / 25) + 1, ep: i % 25 + 1, t: `Chapter ${i + 1}`, d: wk(from, i), r: 23, ov: `What happens in chapter ${i + 1}.`, st: `/still${i + 1}.jpg`, ...(over[i + 1] || {}) })) });
+  if (id === 1735) { const j = mk(500, '2007-02-15', 31910, { 394: { t: 'The New Chunin Exams', ta: 'اختبارات التشونين الجديدة', ov: 'Naruto remembers the exams held while he was away.', oa: 'يتذكر ناروتو الاختبارات التي أقيمت وهو غائب عن القرية.', ra: 8.1 }, 395: { t: 'The Chunin Exams Begin!' } }); j.eps[395] = { n: 396, se: 16, ep: 21, d: wk('2007-02-15', 395) }; return j; }
+  if (id === 21) { const j = mk(1160, '1999-10-20', 37854); j.eps[1157].d = day(3); j.eps[1158].d = day(10); delete j.eps[1159].d; for (const e of j.eps.slice(0, 1157)) if (e.d > day(0)) e.d = day(-1); return j; }
+  if (id === 37989) return mk(12, '2018-10-08', 76757);
+  if (id === 52701) return mk(24, '2024-01-04', 207784);
+  if (id === 5114) return { ...mk(62, '2009-04-05', 31911), fit: 'odd' };
+  if (id === 356) return { ...mk(30, '2006-01-07', 45845), fit: 'loose' };
+  return null; }
