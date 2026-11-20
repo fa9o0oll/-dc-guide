@@ -2,7 +2,7 @@
 // الملف هنا مصنوع للاختبار (ليس قائمة أحد). تشغيل: node tests/anime.test.mjs
 import zlib from 'node:zlib';
 import { parseMal, readMalFile, malDate, STATUSES } from '../site/anime-mal.js';
-import { shapeMal, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS } from '../scripts/lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS } from '../scripts/lib-anime.mjs';
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -59,6 +59,23 @@ check('علاقات الأنمي فقط (لا المانغا)، والنبذة �
 check('سجل ناقص الحقول لا يكسر شيئاً', (() => { const x = shapeMal({ mal_id: 1, title: 'X', status: 'Not yet aired', aired: {}, duration: 'Unknown', rating: null }); return x.status === 'soon' && x.eps === 0 && x.dur === null && x.rating === null && x.img === null && same(x.rel, []) && x.year === null && x.synopsis === null; })());
 check('المدة بالدقائق، والتصنيف الإباحي يُعرف', minutes('1 hr 45 min') === 105 && minutes('24 min per ep') === 24 && minutes('2 hr') === 120 && minutes('30 sec per ep') === 1 && minutes('Unknown') === null && shapeMal({ ...jikan, rating: 'Rx - Hentai' }).rating === 'Rx' && shapeMal({ ...jikan, rating: 'R+ - Mild Nudity' }).rating === 'R+' && shapeMal({ ...jikan, rating: 'PG-13 - Teens 13 or older' }).rating === 'PG-13');
 check('صورة MAL من أي مقاس أو امتداد', malImage({ jpg: { image_url: 'https://cdn.myanimelist.net/images/anime/4/19644.jpg' } }) === '4/19644' && malImage({ jpg: { image_url: 'https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png' } }) === null && malImage(undefined) === null);
+
+// ---------- السجل نفسه من واجهة MyAnimeList الرسمية
+const api = { id: 38524, title: 'Shingeki no Kyojin Season 3 Part 2', main_picture: { medium: 'https://cdn.myanimelist.net/images/anime/1517/100633.jpg', large: 'https://cdn.myanimelist.net/images/anime/1517/100633l.jpg' },
+  alternative_titles: { synonyms: ['SnK 3 Part 2'], en: 'Attack on Titan Season 3 Part 2', ja: '進撃の巨人 Season3 Part.2' }, start_date: '2019-04-29', end_date: '2019-07-01', synopsis: 'Seeking to restore humanity\'s diminishing hope, the Survey Corps embark on a mission.\n\n[Written by MAL Rewrite]',
+  mean: 9.05, rank: 3, num_scoring_users: 1700000, nsfw: 'white', media_type: 'tv', status: 'finished_airing', genres: [{ id: 1, name: 'Action' }, { id: 8, name: 'Drama' }, { id: 58, name: 'Gore' }, { id: 27, name: 'Shounen' }], num_episodes: 10,
+  start_season: { year: 2019, season: 'spring' }, broadcast: { day_of_the_week: 'monday', start_time: '00:10' }, source: 'light_novel', average_episode_duration: 1435, rating: 'r',
+  related_anime: [{ node: { id: 35760, title: 'Shingeki no Kyojin Season 3' }, relation_type: 'prequel', relation_type_formatted: 'Prequel' }, { node: { id: 40028, title: 'Shingeki no Kyojin: The Final Season' }, relation_type: 'sequel', relation_type_formatted: 'Sequel' }, { node: { id: 1, title: 'X' }, relation_type: 'spin_off', relation_type_formatted: 'Spin-off' }],
+  studios: [{ id: 858, name: 'Wit Studio' }] };
+const a = shapeMalApi(api);
+check('سجل الواجهة الرسمية يُشكَّل بالشكل نفسه', a.title === s.title && a.en === s.en && a.jp === s.jp && a.type === 'TV' && a.eps === 10 && a.status === 'finished' && a.from === '2019-04-29' && a.to === '2019-07-01' && a.dur === 24 && a.rating === 'R' && a.nsfw === 0
+  && a.score === 9.05 && a.votes === 1700000 && a.rank === 3 && a.season === 'spring' && a.year === 2019 && a.day === 'Monday' && a.time === '00:10' && a.source === 'Light Novel' && a.img === '1517/100633' && same(a.studios, ['Wit Studio'])
+  && same(a.genres, ['Action', 'Drama', 'Gore', 'Shounen']) && a.synopsis === s.synopsis && same(a.syn, ['SnK 3 Part 2']) && same(Object.keys(a).filter(k => k !== 'nsfw').sort(), Object.keys(s).sort()), a);
+check('علاقاتها بأسماء Jikan نفسها (فتُبنى السلاسل من أي المصدرين)', same(a.rel.map(x => [x.r, x.id]), [['Prequel', 35760], ['Sequel', 40028], ['Spin-Off', 1]]) && a.rel.every(x => LINKS.has(x.r)));
+check('أنواعها وحالاتها وتصنيفاتها، والتاريخ الناقص، والمحتوى الإباحي', (() => { const x = shapeMalApi({ id: 2, title: 'Y', media_type: 'tv_special', status: 'not_yet_aired', start_date: '2027-04', rating: 'rx', nsfw: 'black', average_episode_duration: 20 });
+  const y = shapeMalApi({ id: 3, title: 'Z', media_type: 'movie', status: 'currently_airing', start_date: '1988', rating: 'pg_13', alternative_titles: { en: 'Z' } });
+  return x.type === 'TV Special' && x.status === 'soon' && x.from === '2027-04' && x.year === 2027 && x.rating === 'Rx' && x.nsfw === 1 && x.dur === 1 && y.type === 'Movie' && y.status === 'airing' && y.year === 1988 && y.rating === 'PG-13' && y.en === null && y.img === null; })());
+check('الحقول المطلوبة من الواجهة تشمل ما نقرؤه', ['related_anime', 'alternative_titles', 'start_season', 'average_episode_duration', 'num_scoring_users', 'nsfw', 'main_picture', 'studios', 'broadcast'].every(f => MAL_FIELDS.split(',').includes(f)));
 
 // ---------- مطابقة TMDB من خريطة Fribb
 check('موسم وإزاحة حلقات (الجزء الثاني من موسم)', same(pickTmdb({ type: 'TV', themoviedb_id: { tv: 1429 }, season: { tvdb: 3, tmdb: 3 }, episode_offset: { tvdb: 12, tmdb: 12 } }), { k: 'tv', id: 1429, s: 3, o: 12 }));

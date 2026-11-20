@@ -1,6 +1,7 @@
 // يبني بيانات «أنمياتي» في site/anime/data/ من data/anime/list.json (أرقام MyAnimeList بترتيب قائمة صاحب الموقع):
-//   1) معلومات كل عمل من MyAnimeList عبر Jikan (بلا مفتاح): الأسماء، النوع، الحلقات، الموسم والسنة، الاستوديو، التصنيفات، التقييم، النبذة،
-//      والعلاقات (جزء سابق، لاحق، قصة جانبية…) التي تُبنى منها السلاسل. Jikan يسمح بطلب واحد في الثانية، فلكل تشغيل حصة (ANIME_JIKAN_MAX)،
+//   1) معلومات كل عمل من MyAnimeList: الأسماء، النوع، الحلقات، الموسم والسنة، الاستوديو، التصنيفات، التقييم، النبذة، والعلاقات
+//      (جزء سابق، لاحق، قصة جانبية…) التي تُبنى منها السلاسل. المصدر واجهة MyAnimeList الرسمية بمفتاحها (MAL_CLIENT_ID)، وإن غاب المفتاح
+//      أو تعذّرت فـJikan بلا مفتاح (طلب في الثانية؛ ومن خوادم GitHub لم يكن يُوصل إليه يوم كُتب هذا). لكل تشغيل حصة (ANIME_MAL_MAX)،
 //      وما سُحب يُحفظ في data/generated/anime/mal/ فلا يُسحب ثانية إلا إذا قدُم: المعروض والقادم يومياً، والمنتهي كل 45 يوماً.
 //   2) مطابقة كل عمل بـTMDB من خريطة Fribb/anime-lists (رقم المسلسل والموسم وإزاحة الحلقات)، ومن TMDB: البوستر بدقته العالية والخلفية،
 //      والحلقة القادمة، وأين يُعرض رسمياً في السعودية (بيانات JustWatch) كما في بقية البوابات.
@@ -12,37 +13,39 @@ import net from 'node:net';
 net.setDefaultAutoSelectFamilyAttemptTimeout(5000);
 import { tmdb, hasKey } from './lib-tmdb.mjs';
 import { COUNTRY } from './lib-films.mjs';
-import { shapeMal, worldsOf, pickTmdb, LINKS } from './lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, worldsOf, pickTmdb, LINKS } from './lib-anime.mjs';
 
 const root = new URL('../', import.meta.url), SRC = new URL('data/anime/', root), OUT = new URL('site/anime/data/', root), GEN = new URL('data/generated/anime/', root), MAL = new URL('mal/', GEN);
 for (const d of [OUT, GEN, MAL, new URL('texts/', OUT)]) fs.mkdirSync(d, { recursive: true });
 const rd = (u, fb) => { try { return JSON.parse(fs.readFileSync(u, 'utf8')); } catch { return fb; } };
 const wr = (u, o) => fs.writeFileSync(u, JSON.stringify(o) + '\n');
 const TODAY = new Date().toISOString().slice(0, 10), daysAgo = d => Math.round((Date.parse(TODAY) - Date.parse(d)) / 864e5);
-const PROBE = !!process.env.ANIME_PROBE, MAX = +(process.env.ANIME_JIKAN_MAX || (PROBE ? 30 : 280)), RELATIVES_CAP = 4000;
-const report = { generatedAt: new Date().toISOString(), problems: [], jikan: { asked: 0, ok: 0, failed: 0, gone: 0 } };
+const PROBE = !!process.env.ANIME_PROBE, MAX = +(process.env.ANIME_MAL_MAX || (PROBE ? 40 : 600)), RELATIVES_CAP = 4000;
+const report = { generatedAt: new Date().toISOString(), problems: [], mal: { asked: 0, ok: 0, failed: 0, gone: 0, via: {} } };
 const list = rd(new URL('list.json', SRC), []), translations = rd(new URL('translations.json', SRC), {});
 if (!list.length) { console.error('data/anime/list.json فارغ'); process.exit(1); }
 
-// ---------- 1) MyAnimeList عبر Jikan
+// ---------- 1) MyAnimeList: الواجهة الرسمية ثم Jikan
 const cache = new Map();
 for (const f of fs.readdirSync(MAL)) if (f.endsWith('.json')) { const r = rd(new URL(f, MAL), null); if (r?.id) cache.set(r.id, r); }
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const UA = { 'User-Agent': 'watch-guide-build/1.0 (https://github.com/fa9o0oll/-dc-guide)' };
-let lastCall = 0, streak = 0;
-async function jikan(id) {
-  for (let attempt = 1; attempt <= 4; attempt++) {
-    const gap = 1100 - (Date.now() - lastCall); if (gap > 0) await wait(gap); lastCall = Date.now();
-    let res; try { res = await fetch(`https://api.jikan.moe/v4/anime/${id}/full`, { headers: UA, signal: AbortSignal.timeout(20000) }); }
-    catch (e) { if (attempt === 4) throw new Error(`network: ${e.cause?.code || e.name}`); await wait(1500 * attempt); continue; }
+const UA = { 'User-Agent': 'watch-guide-build/1.0 (https://github.com/fa9o0oll/-dc-guide)' }, CLIENT = (process.env.MAL_CLIENT_ID || '').trim();
+// مصدر واحد: طلب بمهلة وإعادة محاولة عند 429 و5xx وانقطاع الشبكة، وبين كل طلبين فاصل المصدر. يعيد السجل مشكَّلاً، أو null إن حُذف العمل (404)
+const source = (name, gapMs, url, headers, shape) => { let last = 0; return [name, async id => {
+  for (let attempt = 1; ; attempt++) {
+    const gap = gapMs - (Date.now() - last); if (gap > 0) await wait(gap); last = Date.now();
+    let res; try { res = await fetch(url(id), { headers: { ...UA, ...headers }, signal: AbortSignal.timeout(20000) }); }
+    catch (e) { if (attempt >= 3) throw new Error(`network: ${e.cause?.code || e.name}`); await wait(1500 * attempt); continue; }
     if (res.status === 404) return null;
-    if (res.status === 429 || res.status >= 500) { if (attempt === 4) throw new Error('Jikan ' + res.status); await wait(res.status === 429 ? (+res.headers.get('retry-after') || 4) * 1000 : 2000 * attempt); continue; }
-    if (!res.ok) throw new Error('Jikan ' + res.status);
-    const j = await res.json(); if (!j?.data?.mal_id) throw new Error('Jikan: رد بلا بيانات'); return j.data;
-  }
-}
+    if (res.status === 429 || res.status >= 500) { if (attempt >= 4) throw new Error(`${name} ${res.status}`); await wait(res.status === 429 ? Math.min(30, +res.headers.get('retry-after') || 5) * 1000 : 2000 * attempt); continue; }
+    if (!res.ok) throw new Error(`${name} ${res.status}`);
+    const j = await res.json(), d = shape(j); if (!d?.title) throw new Error(`${name}: رد بلا بيانات`); return d;
+  } }]; };
+const sources = [...(CLIENT ? [source('MAL API', 340, id => `https://api.myanimelist.net/v2/anime/${id}?fields=${MAL_FIELDS}`, { 'X-MAL-CLIENT-ID': CLIENT }, j => j?.id ? shapeMalApi(j) : null)] : []),
+  source('Jikan', 1100, id => `https://api.jikan.moe/v4/anime/${id}/full`, {}, j => j?.data?.mal_id ? shapeMal(j.data) : null)];
+const down = {};
 const inList = new Set(list.map(x => x.mal));
-const isAdult = r => r?.d?.rating === 'Rx' || (r?.d?.genres || []).includes('Hentai');
+const isAdult = r => r?.d?.rating === 'Rx' || r?.d?.nsfw === 1 || (r?.d?.genres || []).includes('Hentai');
 // أقرباء السلسلة: ما تشير إليه علاقات القصة من أعمال ليست في القائمة، حتى الإغلاق
 function relatives() { const seen = new Set(inList), out = [], queue = [...inList];
   while (queue.length && out.length < RELATIVES_CAP) { const r = cache.get(queue.shift()); if (!r?.d || isAdult(r)) continue;
@@ -50,17 +53,18 @@ function relatives() { const seen = new Set(inList), out = [], queue = [...inLis
   return out; }
 const stale = id => { const r = cache.get(id); if (!r) return 1e6; if (r.gone) return daysAgo(r.at) > 90 ? 1 : 0;
   const live = r.d.status !== 'finished' || (r.d.to && daysAgo(r.d.to) < 21); const age = daysAgo(r.at); return live ? (age >= 1 ? 1000 + age : 0) : age > 45 ? age : 0; };
-async function pull(ids, why) { for (const id of ids) { if (report.jikan.asked >= MAX || streak >= 8) return;
-    report.jikan.asked++;
-    try { const d = await jikan(id); streak = 0;
-      const rec = d ? { id, at: TODAY, d: shapeMal(d) } : { id, at: TODAY, gone: true }; if (!d) report.jikan.gone++; else report.jikan.ok++;
-      cache.set(id, rec); wr(new URL(id + '.json', MAL), rec); }
-    catch (e) { streak++; report.jikan.failed++; if (report.problems.length < 40) report.problems.push(`Jikan ${id} (${why}): ${e.message}`); } } }
+async function pull(ids, why) { for (const id of ids) { if (report.mal.asked >= MAX || sources.every(([n]) => down[n] >= 3)) return;
+    report.mal.asked++; let got, errs = [];
+    for (const [name, fn] of sources) { if (got !== undefined || down[name] >= 3) continue;
+      try { got = await fn(id); down[name] = 0; report.mal.via[name] = (report.mal.via[name] || 0) + 1; } catch (e) { errs.push(e.message); down[name] = (down[name] || 0) + 1; } }
+    if (got === undefined) { report.mal.failed++; if (report.problems.length < 40) report.problems.push(`MAL ${id} (${why}): ${errs.join(' | ')}`); continue; }
+    const rec = got ? { id, at: TODAY, d: got } : { id, at: TODAY, gone: true }; if (got) report.mal.ok++; else report.mal.gone++;
+    cache.set(id, rec); wr(new URL(id + '.json', MAL), rec); } }
 // الترتيب: ما لم يُسحب قط من القائمة، ثم أقرباء السلاسل الناقصون، ثم ما قدُم (المعروض والقادم أولاً)
 await pull(list.map(x => x.mal).filter(id => !cache.has(id)), 'جديد في القائمة');
 await pull(relatives().filter(id => !cache.has(id)), 'قريب في سلسلة');
 await pull([...cache.keys()].map(id => [id, stale(id)]).filter(x => x[1] > 0 && x[1] < 1e6).sort((a, b) => b[1] - a[1]).map(x => x[0]), 'تحديث');
-if (streak >= 8) report.problems.push('Jikan: توقف السحب بعد ثمانية إخفاقات متتالية، وتبقى البيانات السابقة');
+if (sources.every(([n]) => down[n] >= 3)) report.problems.push(`MyAnimeList: لا مصدر متاح الآن (${sources.map(x => x[0]).join('، ')})، وتبقى البيانات السابقة`);
 
 // ---------- الأعمال الداخلة: القائمة كلها (ولو لم تُسحب معلوماتها بعد) ثم أقرباء السلاسل المسحوبون. الإباحي يُستبعد
 const rel = relatives(), all = [...list.map(x => x.mal), ...rel.filter(id => cache.get(id)?.d)].filter(id => !isAdult(cache.get(id)) && !cache.get(id)?.gone);

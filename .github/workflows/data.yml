@@ -2,13 +2,17 @@ name: build-and-deploy
 on:
   push:
     branches: [main, 'claude/**']
-    paths: ['data/**', '!data/generated/**', 'scripts/**', 'site/**', '!site/*/data/**', '.github/workflows/data.yml']
+    # netlify/** و netlify.toml هنا لأن Netlify لا ينشر إلا إيداع روبوت البناء (انظر ignore في netlify.toml)، فكل ما يلزم نشره يمر من هذا البناء
+    paths: ['data/**', '!data/generated/**', 'scripts/**', 'site/**', '!site/*/data/**', '.github/workflows/data.yml', 'netlify/**', 'netlify.toml']
   schedule:
     - cron: '17 3 * * *'   # يومياً 06:17 بتوقيت الرياض
   workflow_dispatch:
     inputs:
       anime_max:
-        description: 'أنمياتي: كم عملاً يُسحب من MyAnimeList في هذا التشغيل (الافتراضي 280، وكل عمل يأخذ ثانية)'
+        description: 'أنمياتي: كم عملاً يُسحب من MyAnimeList في هذا التشغيل (الافتراضي 600، نحو ثلاثة في الثانية)'
+        required: false
+      quiet:
+        description: 'اكتب 1 ليُحفظ ما بُني بلا نشر على Netlify (سحب طويل على دفعات مثلاً). يُنشر مع أول إيداع عادي بعده'
         required: false
 permissions:
   contents: write
@@ -32,6 +36,14 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           MAL_CLIENT_ID: ${{ secrets.MAL_CLIENT_ID }}   # اختياري: مفتاح واجهة MyAnimeList الرسمية لتقييمات الأنمي
         run: node scripts/build-site-data.mjs && node scripts/build-site-data.mjs fate
+      - name: Build «أنمياتي» (MyAnimeList API, then Jikan; TMDB for posters and where to watch; keeps the previous data when a source is unreachable)
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          ANIME_PROBE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
+          MAL_CLIENT_ID: ${{ secrets.MAL_CLIENT_ID }}
+          ANIME_MAL_MAX: ${{ inputs.anime_max }}
+        run: node scripts/build-anime.mjs
+        continue-on-error: true
       - name: Build the films list (match in TMDB, details, where to watch, collections)
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
@@ -62,13 +74,6 @@ jobs:
           GAME_TITLES_FORCE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
           GAMES_PROBE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
         run: node scripts/build-game-titles.mjs
-        continue-on-error: true
-      - name: Build «أنمياتي» (MyAnimeList via Jikan + TMDB; keeps the previous data when a source is unreachable)
-        env:
-          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          ANIME_PROBE: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
-          ANIME_JIKAN_MAX: ${{ inputs.anime_max }}
-        run: node scripts/build-anime.mjs
         continue-on-error: true
       - name: Keep the worlds map and its audit report (work branches only)
         if: github.ref != 'refs/heads/main'
@@ -103,8 +108,11 @@ jobs:
         run: |
           git config user.name "dc-guide-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/generated site/dc/data site/fate/data site/films/data site/games/data site/anime/data
-          git diff --cached --quiet || git commit -m "data: daily refresh"
+          # ختم آخر إيداع ليس من الروبوت: به يتغيّر شيء مع كل تغيير في الكود ولو لم تتغيّر البيانات، فيتبعه إيداع الروبوت الذي ينشره Netlify.
+          # التحديث اليومي المجدول لا يغيّره، فلا نشر في يوم لم يتغيّر فيه شيء
+          if [ "$(git log -1 --pretty=%an)" != "dc-guide-bot" ]; then printf '{"commit":"%s"}\n' "$GITHUB_SHA" > site/build.json; fi
+          git add data/generated site/dc/data site/fate/data site/films/data site/games/data site/anime/data site/build.json
+          git diff --cached --quiet || git commit -m "data: daily refresh${{ inputs.quiet == '1' && ' [skip netlify]' || '' }}"
           # إن وصل إلى الفرع إيداع جديد أثناء البناء (ملف توثيق مثلاً) يُدمج قبل الدفع بدل أن يُرفض
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"

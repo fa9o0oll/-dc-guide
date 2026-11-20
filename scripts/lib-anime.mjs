@@ -26,6 +26,26 @@ export function shapeMal(d) {
     stream: (d.streaming || []).filter(s => s?.name && /^https:\/\//.test(s.url || '')).map(s => ({ name: s.name, url: s.url })) };
 }
 
+// سجل واجهة MyAnimeList الرسمية (/v2/anime/{id}) ← الشكل نفسه. الواجهة تجمع التصنيفات والثيمات والفئة في genres، ولا تعطي المقطع الدعائي ولا روابط البث
+const MEDIA = { tv: 'TV', ova: 'OVA', movie: 'Movie', special: 'Special', ona: 'ONA', music: 'Music', tv_special: 'TV Special', pv: 'PV', cm: 'CM' };
+const API_STATUS = { finished_airing: 'finished', currently_airing: 'airing', not_yet_aired: 'soon' }, API_RATING = { g: 'G', pg: 'PG', pg_13: 'PG-13', r: 'R', 'r+': 'R+', rx: 'Rx' };
+const REL = { sequel: 'Sequel', prequel: 'Prequel', alternative_setting: 'Alternative Setting', alternative_version: 'Alternative Version', side_story: 'Side Story', parent_story: 'Parent Story', summary: 'Summary', full_story: 'Full Story', spin_off: 'Spin-Off', character: 'Character', other: 'Other' };
+const words = s => String(s || '').split('_').map(w => w ? w[0].toUpperCase() + w.slice(1) : w).join(' ');
+export const MAL_FIELDS = 'id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,num_scoring_users,nsfw,media_type,status,genres,num_episodes,start_season,broadcast,source,average_episode_duration,rating,related_anime,studios';
+// تاريخ MyAnimeList قد يكون ناقصاً (سنة، أو سنة وشهر): يُحفظ كما هو
+const part = d => /^\d{4}(-\d{2}(-\d{2})?)?$/.test(d || '') ? d : null;
+export function shapeMalApi(d) {
+  const en = d.alternative_titles?.en || null, from = part(d.start_date);
+  return { title: d.title || '', en: en && en !== d.title ? en : null, jp: d.alternative_titles?.ja || null, syn: (d.alternative_titles?.synonyms || []).filter(Boolean).slice(0, 8),
+    type: MEDIA[d.media_type] || '', source: d.source && d.source !== 'other' ? words(d.source) : null, eps: d.num_episodes || 0, status: API_STATUS[d.status] || 'finished',
+    from, to: part(d.end_date), dur: d.average_episode_duration ? Math.max(1, Math.round(d.average_episode_duration / 60)) : null, rating: API_RATING[d.rating] || null, nsfw: d.nsfw === 'black' ? 1 : 0,
+    score: d.mean || null, votes: d.num_scoring_users || 0, rank: d.rank || null, season: d.start_season?.season || null, year: d.start_season?.year || (from ? +from.slice(0, 4) : null),
+    day: d.broadcast?.day_of_the_week ? words(d.broadcast.day_of_the_week) : null, time: d.broadcast?.start_time || null,
+    studios: names(d.studios), genres: names(d.genres), themes: [], demo: [], img: malImage({ jpg: { large_image_url: d.main_picture?.large, image_url: d.main_picture?.medium } }), trailer: null,
+    synopsis: (d.synopsis || '').replace(/\s*\[Written by MAL Rewrite\]\s*$/, '').replace(/\s*\(Source: [^)]*\)\s*$/, '').trim() || null,
+    rel: (d.related_anime || []).filter(x => x?.node?.id).map(x => ({ r: REL[x.relation_type] || x.relation_type_formatted || 'Other', id: x.node.id, name: x.node.title || '' })), stream: [] };
+}
+
 // مطابقة TMDB من سطر في خريطة Fribb: { k: 'tv'|'movie', id, s: الموسم, o: إزاحة الحلقات }. s غائب: العمل يمتد على مواسم المسلسل كلها
 export function pickTmdb(e) { const t = e?.themoviedb_id; if (!t) return null;
   if (typeof t === 'number') return { k: e.type === 'MOVIE' ? 'movie' : 'tv', id: t };
