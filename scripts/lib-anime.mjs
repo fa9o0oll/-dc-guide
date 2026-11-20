@@ -52,18 +52,50 @@ export function pickTmdb(e) { const t = e?.themoviedb_id; if (!t) return null;
   if (t.tv) { const s = e.season?.tmdb, o = e.episode_offset?.tmdb; return { k: 'tv', id: t.tv, ...(Number.isInteger(s) ? { s } : {}), ...(o > 0 ? { o } : {}) }; }
   const m = [].concat(t.movie || [])[0]; return m ? { k: 'movie', id: m } : null; }
 
-// السلاسل: مكوّنات مترابطة بعلاقات القصة بين أعمال الكتالوج. للسلسلة اسم أقدم مسلسلاتها (أو أقدم أعمالها)، ورقمها أصغر أرقام أعمالها.
-// items: [{ id, rel: [{r, id}], from, type, title, en, mine }]. تُعاد السلاسل التي فيها عملان فأكثر وفيها عمل من القائمة، وأعمالها بترتيب الصدور
+// السلاسل. items: [{ id, rel: [{r, id}], from, type, eps, title, en, mine }]. تُعاد السلاسل التي فيها عملان فأكثر وفيها عمل من القائمة.
+// الجمع على ثلاث مراحل حتى لا يدمج عملٌ مشترك بين سلسلتين (Fairy Tail x Rave) السلسلتين معاً:
+//   1) «الجزء السابق» و«اللاحق» يجمعان بلا شرط.  2) بقية علاقات القصة تجمع حين لا يكون أحد الطرفين عملاً صغيراً (غير مسلسل، بثلاث حلقات فأقل).
+//   3) العمل الصغير ينضم إلى السلسلة التي تربطه علاقاته بها؛ فإن ربطته بسلسلتين لا يجمعهما اسم مشترك فهو عمل مشترك بينهما: ينضم إلى التي يبدأ اسمه باسمها ولا يدمجهما.
+// لكل سلسلة ترتيبان: ids بترتيب الصدور، وstory بترتيب القصة (يُعاد فقط إن خالف ترتيب الصدور)، وهو ترتيب يحترم كل علاقة:
+// السابق قبل اللاحق، والقصة الأم قبل الجانبية والمتفرعة والملخص، وبين ما لا علاقة تقدّمه الأقدم صدوراً.
+const HARD = new Set(['Sequel', 'Prequel']), BEFORE = { Sequel: 1, 'Side Story': 1, 'Spin-Off': 1, Summary: 1 }, AFTER = { Prequel: 1, 'Parent Story': 1, 'Full Story': 1 };
+const norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const lcp = (a, b) => { a = norm(a); b = norm(b); let i = 0; while (i < a.length && i < b.length && a[i] === b[i]) i++; return i; };
 export function worldsOf(items) {
-  const by = new Map(items.map(x => [x.id, x])), parent = new Map(items.map(x => [x.id, x.id]));
+  const by = new Map(items.map(x => [x.id, x])), parent = new Map(items.map(x => [x.id, x.id])), when = x => x.from || '9999';
   const find = a => { while (parent.get(a) !== a) { parent.set(a, parent.get(parent.get(a))); a = parent.get(a); } return a; };
-  for (const x of items) for (const r of x.rel || []) if (LINKS.has(r.r) && by.has(r.id)) { const a = find(x.id), b = find(r.id); if (a !== b) parent.set(Math.max(a, b), Math.min(a, b)); }
+  const union = (a, b) => { a = find(a); b = find(b); if (a !== b) parent.set(Math.max(a, b), Math.min(a, b)); };
+  const small = x => x.type !== 'TV' && (x.eps || 1) <= 3, soft = new Map(items.map(x => [x.id, new Set()]));
+  for (const x of items) for (const r of x.rel || []) { if (!LINKS.has(r.r) || !by.has(r.id) || r.id === x.id) continue; if (HARD.has(r.r)) union(x.id, r.id); else { soft.get(x.id).add(r.id); soft.get(r.id).add(x.id); } }
+  for (const x of items) if (!small(x)) for (const y of soft.get(x.id)) if (!small(by.get(y))) union(x.id, y);
+  const members = root => items.filter(x => find(x.id) === root), headOf = g => g.slice().sort((a, b) => when(a) < when(b) ? -1 : when(a) > when(b) ? 1 : a.id - b.id).find(x => x.type === 'TV') || g[0];
+  for (const x of items.filter(small).sort((a, b) => a.id - b.id)) { const roots = [...new Set([...soft.get(x.id)].map(find))].filter(r => r !== find(x.id)); if (!roots.length) continue;
+    const heads = roots.map(r => headOf(members(r)).title), kin = heads.every(h => lcp(h, heads[0]) >= 6);
+    if (roots.length === 1 || kin) { for (const r of roots) union(x.id, r); continue; }
+    const best = roots.map((r, i) => [lcp(x.title, heads[i]), -i, r]).sort((a, b) => b[0] - a[0] || b[1] - a[1])[0]; union(x.id, best[2]); }
   const groups = new Map(); for (const x of items) { const k = find(x.id); (groups.get(k) || groups.set(k, []).get(k)).push(x); }
-  const when = x => x.from || '9999', out = [];
-  for (const g of groups.values()) { if (g.length < 2 || !g.some(x => x.mine)) continue;
-    g.sort((a, b) => when(a) < when(b) ? -1 : when(a) > when(b) ? 1 : a.id - b.id);
-    const head = g.find(x => x.type === 'TV') || g[0];
-    out.push({ id: Math.min(...g.map(x => x.id)), name: worldName(head.title), en: head.en ? worldName(head.en) : null, ids: g.map(x => x.id) }); }
+  const byDate = (a, b) => when(a) < when(b) ? -1 : when(a) > when(b) ? 1 : a.id - b.id, out = [];
+  for (const g of groups.values()) { if (g.length < 2 || !g.some(x => x.mine)) continue; g.sort(byDate);
+    const head = g.find(x => x.type === 'TV') || g[0], ids = g.map(x => x.id), story = storyOrder(g), stem = stemOf(g, head);
+    const named = stem || head;   // العمل الذي تحمل السلسلة اسمه: منه نبذتها في نافذتها
+    out.push({ id: Math.min(...ids), name: worldName(named.title), en: named.en ? worldName(named.en) : null, head: named.id, ids, ...(story.join() !== ids.join() ? { story } : {}) }); }
   return out.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' })); }
-// اسم السلسلة من اسم أقدم أعمالها بلا لاحقة الموسم أو النوع: «Gintama (TV)» ← Gintama، «Kingdom Season 1» ← Kingdom
-export const worldName = t => String(t || '').replace(/\s*\((?:TV|\d{4})\)\s*$/i, '').replace(/\s*(?::|-)?\s*(?:Season\s*\d+|\d+(?:st|nd|rd|th)\s+Season|Part\s*\d+|First Season)\s*$/i, '').trim() || String(t || '');
+// ترتيب القصة داخل سلسلة (g مرتبة بالصدور): كل عمل يأتي بعد كل ما تقول العلاقات إنه قبله، ومن بين المتاح يُقدَّم الأقدم صدوراً.
+// صفحات MyAnimeList تتناقض أحياناً (العمل «متفرع» من الثاني والثاني «متفرع» منه): بين عملين يغلب «السابق/اللاحق» على غيره، وعند التساوي يغلب ترتيب الصدور.
+// وما بقي من دوران أطول يُكسر عند أقدم أعماله صدوراً.
+function storyOrder(g) { const ids = new Set(g.map(x => x.id)), at = new Map(g.map((x, i) => [x.id, i])), edge = new Map(), pre = new Map(g.map(x => [x.id, new Set()]));
+  const say = (a, b, w) => { const k = a + '>' + b; if ((edge.get(k) || 0) < w) edge.set(k, w); };
+  for (const x of g) for (const r of x.rel || []) { if (!ids.has(r.id) || r.id === x.id) continue; const w = HARD.has(r.r) ? 2 : 1; if (BEFORE[r.r]) say(x.id, r.id, w); else if (AFTER[r.r]) say(r.id, x.id, w); }
+  for (const [k, w] of edge) { const [a, b] = k.split('>').map(Number), back = edge.get(b + '>' + a) || 0; if (back > w || (back === w && at.get(b) < at.get(a))) continue; pre.get(b).add(a); }
+  const left = g.slice(), done = new Set(), out = [];
+  while (left.length) { let i = left.findIndex(x => [...pre.get(x.id)].every(p => done.has(p))); if (i < 0) i = 0; const [x] = left.splice(i, 1); done.add(x.id); out.push(x.id); }
+  return out; }
+// اسم السلسلة من اسم أقدم أعمالها بلا لاحقة الموسم أو النوع: «Gintama (TV)» ← Gintama، «Kingdom Season 1» ← Kingdom، «Major S1» ← Major
+export const worldName = t => String(t || '').replace(/\s*\((?:TV|\d{4})\)\s*$/i, '').replace(/\s*(?::|-)?\s*(?:Season\s*\d+|\d+(?:st|nd|rd|th)\s+Season|Part\s*\d+|First Season|S\d+)\s*$/i, '').trim() || String(t || '');
+// اسم رأس السلسلة (أقدم مسلسلاتها) لا يصلح دائماً اسماً لها. يُؤخذ بدله أقصر اسم من أسماء أعمالها يبدأ به نصفها على الأقل (عند حد كلمة) في حالتين:
+//   • الرأس نفسه يبدأ به: سلسلة بدأت بـOVA أو فيلم («Ginga Eiyuu Densetsu: Die Neue These - Kaikou» ← Ginga Eiyuu Densetsu).
+//   • أو قلّ ما يبدأ باسم الرأس عن ثلث السلسلة: عالم غلب عليه اسم آخر (ChäoS;HEAd ← Steins;Gate). وإلا يبقى الرأس (Toaru Majutsu no Index لا Railgun).
+function stemOf(g, head) { const names = g.map(x => [x, norm(worldName(x.title))]).filter(n => n[1].length >= 3), need = Math.max(2, Math.ceil(g.length / 2));
+  const starts = (long, short) => long === short || long.startsWith(short + ' '), share = n => names.filter(([, m]) => starts(m, n)).length, h = norm(worldName(head.title));
+  const stem = names.filter(([, n]) => share(n) >= need).sort((a, b) => a[1].length - b[1].length)[0]; if (!stem) return null;
+  return starts(h, stem[1]) || share(h) < g.length / 3 ? stem[0] : null; }

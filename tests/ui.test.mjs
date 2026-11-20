@@ -30,6 +30,8 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     w.nextEpisode = { season: 1, episode: 9, date: new Date(Date.now() + 5 * 864e5).toISOString().slice(0, 10) };
     // «أين تشاهده»: منصات محقونة لخمس حالات (اشتراك وإيجار وشراء، إيجار وشراء فقط، لا شيء في السعودية، موسم له منصته، وباقي الأعمال بلا الحقل كبيانات قبل الميزة)
     const P = (stream = [], free = [], rent = [], buy = []) => ({ link: 'https://www.themoviedb.org/movie/155/watch?locale=SA', stream, free, rent, buy }), set = (id, v) => { j.works.find(x => x.id === id).prov = v; };
+    // بيانات البناء الحقيقية فيها منصات لكل عمل وتتغير كل يوم، فتُنزع أولاً ليبقى الفحص على الحالات الخمس وحدها
+    for (const x of j.works) { delete x.prov; for (const se of x.seasons || []) delete se.prov; }
     j.country = 'SA'; j.providers = { 8: { name: 'Netflix', logo: '/n.jpg' }, 629: { name: 'OSN+', logo: '/o.jpg' }, 2: { name: 'Apple TV', logo: '/a.jpg' }, 3: { name: 'Google Play Movies', logo: '/g.jpg' } };
     set('the-dark-knight-2008', P([8, 629], [], [2], [2, 3])); set('batman-begins-2005', P([], [], [2, 3], [2])); set('the-dark-knight-rises-2012', null); set('peacemaker-2022', P([629]));
     j.works.find(x => x.id === 'peacemaker-2022').seasons[1].prov = P([8]);

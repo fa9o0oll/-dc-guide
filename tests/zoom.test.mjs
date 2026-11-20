@@ -160,7 +160,7 @@ if (!only || only === 'desktop') { console.log('== desktop');
 // كل بوستر في كل عرض من البوابات يقبل التكبير (ما ليس بوستراً مستثنى: الخلفيات وشعارات المنصات وصور الحلقات ونتائج البحث)
 if (!only || only === 'coverage') { console.log('== coverage');
   const { ctx, page, errs, pause } = await session('coverage', 1200, 900, false);
-  const NOT = '.where,.wlist,.tonight,.sh-hero,.opener,.hero,.epthumb,.tile,.hit,.door,.pz,.pz-ghost';
+  const NOT = '.where,.wline,.wlist,.tonight,.sh-hero,.opener,.hero,.epthumb,.tile,.hit,.door,.pz,.pz-ghost';   // .where و.wline: شعارات منصات «أين تشاهده»
   const bare = () => page.evaluate(x => [...document.querySelectorAll('img')].filter(i => /image\.tmdb\.org/.test(i.src) && !i.closest('[data-zoom],[data-zoom-pinch],' + x)).map(i => i.parentElement.className || i.parentElement.tagName).slice(0, 4), NOT);
   const marked = () => page.evaluate(() => document.querySelectorAll('[data-zoom],[data-zoom-pinch]').length);
   await page.goto(base + '/films/'); await page.waitForSelector('.tk .poster img'); await pause(400);
@@ -175,7 +175,7 @@ if (!only || only === 'coverage') { console.log('== coverage');
       b = await bare(); check(`${door}: كل البوسترات في عرض ${v} تقبل التكبير`, !b.length && await marked() > 5, b); }
     await page.evaluate(() => document.querySelector('[data-act="view"][data-view="cards"]')?.click()); await pause(300);
     await page.evaluate(() => document.querySelector('.chead .poster').click()); await pause(800);
-    check(`${door}: بوستر نافذة العمل يُكبَّر بالضغط`, await page.evaluate(() => !!document.querySelector('#sheet:not([hidden]) .dw-top .poster[data-zoom]') && ![...document.querySelectorAll('#sheet .dw img')].some(i => /image\.tmdb\.org/.test(i.src) && !i.closest('[data-zoom],[data-zoom-pinch],.epthumb'))));
+    check(`${door}: بوستر نافذة العمل يُكبَّر بالضغط`, await page.evaluate(() => !!document.querySelector('#sheet:not([hidden]) .dw-top .poster[data-zoom]') && ![...document.querySelectorAll('#sheet .dw img')].some(i => /image\.tmdb\.org/.test(i.src) && !i.closest('[data-zoom],[data-zoom-pinch],.epthumb,.where'))));
   }
   check('coverage: بلا أخطاء برمجية', errs.length === 0, errs);
   await ctx.close(); }

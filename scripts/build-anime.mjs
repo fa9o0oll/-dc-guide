@@ -95,12 +95,18 @@ else {
     catch (e) { fails++; if (e.status !== 404 && report.problems.length < 60) report.problems.push(`TMDB ${k}/${id}: ${e.message}`); } }));
   report.tmdb = { tv: tv.size, movie: movie.size, failed: fails };
 }
+// غلاف بوابة «أنمياتي» في القاعة: للعمل المسمّى في data/anime/door.json بوستر بلا كتابة (الأعلى تقييماً بين بوسترات TMDB التي لا لغة لها) وخلفيته
+let door = null;
+if (tmdbOk) try { const t = fribb[rd(new URL('door.json', SRC), {}).mal]?.tm, T = t && (t.k === 'tv' ? tv : movie).get(t.id);
+  if (T) { const im = await tmdb(`/${t.k}/${t.id}/images`, { include_image_language: 'null' }), best = (im.posters || []).filter(p => !p.iso_639_1 && p.height >= 1400).sort((a, b) => b.vote_average - a.vote_average || b.vote_count - a.vote_count || b.height - a.height)[0];
+    door = { poster: best?.file_path || T.poster, backdrop: T.backdrop, textless: !!best }; } } catch (e) { report.problems.push(`غلاف البوابة: ${e.message}`); }
 // عند تعذّر TMDB كله يبقى ما في الكتالوج السابق من صور ومنصات
 const prevCat = rd(new URL('catalog.json', OUT), null), prevBy = new Map((prevCat?.anime || []).map(a => [a.id, a]));
+if (!door && prevCat?.door) door = prevCat.door;
 if (prevCat && tmdbOk && !tv.size && !movie.size) { tmdbOk = false; Object.assign(providers, prevCat.providers || {}); report.problems.push('TMDB لم يرد بشيء: تبقى صور الكتالوج السابق ومنصاته'); }
 
 // ---------- 3) السلاسل
-const worlds = worldsOf(all.map(id => ({ id, rel: cache.get(id)?.d?.rel || [], from: cache.get(id)?.d?.from || null, type: cache.get(id)?.d?.type || basics.get(id)?.type || '', title: cache.get(id)?.d?.title || basics.get(id)?.title || '', en: cache.get(id)?.d?.en || null, mine: inList.has(id) })));
+const worlds = worldsOf(all.map(id => { const d = cache.get(id)?.d, b = basics.get(id); return { id, rel: d?.rel || [], from: d?.from || null, type: d?.type || b?.type || '', eps: d ? d.eps : b?.eps || 0, title: d?.title || b?.title || '', en: d?.en || null, mine: inList.has(id) }; }));
 const worldOf = new Map(); for (const w of worlds) for (const id of w.ids) worldOf.set(id, w.id);
 
 // ---------- الكتالوج الخفيف (ما تحتاجه القوائم) والنصوص (ما تحتاجه بطاقة العمل)، موزعةً على 32 ملفاً
@@ -125,14 +131,14 @@ const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(
     texts[id % 32][id] = x; }
   return a; });
 wr(new URL('catalog.json', OUT), { generatedAt: report.generatedAt, imageBase: 'https://image.tmdb.org/t/p/', malImages: 'https://cdn.myanimelist.net/images/anime/', country: COUNTRY, providers, genres, anime,
-  worlds: worlds.map(w => ({ id: w.id, name: w.name, ...(w.en ? { en: w.en } : {}), ids: w.ids })) });
+  worlds: worlds.map(w => ({ id: w.id, name: w.name, ...(w.en ? { en: w.en } : {}), head: w.head, ids: w.ids, ...(w.story ? { story: w.story } : {}) })), ...(door ? { door } : {}) });
 texts.forEach((t, i) => wr(new URL(`texts/${i}.json`, OUT), t));
 
 const mine = anime.filter(a => !a.x);
 Object.assign(report, { list: list.length, catalog: anime.length, relatives: anime.length - mine.length, pending: mine.filter(a => a.pending).length, withMal: mine.filter(a => !a.pending).length,
   withTmdb: mine.filter(a => a.tm).length, withPoster: mine.filter(a => a.img || a.tp).length, withBackdrop: mine.filter(a => a.bd).length,
   withProviders: mine.filter(a => a.pv && ['stream', 'free', 'rent', 'buy'].some(k => a.pv[k].length)).length, providers: Object.keys(providers).length,
-  airing: mine.filter(a => a.st === 'airing').length, withNext: mine.filter(a => a.nx).length, worlds: worlds.length, worldsBiggest: worlds.slice().sort((a, b) => b.ids.length - a.ids.length).slice(0, 5).map(w => `${w.name} (${w.ids.length})`),
+  airing: mine.filter(a => a.st === 'airing').length, withNext: mine.filter(a => a.nx).length, door, worlds: worlds.length, worldsWithStoryOrder: worlds.filter(w => w.story).length, worldsBiggest: worlds.slice().sort((a, b) => b.ids.length - a.ids.length).slice(0, 5).map(w => `${w.name} (${w.ids.length})`),
   arabic: mine.filter(a => translations[a.id]).length, cached: cache.size, missingRelatives: relatives().filter(id => !cache.has(id)).length });
 if (PROBE) report.sample = { mal: cache.get(list[0].mal)?.d || null, entries: anime.slice(0, 3), text: texts[list[0].mal % 32][list[0].mal] || null }; // في فروع العمل: عيّنة تُقرأ في سجل البناء للتحقق من شكل البيانات
 wr(new URL('report.json', GEN), report);

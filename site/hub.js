@@ -7,9 +7,9 @@ const films = (n) => { const m = n % 100; return n === 1 ? 'فيلم واحد' :
 const games = (n) => { const m = n % 100; return n === 1 ? 'لعبة واحدة' : n === 2 ? 'لعبتين' : `${n} ${m >= 3 && m <= 10 ? 'ألعاب' : 'لعبة'}`; };
 const progress = door => { try { return JSON.parse(localStorage.getItem(door.dataset.key) || '{}'); } catch { return {}; } };
 // العدّاد: ما شاهدته من كل دليل، وفي ألعابي ما ختمته
-const stat = door => { if (!door.dataset.total) return; const pr = progress(door), isGames = door.dataset.guide === 'games';
-  const seen = isGames ? Object.values(pr.games || {}).filter(v => v?.s === 'done').length : Object.values(pr.works || pr.films || {}).filter(v => v === 'watched').length;
-  door.querySelector('[data-stat]').textContent = seen ? `${isGames ? 'ختمت' : 'شاهدت'} ${seen} من ${door.dataset.total}` : door.dataset.total; };
+const stat = door => { if (!door.dataset.total) return; const pr = progress(door), isGames = door.dataset.guide === 'games', isAnime = door.dataset.guide === 'anime';
+  const seen = isGames ? Object.values(pr.games || {}).filter(v => v?.s === 'done').length : isAnime ? Object.values(pr.a || {}).filter(v => v?.s === 'completed').length : Object.values(pr.works || pr.films || {}).filter(v => v === 'watched').length;
+  door.querySelector('[data-stat]').textContent = seen ? `${isGames ? 'ختمت' : isAnime ? 'أكملت' : 'شاهدت'} ${seen} من ${door.dataset.total}` : door.dataset.total; };
 
 // ---------- القاعة على الشاشات الأضيق من 1024: تُمرَّر أفقياً، والبوابة في الوسط تواجهك وجاراها مائلان (الميل في hub.css)
 const hall = document.getElementById('doors'), nav = document.querySelector('.hall-nav'), narrow = matchMedia('(max-width: 1023.98px)');
@@ -91,11 +91,17 @@ await Promise.all([...document.querySelectorAll('.door[data-key]')].map(async do
     // وإن تعذّر رجعت إلى صورتها العادية بهيئتها. وعلى الأضيق: خلفية العمل بالدقة التي تحتاجها البوابة، وألعابي لوحتها من IGDB
     const cat = await (await fetch(`${door.dataset.guide}/data/${door.dataset.file || 'catalog.json'}?v=${BUILD}`)).json(), big = innerWidth * devicePixelRatio > 1000;
     const tmdbSize = !narrow.matches && door.offsetHeight * devicePixelRatio * 1.2 > 720 ? 'original' : big ? 'w1280' : 'w780';
-    const own = door.dataset.artDesk, desk = !narrow.matches && own ? (/^https:\/\//.test(own) ? own : (cat.imageBase || 'https://image.tmdb.org/t/p/') + (own[0] === '/' ? 'original' + own : own)) : null;
+    const own = door.dataset.artDesk; let desk = !narrow.matches && own ? (/^https:\/\//.test(own) ? own : (cat.imageBase || 'https://image.tmdb.org/t/p/') + (own[0] === '/' ? 'original' + own : own)) : null;
     let usual = null;
     if (cat.games) {
       if (door.dataset.artIgdb) usual = `${cat.img || 'https://images.igdb.com/igdb/image/upload/'}t_${big ? '1080p' : '720p'}/${door.dataset.artIgdb}.jpg`;
       if (cat.games.length) door.dataset.total = games(cat.games.length); else door.querySelector('[data-stat]').textContent = 'قائمتك تنتظر أول لعبة';
+    } else if (cat.anime) {
+      // أنمياتي: غلاف البوابة يختاره البناء (cat.door: بوستر بلا كتابة وخلفية للعمل المسمّى في data-art)، وإلا فبوستر العمل وخلفيته
+      const mine = cat.anime.filter(a => a.ord != null), a = cat.anime.find(x => String(x.id) === door.dataset.art) || mine.find(x => x.bd), tall = cat.door?.poster || a?.tp, wide = cat.door?.backdrop || a?.bd;
+      if (!narrow.matches && tall) desk = cat.imageBase + 'original' + tall;
+      if (wide) usual = cat.imageBase + tmdbSize + wide;
+      door.dataset.total = works(mine.length);
     } else {
       const items = cat.works || cat.films, art = items.find(w => w.id === door.dataset.art) || items.find(w => w.backdrop);
       if (art?.backdrop) usual = cat.imageBase + tmdbSize + art.backdrop;

@@ -3,6 +3,8 @@
 @font-face{font-family:Lalezar;src:url(fonts/lalezar-latin-400-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
 @font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/aref-ruqaa-arabic-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
 @font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/aref-ruqaa-latin-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
+@font-face{font-family:Marhey;font-weight:300 700;src:url(fonts/marhey-arabic-wght-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
+@font-face{font-family:Marhey;font-weight:300 700;src:url(fonts/marhey-latin-wght-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
 @font-face{font-family:Kufi;font-weight:700;src:url(fonts/reem-kufi-arabic-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
 @font-face{font-family:Kufi;font-weight:700;src:url(fonts/reem-kufi-latin-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
 @font-face{font-family:Handjet;font-weight:100 900;src:url(fonts/handjet-arabic-full-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
@@ -18,7 +20,7 @@ body{min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;background:
    الثلاث كلٌّ فوق بوابته، وعلى الجوال لون البوابة التي أمامك ويتبدل معها. تحته خط عتبة بمعين في وسطه، ثم سطر يقول ما وراء الأبواب */
 @font-face{font-family:Inscribe;src:url(fonts/rakkas-arabic-400-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
 @property --lit{syntax:"<color>";inherits:true;initial-value:#e6b65c}
-body[data-here=dc]{--lit:#ff5a4c}body[data-here=fate]{--lit:#e6b65c}body[data-here=films]{--lit:#ff9f43}body[data-here=games]{--lit:#35e0ff}
+body[data-here=dc]{--lit:#ff5a4c}body[data-here=anime]{--lit:#ff8fa3}body[data-here=films]{--lit:#ff9f43}body[data-here=games]{--lit:#35e0ff}
 .hub-top{position:relative;display:grid;justify-items:center;text-align:center;padding:20px var(--pad) 12px}
 .hub-top h1{font-family:Inscribe,Plex,serif;font-weight:400;font-size:clamp(2.9rem,11vw,4.8rem);line-height:1.25;padding-inline:.2em;
   background-image:linear-gradient(105deg,transparent 42%,rgba(255,248,232,.75) 50%,transparent 58%),linear-gradient(180deg,rgba(6,7,10,.55),rgba(6,7,10,.08) 55%,transparent),linear-gradient(100deg,color-mix(in srgb,var(--lit) 45%,#f7ecd8),var(--lit) 46%,color-mix(in srgb,var(--lit) 70%,#2a1c14));
@@ -45,8 +47,8 @@ body[data-here=dc]{--lit:#ff5a4c}body[data-here=fate]{--lit:#e6b65c}body[data-he
 .hub-foot{padding:12px var(--pad) 18px;font-size:.78rem;color:#8d887d}
 .hub-foot a{color:inherit}
 /* ===== قاعة البوابات =====
-   ثلاث بوابات طويلة، كل واحدة يتسرب منها ضوء عالمها: كشّاف يمسح سماء مدينة ماطرة (دي سي)، دائرة استدعاء تتوهج على
-   الأرض ويصعد منها جمر (Fate)، وشعاع آلة عرض يسبح فيه الغبار (الأفلام). والأرضية مصقولة تعكس البوابات.
+   ثلاث بوابات طويلة، كل واحدة يتسرب منها ضوء عالمها: كشّاف يمسح سماء مدينة ماطرة (دي سي)، سماء غسق تومض نجومها
+   ويتنفس أفقها (أنمياتي)، وشعاع آلة عرض يسبح فيه الغبار (الأفلام). والأرضية مصقولة تعكس البوابات.
    الإطار واحد للثلاث (الحجم والزوايا والحافة وإطار داخلي على البعد نفسه)، والهوية داخله: الضوء والنقش واللون والخط
    ونوع خط الإطار الداخلي (فولاذي متصل، ذهبي مزدوج بزوايا حادة، متقطع كتذكرة).
    على الشاشات العريضة تقف الثلاث في قوس يواجهك، وعلى الأضيق تمشي في القاعة: البوابة في الوسط كبيرة تواجهك وجاراها مائلان.
@@ -94,21 +96,16 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
 @keyframes dc-rain-2{to{transform:translateY(340px)}}
 .door.dc .motif{background:radial-gradient(90% 30% at 50% 104%,rgba(150,24,18,.24),transparent 70%)}
 
-/* Fate: دائرة استدعاء ذهبية على الأرض حيث يقف الخادم، تدور ببطء ويتنفس ضوؤها، وجمر يصعد منها */
-.door.fate{--bg:#12060a;--c1:#e6b65c;--c2:#e0445a;--ink:#f7efe0;--display:Ruqaa,Plex,serif;--dw:700;--lh:1.35}
-.door.fate::before{border:3px double color-mix(in srgb,var(--c1) 34%,transparent);border-radius:2px}
-.door.fate .fx::before{content:"";position:absolute;left:50%;top:46%;width:118%;aspect-ratio:1;translate:-50% -50%;opacity:.8;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%23ffd68c' stop-opacity='.6'/%3E%3Cstop offset='1' stop-color='%23ffd68c' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle r='22.6' fill='url(%23g)'/%3E%3Cg fill='none' stroke='%23f0c46e'%3E%3Ccircle r='5' stroke-width='7' stroke-dasharray='0.061 0.724' opacity='0.8'/%3E%3Ccircle r='21.85' stroke-width='0.8' stroke-dasharray='0.267 3.165' opacity='1'/%3E%3Ccircle r='31.1' stroke-width='2.3' stroke-dasharray='0.380 4.505' opacity='1'/%3E%3Ccircle r='40.25' stroke-width='0.8' stroke-dasharray='0.492 5.831' opacity='1'/%3E%3Ccircle r='47.5' stroke-width='2.6' stroke-dasharray='0.580 6.881' opacity='1'/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat;
-  transform:perspective(560px) rotateX(68deg);animation:fate-spin 48s linear infinite}
-@keyframes fate-spin{from{transform:perspective(560px) rotateX(68deg) rotate(0deg)}to{transform:perspective(560px) rotateX(68deg) rotate(360deg)}}
-.door.fate .fx::after{content:"";position:absolute;inset:0;background:radial-gradient(48% 16% at 50% 47%,rgba(230,182,92,.3),transparent 72%);animation:fate-glow 5s ease-in-out infinite alternate}
-@keyframes fate-glow{from{opacity:.5}to{opacity:1}}
-/* الجمر: ذرات تبدأ من الدائرة وتصعد وهي تخفت، كل واحدة بمدتها وموضعها (في الصفحة) */
-.door.fate .motif>i{width:3px;height:3px;border-radius:50%;background:#ffd8a0;box-shadow:0 0 5px 1px rgba(255,150,80,.7);opacity:0;animation:ember 7s linear infinite}
-.door.fate .motif>i:nth-child(3n){width:2px;height:2px}
-.door.fate .motif>i:nth-child(even){animation-name:ember-l}
-@keyframes ember{0%{transform:translate(0,0) scale(.6);opacity:0}14%{opacity:1}62%{opacity:.85}100%{transform:translate(12px,-230px) scale(.9);opacity:0}}
-@keyframes ember-l{0%{transform:translate(0,0) scale(.6);opacity:0}14%{opacity:1}62%{opacity:.85}100%{transform:translate(-14px,-205px) scale(.9);opacity:0}}
+/* أنمياتي: سماء الغسق. نجوم تومض في أعلاها، ووهج الأفق يتنفس في أسفلها، وشهاب يعبرها كل حين */
+.door.anime{--bg:#12142e;--c1:#ff8fa3;--c2:#ffc46b;--ink:#f6efe6;--display:Marhey,Plex,sans-serif;--dw:700;--lh:1.3}
+.door.anime::before{border:1px solid color-mix(in srgb,var(--c1) 40%,transparent);border-radius:3px}
+.door.anime .fx::before{content:"";position:absolute;inset:auto 0 0;height:52%;background:radial-gradient(120% 70% at 50% 106%,rgba(255,179,92,.5),rgba(255,127,134,.34) 30%,rgba(179,80,143,.2) 52%,transparent 74%);animation:anime-glow 7s ease-in-out infinite alternate}
+@keyframes anime-glow{from{opacity:.62}to{opacity:1}}
+.door.anime .fx::after{content:"";position:absolute;top:13%;left:64%;width:84px;height:1.5px;border-radius:2px;background:linear-gradient(to left,transparent,#fff);transform:rotate(-24deg);opacity:0;animation:anime-comet 9s 1.5s ease-out infinite}
+@keyframes anime-comet{0%{opacity:0;translate:50px -24px}4%{opacity:.9}14%,100%{opacity:0;translate:-120px 56px}}
+.door.anime .motif>i{width:2px;height:2px;border-radius:50%;background:#fff;opacity:.3;animation:anime-tw 4s ease-in-out infinite}
+.door.anime .motif>i:nth-child(3n){width:3px;height:3px}
+@keyframes anime-tw{0%,100%{opacity:.25}50%{opacity:1}}
 
 /* الأفلام: قاعة عرض مظلمة، شعاع آلة العرض من الأعلى يرتعش قليلاً ويسبح فيه الغبار، وثقوب شريط الفيلم تمر على الطرف */
 .door.films{--bg:#120e09;--c1:#ff9f43;--c2:#ffe2b8;--ink:#fbf3e4;--display:Kufi,Plex,sans-serif;--dw:700;--lh:1.3;padding-inline-end:46px}
@@ -158,7 +155,7 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   .door .say{grid-row:4;align-self:start}
   .door .stat{grid-row:5}
   .door.dc{transform:rotateY(-9deg)}
-  .door.fate{transform:rotateY(-3deg)}
+  .door.anime{transform:rotateY(-3deg)}
   .door.films{transform:rotateY(3deg)}
   .door.games{transform:rotateY(9deg)}
   /* على الشاشات العريضة (ومنها الأوليد) بُنيت البوابة من جديد: غلاف طولي للفيلم بلا كتابة، باتمان واقفاً بدرعه كاملاً في العتمة
@@ -172,22 +169,18 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px}
   /* والثلاث الباقية على طريقة دي سي نفسها: غلاف طولي بلا كتابة بدقته الأصلية، بحضوره كاملاً (بلا تعتيم ولا مرشحات)، والعتمة من
      الحواف والقاعدة للنص فقط، وحبيبات الفيلم نفسها. تُطبَّق حين يحمل الغلاف فعلاً (data-poster)، وإن تعذّر بقيت البوابة على صورتها السابقة.
-     Fate: آرتشر ورين في أرض السيوف تحت سماء تحترق، لوحة ufotable الرقمية لـ Unlimited Blade Works بدقتها الأصلية (1442×2048؛ غلاف Fate/Zero السابق
-     مسحٌ ضوئي لملصق مطبوع فخطوطه لينة حتى بأصله)، ودائرة الاستدعاء على الأرض تحت قدميهما والجمر يصعد منها.
+     أنمياتي: غلاف يختاره بناء البيانات (بوستر بلا كتابة لعمل البوابة المسمّى في data-art، وإلا بوستره العادي)، ووهج الأفق من تحته والنجوم فوقه.
      الأفلام: وجه K يرفع عينيه في المطر (Blade Runner 2049)، وشعاع آلة العرض يعبره.
      ألعابي: كازويا وجين في نار الجين الشيطاني، لوحة Tekken 8 الرسمية بدقة 4K، كاملة بارتفاع البوابة إلا قاعدتها، وأرضية الحلبة تحتهما */
-  .door[data-poster]:is(.fate,.films,.games) .art img{filter:none}
-  .door[data-poster]:is(.fate,.films,.games) .art img.in{opacity:1}
-  .door[data-poster].fate .art img{object-position:center 30%;transform-origin:50% 20%}
+  .door[data-poster]:is(.anime,.films,.games) .art img{filter:none}
+  .door[data-poster]:is(.anime,.films,.games) .art img.in{opacity:1}
+  .door[data-poster].anime .art img{object-position:center 26%;transform-origin:50% 20%}
   .door[data-poster].films .art img{object-position:center 30%;transform-origin:50% 15%}
   .door[data-poster].games .art img{position:absolute;top:0;left:50%;width:auto;max-width:none;height:90%;translate:-28% 0;transform-origin:28% 30%}
-  .door[data-poster]:is(.fate,.films,.games) .art::after{background:radial-gradient(100% 75% at 50% 32%,transparent 55%,color-mix(in srgb,var(--bg) 75%,transparent)),
+  .door[data-poster]:is(.anime,.films,.games) .art::after{background:radial-gradient(100% 75% at 50% 32%,transparent 55%,color-mix(in srgb,var(--bg) 75%,transparent)),
     linear-gradient(180deg,color-mix(in srgb,var(--bg) 10%,transparent),transparent 12%,transparent 52%,color-mix(in srgb,var(--bg) 55%,transparent) 66%,var(--bg) 86%)}
-  .door[data-poster]:is(.fate,.films,.games)::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;opacity:.2;mix-blend-mode:overlay;
+  .door[data-poster]:is(.anime,.films,.games)::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;opacity:.2;mix-blend-mode:overlay;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px}
-  .door[data-poster].fate .fx::before{top:84%;opacity:.45}
-  .door[data-poster].fate .fx::after{background:radial-gradient(48% 14% at 50% 84%,rgba(230,182,92,.3),transparent 72%)}
-  .door[data-poster].fate .motif{translate:0 30%}
   .door[data-poster].games .art::before{opacity:.4}
   .door[data-poster].games .motif>i{height:80cqh}
   .door[data-poster].games .motif::before{top:calc(72% - 40px);opacity:.8}
@@ -216,7 +209,7 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   /* الأرضية المصقولة: ضوء كل عالم ينسكب تحت بوابته (أخف على الجوال من عكس البوابة كاملة وهي تدور) */
   .slot::after{content:"";position:absolute;inset-inline:-6%;top:calc(100% + 6px);height:clamp(70px,14dvh,120px);pointer-events:none;
     background:radial-gradient(48% 100% at 50% 0,color-mix(in srgb,var(--glow) 24%,transparent),color-mix(in srgb,var(--glow) 6%,transparent) 45%,transparent 72%)}
-  .s-dc{--glow:#ff5a4c}.s-fate{--glow:#e6b65c}.s-films{--glow:#ff9f43}.s-games{--glow:#35e0ff}
+  .s-dc{--glow:#ff5a4c}.s-anime{--glow:#ff8fa3}.s-films{--glow:#ff9f43}.s-games{--glow:#35e0ff}
   @supports (animation-timeline:--slot){.door{animation:hall linear both;animation-timeline:--slot}.slot::after{animation:hall-floor linear both;animation-timeline:--slot}
     .door::after{content:"";position:absolute;inset:0;pointer-events:none;background:#050508;border-radius:inherit;animation:hall-dim linear both;animation-timeline:--slot}}
   /* الجاران ساكنان: حركتهما تبدأ حين يصلان الوسط */

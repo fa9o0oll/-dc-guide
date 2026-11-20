@@ -83,17 +83,43 @@ check('مسلسل بلا موسم (يمتد على المواسم كلها)، و
   && same(pickTmdb({ type: 'MOVIE', themoviedb_id: { movie: [72015, 5] } }), { k: 'movie', id: 72015 }) && pickTmdb({ type: 'MOVIE', mal_id: 8888 }) === null && same(pickTmdb({ type: 'TV', themoviedb_id: { tv: 30984 }, season: { tvdb: 17, tmdb: 2 }, episode_offset: { tvdb: 13 } }), { k: 'tv', id: 30984, s: 2 }));
 
 // ---------- السلاسل
-const W = (id, title, from, rel = [], more = {}) => ({ id, title, from, type: 'TV', en: null, mine: true, rel: rel.map(([r, i]) => ({ r, id: i })), ...more });
+const W = (id, title, from, rel = [], more = {}) => ({ id, title, from, type: 'TV', eps: 12, en: null, mine: true, rel: rel.map(([r, i]) => ({ r, id: i })), ...more });
 const worlds = worldsOf([
-  W(16498, 'Shingeki no Kyojin', '2013-04-07', [['Sequel', 25777], ['Side Story', 18397]], { en: 'Attack on Titan' }), W(25777, 'Shingeki no Kyojin Season 2', '2017-04-01', [['Prequel', 16498]]), W(18397, 'Shingeki no Kyojin OVA', '2013-12-09', [['Parent Story', 16498]], { type: 'OVA', mine: false }),
-  W(11741, 'Fate/Zero 2nd Season', '2012-04-08', [['Prequel', 10087]]), W(10087, 'Fate/Zero', '2011-10-02', [['Sequel', 11741], ['Character', 21]]),
+  W(16498, 'Shingeki no Kyojin', '2013-04-07', [['Sequel', 25777], ['Side Story', 18397]], { en: 'Attack on Titan' }), W(25777, 'Shingeki no Kyojin Season 2', '2017-04-01', [['Prequel', 16498]]), W(18397, 'Shingeki no Kyojin OVA', '2013-12-09', [['Parent Story', 16498]], { type: 'OVA', eps: 3, mine: false }),
+  W(11741, 'Fate/Zero 2nd Season', '2012-04-08', [['Prequel', 10087], ['Sequel', 356]]), W(10087, 'Fate/Zero', '2011-10-02', [['Sequel', 11741], ['Character', 21]]), W(356, 'Fate/stay night', '2006-01-07', [['Prequel', 11741], ['Alternative Version', 22297]]), W(22297, 'Fate/stay night: Unlimited Blade Works', '2014-10-12', [['Alternative Version', 356]]),
   W(21, 'One Piece', '1999-10-20', [['Other', 813]]), W(813, 'Dragon Ball Z', '1989-04-26', []),
   W(900, 'Lonely Relative A', '2001-01-01', [['Sequel', 901]], { mine: false }), W(901, 'Lonely Relative B', '2002-01-01', [], { mine: false }),
-  W(918, 'Gintama', '2006-04-04', [['Sequel', 9969]]), W(9969, "Gintama'", '2011-04-04', []), W(7472, 'Gintama Movie 1', '2010-04-24', [['Alternative Version', 918]], { type: 'Movie' }),
+  W(918, 'Gintama', '2006-04-04', [['Sequel', 9969]]), W(9969, "Gintama'", '2011-04-04', []), W(7472, 'Gintama Movie 1', '2010-04-24', [['Alternative Version', 918]], { type: 'Movie', eps: 1 }),
+  // عمل مشترك بين سلسلتين: Fairy Tail x Rave قصة جانبية للاثنتين
+  W(6702, 'Fairy Tail', '2009-10-12', [['Sequel', 22043], ['Side Story', 19457]]), W(22043, 'Fairy Tail (2014)', '2014-04-05', []), W(239, 'Rave', '2001-10-13', [['Side Story', 19457]]), W(240, 'Rave Specials', '2002-09-07', [['Parent Story', 239]], { type: 'Special', eps: 2 }),
+  W(19457, 'Fairy Tail x Rave', '2013-08-16', [['Parent Story', 6702], ['Parent Story', 239]], { type: 'OVA', eps: 1 }),
+  // وعمل صغير يربط جزأين من سلسلة واحدة لا رابط بينهما غيره: يجمعهما (الاسم مشترك)
+  W(5001, 'Kizuna Saga', '2010-01-01', [['Side Story', 5003]]), W(5002, 'Kizuna Saga Zero', '2015-01-01', [['Side Story', 5003]]), W(5003, 'Kizuna Saga: Gaiden', '2012-01-01', [], { type: 'OVA', eps: 1 }),
 ]);
-check('عملان فأكثر بعلاقات القصة يصيران سلسلة بترتيب الصدور، واسمها اسم أقدم مسلسلاتها', same(worlds.map(w => [w.id, w.name, w.ids]), [[10087, 'Fate/Zero', [10087, 11741]], [918, 'Gintama', [918, 7472, 9969]], [16498, 'Shingeki no Kyojin', [16498, 18397, 25777]]]) && worlds[2].en === 'Attack on Titan', worlds);
+const wOf = n => worlds.find(w => w.name === n);
+check('عملان فأكثر بعلاقات القصة يصيران سلسلة بترتيب الصدور، واسمها اسم أقدم مسلسلاتها', same(wOf('Shingeki no Kyojin').ids, [16498, 18397, 25777]) && wOf('Shingeki no Kyojin').en === 'Attack on Titan' && same(wOf('Gintama').ids, [918, 7472, 9969]) && wOf('Gintama').id === 918, worlds);
 check('«Character» و«Other» لا تدمجان سلسلتين، وسلسلة ليس فيها عمل من القائمة لا تُعرض', !worlds.some(w => w.ids.includes(21) || w.ids.includes(813) || w.ids.includes(900)) && !LINKS.has('Other') && !LINKS.has('Character') && LINKS.has('Side Story'));
-check('اسم السلسلة بلا لاحقة الموسم', worldName('Kingdom 2nd Season') === 'Kingdom' && worldName('Gintama (TV)') === 'Gintama' && worldName('Mob Psycho 100') === 'Mob Psycho 100' && worldName('Spy x Family Part 2') === 'Spy x Family' && worldName('Hunter x Hunter (2011)') === 'Hunter x Hunter' && worldName('86') === '86');
+check('ترتيب القصة يقدّم الجزء السابق ولو صدر لاحقاً (Fate/Zero قبل Fate/stay night)، ولا يُعاد إن طابق ترتيب الصدور', same(wOf('Fate/stay night').ids, [356, 10087, 11741, 22297]) && same(wOf('Fate/stay night').story, [10087, 11741, 356, 22297]) && !('story' in wOf('Gintama')) && !('story' in wOf('Shingeki no Kyojin')), wOf('Fate/stay night'));
+check('عمل مشترك بين سلسلتين ينضم إلى التي يبدأ اسمه باسمها ولا يدمجهما', same(wOf('Fairy Tail').ids, [6702, 19457, 22043]) && same(wOf('Rave').ids, [239, 240]), [wOf('Fairy Tail'), wOf('Rave')]);
+check('وعمل صغير يربط جزأين من سلسلة واحدة يجمعهما', same(wOf('Kizuna Saga').ids, [5001, 5003, 5002]), wOf('Kizuna Saga'));
+check('اسم السلسلة بلا لاحقة الموسم', worldName('Kingdom 2nd Season') === 'Kingdom' && worldName('Gintama (TV)') === 'Gintama' && worldName('Mob Psycho 100') === 'Mob Psycho 100' && worldName('Spy x Family Part 2') === 'Spy x Family' && worldName('Hunter x Hunter (2011)') === 'Hunter x Hunter' && worldName('86') === '86' && worldName('Major S1') === 'Major');
+
+// علاقات MyAnimeList تتناقض أحياناً، واسم أقدم مسلسل لا يصلح دائماً اسماً للسلسلة (حالات من قائمته الحقيقية)
+const more = worldsOf([
+  // Code Geass: المسلسل يقول إن Nunnally «متفرع» منه، وصفحة Nunnally تقول إن المسلسل «متفرع» منها. التناقض لا يحجز المسلسل خلف ما لا علاقة ترتيب له به (Akito)
+  W(1575, 'Code Geass: Hangyaku no Lelouch', '2006-10-06', [['Sequel', 2904], ['Spin-Off', 12685], ['Alternative Setting', 8888]]), W(2904, 'Code Geass: Hangyaku no Lelouch R2', '2008-04-06', [['Prequel', 1575]]),
+  W(12685, 'Code Geass: Hangyaku no Lelouch - Nunnally in Wonderland', '2012-07-27', [['Spin-Off', 1575]], { type: 'OVA', eps: 1 }), W(8888, 'Code Geass: Boukoku no Akito 1', '2012-08-04', [['Alternative Setting', 1575]], { type: 'Movie', eps: 1 }),
+  // سلسلة بدأت بـOVA: اسم أول مسلسلاتها اسم فرع منها
+  W(820, 'Ginga Eiyuu Densetsu', '1988-01-08', [['Alternative Version', 31433]], { type: 'OVA', eps: 110 }), W(31433, 'Ginga Eiyuu Densetsu: Die Neue These - Kaikou', '2018-04-03', [['Alternative Version', 820], ['Sequel', 37575]]), W(37575, 'Ginga Eiyuu Densetsu: Die Neue These - Seiran 1', '2019-09-27', [], { type: 'Movie', eps: 4 }),
+  // عالم غلب عليه اسم غير اسم أقدم مسلسلاته
+  W(4975, 'ChäoS;HEAd', '2008-10-09', [['Alternative Setting', 9253]]), W(9253, 'Steins;Gate', '2011-04-06', [['Sequel', 30484]]), W(30484, 'Steins;Gate 0', '2018-04-12', []), W(11577, 'Steins;Gate Movie: Fuka Ryouiki no Déjà vu', '2013-04-20', [['Parent Story', 9253]], { type: 'Movie', eps: 1 }),
+  // وعالم لأقدم مسلسلاته ثلثه فأكثر: يبقى اسمه ولو كثر ما يحمل اسم فرعه
+  W(4654, 'Toaru Majutsu no Index', '2008-10-05', [['Sequel', 8937], ['Spin-Off', 6213]]), W(8937, 'Toaru Majutsu no Index II', '2010-10-08', []), W(6213, 'Toaru Kagaku no Railgun', '2009-10-03', [['Sequel', 16049]]), W(16049, 'Toaru Kagaku no Railgun S', '2013-04-12', [['Sequel', 38481]]), W(38481, 'Toaru Kagaku no Railgun T', '2020-01-10', []),
+]);
+const mOf = n => more.find(w => w.name === n);
+check('علاقتان متناقضتان بين عملين تُحسمان بترتيب الصدور، فلا يتأخر المسلسل الأصلي عن أعمال لا علاقة ترتيب له بها', !('story' in mOf('Code Geass: Hangyaku no Lelouch')) && same(mOf('Code Geass: Hangyaku no Lelouch').ids, [1575, 2904, 12685, 8888]), mOf('Code Geass: Hangyaku no Lelouch'));
+check('سلسلة بدأت بـOVA تأخذ الاسم الذي تبدأ به أعمالها لا اسم أول مسلسلاتها، ومعها رقم العمل صاحب الاسم', !!mOf('Ginga Eiyuu Densetsu') && mOf('Ginga Eiyuu Densetsu').ids.length === 3 && mOf('Ginga Eiyuu Densetsu').head === 820 && wOf('Shingeki no Kyojin').head === 16498 && mOf('Steins;Gate').head === 9253, more.map(w => [w.name, w.head]));
+check('وعالم غلب عليه اسم آخر يأخذه، وما لأقدم مسلسلاته ثلثه يبقى باسمه', !!mOf('Steins;Gate') && mOf('Steins;Gate').ids.includes(4975) && !!mOf('Toaru Majutsu no Index') && mOf('Toaru Majutsu no Index').ids.length === 5, more.map(w => w.name));
 
 console.log(fail ? `\n❌ فشل ${fail}` : '\n✅ كل فحوص أنمياتي نجحت');
 process.exit(fail ? 1 : 0);

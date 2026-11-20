@@ -9,12 +9,14 @@
 // - كل صفحة تزامن الأدلة كلها معاً، فالواجهة الرئيسية وكل دليل يقرآن سجلاً محدَّثاً دائماً.
 // - الألعاب: لكل لعبة أربع علامات مستقلة: قائمتها g، والمنصة التي خُتمت عليها n، وتاريخ الختم d، والساعات h.
 //   ومعها علامة k لكل تنبيه «لعبتان مكررتان» أسكته صاحبه (مفتاحها أرقام ألعاب المجموعة مرتبة)، فلا يعود التنبيه على جهاز آخر.
+// - أنمياتي: لكل عمل خمس علامات مستقلة: قائمته a، وما شوهد من حلقاته p، وتقييمه r، وتاريخ بدايته b، وتاريخ نهايته z.
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-', CFG = 'guides.fb', META = 'guides.sync', LEGACY = 'guides';
-const GUIDES = { dc: 'dcg.progress', fate: 'fateg.progress', films: 'filmsg.progress', games: 'gamesg.progress' };
-const OK = { w: ['watched', 'watching', 'list', 'skip'], f: ['watched', 'next'], g: ['play', 'new', 'done', 'seen'] };
+const GUIDES = { dc: 'dcg.progress', fate: 'fateg.progress', films: 'filmsg.progress', games: 'gamesg.progress', anime: 'animeg.progress' };
+const OK = { w: ['watched', 'watching', 'list', 'skip'], f: ['watched', 'next'], g: ['play', 'new', 'done', 'seen'], a: ['watching', 'completed', 'hold', 'dropped', 'plan'] };
 // قيم الألعاب غير القائمة: رمز منصة، وتاريخ، وعدد ساعات. وكل علامة لعبة تقابل حقلاً في سجلها
-const FORM = { n: /^[a-z0-9]{2,10}$/, d: /^\d{4}-\d{2}-\d{2}$/, h: /^\d{1,5}$/ };
-const GAME = { g: 's', n: 'on', d: 'at', h: 'h' };
+// وقيم الأنمي غير القائمة: عدد حلقات، وتقييم من 1 إلى 10، وتاريخ قد يكون سنة فقط أو سنة وشهراً (كما في MyAnimeList)
+const FORM = { n: /^[a-z0-9]{2,10}$/, d: /^\d{4}-\d{2}-\d{2}$/, h: /^\d{1,5}$/, p: /^\d{1,5}$/, r: /^(10|[1-9])$/, b: /^\d{4}(-\d{2}(-\d{2})?)?$/, z: /^\d{4}(-\d{2}(-\d{2})?)?$/ };
+const GAME = { g: 's', n: 'on', d: 'at', h: 'h' }, ANIME = { a: 's', p: 'p', r: 'r', b: 'b', z: 'e' };
 const RULE = '"u": { "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } }';
 // على Netlify تُخدَم صفحات الدخول من نطاق الموقع نفسه (الوكيل في netlify.toml)، فلا يعتمد الدخول على تخزين الطرف الثالث الذي تحجبه بعض المتصفحات
 const withHost = c => /\.netlify\.app$/.test(location.hostname) ? { ...c, authDomain: location.host } : c;
@@ -22,23 +24,25 @@ const ls = { get: k => { try { return localStorage.getItem(k); } catch { return 
 const json = (k, d) => { try { return JSON.parse(ls.get(k)) ?? d; } catch { return d; } };
 
 // السجل ⇄ علامات مسطّحة: w|العمل ← حالته، e|العمل|الموسم-الحلقة ← 1، f|الفيلم ← حالته. «درع الحرق» إعداد للجهاز ولا يُزامَن.
-const blank = id => id === 'films' ? { films: {} } : id === 'games' ? { games: {} } : { v: 1, works: {}, eps: {}, shield: true };
+const blank = id => id === 'films' ? { films: {} } : id === 'games' ? { games: {} } : id === 'anime' ? { v: 1, a: {} } : { v: 1, works: {}, eps: {}, shield: true };
 function flat(id, s) { const o = {};
   if (id === 'films') { for (const [k, v] of Object.entries(s.films || {})) if (v) o['f|' + k] = v; return o; }
   if (id === 'games') { for (const [k, g] of Object.entries(s.games || {})) for (const [p, f] of Object.entries(GAME)) if (g?.[f] != null && g[f] !== '') o[`${p}|${k}`] = String(g[f]);
     for (const [k, v] of Object.entries(s.dups || {})) if (v) o['k|' + k] = 1; return o; }
+  if (id === 'anime') { for (const [k, x] of Object.entries(s.a || {})) for (const [p, f] of Object.entries(ANIME)) if (x?.[f]) o[`${p}|${k}`] = String(x[f]); return o; }
   for (const [k, v] of Object.entries(s.works || {})) if (v) o['w|' + k] = v;
   for (const [w, eps] of Object.entries(s.eps || {})) for (const e of Object.keys(eps || {})) o[`e|${w}|${e}`] = 1;
   return o; }
 function put(s, p, v) { const [k, a, b] = p.split('|');
   if (k === 'f') { s.films ||= {}; if (v) s.films[a] = v; else delete s.films[a]; }
   else if (GAME[k]) { s.games ||= {}; const g = s.games[a] ||= {}; if (v) g[GAME[k]] = k === 'h' ? +v : v; else delete g[GAME[k]]; if (!Object.keys(g).length) delete s.games[a]; }
+  else if (ANIME[k]) { s.a ||= {}; const x = s.a[a] ||= {}; if (v) x[ANIME[k]] = k === 'p' || k === 'r' ? +v : v; else delete x[ANIME[k]]; if (!Object.keys(x).length) delete s.a[a]; }
   else if (k === 'k') { s.dups ||= {}; if (v) s.dups[a] = 1; else delete s.dups[a]; }
   else if (k === 'w') { s.works ||= {}; if (v) s.works[a] = v; else delete s.works[a]; }
   else if (k === 'e') { s.eps ||= {}; if (v) (s.eps[a] ||= {})[b] = 1; else if (s.eps[a]) { delete s.eps[a][b]; if (!Object.keys(s.eps[a]).length) delete s.eps[a]; } } }
 // ما يأتي من القاعدة بيانات لا أكثر: لا نقبل إلا القيم المعروفة، وما عداها يُعامل كأنه إلغاء
 const clean = (p, v) => p[0] === 'e' || p[0] === 'k' ? (v ? 1 : undefined) : FORM[p[0]] ? (FORM[p[0]].test(String(v)) ? String(v) : undefined) : OK[p[0]]?.includes(v) ? v : undefined;
-const valid = p => /^([fwgndh]\|[^|]+|k\|\d{1,9}(-\d{1,9}){1,15}|e\|[^|]+\|\d+-\d+)$/.test(p);
+const valid = p => /^([fwgndhaprbz]\|[^|]+|k\|\d{1,9}(-\d{1,9}){1,15}|e\|[^|]+\|\d+-\d+)$/.test(p);
 // مفاتيح Firebase لا تقبل . # $ [ ] /
 const enc = p => p.replace(/[.#$\[\]\/%]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
 const dec = k => k.replace(/%([0-9A-F]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));

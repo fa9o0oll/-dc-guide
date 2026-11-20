@@ -20,6 +20,7 @@ export const GUIDES = {
   },
   fate: {
     id: 'fate', name: 'دليل عالم Fate', logo: 'F', key: 'fateg.progress', first: 'fuyuki',
+    home: { href: '../anime/#worlds', label: 'أنمياتي', aria: 'العودة إلى أنمياتي' },   // عالم Fate من عوالم الأنمي: بوابته داخل «أنمياتي»
     allLabel: 'كل الخطوط', barLabel: 'خطوط القصة', groups: ['خطوط متسلسلة', 'أعمال جانبية'],
     order: { kind: 'paths', label: 'ترتيب المشاهدة', here: 'من أين تبدأ وبأي ترتيب' },
     types: { 'film|animation': 'فيلم أنمي', 'series|animation': 'مسلسل أنمي' },

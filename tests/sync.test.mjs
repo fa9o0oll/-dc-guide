@@ -5,6 +5,7 @@ import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright');
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
 import { fixture } from './fixtures/games.mjs';
+import { catalog as animeCatalog, malGz } from './fixtures/anime.mjs';
 const siteDir = path.resolve(new URL('../site', import.meta.url).pathname), shots = process.argv[2];
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json' };
 const site = http.createServer((q, r) => { const f = path.join(siteDir, decodeURIComponent(q.url.split('?')[0]).replace(/\/$/, '/index.html'));
@@ -61,7 +62,7 @@ const browser = await chromium.launch();
 async function device(name, viewport, mobile) {
   const ctx = await browser.newContext({ viewport, isMobile: mobile, hasTouch: mobile, deviceScaleFactor: shots ? 2 : 1, locale: 'ar-SA' }), page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource|\[sync\]/.test(m.text())) errs.push(m.text()); });
-  await ctx.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com/, r => r.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#234"/></svg>' }));
+  await ctx.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com|cdn\.myanimelist\.net/, r => r.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#234"/></svg>' }));
   await ctx.route(/gstatic\.com\/firebasejs\/.*firebase-(app|auth|database)\.js/, r => r.fulfill({ contentType: 'text/javascript', headers: cors, body: FAKE[r.request().url().match(/firebase-(\w+)\.js/)[1]] }));
   const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); await page.waitForTimeout(250); return mobile ? l.tap() : l.click(); };
   const open = async p => { await page.goto(base + p); await page.waitForSelector(p.includes('films') ? '#grid .tk, #grid article' : '.card'); };
@@ -175,6 +176,24 @@ const undone = (await A.local('gamesg.progress')).dups?.['11208-880001'] !== 1;
 if (!undone) { await A.page.reload(); await A.page.waitForSelector('#grid .gc'); await A.page.evaluate(() => { const P = JSON.parse(localStorage.getItem('gamesg.progress')); delete P.dups['11208-880001']; localStorage.setItem('gamesg.progress', JSON.stringify(P)); }); await A.page.reload(); await A.page.waitForSelector('#grid .gc'); }
 await B.page.waitForFunction(() => !document.getElementById('dup').hidden || !document.getElementById('dupbar').hidden, null, { timeout: 8000 }).catch(() => {});
 check('إلغاء الإسكات على جهاز يعيد التنبيه على الآخر', tree[R + '/games']?.[KD]?.v === 0 && !(await B.local('gamesg.progress')).dups?.['11208-880001'] && (await B.page.isVisible('#dup .dup') || await B.page.isVisible('#dupbar .dup')));
+
+console.log('\n== أنمياتي: السجل المستورد على جهاز يصل الآخر، والتقدّم يُزامَن حيّاً');
+const AX = animeCatalog();
+for (const d of [A, B]) { await d.ctx.route('**/anime/data/catalog.json*', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(AX) })); await d.ctx.route('**/anime/data/texts/*.json*', r => r.fulfill({ contentType: 'application/json', body: '{}' })); }
+const goAnime = async d => { await d.page.goto(base + '/anime/'); await d.page.waitForSelector('#grid .cel'); }, listsOf = d => d.page.$$eval('#lists button', b => b.map(x => x.textContent.replace(/\s+/g, ' ').trim()).join('|'));
+await goAnime(A); await A.tap('.invite [data-act=import]'); await A.page.waitForSelector('#imp[open]');
+await A.page.setInputFiles('#imp-file', { name: 'animelist.xml.gz', mimeType: 'application/gzip', buffer: malGz() }); await A.tap('[data-act=imp-apply]'); await A.page.waitForSelector('#imp .msg.ok'); await new Promise(r => setTimeout(r, 600));
+const AT = tree[R + '/anime'] || {}, val = k => AT[k]?.v;
+check('الاستيراد يكتب كل حقل علامةً مستقلة: القائمة والحلقات والتقييم والتاريخان', val('a|11061') === 'completed' && val('p|11061') === '148' && val('r|11061') === '10' && val('b|11061') === '2016-02-03' && val('z|11061') === '2016-02-21' && val('a|13271') === 'plan' && !('p|13271' in AT) && Object.keys(AT).length === 13 + 8 + 8 + 3 + 3, JSON.stringify([Object.keys(AT).length, val('a|11061'), val('p|11061')]));
+await goAnime(B); await B.page.waitForFunction(() => /أشاهده الآن 3/.test(document.querySelector('#lists').textContent), null, { timeout: 8000 }).catch(() => {});
+check('الجهاز الآخر يستلم السجل كاملاً بلا استيراد', await listsOf(B) === 'أشاهده الآن 3|أكملته 4|مؤجَّل 1|تركته 1|سأشاهده 4|الكل 13' && JSON.stringify((await B.local('animeg.progress')).a[11061]) === '{"s":"completed","p":148,"r":10,"b":"2016-02-03","e":"2016-02-21"}', await listsOf(B));
+await B.tap('.rail .cel[data-id="37989"] [data-act=plus]'); await new Promise(r => setTimeout(r, 500));
+await A.page.keyboard.press('Escape'); await A.page.waitForFunction(() => document.querySelector('.rail .cel[data-id="37989"] .tc b')?.textContent === '8', null, { timeout: 8000 }).catch(() => {});
+check('«+» على الجوال يظهر على الكمبيوتر حيّاً', tree[R + '/anime']['p|37989'].v === '8' && await A.page.textContent('.rail .cel[data-id="37989"] .tc b') === '8');
+// من جهاز ثالث: تقدّم صحيح يُقبل، وتقييم خارج 1–10 لا يُحفظ كما هو (يُعامل إلغاءً)
+await fetch(dbUrl + '/update', { method: 'POST', body: JSON.stringify({ path: R + '/anime', obj: { 'p|52701': { v: '6' }, 'r|1735': { v: '99' } } }) });
+await A.page.waitForFunction(() => JSON.parse(localStorage.getItem('animeg.progress')).a[52701]?.p === 6, null, { timeout: 8000 }).catch(() => {});
+{ const a = (await A.local('animeg.progress')).a; check('قيمة من القاعدة تُقبل إن صحّت صيغتها فقط', a[52701].p === 6 && a[1735].r === undefined && a[1735].p === 393, JSON.stringify([a[52701], a[1735]])); }
 
 console.log('\n== الأعطال والإيقاف');
 const C = await device('جهاز ثالث', { width: 390, height: 844 }, true); deny = true;

@@ -16,20 +16,27 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   // مقاس واحد بتفضيل «تقليل الحركة» في النظام، ليُختبر طريقه (تلاشٍ بلا طيران)
   const ctx = await browser.newContext({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, locale: 'ar-SA', reducedMotion: name === 'fold-cover-zoom' ? 'reduce' : 'no-preference' }), page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => m.type() === 'error' && !/favicon|404|401/.test(m.text()) && errs.push(m.text()));
-  await page.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com/, r => r.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#345"/></svg>' }));
+  await page.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com|cdn\.myanimelist\.net/, r => r.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#345"/></svg>' }));
   const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); await page.waitForTimeout(550); return mobile ? l.tap() : l.click(); };
   const fits = async label => { await page.waitForTimeout(500); const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
       small: [...document.querySelectorAll('button,a[href],summary,select,input')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight && r.bottom > 0 && (r.width < 40 || r.height < 40) && !e.closest('.foot,.hub-foot,.canon,.why,.note,[hidden]'); }).map(e => (e.className || e.tagName) + ':' + (e.textContent || '').trim().slice(0, 24)).slice(0, 3) }));
     check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw, `${o.sw}/${o.iw}`); if (mobile) check(`${label}: أهداف اللمس 40px فأكثر`, o.small.length === 0, o.small.join(' ')); };
   // الواجهة الرئيسية
   await page.goto(base + '/'); await page.waitForSelector('.door');
-  check('الواجهة: أربعة أبواب بروابطها', await page.locator('a.door').count() === 4 && await page.getAttribute('.door.dc', 'href') === 'dc/' && (await page.getAttribute('.door.fate', 'href')) === 'fate/' && (await page.getAttribute('.door.films', 'href')) === 'films/' && (await page.getAttribute('.door.games', 'href')) === 'games/');
+  check('الواجهة: أربعة أبواب بروابطها', await page.locator('a.door').count() === 4 && await page.getAttribute('.door.dc', 'href') === 'dc/' && (await page.getAttribute('.door.anime', 'href')) === 'anime/' && (await page.getAttribute('.door.films', 'href')) === 'films/' && (await page.getAttribute('.door.games', 'href')) === 'games/');
   await page.waitForFunction(() => /\d/.test(document.querySelector('.door.dc [data-stat]').textContent)); check('الواجهة: عدد أعمال كل دليل ظاهر', /196/.test(await page.textContent('.door.dc [data-stat]')));
+  await page.waitForFunction(() => /\d/.test(document.querySelector('.door.anime [data-stat]').textContent)); check('الواجهة: عدد أعمال «أنمياتي» ظاهر', /\d{3,} عمل/.test(await page.textContent('.door.anime [data-stat]')), await page.textContent('.door.anime [data-stat]'));
   await fits('الواجهة');
+  // أنمياتي ببياناتها المبنية فعلاً: القائمة تُحمَّل، وقبل الاستيراد دعوته، والسلاسل فيها مدخل Fate
+  await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel');
+  check('أنمياتي: القائمة المبنية تُحمَّل بأعمالها وصورها، وقبل الاستيراد دعوته', await page.evaluate(() => document.querySelectorAll('#grid .cel').length === 60 && !!document.querySelector('.invite [data-act=import]') && /^https:\/\/(cdn\.myanimelist\.net|image\.tmdb\.org)\//.test(document.querySelector('#grid .cel img')?.src || '') && /\d{3,} عمل/.test(document.querySelector('#count').textContent)));
+  await page.evaluate(() => document.querySelector('[data-act=view][data-v=worlds]').click()); await page.waitForSelector('#worlds .wc');
+  check('أنمياتي: السلاسل مبنية من علاقات الأعمال، وأولها مدخل دليل Fate', await page.evaluate(() => document.querySelectorAll('#worlds button.wc').length >= 20 && document.querySelector('#worlds .wc').matches('a.fate[href="../fate/"]')));
+  await fits('أنمياتي');
   // دليل Fate
   await page.goto(base + '/fate/'); await page.waitForSelector('.card'); await page.evaluate(() => { try { localStorage.removeItem('fateg.progress'); } catch {} }); await page.reload(); await page.waitForSelector('.card');
   check(`Fate: ${P.length} بطاقة في ${U.length} خطوط`, await page.locator('.card').count() === P.length && await page.locator('section.uni').count() === U.length);
-  check('Fate: سجل منفصل عن دي سي والعودة للواجهة موجودة', await page.getAttribute('.top .home', 'href') === '../' && await page.title() === 'دليل عالم Fate');
+  check('Fate: سجل منفصل عن دي سي، والعودة إلى «أنمياتي» التي يسكن داخلها', await page.getAttribute('.top .home', 'href') === '../anime/#worlds' && (await page.textContent('.top .home')).trim() === 'أنمياتي' && await page.title() === 'دليل عالم Fate');
   const first = P[0], sel = '#' + await page.locator('.card').first().getAttribute('id');
   check('Fate: زرّا MyAnimeList وSimkl بروابط الإدراج نفسه', await page.evaluate(([s, mal, simkl]) => { const h = [...document.querySelectorAll(`${s} .xlinks a`)].map(a => a.href); return h.includes(`https://myanimelist.net/anime/${mal}`) && h.includes(`https://simkl.com/anime/${simkl}`); }, [sel, first.mal, first.simkl]));
   { const hasMal = !!JSON.parse(fs.readFileSync(path.join(siteDir, 'fate/data/mal.json'))).anime?.[first.mal]?.score, src = await page.textContent(sel + ' .rates .src');

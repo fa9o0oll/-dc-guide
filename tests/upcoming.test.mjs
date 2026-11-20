@@ -28,7 +28,7 @@ const browser = await chromium.launch();
 async function open(width, height, mobile, extra = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, locale: 'ar-SA', ...extra }), page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => m.type() === 'error' && !/favicon|404|Failed to load/.test(m.text()) && errs.push(m.text()));
-  await page.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com/, r => r.fulfill({ contentType: 'image/svg+xml', body: ph }));
+  await page.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com|cdn\.myanimelist\.net/, r => r.fulfill({ contentType: 'image/svg+xml', body: ph }));
   return { ctx, page, errs };
 }
 
@@ -140,13 +140,13 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
   await page.waitForTimeout(900);
   const art = await page.evaluate(() => [...document.querySelectorAll('.door')].map(x => { const i = x.querySelector('.art img'); return { g: x.dataset.guide, poster: x.hasAttribute('data-poster'), src: i?.src || '', op: i ? getComputedStyle(i).opacity : '', filter: i ? getComputedStyle(i).filter : '' }; }));
   if (w >= 1024) check(`${name}: كل بوابة بغلافها الطولي بدقته الأصلية (دي سي وFate وأفلامي من TMDB، وألعابي لوحة Tekken 8 بدقة 4K)، والثلاث بحضورها كاملاً بلا تعتيم ولا مرشحات`,
-    art.every(a => a.poster) && /original\/mhOo2k/.test(art[0].src) && /original\/pgsHTHQ/.test(art[1].src) && /original\/xWRahw/.test(art[2].src) && /store-images\.s-microsoft\.com\/.*w=2880/.test(art[3].src)
+    art.every(a => a.poster) && /original\/mhOo2k/.test(art[0].src) && /\/t\/p\/original\//.test(art[1].src) && /original\/xWRahw/.test(art[2].src) && /store-images\.s-microsoft\.com\/.*w=2880/.test(art[3].src)
     && art.slice(1).every(a => a.op === '1' && a.filter === 'none'), art);
   else check(`${name}: على الأضيق كل بوابة بصورتها العادية، لا غلاف الشاشات العريضة`, art.every(a => !a.poster) && /images\.igdb\.com\/.*ar5zhb/.test(art[3].src) && !/pgsHTHQ|xWRahw|mhOo2k|s-microsoft/.test(art.map(a => a.src).join()), art);
   // الجاران مائلان قليلاً في القوس فيُسقَط موضع أسطرهما بفارق بكسلات قليلة
   if (w >= 1024) check(`${name}: البوابات الأربع ظاهرة في قوس يواجهك (الطرفان أكثر ميلاً من الوسطيين)، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, d.flat.length === 4 && [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 4) && (a => a[0] < a[1] && a[1] < 0 && 0 < a[2] && a[2] < a[3])(d.flat.map(rotY)) && !d.nav.length, { ...d, angles: d.flat.map(rotY) });
   else {
-    check(`${name}: القاعة تبدأ بالبوابة الوسطى كبيرة تواجهك وجاراها مائلان على الجانبين`, d.here.join() === 'fate' && Math.abs(d.off[1]) <= 2 && d.off[0] > 0 && d.off[2] < 0 && d.off[3] < d.off[2] && facing(d.flat[1]) && !facing(d.flat[0]) && !facing(d.flat[2]) && d.nav.join() === 'false,true,false,false', d);
+    check(`${name}: القاعة تبدأ بالبوابة الوسطى كبيرة تواجهك وجاراها مائلان على الجانبين`, d.here.join() === 'anime' && Math.abs(d.off[1]) <= 2 && d.off[0] > 0 && d.off[2] < 0 && d.off[3] < d.off[2] && facing(d.flat[1]) && !facing(d.flat[0]) && !facing(d.flat[2]) && d.nav.join() === 'false,true,false,false', d);
     // ما يتحرك في القاعة: transform وopacity فقط (يحرّكه كرت الشاشة دون إعادة رسم)، بلا تمويه، وحركة الجارين ساكنة حتى يصلا الوسط
     const fx = await page.evaluate(() => { const ok = new Set(['offset', 'computedOffset', 'easing', 'composite', 'transform', 'opacity', 'translate', 'rotate', 'scale']);
       const anims = document.getAnimations().filter(a => a.effect?.target?.closest?.('.doors'));
@@ -161,10 +161,10 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
     check(`${name}: كل ما يتحرك في القاعة transform وopacity فقط، وبلا تمويه`, fx.n > 20 && !fx.props.length && !fx.blur, fx);
     check(`${name}: حركة البوابتين الجانبيتين ساكنة، والتي في الوسط تتحرك`, fx.side.join() === 'paused' && fx.mid.join() === 'running', fx);
     check(`${name}: مطر دي سي خفيف: طبقتان من نسيج خيوط، كل طبقة تنزل مسافة تكرار نسيجها، مائلة كمطر الغلاف`, fx.rain.length === 2 && fx.rain.every(([svg, t, bs]) => svg && t === `translateY(${parseInt(bs.split(' ')[1])}px)`) && /^matrix\(1, 0, -0\.2/.test(fx.skew), fx);
-    // النقش فوق القاعة يأخذ لون البوابة التي أمامك (Fate ذهبي)
+    // النقش فوق القاعة يأخذ لون البوابة التي أمامك (أنمياتي وردي الغسق)
     const lit = () => page.evaluate(() => [document.body.dataset.here, getComputedStyle(document.body).getPropertyValue('--lit').trim()]);
     await page.waitForTimeout(900); const l0 = await lit();
-    check(`${name}: لون النقش من البوابة التي أمامك`, l0[0] === 'fate' && /230, 182, 92|#e6b65c/i.test(l0[1]), l0);
+    check(`${name}: لون النقش من البوابة التي أمامك`, l0[0] === 'anime' && /255, 143, 163|#ff8fa3/i.test(l0[1]), l0);
     const tapDoor = async g => { const b = await page.locator(`.door.${g}`).boundingBox(); const x = g === 'dc' ? Math.min(w - 6, b.x + b.width * .5) : b.x + b.width * .5; if (mobile) await page.touchscreen.tap(x, b.y + b.height * .5); else await page.mouse.click(x, b.y + b.height * .5); };
     await tapDoor('dc'); await page.waitForTimeout(1100);
     const after = await page.evaluate(() => ({ url: location.pathname, here: document.querySelector('.door[data-here]')?.dataset.guide, t: getComputedStyle(document.querySelector('.door.dc')).transform }));
@@ -265,7 +265,7 @@ for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440,
 for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440, 900, false]]) {
   console.log(`== mini portals ${name}`);
   const { ctx, page, errs } = await open(w, h, mobile), look = {};
-  for (const g of ['dc', 'fate', 'films', 'games']) {
+  for (const g of ['dc', 'anime', 'films', 'games']) {
     await page.goto(`${base}/${g}/`); await page.waitForSelector('.top .home .pdoor'); await page.waitForTimeout(500);
     const m = await page.evaluate(() => { const ok = new Set(['offset', 'computedOffset', 'easing', 'composite', 'transform', 'opacity', 'translate', 'rotate', 'scale']);
       const d = document.querySelector('.top .home .pdoor'), a = d.getAnimations({ subtree: true }), r = document.querySelector('.top .home').getBoundingClientRect(), cs = getComputedStyle(d);
@@ -281,6 +281,11 @@ for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440,
     check(`${name} ${g}: الضغط يوسّع البوابة الصغيرة حتى تملأ الشاشة ثم يعيدك إلى القاعة${mobile ? '، وبوابة هذا العالم في وسطها' : ''}`, grow && back.path === '/' && back.last === g && (!mobile || back.here === g), { grow, back });
   }
   check(`${name}: لكل عالم بوابته الصغيرة بهويته (إطار ولون مختلفان)`, new Set(Object.values(look)).size === 4, look);
+  // دليل Fate يسكن داخل «أنمياتي»: زر رجوعه يعيد إليها (على السلاسل) لا إلى القاعة
+  await page.goto(`${base}/fate/`); await page.waitForSelector('.top .home .pdoor');
+  const fh = await page.evaluate(() => [document.querySelector('.top .home').getAttribute('href'), document.querySelector('.top .home').textContent.trim(), document.querySelector('.gate').getAttribute('href'), document.querySelector('.top .logo').getAttribute('aria-label')]);
+  await page.click('.top .home'); await page.waitForURL(u => new URL(u).pathname === '/anime/', { timeout: 5000 }).catch(() => {}); await page.waitForSelector('#worlds .wc', { timeout: 8000 }).catch(() => {});
+  check(`${name}: زر الرجوع في دليل Fate يعيد إلى «أنمياتي» على سلاسلها`, fh.join('|') === '../anime/#worlds|أنمياتي|../anime/#worlds|العودة إلى أنمياتي' && new URL(page.url()).pathname === '/anime/' && await page.evaluate(() => !document.querySelector('#worlds').hidden && !!document.querySelector('#worlds a.fate[href="../fate/"]')), { fh, url: page.url() });
   check(`mini portals ${name}: بلا أخطاء برمجية`, !errs.length, errs);
   await ctx.close(); }
 
@@ -291,13 +296,13 @@ for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440,
   check('تقليل الحركة: الأرقام تتغير بلا حركة، ومصابيح اللافتة ثابتة', await page.evaluate(() => [...document.querySelectorAll('.dg span')].every(s => !s.getAnimations().length) && [...document.querySelectorAll('.mq')].every(m => getComputedStyle(m, '::before').animationName === 'none')));
   await page.goto(`${base}/dc/`); await page.waitForSelector('.pm'); await page.waitForTimeout(1300);
   check('تقليل الحركة: لوحة العدّ بلا ضوء يمر ولا نبض', await page.evaluate(() => [...document.querySelectorAll('.pm')].every(p => getComputedStyle(p, '::after').animationName === 'none') && [...document.querySelectorAll('.dg span')].every(s => !s.getAnimations().length)));
-  await page.goto(`${base}/fate/`); await page.waitForSelector('.top .home .pdoor'); await page.waitForTimeout(400);
+  await page.goto(`${base}/anime/`); await page.waitForSelector('.top .home .pdoor'); await page.waitForTimeout(400);
   const rm = await page.evaluate(() => document.querySelector('.top .home .pdoor').getAnimations({ subtree: true }).length);
   await page.click('.top .home'); const g2 = await page.evaluate(() => !!document.querySelector('.pexit')).catch(() => false);
   await page.waitForURL(u => new URL(u).pathname === '/', { timeout: 3000 }).catch(() => {});
   check('تقليل الحركة: البوابة الصغيرة ساكنة، والضغط ينقلك مباشرة بلا اتساع', !rm && !g2 && new URL(page.url()).pathname === '/', { rm, g2, url: page.url() });
   await page.goto(`${base}/`); await page.waitForTimeout(700);
-  check('تقليل الحركة: البوابات مستوية بلا ميل ولا مطر ولا جمر، والنقش بلا ضوء يمر، والتنقل بينها يبقى', await page.evaluate(() => [...document.querySelectorAll('.door')].every(d => getComputedStyle(d).transform === 'none') && !document.getAnimations().length && !!document.querySelector('.door.fate[data-here]')));
+  check('تقليل الحركة: البوابات مستوية بلا ميل ولا مطر ولا جمر، والنقش بلا ضوء يمر، والتنقل بينها يبقى', await page.evaluate(() => [...document.querySelectorAll('.door')].every(d => getComputedStyle(d).transform === 'none') && !document.getAnimations().length && !!document.querySelector('.door.anime[data-here]')));
   check('reduced-motion: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
 

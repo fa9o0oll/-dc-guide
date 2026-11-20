@@ -1,6 +1,7 @@
 // الهيكل المشترك لكل دليل: الأيقونات، الترويسة، أشرطة التنقل، النافذة المنبثقة. يُحقن مرة واحدة قبل تشغيل الواجهة.
 import { miniDoor } from './portal.js?v=__BUILD__';
-export const shell = G => `<svg hidden aria-hidden="true"><defs>
+// G.home: الدليل الذي يسكن داخل بوابة أخرى (Fate داخل أنمياتي) يعود إليها لا إلى القاعة
+export const shell = (G, H = G.home || { href: '../', label: 'البوابات', aria: 'العودة إلى البوابات' }) => `<svg hidden aria-hidden="true"><defs>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
 <symbol id="i-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/></symbol>
 <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" stroke-width="1.6" d="M8.5 6v12l10-6z"/></symbol>
@@ -18,14 +19,14 @@ export const shell = G => `<svg hidden aria-hidden="true"><defs>
 <div class="atmo" aria-hidden="true"><div class="scene"><div class="scene-img"></div><div class="motif"></div></div><div class="scene"><div class="scene-img"></div><div class="motif"></div></div></div>
 <header class="top" id="top">
   <div class="brand">
-    <a class="logo" href="../" aria-label="العودة إلى البوابات">${G.logo}</a>
+    <a class="logo" href="${H.href}" aria-label="${H.aria}">${G.logo}</a>
     <div><h1>${G.name}</h1><p id="statsLine">جارٍ التحميل…</p></div>
   </div>
-  <a class="home" href="../">${miniDoor}<span>البوابات</span></a>
+  <a class="home" href="${H.href}">${miniDoor}<span>${H.label}</span></a>
 </header>
 <div class="stick" id="stick">
 <div class="controls">
-  <a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a>
+  <a class="gate" href="${H.href}" aria-label="${H.aria}" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">${H.label}</span></a>
   <nav class="views" aria-label="طرق العرض">
     <button data-act="view" data-view="cards" class="on">البطاقات</button>
     <button data-act="view" data-view="timeline">الخط الزمني</button>
