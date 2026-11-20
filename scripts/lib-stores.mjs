@@ -19,7 +19,7 @@ const PASS_PC = 'fdd9e2a7-0fee-49f6-ad69-4354098401ff';   // قائمة PC Game 
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const chunks = (a, n) => { const o = []; for (let i = 0; i < a.length; i += n) o.push(a.slice(i, i + n)); return o; };
 // اسم للمطابقة: بلا علامات تجارية ولا لواحق النسخة («for Windows 10»، «(PC)»، «Standard Edition»)
-export const norm = s => String(s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[™®©]/g, '').replace(/&/g, ' and ')
+export const norm = s => String(s || '').replace(/[™®©]/g, '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/&/g, ' and ')
   .replace(/\((pc|windows|windows 10|win10)\)/g, ' ').replace(/[-–:]?\s*\b(for windows 10|for windows|windows 10 edition|windows edition|windows 10|standard edition)\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
 export const isPc = g => (g.plats || []).includes('pc') || (g.also || []).includes('pc');
 export const epicSlug = u => { const m = String(u || '').match(/epicgames\.com\/(?:store\/)?(?:[a-z]{2}(?:-[A-Za-z]{2})?\/)?(p|product|bundles)\/([^/?#]+)/); return m ? { kind: m[1] === 'bundles' ? 'bundles' : 'p', slug: m[2] } : null; };
