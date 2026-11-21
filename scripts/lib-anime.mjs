@@ -110,8 +110,10 @@ function stemOf(g, head) { const names = g.map(x => [x, norm(worldName(x.title))
 // ---------- الحلقات: من مواسم المسلسل في TMDB إلى حلقات كل عمل
 // حلقة TMDB ← ما نحفظه. الاسم الآلي («Episode 5»، «第5話») ليس عنواناً، والتقييم يُحفظ حين يكفي عدد أصواته
 const autoName = n => /^(?:episode|episodio|épisode|folge|capítulo)\s*#?\d+$/i.test(n) || /^第?\s*\d+\s*話$/.test(n) || /^\d+$/.test(n);
-export const shapeEpisode = e => { const name = (e.name || '').trim();
-  return { se: e.season_number, ep: e.episode_number, t: name && !autoName(name) ? name : null, d: day(e.air_date), r: e.runtime || null, ov: (e.overview || '').replace(/\s+/g, ' ').trim() || null,
+// وكذلك الملخص الآلي: عبارة موقع تقول إن لا ملخص («Be the first one to add a plot»، «No description yet») ليست ملخصاً، فلا تُعرض ولا تُترجم
+const noPlot = s => /be the first (?:one )?to add a plot|^no (?:description|overview|plot|summary|synopsis)(?: (?:yet|available))?\.?$|^(?:tba|tbd|n\/a)\.?$|we don't have an overview/i.test(s);
+export const shapeEpisode = e => { const name = (e.name || '').trim(), ov = (e.overview || '').replace(/\s+/g, ' ').trim();
+  return { se: e.season_number, ep: e.episode_number, t: name && !autoName(name) ? name : null, d: day(e.air_date), r: e.runtime || null, ov: ov && !noPlot(ov) ? ov : null,
     st: e.still_path || null, ra: e.vote_count >= 5 && e.vote_average ? Math.round(e.vote_average * 10) / 10 : null }; };
 const gap = (a, b) => Math.round((Date.parse(a) - Date.parse(b)) / 864e5), exact = d => /^\d{4}-\d{2}-\d{2}$/.test(d || '') ? d : null;
 // أين تقع حلقات العمل في حلقات المسلسل على TMDB. flat: المواسم العادية كلها بترتيبها قائمةً واحدة، start: الموضع الذي تقوله الخريطة
