@@ -81,6 +81,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('نافذة الفيلم: أين تشاهده في السعودية بصفوف الإتاحة', await page.evaluate(() => { const w = document.querySelector('#sheet .where'); if (!w) return false;
     const rows = [...w.querySelectorAll('.wrow')].map(r => r.querySelector('b').textContent + ':' + [...r.querySelectorAll('a')].map(a => a.textContent).join('+'));
     return w.querySelector('h4').textContent === 'أين تشاهده في السعودية' && rows.join(' | ') === 'باشتراك:Netflix+OSN+ | إيجار:Apple TV | شراء:Apple TV+Google Play Movies' && [...w.querySelectorAll('a')].every(a => a.href === 'https://www.themoviedb.org/movie/155/watch?locale=SA' && a.target === '_blank' && a.querySelector('img')) && /JustWatch/.test(w.querySelector('.lbl').textContent); }));
+  // سطر موقعه تحت العنوان (E53): رقمه في خط زمن عالمه، وما قبله وما بعده أزرار تفتح بطاقتيهما في العالم نفسه
+  check('نافذة الفيلم: سطر موقعه «2 من 3 · بعد Batman Begins · وقبل The Dark Knight Rises» في ثلاثية فارس الظلام', await page.evaluate(() => { const c = document.querySelector('#sheet .dw-top + .chain'); if (!c) return false;
+    return c.querySelector('.ch-k').textContent === '2 من 3' && [...c.querySelectorAll('.ch-l')].map(x => x.textContent + '@' + x.dataset.uni).join('|') === 'Batman Begins@nolan|The Dark Knight Rises@nolan' && /ثلاثية فارس الظلام، بترتيب المشاهدة/.test(c.querySelector('.ch-n').textContent); }));
   await overflow('نافذة الفيلم'); await snap('2-film');
   // تكبير البوستر (zoom.js المشترك بين البوابات)
   await tap('#sheet [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(950);

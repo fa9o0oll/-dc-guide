@@ -65,7 +65,8 @@ else if (cmd === 'check') { const bad = [], raw = fs.readFileSync(new URL('data/
     if (!/^\{\n("\d+x\d+": \{.*\},?\n)*\}\n$/.test(raw2)) bad.push(`${f}: الصيغة: سطر لكل حلقة`);
     for (const [k, x] of Object.entries(T)) { eps++; const e = en.get(`${tv}:${k}`), w = [x.t || '', x.o || ''].map(v => v && badText(v)).find(Boolean);
       if (!/^[0-9a-f]{10}$/.test(x.h || '') || !(x.t || x.o)) bad.push(`${f} ${k}: بلا بصمة أو بلا نص`); if (w) bad.push(`${f} ${k}: ${w}`);
-      if (e && x.h !== epPrint(sha, e)) stale++; else if (e?.ov && x.o) { const r = x.o.length / e.ov.length; if (r < .3 || r > 2.2) bad.push(`${f} ${k}: طول الملخص ${Math.round(r * 100)}% من الأصل`); } } }
+      if (x.src != null && !/^https:\/\/\S+$/.test(x.src)) bad.push(`${f} ${k}: رابط المصدر ليس https`);
+      if (e && x.h !== epPrint(sha, e)) stale++; else if (e?.ov && x.o && !x.src) { const r = x.o.length / e.ov.length; if (r < .3 || r > 2.2) bad.push(`${f} ${k}: طول الملخص ${Math.round(r * 100)}% من الأصل`); } } }
   // الملفات المحرَّرة باليد: نبذات العوالم (worlds.json)، وترتيب القصة المُراجَع (orders.json)، وتصحيح مطابقة TMDB (tmdb.json)
   const heads = new Map((cat.worlds || []).map(w => [w.head, w])), about = rd('data/anime/worlds.json', {}), orders = rd('data/anime/orders.json', {}), fix = rd('data/anime/tmdb.json', {});
   for (const [k, v] of Object.entries(about)) { if (!heads.has(+k)) bad.push(`worlds.json ${k}: ليس العمل الذي تحمل سلسلةٌ اسمه`); const w = typeof v === 'string' ? badText(v) : 'ليس نصاً'; if (w) bad.push(`worlds.json ${k}: ${w}`); }
@@ -87,7 +88,9 @@ else if (cmd === 'eps-add') { const add = JSON.parse(fs.readFileSync(args[0], 'u
       if (o && !e.ov) { bad.push(`${id} الحلقة ${num}: ملخص لحلقة لا ملخص لها في المصدر`); continue; } if (t && !e.t) { bad.push(`${id} الحلقة ${num}: عنوان لحلقة لا عنوان لها في المصدر`); continue; }
       if ((e.t && !t && !same) || (e.ov && !o)) { bad.push(`${id} الحلقة ${num}: ينقصها ${e.t && !t && !same ? 'العنوان' : 'الملخص'}`); continue; }
       const w = [t, o].filter(Boolean).map(badText).find(Boolean); if (w) { bad.push(`${id} الحلقة ${num}: ${w}`); continue; }
-      const k = epKey(e), v = { ...(t ? { t } : {}), ...(o ? { o } : {}), h: epPrint(sha, e) }; if (!T[k]) n++; else if (JSON.stringify(T[k]) !== JSON.stringify(v)) changed++; T[k] = v; }
+      // src: ملخص كُتب من مصدر موثوق لأن ملخص TMDB يصف حلقة أخرى؛ رابطه يبقى معه، ولا يُقاس طوله بطول الأصل الخاطئ
+      const src = (x.src || '').trim(); if (src && !/^https:\/\/\S+$/.test(src)) { bad.push(`${id} الحلقة ${num}: رابط المصدر ليس https`); continue; }
+      const k = epKey(e), v = { ...(t ? { t } : {}), ...(o ? { o } : {}), ...(src ? { src } : {}), h: epPrint(sha, e) }; if (!T[k]) n++; else if (JSON.stringify(T[k]) !== JSON.stringify(v)) changed++; T[k] = v; }
     saveTr(j.tv, T); }
   console.log(`حلقات جديدة ${n}، معدَّلة ${changed}${bad.length ? '\n' + bad.join('\n') : ''}`); process.exit(bad.length ? 1 : 0); }
 else if (cmd === 'eps-left') { const ids = args.map(Number).filter(Boolean), index = rd('site/anime/data/eps/index.json', {}), rows = [];

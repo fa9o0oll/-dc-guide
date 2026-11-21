@@ -310,9 +310,23 @@ function relatedHTML(f) { const w = D.wworks[keyOf(f)]; if (!w) return '';
   return `<section class="sec"><h3>أعمال مرتبطة</h3>${src ? `<ul class="srcs">${src}</ul>` : ''}${rel.length ? `<div class="reel rels">${rel.map(relCard).join('')}</div>` : ''}
 <p class="note">العلاقات آلية من ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + (w.q || ''))}: الأصل الذي اقتُبس منه العمل، وما اقتُبس عنه من ريميك أو مسلسل، واقتباسات أخرى للمصدر نفسه.</p></section>`; }
 const worldHTML = f => orderHTML(f) + relatedHTML(f);
-// يعيد رسم قسم العالم في البطاقة المفتوحة (بعد وصول خريطة العوالم أو نتيجة البحث المباشر)
+// ---------- سطر موقعه تحت العنوان، لتعرف وأنت في البطاقة أين تقع: رقمه في سلسلته وما قبله وما بعده فيها بالترتيب الظاهر في «ترتيب المشاهدة» أسفل،
+// وأصله إن كان إعادة صنع لعمل آخر أو مقتبساً عنه (من Wikidata). كل اسم فيه يفتح بطاقته
+// y: تُذكر السنة مع الاسم حين يتكرر الاسم نفسه حوله (Aladdin بعد Aladdin وقبل Aladdin)
+const chainLink = (s, y) => { const l = listedOf(s), o = infoOf(s), t = esc(o.title || '') + (y && o.year ? ` (${o.year})` : ''); if (!o.title) return '';
+  return l ? `<button type="button" class="ch-l" data-act="open" data-id="${l.id}" dir="ltr">${t}</button>` : s.m || s.t ? `<button type="button" class="ch-l" data-act="add-part"${outRef(s)} data-q="${esc(o.title)}${o.year ? ' ' + o.year : ''}" dir="ltr">${t}</button>` : `<bdi dir="ltr">${t}</bdi>`; };
+function chainHTML(f) { const g = groupOf(f), o = g?.order || [], i = o.findIndex(s => isHere(f, s)), rows = [];
+  if (i >= 0 && o.length > 1) { const nm = s => infoOf(s).title || '', y = s => [f.title, ...[o[i - 1], o[i + 1]].filter(Boolean).map(nm)].filter(t => t === nm(s)).length > 1;
+    const a = i > 0 && chainLink(o[i - 1], y(o[i - 1])), b = o[i + 1] && chainLink(o[i + 1], y(o[i + 1])), bits = [a && `بعد ${a}`, b && `${a ? 'و' : ''}قبل ${b}`].filter(Boolean);
+    rows.push(`<p class="ch-m"><b class="ch-k">${i + 1} من ${o.length}</b>${bits.length ? `<span>${bits.join(' · ')}</span>` : ''}</p><p class="ch-n">في <bdi dir="ltr">${esc(g.name)}</bdi>، ${g.curated ? 'بترتيب المشاهدة الذي يوصي به الدليل' : g.chrono ? 'بترتيب الأحداث' : 'بترتيب الصدور'}</p>`); }
+  const orig = (D.wworks[keyOf(f)]?.rel || []).find(r => r.r === 'original' && infoOf(stepOf(r.k)).title);
+  if (orig) { const s = stepOf(orig.k), y = infoOf(s).year, same = (s.t ? 'tv' : 'movie') === f.kind;
+    rows.push(`<p class="ch-m"><b class="ch-k">${same ? 'إعادة صنع' : 'مقتبس'}</b><span>${same ? (f.kind === 'tv' ? 'لمسلسل' : 'لفيلم') : s.t ? 'عن مسلسل' : 'عن فيلم'} ${chainLink(s)}${y ? ` <bdi>(${y})</bdi>` : ''}</span></p>`); }
+  return rows.length ? `<nav class="chain" aria-label="موقعه من سلسلته">${rows.join('')}</nav>` : ''; }
+// يعيد رسم قسم العالم وسطر الموقع في البطاقة المفتوحة (بعد وصول خريطة العوالم أو نتيجة البحث المباشر)
 const slotOf = { k: null, f: null };
-const refreshSlot = () => { const el = $('#wslot'); if (el && sheet.open && slotOf.f && el.dataset.k === slotOf.k) el.innerHTML = worldHTML(slotOf.f); };
+const refreshSlot = () => { const el = $('#wslot'), ch = $('#chslot'); if (!sheet.open || !slotOf.f) return;
+  if (el && el.dataset.k === slotOf.k) el.innerHTML = worldHTML(slotOf.f); if (ch && ch.dataset.k === slotOf.k) ch.innerHTML = chainHTML(slotOf.f); };
 // عمل جديد أو بطاقة اطلاع: سلسلته وعالمه من Wikidata عبر الخادم، مرة واحدة لكل عمل. الفشل يُبقي ما لدينا (مجموعة TMDB أو «مستقل»)
 function liveWorlds(f) { const k = keyOf(f); if (!pass() || D.wlive.has(k)) return;
   D.wlive.set(k, 'wait'); refreshSlot();
@@ -335,7 +349,7 @@ async function sheetHTML(f, pv = null) { await Promise.race([D.worldsReady, new 
 <div class="sh-head">${f.poster ? `<button type="button" class="poster" data-zoom="" data-zoom-title="${esc(f.title)}" aria-label="تكبير بوستر ${esc(f.title)}">${poster(f.poster, '170px')}</button>` : `<div class="poster">${slate(f)}</div>`}<div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
 <p class="facts">${[f.kind === 'tv' ? 'مسلسل' : '', f.year ? `<bdi>${f.year}</bdi>` : '', rt(f.runtime), f.seasons ? count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم']) : '', f.cert ? `<bdi dir="ltr">${esc(f.cert)}</bdi>` : '', LANGS[f.lang] ? 'اللغة ' + LANGS[f.lang] : '', f.rating ? `<span class="rate">تقييم <bdi dir="ltr">TMDB ${f.rating.toFixed(1)}</bdi></span>` : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</p>
 <div class="tags">${f.genres.map(g => GENRES[g] ? `<span>${GENRES[g]}</span>` : '').join('')}</div></div></div>
-${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>
+<div id="chslot" data-k="${keyOf(f)}">${chainHTML(f)}</div>${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>
 <section class="sec"><p class="ask">ليس في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">TMDB</bdi>.</p></section>`
   : `<div class="sh-acts"><button class="btn sec" data-act="set" data-v="watched" aria-pressed="${s === 'watched'}">${ic('check')}شاهدته</button><button class="btn sec nx" data-act="set" data-v="next" aria-pressed="${s === 'next'}">${ic('mark')}التالي في المشاهدة</button></div>`}
 ${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''}${f.src === 'added' ? '<section class="sec"><p class="ask">أُضيف بزر «أضف فيلماً»: معلوماته آلية من <bdi dir="ltr">TMDB</bdi> ولم تُراجَع يدوياً.</p></section>' : ''}

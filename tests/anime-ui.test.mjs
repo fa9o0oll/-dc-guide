@@ -145,6 +145,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('نبذة مترجمة: لا زر طلب', await page.evaluate(() => !document.querySelector('#sheet .tr[data-what=about]')));
   check('رابط مباشر يفتح العمل بنبذته العربية وسلسلته', await page.evaluate(() => /Gon Freecss/.test(document.querySelector('#sheet-body .ov').textContent) && /من سلسلة Hunter x Hunter/.test(document.querySelector('#sheet-body').textContent) && /العمل 3 من 4/.test(document.querySelector('#sheet-body').textContent)
     && document.querySelectorAll('#sheet .strip button').length === 4 && document.querySelector('#sheet .strip [aria-current=true]').getAttribute('aria-label') === 'Hunter x Hunter (2011)'));
+  // سطر موقعه تحت العنوان (E53): علاقته بما قبله من MyAnimeList والاسم يفتح بطاقته، وما يليه، ورقمه في سلسلته
+  const ch = await page.evaluate(() => { const c = document.querySelector('#sheet .head + .chain'); return c && { k: c.querySelector('.ch-k')?.textContent, text: c.querySelector('.ch-m span')?.textContent, ids: [...c.querySelectorAll('.ch-l')].map(x => x.dataset.id), n: c.querySelector('.ch-n')?.textContent }; });
+  check('سطر موقعه تحت العنوان: «نسخة أخرى من Hunter x Hunter · ويليه …» والاسمان يفتحان بطاقتيهما، و«3 من 4 في سلسلة Hunter x Hunter، بترتيب الصدور»',
+    ch?.k === 'نسخة أخرى' && ch.text === 'من Hunter x Hunter · ويليه Hunter x Hunter Movie 1: Phantom Rouge' && ch.ids.join() === '136,13271' && ch.n === '3 من 4 في سلسلة Hunter x Hunter، بترتيب الصدور', ch);
+  await tap('#sheet .chain .ch-l[data-id="136"]'); await page.waitForFunction(() => location.hash === '#a136');
+  check('لمس اسم في سطر الموقع يفتح بطاقة ذلك العمل', await page.evaluate(() => /Hunter x Hunter/.test(document.querySelector('#sheet .head h2').textContent) && location.hash === '#a136'));
+  await page.goto('about:blank'); await page.goto(base + '/anime/#a37989'); await page.waitForSelector('#sheet[open]');
   check('السجل محفوظ بعد إعادة التحميل', (await log())[37989].p === 11 && (await lists())[0] === 'أشاهده الآن 2');
   await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
 

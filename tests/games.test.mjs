@@ -147,6 +147,11 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   check('أزرار البطاقة بوظيفتها (ألعبها الآن، سألعبها لاحقاً، ختمتها، شاهدتها فقط)، وتحت كل زر اسم قائمته، وفي آخرها «احذفها من مكتبتي»',
     names.h === 'حالتها عندي' && names.b.join('|') === 'ألعبها الآن / في «متابعة»|سألعبها لاحقاً / في «لعبة جديدة»|ختمتها / في «شارة النهاية»|شاهدتها فقط / في «وضع المتفرج»' && names.rm === 'احذفها من مكتبتي', names);
   check('كم تأخذ لتختمها: ثلاثة أشرطة وشريط ساعاتك', sh.ttb.join() === 't-h,t-n,t-c,t-m', sh.ttb);
+  // سطر موقعها تحت العنوان (E53): نوع موقعها من الأحداث، والجزء الذي قبلها اسماً يُلمس (خارج القائمة: بطاقة اطلاع برقمه)، ورقمها في سلسلتها
+  const ch = await page.evaluate(() => { const c = document.querySelector('#sheet .sh-head + .chain'); return c && { k: c.className, label: c.querySelector('.ch-k')?.textContent, text: c.querySelector('.ch-m span')?.textContent,
+    link: c.querySelector('.ch-l') && { act: c.querySelector('.ch-l').dataset.act, id: c.querySelector('.ch-l').dataset.id, t: c.querySelector('.ch-l').textContent }, n: c.querySelector('.ch-n')?.textContent }; });
+  check('سطر موقعها تحت العنوان: «تكملة لأحداث God of War (2018)» والاسم يفتح بطاقة الجزء 19560، و«رقمها في سلسلة God of War: 8 من 8 بترتيب الصدور»',
+    ch?.k === 'chain k-sequel' && ch.label === 'تكملة' && ch.text === 'لأحداث God of War (2018)' && ch.link?.act === 'peek' && ch.link.id === '19560' && ch.n === 'رقمها في سلسلة God of War: 8 من 8 بترتيب الصدور', ch);
   check('السلسلة بترتيب الصدور وهذه اللعبة في موضعها (8 من 8)، وترتيب القصة الرسمي مخفي حتى يُختار ويبدأ بـ Ascension، ومصدره رابط', sh.ord.length === 8 && sh.ord[7] === '8*' && sh.storyHidden && sh.story[0] === 'God of War: Ascension' && sh.story[7] === 'God of War Ragnarök' && /playstation/.test(sh.src || ''), sh);
   check('المحتوى الإضافي، والاقتباس إلى مسلسل (خارج أفلامي): TMDB و«أضفه إلى أفلامي»، وروابط المتاجر والتختيم', sh.dlc === 'God of War Ragnarök: Valhalla' && sh.tv.includes('https://www.themoviedb.org/tv/999001') && sh.tv.some(h => /^\.\.\/films\/#add=God%20of%20War%202027$/.test(h)) && sh.links.includes('YouTube') && sh.links.includes('HowLongToBeat'), sh);
   await page.click('#sheet [data-act=ordv][data-v=story]'); await page.waitForTimeout(150);

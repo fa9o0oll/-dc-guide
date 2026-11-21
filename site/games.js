@@ -412,7 +412,7 @@ async function sheetHTML(g, pv) { if (g.from?.some(w => w.tmdb) || g.into?.some(
   return `<div class="sh-hero">${art ? `<img alt="" src="${img(art, '720p')}" srcset="${img(art, '720p')} 1280w, ${img(art, '1080p')} 1920w" sizes="(max-width:900px) 100vw, 900px">` : ''}</div>
 <div class="sh-head">${g.cover ? `<button type="button" class="cover" data-zoom="${img(g.cover, '1080p')}" data-zoom-title="${esc(g.title)}" aria-label="كبّر غلاف ${esc(g.title)}">${coverImg(g.cover, '180px', false)}</button>` : `<div class="cover">${cart(g)}</div>`}
 <div class="txt"><h2 dir="ltr">${esc(g.title)}</h2>${g.titleAr ? `<p class="ar">${esc(g.titleAr)}</p>` : ''}<p class="facts">${facts.map(x => `<span>${x}</span>`).join('')}</p><div class="tags">${(g.genres || []).map(x => `<span>${esc(x)}</span>`).join('')}${(g.modes || []).slice(0, 2).map(x => `<span class="m">${esc(x)}</span>`).join('')}</div></div></div>
-${pv ? `<section class="save pv">${twinHTML(g, true)}<h3>أضفها إلى مكتبتي</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${listBtn(k)}</button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
+${chainHTML(g)}${pv ? `<section class="save pv">${twinHTML(g, true)}<h3>أضفها إلى مكتبتي</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${listBtn(k)}</button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
 ${g.src === 'added' ? '<section class="sec"><p class="ask">أُضيفت بزر «أضف لعبة»: معلوماتها آلية من <bdi dir="ltr">IGDB</bdi>، وعالمها واقتباساتها تكتمل في البناء القادم.</p></section>' : ''}
 ${board(g)}${placeSec(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${pcSec(g)}${mediaSec(g)}${linksSec(g)}`; }
 // ---------- عن اللعبة. النصوص الطويلة (النبذة والقصة بلغتيهما) في ملف مستقل يُجلب مرة واحدة (ويُسبق جلبه بعد الإقلاع)، وما أُضيف للتو نصه في سجله.
@@ -445,10 +445,27 @@ async function askTr(btn) { const box = btn.closest('.tr'), id = +box.dataset.id
 const PK = { first: 'بداية الحكاية', sequel: 'تكملة', prequel: 'قبل الأحداث', between: 'بين جزأين', parallel: 'أحداث متزامنة', side: 'قصة جانبية', alone: 'قصة مستقلة', reboot: 'بداية جديدة', remake: 'إعادة صنع',
   same: 'الأحداث نفسها', alt: 'عالم بديل', retell: 'تروي الأصل', nostory: 'بلا حكاية متصلة', bundle: 'مجموعة أجزاء' };
 const sameTitle = (a, b) => fold(a) === fold(b);
+// لعبة باسمها من سلسلة اللعبة أو من القائمة. «God of War (2018)»: السنة بين قوسين تميّز بين جزأين بالاسم نفسه.
+// IGDB يفرد لنسخة الأركيد ونسخة المنزل سجلّين بالاسم نفسه أحياناً: المملوكة أولى
+const byTitle = (g, t) => { const members = (g.series || []).flatMap(id => D.series[id]?.members || []), m = String(t || '').match(/^(.*?)\s*\((\d{4})\)$/), name = m ? m[1] : t,
+  ok = x => sameTitle(x.title, name) && (!m || x.year === +m[2]), hits = t ? [...members, ...D.games].filter(ok) : [];
+  return hits.find(x => D.byId.has(x.id)) || hits[0]; };
+// ---------- سطر موقعها تحت العنوان، لتعرف وأنت في البطاقة أين تقع: نوع موقعها من الأحداث وما قبلها وما بعدها (places.json)، أو أصلها إن كانت
+// ريميك أو ريماستر أو توسعة، ثم رقمها في سلسلتها بترتيب الصدور وبترتيب القصة إن اختلف. كل اسم فيه يفتح بطاقته، والتفصيل في «موقعها من أحداث عالمها» أسفل
+const CHAIN = { sequel: (a, b) => [a && `لأحداث ${a}`, b && `وتليها ${b}`], first: (a, b) => [b && `تليها ${b}`], prequel: (a, b) => [b && `أحداثها تسبق ${b}`],
+  between: (a, b) => [a && b ? `${a} و${b}` : a ? `بعد ${a}` : b && `قبل ${b}`], side: (a, b) => [a && `بعد ${a}`, b && `وتليها ${b}`], parallel: a => [a && `مع ${a}`],
+  alt: (a, b) => [b && `تليها ${b}`], reboot: () => ['لا تحتاج ما قبلها'], alone: () => ['لا تحتاج ما قبلها'], remake: (a, b, p) => [p && `للعبة ${p}`], same: (a, b, p) => [p && `التي في ${p}`] };
+const OFTYPE = { remake: 'للعبة', remaster: 'للعبة', standalone: 'للعبة', dlc: 'للعبة', expansion: 'للعبة', expanded: 'من', port: 'من' };
+const chainLink = (m, t) => m ? `<button type="button" class="ch-l" data-act="${D.byId.has(m.id) ? 'open' : 'peek'}" data-id="${m.id}" data-q="${esc(m.title)}${m.year ? ' ' + m.year : ''}" dir="ltr">${esc(t || m.title)}</button>` : `<bdi dir="ltr">${esc(t)}</bdi>`;
+function chainHTML(g) { const p = g.place, k = p && PK[p.k] ? p.k : null, par = g.rel?.parent_game || g.rel?.version_parent;
+  const P = par && chainLink(par, par.title + (par.year && par.year !== g.year ? ` (${par.year})` : '')), A = p?.after && chainLink(byTitle(g, p.after), p.after), B = p?.before && chainLink(byTitle(g, p.before), p.before);
+  const [label, bits] = k ? [PK[k], (CHAIN[k] || (() => []))(A, B, P)] : OFTYPE[g.type] && par ? [TYPES[g.type], [`${OFTYPE[g.type]} ${P}`]] : [null, []];
+  const s = (g.series || []).map(id => D.series[id]).find(x => x?.members?.some(m => m.id === g.id)), i = s ? s.members.findIndex(m => m.id === g.id) : -1, j = s?.story?.order?.indexOf(g.id) ?? -1;
+  const pos = i < 0 ? '' : `رقمها في سلسلة <bdi dir="ltr">${esc(s.name)}</bdi>: ${i + 1} من ${s.members.length} بترتيب الصدور${j >= 0 && j !== i ? `، و${j + 1} بترتيب القصة` : ''}`;
+  const text = bits.filter(Boolean).map((t, n) => n ? t : t.replace(/^و/, '')); if (!label && !pos) return '';
+  return `<nav class="chain${k ? ' k-' + k : ''}" aria-label="موقعها من سلسلتها">${label ? `<p class="ch-m"><b class="ch-k">${label}</b>${text.length ? `<span>${text.join(' · ')}</span>` : ''}</p>` : ''}${pos ? `<p class="ch-n">${pos}</p>` : ''}</nav>`; }
 function placeSec(g) { const p = g.place; if (!p || !PK[p.k]) return '';
-  // «God of War (2018)»: السنة بين قوسين تميّز بين جزأين بالاسم نفسه
-  const members = (g.series || []).flatMap(id => D.series[id]?.members || []), find1 = t => { const m = String(t || '').match(/^(.*?)\s*\((\d{4})\)$/), name = m ? m[1] : t, ok = x => sameTitle(x.title, name) && (!m || x.year === +m[2]), hits = t ? [...members, ...D.games].filter(ok) : [];
-    return hits.find(x => D.byId.has(x.id)) || hits[0]; };   // IGDB يفرد لنسخة الأركيد ونسخة المنزل سجلّين بالاسم نفسه أحياناً: المملوكة أولى
+  const find1 = t => byTitle(g, t);
   const stop = (cls, label, title) => { const m = cls === 'here' ? null : find1(title), own = m && D.byId.has(m.id), inner = `<small>${label}</small><b dir="ltr">${esc(title)}</b>`;
     return `<li class="${cls}">${cls === 'here' ? '<i aria-hidden="true"></i>' : ''}${m ? `<button type="button" data-act="${own ? 'open' : 'peek'}" data-id="${m.id}" data-q="${esc(m.title)}${m.year ? ' ' + m.year : ''}">${inner}</button>` : `<span>${inner}</span>`}</li>`; };
   const track = p.after || p.before ? `<ol class="pl-track" aria-label="موضعها بين ما قبلها وما بعدها في الأحداث">${p.after ? stop('was', 'قبلها في الأحداث', p.after) : ''}${stop('here', 'هذه اللعبة', g.title)}${p.before ? stop('next', 'بعدها في الأحداث', p.before) : ''}</ol>` : '';

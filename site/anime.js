@@ -219,6 +219,21 @@ function worldStrip(a) { const w = D.wby.get(a.w); if (!w) return ''; const orde
   return `<section class="sec"><h3>من سلسلة ${ltr(w.name)}</h3><p class="lbl">العمل ${at} من ${order.length} بترتيب ${w.story ? 'القصة' : 'الصدور'}</p>
     <div class="strip">${order.map(id => D.by.get(id)).filter(Boolean).map(x => `<button data-act="open" data-id="${x.id}" aria-current="${x.id === a.id}" aria-label="${esc(x.t)}">${dot(x.id)}${poster(x) ? `<img loading="lazy" alt="" src="${esc(poster(x))}">` : `<span class="ph">${esc(x.t[0])}</span>`}<span>${esc(title(x))}</span></button>`).join('')}</div>
     <div class="acts"><button class="btn ghost" data-act="world" data-w="${w.id}">افتح السلسلة بترتيبها</button></div></section>`; }
+// ---------- سطر موقعه تحت العنوان، لتعرف وأنت في البطاقة أين تقع: علاقته المباشرة بما قبله من علاقات MyAnimeList (تكملة، قصة جانبية، ملخص، نسخة أخرى)
+// وما يليه، ثم رقمه في سلسلته بترتيبها الظاهر في «من سلسلة» أسفل. وما لا علاقة مباشرة له (أو قبل وصول علاقاته مع نصوص العمل): ما قبله وما بعده في
+// ترتيب سلسلته. كل اسم يفتح بطاقته، وما ليس في «أنمياتي» يُذكر باسمه
+const RELS = [['Prequel', 'تكملة', l => `لأحداث ${l}`], ['Parent Story', 'قصة جانبية', l => `من ${l}`], ['Full Story', 'ملخص', l => `يلخّص ${l}`], ['Alternative Version', 'نسخة أخرى', l => `من ${l}`], ['Alternative Setting', 'عالم بديل', l => `من ${l}`]];
+const chainLink = (id, name) => { const x = D.by.get(id); return x ? `<button type="button" class="ch-l" data-act="open" data-id="${id}" dir="ltr">${esc(title(x))}</button>` : name ? ltr(name) : ''; };
+function chainHTML(a, x) { const w = D.wby.get(a.w), order = w ? w.story || w.ids : [], i = order.indexOf(a.id), n = i >= 0 && order.length > 1 ? order.length : 0, rel = x?.rel || [], one = r => rel.find(e => e.r === r);
+  // «نسخة أخرى» و«عالم بديل» صلتان متبادلتان في MyAnimeList: تُذكران للعمل الأحدث وحده (Brotherhood نسخة أخرى من Fullmetal Alchemist، لا العكس)
+  const older = e => { const o = D.by.get(e.id); return !!(o?.y && a.y && o.y < a.y); }, ok = (r, e) => !/^Alternative/.test(r) || older(e);
+  const hit = RELS.map(([r, k, f]) => [rel.find(e => e.r === r && ok(r, e)), k, f]).find(([e]) => e), seq = one('Sequel'), L = e => chainLink(e.id, e.name); let k = '', bits = [];
+  if (hit) { k = hit[1]; bits = [hit[2](L(hit[0])), seq && `ويليه ${L(seq)}`]; }
+  else if (seq && i <= 0) { k = 'البداية'; bits = [`يليه ${L(seq)}`]; }
+  else if (n) { k = `${i + 1} من ${n}`; const p = i > 0 && chainLink(order[i - 1]), q = order[i + 1] && chainLink(order[i + 1]); bits = [p && `بعد ${p}`, q && `وقبل ${q}`]; }
+  const pos = n ? `${k === `${i + 1} من ${n}` ? '' : `${i + 1} من ${n} `}في سلسلة ${ltr(w.name)}، بترتيب ${w.story ? 'القصة' : 'الصدور'}` : '', text = bits.filter(Boolean).map((t, n) => n ? t : t.replace(/^و/, ''));
+  if (!k && !pos) return '';
+  return `<nav class="chain" aria-label="موقعه من سلسلته">${k ? `<p class="ch-m"><b class="ch-k">${k}</b>${text.length ? `<span>${text.join(' · ')}</span>` : ''}</p>` : ''}${pos ? `<p class="ch-n">${pos}</p>` : ''}</nav>`; }
 function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `${D.base}w780${a.tp}` : poster(a, true), facts = [[typeOf(a)], a.type !== 'Movie' && a.eps ? [nEps(a.eps)] : a.eps === 0 && a.st === 'airing' ? ['مستمر'] : null, a.dur ? [`${a.dur} دقيقة${a.type === 'Movie' ? '' : ' للحلقة'}`] : null,
     a.se && a.y ? [`${SEASON[a.se]} ${a.y}`] : a.y ? [a.y] : null, a.st === 'airing' ? ['يُعرض الآن'] : a.st === 'soon' ? ['لم يُعرض بعد'] : null, a.studio ? [ltr(a.studio)] : null, x?.source ? [`المصدر: ${SOURCE[x.source] || ltr(x.source)}`] : null, a.rating ? [/^\+/.test(RATING[a.rating] || a.rating) ? ltr(RATING[a.rating] || a.rating) : RATING[a.rating] || ltr(a.rating)] : null].filter(Boolean);
   const alt = [a.en && a.en !== a.t ? a.en : '', ui.names === 'english' && a.en ? a.t : '', x?.jp || ''].filter(Boolean);
@@ -227,7 +242,7 @@ function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `
   <div class="body"><div class="head"><button class="cel-art" ${poster(a) ? `data-zoom="${esc(big)}" data-zoom-title="${esc(a.t)}"` : 'disabled'} aria-label="تكبير بوستر ${esc(a.t)}">${art(a, '170px', true)}</button>
     <div><h2>${esc(title(a))}</h2>${alt.map(t => `<p class="alt">${esc(t)}</p>`).join('')}
       <div class="facts">${facts.map(f => `<span>${f[0]}</span>`).join('')}${a.sc ? `<span class="mal">${ltr('MyAnimeList')} <b>${a.sc.toFixed(2)}</b></span>${a.sv ? `<span>${num(a.sv)} تقييماً</span>` : ''}` : ''}</div></div></div>
-    ${mineHTML(a)}
+    ${chainHTML(a, x)}${mineHTML(a)}
     ${D.eps[a.id] ? `<section class="sec xs" id="xs" aria-busy="true"><h3>الحلقات</h3><p class="lbl">تُحمَّل الحلقات…</p></section>` : ''}
     ${a.pending ? '<p class="lbl">معلومات هذا العمل تُجلب في البناء القادم.</p>' : x?.ar ? `<section class="sec"><h3>القصة</h3><p class="ov">${esc(x.ar)}</p></section>` : x?.en ? `<section class="sec"><h3>القصة</h3><span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')}، ولم تُترجم بعد.</span><p class="ov en">${esc(x.en)}</p>${trHTML(a, 'about')}</section>` : ''}
     ${(a.g || []).length ? `<div class="facts">${a.g.map(i => `<span>${genreOf(D.genres[i])}</span>`).join('')}</div>` : ''}

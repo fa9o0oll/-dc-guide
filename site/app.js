@@ -476,10 +476,17 @@ addEventListener('popstate', () => { if (ui.skipPop) { ui.skipPop = false; retur
     sh.style.transform = ''; if (d.dy && !reduce.matches) sh.animate({ transform: [`translateY(${d.dy}px)`, 'none'] }, { duration: 240, easing: EASE }); };
   head.addEventListener('pointerup', end); head.addEventListener('pointercancel', end); }
 
-function openWork(id, season, from) {
+// ---------- سطر موقعه تحت العنوان، لتعرف وأنت في البطاقة أين تقع: رقمه في خط زمن عالمه وما قبله وما بعده فيه، كما في الخط الزمني، لعالم يُشاهد
+// بالترتيب. كل اسم يفتح بطاقته في العالم نفسه
+function chainHTML(pl) { const u = uniOf(pl.universe); if (!u?.serial) return '';
+  const all = D.placements.filter(p => p.universe === pl.universe).sort((a, b) => a.position - b.position), i = all.indexOf(pl); if (i < 0 || all.length < 2) return '';
+  const L = p => `<button type="button" class="ch-l" data-act="open" data-id="${p.work}"${p.season ? ` data-season="${p.season}"` : ''} data-uni="${p.universe}">${ltr(titleOf(p))}</button>`;
+  const bits = [i > 0 && `بعد ${L(all[i - 1])}`, all[i + 1] && `${i > 0 ? 'و' : ''}قبل ${L(all[i + 1])}`].filter(Boolean);
+  return `<nav class="chain" aria-label="موقعه من خط زمن عالمه"><p class="ch-m"><b class="ch-k">${i + 1} من ${all.length}</b>${bits.length ? `<span>${bits.join(' · ')}</span>` : ''}</p><p class="ch-n">في ${esc(u.name)}، بترتيب المشاهدة</p></nav>`; }
+function openWork(id, season, from, uniHint) {
   const w = D.works.get(id), soon = isSoon(w);
   const places = D.placements.filter(p => p.work === id);
-  const uni = from?.closest('section.uni')?.dataset.uni || (places.find(p => p.universe === ui.uni) || places[0]).universe;
+  const uni = (uniHint && places.some(p => p.universe === uniHint) && uniHint) || from?.closest('section.uni')?.dataset.uni || (places.find(p => p.universe === ui.uni) || places[0]).universe;
   const series = w.kind === 'series' && w.episodeCount, pl = places.find(p => p.universe === uni && (p.season ?? null) === (season ?? null)) || places.find(p => p.season === season) || places.find(p => p.universe === uni) || places[0];
   const tabs = series ? [...w.seasons, ...(w.specials ? [{ n: 0 }] : [])] : [];
   openSheet(ltr(w.title), `<div class="hero">${w.backdrop ? `<img decoding="async" src="${img(w.backdrop, 'w780')}" alt="">` : ''}</div>
@@ -487,7 +494,7 @@ function openWork(id, season, from) {
       <div><h3>${ltr(w.title)}</h3>
       <div class="meta bits">${bits([typeOf(w), w.date ? fmtDate(w.date) : w.year, w.runtime ? cnt(w.runtime, 'min') : '', ...(w.episodeCount ? [cnt(w.seasons.length, 'season'), cnt(w.episodeCount, 'ep')] : [])])}</div>
       ${soon ? `<div class="tags"><span class="tag soon">${pl.upcoming?.stage === 'development' ? 'معلن' : 'قادم'}</span></div>` : ''}</div></div>
-    ${w.overviewAr ? `<p class="ov">${ar(w.overviewAr)}</p>` : w.overviewEn ? `<div><span class="lbl">النبذة بالإنجليزية (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(w.overviewEn)}</p></div>` : ''}
+    ${chainHTML(pl)}${w.overviewAr ? `<p class="ov">${ar(w.overviewAr)}</p>` : w.overviewEn ? `<div><span class="lbl">النبذة بالإنجليزية (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(w.overviewEn)}</p></div>` : ''}
     <div class="actions">${places.map(p => `<button data-act="goto" data-to="c" data-target="${domId('c', p)}" data-uni="${p.universe}" data-force="1">البطاقة في ${esc(uniOf(p.universe).name)}${p.season ? `، الموسم ${p.season}` : ''}</button>`).join('')}</div>
     ${soon ? soonBlock(w, uni, pl.upcoming) : ''}
     ${rateBlock(w, pl)}
@@ -622,7 +629,7 @@ document.addEventListener('click', ev => {
     case 'view': if (ui.sheet) closeSheet(); ui.view = d.view; render(); scrollTo(0, 0); break;
     case 'meant': $('#q').value = d.q; render(); break;
     case 'uni': if (ui.sheet) closeSheet(); if (ui.view === 'arrow') ui.view = 'cards'; ui.uni = d.uni; render(); scrollTo(0, 0); break;
-    case 'open': openWork(id, season, b.closest('.card,.node')); break;
+    case 'open': openWork(id, season, b.closest('.card,.node'), d.uni); break;
     case 'season': showSeason(id, season); break;
     case 'path': ui.path = d.path; render(true); break;
     case 'close': closeSheet(); break;
