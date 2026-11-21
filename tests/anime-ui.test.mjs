@@ -160,6 +160,54 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.selectOption('#sort', 'mal'); check('وترتيب القائمة هو ترتيبها في MyAnimeList', (await page.$$eval('#grid .cel', c => c.map(x => x.dataset.id))).join(',') === '11061,136,5114,199');
   await page.selectOption('#names', 'english'); check('الأسماء بالإنجليزية لمن له اسم إنجليزي', await page.textContent('#grid .cel[data-id="11061"] h3') === 'Hunter x Hunter' && await page.textContent('#grid .cel[data-id="5114"] h3') === 'Fullmetal Alchemist: Brotherhood'); await page.selectOption('#names', 'romaji');
 
+  // ---------- «أضف أنمي»: البحث في «أنمياتي» (ومعه أقرباء السلاسل)، ثم في MyAnimeList (Jikan مُحاكى)، والإضافة بكلمة السر (الدالة مُحاكاة)
+  { const jik = [], adds = [];
+    await page.route('https://api.jikan.moe/**', r => { const u = new URL(r.request().url()); jik.push(u.pathname + u.search); const q = u.searchParams.get('q');
+      const im = n => ({ webp: { small_image_url: `https://cdn.myanimelist.net/images/anime/1/${n}t.webp` } });
+      return r.fulfill({ headers: { 'access-control-allow-origin': '*' }, contentType: 'application/json', body: JSON.stringify({ data: q === 'frieren' ? [
+        { mal_id: 52991, title: 'Sousou no Frieren', title_english: "Frieren: Beyond Journey's End", type: 'TV', episodes: 28, year: 2023, images: im(1), rating: 'PG-13 - Teens 13 or older' },
+        { mal_id: 11061, title: 'Hunter x Hunter (2011)', type: 'TV', episodes: 148, year: 2011, images: im(2), rating: 'PG-13 - Teens 13 or older' },
+        { mal_id: 99990, title: 'Should Not Appear', type: 'OVA', episodes: 2, images: im(3), rating: 'Rx - Hentai' },
+        { mal_id: 56876, title: 'Sousou no Frieren 2nd Season', type: 'TV', episodes: null, year: null, aired: { prop: { from: { year: 2026 } } }, images: {}, rating: 'PG-13 - Teens 13 or older' }] : [] }) }); });
+    await page.route(base + '/api/anime-add', r => { const b = JSON.parse(r.request().postData() || '{}'); adds.push(b);
+      return b.password !== 'open-sesame' ? r.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"password"}' }) : r.fulfill({ contentType: 'application/json', body: '{"state":"added"}' }); });
+    const rows = () => page.$$eval('#add-res .arow', r => r.map(x => (x.dataset.id || 'mal' + x.dataset.mal) + ':' + (x.querySelector('.astate')?.textContent.trim() || x.querySelectorAll('.aacts .btn').length)));
+    const works = () => page.evaluate(() => +(document.querySelector('#tally b')?.textContent || '').replace(/\D/g, '') || 0);
+    await tap('.top [data-act=add]'); await page.waitForSelector('#addd[open]');
+    check('«أضف أنمي»: نافذة بعنوانها في الرابط، والمؤشر في خانة البحث', await page.evaluate(() => location.hash === '#add' && document.activeElement?.id === 'add-q' && /اكتب اسم العمل/.test(document.querySelector('#add-res').textContent)));
+    await page.fill('#add-q', 'hunter'); await page.waitForFunction(() => document.querySelectorAll('#add-res .arow').length === 4);
+    check('البحث في كل ما في «أنمياتي»: ما في قائمتك بحالته، والقريب الذي ليس فيها بزرّي الإضافة، بترتيب الصدور', (await rows()).join(' | ') === '136:في «أكملته» | 137:2 | 11061:في «أكملته» | 13271:في «سأشاهده»', await rows());
+    await tap('#add-res .arow[data-id="137"] [data-act=add-to][data-s=plan]');
+    check('إضافته إلى «سأشاهده» تدخل سجلّك وتتغير حالته في النافذة، ومعها «تراجع» ظاهر فوق النافذة', JSON.stringify((await log())[137]) === '{"s":"plan"}' && (await rows())[1] === '137:في «سأشاهده»' && /سأشاهده/.test(await toastText())
+      && await page.evaluate(() => document.querySelector('#toast').closest('dialog')?.id === 'addd'), [await rows(), await toastText()]);
+    await tap('#toast [data-act=undo]');
+    check('و«تراجع» يعيده كما كان، والنافذة تتحدث', (await log())[137] === undefined && (await rows())[1] === '137:2', await rows());
+    await tap('#add-res .arow[data-id="11061"] .aart'); await page.waitForSelector('#sheet[open]');
+    const inCard = await page.evaluate(() => location.hash); await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' });
+    check('بطاقة عمل من النافذة تُفتح فوقها، والرجوع يغلق البطاقة وحدها', inCard === '#a11061' && await page.evaluate(() => document.querySelector('#addd').open && location.hash === '#add'), inCard);
+    await page.fill('#add-q', 'frieren'); await page.waitForFunction(() => /لا عمل في «أنمياتي» بهذا الاسم/.test(document.querySelector('#add-res').textContent));
+    check('ما ليس في «أنمياتي»: لا يُسأل MyAnimeList حتى تطلب، وزر البحث فيه باسم ما كتبت', !jik.length && /ابحث في MyAnimeList عن «frieren»/.test(await page.textContent('#add-res [data-act=add-find]')), jik);
+    await page.press('#add-q', 'Enter'); await page.waitForSelector('#add-res .arow[data-mal]');
+    check('Enter يبحث في MyAnimeList: الجديد تحت عنوانه، وما في «أنمياتي» منه معه أعلاه، والإباحي لا يظهر', jik.length === 1 && /q=frieren/.test(jik[0]) && /sfw=true/.test(jik[0])
+      && (await rows()).join(' | ') === '11061:في «أكملته» | mal52991:2 | mal56876:2' && /2026/.test(await page.textContent('#add-res .arow[data-mal="56876"] .meta')) && /28 حلقة/.test(await page.textContent('#add-res .arow[data-mal="52991"] .meta')), [jik, await rows()]);
+    await snap('9-add'); await overflow('أضف أنمي');
+    const w0 = await works(); await page.evaluate(() => localStorage.removeItem('animeg.pass'));   // حفظها قسم «ترجمها لي»
+    await tap('#add-res .arow[data-mal="52991"] [data-act=add-mal][data-s=plan]'); await page.waitForSelector('#add-res .add-pass');
+    check('أول إضافة من MyAnimeList بلا كلمة سر محفوظة: تُطلب كلمة السر ولا يُرسل شيء', !adds.length && await page.evaluate(() => document.activeElement?.classList.contains('add-pass')));
+    await page.fill('#add-res .add-pass', 'nope'); await page.press('#add-res .add-pass', 'Enter'); await page.waitForFunction(() => /كلمة السر غير صحيحة/.test(document.querySelector('#add-res .msg')?.textContent || ''));
+    check('كلمة سر خاطئة: تقال، وتُفرغ الخانة، ولا يدخل سجلّك شيء', adds.length === 1 && await page.inputValue('#add-res .add-pass') === '' && (await log())[52991] === undefined, adds);
+    await page.fill('#add-res .add-pass', 'open-sesame'); await tap('#add-res .arow[data-mal="52991"] [data-act=add-mal][data-s=plan]'); await page.waitForSelector('#add-res .arow[data-mal="52991"] .astate');
+    const sent = adds.at(-1), keys = Object.keys(sent).sort().join();
+    check('تُرسل الإضافة رقم العمل واسمه ونوعه وحلقاته فقط، ويدخل سجلّك «سأشاهده»، ويقال إنه يظهر مع البناء القادم', keys === 'eps,mal,password,title,type' && sent.mal === 52991 && sent.title === 'Sousou no Frieren' && sent.type === 'TV' && sent.eps === 28
+      && JSON.stringify((await log())[52991]) === '{"s":"plan"}' && /أُضيف إلى «سأشاهده»، ويظهر مع البناء القادم/.test(await page.textContent('#add-res .arow[data-mal="52991"] .astate')) && await works() === w0 + 1
+      && await page.evaluate(() => JSON.parse(localStorage.getItem('animeg.added'))[52991]?.s === 'plan' && localStorage.getItem('animeg.pass') === 'open-sesame'), [sent, await works(), w0]);
+    await tap('#add-res .arow[data-mal="56876"] [data-act=add-mal][data-s=watching]'); await page.waitForSelector('#add-res .arow[data-mal="56876"] .astate');
+    check('وكلمة السر محفوظة بعدها: إضافة أخرى بلا سؤال، وفي القائمة التي اخترتها', adds.length === 3 && adds[2].password === 'open-sesame' && adds[2].eps === 0 && JSON.stringify((await log())[56876]) === '{"s":"watching"}', adds.slice(2));
+    await page.keyboard.press('Escape'); await page.waitForSelector('#addd', { state: 'hidden' });
+    check('Esc يغلق النافذة برابط نظيف، وما أضفته لا يظهر في القوائم حتى يدخل الكتالوج', await page.evaluate(() => location.hash === '' && !document.querySelector('#grid .cel[data-id="52991"]')));
+    await page.evaluate(() => { const p = JSON.parse(localStorage.getItem('animeg.progress')); delete p.a[52991]; delete p.a[56876]; localStorage.setItem('animeg.progress', JSON.stringify(p)); localStorage.removeItem('animeg.added'); });
+    await page.reload(); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=completed]'); }
+
   // ---------- السلاسل
   await tap('[data-act=view][data-v=worlds]'); await page.waitForSelector('#worlds .wc');
   check('السلاسل: مدخل دليل Fate أولاً، ثم سلاسل القائمة بتقدّمك فيها', await page.evaluate(() => { const c = [...document.querySelectorAll('#worlds .wc')]; return c.length === 3 && c[0].matches('a.fate[href="../fate/"]') && !!c[0].querySelector('img') && c[1].querySelector('h3').textContent === 'Hunter x Hunter'

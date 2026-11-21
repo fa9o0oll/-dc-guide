@@ -12,7 +12,7 @@ import { prepare, find, fold } from './find.js?v=__BUILD__';
 import { readMalFile } from './anime-mal.js?v=__BUILD__';
 import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead } from './anime-simkl.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
-const BUILD = '__BUILD__', KEY = 'animeg.progress', UI = 'anime.ui', ASK = 'animeg.asked', PASS = 'animeg.pass';
+const BUILD = '__BUILD__', KEY = 'animeg.progress', UI = 'anime.ui', ASK = 'animeg.asked', PASS = 'animeg.pass', ADDK = 'animeg.added';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -87,7 +87,7 @@ const daysTo = d => Math.ceil((Date.parse(d) - Date.parse(today)) / 864e5);
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <section class="sky" id="sky"><div class="sky-art" aria-hidden="true"><i></i><i></i><b></b></div>
   <header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${miniDoor}<span>البوابات</span></a><h1>أنمياتي</h1>
-    <button class="btn ghost" data-act="import">${ic('in')}<span>قائمتي وحساباتي</span></button></header>
+    <button class="btn ghost" data-act="import">${ic('in')}<span>قائمتي وحساباتي</span></button><button class="btn pri" data-act="add">${ic('plus')}<span>أضف أنمي</span></button></header>
   <p class="tally" id="tally"></p><div id="now"></div>
   <svg class="sky-line" viewBox="0 0 1200 96" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M0 96V70l60-3 40 4 70-9 50 6 90-4 60 5 80-8 70 6 110-5 60 4 90-7 70 6 120-4 80 5 150-6v36z"/>
     <g fill="none" stroke="currentColor" stroke-width="1.2" vector-effect="non-scaling-stroke"><path d="M0 34q150 26 300 2t300 0 300 2 300-4"/><path d="M0 44q150 24 300 2t300 0 300 2 300-4"/><path d="M0 26q150 22 300 0"/></g>
@@ -103,6 +103,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <main><div class="grid" id="grid"><p class="load">تُحمَّل القائمة…</p></div><div class="worlds" id="worlds" hidden></div></main>
 <footer class="foot"><p>معلومات الأنمي وصوره وتقييماته من <a href="https://myanimelist.net/" target="_blank" rel="noopener">${ltr('MyAnimeList')}</a>، والبوسترات العالية الدقة والخلفيات من <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">${ltr('TMDB')}</a>، وبيانات أماكن العرض من <a href="https://www.justwatch.com/" target="_blank" rel="noopener">${ltr('JustWatch')}</a>، ومطابقة الأرقام بين المواقع من ${ltr('Fribb/anime-lists')}. ${ltr('This product uses the TMDB API but is not endorsed or certified by TMDB.')}</p>
   <p><button class="syncb" data-sync-open><span data-sync-label></span></button></p></footer>
+<dialog id="addd" aria-labelledby="add-h"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="add-body"></div></dialog>
 <dialog id="sheet" aria-label="بطاقة العمل"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="sheet-body"></div></dialog>
 <dialog id="wsheet" aria-label="السلسلة"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="wsheet-body"></div></dialog>
 <dialog id="imp" aria-labelledby="imp-h"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="imp-body"></div></dialog>
@@ -167,7 +168,7 @@ const moreIO = new IntersectionObserver(es => { if (!es.some(e => e.isIntersecti
   more.insertAdjacentHTML('beforebegin', cur.slice(from, ui.shown).map((a, i) => celHTML(a, 'grid', i)).join('')); if (cur.length > ui.shown) moreIO.observe(more); else more.remove(); }, { rootMargin: '900px' });
 function setView(v) { ui.view = v; $$('.views button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
   $('#grid').hidden = v !== 'list'; $('#worlds').hidden = v !== 'worlds'; $('#lists').hidden = $('#tools').hidden = v !== 'list'; if (v === 'worlds') $('#worlds').innerHTML = worldsHTML(); renderGrid(); }
-function renderAll(keepShown) { renderSky(); renderLists(); if (ui.view === 'worlds') $('#worlds').innerHTML = worldsHTML(); renderGrid(keepShown); }
+function renderAll(keepShown) { renderSky(); renderLists(); if (ui.view === 'worlds') $('#worlds').innerHTML = worldsHTML(); renderGrid(keepShown); if ($('#addd')?.open) drawAddRes(); }
 
 // ---------- تعديل السجل. كل تعديل يُحفظ ويُزامَن فوراً، ومعه «تراجع»
 function commit(id, before, say) { const m = P.a[id]; if (m) { if (!m.p) delete m.p; if (!m.r) delete m.r; if (!m.b) delete m.b; if (!m.e) delete m.e; if (!m.s) delete P.a[id]; }
@@ -236,15 +237,16 @@ function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `
 // الرابط المباشر والعنوان المكتوب أو الملصوق باليد خطوة بلا حالة: يُقرأ ما يُفتح من الرابط نفسه (at)، وإغلاق نافذتها يغلقها وينظف الرابط (shut).
 // والبطاقة فوق سلسلتها دائماً، ولا تُفتح سلسلة فوق بطاقة: فتح السلسلة من بطاقة يطويها (stash) والرجوع يعيدها كما كانت (reshow)
 async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; kept = null; const d = $('#sheet'), body = $('#sheet-body'); delete body.dataset.full; body.innerHTML = sheetHTML(a, null); body.scrollTop = 0; showEps(a);
-  if (!d.open) { d.showModal(); body.scrollTop = 0; if (push) history.pushState({ a: id, w: $('#wsheet').open ? wopen : 0, p: 1 }, '', `#a${id}`); }   // التصفير بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
+  if (!d.open) { d.showModal(); body.scrollTop = 0; if (push) history.pushState({ a: id, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1 }, '', `#a${id}`); }   // التصفير بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
   else if (push) history.replaceState(history.state?.p ? { ...history.state, a: id } : null, '', `#a${id}`);
   const x = await texts(id); if (open !== id) return; if (x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; showEps(a); } body.dataset.full = id; }
 const stash = () => { const d = $('#sheet'); if (!d.open) return; kept = { id: open, y: $('#sheet-body').scrollTop }; d.close(); };
 function reshow() { const a = D.by.get(kept.id), body = $('#sheet-body'), y = kept.y; kept = null; open = a.id; $('#sheet').showModal(); body.scrollTop = y; const box = body.querySelector('.mine'); if (box) box.outerHTML = mineHTML(a); drawXs(a); }
-const at = () => { const st = history.state; if (st && (st.a || st.w || st.imp)) return st; const h = location.hash.slice(1); let m; return (m = h.match(/^a(\d+)$/)) ? { a: +m[1] } : (m = h.match(/^w(\d+)$/)) ? { w: +m[1] } : {}; };
+const at = () => { const st = history.state; if (st && (st.a || st.w || st.imp || st.add)) return st; const h = location.hash.slice(1); let m; return (m = h.match(/^a(\d+)$/)) ? { a: +m[1] } : (m = h.match(/^w(\d+)$/)) ? { w: +m[1] } : {}; };
 // يجعل النوافذ المفتوحة كما تصفها خطوة السجل
 function apply(st) { const sh = $('#sheet'), ws = $('#wsheet'), a = D.by.has(+st.a) ? +st.a : 0, w = D.wby.has(+st.w) ? +st.w : 0;
   if (!st.imp && $('#imp').open) $('#imp').close();
+  if (!st.add && $('#addd').open) $('#addd').close();
   if (sh.open && (!a || (w && !ws.open))) stash();
   if (ws.open && !w) ws.close();
   if (w && (wopen !== w || !ws.open)) openWorld(w, false);
@@ -278,6 +280,66 @@ async function askTr(btn) { const box = btn.closest('.tr'), id = +box.dataset.id
     let msg = box.querySelector('.msg'); if (!msg) { msg = Object.assign(document.createElement('p'), { className: 'msg' }); msg.setAttribute('aria-live', 'polite'); box.append(msg); }
     msg.innerHTML = e instanceof TypeError ? 'تعذّر الاتصال. تحقق من الشبكة ثم حاول.' : e.message; } }
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches?.('.tr-pass')) { e.preventDefault(); e.target.closest('.tr').querySelector('[data-act=tr-ask]')?.click(); } });
+
+// ---------- «أضف أنمي»: البحث في كل ما في «أنمياتي» (أعمالك وأقرباء سلاسلها)، وما ليس فيه ففي MyAnimeList (Jikan، من المتصفح بلا مفتاح).
+// ما في «أنمياتي» يدخل سجلّك مباشرة. وما ليس فيه يُضاف رقمه إلى data/anime/list.json في المستودع (دالة /api/anime-add بكلمة سر «أضف لعبة»، بإيداع لا يعيد البناء)،
+// ويدخل سجلّك من الآن، ويظهر في قائمتك مع البناء القادم بعد أن تُسحب معلوماته. لا يُرسل من السجل شيء: رقم العمل واسمه ونوعه وعدد حلقاته
+const ADD = { q: '', mal: null, malQ: '', busy: false, msg: '', need: null };
+const addedMap = () => { try { const m = JSON.parse(store.get(ADDK) || '{}'); return m && typeof m === 'object' ? m : {}; } catch { return {}; } };
+const byFrom = (a, b) => (a.from || '9999') < (b.from || '9999') ? -1 : (a.from || '9999') > (b.from || '9999') ? 1 : a.id - b.id;
+function addLocal(q) { const f = fold(q).trim(); if (!f) return [];
+  const name = a => a.ht ||= fold(`${a.t} ${a.en || ''}`), rank = a => { const t = fold(a.t), e = fold(a.en || ''); return t === f || e === f ? 0 : t.startsWith(f) || e.startsWith(f) ? 1 : 2; };
+  let hit = D.list.filter(a => name(a).includes(f));
+  if (!hit.length) hit = find(D.prepAll ||= prepare(D.list, a => [a.t, a.en]), q, { limit: 8, min: 50 }).hits.map(h => D.by.get(h.id)).filter(Boolean);
+  return hit.sort((a, b) => rank(a) - rank(b) || byFrom(a, b)).slice(0, 12); }
+const metaOf = a => [typeOf(a), a.y || '', a.type !== 'Movie' && a.eps ? nEps(a.eps) : a.st === 'airing' ? 'يُعرض الآن' : a.st === 'soon' ? 'لم يُعرض بعد' : ''].filter(Boolean).join(' · ');
+const addBtns = (id, act) => `<button class="btn pri" data-act="${act}" data-id="${id}" data-s="plan">${ic('mark')}<span>سأشاهده</span></button><button class="btn ghost" data-act="${act}" data-id="${id}" data-s="watching">${ic('play')}<span>أشاهده الآن</span></button>`;
+const LIC = Object.fromEntries(LISTS.map(l => [l[0], l[2]]));
+function addRow(a) { const m = me(a.id);
+  return `<li class="arow" data-id="${a.id}"><button class="aart" data-act="open" data-id="${a.id}" aria-label="بطاقة ${esc(a.t)}">${art(a, '52px')}</button>
+    <div class="ainfo"><b>${esc(title(a))}</b><span class="meta">${metaOf(a)}</span></div>
+    <div class="aacts">${m ? `<span class="astate" data-l="${m.s}">${ic(LIC[m.s])}في «${LNAME[m.s]}»</span><button class="btn quiet" data-act="open" data-id="${a.id}">بطاقته</button>` : addBtns(a.id, 'add-to')}</div></li>`; }
+function malRow(x) { const done = addedMap()[x.id], need = ADD.need?.id === x.id, ph = esc((x.t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase());
+  return `<li class="arow" data-mal="${x.id}"><span class="aart">${x.img ? `<img loading="lazy" decoding="async" alt="" src="${esc(x.img)}">` : `<span class="ph">${ph}</span>`}</span>
+    <div class="ainfo"><b>${esc(ui.names === 'english' && x.en ? x.en : x.t)}</b><span class="meta">${[x.type ? typeOf(x) : '', x.y || '', x.type !== 'Movie' && x.eps ? nEps(x.eps) : ''].filter(Boolean).join(' · ')}</span></div>
+    <div class="aacts">${done ? `<span class="astate" data-l="${done.s}">${ic('check')}أُضيف إلى «${LNAME[done.s] || LNAME.plan}»، ويظهر مع البناء القادم</span>` : addBtns(x.id, 'add-mal')}</div>
+    ${need ? `<div class="apass"><label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة» أو «أضف فيلماً»)<input class="add-pass" type="password" autocomplete="current-password"></label><p class="msg" aria-live="polite">${ADD.need.msg || ''}</p></div>` : ''}</li>`; }
+function addResHTML() { const q = ADD.q.trim(); if (!q) return `<p class="lbl">اكتب اسم العمل كما في ${ltr('MyAnimeList')} أو بالإنجليزية.</p>`;
+  const loc = addLocal(q), shown = new Set(loc.map(a => a.id)), mal = ADD.malQ === q ? ADD.mal : null;
+  const extra = mal ? mal.filter(x => D.by.has(x.id) && !shown.has(x.id)).map(x => D.by.get(x.id)) : [], fresh = mal ? mal.filter(x => !D.by.has(x.id)) : [];
+  return `<h3 class="ah">في «أنمياتي»</h3>${loc.length + extra.length ? `<ul class="ares">${[...loc, ...extra].map(addRow).join('')}</ul>` : `<p class="lbl">لا عمل في «أنمياتي» بهذا الاسم.</p>`}
+    <h3 class="ah">في ${ltr('MyAnimeList')}</h3>${ADD.busy && ADD.malQ === q ? `<p class="lbl">يُبحث في ${ltr('MyAnimeList')}…</p>`
+      : mal ? (fresh.length ? `<ul class="ares">${fresh.map(malRow).join('')}</ul><p class="lbl">ما تضيفه من هنا يدخل سجلّك الآن، ويظهر في قائمتك مع البناء القادم بعد أن تُجلب معلوماته وحلقاته.</p>` : `<p class="lbl">${mal.length ? 'كل ما وُجد هناك في «أنمياتي» أعلاه.' : 'لا نتيجة هناك بهذا الاسم.'}</p>`)
+      : q.length < 2 ? `<p class="lbl">اكتب حرفين على الأقل.</p>` : `${ADD.msg && ADD.malQ === q ? `<p class="msg" aria-live="polite">${ADD.msg}</p>` : ''}<button type="button" class="btn ghost" data-act="add-find">${ic('search')}<span>ابحث في ${ltr('MyAnimeList')} عن «${esc(q)}»</span></button>`}`; }
+// يُعاد رسم النتائج مع كل تعديل في السجل (وبالمزامنة)، وما كُتب في خانة كلمة السر يبقى
+const drawAddRes = () => { const box = $('#add-res'); if (!box) return; const f = box.querySelector('.add-pass'), v = f?.value, foc = f && document.activeElement === f; box.innerHTML = addResHTML(); const g = box.querySelector('.add-pass'); if (g && v) g.value = v; if (g && foc) g.focus(); };
+function openAdd() { ADD.need = null; $('#add-body').innerHTML = `<h2 id="add-h">أضف أنمي</h2><p class="lbl">ابحث في كل ما في «أنمياتي»: أعمالك وأقرباء سلاسلها. وما ليس هنا تجده في ${ltr('MyAnimeList')}.</p>
+  <label class="search">${ic('search')}<span class="sr">اسم الأنمي</span><input id="add-q" type="search" placeholder="اسم الأنمي" autocomplete="off" enterkeyhint="search" value="${esc(ADD.q)}"></label><div id="add-res">${addResHTML()}</div>`;
+  const d = $('#addd'); if (!d.open) { d.showModal(); history.pushState({ add: 1, p: 1 }, '', '#add'); } const i = $('#add-q'); i.focus(); i.select(); }
+async function findMal() { const q = ADD.q.trim(); if (q.length < 2 || (ADD.busy && ADD.malQ === q)) return; ADD.busy = true; ADD.msg = ''; ADD.malQ = q; ADD.mal = null; ADD.need = null; drawAddRes();
+  let list = null, msg = '';
+  try { const r = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=12&sfw=true`); if (r.status === 429) throw new Error('busy'); if (!r.ok) throw new Error('http');
+    const j = await r.json(); list = (Array.isArray(j?.data) ? j.data : []).filter(x => Number.isInteger(x?.mal_id) && x.title && !/^Rx/.test(x.rating || ''))
+      .map(x => ({ id: x.mal_id, t: x.title, en: x.title_english || '', type: x.type || '', eps: Number.isInteger(x.episodes) ? x.episodes : 0, y: x.year || x.aired?.prop?.from?.year || '', img: x.images?.webp?.small_image_url || x.images?.jpg?.small_image_url || '' }));
+  } catch (e) { msg = e.message === 'busy' ? `${ltr('MyAnimeList')} مشغول الآن. انتظر ثواني ثم ابحث ثانية.` : e instanceof TypeError ? `تعذّر الاتصال بـ${ltr('MyAnimeList')}. تحقق من الشبكة ثم حاول.` : `تعذّر البحث في ${ltr('MyAnimeList')} الآن. حاول بعد قليل.`; }
+  if (ADD.malQ !== q) return; ADD.busy = false; ADD.mal = list; ADD.msg = msg; if (!list) ADD.malQ = q; drawAddRes(); }
+async function addMal(btn) { const row = btn.closest('.arow'), id = +row.dataset.mal, s = btn.dataset.s, x = ADD.mal?.find(m => m.id === id); if (!x || !LNAME[s]) return;
+  const field = row.querySelector('.add-pass'), pw = field?.value || pass();
+  if (!pw) { if (ADD.need?.id === id) ADD.need.msg = 'اكتب كلمة السر أولاً.'; else ADD.need = { id, msg: '' }; ADD.need.s = s; drawAddRes(); $(`.arow[data-mal="${id}"] .add-pass`)?.focus(); return; }
+  for (const b of row.querySelectorAll('[data-act=add-mal]')) b.disabled = true; btn.querySelector('span').textContent = 'يُضاف…';
+  try { const r = await fetch('/api/anime-add', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw, mal: id, title: x.t, type: x.type, eps: x.eps }) }), j = await r.json().catch(() => ({}));
+    if (r.status === 401 && j.error === 'password') { store.del(PASS); throw Object.assign(new Error('كلمة السر غير صحيحة.'), { pw: true }); }
+    if (r.status === 404 || r.status === 405) throw new Error(`الإضافة تعمل من نسخة الموقع على ${ltr('Netlify')}، لا من هذه النسخة.`);
+    if (!r.ok) throw new Error(j.error ? esc(j.error) : 'تعذّرت الإضافة الآن. حاول بعد قليل.');
+    store.set(PASS, pw); const m = addedMap(); m[id] = { t: x.t, s, at: today }; store.set(ADDK, JSON.stringify(m)); ADD.need = null;
+    if (!P.a[id]) { P.a[id] = { s }; save(); renderAll(true); } drawAddRes();
+    toast(`${ltr(x.t)} في «${LNAME[s]}». ${j.state === 'exists' ? 'رقمه في القائمة من قبل، ويظهر مع البناء القادم.' : 'يظهر في قائمتك مع البناء القادم.'}`);
+  } catch (e) { ADD.need = { id, s, msg: e instanceof TypeError ? 'تعذّر الاتصال. تحقق من الشبكة ثم حاول.' : e.message }; drawAddRes();
+    const f = $(`.arow[data-mal="${id}"] .add-pass`); if (f) { if (e.pw) f.value = ''; else f.value = pw; f.focus(); } } }
+let addT = 0; document.addEventListener('input', e => { if (e.target.id !== 'add-q') return; clearTimeout(addT); addT = setTimeout(() => { ADD.q = e.target.value; ADD.need = null; drawAddRes(); }, 140); });
+document.addEventListener('keydown', e => { if (e.key !== 'Enter') return;
+  if (e.target.id === 'add-q') { e.preventDefault(); clearTimeout(addT); ADD.q = e.target.value; findMal(); }
+  else if (e.target.matches?.('.add-pass')) { e.preventDefault(); const row = e.target.closest('.arow'); row.querySelector(`[data-act=add-mal][data-s="${ADD.need?.s || 'plan'}"]`)?.click(); } });
 
 const pageOf = n => n <= 60 ? n : n <= 300 ? 25 : 50;
 // ما لم يُعرض بعد: بتاريخه إن عُرف، وإلا فما بعد آخر حلقة عُرضت في عمل ما زال يُعرض
@@ -351,7 +413,7 @@ function openWorld(wid, push = true) { const w = D.wby.get(wid); if (!w) return;
     <div id="wintro"></div>
     ${isFate(w) ? `<a class="wc fate in" href="../fate/"><h3>${ltr('Fate')}</h3><p>لهذا العالم دليل كامل بخطوط قصته وترتيب مشاهدته. افتحه.</p></a>` : ''}
     <section class="sec" id="worder">${worderHTML(w)}</section></div>`;
-  $('#wsheet-body').scrollTop = 0; if (!d.open) { d.showModal(); $('#wsheet-body').scrollTop = 0; if (push) history.pushState({ a: 0, w: wid, p: 1 }, '', `#w${wid}`); } else if (push) history.replaceState(history.state?.p ? { ...history.state, a: 0, w: wid } : null, '', `#w${wid}`);
+  $('#wsheet-body').scrollTop = 0; if (!d.open) { d.showModal(); $('#wsheet-body').scrollTop = 0; if (push) history.pushState({ a: 0, w: wid, add: $('#addd').open ? 1 : 0, p: 1 }, '', `#w${wid}`); } else if (push) history.replaceState(history.state?.p ? { ...history.state, a: 0, w: wid } : null, '', `#w${wid}`);
   // «عن هذا العالم»: نبذة السلسلة المكتوبة (wa، تُحمل مع نصوص العمل الذي تحمل اسمه). و«الحكاية»: نبذة ذلك العمل (يحدده البناء)، وإن غاب فأول عمل رئيسي
   // فيها (مسلسل، أو ما زاد على ثلاث حلقات، أو فيلم طويل)
   const first = D.by.get(w.head) || all.find(a => a.type === 'TV' || (a.eps || 1) > 3 || (a.type === 'Movie' && (a.dur || 0) >= 45)) || all[0];
@@ -423,6 +485,10 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'worder': { ui.worder = d.o; const w = D.wby.get(wopen), box = $('#worder'); if (w && box) box.innerHTML = worderHTML(w); break; }
     case 'close': shut(t.closest('dialog')); break;
     case 'import': openImport(); break;
+    case 'add': openAdd(); break;
+    case 'add-to': setStatus(id, d.s); drawAddRes(); break;
+    case 'add-find': findMal(); break;
+    case 'add-mal': addMal(t); break;
     case 'imp-clear': IMP.mal = null; IMP.msg = ''; drawImp(); break;
     case 'imp-apply': { const { n } = applyEntries(IMP.mal.entries, 'file'); IMP.ok = true; IMP.msg = `دخل سجلّك: ${nWorks(n)}. المزامنة تنقله إلى بقية أجهزتك.`; IMP.mal = null; ui.list = inList('watching').length ? 'watching' : 'all'; renderAll(); drawImp(); break; }
     case 'backup': { const u = URL.createObjectURL(new Blob([JSON.stringify({ exported: new Date().toISOString(), source: 'أنمياتي', ...P }, null, 1)], { type: 'application/json' })); Object.assign(document.createElement('a'), { href: u, download: `anime-log-${today}.json` }).click(); setTimeout(() => URL.revokeObjectURL(u), 4000); break; }
@@ -460,10 +526,11 @@ addEventListener('popstate', () => apply(at()));
 
 // ---------- الإقلاع
 const liftVeil = () => { const v = $('#veil'); if (!v || v.hidden) return; requestAnimationFrame(() => requestAnimationFrame(() => { v.classList.add('lift'); setTimeout(() => v.remove(), calm ? 0 : 800); })); };
-function route() { const h = location.hash.slice(1), st = at(); if (st.a || st.w) { if (st.w && !st.a && D.wby.has(+st.w)) setView('worlds'); apply(st); } else if (h === 'worlds') setView('worlds'); else if (h === 'import') { history.replaceState(null, '', location.pathname); openImport(); } }
+function route() { const h = location.hash.slice(1), st = at(); if (st.a || st.w) { if (st.w && !st.a && D.wby.has(+st.w)) setView('worlds'); apply(st); } else if (h === 'worlds') setView('worlds'); else if (h === 'import') { history.replaceState(null, '', location.pathname); openImport(); } else if (h === 'add') { history.replaceState(null, '', location.pathname); openAdd(); } }
 try {
   const [cat, epi] = await Promise.all([get('catalog.json'), get('eps/index.json').catch(() => ({}))]); D.eps = epi || {}; D.base = cat.imageBase || D.base; D.mal = cat.malImages || D.mal; D.prov = cat.providers || {}; D.genres = cat.genres || [];
   D.list = cat.anime || []; for (const a of D.list) D.by.set(a.id, a);
+  { const m = addedMap(); let ch = 0; for (const k of Object.keys(m)) if (D.by.has(+k) || !(Date.parse(today) - Date.parse(m[k]?.at) < 30 * 864e5)) { delete m[k]; ch = 1; } if (ch) store.set(ADDK, JSON.stringify(m)); }   // ما دخل الكتالوج، أو مضى عليه شهر
   D.worlds = (cat.worlds || []).filter(w => w.ids.some(id => D.by.get(id)?.ord != null)); for (const w of D.worlds) D.wby.set(w.id, w);
   const types = [...new Set(D.list.filter(a => a.ord != null).map(a => a.type).filter(Boolean))]; $('#type').insertAdjacentHTML('beforeend', types.map(t => `<option value="${esc(t)}">${TYPE[t] || esc(t)}</option>`).join(''));
   $('#sort').value = ui.sort; $('#names').value = ui.names; if (!LNAME[ui.list] && ui.list !== 'all') ui.list = 'watching'; if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';

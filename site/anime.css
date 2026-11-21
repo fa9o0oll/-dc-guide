@@ -278,6 +278,26 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
 .tr-ok{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:10px;background:color-mix(in srgb,var(--ok) 10%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 35%,transparent);font-size:.9rem;line-height:1.7}
 .tr-ok .ic{flex:none;width:18px;height:18px;margin-top:4px;color:var(--ok)}
 .msg.ok{color:var(--ok)}
+/* «أضف أنمي»: البحث في «أنمياتي» ثم في MyAnimeList، وسطر لكل عمل */
+#addd{width:min(640px,calc(100vw - 20px));max-height:min(92dvh,860px);margin:auto;border-radius:18px;overflow:hidden}
+#addd .scroll{max-height:min(92dvh,860px);padding:22px 20px 20px;display:grid;gap:12px;align-content:start}
+#addd h2{font-family:var(--display);font-size:1.4rem;padding-inline-end:48px}
+#addd .search{flex:none}
+#add-res{display:grid;gap:10px;justify-items:stretch}#add-res>.btn{justify-self:start;max-width:100%;white-space:normal;text-align:start;padding-block:8px}
+.ah{font-family:var(--display);font-weight:600;font-size:1rem;margin-top:6px}
+.ares{list-style:none;display:grid;gap:8px;margin:0;padding:0}
+.arow{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:8px;border-radius:12px;background:var(--card);border:1px solid var(--line)}
+.aart{display:block;width:52px;aspect-ratio:2/3;border-radius:6px;overflow:hidden;background:var(--bg)}
+.aart img{width:100%;height:100%;object-fit:cover;display:block}
+.aart .ph{display:grid;place-items:center;width:100%;height:100%;font-family:var(--display);font-weight:700;font-size:1.3rem;color:var(--line)}
+.ainfo{display:grid;gap:2px;min-width:0}
+.ainfo b{font-weight:600;line-height:1.35;direction:ltr;text-align:right;overflow-wrap:anywhere}
+.ainfo .meta{font-size:.8rem;color:var(--dim)}
+.aacts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:flex-end}
+.aacts .btn{padding:0 12px;font-size:.84rem}
+.astate{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;font-weight:600;color:var(--tone,var(--ok))}
+.astate .ic{flex:none;width:16px;height:16px}
+.apass{grid-column:1/-1;display:grid;gap:6px}
 .acts{display:flex;flex-wrap:wrap;gap:10px}
 .toast{position:fixed;inset-inline:0;bottom:max(18px,env(safe-area-inset-bottom));z-index:200;margin:auto;width:max-content;max-width:calc(100vw - 28px);padding:10px 18px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:600;font-size:.92rem;text-align:center;opacity:0;translate:0 12px;transition:opacity .25s ease,translate .25s ease;pointer-events:none}
 .toast.on{opacity:1;translate:0}
@@ -316,6 +336,7 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
   .orow img,.orow .ph{width:48px}
   .views button{padding:0 10px}
   .gate-t{display:none}.bar.docked .gate{max-width:46px}
+  .arow{grid-template-columns:48px minmax(0,1fr)}.aart{width:48px}.aacts{grid-column:1/-1;justify-content:flex-start}
   .xr{grid-template-columns:44px minmax(0,1fr) 54px}.xsheet.ro .xr{grid-template-columns:44px minmax(0,1fr)}.xd{grid-template-columns:minmax(0,1fr)}.xi{display:none}
 }
 @media (max-width:340px){.dates{grid-template-columns:minmax(0,1fr)}.rail .cel{width:138px}}
