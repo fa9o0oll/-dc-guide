@@ -25,6 +25,7 @@ FX.moved = { 555001: 990001, 555002: 1942 };
 // الاشتراكات (scripts/lib-subs.mjs): Witcher 3 في الاثنين وتغادر Game Pass قريباً، وRagnarök في كتالوج PS Plus وحده، وMinecraft (بلا PlayStation) في لا شيء
 FX.subs = { at: '2026-11-21T09:00:00Z', n: { gp: 1, ps: 2 } };
 FX.games.find(g => g.id === 1942).subs = { gp: { on: ['xbox', 'pc'], u: 'https://www.xbox.com/games/store/the-witcher-3-wild-hunt/BR765873CQJD', out: 1 }, ps: { k: 'extra', on: ['ps5', 'ps4'], u: 'https://store.playstation.com/en-sa/concept/10000876' } };
+FX.games.find(g => g.id === 136625).subs = { gp: { on: ['xbox'], u: 'https://www.xbox.com/games/store/grand-theft-auto-vi/9NGTA6000000', soon: 1 } };   // قادمة إلى Game Pass: لا ختم ولا تُعد
 FX.games.find(g => g.id === 112875).subs = { ps: { k: 'extra', on: ['ps5', 'ps4'], u: 'https://store.playstation.com/en-sa/concept/10001850', n: 'God of War Ragnarök PS4 & PS5' } };
 const server = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]);
   if (u === '/games/data/games.json') { r.writeHead(200, { 'content-type': 'application/json' }); return r.end(JSON.stringify(FX)); }
@@ -273,7 +274,7 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
       && r.mems[1] === 'https://store.playstation.com/en-sa/concept/10000876|mem mem-ps on|PS Plus Deluxe|ضمن اشتراكك الآن|في كتالوج الألعاب، على PS5 وPS4.' && /^يُفحص كل يوم في كتالوجَي Game Pass وPS Plus لمتجر السعودية\. آخر فحص: /.test(r.note), r);
     r = await subOf(112875); check('اسمها في الكتالوج حين يختلف، وما ليست ضمنه خافت بسببه', /واسمها فيه God of War Ragnarök PS4 & PS5\.$/.test(r.mems[1]) && r.mems[0] === 'mem mem-gp|Game Pass Ultimate|ليست ضمنه الآن|' && r.head === 'PS Plusضمن اشتراكك: تلعبها بلا ثمن', r);
     r = await subOf(11208); check('لم تصدر على PlayStation: يقال ذلك، ولا ختم في الرأس', r.mems.join(' ~ ') === 'mem mem-gp|Game Pass Ultimate|ليست ضمنه الآن| ~ mem mem-ps|PS Plus Deluxe|لم تصدر على PlayStation|' && !r.head, r);
-    r = await subOf(136625); check('لم تصدر بعد على Xbox ولا الكمبيوتر: ليست ضمنه (منصاتها Xbox وPS)', r.mems[0] === 'mem mem-gp|Game Pass Ultimate|ليست ضمنه الآن|', r); }
+    r = await subOf(136625); check('قادمة إلى Game Pass: بطاقة نصف مضيئة تقول إنها تصل إليه قريباً، ولا ختم في الرأس', r.mems[0] === 'https://www.xbox.com/games/store/grand-theft-auto-vi/9NGTA6000000|mem mem-gp soon|Game Pass Ultimate|تصل إليه قريباً|تلعبها على Xbox.' && !r.head && r.mems[1] === 'mem mem-ps|PS Plus Deluxe|ليست ضمنه الآن|', r); }
   { // مصدر لم يُجب في آخر فحص: الملاحظة تقول ذلك
     const p2 = await ctx.newPage(); await mockApi(p2); await p2.route(/\/games\/data\/games\.json/, async r => { const j = JSON.parse(JSON.stringify(FX)); j.stores = { at: j.stores.at, failed: ['steam', 'gamepass', 'wikidata'] }; await r.fulfill({ contentType: 'application/json', body: JSON.stringify(j) }); });
     await p2.goto(`${base}/games/#g119133`); await p2.waitForSelector('#sheet[open] .pcsec .note');

@@ -16,14 +16,15 @@ const games = [
   G(12, 'Both Lists', { ext: { psn: '555' } }),
   G(13, 'Prev Keeper', { ext: { ms: ['9PREV0000001'] } }),
   G(14, 'Nowhere Game', { ext: { ms: ['9NOWHERE0001'], psn: '999' } }),
+  G(15, 'Future Saga', { ext: { ms: ['9COMING00001'] } }),
 ];
 // ---------- الكتالوجان المُحاكيان
 const SIGL = { console: ['9HALO0000001', '9FORZA000001', '9LEAVE000001', '9PREV0000001'], pc: ['9HALO0000001'], pc2: ['9HALO0000001', '9DOOM0000001'], all: ['9HALO0000001', '9FORZA000001', '9DOOM0000001', '9EARACER0001', '9LEAVE000001', '9PREV0000001'],
-  eaA: ['9EARACER0001'], eaB: [], leaving: ['9LEAVE000001'] };
+  eaA: ['9EARACER0001'], eaB: [], leaving: ['9LEAVE000001'], leavingPc: [], coming: ['9COMING00001'], comingPc: ['9COMING00001'] };
 const prod = (id, title, year, plat = ['Windows.Xbox', 'Windows.Desktop']) => ({ ProductId: id, LocalizedProperties: [{ ProductTitle: title }], MarketProperties: [{ OriginalReleaseDate: `${year}-03-01T00:00:00.0000000Z` }],
   DisplaySkuAvailabilities: [{ Sku: { SkuType: 'full', Properties: { Packages: [{ PlatformDependencies: plat.map(p => ({ PlatformName: p })) }] } }, Availabilities: [] }] });
 const MS = { '9HALO0000001': prod('9HALO0000001', 'Halo Quest', 2020), '9FORZA000001': prod('9FORZA000001', 'Forza Track Standard Edition', 2021, ['Windows.Xbox']), '9DOOM0000001': prod('9DOOM0000001', 'DOOM', 2016),
-  '9EARACER0001': prod('9EARACER0001', 'EA Racer', 2020), '9LEAVE000001': prod('9LEAVE000001', 'Leaving Game', 2020), '9PREV0000001': prod('9PREV0000001', 'Prev Keeper', 2020) };
+  '9EARACER0001': prod('9EARACER0001', 'EA Racer', 2020), '9LEAVE000001': prod('9LEAVE000001', 'Leaving Game', 2020), '9PREV0000001': prod('9PREV0000001', 'Prev Keeper', 2020), '9COMING00001': prod('9COMING00001', 'Future Saga', 2027) };
 const ps = (conceptId, name, device, x = {}) => ({ conceptId, name, nameEn: name, conceptUrl: `https://store.playstation.com/en-sa/concept/${conceptId}`, device, ...x });
 const PSD = { extra: [ps(111, 'Spider Hero', ['PS4', 'PS5']), ps(222, "Ghost Isle DIRECTOR'S CUT PS4 & PS5", ['PS4', 'PS5']), ps(333, 'Twin Title', ['PS5']), ps(555, 'Both Lists', ['PS5'])],
   ubi: [], deluxe: [ps(666, 'Retro Bandit (PS1)', ['PS4', 'PS5']), ps(555, 'Both Lists', ['PS4'])], month: [ps(444, 'Monthly Hit™', ['PS5'])] };
@@ -56,6 +57,7 @@ check('PS monthly game', at(9).ps?.k === 'month' && !at(9).ps.n, at(9));
 check('two games of one name are not matched by name', !at(10).ps && !at(11).ps, [at(10), at(11)]);
 check('in the catalog and the classics: catalog first, platforms joined', at(12).ps?.k === 'extra' && JSON.stringify(at(12).ps.on) === '["ps5","ps4"]', at(12));
 check('in neither', !r.rows.has(14), at(14));
+check('coming soon: platforms from the coming lists, marked soon, not counted as included', at(15).gp?.soon === 1 && JSON.stringify(at(15).gp.on) === '["xbox","pc"]' && !at(15).gp.out, at(15));
 check('meta counts', r.meta.n.gp === 5 && r.meta.n.ps === 5 && !r.meta.failed, r.meta);
 
 const prev = new Map([[13, { gp: { on: ['xbox'], u: 'x' } }], [6, { ps: { k: 'deluxe', on: [], u: 'old' } }], [14, { gp: { on: ['pc'], u: 'gone' } }]]);

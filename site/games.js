@@ -147,7 +147,7 @@ function chip(o) { if (!soon(o)) return '';
 const metaLine = g => { const r = rec(g.id), now = Date.now(); return [(g.pc || []).some(x => giftNow(x, now)) ? '<span class="gift">مجانية الآن</span>' : '', soon(g) ? '<span class="up">قادمة</span>' : g.year ? `<span><bdi>${g.year}</bdi></span>` : '', r.h ? `<span>لعبتها ${hrs(r.h)}</span>` : g.ttb?.n && !soon(g) ? `<span>تُختم في ${hrs(g.ttb.n)}</span>` : ''].filter(Boolean).join(''); };
 // ختم الاشتراك على الغلاف: مصباح صغير يقول إن اللعبة ضمن Game Pass Ultimate أو PS Plus Deluxe الآن (g.subs من البناء، scripts/lib-subs.mjs)،
 // وتمر عليه لمعة كل بضع ثوانٍ، لكل غلاف موعده (--d) فلا تلمع الشبكة كلها معاً. وما يغادر Game Pass قريباً يحيط مصباحه خط متقطع
-const SUBN = { gp: 'Game Pass', ps: 'PS Plus' }, subsOf = g => ['gp', 'ps'].filter(k => g.subs?.[k]);
+const SUBN = { gp: 'Game Pass', ps: 'PS Plus' }, subsOf = g => ['gp', 'ps'].filter(k => g.subs?.[k] && !g.subs[k].soon);   // القادمة إلى Game Pass ليست فيه بعد
 const lamps = g => subsOf(g).map(k => `<i class="sl-${k}${g.subs[k].out ? ' out' : ''}"><b dir="ltr">${SUBN[k]}</b></i>`).join('');
 const subSeal = g => subsOf(g).length ? `<span class="seal" style="--d:${((g.id * 7) % 11) * .55}s" aria-hidden="true">${lamps(g)}</span>` : '';
 const subSay = g => { const s = subsOf(g); return s.length ? `، ضمن ${s.map(k => SUBN[k]).join(' و')}${g.subs.gp?.out ? '، وتغادر Game Pass قريباً' : ''}` : ''; };
@@ -400,7 +400,7 @@ function pcSec(g) { if (!g.plats?.length) return '';
   return `<section class="sec pcsec"><h3>أين تلعبها على الكمبيوتر</h3>${head}<div class="links pcs">${rows.map(tile).join('')}</div>
 <p class="note">${built ? `المجانية تُفحص كل يوم في <bdi dir="ltr">Steam</bdi> و<bdi dir="ltr">Epic Games Store</bdi> و<bdi dir="ltr">GOG</bdi> و<bdi dir="ltr">Xbox</bdi> بأسعار متجر السعودية.${fresh}${stale}` : 'المتاجر من روابط <bdi dir="ltr">IGDB</bdi>. المجانية وبقية المشغّلات تُفحص في البناء القادم.'}</p></section>`; }
 // ---------- في اشتراكاتك: Game Pass Ultimate وPS Plus Deluxe، وهما اشتراكا صاحب الموقع وأعلى فئتين في السعودية. g.subs من البناء (scripts/lib-subs.mjs):
-// gp: { on: ['xbox', 'pc'], u, ea?: عبر EA Play, out?: تغادره قريباً, n?: اسمها فيه } وps: { k: 'extra' | 'ubi' | 'deluxe' | 'month', on: […], u, n? }.
+// gp: { on: ['xbox', 'pc'], u, ea?: عبر EA Play, out?: تغادره قريباً, soon?: قادمة إليه, n?: اسمها فيه } وps: { k: 'extra' | 'ubi' | 'deluxe' | 'month', on: […], u, n? }.
 // بطاقتان مضيئتان لما هي ضمنه، وخافتتان لما ليست فيه، مع السبب (ليست ضمنه الآن، أو لم تصدر على منصاته). ما أُضيف للتو يُفحص في البناء القادم
 const PSK = { extra: 'في كتالوج الألعاب', ubi: 'في كلاسيكيات <bdi dir="ltr">Ubisoft+</bdi>', deluxe: 'في الكلاسيكيات', month: 'من ألعاب الشهر: أضفها إلى مكتبتك قبل أن ينتهي شهرها' };
 const ONN = { xbox: 'Xbox', pc: 'الكمبيوتر', ps5: 'PS5', ps4: 'PS4', ps3: 'PS3', ps2: 'PS2', ps1: 'PS1', psp: 'PSP', vita: 'PS Vita', psvr: 'PS VR', psvr2: 'PS VR2' };
@@ -409,7 +409,7 @@ function subsSec(g, pv) { if (pv || !g.plats?.length) return '';
   const on = l => andAr(l.map(c => c === 'pc' ? ONN.pc : `<bdi dir="ltr">${esc(ONN[c] || c)}</bdi>`));
   const how = (k, r) => [k === 'gp' ? [r.on.length ? `تلعبها على ${on(r.on)}` : '', r.ea ? 'عبر <bdi dir="ltr">EA Play</bdi> المضمّن فيه' : ''].filter(Boolean).join(' ') : [PSK[r.k] || '', r.on.length ? `على ${on(r.on)}` : ''].filter(Boolean).join('، '),
     r.n ? `واسمها فيه <bdi dir="ltr">${esc(r.n)}</bdi>` : ''].filter(Boolean).join('. ');
-  const mem = (k, title, r, off) => r ? `<a class="mem mem-${k} on" href="${esc(r.u)}" target="_blank" rel="noopener"><span class="mn"><i aria-hidden="true"></i><bdi dir="ltr">${title}</bdi></span><strong>${r.out ? 'ضمن اشتراكك، وتغادره قريباً' : 'ضمن اشتراكك الآن'}</strong>${how(k, r) ? `<small>${how(k, r)}.</small>` : ''}</a>`
+  const mem = (k, title, r, off) => r ? `<a class="mem mem-${k} ${r.soon ? 'soon' : 'on'}" href="${esc(r.u)}" target="_blank" rel="noopener"><span class="mn"><i aria-hidden="true"></i><bdi dir="ltr">${title}</bdi></span><strong>${r.soon ? 'تصل إليه قريباً' : r.out ? 'ضمن اشتراكك، وتغادره قريباً' : 'ضمن اشتراكك الآن'}</strong>${how(k, r) ? `<small>${how(k, r)}.</small>` : ''}</a>`
     : `<div class="mem mem-${k}"><span class="mn"><i aria-hidden="true"></i><bdi dir="ltr">${title}</bdi></span><strong>${off}</strong></div>`;
   const gpOff = !checked ? 'يُفحص في البناء القادم' : fams.has('xbox') || fams.has('pc') ? 'ليست ضمنه الآن' : 'لم تصدر على Xbox ولا الكمبيوتر';
   const psOff = !checked ? 'يُفحص في البناء القادم' : fams.has('ps') ? 'ليست ضمنه الآن' : 'لم تصدر على PlayStation';
