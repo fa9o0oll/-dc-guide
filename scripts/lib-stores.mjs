@@ -24,10 +24,10 @@ export const norm = s => String(s || '').replace(/[™®©]/g, '').normalize('NF
 export const isPc = g => (g.plats || []).includes('pc') || (g.also || []).includes('pc');
 export const epicSlug = u => { const m = String(u || '').match(/epicgames\.com\/(?:store\/)?(?:[a-z]{2}(?:-[A-Za-z]{2})?\/)?(p|product|bundles)\/([^/?#]+)/); return m ? { kind: m[1] === 'bundles' ? 'bundles' : 'p', slug: m[2] } : null; };
 const epicUrl = u => { const s = epicSlug(u); return s ? `https://store.epicgames.com/${s.kind}/${s.slug}` : u; };
-const slugify = t => norm(String(t || '').replace(/['’]/g, '')).replace(/ /g, '-') || '-';   // «Assassin's Creed» ← assassins-creed، كما تكتبه المتاجر
+export const slugify = t => norm(String(t || '').replace(/['’]/g, '')).replace(/ /g, '-') || '-';   // «Assassin's Creed» ← assassins-creed، كما تكتبه المتاجر
 const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
 
-function client(opt) { const f = opt.fetch || fetch, pause = opt.pause ?? 500;
+export function client(opt) { const f = opt.fetch || fetch, pause = opt.pause ?? 500;
   return async (url, o = {}) => { for (let i = 0; ; i++) {
     try { const r = await f(url, { headers: { 'user-agent': UA, accept: 'application/json', ...(o.headers || {}) }, signal: AbortSignal.timeout(o.timeout || 25000) });
       if (r.status === 429 || r.status >= 500) throw Object.assign(new Error('HTTP ' + r.status), { status: r.status });
@@ -91,9 +91,10 @@ async function epicPage(slug, get) { const r = await get(`https://store-content.
 
 // ---------- Microsoft: المنتجات بأرقامها (حزمة للكمبيوتر؟ تُشترى؟ سعرها)، وقائمة PC Game Pass
 const msProduct = p => { const skus = p.DisplaySkuAvailabilities || [], full = skus.find(s => s.Sku?.SkuType === 'full') || skus[0], buy = (full?.Availabilities || []).find(a => (a.Actions || []).includes('Purchase') && a.OrderManagementData?.Price), pr = buy?.OrderManagementData?.Price;
-  return { id: p.ProductId, title: p.LocalizedProperties?.[0]?.ProductTitle || '', pc: skus.some(s => (s.Sku?.Properties?.Packages || []).some(k => (k.PlatformDependencies || []).some(d => d.PlatformName === 'Windows.Desktop'))),
+  const on = name => skus.some(s => (s.Sku?.Properties?.Packages || []).some(k => (k.PlatformDependencies || []).some(d => d.PlatformName === name)));
+  return { id: p.ProductId, title: p.LocalizedProperties?.[0]?.ProductTitle || '', pc: on('Windows.Desktop'), con: on('Windows.Xbox'), year: +String(p.MarketProperties?.[0]?.OriginalReleaseDate || '').slice(0, 4) || 0,
     price: pr ? { list: pr.ListPrice, msrp: pr.MSRP } : null }; };
-async function msCatalog(ids, get, pause) { const out = new Map(); let ok = true;
+export async function msCatalog(ids, get, pause) { const out = new Map(); let ok = true;
   for (const part of chunks(ids, 20)) { const r = await get(`https://displaycatalog.mp.microsoft.com/v7.0/products?bigIds=${part.join(',')}&market=SA&languages=en-us&MS-CV=DGU1mcuYo0WMMp+F.1`);
     if (r.status !== 200 || !Array.isArray(r.body?.Products)) { ok = false; continue; } for (const p of r.body.Products) out.set(p.ProductId, msProduct(p)); await wait(pause / 2); }
   return { out, ok }; }

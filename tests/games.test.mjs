@@ -22,6 +22,10 @@ const TX = { 112875: { s: 'Ragnarök is coming.\n\nKratos and Atreus must journe
 FX.games.find(g => g.id === 1942).also = ['ps3'];
 FX.games.find(g => g.id === 112875).place = { k: 'sequel', after: 'God of War (2018)', line: 'تكمل أحداث God of War بعد ثلاث سنوات: الشتاء العظيم يوشك أن ينتهي.', when: 'بعد ثلاث سنوات من الجزء السابق', where: 'العوالم التسعة', src: 'igdb' };
 FX.moved = { 555001: 990001, 555002: 1942 };
+// الاشتراكات (scripts/lib-subs.mjs): Witcher 3 في الاثنين وتغادر Game Pass قريباً، وRagnarök في كتالوج PS Plus وحده، وMinecraft (بلا PlayStation) في لا شيء
+FX.subs = { at: '2026-11-21T09:00:00Z', n: { gp: 1, ps: 2 } };
+FX.games.find(g => g.id === 1942).subs = { gp: { on: ['xbox', 'pc'], u: 'https://www.xbox.com/games/store/the-witcher-3-wild-hunt/BR765873CQJD', out: 1 }, ps: { k: 'extra', on: ['ps5', 'ps4'], u: 'https://store.playstation.com/en-sa/concept/10000876' } };
+FX.games.find(g => g.id === 112875).subs = { ps: { k: 'extra', on: ['ps5', 'ps4'], u: 'https://store.playstation.com/en-sa/concept/10001850', n: 'God of War Ragnarök PS4 & PS5' } };
 const server = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]);
   if (u === '/games/data/games.json') { r.writeHead(200, { 'content-type': 'application/json' }); return r.end(JSON.stringify(FX)); }
   if (u === '/games/data/texts.json') { r.writeHead(200, { 'content-type': 'application/json' }); return r.end(JSON.stringify({ built: FX.built, texts: TX })); }
@@ -234,7 +238,7 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
           links: [...document.querySelectorAll('#sheet .sec:last-child .links a b')].map(b => b.textContent) }; });
       await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(250); return r; };
     let r = await pcOf(112875);
-    check('هدية جارية: سطر الحال يقول أين وإلى متى، وبلاطة Epic تحملها، والقسم بعد «المنصات»', r.h === 'أين تلعبها على الكمبيوتر' && r.after === 'المنصات' && /^on\|مجانية الآن على Epic Games Store، حتى (الأحد|الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت) \d+ \S+ الساعة \d+(:\d\d)? [صم]\.$/.test(r.f)
+    check('هدية جارية: سطر الحال يقول أين وإلى متى، وبلاطة Epic تحملها، والقسم بعد «في اشتراكاتك»', r.h === 'أين تلعبها على الكمبيوتر' && r.after === 'في اشتراكاتك' && /^on\|مجانية الآن على Epic Games Store، حتى (الأحد|الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت) \d+ \S+ الساعة \d+(:\d\d)? [صم]\.$/.test(r.f)
       && r.tiles[0] === 'steam:Steam:المتجر' && /^epic\.free:Epic Games Store:مجانية الآن حتى /.test(r.tiles[1]) && r.hrefs[1] === 'https://store.epicgames.com/p/god-of-war-ragnarok|_blank|noopener', r);
     check('ملاحظة القسم: أين تُفحص المجانية وبأي أسعار ومتى آخر فحص، ومتاجر الكمبيوتر لا تتكرر في «صفحتها في المواقع»', /تُفحص كل يوم في Steam وEpic Games Store وGOG وXbox بأسعار متجر السعودية\. آخر فحص: /.test(r.note) && !r.links.includes('Steam') && !r.links.includes('Epic Games') && r.links.includes('IGDB'), r);
     check('علبة اللعبة في المكتبة تقول «مجانية الآن»، وغيرها لا', await page.locator('#g-112875 .meta .gift').count() === 1 && await page.textContent('#g-112875 .meta .gift') === 'مجانية الآن' && await page.locator('.gc .meta .gift').count() === 1);
@@ -248,6 +252,28 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
     r = await pcOf(117170); check('لعبة كمبيوتر بلا روابط متاجر ولم تُفحص: تُفحص في البناء القادم', !r.tiles.length && /متاجرها على الكمبيوتر تُفحص في البناء القادم/.test(r.note), r);
     r = await pcOf(136625); check('لعبة ليست على الكمبيوتر: يقال ذلك', !r.tiles.length && /لم تصدر على الكمبيوتر/.test(r.note) && !r.f, r);
     await page.evaluate(() => 0); }
+  // ---------- في اشتراكاتك: ختم مضيء على الغلاف، وزر التصفية، وقسم في البطاقة بعد «المنصات»
+  { const seal = id => page.evaluate(id => { const c = document.querySelector(`#g-${id} .cover`), s = c.querySelector('.seal'); return { lamps: s ? [...s.querySelectorAll('i')].map(i => i.className + ':' + i.textContent) : [], label: c.getAttribute('aria-label'), hidden: s?.getAttribute('aria-hidden') }; }, id);
+    let x = await seal(1942); check('ختم الغلاف: مصباحا الاشتراكين بالترتيب، وما يغادر قريباً معلَّم، والوصف للقارئ الآلي في زر الغلاف', x.lamps.join(' ~ ') === 'sl-gp out:Game Pass ~ sl-ps:PS Plus' && x.hidden === 'true' && x.label === 'افتح بطاقة The Witcher 3: Wild Hunt، ضمن Game Pass وPS Plus، وتغادر Game Pass قريباً', x);
+    x = await seal(112875); check('ختم الغلاف لاشتراك واحد', x.lamps.join(' ~ ') === 'sl-ps:PS Plus' && x.label === 'افتح بطاقة God of War Ragnarök، ضمن PS Plus', x);
+    check('لا ختم لما ليس في اشتراك', await page.locator('.gc .seal').count() === 2, await page.locator('.gc .seal').count());
+    const f = page.locator('.chip.subf'); check('زر «في اشتراكاتي» بعدده', await f.count() === 1 && /في اشتراكاتي\s*2$/.test((await f.textContent()).trim()) && await f.getAttribute('aria-pressed') === 'false', await f.textContent());
+    await f.click(); await page.waitForTimeout(200);
+    const vis = await page.evaluate(() => [...document.querySelectorAll('.gc')].filter(c => !c.hidden).map(c => +c.dataset.id).sort());
+    check('التصفية: لا يبقى إلا ما في اشتراك، وسطر العدّ بزر الإزالة', JSON.stringify(vis) === JSON.stringify([1942, 112875].sort()) && await page.locator('.chip.subf').getAttribute('aria-pressed') === 'true' && /^يظهر 2 من \d+ أزل التصفية$/.test((await page.textContent('#count')).trim()), [vis, await page.textContent('#count')]);
+    await page.click('#count [data-act=reset]'); await page.waitForTimeout(200);
+    check('«أزل التصفية» يطفئ الزر ويعيد الكل', await page.locator('.chip.subf').getAttribute('aria-pressed') === 'false' && await page.evaluate(() => [...document.querySelectorAll('.gc')].every(c => !c.hidden)));
+    const subOf = async id => { await page.click(`#g-${id} .cover`); await page.waitForSelector('#sheet[open] .save'); await page.waitForTimeout(250);
+      const r = await page.evaluate(() => { const x = document.querySelector('#sheet .subsec'), head = document.querySelector('#sheet .sh-head .seal');
+        return x && { after: x.previousElementSibling?.querySelector('h3')?.textContent, head: head ? head.textContent : '', mems: [...x.querySelectorAll('.mem')].map(m => `${m.tagName === 'A' ? m.getAttribute('href') + '|' : ''}${m.className}|${m.querySelector('.mn').textContent}|${m.querySelector('strong').textContent}|${m.querySelector('small')?.textContent || ''}`), note: x.querySelector('.note').textContent }; });
+      await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(250); return r; };
+    let r = await subOf(1942);
+    check('البطاقة: القسم بعد «المنصات»، وختم الرأس يقول إنها ضمن اشتراكك وتغادر Game Pass قريباً', r.after === 'المنصات' && r.head === 'Game PassPS Plusضمن اشتراكك: تلعبها بلا ثمن، وتغادر Game Pass قريباً', r);
+    check('بطاقتا العضوية مضيئتان برابطيهما ومنصاتهما', r.mems[0] === 'https://www.xbox.com/games/store/the-witcher-3-wild-hunt/BR765873CQJD|mem mem-gp on|Game Pass Ultimate|ضمن اشتراكك، وتغادره قريباً|تلعبها على Xbox والكمبيوتر.'
+      && r.mems[1] === 'https://store.playstation.com/en-sa/concept/10000876|mem mem-ps on|PS Plus Deluxe|ضمن اشتراكك الآن|في كتالوج الألعاب، على PS5 وPS4.' && /^يُفحص كل يوم في كتالوجَي Game Pass وPS Plus لمتجر السعودية\. آخر فحص: /.test(r.note), r);
+    r = await subOf(112875); check('اسمها في الكتالوج حين يختلف، وما ليست ضمنه خافت بسببه', /واسمها فيه God of War Ragnarök PS4 & PS5\.$/.test(r.mems[1]) && r.mems[0] === 'mem mem-gp|Game Pass Ultimate|ليست ضمنه الآن|' && r.head === 'PS Plusضمن اشتراكك: تلعبها بلا ثمن', r);
+    r = await subOf(11208); check('لم تصدر على PlayStation: يقال ذلك، ولا ختم في الرأس', r.mems.join(' ~ ') === 'mem mem-gp|Game Pass Ultimate|ليست ضمنه الآن| ~ mem mem-ps|PS Plus Deluxe|لم تصدر على PlayStation|' && !r.head, r);
+    r = await subOf(136625); check('لم تصدر بعد على Xbox ولا الكمبيوتر: ليست ضمنه (منصاتها Xbox وPS)', r.mems[0] === 'mem mem-gp|Game Pass Ultimate|ليست ضمنه الآن|', r); }
   { // مصدر لم يُجب في آخر فحص: الملاحظة تقول ذلك
     const p2 = await ctx.newPage(); await mockApi(p2); await p2.route(/\/games\/data\/games\.json/, async r => { const j = JSON.parse(JSON.stringify(FX)); j.stores = { at: j.stores.at, failed: ['steam', 'gamepass', 'wikidata'] }; await r.fulfill({ contentType: 'application/json', body: JSON.stringify(j) }); });
     await p2.goto(`${base}/games/#g119133`); await p2.waitForSelector('#sheet[open] .pcsec .note');

@@ -81,7 +81,7 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 </defs></svg>`;
 
 // ---------- البيانات والسجل
-const D = { games: [], byId: new Map(), series: {}, plats: {}, fr: {}, films: null, built: null, stores: null };
+const D = { games: [], byId: new Map(), series: {}, plats: {}, fr: {}, films: null, built: null, stores: null, subs: null };
 let P = { games: {} };
 const load = () => { try { P = { games: {}, ...JSON.parse(store.get(KEY) || '{}') }; P.games ||= {}; if (P.dups && typeof P.dups !== 'object') delete P.dups; } catch { P = { games: {} }; } };
 load();
@@ -90,7 +90,7 @@ const rec = id => P.games[id] || {};
 const lst = id => rec(id).s || 'new';
 function setRec(id, patch) { const cur = { ...rec(id), ...patch }; for (const k of Object.keys(cur)) if (cur[k] === '' || cur[k] == null || Number.isNaN(cur[k])) delete cur[k];
   if (Object.keys(cur).length) P.games[id] = cur; else delete P.games[id]; save(); }
-const ui = { list: 'all', q: '', plat: '', genre: '', sort: 'list', view: 'grid', ov: 'release' };
+const ui = { list: 'all', q: '', plat: '', genre: '', sort: 'list', view: 'grid', ov: 'release', sub: false };
 const register = g => { if (D.byId.has(g.id)) return false; D.games.push(g); D.byId.set(g.id, g); return true; };
 const merge = r => { Object.assign(D.series, r.series || {}); Object.assign(D.plats, r.plats || {}); Object.assign(D.fr, r.franchises || {}); };
 
@@ -145,9 +145,15 @@ function chip(o) { if (!soon(o)) return '';
   if (exact(o)) return `<span class="cd" data-until="${o.date}" data-now="تصدر اليوم"><small>تصدر بعد</small><span class="ck" aria-hidden="true">${clock(o.date, 'تصدر اليوم')}</span><span class="sr sr-time">${spoken(o.date)}</span></span>`;
   return `<span class="cd tba"><small>قريباً</small><b>${esc(whenText(o))}</b></span>`; }
 const metaLine = g => { const r = rec(g.id), now = Date.now(); return [(g.pc || []).some(x => giftNow(x, now)) ? '<span class="gift">مجانية الآن</span>' : '', soon(g) ? '<span class="up">قادمة</span>' : g.year ? `<span><bdi>${g.year}</bdi></span>` : '', r.h ? `<span>لعبتها ${hrs(r.h)}</span>` : g.ttb?.n && !soon(g) ? `<span>تُختم في ${hrs(g.ttb.n)}</span>` : ''].filter(Boolean).join(''); };
+// ختم الاشتراك على الغلاف: مصباح صغير يقول إن اللعبة ضمن Game Pass Ultimate أو PS Plus Deluxe الآن (g.subs من البناء، scripts/lib-subs.mjs)،
+// وتمر عليه لمعة كل بضع ثوانٍ، لكل غلاف موعده (--d) فلا تلمع الشبكة كلها معاً. وما يغادر Game Pass قريباً يحيط مصباحه خط متقطع
+const SUBN = { gp: 'Game Pass', ps: 'PS Plus' }, subsOf = g => ['gp', 'ps'].filter(k => g.subs?.[k]);
+const lamps = g => subsOf(g).map(k => `<i class="sl-${k}${g.subs[k].out ? ' out' : ''}"><b dir="ltr">${SUBN[k]}</b></i>`).join('');
+const subSeal = g => subsOf(g).length ? `<span class="seal" style="--d:${((g.id * 7) % 11) * .55}s" aria-hidden="true">${lamps(g)}</span>` : '';
+const subSay = g => { const s = subsOf(g); return s.length ? `، ضمن ${s.map(k => SUBN[k]).join(' و')}${g.subs.gp?.out ? '، وتغادر Game Pass قريباً' : ''}` : ''; };
 function card(g) { const s = rec(g.id).s || 'new';
   return `<article class="gc s-${s}${g.fresh ? ' fresh' : ''}" id="g-${g.id}" data-id="${g.id}"><div class="case">${band(g)}
-<button class="cover" data-act="open" ${g.cover ? `data-zoom-pinch data-zoom-title="${esc(g.title)}" ` : ''}aria-label="افتح بطاقة ${esc(g.title)}">${coverImg(g.cover, '(max-width:520px) 45vw, 200px') || cart(g)}${badge(g)}${chip(g)}</button></div>
+<button class="cover" data-act="open" ${g.cover ? `data-zoom-pinch data-zoom-title="${esc(g.title)}" ` : ''}aria-label="افتح بطاقة ${esc(g.title)}${subSay(g)}">${coverImg(g.cover, '(max-width:520px) 45vw, 200px') || cart(g)}${badge(g)}${chip(g)}${subSeal(g)}</button></div>
 <div class="info"><h3 dir="ltr">${esc(g.title)}</h3><p class="meta">${metaLine(g)}</p><button class="qm-b" data-act="qm" aria-haspopup="menu" aria-label="حالة «${esc(g.title)}» عندي وحذفها">${ic('dots')}</button></div></article>`; }
 
 // ---------- التصفية والترتيب والبحث
@@ -168,15 +174,17 @@ function match(g) { if (ui.dup && DUP) return DUP.has(g.id);   // مراجعة �
   if (ui.list !== 'all' && lst(g.id) !== ui.list) return false;
   if (ui.plat && !onPlat(g, ui.plat)) return false;
   if (ui.genre && !(g.genres || []).includes(ui.genre)) return false;
+  if (ui.sub && !subsOf(g).length) return false;
   if (ui.q) { const z = fuzzyFor(ui.q); if (z.ids ? !z.ids.has(g.id) : !literal(g, z.ws)) return false; }
   return true; }
 function chipsHTML() { const sel = (k, label, opts) => `<select class="pick${ui[k] ? ' on' : ''}" data-k="${k}" aria-label="${label}"><option value="">${label}</option>${opts}</select>`, op = (v, t) => `<option value="${esc(v)}"${ui.plat === v || ui.genre === v ? ' selected' : ''}>${esc(t)}</option>`;
   const fam = {}, code = {}, genres = {}; for (const g of D.games) { const on = rec(g.id).on, ps = new Set([...platsOf(g), ...(on && !WATCH.includes(on) ? [on] : [])]);
     for (const c of ps) { code[c] = (code[c] || 0) + 1; fam[famOf(c)] = 1; } for (const x of g.genres || []) genres[x] = (genres[x] || 0) + 1; }
   const plats = `<optgroup label="العائلة">${Object.keys(FAMN).filter(f => fam[f]).map(f => op('f:' + f, FAMN[f])).join('')}</optgroup><optgroup label="المنصة">${Object.entries(code).sort((a, b) => b[1] - a[1]).map(([c]) => op('c:' + c, abbr(c))).join('')}</optgroup>`;
-  return sel('plat', 'المنصة', plats) + sel('genre', 'النوع', Object.entries(genres).sort((a, b) => b[1] - a[1]).map(([x]) => op(x, x)).join(''))
+  const nSub = D.games.filter(g => subsOf(g).length).length, subf = nSub ? `<button type="button" class="chip subf" data-act="subf" aria-pressed="${ui.sub}"><i aria-hidden="true"></i>في اشتراكاتي<small>${nSub}</small></button>` : '';   // ما تلعبه الليلة بلا ثمن
+  return subf + sel('plat', 'المنصة', plats) + sel('genre', 'النوع', Object.entries(genres).sort((a, b) => b[1] - a[1]).map(([x]) => op(x, x)).join(''))
     + `<select class="pick on" data-k="sort" aria-label="الترتيب">${Object.entries(SORTS).map(([k, [t]]) => `<option value="${k}"${ui.sort === k ? ' selected' : ''}>${t}</option>`).join('')}</select>`; }
-const filtered = () => ui.plat || ui.genre || ui.q;
+const filtered = () => ui.plat || ui.genre || ui.q || ui.sub;
 function apply(resort) { const grid = $('#grid'); dupTidy();
   if (resort) { const frag = document.createDocumentFragment(); for (const g of [...D.games].sort(SORTS[ui.sort][1])) { const el = document.getElementById('g-' + g.id); if (el) frag.append(el); } grid.append(frag); }
   let shown = 0; for (const g of D.games) { const el = document.getElementById('g-' + g.id); if (!el) continue; const ok = match(g); el.hidden = !ok; if (ok) shown++; }
@@ -391,6 +399,24 @@ function pcSec(g) { if (!g.plats?.length) return '';
   const stale = down.length ? ` تعذّر فيه الوصول إلى ${down.map(n => `<bdi dir="ltr">${n}</bdi>`).join(' و')}، فحاله هنا من الفحص الذي قبله.` : '';
   return `<section class="sec pcsec"><h3>أين تلعبها على الكمبيوتر</h3>${head}<div class="links pcs">${rows.map(tile).join('')}</div>
 <p class="note">${built ? `المجانية تُفحص كل يوم في <bdi dir="ltr">Steam</bdi> و<bdi dir="ltr">Epic Games Store</bdi> و<bdi dir="ltr">GOG</bdi> و<bdi dir="ltr">Xbox</bdi> بأسعار متجر السعودية.${fresh}${stale}` : 'المتاجر من روابط <bdi dir="ltr">IGDB</bdi>. المجانية وبقية المشغّلات تُفحص في البناء القادم.'}</p></section>`; }
+// ---------- في اشتراكاتك: Game Pass Ultimate وPS Plus Deluxe، وهما اشتراكا صاحب الموقع وأعلى فئتين في السعودية. g.subs من البناء (scripts/lib-subs.mjs):
+// gp: { on: ['xbox', 'pc'], u, ea?: عبر EA Play, out?: تغادره قريباً, n?: اسمها فيه } وps: { k: 'extra' | 'ubi' | 'deluxe' | 'month', on: […], u, n? }.
+// بطاقتان مضيئتان لما هي ضمنه، وخافتتان لما ليست فيه، مع السبب (ليست ضمنه الآن، أو لم تصدر على منصاته). ما أُضيف للتو يُفحص في البناء القادم
+const PSK = { extra: 'في كتالوج الألعاب', ubi: 'في كلاسيكيات <bdi dir="ltr">Ubisoft+</bdi>', deluxe: 'في الكلاسيكيات', month: 'من ألعاب الشهر: أضفها إلى مكتبتك قبل أن ينتهي شهرها' };
+const ONN = { xbox: 'Xbox', pc: 'الكمبيوتر', ps5: 'PS5', ps4: 'PS4', ps3: 'PS3', ps2: 'PS2', ps1: 'PS1', psp: 'PSP', vita: 'PS Vita', psvr: 'PS VR', psvr2: 'PS VR2' };
+function subsSec(g, pv) { if (pv || !g.plats?.length) return '';
+  const fams = new Set([...g.plats, ...(g.also || [])].map(famOf)), checked = !!D.subs && g.src !== 'added', s = g.subs || {};
+  const on = l => andAr(l.map(c => c === 'pc' ? ONN.pc : `<bdi dir="ltr">${esc(ONN[c] || c)}</bdi>`));
+  const how = (k, r) => [k === 'gp' ? [r.on.length ? `تلعبها على ${on(r.on)}` : '', r.ea ? 'عبر <bdi dir="ltr">EA Play</bdi> المضمّن فيه' : ''].filter(Boolean).join(' ') : [PSK[r.k] || '', r.on.length ? `على ${on(r.on)}` : ''].filter(Boolean).join('، '),
+    r.n ? `واسمها فيه <bdi dir="ltr">${esc(r.n)}</bdi>` : ''].filter(Boolean).join('. ');
+  const mem = (k, title, r, off) => r ? `<a class="mem mem-${k} on" href="${esc(r.u)}" target="_blank" rel="noopener"><span class="mn"><i aria-hidden="true"></i><bdi dir="ltr">${title}</bdi></span><strong>${r.out ? 'ضمن اشتراكك، وتغادره قريباً' : 'ضمن اشتراكك الآن'}</strong>${how(k, r) ? `<small>${how(k, r)}.</small>` : ''}</a>`
+    : `<div class="mem mem-${k}"><span class="mn"><i aria-hidden="true"></i><bdi dir="ltr">${title}</bdi></span><strong>${off}</strong></div>`;
+  const gpOff = !checked ? 'يُفحص في البناء القادم' : fams.has('xbox') || fams.has('pc') ? 'ليست ضمنه الآن' : 'لم تصدر على Xbox ولا الكمبيوتر';
+  const psOff = !checked ? 'يُفحص في البناء القادم' : fams.has('ps') ? 'ليست ضمنه الآن' : 'لم تصدر على PlayStation';
+  const at = D.subs?.at ? new Date(D.subs.at) : null, FAIL = { gamepass: 'Game Pass', 'gamepass-titles': 'Game Pass', psplus: 'PS Plus' }, down = [...new Set((D.subs?.failed || []).map(k => FAIL[k]).filter(Boolean))];
+  const note = checked ? `يُفحص كل يوم في كتالوجَي <bdi dir="ltr">Game Pass</bdi> و<bdi dir="ltr">PS Plus</bdi> لمتجر السعودية.${at ? ` آخر فحص: ${dayAr(at)} الساعة ${clockAr(at)}.` : ''}${down.length ? ` تعذّر فيه الوصول إلى ${down.map(n => `<bdi dir="ltr">${n}</bdi>`).join(' و')}، فحاله هنا من الفحص الذي قبله.` : ''}`
+    : 'أُضيفت للتو، فاشتراكاتها تُفحص في البناء القادم.';
+  return `<section class="sec subsec"><h3>في اشتراكاتك</h3><div class="mems">${mem('gp', 'Game Pass Ultimate', s.gp, gpOff)}${mem('ps', 'PS Plus Deluxe', s.ps, psOff)}</div><p class="note">${note}</p></section>`; }
 const precOfHuman = h => { h = String(h || '').trim(); return !h ? null : /^tb[ad]$/i.test(h) ? 'tbd' : /^q[1-4]\s+\d{4}$/i.test(h) ? 'q' : /^\d{4}$/.test(h) ? 'y' : /^[a-z]{3,}\.?\s+\d{4}$/i.test(h) ? 'm' : 'd'; };
 function mediaSec(g) { const shots = (g.shots || []).slice(0, 8), vids = g.videos || []; if (!shots.length && !vids.length) return '';
   return `<section class="sec"><h3>من داخل اللعبة</h3>${shots.length ? `<div class="reel shots" data-zoom-set>${shots.map((s, i) => `<button type="button" class="shot" data-zoom="${img(s, '1080p')}" data-zoom-title="${esc(g.title)}" aria-label="كبّر اللقطة ${i + 1}"><img loading="lazy" decoding="async" alt="" src="${img(s, 'screenshot_med')}" srcset="${img(s, 'screenshot_med')} 569w, ${img(s, 'screenshot_big')} 889w" sizes="260px"></button>`).join('')}</div>` : ''}
@@ -411,10 +437,10 @@ async function sheetHTML(g, pv) { if (g.from?.some(w => w.tmdb) || g.into?.some(
   const story = aboutSec(g, pv ? {} : (await texts())[g.id] || {}, pv);
   return `<div class="sh-hero">${art ? `<img alt="" src="${img(art, '720p')}" srcset="${img(art, '720p')} 1280w, ${img(art, '1080p')} 1920w" sizes="(max-width:900px) 100vw, 900px">` : ''}</div>
 <div class="sh-head">${g.cover ? `<button type="button" class="cover" data-zoom="${img(g.cover, '1080p')}" data-zoom-title="${esc(g.title)}" aria-label="كبّر غلاف ${esc(g.title)}">${coverImg(g.cover, '180px', false)}</button>` : `<div class="cover">${cart(g)}</div>`}
-<div class="txt"><h2 dir="ltr">${esc(g.title)}</h2>${g.titleAr ? `<p class="ar">${esc(g.titleAr)}</p>` : ''}<p class="facts">${facts.map(x => `<span>${x}</span>`).join('')}</p><div class="tags">${(g.genres || []).map(x => `<span>${esc(x)}</span>`).join('')}${(g.modes || []).slice(0, 2).map(x => `<span class="m">${esc(x)}</span>`).join('')}</div></div></div>
+<div class="txt"><h2 dir="ltr">${esc(g.title)}</h2>${g.titleAr ? `<p class="ar">${esc(g.titleAr)}</p>` : ''}<p class="facts">${facts.map(x => `<span>${x}</span>`).join('')}</p><div class="tags">${(g.genres || []).map(x => `<span>${esc(x)}</span>`).join('')}${(g.modes || []).slice(0, 2).map(x => `<span class="m">${esc(x)}</span>`).join('')}</div>${!pv && subsOf(g).length ? `<p class="seal inl">${lamps(g)}<span>ضمن اشتراكك: تلعبها بلا ثمن${g.subs.gp?.out ? '، وتغادر <bdi dir="ltr">Game Pass</bdi> قريباً' : ''}</span></p>` : ''}</div></div>
 ${chainHTML(g)}${pv ? `<section class="save pv">${twinHTML(g, true)}<h3>أضفها إلى مكتبتي</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${listBtn(k)}</button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
 ${g.src === 'added' ? '<section class="sec"><p class="ask">أُضيفت بزر «أضف لعبة»: معلوماتها آلية من <bdi dir="ltr">IGDB</bdi>، وعالمها واقتباساتها تكتمل في البناء القادم.</p></section>' : ''}
-${board(g)}${placeSec(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${pcSec(g)}${mediaSec(g)}${linksSec(g)}`; }
+${board(g)}${placeSec(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${subsSec(g, pv)}${pcSec(g)}${mediaSec(g)}${linksSec(g)}`; }
 // ---------- عن اللعبة. النصوص الطويلة (النبذة والقصة بلغتيهما) في ملف مستقل يُجلب مرة واحدة (ويُسبق جلبه بعد الإقلاع)، وما أُضيف للتو نصه في سجله.
 // المترجَم يُعرض بالعربية وتحته الأصل الإنجليزي لمن أراده؛ وغير المترجَم بالإنجليزية مع زر «ترجمها لي» يوصل الطلب إلى المترجم (فرع requests في المستودع).
 // لا مرور آلي للمترجم (قرار صاحب الموقع): الطلبات تنتظر حتى يقول «ترجم الجديد»، فتُترجم بدورة docs/GAMES-CARE.md
@@ -717,7 +743,8 @@ document.addEventListener('click', e => { if (!qm.hidden && !e.target.closest('#
   else if (act === 'meant') { $('#q').value = t.dataset.q; ui.q = t.dataset.q; apply(false); $('#q').focus(); }
   else if (act === 'meant-add') { $('#add-q').value = t.dataset.q; $('#add-form').requestSubmit(); }
   else if (act === 'soon') soonFlip();
-  else if (act === 'reset') { Object.assign(ui, { q: '', plat: '', genre: '' }); $('#q').value = ''; $('#chips').innerHTML = chipsHTML(); apply(false); }
+  else if (act === 'subf') { ui.dup = null; ui.sub = !ui.sub; t.setAttribute('aria-pressed', String(ui.sub)); apply(false); }
+  else if (act === 'reset') { Object.assign(ui, { q: '', plat: '', genre: '', sub: false }); $('#q').value = ''; $('#chips').innerHTML = chipsHTML(); apply(false); }
   else if (act === 'add') { if (accDlg.open) accDlg.close(); openAdd(); }
   else if (act === 'accounts') openAccounts();
   else if (act === 'add-pick') askList(t);
@@ -751,7 +778,7 @@ function route() { const h = location.hash.slice(1); let m;
   else if ((m = h.match(/^steam=(\d{17})$/))) { store.set(STEAM, m[1]); history.replaceState(null, '', location.pathname); toast('رُبط حسابك في Steam'); openAccounts(); }
   else if (h === 'steam-fail') { history.replaceState(null, '', location.pathname); toast('لم يكتمل الدخول عبر Steam. حاول ثانية.'); openAccounts(); } }
 try {
-  const cat = await get('games.json'); IMGB = cat.img || IMGB; D.built = cat.built; D.stores = cat.stores || null; merge(cat);
+  const cat = await get('games.json'); IMGB = cat.img || IMGB; D.built = cat.built; D.stores = cat.stores || null; D.subs = cat.subs || null; merge(cat);
   // لعبة صُحّح رقمها (مطابقة خاطئة من سحب قديم): سجلها ينتقل إلى رقمها الصحيح مرة واحدة ويُزامَن
   { let mv = false; for (const [o, n] of Object.entries(cat.moved || {})) if (P.games[o]) { P.games[n] ||= P.games[o]; delete P.games[o]; mv = true; } if (mv) save(); }
   // ما حذفته من هذا الجهاز يبقى مخفياً حتى يصل بناء أحدث من حذفه بعشرين دقيقة (فإن بقي فيه فقد أُعيدت إضافته من جهاز آخر)

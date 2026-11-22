@@ -10,8 +10,9 @@ import { applyCare } from './lib-care.mjs';
 import { hasIgdb, igdb } from './lib-igdb.mjs';
 import { gamesFor, IMG } from './lib-games.mjs';
 import { storesFor } from './lib-stores.mjs';
+import { subsFor } from './lib-subs.mjs';
 
-const ADDED = 'data/games/added.json', OUT = 'site/games/data/games.json', TEXTS = 'site/games/data/texts.json', STORES = 'data/generated/games/stores-report.json';
+const ADDED = 'data/games/added.json', OUT = 'site/games/data/games.json', TEXTS = 'site/games/data/texts.json', STORES = 'data/generated/games/stores-report.json', SUBS = 'data/generated/games/subs-report.json';
 const read = (f, d) => readFile(f, 'utf8').then(JSON.parse).catch(() => d);
 const added = (await read(ADDED, { games: [] })).games || [];
 await mkdir('site/games/data', { recursive: true });
@@ -70,6 +71,15 @@ r.games.sort((a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9));
         console.log(`stores: fix ${id} (${r.games.find(g => String(g.id) === id)?.title}) steam ${f.ids.steam} = ${d?.name ?? '?'} [${d?.type ?? '?'}]`); }   // ما صُحّح باليد يُرى اسمه في المتجر
       for (const [n, v] of Object.entries(st.report.games)) console.log(`stores: ${n} => ${v}`); console.log('stores: pass by title: ' + st.report.passByTitle.join(' | ')); console.log('stores: epic free: ' + st.report.epicFree.join(' | ')); console.log('stores: none: ' + st.report.none.join(' | ')); console.log('stores: gog search: ' + st.report.gogSearch.join(' | ')); console.log('stores: epic guess: ' + st.report.epicGuess.join(' | ')); }
   } catch (e) { console.log(`games: stores failed (${e.message}), keeping the previous stores`); for (const g of r.games) { const o = prev.get(g.id); if (o?.pc) g.pc = o.pc; if (o?.f2p) g.f2p = 1; } } }
+// ضمن Game Pass Ultimate أو PS Plus Deluxe الآن (scripts/lib-subs.mjs). ما تعذّر من مصدريه يبقى له ما كان في الملف السابق، وإن تعذّر كله بقي ما كان كما هو
+{ const prev = new Map(((await read(OUT, null))?.games || []).map(g => [g.id, g.subs || {}]));
+  try { const sb = await subsFor(r.games, { prev, log: m => console.log('games: ' + m) });
+    for (const g of r.games) { const row = sb.rows.get(g.id); if (row) g.subs = row; }
+    r.subs = sb.meta; await mkdir('data/generated/games', { recursive: true }); await writeFile(SUBS, JSON.stringify(sb.report, null, 1) + '\n');
+    if (process.env.GAMES_PROBE) {   // فروع العمل: الجدول كله في سجل البناء للمراجعة
+      for (const [n, v] of Object.entries(sb.report.games)) console.log(`subs: ${n} => ${v}`); console.log('subs: by title: ' + sb.report.byTitle.join(' | '));
+      for (const [k, x] of Object.entries(sb.report.sample)) console.log(`subs: sample ${k}: ${JSON.stringify(x).slice(0, 1200)}`); }
+  } catch (e) { console.log(`games: subscriptions failed (${e.message}), keeping the previous ones`); for (const g of r.games) { const o = prev.get(g.id); if (o?.gp || o?.ps) g.subs = o; } } }
 const TR = await read('data/games/translations.json', {}), PLACES = await read('data/games/places.json', {}), moved = await read('data/games/moved.json', {});
 const built = new Date().toISOString(), { texts, n } = applyCare(r.games, {}, TR, PLACES);
 await writeFile(TEXTS, JSON.stringify({ built, texts }));

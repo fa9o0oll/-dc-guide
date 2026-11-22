@@ -461,6 +461,55 @@ section.sec{padding:22px clamp(14px,3vw,30px) 0}
 @media (hover:hover){.pcs a.st:hover{background:var(--card2)}}
 @media (hover:hover){.links a:hover{box-shadow:inset 0 0 0 1px var(--cy)}}
 
+/* ===== ضمن اشتراكك: Game Pass Ultimate (مصباح حلقة خضراء) وPS Plus Deluxe (مصباح زائد ذهبي) =====
+   على الغلاف ختم صغير: كبسولة زجاجية داكنة فيها المصباح يتوهج بلون اشتراكه، وتمر عليه لمعة كل بضع ثوانٍ (لكل غلاف موعده).
+   وفي البطاقة: الختم نفسه تحت العنوان، وقسم «في اشتراكاتك» ببطاقتي عضوية تضيء ما هي ضمنه وتخفت ما ليست فيه */
+:root{--gp:#4be37a;--psp:#ffd84a}
+.seal{position:absolute;inset-inline-start:7px;bottom:7px;z-index:2;display:grid;justify-items:start;gap:4px;pointer-events:none}
+.cover:has(.cd) .seal{bottom:auto;top:7px}   /* لم تصدر بعد: لوحة العدّ في أسفل الغلاف */
+.seal i{--sc:var(--gp);position:relative;display:inline-flex;align-items:center;gap:6px;height:21px;padding:0 9px 0 7px;border-radius:999px;overflow:hidden;font-style:normal;
+  background:linear-gradient(180deg,rgba(16,20,46,.84),rgba(6,8,22,.92));-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sc) 62%,transparent),0 0 14px -3px color-mix(in srgb,var(--sc) 78%,transparent),0 3px 10px rgba(0,0,0,.55)}
+.seal .sl-ps{--sc:var(--psp)}
+.seal i.out{outline:1px dashed color-mix(in srgb,var(--sc) 85%,transparent);outline-offset:1.5px}   /* تغادر Game Pass قريباً */
+.seal b{font-family:var(--display);font-weight:600;font-size:.9rem;letter-spacing:.04em;line-height:1;color:#fff}
+.seal i::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--sc),0 0 7px var(--sc)}
+.seal .sl-ps::before{width:9px;height:9px;border-radius:0;box-shadow:none;background:linear-gradient(var(--sc) 0 0) center/100% 2.5px no-repeat,linear-gradient(var(--sc) 0 0) center/2.5px 100% no-repeat;filter:drop-shadow(0 0 3px var(--sc))}
+.seal i::after{content:"";position:absolute;inset:-2px;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.62) 50%,transparent 65%);transform:translateX(-140%);pointer-events:none}
+@media (prefers-reduced-motion:no-preference){
+  .seal i::after{animation:gleam 6.5s var(--d,0s) cubic-bezier(.4,0,.2,1) infinite}
+  .seal i+i::after{animation-delay:calc(var(--d,0s) + .3s)}
+  .seal i::before{animation:lamp 6.5s var(--d,0s) ease-in-out infinite}
+  .seal i+i::before{animation-delay:calc(var(--d,0s) + .3s)}}
+@keyframes gleam{0%,78%{transform:translateX(-140%)}93%,100%{transform:translateX(140%)}}
+@keyframes lamp{0%,74%,100%{opacity:.85}86%{opacity:1;scale:1.25}}
+.seal.inl{position:static;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.seal.inl span{font-size:.84rem;color:var(--dim)}
+/* قسم «في اشتراكاتك» */
+.mems{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px}
+.mem{--sc:var(--gp);position:relative;isolation:isolate;display:grid;gap:4px;align-content:start;min-height:86px;padding:13px 16px;border-radius:14px;overflow:hidden;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);color:var(--mute);text-decoration:none}
+.mem-ps{--sc:var(--psp)}
+.mem .mn{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:600;font-size:1.3rem;line-height:1.1;color:var(--dim)}
+.mem .mn i{--lc:color-mix(in srgb,var(--sc) 40%,var(--mute));flex:none;width:11px;height:11px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--lc)}
+.mem-ps .mn i{border-radius:0;box-shadow:none;background:linear-gradient(var(--lc) 0 0) center/100% 3px no-repeat,linear-gradient(var(--lc) 0 0) center/3px 100% no-repeat}
+.mem strong{font-weight:600;font-size:.95rem;color:var(--dim)}
+.mem small{font-size:.8rem;line-height:1.6;color:var(--mute)}
+.mem.on{background:radial-gradient(130% 120% at 100% 0,color-mix(in srgb,var(--sc) 15%,var(--card)),var(--card) 62%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sc) 55%,var(--line)),0 0 30px -12px color-mix(in srgb,var(--sc) 80%,transparent)}
+.mem.on .mn{color:var(--ink)}
+.mem.on .mn i{--lc:var(--sc);box-shadow:inset 0 0 0 2px var(--sc),0 0 9px var(--sc)}
+.mem-ps.on .mn i{box-shadow:none;filter:drop-shadow(0 0 4px var(--sc))}
+.mem.on strong{color:var(--sc)}
+.mem.on small{color:var(--dim)}
+.mem.on::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,transparent 30%,color-mix(in srgb,var(--sc) 24%,transparent) 48%,transparent 66%);transform:translateX(-120%)}
+@media (prefers-reduced-motion:no-preference){.mem.on::after{animation:gleam1 1.6s .35s cubic-bezier(.4,0,.2,1) both}}
+@keyframes gleam1{to{transform:translateX(120%)}}
+@media (hover:hover){a.mem.on:hover{box-shadow:inset 0 0 0 1px var(--sc),0 0 34px -10px var(--sc)}}
+/* زر التصفية «في اشتراكاتي» */
+.chip.subf{border-color:color-mix(in srgb,var(--gp) 35%,var(--line))}
+.chip.subf i{flex:none;width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,var(--gp) 50%,var(--psp) 50%);box-shadow:0 0 8px color-mix(in srgb,var(--gp) 55%,transparent)}
+.chip.subf small{margin-inline-start:2px;color:var(--mute);font-size:.76rem}
+.chip.subf[aria-pressed=true]{border-color:var(--gp);color:#d2ffe0;background:color-mix(in srgb,var(--gp) 12%,var(--card));box-shadow:0 0 16px -6px var(--gp)}
+
 /* القائمة السريعة (⋮) */
 .qm{position:fixed;z-index:150;display:grid;gap:2px;min-width:200px;padding:6px;border-radius:12px;background:#151a3c;box-shadow:0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.6)}
 .qm p{padding:4px 10px 2px;font-size:.78rem;color:var(--mute)}
