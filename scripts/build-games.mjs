@@ -19,6 +19,7 @@ const empty = { built: new Date().toISOString(), img: IMG, games: [], series: {}
 if (!hasIgdb()) { const old = await read(OUT, null); if (!old) await writeFile(OUT, JSON.stringify(empty)); console.log(`games: no IGDB keys (IGDB_CLIENT_ID, IGDB_CLIENT_SECRET), ${old ? 'kept the previous file' : 'wrote an empty catalog'}`); process.exit(0); }
 
 if (process.env.GAMES_PROBE) {
+  await (await import('./probe-subs.mjs')).probeSubs().catch(e => console.log('subs-probe failed: ' + e.message));   // مصادر الاشتراكات (Game Pass وPS Plus)
   // عينة للتحقق من أسماء الحقول ومصادر المعرّفات الخارجية في IGDB الحية (فروع العمل فقط)
   const show = (t, x) => console.log(`probe ${t}: ${JSON.stringify(x).slice(0, 900)}`);
   show('game_types', await igdb('game_types', 'fields type; limit 50;').catch(e => e.message));
