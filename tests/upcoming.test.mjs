@@ -5,7 +5,7 @@
 //   • العدّ نفسه: يتحرك كل ثانية، والرقم المتغير وحده يتحرك، ويكتب «اليوم» حين يحين الموعد (بساعة مصطنعة)
 //   • أبواب الصفحة الرئيسية متناسقة: إطار وحجم واحد، بلا ظل مائل، وأسطرها مصطفة على الشاشات العريضة
 //   • ميلان البوستر مع المؤشر والضغط عليه على الكمبيوتر، وتوقف الحركة مع «تقليل الحركة»
-//   • القاعة على الجوال لا تعيد رسم شيء أثناء السحب: كل حركة فيها transform وopacity فقط، بلا انعكاس ولا تمويه، وحركة الجارين ساكنة
+//   • القاعة على الجوال لا تعيد رسم شيء أثناء السحب: كل حركة فيها transform وopacity فقط، بلا انعكاس ولا تمويه، والجاران لوحة واحدة زينتها ثابتة
 //   • بوابة دي سي: غلافها بألوانه ومطره ينزل بثلاث طبقات، والنقش فوق القاعة يأخذ لون البوابة التي أمامك
 //   • زر الرجوع في كل عالم بوابة صغيرة متحركة بهويته، يتسع عند الضغط ويعيدك إلى بوابته في القاعة
 // node tests/upcoming.test.mjs   (يحتاج playwright عبر NODE_PATH)
@@ -159,8 +159,14 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
         rain: rain.map(b => [/svg/.test(getComputedStyle(b).backgroundImage), b.getAnimations()[0]?.effect.getKeyframes().at(-1)?.transform, getComputedStyle(b).backgroundSize]), skew: getComputedStyle(document.querySelector('.door.dc .art i')).transform };
     });
     check(`${name}: كل ما يتحرك في القاعة transform وopacity فقط، وبلا تمويه`, fx.n > 20 && !fx.props.length && !fx.blur, fx);
-    check(`${name}: حركة البوابتين الجانبيتين ساكنة، والتي في الوسط تتحرك`, fx.side.join() === 'paused' && fx.mid.join() === 'running', fx);
-    check(`${name}: مطر دي سي خفيف: طبقتان من نسيج خيوط، كل طبقة تنزل مسافة تكرار نسيجها، مائلة كمطر الغلاف`, fx.rain.length === 2 && fx.rain.every(([svg, t, bs]) => svg && t === `translateY(${parseInt(bs.split(' ')[1])}px)`) && /^matrix\(1, 0, -0\.2/.test(fx.skew), fx);
+    // الجاران لوحة واحدة تُرسم مرة: زينة عالمهما ثابتة بلا حركة، فلا يرسم كرت الشاشة أثناء السحب كل بوابة مائلة في صفحة جانبية ثم يقصها
+    check(`${name}: زينة البوابتين الجانبيتين ثابتة بلا حركة، والتي في الوسط تتحرك`, !fx.side.length && fx.mid.join() === 'running', fx);
+    const flat = await page.evaluate(() => { const g = document.querySelector('.door.games');
+      return { wc: [...document.querySelectorAll('.door')].filter(x => getComputedStyle(x.querySelector('.art')).willChange === 'transform').map(x => x.dataset.guide),
+        floor: /svg/.test(getComputedStyle(g.querySelector('.motif')).backgroundImage), grid: getComputedStyle(g.querySelector('.motif>i')).visibility,
+        dim: [...document.querySelectorAll('.slot')].map(x => getComputedStyle(x, '::before').content !== 'none'), inner: [...document.querySelectorAll('.door')].some(x => getComputedStyle(x, '::after').content !== 'none') }; });
+    check(`${name}: الجاران بلا طبقات داخلهما: طبقة الصورة المستقلة للتي في الوسط وحدها، وأرضية ألعابي على الجار مرسومة سلفاً، والعتمة طبقة شقيقة للبوابة لا ابنة تحت قصها`,
+      flat.wc.join() === 'anime' && flat.floor && flat.grid === 'hidden' && flat.dim.every(Boolean) && !flat.inner, flat);
     // النقش فوق القاعة يأخذ لون البوابة التي أمامك (أنمياتي وردي الغسق)
     const lit = () => page.evaluate(() => [document.body.dataset.here, getComputedStyle(document.body).getPropertyValue('--lit').trim()]);
     await page.waitForTimeout(900); const l0 = await lit();
@@ -169,6 +175,9 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
     await tapDoor('dc'); await page.waitForTimeout(1100);
     const after = await page.evaluate(() => ({ url: location.pathname, here: document.querySelector('.door[data-here]')?.dataset.guide, t: getComputedStyle(document.querySelector('.door.dc')).transform }));
     check(`${name}: الضغط على البوابة الجانبية يأتي بها إلى الوسط ولا يدخلها`, after.url === '/' && after.here === 'dc' && facing(after.t), after);
+    // ومطرها يبدأ حين تستقر في الوسط
+    const rain = await page.evaluate(() => [...document.querySelectorAll('.door.dc .art b')].map(b => [/svg/.test(getComputedStyle(b).backgroundImage), b.getAnimations()[0]?.effect.getKeyframes().at(-1)?.transform, getComputedStyle(b).backgroundSize, b.getAnimations()[0]?.playState]));
+    check(`${name}: مطر دي سي خفيف: طبقتان من نسيج خيوط، كل طبقة تنزل مسافة تكرار نسيجها، مائلة كمطر الغلاف`, rain.length === 2 && rain.every(([svg, t, bs, st]) => svg && t === `translateY(${parseInt(bs.split(' ')[1])}px)` && st === 'running') && /^matrix\(1, 0, -0\.2/.test(fx.skew), { rain, skew: fx.skew });
     await page.waitForTimeout(900); const l1 = await lit();
     check(`${name}: وحين تصل دي سي إلى الوسط يحمرّ النقش معها`, l1[0] === 'dc' && /255, 90, 76|#ff5a4c/i.test(l1[1]), l1);
     await tapDoor('dc'); await page.waitForURL(/\/dc\/$/, { timeout: 4000 }).catch(() => {});
@@ -303,6 +312,8 @@ for (const [name, w, h, mobile] of [['cover', 369, 905, true], ['desktop', 1440,
   check('تقليل الحركة: البوابة الصغيرة ساكنة، والضغط ينقلك مباشرة بلا اتساع', !rm && !g2 && new URL(page.url()).pathname === '/', { rm, g2, url: page.url() });
   await page.goto(`${base}/`); await page.waitForTimeout(700);
   check('تقليل الحركة: البوابات مستوية بلا ميل ولا مطر ولا جمر، والنقش بلا ضوء يمر، والتنقل بينها يبقى', await page.evaluate(() => [...document.querySelectorAll('.door')].every(d => getComputedStyle(d).transform === 'none') && !document.getAnimations().length && !!document.querySelector('.door.anime[data-here]')));
+  check('تقليل الحركة: البوابات ظاهرة على الجوال، لا عتمة تغطيها حين لا تتحرك القاعة', await page.evaluate(() => [...document.querySelectorAll('.slot')].every(s => { const c = getComputedStyle(s, '::before'); return c.content === 'none' || c.opacity === '0'; })
+    && [...document.querySelectorAll('.door')].every(d => { const c = getComputedStyle(d, '::after'); return c.content === 'none' || c.opacity === '0'; })));
   check('reduced-motion: بلا أخطاء برمجية', !errs.length, errs);
   await ctx.close(); }
 

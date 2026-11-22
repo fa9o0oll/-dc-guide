@@ -17,8 +17,8 @@ const slots = [...hall.querySelectorAll('.slot')], doorOf = s => s.querySelector
 const mid = el => { const r = el.getBoundingClientRect(); return r.left + r.width / 2; };
 const off = s => mid(s) - mid(hall);   // بعد البوابة عن وسط القاعة (الخانة نفسها لا تميل، فقياسها صادق)
 const go = (s, smooth = true) => hall.scrollBy({ left: off(s), behavior: smooth && !calm ? 'smooth' : 'instant' });
-// أي بوابة في الوسط؟ من موضع التمرير ومراكز الخانات المحفوظة: لا قياس للصفحة في كل إطار أثناء السحب،
-// ولا تُلمس الصفحة إلا حين تتبدل البوابة التي في الوسط (فتبدأ حركتها وتسكن حركة جارتها)
+// أي بوابة في الوسط؟ من موضع التمرير ومراكز الخانات المحفوظة، ولا تُلمس الصفحة إلا حين تستقر القاعة وقد تبدلت البوابة
+// التي في الوسط (فتبدأ حركتها وتسكن حركة جارتها ويتبدل ضوء العنوان)
 let centers = [], cur;
 const measure = () => { centers = slots.map(s => s.offsetLeft + s.offsetWidth / 2); };
 const nearest = () => { const c = hall.scrollLeft + hall.clientWidth / 2; let k = 0; centers.forEach((x, i) => { if (Math.abs(x - c) < Math.abs(centers[k] - c)) k = i; }); return slots[k]; };
@@ -27,11 +27,10 @@ function mark() { const h = narrow.matches ? nearest() : null; if (h === cur) re
   for (const s of slots) doorOf(s).toggleAttribute('data-here', s === h);
   document.body.dataset.here = h ? doorOf(h).dataset.guide : '';
   nav?.querySelectorAll('button').forEach(b => b.setAttribute('aria-current', String(!!h && b.dataset.to === doorOf(h).dataset.guide))); onHere(); }
-// أثناء السحب (وحتى يستقر) لا يُكتب شيء غير ما يلزم؛ الاستقرار من scrollend، وإلا بعد سكون قصير
-let mraf = 0, still = 0, moving = false;
+// أثناء السحب (وحتى يستقر) لا يُكتب في الصفحة شيء، فكل إطار من الحركة على كرت الشاشة وحده؛ الاستقرار من scrollend، وإلا بعد سكون قصير
+let still = 0, moving = false;
 const settle = () => { clearTimeout(still); moving = false; mark(); onHere(); };
-hall.addEventListener('scroll', () => { moving = true; clearTimeout(still); still = setTimeout(settle, 180);
-  if (!mraf) mraf = requestAnimationFrame(() => { mraf = 0; mark(); }); }, { passive: true });
+hall.addEventListener('scroll', () => { moving = true; clearTimeout(still); still = setTimeout(settle, 180); }, { passive: true });
 hall.addEventListener('scrollend', settle);
 nav?.addEventListener('click', e => { const b = e.target.closest('button[data-to]'); if (b) go(slots.find(s => doorOf(s).dataset.guide === b.dataset.to)); });
 hall.addEventListener('focusin', e => { const s = e.target.closest('.slot'); if (s && narrow.matches) go(s); });

@@ -204,16 +204,32 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   .doors::-webkit-scrollbar{display:none}
   .slot{direction:rtl;display:block;position:relative;flex:0 0 var(--dw);scroll-snap-align:center;perspective:1000px;view-timeline:--slot inline}
   .door{height:var(--dh)}
-  /* صورة البوابة في طبقة مستقلة: ميلان الجوال يزيحها دون إعادة رسم */
-  .door .art{will-change:transform}
+  /* صورة البوابة التي في الوسط في طبقة مستقلة: ميلان الجوال يزيحها دون إعادة رسم. والجاران لا طبقات داخلهما: كل منهما لوحة
+     واحدة تُرسم مرة، فلا يحتاج كرت الشاشة أثناء السحب إلى رسم كل بوابة مائلة في صفحة جانبية ثم قصّها بزواياها */
+  .door[data-here] .art{will-change:transform}
   /* الأرضية المصقولة: ضوء كل عالم ينسكب تحت بوابته (أخف على الجوال من عكس البوابة كاملة وهي تدور) */
   .slot::after{content:"";position:absolute;inset-inline:-6%;top:calc(100% + 6px);height:clamp(70px,14dvh,120px);pointer-events:none;
     background:radial-gradient(48% 100% at 50% 0,color-mix(in srgb,var(--glow) 24%,transparent),color-mix(in srgb,var(--glow) 6%,transparent) 45%,transparent 72%)}
   .s-dc{--glow:#ff5a4c}.s-anime{--glow:#ff8fa3}.s-films{--glow:#ff9f43}.s-games{--glow:#35e0ff}
+  /* عتمة الجارين طبقة شقيقة للبوابة تميل معها بالحركة نفسها (لا ابنة تحت قصّها)، وشفافة إن لم تتحرك القاعة (تقليل الحركة) */
   @supports (animation-timeline:--slot){.door{animation:hall linear both;animation-timeline:--slot}.slot::after{animation:hall-floor linear both;animation-timeline:--slot}
-    .door::after{content:"";position:absolute;inset:0;pointer-events:none;background:#050508;border-radius:inherit;animation:hall-dim linear both;animation-timeline:--slot}}
-  /* الجاران ساكنان: حركتهما تبدأ حين يصلان الوسط */
-  .door:not([data-here]) :is(.art,.fx,.motif)::before,.door:not([data-here]) .fx::after,.door:not([data-here]) :is(.art,.fx,.motif) :is(i,b,img){animation-play-state:paused!important}
+    .slot::before{content:"";position:absolute;z-index:1;inset:0 0 auto;height:var(--dh);border-radius:20px;background:#050508;opacity:0;pointer-events:none;
+      animation:hall linear both,hall-dim linear both;animation-timeline:--slot,--slot}}
+  /* الجاران ساكنان: زينة عالمهما ثابتة على أول مشهد من حركتها ومرسومة معهما، وحركتها تبدأ حين يصلان الوسط ويستقران */
+  .door:not([data-here]) :is(.art,.fx,.motif)::before,.door:not([data-here]) .fx::after,.door:not([data-here]) :is(.art,.fx,.motif) :is(i,b,img){animation:none!important}
+  .door.anime .fx::before{opacity:.62}
+  .door.films .fx>i{opacity:.45}
+  .door.games .fx::before{transform:translateX(42%)}
+  /* أرضية ألعابي على الجار: الأرضية نفسها مرسومة سلفاً كما يُسقطها منظورها عند أول حركتها (صورة مسطحة تُرسم مرة مع البوابة)،
+     والأرضية الحية بمنظورها ثلاثي الأبعاد للبوابة التي في الوسط وحدها */
+  .door.games:not([data-here]) .motif{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1500 0 3000 1000' preserveAspectRatio='xMidYMin meet'%3E%3Cpath fill='%2335e0ff' fill-opacity='.3' d='M-1575 1020L-1571.3 1020L-952.6 565.3L-954.8 565.3ZM-1505 1020L-1501.3 1020L-910.1 565.3L-912.4 565.3ZM-1435 1020L-1431.3 1020L-867.7 565.3L-870 565.3ZM-1365 1020L-1361.3 1020L-825.3 565.3L-827.5 565.3ZM-1295 1020L-1291.3 1020L-782.8 565.3L-785.1 565.3ZM-1225 1020L-1221.3 1020L-740.4 565.3L-742.6 565.3ZM-1155 1020L-1151.3 1020L-698 565.3L-700.2 565.3ZM-1085 1020L-1081.3 1020L-655.5 565.3L-657.8 565.3ZM-1015 1020L-1011.3 1020L-613.1 565.3L-615.3 565.3ZM-945 1020L-941.3 1020L-570.7 565.3L-572.9 565.3ZM-875 1020L-871.3 1020L-528.2 565.3L-530.5 565.3ZM-805 1020L-801.3 1020L-485.8 565.3L-488 565.3ZM-735 1020L-731.3 1020L-443.3 565.3L-445.6 565.3ZM-665 1020L-661.3 1020L-400.9 565.3L-403.1 565.3ZM-595 1020L-591.3 1020L-358.5 565.3L-360.7 565.3ZM-525 1020L-521.3 1020L-316 565.3L-318.3 565.3ZM-455 1020L-451.3 1020L-273.6 565.3L-275.8 565.3ZM-385 1020L-381.3 1020L-231.2 565.3L-233.4 565.3ZM-315 1020L-311.3 1020L-188.7 565.3L-191 565.3ZM-245 1020L-241.3 1020L-146.3 565.3L-148.5 565.3ZM-175 1020L-171.3 1020L-103.8 565.3L-106.1 565.3ZM-105 1020L-101.3 1020L-61.4 565.3L-63.7 565.3ZM-35 1020L-31.3 1020L-19 565.3L-21.2 565.3ZM35 1020L38.7 1020L23.5 565.3L21.2 565.3ZM105 1020L108.7 1020L65.9 565.3L63.7 565.3ZM175 1020L178.7 1020L108.3 565.3L106.1 565.3ZM245 1020L248.7 1020L150.8 565.3L148.5 565.3ZM315 1020L318.7 1020L193.2 565.3L191 565.3ZM385 1020L388.7 1020L235.6 565.3L233.4 565.3ZM455 1020L458.7 1020L278.1 565.3L275.8 565.3ZM525 1020L528.7 1020L320.5 565.3L318.3 565.3ZM595 1020L598.7 1020L363 565.3L360.7 565.3ZM665 1020L668.7 1020L405.4 565.3L403.1 565.3ZM735 1020L738.7 1020L447.8 565.3L445.6 565.3ZM805 1020L808.7 1020L490.3 565.3L488 565.3ZM875 1020L878.7 1020L532.7 565.3L530.5 565.3ZM945 1020L948.7 1020L575.1 565.3L572.9 565.3ZM1015 1020L1018.7 1020L617.6 565.3L615.3 565.3ZM1085 1020L1088.7 1020L660 565.3L657.8 565.3ZM1155 1020L1158.7 1020L702.4 565.3L700.2 565.3ZM1225 1020L1228.7 1020L744.9 565.3L742.6 565.3ZM1295 1020L1298.7 1020L787.3 565.3L785.1 565.3ZM1365 1020L1368.7 1020L829.8 565.3L827.5 565.3ZM1435 1020L1438.7 1020L872.2 565.3L870 565.3ZM1505 1020L1508.7 1020L914.6 565.3L912.4 565.3Z'/%3E%3Cpath fill='%2335e0ff' fill-opacity='.4' d='M-1500 565.3H1500V566H-1500ZM-1500 578.4H1500V579.1H-1500ZM-1500 592H1500V592.8H-1500ZM-1500 606.2H1500V606.9H-1500ZM-1500 620.9H1500V621.7H-1500ZM-1500 636.1H1500V637H-1500ZM-1500 652.1H1500V652.9H-1500ZM-1500 668.7H1500V669.6H-1500ZM-1500 686H1500V686.9H-1500ZM-1500 704H1500V705H-1500ZM-1500 722.9H1500V723.9H-1500ZM-1500 742.7H1500V743.7H-1500ZM-1500 763.3H1500V764.5H-1500ZM-1500 785H1500V786.2H-1500ZM-1500 807.8H1500V809H-1500ZM-1500 831.7H1500V833H-1500ZM-1500 856.8H1500V858.2H-1500ZM-1500 883.3H1500V884.8H-1500ZM-1500 911.3H1500V912.8H-1500ZM-1500 940.8H1500V942.4H-1500ZM-1500 972.1H1500V973.8H-1500Z'/%3E%3C/svg%3E") 50% 0/auto 100% no-repeat}
+  .door.games:not([data-here]) .motif>i{visibility:hidden}
+  /* دي سي: الصورة ثابتة بمرشحها (يُطبَّق مرة عند الرسم)، واقترابها البطيء يحرّك طبقتها كلها، ورعشة ضوء الشعلة عتمة رقيقة فوقها */
+  .door.dc .art img,.door.dc .art img.in{transform:none;animation:none}
+  .door.dc .art{transform:scale(1.08)}
+  .door.dc[data-here] .art{animation:dc-loom 18s ease-in-out infinite alternate}
+  .door.dc .fx::before{content:"";position:absolute;inset:0;background:#050304;opacity:0}
+  .door.dc[data-here] .fx::before{animation:dc-dark 2.8s linear infinite}
   .hall-nav{position:relative;z-index:2;display:flex;justify-content:center;gap:8px;padding:0 var(--pad) 6px}
   .hall-nav button{min-height:40px;min-width:64px;padding:4px 14px;border-radius:999px;border:1px solid #2c2b28;background:rgba(14,14,18,.72);color:#a9a498;font:inherit;font-size:.84rem;font-weight:600;cursor:pointer;transition:color .3s ease,border-color .3s ease,background-color .3s ease}
   .hall-nav button[aria-current=true]{color:#f6f1e6;border-color:rgba(246,241,230,.55);background:rgba(246,241,230,.08)}
@@ -223,6 +239,8 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
 /* الجاران يعتمان بطبقة فوقهما لا بمرشّح، وضوؤهما على الأرض يبتعد ويخفت معهما */
 @keyframes hall-dim{0%,100%{opacity:.55}50%{opacity:0}}
 @keyframes hall-floor{0%{transform:translateX(-26%) scale(.72);opacity:.3}50%{transform:none;opacity:1}100%{transform:translateX(26%) scale(.72);opacity:.3}}
+/* رعشة الشعلة على الجوال: عتمة تخفّ وتشتد فوق الصورة (مثل خفوت الصورة نفسها على سوادها) */
+@keyframes dc-dark{0%,100%{opacity:0}8%{opacity:.1}15%{opacity:.04}23%{opacity:.16}31%{opacity:.02}40%{opacity:.13}48%{opacity:.04}57%{opacity:.15}66%{opacity:.06}74%{opacity:.13}83%{opacity:0}91%{opacity:.1}}
 @media (max-width:600px){.doors{--dw:min(82vw,340px);--dh:min(64dvh,600px)}.door{padding:24px 20px 22px}.door.films{padding-inline-end:42px}.door strong{font-size:2rem}}
 @media (max-height:560px) and (max-width:1023.98px){.doors{--dh:76dvh}}
 /* الدخول: الباب يتمدد حتى يملأ الشاشة بلون عالمه واسمه، والصفحة التالية تبدأ بنفس المشهد ثم تكشف نفسها */
