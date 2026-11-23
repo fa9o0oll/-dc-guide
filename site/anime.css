@@ -56,6 +56,22 @@ bdi[dir=ltr]{unicode-bidi:isolate}
 .rail{display:flex;gap:14px;overflow-x:auto;padding:10px var(--pad) 14px;scroll-padding-inline:var(--pad);scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.3) transparent}
 .rail .cel{flex:none;width:clamp(150px,17vw,206px);scroll-snap-align:start}
 .rail-more{flex:none;align-self:center;min-width:120px;min-height:44px;padding:0 14px;border-radius:12px;border:1px dashed rgba(255,255,255,.4);color:#fff;font-weight:600;font-size:.86rem}
+/* ---------- «اقتراح الليلة»: بطاقة عريضة بصورة العمل في طرفها، وتحتها مزاجك بالتصنيفات (اختيار متعدد) */
+.tn{position:relative;margin:20px var(--pad) 0;max-width:1400px;min-height:230px;border-radius:18px;overflow:hidden;isolation:isolate;background:rgba(13,15,44,.62);border:1px solid color-mix(in srgb,var(--ac,#fff) 34%,rgba(255,255,255,.12));box-shadow:0 18px 40px -24px #000}
+.tn-bd{position:absolute;inset:0 0 0 auto;width:62%;z-index:-1}
+.tn-bd img{width:100%;height:100%;object-fit:cover;-webkit-mask:linear-gradient(to right,#000 20%,transparent 92%);mask:linear-gradient(to right,#000 20%,transparent 92%);opacity:.85}
+[dir=rtl] .tn-bd{inset:0 auto 0 0}
+.tn-t{display:grid;gap:6px;padding:18px 20px 16px;max-width:min(100%,620px);background:linear-gradient(to left,rgba(13,15,44,.92) 55%,rgba(13,15,44,.6) 80%,transparent)}
+.tn-l{font-size:.82rem;color:#e7defa}
+.tn h2{font-family:var(--display);font-weight:700;font-size:clamp(1.4rem,3.6vw,2rem);line-height:1.2;text-align:right;color:#fff;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tn h2.long{font-size:clamp(1.1rem,2.5vw,1.45rem);line-height:1.3}
+.tn-k{font-size:.86rem;font-weight:600;color:color-mix(in srgb,var(--ac,var(--cel)) 70%,#fff)}
+.tn-m{font-size:.84rem;color:#d7cdea}
+.tn .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.tn-mood{display:grid;gap:6px;margin-top:6px}.tn-mood>span{font-size:.8rem;color:#e7defa}
+.tn-c{flex:none}
+.tn-h{font-size:.82rem;color:#d7cdea}
+@media (max-width:560px){.tn-bd{position:relative;inset:auto;width:100%;height:150px}.tn-bd img{-webkit-mask:linear-gradient(transparent,#000 30%,#000 60%,transparent);mask:linear-gradient(transparent,#000 30%,#000 60%,transparent)}.tn-t{max-width:none;background:none;margin-top:-40px}}
 .invite{margin:18px var(--pad) 0;padding:18px;border-radius:16px;background:rgba(13,15,44,.55);border:1px solid rgba(255,255,255,.2);display:grid;gap:10px;max-width:760px}
 .invite h2{font-family:var(--display);font-size:1.3rem}
 .invite p{color:#e7defa;font-size:.94rem}
@@ -84,6 +100,11 @@ bdi[dir=ltr]{unicode-bidi:isolate}
 .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .tools select{min-height:42px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);font-size:.86rem;max-width:100%}
 .tools .names{margin-inline-start:auto}
+/* تصنيفات العمل في بطاقته أزرار: كل واحد يخرج إلى قائمتك مفروزة به، بلون التصنيف نفسه في شريط التصنيفات */
+.glinks{display:flex;flex-wrap:wrap;gap:8px}
+.glinks button{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);font-size:.86rem;font-weight:600;color:var(--dim);background:color-mix(in srgb,var(--card) 70%,transparent);transition:border-color .2s ease,color .2s ease}
+.glinks button::before{content:"";width:8px;height:8px;border-radius:50%;background:hsl(var(--gh) 82% 68%)}
+@media (hover:hover){.glinks button:hover{border-color:hsl(var(--gh) 82% 68%);color:var(--ink)}}
 /* شريط التصنيفات: خرز ملوّن على خيط في الفراغ بين «النوع» و«الأسماء». لكل تصنيف لونه، والمختار يمتلئ به */
 .gchips{--rl-s:40px;flex:1 1 240px;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;padding:1px;
   -webkit-mask:linear-gradient(to left,transparent,#000 10px,#000 calc(100% - 10px),transparent);mask:linear-gradient(to left,transparent,#000 10px,#000 calc(100% - 10px),transparent)}
@@ -145,10 +166,11 @@ main{padding:12px var(--pad) 56px}
 
 /* ---------- السلاسل */
 .worlds{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px}
-.wc{position:relative;display:grid;align-content:end;gap:4px;min-height:164px;padding:14px 16px;border-radius:14px;overflow:hidden;isolation:isolate;text-align:start;background:var(--card);border:1px solid var(--line);text-decoration:none}
-.wc img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;opacity:.75}
-.wc::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to top,rgba(12,13,36,.96) 12%,rgba(12,13,36,.55) 55%,rgba(12,13,36,.15))}
-.wc h3{font-size:1.12rem;direction:ltr;text-align:right}
+/* كل عالم بوابة بلونه (site/anime-theme.js): حافتها ووهجها واسمها بلونيه، وتنفتح على بوابته */
+.wc{position:relative;display:grid;align-content:end;gap:4px;min-height:164px;padding:14px 16px;border-radius:14px;overflow:hidden;isolation:isolate;text-align:start;background:var(--wbg,var(--card));border:1px solid color-mix(in srgb,var(--wc1,var(--line)) 34%,var(--line));text-decoration:none;transition:border-color .2s ease,transform .25s cubic-bezier(.2,.8,.3,1),box-shadow .25s ease}
+.wc img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;opacity:.7}
+.wc::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to top,color-mix(in srgb,var(--wbg,#0c0d24) 97%,transparent) 14%,color-mix(in srgb,var(--wbg,#0c0d24) 55%,transparent) 58%,transparent),radial-gradient(80% 60% at 100% 100%,color-mix(in srgb,var(--wc1,transparent) 22%,transparent),transparent 70%)}
+.wc h3{font-size:1.12rem;direction:ltr;text-align:right;color:color-mix(in srgb,var(--wc1,var(--ink)) 72%,#fff)}
 .wc p{font-size:.82rem;color:var(--dim)}
 .wc .wbar{height:5px;border-radius:3px;background:linear-gradient(to left,var(--ok) calc(var(--p) * 100%),rgba(255,255,255,.18) 0)}
 .wc.fate{border-color:#e6b65c;background:linear-gradient(135deg,#2a0b12,#12060a)}
@@ -157,7 +179,7 @@ main{padding:12px var(--pad) 56px}
 .wname{position:relative;margin-top:-1.6em;font-family:var(--display);font-size:clamp(1.5rem,4vw,2.2rem);direction:ltr;text-align:right}
 .wen{direction:ltr;text-align:right;color:var(--dim);font-size:.9rem}
 #worder .views{justify-self:start}
-@media (hover:hover){.wc:hover{border-color:var(--cel)}.wc:hover img{opacity:.95}}
+@media (hover:hover){.wc:hover{border-color:var(--wc1,var(--cel));transform:translateY(-3px);box-shadow:0 16px 34px -18px var(--wc1,#000)}.wc:hover img{opacity:.92}}
 
 /* ---------- النوافذ */
 dialog{border:0;padding:0;color:var(--ink);background:var(--bg2);max-width:none;max-height:none}

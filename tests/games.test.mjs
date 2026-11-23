@@ -91,7 +91,16 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   check('«لعبة جديدة»: اقتراح الليلة مما صدر فيها (لا GTA VI القادمة)، ومزاجك الليلة بأنواعها، والشبكة بخمس ألعاب', n.lbl === 'ماذا ألعب الليلة؟' && ['The Witcher 3: Wild Hunt', 'The Last of Us Part I', 'Minecraft', 'Tiny Obscure Indie'].includes(n.t) && n.moods[0].startsWith('أي نوع') && n.moods.length >= 3 && n.ids.length === 5, n);
   await page.click('#slot .mood .chip:has-text("نجاة")'); await page.waitForTimeout(300);
   check('اختيار مزاج «نجاة» يأتي بلعبة منه (The Last of Us Part I) ويُحفظ', await page.textContent('#slot h2') === 'The Last of Us Part I' && await page.evaluate(() => localStorage.getItem('games.mood')) === 'نجاة');
-  await page.click('#slot .mood .chip >> nth=0'); await page.waitForTimeout(200);
+  // مزاج بأكثر من نوع (E62): لمسة تضيف ولمسة ترفع، ويُقدَّم ما يجمعها كلها ثم ما يجمع أكثرها، وسطر يقول أيهما
+  const md = () => page.evaluate(() => ({ t: document.querySelector('#slot h2')?.textContent, on: [...document.querySelectorAll('#slot .mood .chip[aria-pressed=true]')].map(c => c.dataset.g).sort().join('|'), hint: document.querySelector('#slot .mood-hint')?.textContent || '', meta: document.querySelector('#slot .meta').textContent, saved: localStorage.getItem('games.mood') }));
+  await page.click('#slot .mood .chip:has-text("أكشن")'); await page.waitForTimeout(300); let M2 = await md();
+  check('مزاجان «نجاة» و«أكشن»: الاثنان مضغوطان ومحفوظان، واللعبة تجمعهما ويقال ذلك، ونوعاها أول سطرها', M2.t === 'The Last of Us Part I' && M2.on === ['أكشن', 'نجاة'].sort().join('|') && /^لعبة تجمع نجاة وأكشن\.$/.test(M2.hint) && M2.saved === 'نجاة|أكشن' && /أكشن/.test(M2.meta) && /نجاة/.test(M2.meta), M2);
+  await page.click('#slot .mood .chip:has-text("تقمّص أدوار")'); await page.waitForTimeout(300); M2 = await md();
+  check('ثلاثة لا تجمعها لعبة: أقربها (The Last of Us Part I) ويقال كم تجمع', M2.t === 'The Last of Us Part I' && /تجمع 2 من 3/.test(M2.hint), M2);
+  await page.click('#slot .mood .chip:has-text("نجاة")'); await page.waitForTimeout(300); M2 = await md();
+  check('لمسة ثانية ترفع النوع، وما بقي لا تجمعه لعبة فيُقدَّم أقربها', M2.on === ['أكشن', 'تقمّص أدوار'].sort().join('|') && ['The Last of Us Part I', 'The Witcher 3: Wild Hunt'].includes(M2.t) && /تجمع 1 من 2/.test(M2.hint), M2);
+  await page.click('#slot .mood .chip >> nth=0'); await page.waitForTimeout(200); M2 = await md();
+  check('«أي نوع» يرفعها كلها', M2.on === '' && !M2.hint && !M2.saved, M2);
   // الكل: العلب وشرائط المنصات والملصقات واللمعة والعدّ
   await page.click('#mm-menu [data-v=all]'); await page.waitForTimeout(400);
   const c = await page.evaluate(() => { const g = id => document.getElementById('g-' + id), band = id => [g(id).querySelector('.band b')?.textContent, getComputedStyle(g(id).querySelector('.band')).backgroundImage.includes('gradient')];
@@ -230,6 +239,13 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
   await page.click('#g-112875 .cover'); await page.waitForSelector('#sheet[open] .save'); await page.waitForTimeout(300);
   check('بطاقة تُفتح بعد أخرى أُغلقت وهي ممرَّرة: تبدأ من أعلاها لا من موضع السابقة', yA > 0 && await page.evaluate(() => document.getElementById('sheet-body').scrollTop) === 0, yA);
+  // E64: ضغطة بدأت داخل البطاقة (سحب الصور، تحديد نص) وأُفلتت خارجها لا تغلقها، والضغط خارجها يغلقها
+  { const b = await page.locator('#sheet').boundingBox(), y = b.y + Math.min(300, b.height / 2), out = Math.max(6, b.x - 40);
+    await page.mouse.move(b.x + b.width / 2, y); await page.mouse.down(); await page.mouse.move(out, y, { steps: 6 }); await page.mouse.up(); await page.waitForTimeout(350);
+    const kept = await page.evaluate(() => document.querySelector('#sheet').open);
+    await page.mouse.click(out, y); await page.waitForSelector('#sheet', { state: 'hidden' }).catch(() => {});
+    check('الإفلات خارج البطاقة بعد ضغطة بدأت داخلها لا يغلقها، والضغط خارجها يغلقها', kept && b.x > 46 && !(await page.evaluate(() => document.querySelector('#sheet').open)), [kept, b]);
+    await page.click('#g-112875 .cover'); await page.waitForSelector('#sheet[open] .save'); await page.waitForTimeout(300); }
   await page.keyboard.press('Escape'); await page.waitForTimeout(300);
   // ---------- أين تلعبها على الكمبيوتر، وهل هي مجانية الآن
   { const pcOf = async id => { await page.click(`#g-${id} .cover`); await page.waitForSelector('#sheet[open] .pcsec, #sheet[open] .save'); await page.waitForTimeout(250);

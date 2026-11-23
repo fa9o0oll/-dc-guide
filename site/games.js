@@ -252,18 +252,26 @@ function dupNo(k) { const d = dupGroups().find(x => x.key === k); if (!d) return
 function renew(id) { const m = removedMap(); if (m[id]) { delete m[id]; store.set(REM, JSON.stringify(m)); } for (const k of Object.keys(P.dups || {})) if (k.split('-').includes(String(id))) delete P.dups[k]; }
 
 // ---------- القائمة الرئيسية: القوائم الأربع كقائمة لعبة، وبجانبها «ملف الحفظ» المختار: آخر ما تلعبه، أو اقتراح الليلة، أو آخر ما ختمته
-let tonightId = null, mood = store.get('games.mood') || '', slotId = null;
+// «مزاجك الليلة»: نوع أو أكثر، يُقدَّم ما يجمعها كلها ثم ما يجمع أكثرها (كما في الأفلام). لمسة تضيف ولمسة ترفع، و«أي نوع» يرفعها كلها
+let tonightId = null, moods = (store.get('games.mood') || '').split('|').filter(Boolean), slotId = null;
+const fits = (gs, ms) => ms.filter(m => gs.includes(m)).length;
+// أنواع اللعبة في سطر الاقتراح: ما اخترته من المزاج أولاً (فيظهر ما جمعته منه)، ثم غيره حتى نوعين، وثلاثة إن جمعت ثلاثة مما اخترت
+const moodFirst = gs => { const hit = gs.filter(x => moods.includes(x)); return [...hit, ...gs.filter(x => !moods.includes(x))].slice(0, Math.min(3, Math.max(2, hit.length))); };
 const inL = s => D.games.filter(g => lst(g.id) === s);
 const byAt = list => [...list].sort((a, b) => (rec(b.id).at || '').localeCompare(rec(a.id).at || '') || (b.ord ?? 0) - (a.ord ?? 0));
 const tonightOk = g => lst(g.id) === 'new' && !soon(g) && g.status !== 'cancelled';
 function menuHTML() { return ORDER.map(k => { const n = k === 'all' ? D.games.length : inL(k).length, L = LISTS[k];
   return `<button type="button" class="mi m-${k}" data-act="list" data-v="${k}" aria-pressed="${ui.list === k}"><span class="cur" aria-hidden="true">${ic('play')}</span><span class="mt"><b>${k === 'all' ? 'كل الألعاب' : L.t}</b><small>${k === 'all' ? 'قائمتك كاملة' : L.s}</small></span><i class="n">${n}</i></button>`; }).join(''); }
-function moodHTML() { const n = {}; for (const g of D.games) if (tonightOk(g)) for (const x of g.genres || []) n[x] = (n[x] || 0) + 1; if (mood && !n[mood]) mood = '';
-  const all = D.games.filter(tonightOk).length, c = (v, t, k) => `<button type="button" class="chip" data-act="mood" data-g="${esc(v)}" aria-pressed="${String(mood === v)}">${esc(t)}<small>${k}</small></button>`;
-  return all < 2 ? '' : `<div class="mood" role="group" aria-label="مزاجك الليلة"><span class="mood-l">مزاجك الليلة</span><div class="mood-c">${c('', 'أي نوع', all)}${Object.entries(n).sort((a, b) => b[1] - a[1]).map(([x, k]) => c(x, x, k)).join('')}</div></div>`; }
-function pickTonight(fresh) { const ok = g => tonightOk(g) && (!mood || (g.genres || []).includes(mood)), pool = D.games.filter(g => ok(g) && g.id !== tonightId);
-  if (!fresh && tonightId && ok(D.byId.get(tonightId) || {})) return D.byId.get(tonightId);
-  const from = pool.length ? pool : D.games.filter(ok); if (!from.length) return null;
+function moodHTML() { const n = {}; for (const g of D.games) if (tonightOk(g)) for (const x of g.genres || []) n[x] = (n[x] || 0) + 1; moods = moods.filter(m => n[m]);
+  const all = D.games.filter(tonightOk).length, c = (v, t, k) => `<button type="button" class="chip" data-act="mood" data-g="${esc(v)}" aria-pressed="${String(v ? moods.includes(v) : !moods.length)}">${esc(t)}<small>${k}</small></button>`;
+  const best = moods.length >= 2 ? fits(D.byId.get(tonightId)?.genres || [], moods) : 0;
+  return all < 2 ? '' : `<div class="mood" role="group" aria-label="مزاجك الليلة"><span class="mood-l">مزاجك الليلة</span><div class="mood-c" data-drag>${c('', 'أي نوع', all)}${Object.entries(n).sort((a, b) => b[1] - a[1]).map(([x, k]) => c(x, x, k)).join('')}</div></div>
+${moods.length >= 2 ? `<p class="mood-hint">${best === moods.length ? `لعبة تجمع ${moods.map(esc).join(' و')}.` : best ? `لا لعبة في قائمتك تجمعها كلها، فهذه أقربها: تجمع ${best} من ${moods.length}.` : 'لا لعبة في قائمتك من هذه الأنواع.'}</p>` : ''}`; }
+function pickTonight(fresh) { const ok = g => tonightOk(g), all = D.games.filter(ok);
+  let best = 0; for (const g of all) best = Math.max(best, fits(g.genres || [], moods)); const good = g => ok(g) && (!moods.length || !best || fits(g.genres || [], moods) === best);
+  const pool = all.filter(g => good(g) && g.id !== tonightId);
+  if (!fresh && tonightId && good(D.byId.get(tonightId) || {})) return D.byId.get(tonightId);
+  const from = pool.length ? pool : all.filter(good); if (!from.length) return null;
   const strong = from.filter(g => (g.critic || g.users || 0) >= 80), list = strong.length >= 4 ? strong : from, g = list[Math.floor(Math.random() * list.length)]; tonightId = g.id; return g; }
 function featured() { const k = ui.list; if (!D.games.length) return null;
   if (k === 'new') return pickTonight(false); if (k === 'all') return D.byId.get(slotId) || byAt(D.games.filter(g => g.art || g.cover))[0] || D.games[0];
@@ -275,7 +283,7 @@ function slotHTML(g) { const k = ui.list, r = g ? rec(g.id) : {};
 <p class="meta">${k === 'new' ? 'ما في «لعبة جديدة» صدر كله وختمته، أو لا شيء فيه بهذا المزاج.' : 'انقل إليها لعبة من بطاقتها، أو من زر ⋮ تحت غلافها.'}</p>${k === 'new' ? moodHTML() : ''}`;
   const plat = r.on ? abbr(r.on) : '', lbl = { play: 'تابع من حيث توقفت', new: 'ماذا ألعب الليلة؟', done: 'آخر شارة نهاية', seen: 'آخر ما شاهدته', all: 'من قائمتك' }[k];
   const line = k === 'play' ? [plat && `على ${plat}`, r.h && `لعبتها ${hrs(r.h)}`, g.ttb?.n && `تُختم في ${hrs(g.ttb.n)}`] : k === 'done' ? [plat && `على ${plat}`, r.at && monthAr(r.at), r.h && hrs(r.h)]
-    : k === 'seen' ? [plat && `عند ${plat}`, r.at && monthAr(r.at)] : [g.year, (g.genres || []).slice(0, 2).join('، '), g.ttb?.n && `تُختم في ${hrs(g.ttb.n)}`, (g.critic || g.users) && `التقييم ${g.critic || g.users}`];
+    : k === 'seen' ? [plat && `عند ${plat}`, r.at && monthAr(r.at)] : [g.year, moodFirst(g.genres || []).join('، '), g.ttb?.n && `تُختم في ${hrs(g.ttb.n)}`, (g.critic || g.users) && `التقييم ${g.critic || g.users}`];
   const stats = k === 'done' ? (() => { const d = inL('done'), h = d.reduce((a, x) => a + (rec(x.id).h || 0), 0); return `<p class="stat">ختمت ${nGames(d.length)}${h ? ` في ${hrs(h)}` : ''}</p>`; })() : '';
   const acts = { play: `<button class="btn sec" data-act="quick" data-id="${g.id}" data-v="done">${ic('trophy')}ختمتها!</button>`, new: `<button class="btn sec" data-act="reroll">${ic('roll')}اقتراح آخر</button><button class="btn sec" data-act="quick" data-id="${g.id}" data-v="play">${ic('play')}سألعبها الآن</button>`,
     seen: `<button class="btn sec" data-act="quick" data-id="${g.id}" data-v="new">${ic('star')}سألعبها بنفسي</button>`, done: '', all: `<button class="btn sec" data-act="shuffle">${ic('roll')}لعبة أخرى</button>` }[k];
@@ -736,7 +744,7 @@ document.addEventListener('click', e => { if (!qm.hidden && !e.target.closest('#
   else if (act === 'quick') setList1(+t.dataset.id, t.dataset.v);
   else if (act === 'reroll') { pickTonight(true); renderMenu(true); }
   else if (act === 'shuffle') { const pool = D.games.filter(g => g.id !== slotId && (g.art || g.cover)); slotId = pool[Math.floor(Math.random() * pool.length)]?.id ?? slotId; renderMenu(true); }
-  else if (act === 'mood') { mood = t.dataset.g; store.set('games.mood', mood); tonightId = null; pickTonight(true); renderMenu(true); }
+  else if (act === 'mood') { const g = t.dataset.g; moods = !g ? [] : moods.includes(g) ? moods.filter(x => x !== g) : [...moods, g]; store.set('games.mood', moods.join('|')); tonightId = null; pickTonight(true); renderMenu(true); }
   else if (act === 'close') closeGame();
   else if (act === 'close-add') addDlg.close();
   else if (act === 'close-acc') accDlg.close();

@@ -403,3 +403,5 @@ section.sec{padding:20px clamp(14px,3vw,30px) 0}
 @media (prefers-reduced-motion:reduce){.pdoor i{animation:none!important}}
 /* الرجوع: البوابة الصغيرة تتسع حتى تملأ الشاشة (portal.js) */
 .pexit{position:fixed;inset:0;z-index:500;transform-origin:0 0;pointer-events:none;will-change:transform}
+/* «المزاج» بأكثر من نوع: سطر يقول هل الاقتراح يجمعها كلها أم أقربها */
+.mood-hint{margin-top:6px;font-size:.82rem;line-height:1.6;color:var(--mute);max-width:60ch}

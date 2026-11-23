@@ -60,7 +60,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <button class="btn pri add" data-act="add">${ic('plus')}<span>أضف فيلماً</span><span class="sr">أضف فيلماً</span></button><p class="tally" id="tally"></p></header>
 <section class="tonight" id="tonight" hidden><div class="bd"></div><p class="lbl">اقتراح الليلة</p><h2 dir="ltr"></h2><p class="meta"></p>
   <div class="acts"><button class="btn pri" data-act="open-tonight">افتح بطاقته</button><button class="btn sec" data-act="reroll">${ic('roll')}اقتراح آخر</button></div>
-  <div class="mood" role="group" aria-labelledby="mood-l"><span class="mood-l" id="mood-l">مزاج السهرة</span><div class="mood-c" id="mood"></div></div></section>
+  <div class="mood" role="group" aria-labelledby="mood-l"><span class="mood-l" id="mood-l">مزاج السهرة</span><div class="mood-c" id="mood" data-drag></div></div><p class="mood-hint" id="mood-hint" hidden></p></section>
 <nav class="bar" aria-label="البحث والتصفية"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a><label class="search">${ic('search')}<span class="sr">ابحث في القائمة</span><input id="q" type="search" placeholder="ابحث: فيلم، مخرج، سنة" autocomplete="off" enterkeyhint="search"></label>
   <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الأفلام</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
   <div class="chips" id="chips"></div></nav>
@@ -157,22 +157,28 @@ function apply(resort) { const grid = $('#grid');
 function renderGrid() { $('#grid').innerHTML = [...D.films].sort(SORTS[ui.sort][1]).map(card).join(''); $('#chips').innerHTML = chipsHTML(); apply(false); }
 
 // ---------- اقتراح الليلة ----------
-// «مزاج السهرة»: تختار النوع مرة (أكشن، رسوم متحركة، كوميديا…) فيأتي الاقتراح وكل «اقتراح آخر» منه، ويُحفظ اختيارك.
+// «مزاج السهرة»: تختار نوعاً أو أكثر (أكشن، كوميديا…) فيأتي الاقتراح وكل «اقتراح آخر» منها، ويُحفظ اختيارك. لمسة تضيف النوع ولمسة ثانية ترفعه،
+// و«أي نوع» يرفعها كلها. يُقدَّم ما يجمع الأنواع المختارة كلها، فإن لم يوجد فما يجمع أكثرها، فلا يبقى الاقتراح فارغاً.
 // الأنواع المعروضة هي ما في قائمتك فعلاً من أفلام لم تشاهدها، مرتبة بعددها، وبجانب كل نوع كم فيلماً ينتظرك فيه.
-let tonightId = null, mood = '';
-try { mood = localStorage.getItem('films.mood') || ''; } catch {}
+let tonightId = null, moods = [];
+try { moods = (localStorage.getItem('films.mood') || '').split(',').filter(Boolean); } catch {}
 const tonightOk = f => f.backdrop && f.kind === 'movie' && !unreleased(f) && st(f.id) !== 'watched';
+const fits = (gs, ms) => ms.filter(m => gs.includes(m)).length;
 function moodChips() { const n = {}; for (const f of D.films) if (tonightOk(f)) for (const g of f.genres) if (GENRES[g]) n[g] = (n[g] || 0) + 1;
-  if (mood && !n[mood]) mood = '';
-  const all = D.films.filter(tonightOk).length, chip = (g, t, c) => `<button type="button" class="chip" data-act="mood" data-g="${g}" aria-pressed="${String(mood === g)}">${t}<small>${c}</small></button>`;
+  moods = moods.filter(g => n[g]);
+  const all = D.films.filter(tonightOk).length, chip = (g, t, c) => `<button type="button" class="chip" data-act="mood" data-g="${g}" aria-pressed="${String(g ? moods.includes(g) : !moods.length)}">${t}<small>${c}</small></button>`;
   $('#mood').innerHTML = chip('', 'أي نوع', all) + Object.entries(n).sort((a, b) => b[1] - a[1]).map(([g, c]) => chip(g, GENRES[g], c)).join(''); }
-function reroll(first) { const ok = f => tonightOk(f) && f.id !== tonightId && (!mood || f.genres.includes(+mood));
-  let pool = D.films.filter(f => ok(f) && match(f)); if (!pool.length) pool = D.films.filter(ok); const box = $('#tonight'); if (!pool.length) { if (first || !tonightId) box.hidden = true; return; }
+function reroll(first) { const ok = f => tonightOk(f) && f.id !== tonightId, ms = moods.map(Number);
+  let pool = D.films.filter(f => ok(f) && match(f)); if (!pool.length) pool = D.films.filter(ok);
+  let best = 0; if (ms.length) { for (const f of pool) best = Math.max(best, fits(f.genres, ms)); if (best) pool = pool.filter(f => fits(f.genres, ms) === best); }
+  const hint = $('#mood-hint'); hint.hidden = ms.length < 2; if (ms.length >= 2) hint.textContent = best === ms.length ? `فيلم يجمع ${ms.map(g => GENRES[g]).join(' و')}.` : best ? `لا فيلم في قائمتك يجمعها كلها، فهذا أقربها: يجمع ${best} من ${ms.length}.` : 'لا فيلم في قائمتك من هذه الأنواع.';
+  const box = $('#tonight'); if (!pool.length) { if (first || !tonightId) box.hidden = true; return; }
   const next = pool.filter(f => st(f.id) === 'next'), strong = pool.filter(f => f.rating >= 7 && f.votes >= 500);
   const from = first && next.length ? next : strong.length >= 5 ? strong : pool, f = from[Math.floor(Math.random() * from.length)];
   tonightId = f.id; box.hidden = false; $('h2', box).textContent = f.title;
-  const gs = mood ? [+mood, ...f.genres.filter(g => g !== +mood)] : f.genres;   // نوع المزاج المختار أولاً
-  $('.meta', box).textContent = [f.year, rt(f.runtime), gs.slice(0, 2).map(g => GENRES[g]).filter(Boolean).join('، '), f.rating ? `التقييم ${f.rating.toFixed(1)}` : ''].filter(Boolean).join(' · ');
+  // أنواع المزاج المختارة أولاً (فيظهر ما جمعه الفيلم منها)، ثم غيرها حتى نوعين، وثلاثة إن جمع ثلاثة مما اخترت
+  const hit = f.genres.filter(g => moods.includes(String(g))), gs = [...hit, ...f.genres.filter(g => !moods.includes(String(g)))].filter(g => GENRES[g]).slice(0, Math.min(3, Math.max(2, hit.length)));
+  $('.meta', box).textContent = [f.year, rt(f.runtime), gs.map(g => GENRES[g]).join('، '), f.rating ? `التقييم ${f.rating.toFixed(1)}` : ''].filter(Boolean).join(' · ');
   const img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = IMG + (innerWidth * devicePixelRatio > 1000 ? 'w1280' : 'w780') + f.backdrop;
   img.onload = () => { $('.bd', box).replaceChildren(img); requestAnimationFrame(() => img.classList.add('in')); };
   if (!first) { box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap'); } }
@@ -465,7 +471,7 @@ document.addEventListener('click', e => { const t = e.target.closest('[data-act]
   else if (act === 'reset') { Object.assign(ui, { q: '', status: 'todo', genre: '', decade: '', prov: '', series: false }); $('#q').value = ''; $('#chips').innerHTML = chipsHTML(); apply(false); }
   else if (act === 'view') setView(t.dataset.v);
   else if (act === 'reroll') reroll(false);
-  else if (act === 'mood') { mood = t.dataset.g; try { localStorage.setItem('films.mood', mood); } catch {} moodChips(); tonightId = null; reroll(false); }
+  else if (act === 'mood') { const g = t.dataset.g; moods = !g ? [] : moods.includes(g) ? moods.filter(x => x !== g) : [...moods, g]; try { localStorage.setItem('films.mood', moods.join()); } catch {} moodChips(); tonightId = null; reroll(false); }
   else if (act === 'open-tonight') openFilm(tonightId);
   else if (act === 'add') openAdd();
   else if (act === 'add-part') { if (t.dataset.tmdb && pass()) openPreview(+t.dataset.tmdb, t.dataset.kind, t); else { if (sheet.open) closeFilm(); openAdd(t.dataset.q); } }

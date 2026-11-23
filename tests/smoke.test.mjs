@@ -90,6 +90,13 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await page.goto(base + '/films/'); await page.waitForSelector('.tk'); await page.evaluate(() => { try { ['filmsg.progress', 'filmsg.pending', 'filmsg.pass'].forEach(k => localStorage.removeItem(k)); } catch {} }); await page.reload(); await page.waitForSelector('.tk');
   check(`الأفلام: ${FL.length} تذكرة والعنوان صحيح`, await page.locator('.tk').count() === FL.length && await page.title() === 'قائمة أفلامي' && await page.getAttribute('.top .home', 'href') === '../');
   await fits('الأفلام: الشبكة');
+  // «مزاج السهرة» بأكثر من نوع (E62): لمسة تضيف ولمسة ترفع، ويُقدَّم ما يجمعها ويقال ذلك، ويُحفظ الاختيار
+  { const gs = await page.$$eval('#mood .chip', c => c.map(x => x.dataset.g)), mood = () => page.evaluate(() => { const on = [...document.querySelectorAll('#mood .chip[aria-pressed=true]')], h = document.querySelector('#mood-hint');
+      return { on: on.map(x => x.dataset.g).join(), names: on.map(x => x.firstChild.textContent), hint: h.hidden ? '' : h.textContent, meta: document.querySelector('#tonight .meta').textContent, saved: localStorage.getItem('films.mood') || '' }; });
+    await tap(`#mood .chip[data-g="${gs[1]}"]`); await tap(`#mood .chip[data-g="${gs[2]}"]`); let m = await mood();
+    check('الأفلام: مزاج السهرة بنوعين: الاثنان مضغوطان ومحفوظان، والاقتراح يجمعهما ويقال ذلك ونوعاه أول سطره', m.on === `${gs[1]},${gs[2]}` && /^فيلم يجمع /.test(m.hint) && m.names.every(n => m.meta.includes(n)) && m.saved === m.on, m);
+    await tap(`#mood .chip[data-g="${gs[1]}"]`); m = await mood(); check('الأفلام: لمسة ثانية ترفع النوع', m.on === gs[2] && !m.hint && m.saved === gs[2], m);
+    await tap('#mood .chip[data-g=""]'); m = await mood(); check('الأفلام: «أي نوع» يرفعها كلها', m.on === '' && !m.hint && !m.saved, m); }
   check('الأفلام: أجزاء السلسلة متجاورة في «ترتيب قائمتي» بترتيب أحداثها مهما كان ترتيب إضافتها', await page.evaluate(ids => { const all = [...document.querySelectorAll('#grid .tk')].map(e => e.id), at = ids.map(m => all.indexOf('f-m' + m));
     return at.every((x, i) => x >= 0 && (i === 0 || x === at[i - 1] + 1)); }, PRED));
   check('الأفلام: تذكرة الجزء الذي تبدأ به الأحداث موسومة «بداية الأحداث»، وغيره بموضعه', (await page.textContent('#f-m766507 .tag')) === 'بداية الأحداث' && /^\d+\/\d+$/.test((await page.textContent('#f-m106 .tag')).trim()));

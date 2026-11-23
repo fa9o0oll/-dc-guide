@@ -78,6 +78,22 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('«أكمل المشاهدة»: الأقرب إلى الإكمال أولاً، ثم ما لم يبدأ', (await page.$$eval('.rail .cel', c => c.map(x => x.dataset.id))).join(',') === '1735,37989,52701' && (await page.$$eval('.rail .tc span', s => s.map(x => x.textContent.trim()))).join('|') === '393 من 500|7 من 12|0 من 24', await page.$$eval('.rail .tc span', s => s.map(x => x.textContent.trim())));
   check('السِل: ختم تقييمك، ومخطط توقيت بخانة لكل حلقة حتى 26 وشريط متصل لما زاد', await page.evaluate(() => { const gk = document.querySelector('.rail .cel[data-id="37989"]'), na = document.querySelector('.rail .cel[data-id="1735"]');
     return gk.querySelector('.stamp').textContent === '8' && gk.querySelector('.tc').style.getPropertyValue('--n') === '12' && !na.querySelector('.tc').style.getPropertyValue('--n') && Math.abs(+na.querySelector('.tc').style.getPropertyValue('--p') - .786) < .001; }));
+  // ---------- «اقتراح الليلة» (E62): عمل من «سأشاهده» مما عُرض ويصلح بداية، ومزاجه تصنيفات تختار منها ما تشاء (لمسة تضيف ولمسة ترفع)
+  const tn = () => page.evaluate(() => { const b = document.querySelector('#tonight .tn'); return b && { id: b.querySelector('[data-act=open]')?.dataset.id || '', hint: b.querySelector('.tn-h')?.textContent || '',
+    on: [...b.querySelectorAll('.tn-c [aria-pressed=true]')].map(x => x.dataset.g).sort().join(), chips: [...b.querySelectorAll('.tn-c button[data-g]')].map(x => x.dataset.g + ':' + x.querySelector('b').textContent).join() }; });
+  let T = await tn();
+  check('«اقتراح الليلة»: من «سأشاهده» مما عُرض (لا القادم ولا ما لم تُجلب معلوماته)، ومزاجه تصنيفات ما ينتظر بأعدادها', ['13271', '22297'].includes(T?.id) && T.on === '-1' && T.chips === '-1:2,0:2,1:1,2:1', T);
+  await tap('#tonight [data-g="1"]'); T = await tn();
+  check('مزاج واحد: الاقتراح منه، بلا سطر شرح', T.id === '13271' && T.on === '1' && !T.hint, T);
+  await tap('#tonight [data-g="0"]'); T = await tn();
+  check('مزاجان: لمسة تضيف الثاني، والاقتراح ما يجمعهما ويقال ذلك', T.id === '13271' && T.on === '0,1' && /^عمل يجمع /.test(T.hint), T);
+  await tap('#tonight [data-g="2"]'); T = await tn();
+  check('ثلاثة لا يجمعها عمل: يُقدَّم أقربها ويقال كم يجمع', ['13271', '22297'].includes(T.id) && T.on === '0,1,2' && /يجمع 2 من 3/.test(T.hint), T);
+  await tap('#tonight [data-g="1"]'); T = await tn();
+  check('لمسة ثانية على تصنيف ترفعه، والمزاج يُحفظ', T.id === '22297' && T.on === '0,2' && await page.evaluate(() => localStorage.getItem('anime.mood')) === '0,2', T);
+  await tap('#tonight [data-g="-1"]'); T = await tn();
+  check('«أي تصنيف» يرفعها كلها', T.on === '-1' && !T.hint && !(await page.evaluate(() => localStorage.getItem('anime.mood'))), T);
+  { const was = T.id; await tap('#tonight [data-act=treroll]'); T = await tn(); check('«اقتراح آخر» يأتي بغيره', T.id !== was && ['13271', '22297'].includes(T.id), [was, T.id]); }
   await overflow('بعد الاستيراد'); await snap('3-home');
   const small = await page.evaluate(() => [...document.querySelectorAll('button,a,select,input')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 40 || r.width < 40) && !e.closest('.foot,[hidden]') && e.type !== 'file'; }).map(e => (e.textContent || e.id).trim().slice(0, 24)));
   check('أهداف اللمس ≥ 40px', small.length === 0, small.slice(0, 6));
@@ -153,6 +169,12 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     && ch.map === 4 && ch.branch && ch.f === '3 من 4 في Hunter x Hunter، بترتيب الصدور', ch);
   await tap('#sheet .pos .ch-l[data-id="136"]'); await page.waitForFunction(() => location.hash === '#a136');
   check('لمس اسم في سطر الموقع يفتح بطاقة ذلك العمل', await page.evaluate(() => /Hunter x Hunter/.test(document.querySelector('#sheet .head h2').textContent) && location.hash === '#a136'));
+  // تصنيف في بطاقة العمل زر: يخرج إلى قائمتك كلها مفروزة به، ويُغلق البطاقة بالرجوع في السجل (E63)
+  await page.goto('about:blank'); await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=all]'); await tap('#grid .cel[data-id="11061"] [data-act=open]'); await page.waitForFunction(() => document.querySelector('#sheet-body').dataset.full === '11061' && !!document.querySelector('#sheet .glinks'));
+  { const g = await page.getAttribute('#sheet .glinks button >> nth=0', 'data-g'); await tap('#sheet .glinks button >> nth=0'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(150);
+    check('تصنيف من البطاقة يفرز قائمتك كلها به ويغلق البطاقة بلا أثر في السجل', await page.evaluate(g => !location.hash && !history.state?.p && document.querySelector('#lists [data-l=all]').getAttribute('aria-pressed') === 'true'
+      && document.querySelector(`#gchips [data-g="${g}"]`)?.getAttribute('aria-pressed') === 'true' && /من تصنيف/.test(document.querySelector('#count').textContent), g)); }
+  await tap('#gchips [data-g="-1"]');
   await page.goto('about:blank'); await page.goto(base + '/anime/#a37989'); await page.waitForSelector('#sheet[open]');
   check('السجل محفوظ بعد إعادة التحميل', (await log())[37989].p === 11 && (await lists())[0] === 'أشاهده الآن 2');
   await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
@@ -222,25 +244,38 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('السلاسل: مدخل دليل Fate أولاً، ثم سلاسل القائمة بتقدّمك فيها', await page.evaluate(() => { const c = [...document.querySelectorAll('#worlds .wc')]; return c.length === 3 && c[0].matches('a.fate[href="../fate/"]') && !!c[0].querySelector('img') && c[1].querySelector('h3').textContent === 'Hunter x Hunter'
     && /4 أعمال · في قائمتك 3 · أكملت 2/.test(c[1].textContent) && document.querySelector('#lists').hidden && /سلسلتان فيها أعمال من قائمتك/.test(document.querySelector('#count').textContent); }), await page.$$eval('#worlds .wc', c => c.map(x => x.textContent.slice(0, 60))));
   await snap('5-worlds'); await overflow('السلاسل');
-  await tap('#worlds button.wc'); await page.waitForSelector('#wsheet[open]');
-  check('نافذة السلسلة: أعمالها بترتيب الصدور وحالة كل منها', (await page.$$eval('#wsheet .orow', r => r.map(x => x.dataset.id + ':' + x.querySelector('.chip').textContent))).join('|') === '136:أكملته · 10|137:ليس في قائمتك|11061:أكملته · 10|13271:سأشاهده', await page.$$eval('#wsheet .orow', r => r.map(x => x.dataset.id + ':' + x.querySelector('.chip').textContent)));
-  await page.waitForSelector('#wintro .ov');
-  check('نافذة السلسلة: حكايتها نبذة العمل الذي تحمل اسمه، وأرقامها (أعمالها وحلقاتها ومدتها وسنواتها وما شاهدته منها)', await page.evaluate(() => { const t = document.querySelector('#wsheet-body').textContent, i = document.querySelector('#wintro');
-    const [about, tale] = i.querySelectorAll('.sec');
-    return about.classList.contains('wabout') && about.querySelector('h3').textContent === 'عن هذا العالم' && /يوشيهيرو توغاشي/.test(about.querySelector('.ov').textContent) && /نسخة 2011/.test(about.querySelector('.ov').textContent)
-      && tale.querySelector('h3').textContent === 'الحكاية' && /نبذة Hunter x Hunter \(2011\)/.test(tale.textContent) && /Gon Freecss/.test(tale.querySelector('.ov').textContent) && /4 أعمال/.test(t) && /219 حلقة/.test(t) && /1999 إلى 2013/.test(t) && /في قائمتك 3/.test(t) && /أكملت 2/.test(t) && /شاهدت منها 210 حلقات/.test(t); }), await page.textContent('#wsheet-body .facts'));
-  check('سلسلة ترتيب قصتها هو ترتيب صدورها: ترتيب واحد بلا تبديل', await page.locator('#wsheet [data-act=worder]').count() === 0 && /ترتيب القصة في هذه السلسلة هو ترتيب صدورها نفسه/.test(await page.textContent('#worder')));
-  await snap('6-world'); await tap('#wsheet .orow[data-id="137"]'); await page.waitForSelector('#sheet[open]');
+  // بوابة العالم (E57): تنفتح من بطاقته بثيمه، وفيها أرقامه وتقدّمك و«كمّل»، و«عن هذا العالم» و«الحكاية»، وخطه الزمني بمحطاته
+  await tap('#worlds button.wc'); await page.waitForSelector('#wsheet[open].gw'); await page.waitForSelector('#wsheet .gn');
+  const nodes = () => page.$$eval('#wsheet .gn', r => r.map(x => x.querySelector('.gn-b').dataset.id + ':' + (x.querySelector('.chip')?.textContent || '')));
+  check('البوابة: محطات العالم بترتيب الصدور وحالة كل منها، وسنوات الصدور على السكة', (await nodes()).join('|') === '136:أكملته · 10|137:|11061:أكملته · 10|13271:سأشاهده'
+    && (await page.$$eval('#wsheet .gy span', r => r.map(x => x.textContent))).join() === '1999,2002,2011,2013', await nodes());
+  check('البوابة بثيم عالمها: ألوانه على النافذة، وسماؤها بنقشه وصورته', await page.evaluate(() => { const d = document.querySelector('#wsheet'), sky = d.querySelector('.gw-sky');
+    return /--c1:/.test(d.style.cssText) && /--bg:/.test(d.style.cssText) && !!sky && /\bm-[a-z]+/.test(sky.className) && !!sky.querySelector('.gw-art'); }));
+  check('محطة ما في الخط الرئيسي على السكة، والنسخة الأخرى فرع بلونها، وشارة موقع كل منها', await page.evaluate(() => { const g = id => document.querySelector(`#wsheet .gn-b[data-id="${id}"]`).closest('.gn');
+    return !g(136).classList.contains('side') && g(11061).classList.contains('side') && g(11061).dataset.k === 'a' && g(136).querySelector('.gn-k').textContent.startsWith('بداية العالم') && /نسخة أخرى من القصة/.test(g(11061).querySelector('.gn-k').textContent); }));
+  await page.waitForSelector('#gw-about .ov');
+  check('البوابة: «عن هذا العالم» و«الحكاية» (نبذة العمل الذي يحمل اسمه)، وأرقامه وسنواته وتقدّمك فيه', await page.evaluate(() => { const t = document.querySelector('#wsheet-body').textContent, [about, tale] = document.querySelectorAll('#gw-about .gw-about');
+    return about.querySelector('h2').textContent === 'عن هذا العالم' && /يوشيهيرو توغاشي/.test(about.querySelector('.ov').textContent) && tale.querySelector('h2').textContent === 'الحكاية' && /نبذة Hunter x Hunter \(2011\)/.test(tale.textContent)
+      && [...document.querySelectorAll('#wsheet .gw-stats dd')].map(x => x.textContent).join() === '4,219,' + document.querySelectorAll('#wsheet .gw-stats dd')[2]?.textContent && /1999 إلى 2013/.test(t) && /أكملت 2 من 4 أعمال/.test(t) && /شاهدت منه 210 حلقات/.test(t); }), await page.textContent('#wsheet .gw-hero'));
+  check('«كمّل»: أول ما لم تكمله من القصة الرئيسية', await page.evaluate(() => { const b = document.querySelector('#wsheet .gw-go'); return !!b && b.dataset.id === '137' && /التالي لك في هذا العالم/.test(b.textContent); }));
+  check('محطة ما تكمله: شارتها «أنت هنا» لا يقصها صندوق المحطة', await page.evaluate(() => { const h = document.querySelector('#wsheet .gn.here'); return !!h && h.querySelector('.gn-b').dataset.id === '137' && h.querySelector('.gn-here').textContent === 'أنت هنا' && getComputedStyle(h).contentVisibility === 'visible'; }));
+  if (!mobile) check('سهما شريط الخطوط لا يأخذان حشو أزراره ولا نقطتها', await page.evaluate(() => { const a = document.querySelector('#wsheet .gw-legend .rl-a'); if (!a) return 'no arrow'; const c = getComputedStyle(a); return c.paddingLeft === '0px' && c.width === c.height && getComputedStyle(a, '::before').content === 'none'; }) === true);
+  check('عالم ترتيب أحداثه هو ترتيب صدوره: ترتيب واحد بلا تبديل', await page.locator('#wsheet [data-act=gw-order]').count() === 0 && /ترتيب الأحداث في هذا العالم هو ترتيب صدوره نفسه/.test(await page.textContent('#gw-line .gw-hint')));
+  await snap('6-world'); await overflow('بوابة العالم'); await tap('#wsheet .gn-b[data-id="137"]'); await page.waitForSelector('#sheet[open]');
+  check('البطاقة فوق البوابة تلبس ألوان عالمها', await page.evaluate(() => document.querySelector('#sheet').classList.contains('themed') && /--wc1/.test(document.querySelector('#sheet').style.cssText)));
   await tap('#sheet [data-act=status][data-s=plan]');
-  check('عمل من السلسلة ليس في القائمة يُضاف منها', JSON.stringify((await log())[137]) === '{"s":"plan"}' && await page.textContent('#wsheet .orow[data-id="137"] .chip') === 'سأشاهده');
+  check('عمل من العالم ليس في القائمة يُضاف منه، ومحطته تتحدّث', JSON.stringify((await log())[137]) === '{"s":"plan"}' && await page.textContent('#wsheet .gn-b[data-id="137"] .chip') === 'سأشاهده');
   await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.goBack(); await page.waitForSelector('#wsheet', { state: 'hidden' });
-  check('الرجوع يغلق البطاقة ثم السلسلة', await page.evaluate(() => !document.querySelector('#sheet').open && !document.querySelector('#wsheet').open));
-  await tap('#worlds button.wc >> nth=1'); await page.waitForSelector('#wsheet[open]');
-  const ord = () => page.$$eval('#wsheet .orow', r => r.map(x => x.dataset.id).join());
-  const o1 = await ord(); await tap('#wsheet [data-act=worder][data-o=release]'); const o2 = await ord();
-  check('سلسلة لها ترتيب قصة: تفتح عليه، وزر «ترتيب الصدور» يبدّله، وفيها مدخل دليل Fate', o1 === '22297,356' && o2 === '356,22297' && await page.getAttribute('#wsheet [data-o=release]', 'aria-pressed') === 'true' && await page.locator('#wsheet a.fate[href="../fate/"]').count() === 1, [o1, o2]);
-  check('ترتيب مُراجَع: ملاحظته تظهر في الترتيبين، ويُقال إنه روجع حين يُعرض ترتيب القصة', /من يشاهد أول مرة يبدأ بترتيب الصدور/.test(await page.textContent('#wsheet .wnote')) && !/راجعناه/.test(await page.textContent('#worder'))
-    && await (async () => { await tap('#wsheet [data-act=worder][data-o=story]'); const t = await page.textContent('#worder'); await tap('#wsheet [data-act=worder][data-o=release]'); return /راجعناه عملاً عملاً/.test(t) && /من يشاهد أول مرة/.test(t) && !/علاقات الأعمال/.test(t); })(), await page.textContent('#worder'));
+  check('الرجوع يغلق البطاقة ثم البوابة', await page.evaluate(() => !document.querySelector('#sheet').open && !document.querySelector('#wsheet').open));
+  await tap('#worlds button.wc >> nth=1'); await page.waitForSelector('#wsheet[open].gw'); await page.waitForSelector('#wsheet .gn');
+  const ord = () => page.$$eval('#wsheet .gn-b', r => r.map(x => x.dataset.id).join());
+  const o1 = await ord(); await tap('#wsheet [data-act=gw-order][data-o=release]'); const o2 = await ord();
+  check('عالم له ترتيب أحداث: تفتح بوابته عليه، و«ترتيب الصدور» يبدّله، وفيها مدخل دليل Fate', o1 === '22297,356' && o2 === '356,22297' && await page.getAttribute('#wsheet [data-o=release]', 'aria-pressed') === 'true' && await page.locator('#wsheet a.fate[href="../fate/"]').count() === 1, [o1, o2]);
+  check('ترتيب مُراجَع: ملاحظته تظهر في الترتيبين، ويُقال إنه روجع حين يُعرض ترتيب الأحداث', /من يشاهد أول مرة يبدأ بترتيب الصدور/.test(await page.textContent('#wsheet .gw-note')) && !/راجعناه/.test(await page.textContent('#gw-line .gw-hint'))
+    && await (async () => { await tap('#wsheet [data-act=gw-order][data-o=story]'); const t = await page.textContent('#gw-line .gw-hint'); await tap('#wsheet [data-act=gw-order][data-o=release]'); return /راجعناه عملاً عملاً/.test(t); })(), await page.textContent('#gw-line .gw-hint'));
+  { const notes = () => page.evaluate(() => Object.fromEntries([...document.querySelectorAll('#wsheet .gn-b')].map(b => [b.dataset.id, b.querySelector('.gn-w')?.textContent.trim() || ''])));
+    const rel = await notes(); await tap('#wsheet [data-act=gw-order][data-o=story]'); const sto = await notes(); await tap('#wsheet [data-act=gw-order][data-o=release]');
+    check('في ترتيب الصدور «أحداثه قبل…» على ما صدر لاحقاً وأحداثه أسبق، وفي ترتيب الأحداث «صدر بعد ما يليه» عليه نفسه', rel[22297] === 'أحداثه قبل Fate/stay night' && !rel[356] && /^صدر بعد ما يليه، عام 2014$/.test(sto[22297]) && !sto[356], [rel, sto]); }
   await page.goBack(); await page.waitForSelector('#wsheet', { state: 'hidden' });
   await tap('[data-act=view][data-v=list]');
 
@@ -333,7 +368,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check('«افتح السلسلة بترتيبها» من بطاقة: تُطوى البطاقة وتُفتح السلسلة وحدها', !s.a && s.w && s.h === '#w136', s);
     await page.goBack(); await shut('#wsheet'); await page.waitForSelector('#sheet[open]'); s = await st();
     check('الرجوع من السلسلة يعيد البطاقة كما كانت وبموضع تمريرها', s.a === 'Hunter x Hunter' && !s.w && s.h === '#a136' && y0 > 0 && s.y === y0, [s, y0]);
-    await tap('#sheet [data-act=world]'); await page.waitForSelector('#wsheet[open]'); await tap('#wsheet .orow[data-id="137"]'); await full(137); s = await st();
+    await tap('#sheet [data-act=world]'); await page.waitForSelector('#wsheet[open]'); await tap('#wsheet .gn-b[data-id="137"]'); await full(137); s = await st();
     check('عمل آخر من السلسلة: بطاقته فوقها، وتبدأ من أعلاها لا من موضع البطاقة السابقة', s.a === 'Hunter x Hunter: Original Video Animation' && s.w && s.y === 0 && s.h === '#a137'
       && await page.evaluate(() => { const r = document.querySelector('#sheet h2').getBoundingClientRect(); return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)?.closest('dialog')?.id === 'sheet'; }), s);
     await tap('#sheet [data-act=world]'); await shut('#sheet'); s = await st();
@@ -350,7 +385,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await tap('#grid .cel[data-id="11061"] [data-act=open]'); await full(11061); await tap('#sheet [data-act=close]'); await shut('#sheet'); s = await st();
     check('وبعده عمل آخر ثم ✕: يُغلق ولا يعود العمل الأول', !s.a && s.h === '' && s.path === '/anime/', s);
     // رابط مباشر إلى سلسلة: عمل منها ثم رجوع يبقي السلسلة، و✕ يغلقها
-    await page.goto('about:blank'); await page.goto(base + '/anime/#w136'); await page.waitForSelector('#wsheet[open]'); await tap('#wsheet .orow[data-id="136"]'); await full(136);
+    await page.goto('about:blank'); await page.goto(base + '/anime/#w136'); await page.waitForSelector('#wsheet[open]'); await page.waitForSelector('#wsheet .gn'); await tap('#wsheet .gn-b[data-id="136"]'); await full(136);
     await page.goBack(); await shut('#sheet'); s = await st(); await tap('#wsheet [data-act=close]'); await shut('#wsheet'); const s3 = await st();
     check('رابط مباشر إلى سلسلة: الرجوع من عمل فيها يبقيها، و✕ يغلقها برابط نظيف', !s.a && s.w && s.h === '#w136' && !s3.w && s3.h === '' && s3.path === '/anime/', [s, s3]);
     // عنوان كُتب أو لُصق والصفحة مفتوحة
@@ -358,6 +393,18 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await page.keyboard.press('Escape'); await shut('#sheet'); const s4 = await st();
     check('عنوان عمل كُتب باليد والصفحة مفتوحة يفتحه، وعنوان آخر يبدّله، وEsc يغلقه', s.a === 'Hunter x Hunter (2011)' && s.h === '#a11061' && !s4.a && s4.h === '' && s4.path === '/anime/', [s, s4]);
     await page.goto('about:blank'); await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel'); }
+  // ---------- ما أكملت ما بعده من القصة الرئيسية ولم تكمله «فاتك» لا «التالي» (شاهدت بترتيب آخر أو تخطيت جزءاً)
+  const setLog = async o => { await page.evaluate(o => { const k = 'animeg.progress', j = JSON.parse(localStorage.getItem(k)); Object.assign(j.a, o); localStorage.setItem(k, JSON.stringify(j)); localStorage.removeItem('anime.mood'); }, o); await page.goto('about:blank'); };
+  await setLog({ 11061: { s: 'completed', p: 148 }, 136: { s: 'plan' }, 137: { s: 'completed', p: 8 }, 13271: { s: 'plan' }, 22297: { s: 'plan' } });
+  await page.goto(base + '/anime/#w136'); await page.waitForSelector('#wsheet[open] .gn');
+  check('«فاتك من القصة الرئيسية» على أول ما لم تكمله وقد أكملت ما بعده، ومحطته «فاتك»', await page.evaluate(() => { const b = document.querySelector('#wsheet .gw-go'), h = document.querySelector('#wsheet .gn.here');
+    return b?.dataset.id === '136' && /فاتك من القصة الرئيسية/.test(b.textContent) && h?.querySelector('.gn-b').dataset.id === '136' && h.querySelector('.gn-here').textContent === 'فاتك'; }), await page.textContent('#wsheet .gw-hero'));
+  // ---------- «اقتراح الليلة» لا يقترح جزءاً قبل أن تكمل ما قبله في خطه (فيلم Hunter x Hunter يكمل مسلسل 2011)، و«سأبدأه الآن» ينقله إلى ما تشاهده
+  await setLog({ 11061: { s: 'watching', p: 10 }, 136: { s: 'completed', p: 62 } }); await page.goto(base + '/anime/'); await page.waitForSelector('#tonight .tn');
+  { const seen = new Set(); for (let i = 0; i < 6; i++) { seen.add(await page.getAttribute('#tonight [data-act=open]', 'data-id')); await tap('#tonight [data-act=treroll]'); await page.waitForTimeout(40); }
+    check('لا يُقترح جزء قبل إكمال ما قبله في خطه', [...seen].join() === '22297', [...seen]); }
+  await tap('#tonight [data-act=status]'); await page.waitForTimeout(150);
+  check('«سأبدأه الآن» ينقله إلى ما تشاهده، ولا يبقى ما يُقترح', (await log())[22297].s === 'watching' && await page.locator('.rail .cel[data-id="22297"]').count() === 1 && await page.locator('#tonight .tn').count() === 0, await log());
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3));
   await ctx.close();
 }

@@ -10,7 +10,8 @@ import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
 import { readMalFile } from './anime-mal.js?v=__BUILD__';
-import { describe, noun } from './anime-pos.js?v=__BUILD__';
+import { describe, noun, model } from './anime-pos.js?v=__BUILD__';
+import { themeOf } from './anime-theme.js?v=__BUILD__';
 import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead } from './anime-simkl.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
@@ -90,7 +91,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <section class="sky" id="sky"><div class="sky-art" aria-hidden="true"><i></i><i></i><b></b></div>
   <header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${miniDoor}<span>البوابات</span></a><h1>أنمياتي</h1>
     <button class="btn ghost" data-act="import">${ic('in')}<span>قائمتي وحساباتي</span></button><button class="btn pri" data-act="add">${ic('plus')}<span>أضف أنمي</span></button></header>
-  <p class="tally" id="tally"></p><div id="now"></div>
+  <p class="tally" id="tally"></p><div id="now"></div><div id="tonight"></div>
   <svg class="sky-line" viewBox="0 0 1200 96" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M0 96V70l60-3 40 4 70-9 50 6 90-4 60 5 80-8 70 6 110-5 60 4 90-7 70 6 120-4 80 5 150-6v36z"/>
     <g fill="none" stroke="currentColor" stroke-width="1.2" vector-effect="non-scaling-stroke"><path d="M0 34q150 26 300 2t300 0 300 2 300-4"/><path d="M0 44q150 24 300 2t300 0 300 2 300-4"/><path d="M0 26q150 22 300 0"/></g>
     <g fill="currentColor"><path d="M297 14h6v70h-6zM282 22h36v3h-36zM286 34h28v3h-28zM597 18h6v62h-6zM584 26h32v3h-32zM897 12h6v72h-6zM880 20h40v3h-40zM886 32h28v3h-28z"/></g></svg></section>
@@ -146,7 +147,31 @@ function nowHTML() { if (!hasLog()) return D.list.length ? `<div class="invite">
     <button class="btn pri" data-act="import">${ic('in')}<span>استورد سجلّي</span></button></div>` : '';
   const l = nowList(); if (!l.length) return '';
   return `<div class="now"><h2>أكمل المشاهدة<small>${nWorks(l.length)}</small></h2><div class="rail" id="rail">${l.slice(0, 14).map((a, i) => celHTML(a, 'rail', i)).join('')}${l.length > 14 ? `<button class="rail-more" data-act="list" data-l="watching">كل ما أشاهده (${l.length})</button>` : ''}</div></div>`; }
-function renderSky() { $('#tally').innerHTML = tallyHTML(); $('#now').innerHTML = nowHTML(); }
+function renderSky() { $('#tally').innerHTML = tallyHTML(); $('#now').innerHTML = nowHTML(); renderTonight(); }
+// ---------- «اقتراح الليلة»: عمل تبدأه من «سأشاهده»، مما عُرض ويصلح بدايةً: أول أجزاء خطه، أو ما أكملت الجزء الذي قبله فيه (لا يُقترح موسم ثالث
+// قبل الثاني). الأعلى تقييماً في MyAnimeList أولاً، و«اقتراح آخر» يأتي بغيره. ومزاجه تصنيفات تختار منها ما تشاء: لمسة تضيف ولمسة ترفع،
+// ويُقدَّم ما يجمعها كلها ثم ما يجمع أكثرها، كما في الأفلام والألعاب
+let tonightId = 0, amoods = []; try { amoods = (store.get('anime.mood') || '').split(',').filter(Boolean).map(Number); } catch {}
+// يصلح بدايةً: ما قبله في خطه أكملته (أو هو أوله)، وما كان فرعاً (جانبياً، نسخة أخرى، ملخصاً…) فأصله أكملته أيضاً
+const startable = a => { const w = D.wby.get(a.w); if (!w) return true; const M = model(w, D.by), L = M.lines[M.lineOf.get(a.id)]; if (!L) return true; const i = L.ids.indexOf(a.id), done = id => me(id)?.s === 'completed';
+  if (i > 0 && !done(L.ids[i - 1])) return false; const root = M.refOf.get(L.ids[0]); return L.i === 0 || !root || done(root); };
+const tonightOk = a => me(a.id)?.s === 'plan' && a.st !== 'soon' && !a.pending && (a.img || a.tp) && startable(a);
+const gfits = a => amoods.filter(g => (a.g || []).includes(g)).length;
+function pickTonight(fresh) { const all = D.list.filter(tonightOk); let best = 0; for (const a of all) best = Math.max(best, gfits(a)); const good = a => !amoods.length || !best || gfits(a) === best;
+  const cur = D.by.get(tonightId); if (!fresh && cur && tonightOk(cur) && good(cur)) return { a: cur, best };
+  const pool = all.filter(a => good(a) && a.id !== tonightId), from0 = pool.length ? pool : all.filter(good); if (!from0.length) return { a: null, best };
+  const strong = from0.filter(a => (a.sc || 0) >= 7.8), from = strong.length >= 4 ? strong : from0, a = from[Math.floor(Math.random() * from.length)]; tonightId = a.id; return { a, best }; }
+function renderTonight(fresh) { const box = $('#tonight'); if (!box) return; if (!hasLog()) { box.innerHTML = ''; return; }
+  const n = new Map(); for (const a of D.list) if (tonightOk(a)) for (const g of a.g || []) n.set(g, (n.get(g) || 0) + 1); amoods = amoods.filter(g => n.has(g));
+  const { a, best } = pickTonight(fresh), total = D.list.filter(tonightOk).length; if (!total) { box.innerHTML = ''; return; }
+  const chip = (g, name, c) => `<button type="button" data-act="amood" data-g="${g}" aria-pressed="${g < 0 ? !amoods.length : amoods.includes(g)}"${g >= 0 ? ` style="--gh:${ghue(D.genres[g])}"` : ''}>${name}<b>${num(c)}</b></button>`;
+  const w = a && D.wby.get(a.w), d = w ? pos(w, a.id) : null, wn = w ? (ui.names === 'english' && w.en ? w.en : w.name) : '', meta = a ? [typeOf(a), a.y || '', a.type !== 'Movie' && a.eps ? nEps(a.eps) : '', a.sc ? `${ltr('MyAnimeList')} ${a.sc.toFixed(2)}` : ''].filter(Boolean).join(' · ') : '';
+  const gs = a ? [...(a.g || []).filter(g => amoods.includes(g)), ...(a.g || []).filter(g => !amoods.includes(g))].slice(0, 3).map(g => genreOf(D.genres[g])).join('، ') : '';
+  const hint = amoods.length >= 2 ? (best === amoods.length ? `عمل يجمع ${amoods.map(g => genreOf(D.genres[g])).join(' و')}.` : best ? `لا عمل في «سأشاهده» يجمعها كلها، فهذا أقربها: يجمع ${best} من ${amoods.length}.` : 'لا عمل في «سأشاهده» من هذه التصنيفات.') : '';
+  box.innerHTML = `<section class="tn" aria-label="اقتراح الليلة"${a?.ac ? ` style="--ac:#${a.ac}"` : ''}>${a?.bd ? `<div class="tn-bd"><img alt="" decoding="async" src="${D.base}w780${a.bd}"></div>` : ''}
+    <div class="tn-t"><p class="tn-l">اقتراح الليلة من «سأشاهده»</p>${a ? `<h2 dir="ltr"${title(a).length > 34 ? ' class="long"' : ''}>${esc(title(a))}</h2>${d ? `<p class="tn-k">${d.badge}${wn && wn !== title(a) ? ` · ${ltr(wn)}` : ''}</p>` : '<p class="tn-k">عمل منفرد</p>'}<p class="tn-m">${meta}${gs ? ` · ${gs}` : ''}</p>
+      <div class="acts"><button class="btn pri" data-act="open" data-id="${a.id}">افتح بطاقته</button><button class="btn ghost" data-act="treroll">${ic('warp')}<span>اقتراح آخر</span></button><button class="btn ghost" data-act="status" data-id="${a.id}" data-s="watching">${ic('play')}<span>سأبدأه الآن</span></button></div>` : '<h2>لا شيء بهذا المزاج</h2>'}
+      <div class="tn-mood"><span>مزاجك الليلة</span><div class="gchips tn-c" data-drag>${chip(-1, 'أي تصنيف', total)}${[...n].sort((x, y) => y[1] - x[1]).map(([g, c]) => chip(g, genreOf(D.genres[g]), c)).join('')}</div></div>${hint ? `<p class="tn-h">${hint}</p>` : ''}</div></section>`; }
 
 // ---------- القوائم والشبكة
 function renderLists() { const n = l => inList(l).length, log = hasLog();
@@ -193,7 +218,7 @@ function commit(id, before, say) { const m = P.a[id]; if (m) { if (!m.p) delete 
 function redraw(id, moved) { const a = D.by.get(id); if (moved) renderAll(true); else { renderLists(); $('#tally').innerHTML = tallyHTML();
     for (const c of $$(`.cel[data-id="${id}"]`)) { const rail = !!c.closest('.rail'), t = document.createElement('template'); t.innerHTML = celHTML(a, rail ? 'rail' : 'grid', +c.style.getPropertyValue('--i') || 0); const n = t.content.firstElementChild; n.style.animation = 'none'; c.replaceWith(n); } }
   if (open === id) { const box = $('#sheet-body .mine'); if (box) box.outerHTML = mineHTML(a); drawXs(a); }
-  if (wopen && D.wby.get(wopen)?.ids.includes(id)) { const o = $('#wsheet-body .order'); if (o) o.innerHTML = orderHTML(D.wby.get(wopen)); } }
+  if (wopen && D.wby.get(wopen)?.ids.includes(id)) redrawGate(); }
 function bump(id, d) { const a = D.by.get(id), before = me(id) ? { ...me(id) } : null, p0 = before?.p || 0, p = Math.max(0, a.eps ? Math.min(a.eps, p0 + d) : p0 + d); if (p === p0) return;
   const m = P.a[id] ||= {}; m.p = p; let say = d > 0 ? `شاهدت الحلقة ${num(p)} من ${ltr(a.t)}` : '';
   if (!m.s || m.s === 'plan') m.s = 'watching'; if (d > 0 && !p0 && !m.b) m.b = today;
@@ -277,14 +302,16 @@ function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `
     ${posHTML(a)}${mineHTML(a)}
     ${D.eps[a.id] ? `<section class="sec xs" id="xs" aria-busy="true"><h3>الحلقات</h3><p class="lbl">تُحمَّل الحلقات…</p></section>` : ''}
     ${a.pending ? '<p class="lbl">معلومات هذا العمل تُجلب في البناء القادم.</p>' : x?.ar ? `<section class="sec"><h3>القصة</h3><p class="ov">${esc(x.ar)}</p></section>` : x?.en ? `<section class="sec"><h3>القصة</h3><span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')}، ولم تُترجم بعد.</span><p class="ov en">${esc(x.en)}</p>${trHTML(a, 'about')}</section>` : ''}
-    ${(a.g || []).length ? `<div class="facts">${a.g.map(i => `<span>${genreOf(D.genres[i])}</span>`).join('')}</div>` : ''}
+    ${(a.g || []).length ? `<div class="glinks" role="group" aria-label="تصنيفاته: اضغط تصنيفاً لترى أعماله في قائمتك">${a.g.map(i => `<button type="button" data-act="genre-go" data-g="${i}" style="--gh:${ghue(D.genres[i])}">${genreOf(D.genres[i])}</button>`).join('')}</div>` : ''}
     ${whereHTML(a)}${worldStrip(a)}
     <section class="sec"><h3>صفحاته</h3><div class="links">${links.map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}${ic('ext')}</a>`).join('')}</div></section></div>`; }
 // السجل: كل نافذة يفتحها الموقع خطوة فيه، وحالتها تصف ما هو مفتوح عندها: a العمل، وw السلسلة التي تحته إن فُتح منها، وp أنها خطوة أضافها الموقع فإغلاق نافذتها رجوع.
 // الرابط المباشر والعنوان المكتوب أو الملصوق باليد خطوة بلا حالة: يُقرأ ما يُفتح من الرابط نفسه (at)، وإغلاق نافذتها يغلقها وينظف الرابط (shut).
 // والبطاقة فوق سلسلتها دائماً، ولا تُفتح سلسلة فوق بطاقة: فتح السلسلة من بطاقة يطويها (stash) والرجوع يعيدها كما كانت (reshow)
-async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; kept = null; const d = $('#sheet'), body = $('#sheet-body'); delete body.dataset.full; body.innerHTML = sheetHTML(a, null); body.scrollTo(0, 0); showEps(a);
-  if (!d.open) { d.showModal(); body.scrollTo(0, 0); if (push) history.pushState({ a: id, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1 }, '', `#a${id}`); }   // التصفير بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
+async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; kept = null; const d = $('#sheet'), body = $('#sheet-body');
+  // فوق بوابة عالم تلبس البطاقة ألوانه
+  const gw = GM && $('#wsheet').open && D.wby.get(wopen), th = gw && themeOf(gw, D.by, D.genres); d.classList.toggle('themed', !!th); if (th) { d.style.setProperty('--wbg', th.bg); d.style.setProperty('--wc1', th.c1); } delete body.dataset.full; body.innerHTML = sheetHTML(a, null); body.scrollTo(0, 0); showEps(a);
+  if (!d.open) { d.showModal(); body.scrollTo(0, 0); if (push) history.pushState({ a: id, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1, n: depth() + 1 }, '', `#a${id}`); }   // التصفير بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
   else if (push) history.replaceState(history.state?.p ? { ...history.state, a: id } : null, '', `#a${id}`);
   const x = await texts(id); if (open !== id) return; if (x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; showEps(a); } body.dataset.full = id; }
 const stash = () => { const d = $('#sheet'); if (!d.open) return; kept = { id: open, y: $('#sheet-body').scrollTop }; d.close(); };
@@ -362,7 +389,7 @@ function addResHTML() { const q = ADD.q.trim(); if (!q) return `<p class="lbl">�
 const drawAddRes = () => { const box = $('#add-res'); if (!box) return; const f = box.querySelector('.add-pass'), v = f?.value, foc = f && document.activeElement === f; box.innerHTML = addResHTML(); const g = box.querySelector('.add-pass'); if (g && v) g.value = v; if (g && foc) g.focus(); };
 function openAdd() { ADD.need = null; $('#add-body').innerHTML = `<h2 id="add-h">أضف أنمي</h2><p class="lbl">ابحث في كل ما في «أنمياتي»: أعمالك وأقرباء سلاسلها. وما ليس هنا تجده في ${ltr('MyAnimeList')}.</p>
   <label class="search">${ic('search')}<span class="sr">اسم الأنمي</span><input id="add-q" type="search" placeholder="اسم الأنمي" autocomplete="off" enterkeyhint="search" value="${esc(ADD.q)}"></label><div id="add-res">${addResHTML()}</div>`;
-  const d = $('#addd'); if (!d.open) { d.showModal(); history.pushState({ add: 1, p: 1 }, '', '#add'); } const i = $('#add-q'); i.focus(); i.select(); }
+  const d = $('#addd'); if (!d.open) { d.showModal(); history.pushState({ add: 1, p: 1, n: depth() + 1 }, '', '#add'); } const i = $('#add-q'); i.focus(); i.select(); }
 async function findMal() { const q = ADD.q.trim(); if (q.length < 2 || (ADD.busy && ADD.malQ === q)) return; ADD.busy = true; ADD.msg = ''; ADD.malQ = q; ADD.mal = null; ADD.need = null; drawAddRes();
   let list = null, msg = '';
   try { const r = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=12&sfw=true`); if (r.status === 429) throw new Error('busy'); if (!r.ok) throw new Error('http');
@@ -441,31 +468,26 @@ function worldsHTML() { const q = fold(ui.q || '').trim(), n = new Map(D.worlds.
   const fa = D.list.find(a => /^Fate\/stay night: Unlimited Blade Works/.test(a.t) && a.bd) || D.list.find(a => /^Fate\//.test(a.t) && a.bd);
   const fate = `<a class="wc fate" href="../fate/" data-fate>${fa ? `<img loading="lazy" alt="" src="${D.base}w780${fa.bd}">` : ''}<h3>${ltr('Fate')}</h3><p>دليل ${ltr('Fate')} الكامل: خطوط القصة كلها، ومن أين تبدأ، وبأي ترتيب تشاهد.</p></a>`;
   return (q && !/fate|فيت/i.test(ui.q) ? '' : fate) + l.map(w => { const n = w.ids.length, m = wMine(w).length, d = wDone(w).length, im = wArt(w);
-    return `<button class="wc" data-act="world" data-w="${w.id}">${im ? `<img loading="lazy" alt="" src="${im}">` : ''}<h3>${esc(ui.names === 'english' && w.en ? w.en : w.name)}</h3><p>${nWorks(n)} · في قائمتك ${num(m)} · أكملت ${num(d)}</p><i class="wbar" style="--p:${n ? d / n : 0}"></i></button>`; }).join('') || '<p class="none">لا سلسلة تطابق ما كتبت.</p>'; }
-// للسلسلة ترتيبان حين يختلفان: ترتيب القصة (الافتراضي) وترتيب الصدور
-const orderOf = w => (ui.worder !== 'release' && w.story) || w.ids;
-function orderHTML(w) { return orderOf(w).map(id => D.by.get(id)).filter(Boolean).map(a => { const m = me(a.id);
-  return `<button class="orow" data-act="open" data-id="${a.id}">${poster(a) ? `<img loading="lazy" alt="" src="${esc(poster(a))}">` : `<span class="ph">${esc(a.t[0])}</span>`}<div><h4>${esc(title(a))}</h4>${posTag(w, a.id)}<p>${[typeOf(a), a.y || '', a.type !== 'Movie' && a.eps ? nEps(a.eps) : ''].filter(Boolean).join(' · ')}${m?.p && m.s !== 'completed' ? ` · شاهدت ${num(m.p)}` : ''}</p></div>
-    ${m ? `<span class="chip" data-l="${m.s}">${LNAME[m.s]}${m.r ? ` · ${m.r}` : ''}</span>` : '<span class="chip no">ليس في قائمتك</span>'}</button>`; }).join(''); }
-function worderHTML(w) { const story = ui.worder !== 'release' && !!w.story;
-  return `<h3>ترتيب المشاهدة</h3>${w.story ? `<div class="views" role="group" aria-label="الترتيب"><button data-act="worder" data-o="story" aria-pressed="${story}">ترتيب القصة</button><button data-act="worder" data-o="release" aria-pressed="${!story}">ترتيب الصدور</button></div>` : ''}
-    <p class="lbl">${story ? (w.sv ? 'أحداث القصة بتسلسلها الزمني: الجزء السابق قبل اللاحق ولو صدر بعده. ترتيب هذه السلسلة راجعناه عملاً عملاً.' : `أحداث القصة بتسلسلها: الجزء السابق قبل اللاحق ولو صدر بعده، والقصة الجانبية بعد أصلها. مأخوذ من علاقات الأعمال في ${ltr('MyAnimeList')}.`) : w.story ? 'كما صدرت الأعمال، وهو الترتيب الآمن للمشاهدة الأولى: لا يحرق عملٌ ما قبله.' : 'ترتيب القصة في هذه السلسلة هو ترتيب صدورها نفسه.'}</p>${w.sn ? `<p class="wnote">${esc(w.sn)}</p>` : ''}<div class="order">${orderHTML(w)}</div>`; }
+    const th = themeOf(w, D.by, D.genres);
+    return `<button class="wc" data-act="world" data-w="${w.id}" style="--wc1:${th.c1};--wbg:${th.bg};--wc2:${th.c2}">${im ? `<img loading="lazy" alt="" src="${im}">` : ''}<h3>${esc(ui.names === 'english' && w.en ? w.en : w.name)}</h3><p>${nWorks(n)} · في قائمتك ${num(m)} · أكملت ${num(d)}</p><i class="wbar" style="--p:${n ? d / n : 0}"></i></button>`; }).join('') || '<p class="none">لا سلسلة تطابق ما كتبت.</p>'; }
 // مدة السلسلة كلها: مجموع حلقات كل عمل في مدة حلقته (والفيلم بطوله)
 const span = min => { const h = Math.round(min / 60); return h >= 48 ? `${nDays(Math.floor(h / 24))}${h % 24 ? ` و${count(h % 24, ['ساعة', 'ساعتان', 'ساعات', 'ساعة', 'ساعة'])}` : ''}` : count(Math.max(1, h), ['ساعة واحدة', 'ساعتان', 'ساعات', 'ساعة', 'ساعة']); };
-function openWorld(wid, push = true) { const w = D.wby.get(wid); if (!w) return; wopen = wid; const d = $('#wsheet'), im = wArt(w), n = w.ids.length, all = w.ids.map(id => D.by.get(id)).filter(Boolean), eps = all.reduce((s, a) => s + (a.eps || 0), 0);
-  const min = all.reduce((s, a) => s + (a.dur || 0) * (a.eps || 1), 0), ys = all.map(a => a.y).filter(Boolean), y0 = Math.min(...ys), y1 = Math.max(...ys), seen = all.reduce((s, a) => s + (me(a.id)?.p || 0), 0);
-  $('#wsheet-body').innerHTML = `<div class="hero">${im ? `<img decoding="async" alt="" src="${im.replace('/w780/', '/w1280/')}">` : ''}</div>
-    <div class="body"><div><h2 class="wname">${esc(w.name)}</h2>${w.en && w.en !== w.name ? `<p class="wen">${esc(w.en)}</p>` : ''}
-      <div class="facts"><span>${nWorks(n)}</span>${eps ? `<span>${nEps(eps)}</span>` : ''}${min ? `<span>مدتها كلها ${span(min)}</span>` : ''}${ys.length ? `<span>${y0 === y1 ? y0 : `${y0} إلى ${y1}`}</span>` : ''}<span>في قائمتك <b>${num(wMine(w).length)}</b></span><span>أكملت <b>${num(wDone(w).length)}</b></span>${seen ? `<span>شاهدت منها ${nEps(seen)}</span>` : ''}</div></div>
-    <div id="wintro"></div>
-    ${isFate(w) ? `<a class="wc fate in" href="../fate/"><h3>${ltr('Fate')}</h3><p>لهذا العالم دليل كامل بخطوط قصته وترتيب مشاهدته. افتحه.</p></a>` : ''}
-    <section class="sec" id="worder">${worderHTML(w)}</section></div>`;
-  $('#wsheet-body').scrollTop = 0; if (!d.open) { d.showModal(); $('#wsheet-body').scrollTop = 0; if (push) history.pushState({ a: 0, w: wid, add: $('#addd').open ? 1 : 0, p: 1 }, '', `#w${wid}`); } else if (push) history.replaceState(history.state?.p ? { ...history.state, a: 0, w: wid } : null, '', `#w${wid}`);
-  // «عن هذا العالم»: نبذة السلسلة المكتوبة (wa، تُحمل مع نصوص العمل الذي تحمل اسمه). و«الحكاية»: نبذة ذلك العمل (يحدده البناء)، وإن غاب فأول عمل رئيسي
-  // فيها (مسلسل، أو ما زاد على ثلاث حلقات، أو فيلم طويل)
-  const first = D.by.get(w.head) || all.find(a => a.type === 'TV' || (a.eps || 1) > 3 || (a.type === 'Movie' && (a.dur || 0) >= 45)) || all[0];
-  if (first) texts(first.id).then(x => { const box = $('#wintro'); if (wopen !== wid || !box || !(x?.wa || x?.ar || x?.en)) return;
-    box.innerHTML = `${x.wa ? `<section class="sec wabout"><h3>عن هذا العالم</h3><p class="ov">${esc(x.wa)}</p></section>` : ''}${x.ar || x.en ? `<section class="sec"><h3>الحكاية</h3><p class="lbl">نبذة ${ltr(title(first))}، العمل الذي تحمل السلسلة اسمه.</p>${x.ar ? `<p class="ov">${esc(x.ar)}</p>` : `<span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')} (الترجمة العربية قيد الإعداد)</span><p class="ov en">${esc(x.en)}</p>`}</section>` : ''}`; }); }
+// ---------- بوابة العالم (E57): وحدتها وتنسيقها يُحمَّلان حين تُفتح أول بوابة (site/anime-gate.js وanime-gate.css)، ونافذتها نافذة السلسلة (#wsheet) بسجلها
+let GM = null;
+const gateMod = () => GM ? Promise.resolve(GM) : Promise.all([import(`./anime-gate.js?v=${BUILD}`), new Promise(ok => { const l = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: `../anime-gate.css?v=${BUILD}` }); l.onload = l.onerror = ok; document.head.append(l); })])
+  .then(([m]) => { m.init({ D, ui, me, esc, ltr, num, nEps, nWorks, count, span, typeOf, ic, LNAME, poster, title, texts, art: wArt, isFate, calm, pos, model: w => model(w, D.by) }); return GM = m; });
+async function openWorld(wid, push = true, from = null) { const w = D.wby.get(wid); if (!w) return; wopen = wid; const d = $('#wsheet'), fresh = !d.open, g = await gateMod(); if (wopen !== wid) return;
+  if (fresh) g.resetView();
+  const show = () => { if (wopen !== wid) return; d.className = 'gw'; d.style.cssText = g.themeStyle(w); d.querySelector('.gw-sky')?.remove(); d.insertAdjacentHTML('afterbegin', g.skyHTML(w));
+    const body = $('#wsheet-body'); body.innerHTML = g.gateHTML(w); body.scrollTop = 0;
+    if (!d.open) { d.showModal(); body.scrollTop = 0; d.classList.add('in'); if (push) history.pushState({ a: 0, w: wid, add: $('#addd').open ? 1 : 0, p: 1, n: depth() + 1 }, '', `#w${wid}`); }
+    else if (push) history.replaceState(history.state?.p ? { ...history.state, a: 0, w: wid } : null, '', `#w${wid}`);
+    // «عن هذا العالم» و«الحكاية» من نصوص العمل الذي يحمل العالم اسمه (يحدده البناء)، وإن غاب فأول عمل رئيسي فيه
+    const all = w.ids.map(id => D.by.get(id)).filter(Boolean), head = D.by.get(w.head) || all.find(a => a.type === 'TV' || (a.eps || 1) > 3 || (a.type === 'Movie' && (a.dur || 0) >= 45)) || all[0];
+    if (head) texts(head.id).then(x => { const box = $('#gw-about'); if (wopen === wid && box) box.innerHTML = g.aboutHTML(w, x, head); }); };
+  if (fresh && from && !calm) g.portal(from, w, show); else show(); }
+// ما يتغير في سجلك يتغير في البوابة المفتوحة: الواجهة (التقدم و«كمّل») والخط الزمني
+function redrawGate() { const w = D.wby.get(wopen); if (!w || !GM || !$('#wsheet').open) return; const h = $('#wsheet-body .gw-hero'), tl = $('#wsheet-body .gw-tl'); if (h) h.outerHTML = GM.heroHTML(w); if (tl) tl.innerHTML = GM.lineHTML(w); }
 
 // ---------- «قائمتي وحساباتي»: الاستيراد من ملف MyAnimeList، والربط بـSIMKL، ونسخة احتياطية
 const IMP = { mal: null, msg: '', ok: false, simkl: null, sk: null };
@@ -497,7 +519,7 @@ function impHTML() { const m = IMP.mal, log = hasLog(), n = Object.keys(P.a).len
     <section class="sec"><h3>نسخة من سجلّي</h3><p class="lbl">${log ? `في سجلّك ${nWorks(n)}.` : 'سجلّك فارغ على هذا الجهاز.'} النسخة ملف ${ltr('JSON')} فيه حالاتك وحلقاتك وتقييماتك وتواريخك.</p>
       <div class="acts"><button class="btn ghost" data-act="backup" ${log ? '' : 'disabled'}>نزّل نسخة</button>${store.get(KEY + '.bak') ? '<button class="btn quiet" data-act="restore">تراجع عن آخر استيراد</button>' : ''}</div></section>`; }
 function drawImp() { $('#imp-body').innerHTML = impHTML(); }
-function openImport() { IMP.msg = ''; drawImp(); const d = $('#imp'); if (!d.open) { d.showModal(); history.pushState({ imp: 1, p: 1 }, '', '#import'); } }
+function openImport() { IMP.msg = ''; drawImp(); const d = $('#imp'); if (!d.open) { d.showModal(); history.pushState({ imp: 1, p: 1, n: depth() + 1 }, '', '#import'); } }
 async function readFile(f) { if (!f) return; IMP.msg = ''; try { IMP.mal = await readMalFile(f); if (!IMP.mal.entries.length) { IMP.mal = null; IMP.msg = 'الملف سليم لكنه بلا أعمال.'; } }
   catch (e) { IMP.mal = null; IMP.ok = false; IMP.msg = esc(e.message || 'تعذّرت قراءة الملف.'); } drawImp(); }
 // كل استيراد يحفظ قبله نسخة من السجل (animeg.progress.bak) يُرجع إليها بزر «تراجع عن آخر استيراد»
@@ -529,8 +551,12 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'list': ui.list = d.l; keep(); if (ui.view !== 'list') setView('list'); renderLists(); renderGrid(); if (t.closest('.rail')) $('.bar').scrollIntoView({ behavior: calm ? 'auto' : 'smooth' }); break;
     case 'view': setView(d.v); break;
     case 'genre': ui.genre = +d.g === ui.genre ? -1 : +d.g; renderGrid(); break;
-    case 'world': if ($('#sheet').open && $('#wsheet').open && wopen === +d.w) shut($('#sheet')); else { stash(); openWorld(+d.w); } break;   // سلسلته هي المفتوحة تحته: إغلاق البطاقة يكشفها
-    case 'worder': { ui.worder = d.o; const w = D.wby.get(wopen), box = $('#worder'); if (w && box) box.innerHTML = worderHTML(w); break; }
+    case 'amood': { const g = +d.g; amoods = g < 0 ? [] : amoods.includes(g) ? amoods.filter(x => x !== g) : [...amoods, g]; store.set('anime.mood', amoods.join()); renderTonight(true); break; }
+    case 'treroll': renderTonight(true); break;
+    case 'genre-go': showGenre(+d.g); break;
+    case 'world': if ($('#sheet').open && $('#wsheet').open && wopen === +d.w) shut($('#sheet')); else { stash(); openWorld(+d.w, true, t.closest('.wc') || t); } break;   // سلسلته هي المفتوحة تحته: إغلاق البطاقة يكشفها
+    case 'gw-order': case 'gw-line': { const w = D.wby.get(wopen), sec = $('#gw-line'); if (!w || !GM || !sec) break; if (d.act === 'gw-order') GM.setView('order', d.o); else GM.setView('line', +d.l);
+      const y = $('#wsheet-body').scrollTop; sec.outerHTML = GM.timelineHTML(w); $('#wsheet-body').scrollTop = y; break; }
     case 'close': shut(t.closest('dialog')); break;
     case 'import': openImport(); break;
     case 'add': openAdd(); break;
@@ -568,9 +594,17 @@ document.addEventListener('dragleave', e => e.target.closest?.('#drop')?.classLi
 document.addEventListener('drop', e => { const z = e.target.closest?.('#drop'); if (z) { e.preventDefault(); z.classList.remove('over'); readFile(e.dataTransfer.files[0]); } });
 // الرجوع (زر المتصفح أو إيماءة الجوال) يغلق النافذة المفتوحة، وEsc مثله
 for (const d of $$('dialog')) { d.addEventListener('cancel', e => { e.preventDefault(); shut(d); });
-  d.addEventListener('close', () => { if (d.open) return; if (d.id === 'sheet') open = 0; if (d.id === 'wsheet') wopen = 0; if (d.id === 'imp') IMP.simkl = null; });   // ما أُغلق وأُعيد فتحه في اللحظة نفسها مفتوح
+  d.addEventListener('close', () => { if (d.open) return; if (d.id === 'sheet') open = 0; if (d.id === 'wsheet') { wopen = 0; d.classList.remove('in'); } if (d.id === 'imp') IMP.simkl = null; });   // ما أُغلق وأُعيد فتحه في اللحظة نفسها مفتوح
   d.addEventListener('click', e => { if (e.target === d) shut(d); }); }
-addEventListener('popstate', () => apply(at()));
+addEventListener('popstate', () => { apply(at()); if (leaving && !history.state?.p) { const f = leaving; leaving = null; f(); } });
+// عمق النوافذ في السجل: كل نافذة يفتحها الموقع خطوة عليه (n). والخروج من النوافذ كلها إلى الصفحة يرجع بعددها فلا يبقى في السجل ما يعيد فتحها
+const depth = () => history.state?.n || 0;
+let leaving = null;
+function leaveTo(fn) { const k = depth(); if (k) { leaving = fn; history.go(-k); return; }
+  for (const id of ['#sheet', '#wsheet', '#addd', '#imp']) if ($(id).open) $(id).close(); if (location.hash) history.replaceState(null, '', location.pathname + location.search); fn(); }
+// تصنيف من بطاقة عمل: يخرج إلى «أنمياتي» ويفرز قائمتك كلها بذلك التصنيف
+function showGenre(g) { leaveTo(() => { ui.genre = g; ui.list = hasLog() ? 'all' : ui.list; ui.type = ''; $('#type').value = ''; ui.q = ''; $('#q').value = ''; if (ui.view !== 'list') setView('list'); renderLists(); renderGrid();
+  requestAnimationFrame(() => $('#count').scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' })); }); }
 
 // ---------- الإقلاع
 const liftVeil = () => { const v = $('#veil'); if (!v || v.hidden) return; requestAnimationFrame(() => requestAnimationFrame(() => { v.classList.add('lift'); setTimeout(() => v.remove(), calm ? 0 : 800); })); };

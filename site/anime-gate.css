@@ -1,0 +1,183 @@
+/* بوابة العالم في «أنمياتي» (site/anime-gate.js، E57): تُحمَّل حين تُفتح أول بوابة. نافذتها نافذة السلسلة نفسها (#wsheet) ملء الشاشة،
+   بألوان العالم (--bg و--c1 و--c2 من site/anime-theme.js)، وسماؤها الثابتة خلف المحتوى: صورته مموهة ونقش جوّه ووهج لونيه.
+   الجرأة في الواجهة والسكة؛ وما حولهما هادئ. الحركة كلها transform/opacity، ولا شيء منها مع «تقليل الحركة». */
+#wsheet.gw{width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border-radius:0;background:var(--bg);color:var(--ink);overflow:hidden}
+#wsheet.gw::backdrop{background:var(--bg)}
+#wsheet.gw .scroll{position:relative;z-index:1;background:none;scroll-behavior:auto}
+#wsheet.gw .close{z-index:5;background:color-mix(in srgb,var(--bg) 60%,transparent);border-color:color-mix(in srgb,var(--c1) 40%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#wsheet.gw.in .scroll{animation:gw-in .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes gw-in{from{opacity:0;transform:translateY(18px) scale(.985)}}
+/* السماء */
+.gw-sky{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(120% 70% at 85% 0%,color-mix(in srgb,var(--c1) 16%,transparent),transparent 60%),var(--bg)}
+.gw-art{position:absolute;inset:-6%;background:center 30%/cover no-repeat;filter:blur(2px) saturate(1.15);opacity:.34;-webkit-mask:linear-gradient(#000 0,rgba(0,0,0,.6) 38%,transparent 72%);mask:linear-gradient(#000 0,rgba(0,0,0,.6) 38%,transparent 72%)}
+.gw-glow{position:absolute;inset:0;background:radial-gradient(70% 50% at 10% 100%,color-mix(in srgb,var(--c2) 14%,transparent),transparent 70%)}
+.motif{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.motif::before,.motif::after{content:"";position:absolute;inset:0}
+/* ---------- النقوش: واحد لكل مزاج. تُرسم على .motif داخل المشهد وداخل افتتاحية العالم */
+.motif{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.motif::before,.motif::after{content:"";position:absolute;inset:0}
+.gw-sky.m-rays .motif::before{background:repeating-conic-gradient(from 196deg at 8% -6%,color-mix(in srgb,var(--c1) 17%,transparent) 0 3.5deg,transparent 3.5deg 10deg);-webkit-mask:radial-gradient(120% 100% at 8% 0%,#000,transparent 70%);mask:radial-gradient(120% 100% at 8% 0%,#000,transparent 70%)}
+.gw-sky.m-steel .motif::before{background:repeating-linear-gradient(98deg,rgba(255,255,255,.05) 0 1px,transparent 1px 5px)}
+.gw-sky.m-steel .motif::after{background:radial-gradient(40% 12% at 18% 22%,color-mix(in srgb,var(--c2) 40%,transparent),transparent 70%),radial-gradient(6% 60% at 18% 22%,color-mix(in srgb,var(--c1) 22%,transparent),transparent 70%)}
+.gw-sky.m-rain .motif::before{inset:-100% 0 0;background:repeating-linear-gradient(102deg,transparent 0 26px,rgba(205,220,235,.17) 26px 27px,transparent 27px 61px,rgba(205,220,235,.1) 61px 62px);animation:gw-fall 1.1s linear infinite}
+.gw-sky.m-rain .motif::after{background:radial-gradient(60% 40% at 80% 100%,color-mix(in srgb,var(--c1) 26%,transparent),transparent 70%)}
+@keyframes gw-fall{to{transform:translateY(50%)}}
+.gw-sky.m-beam .motif::before{background:conic-gradient(from 148deg at 84% -4%,transparent 0 16deg,color-mix(in srgb,var(--c1) 24%,transparent) 16deg 31deg,transparent 31deg);filter:blur(6px)}
+.gw-sky.m-beam .motif::after{background:radial-gradient(70% 30% at 40% 100%,rgba(140,170,210,.14),transparent 70%)}
+.gw-sky.m-stairs .motif::before{background:repeating-linear-gradient(153deg,color-mix(in srgb,var(--c1) 13%,transparent) 0 30px,transparent 30px 44px,color-mix(in srgb,var(--c2) 9%,transparent) 44px 60px,transparent 60px 96px);-webkit-mask:linear-gradient(115deg,transparent 30%,#000);mask:linear-gradient(115deg,transparent 30%,#000)}
+.gw-sky.m-gothic .motif::before{background:radial-gradient(52px 96px at 50% 100%,transparent 49px,color-mix(in srgb,var(--c1) 30%,transparent) 50px 52px,transparent 53px) 0 0/104px 190px;-webkit-mask:linear-gradient(transparent,#000 60%);mask:linear-gradient(transparent,#000 60%)}
+.gw-sky.m-gothic .motif::after{background:radial-gradient(18% 26% at 82% 16%,color-mix(in srgb,var(--c2) 26%,transparent),transparent 70%)}
+.gw-sky.m-crystal .motif::before{background:repeating-linear-gradient(60deg,color-mix(in srgb,var(--c1) 17%,transparent) 0 1px,transparent 1px 58px),repeating-linear-gradient(-60deg,color-mix(in srgb,var(--c1) 17%,transparent) 0 1px,transparent 1px 58px),repeating-linear-gradient(0deg,color-mix(in srgb,#fff 7%,transparent) 0 1px,transparent 1px 50px);-webkit-mask:radial-gradient(100% 90% at 15% 10%,#000,transparent 75%);mask:radial-gradient(100% 90% at 15% 10%,#000,transparent 75%)}
+.gw-sky.m-bolts .motif::before{background:var(--c2);opacity:.5;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300' fill='none' stroke='%23000' stroke-width='3' stroke-linejoin='bevel'%3E%3Cpath d='M-10 40 120 70 96 96 280 124 250 150 470 190 438 214 640 250'/%3E%3Cpath stroke-width='1.5' d='M-10 150 90 166 74 182 220 204 200 220 380 250 360 266 640 300M150 -10 250 20 232 40 420 70 396 92 640 120'/%3E%3C/svg%3E") center/cover;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300' fill='none' stroke='%23000' stroke-width='3' stroke-linejoin='bevel'%3E%3Cpath d='M-10 40 120 70 96 96 280 124 250 150 470 190 438 214 640 250'/%3E%3Cpath stroke-width='1.5' d='M-10 150 90 166 74 182 220 204 200 220 380 250 360 266 640 300M150 -10 250 20 232 40 420 70 396 92 640 120'/%3E%3C/svg%3E") center/cover;animation:gw-flicker 5s steps(1) infinite}
+.gw-sky.m-bolts .motif::after{background:repeating-linear-gradient(0deg,color-mix(in srgb,var(--c1) 10%,transparent) 0 1px,transparent 1px 22px);-webkit-mask:linear-gradient(90deg,#000,transparent 70%);mask:linear-gradient(90deg,#000,transparent 70%)}
+@keyframes gw-flicker{0%,7%,11%,100%{opacity:.5}5%,9%{opacity:.95}6%,62%{opacity:.25}}
+.gw-sky.m-slash .motif::before{background:repeating-linear-gradient(-36deg,color-mix(in srgb,var(--c2) 22%,transparent) 0 2px,transparent 2px 84px),repeating-linear-gradient(-36deg,transparent 0 40px,color-mix(in srgb,var(--c1) 9%,transparent) 40px 62px,transparent 62px 168px)}
+.gw-sky.m-sand .motif::before{inset:0 -50% 0 0;background:radial-gradient(circle,color-mix(in srgb,var(--c1) 75%,transparent) 0 1px,transparent 1.6px) 0 0/46px 52px,radial-gradient(circle,color-mix(in srgb,var(--c1) 45%,transparent) 0 1.4px,transparent 2px) 20px 30px/88px 74px;-webkit-mask:linear-gradient(200deg,#000,transparent 80%);mask:linear-gradient(200deg,#000,transparent 80%);animation:gw-drift 50s linear infinite}
+.gw-sky.m-sand .motif::after{background:radial-gradient(50% 40% at 78% 24%,color-mix(in srgb,var(--c2) 24%,transparent),transparent 70%)}
+@keyframes gw-drift{to{transform:translateX(33%)}}
+.gw-sky.m-deco .motif::before{background:linear-gradient(transparent 30%,color-mix(in srgb,var(--c1) 30%,transparent))}
+.gw-sky.m-deco .motif::after{inset:auto 0 0 0;height:min(46%,260px);background:#050203;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200' preserveAspectRatio='none'%3E%3Cpath d='M0 200V120h30V70h14V40h8v30h14v50h34V90h20V30l10-18 10 18v60h26v40h30V60h12V20h6V0h4v20h6v40h12v70h40V100h22V50h18v50h30v30h36V80h10V44h14v36h10v50h44V70l16-24 16 24v60h30V96h24v34h40V56h12V28h10v28h12v74h48V110h20V60h26v50h22v90z'/%3E%3C/svg%3E") bottom/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200' preserveAspectRatio='none'%3E%3Cpath d='M0 200V120h30V70h14V40h8v30h14v50h34V90h20V30l10-18 10 18v60h26v40h30V60h12V20h6V0h4v20h6v40h12v70h40V100h22V50h18v50h30v30h36V80h10V44h14v36h10v50h44V70l16-24 16 24v60h30V96h24v34h40V56h12V28h10v28h12v74h48V110h20V60h26v50h22v90z'/%3E%3C/svg%3E") bottom/100% 100% no-repeat}
+.gw-sky.m-embers .motif::before{inset:0 0 -100%;background:radial-gradient(circle,var(--c2) 0 1.2px,transparent 2px) 0 0/90px 120px,radial-gradient(circle,var(--c1) 0 1.6px,transparent 2.4px) 40px 60px/140px 170px,radial-gradient(circle,color-mix(in srgb,var(--c1) 70%,#fff) 0 1px,transparent 1.6px) 70px 20px/60px 96px;opacity:.75;-webkit-mask:linear-gradient(transparent 10%,#000 60%);mask:linear-gradient(transparent 10%,#000 60%);animation:gw-rise 14s linear infinite}
+.gw-sky.m-embers .motif::after{background:radial-gradient(90% 46% at 50% 108%,color-mix(in srgb,var(--c1) 48%,transparent),transparent 70%)}
+@keyframes gw-rise{to{transform:translateY(-50%)}}
+.gw-sky.m-horizon .motif::before{background:repeating-linear-gradient(0deg,color-mix(in srgb,var(--c1) 15%,transparent) 0 2px,transparent 2px 44px);-webkit-mask:linear-gradient(transparent 35%,#000);mask:linear-gradient(transparent 35%,#000)}
+.gw-sky.m-horizon .motif::after{background:radial-gradient(38% 46% at 22% 100%,color-mix(in srgb,var(--c2) 46%,transparent),transparent 70%)}
+.gw-sky.m-diamonds .motif::before{background:linear-gradient(45deg,color-mix(in srgb,var(--c1) 17%,transparent) 25%,transparent 25% 75%,color-mix(in srgb,var(--c1) 17%,transparent) 75%) 0 0/72px 72px,linear-gradient(45deg,color-mix(in srgb,var(--c1) 17%,transparent) 25%,transparent 25% 75%,color-mix(in srgb,var(--c1) 17%,transparent) 75%) 36px 36px/72px 72px;-webkit-mask:linear-gradient(120deg,#000,transparent 65%);mask:linear-gradient(120deg,#000,transparent 65%)}
+.gw-sky.m-halftone .motif::before{background:radial-gradient(circle,color-mix(in srgb,var(--c1) 60%,transparent) 0 2.2px,transparent 2.8px) 0 0/13px 13px;-webkit-mask:radial-gradient(90% 90% at 6% 0%,#000,transparent 72%);mask:radial-gradient(90% 90% at 6% 0%,#000,transparent 72%)}
+.gw-sky.m-halftone .motif::after{background:radial-gradient(circle,color-mix(in srgb,var(--c2) 50%,transparent) 0 1.6px,transparent 2.2px) 6px 6px/13px 13px;-webkit-mask:radial-gradient(60% 60% at 100% 100%,#000,transparent 75%);mask:radial-gradient(60% 60% at 100% 100%,#000,transparent 75%)}
+.gw-sky.m-spiral .motif::before{background:repeating-radial-gradient(circle at 16% 26%,color-mix(in srgb,var(--c1) 20%,transparent) 0 2px,transparent 2px 24px);-webkit-mask:radial-gradient(90% 100% at 16% 26%,#000,transparent 78%);mask:radial-gradient(90% 100% at 16% 26%,#000,transparent 78%)}
+.gw-sky.m-scan .motif::before{background:repeating-linear-gradient(0deg,rgba(255,255,255,.06) 0 1px,transparent 1px 4px)}
+.gw-sky.m-scan .motif::after{background:radial-gradient(70% 50% at 20% 0%,color-mix(in srgb,var(--c1) 22%,transparent),transparent 70%)}
+.gw-sky.m-stars .motif::before{background:radial-gradient(circle,#fff 0 .9px,transparent 1.5px) 0 0/97px 113px,radial-gradient(circle,var(--c2) 0 1.3px,transparent 2px) 31px 67px/173px 149px,radial-gradient(circle,var(--c1) 0 1.8px,transparent 2.6px) 90px 20px/251px 233px;opacity:.8}
+.gw-sky.m-stars .motif::after{background:radial-gradient(46% 40% at 14% 16%,color-mix(in srgb,var(--c1) 26%,transparent),transparent 70%)}
+.gw-sky.m-circle .motif::before{inset:auto auto -34vmin -30vmin;width:120vmin;height:120vmin;border-radius:50%;opacity:.5;
+  background:repeating-conic-gradient(color-mix(in srgb,var(--c1) 70%,transparent) 0 .6deg,transparent .6deg 10deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 30%,#000 30.4% 31%,transparent 31.4% 43%,#000 43.4% 46%,transparent 46.4% 57%,#000 57.4% 58%,transparent 58.4% 66%,#000 66.4% 70%,transparent 70.4%);
+  mask:radial-gradient(circle,transparent 0 30%,#000 30.4% 31%,transparent 31.4% 43%,#000 43.4% 46%,transparent 46.4% 57%,#000 57.4% 58%,transparent 58.4% 66%,#000 66.4% 70%,transparent 70.4%);
+  animation:gw-spin 160s linear infinite}
+.gw-sky.m-circle .motif::after{background:radial-gradient(46% 40% at 82% 18%,color-mix(in srgb,var(--c2) 30%,transparent),transparent 70%),radial-gradient(60% 46% at 10% 100%,color-mix(in srgb,var(--c1) 20%,transparent),transparent 70%)}
+@keyframes gw-spin{to{transform:rotate(360deg)}}
+
+/* نقوش جديدة لعوالم أنمياتي: الموج (One Piece)، والكتابة (Monogatari)، والمربعات (Kimetsu no Yaiba)، و«ゴ» (JoJo) */
+.gw-sky.m-waves .motif::before{inset:auto -20% 0;height:46%;background:repeating-radial-gradient(ellipse 60px 26px at 50% 100%,transparent 0 17px,color-mix(in srgb,var(--c1) 22%,transparent) 18px 19px,transparent 20px 26px) 0 0/120px 52px;-webkit-mask:linear-gradient(transparent,#000 70%);mask:linear-gradient(transparent,#000 70%);animation:gw-drift 60s linear infinite}
+.gw-sky.m-waves .motif::after{background:radial-gradient(60% 40% at 80% 0%,color-mix(in srgb,var(--c1) 22%,transparent),transparent 70%)}
+.gw-sky.m-typo .motif::before{content:"قصة · حكاية · كلام · عالم · قصة · حكاية · كلام · عالم";inset:auto -10% 8% -10%;font:700 clamp(4rem,16vw,11rem)/1.05 var(--display);color:color-mix(in srgb,var(--c1) 3.2%,transparent);white-space:normal;word-spacing:.3em;transform:rotate(-6deg);-webkit-mask:linear-gradient(transparent,#000 40%);mask:linear-gradient(transparent,#000 40%)}
+.gw-sky.m-typo .motif::after{background:linear-gradient(118deg,transparent 62%,color-mix(in srgb,var(--c2) 70%,transparent) 62.2% 68%,transparent 68.2%);opacity:.22}
+.gw-sky.m-check .motif::before{background:conic-gradient(color-mix(in srgb,var(--c2) 24%,transparent) 25%,transparent 0 50%,color-mix(in srgb,var(--c2) 24%,transparent) 0 75%,transparent 0) 0 0/64px 64px;-webkit-mask:linear-gradient(200deg,#000,transparent 55%);mask:linear-gradient(200deg,#000,transparent 55%)}
+.gw-sky.m-check .motif::after{background:radial-gradient(50% 40% at 80% 10%,color-mix(in srgb,var(--c1) 22%,transparent),transparent 70%)}
+.gw-sky.m-menacing .motif::before{content:"ゴ ゴ ゴ ゴ ゴ ゴ ゴ ゴ ゴ ゴ";inset:6% -20% auto auto;width:80%;font:900 clamp(2.4rem,7vw,5rem)/1.2 sans-serif;color:color-mix(in srgb,var(--c1) 34%,transparent);letter-spacing:.4em;transform:rotate(-12deg) skewX(-8deg);text-shadow:4px 4px 0 color-mix(in srgb,var(--c2) 22%,transparent);animation:gw-throb 3.4s ease-in-out infinite}
+.gw-sky.m-menacing .motif::after{background:radial-gradient(60% 45% at 15% 85%,color-mix(in srgb,var(--c2) 18%,transparent),transparent 70%)}
+@keyframes gw-throb{50%{transform:rotate(-12deg) skewX(-8deg) scale(1.04);opacity:.8}}
+/* اللمسات الخاصة: هالة الطاقة خلف اسم Dragon Ball، وموج البحر أسفل سماء One Piece */
+.sig-ki .gw-glow{background:radial-gradient(42% 30% at 50% 26%,color-mix(in srgb,var(--c1) 30%,transparent),transparent 70%);animation:gw-ki 2.6s ease-in-out infinite}
+@keyframes gw-ki{50%{transform:scale(1.08);opacity:.75}}
+.gw-sea{position:absolute;inset:auto 0 0;width:100%;height:16vh;fill:color-mix(in srgb,var(--c2) 10%,var(--bg))}
+.gw-sea path:last-child{fill:color-mix(in srgb,var(--c1) 8%,var(--bg));animation:gw-swell 7s ease-in-out infinite alternate}
+@keyframes gw-swell{to{transform:translateX(-6%)}}
+
+/* ---------- الواجهة */
+.gw-hero{position:relative;display:grid;justify-items:start;gap:10px;padding:max(64px,9vh) clamp(18px,5vw,64px) 22px}
+.gw-hero>:not(.gw-stack){max-width:min(100%,780px)}
+/* على الشاشات الواسعة: ثلاثة من أغلفة القصة الرئيسية مروحةً في الجهة الأخرى من الواجهة */
+.gw-stack{display:none}
+@media (min-width:1100px){.gw-stack{display:block;position:absolute;inset-inline-end:clamp(40px,7vw,120px);top:max(70px,10vh);width:300px;height:420px}
+  .gw-stack img{position:absolute;inset:0 0 auto;margin:auto;width:220px;aspect-ratio:2/3;object-fit:cover;border-radius:12px;border:1px solid color-mix(in srgb,var(--c1) 40%,transparent);
+    box-shadow:0 26px 50px -20px #000,0 0 0 6px color-mix(in srgb,var(--bg) 70%,transparent);transform:translateX(calc(var(--i) * -64px)) rotate(calc(var(--i) * -9deg)) translateY(calc(var(--i) * var(--i) * 12px));transform-origin:50% 120%}
+  .gw-stack img:nth-child(2){z-index:1}
+  #wsheet.gw.in .gw-stack img{animation:gw-fan .8s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes gw-fan{from{opacity:0;transform:rotate(0) translateY(30px)}}}
+.gw-name{font-family:var(--display);font-weight:700;font-size:clamp(2.6rem,9vw,5.6rem);line-height:1.02;color:var(--c1);text-shadow:0 2px 0 color-mix(in srgb,var(--bg) 60%,transparent),0 0 46px color-mix(in srgb,var(--c1) 34%,transparent);overflow-wrap:anywhere}
+.gw-en{color:var(--dim);font-size:1rem}
+.gw-span{color:color-mix(in srgb,var(--ink) 78%,var(--c1));font-size:.95rem}
+.gw-stats{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:6px}
+.gw-stats div{display:grid}
+.gw-stats dt{order:2;font-size:.8rem;color:var(--dim)}
+.gw-stats dd{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,4.4vw,2.2rem);line-height:1.15;color:var(--ink)}
+.gw-me{display:flex;align-items:center;gap:12px;margin-top:4px}
+.gw-me svg{width:60px;height:60px;transform:rotate(-90deg)}
+.gw-me .trk{fill:none;stroke:color-mix(in srgb,var(--ink) 14%,transparent);stroke-width:7}
+.gw-me .val{fill:none;stroke:var(--c1);stroke-width:7;stroke-linecap:round;transition:stroke-dasharray .8s cubic-bezier(.2,.8,.2,1)}
+.gw-me p{display:grid;line-height:1.5}.gw-me b{font-size:1rem}.gw-me span{font-size:.86rem;color:var(--dim)}
+.gw-go{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:16px;align-items:center;margin-top:8px;padding:12px 18px 13px;min-height:64px;max-width:min(100%,520px);border-radius:16px;text-align:start;
+  color:#0b0c18;background:linear-gradient(120deg,var(--c1),color-mix(in srgb,var(--c1) 55%,var(--c2)));box-shadow:0 14px 34px -14px color-mix(in srgb,var(--c1) 80%,transparent);transition:transform .2s ease}
+.gw-go small{font-size:.78rem;font-weight:600;opacity:.75}.gw-go b{font-family:var(--display);font-size:1.12rem;line-height:1.35}
+.gw-go span{font-weight:600;font-size:.94rem;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gw-go .ic{grid-row:1/4;grid-column:2;width:30px;height:30px;padding:7px;border-radius:50%;background:rgba(11,12,24,.85);color:var(--c1);box-sizing:content-box}
+@media (hover:hover){.gw-go:hover{transform:translateY(-2px)}}
+.gw-go:active{transform:scale(.98)}
+.gw-done{display:flex;gap:8px;align-items:center;color:var(--c1);font-weight:600}
+.gw-fate{margin:70px clamp(18px,5vw,64px) 0;max-width:640px}
+
+/* ---------- الأقسام */
+.gw-sec{margin:0 clamp(18px,5vw,64px);padding:22px 0 6px;max-width:880px}
+.gw-sec h2{font-family:var(--display);font-weight:700;font-size:clamp(1.4rem,3.6vw,1.9rem);color:var(--c1);margin-bottom:8px}
+.gw-sec .ov{line-height:1.9;max-width:72ch}.gw-sec .ov.en{direction:ltr;text-align:left}
+.gw-sec .lbl{color:var(--dim);font-size:.84rem}
+.gw-hint{color:var(--dim);font-size:.86rem;max-width:72ch}
+.gw-note{margin-top:8px;padding:10px 14px;border-radius:12px;max-width:72ch;font-size:.92rem;line-height:1.8;background:color-mix(in srgb,var(--c1) 8%,transparent);border-inline-start:3px solid var(--c1)}
+.gw-tools{display:grid;gap:10px;margin:4px 0 10px}
+.gw-tools .views{justify-self:start;background:color-mix(in srgb,var(--bg) 70%,#000);border-color:color-mix(in srgb,var(--c1) 26%,transparent)}
+.gw-tools .views button[aria-pressed=true]{background:var(--c1);color:#0b0c18}
+.gw-legend{--rl-s:40px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;padding:1px}
+.gw-legend::-webkit-scrollbar{display:none}
+.gw-legend button{--lc:var(--c1);flex:none;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 13px;border-radius:999px;border:1px solid color-mix(in srgb,var(--lc) 40%,transparent);color:var(--dim);font-size:.84rem;font-weight:600;white-space:nowrap;background:color-mix(in srgb,var(--bg) 70%,transparent)}
+.gw-legend button::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--lc)}
+.gw-legend button[data-k=all]::before{display:none}
+.gw-legend button b{font-weight:400;font-size:.76rem;color:var(--mute)}
+.gw-legend button[aria-pressed=true]{background:var(--lc);color:#0b0c18;border-color:transparent}.gw-legend button[aria-pressed=true] b{color:rgba(11,12,24,.7)}
+.gw-legend [data-k=s]{--lc:var(--amber)}.gw-legend [data-k=a],.gw-legend [data-k=t]{--lc:var(--listed)}.gw-legend [data-k=f]{--lc:var(--rose)}.gw-legend [data-k=r],.gw-legend [data-k=R]{--lc:var(--dim)}
+
+/* ---------- الخط الزمني: سكة رأسية على يمين الصفحة، محطات القصة الرئيسية عليها، والفروع معلّقة بها بلون نوعها */
+.gw-tl{--x:22px;position:relative;list-style:none;display:grid;gap:10px;padding:6px 0 18px;max-width:760px}
+/* ما تكمله: شارته «أنت هنا» ووهجه يخرجان عن صندوق المحطة، فلا يُقص رسمها (content-visibility يقص) */
+.gn.here{margin-top:12px;content-visibility:visible}
+.gw-tl::before{content:"";position:absolute;inset-block:0;inset-inline-start:calc(var(--x) - 1.5px);width:3px;border-radius:3px;background:linear-gradient(var(--c1),color-mix(in srgb,var(--c1) 40%,var(--c2)) 70%,transparent)}
+.gn{--lc:var(--c1);position:relative;padding-inline:calc(var(--x) + 26px) 4px;content-visibility:auto;contain-intrinsic-size:auto 112px}
+.gn::before{content:"";position:absolute;z-index:1;inset-inline-start:calc(var(--x) - 8px);top:calc(50% - 8px);width:16px;height:16px;border-radius:50%;background:var(--bg);border:3px solid var(--lc);box-sizing:border-box}
+.gn.done::before{background:var(--lc)}
+.gn.side{--lc:var(--amber);padding-inline-start:calc(var(--x) + 58px)}
+.gn.side::before{inset-inline-start:calc(var(--x) + 26px);width:14px;height:14px;top:calc(50% - 7px);border-width:2.5px}
+.gn.side::after{content:"";position:absolute;inset-inline-start:var(--x);top:calc(50% - 1px);width:30px;height:2px;background:repeating-linear-gradient(to left,var(--lc) 0 4px,transparent 4px 7px)}
+.gn[data-k=a],.gn[data-k=t]{--lc:var(--listed)}.gn[data-k=f]{--lc:var(--rose)}.gn[data-k=r],.gn[data-k=R]{--lc:var(--dim)}
+.gn-b{display:grid;grid-template-columns:62px minmax(0,1fr) auto;align-items:center;gap:14px;width:100%;padding:9px 12px 9px 10px;border-radius:14px;text-align:start;
+  background:linear-gradient(100deg,color-mix(in srgb,var(--ac,var(--lc)) 12%,color-mix(in srgb,var(--bg) 80%,#000)),color-mix(in srgb,var(--bg) 86%,#000) 60%);border:1px solid color-mix(in srgb,var(--ac,var(--lc)) 22%,transparent);transition:border-color .2s ease,transform .2s ease}
+@media (hover:hover){.gn-b:hover{border-color:var(--lc);transform:translateX(-3px)}}
+.gn-b img,.gn-b .ph{width:62px;aspect-ratio:2/3;object-fit:cover;border-radius:7px;background:var(--card);display:grid;place-items:center;color:var(--line);font-family:var(--display);font-size:1.4rem}
+.gn-t{display:grid;gap:2px;min-width:0}
+.gn-k{font-size:.8rem;line-height:1.45;color:var(--lc);font-weight:600}.gn-k span{color:var(--dim);font-weight:400}
+.gn-n{font-weight:600;font-size:.98rem;line-height:1.35;text-align:right;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.gn-t small{font-size:.78rem;color:var(--mute)}
+.gn-w{display:flex;gap:5px;align-items:center;color:var(--amber)!important}.gn-w .ic{width:1em;height:1em}
+.gn .chip{padding:2px 10px;border-radius:999px;font-size:.74rem;font-weight:600;color:#0c0e24;background:var(--tone,var(--line));white-space:nowrap}
+.gn.here .gn-b{border-color:var(--c1);box-shadow:0 0 0 1px var(--c1),0 12px 30px -16px color-mix(in srgb,var(--c1) 90%,transparent)}
+.gn.here::before{box-shadow:0 0 0 6px color-mix(in srgb,var(--c1) 26%,transparent);animation:gw-beat 2.2s ease-in-out infinite}
+@keyframes gw-beat{50%{box-shadow:0 0 0 11px color-mix(in srgb,var(--c1) 8%,transparent)}}
+.gn-here{position:absolute;top:-9px;inset-inline-end:14px;padding:1px 10px;border-radius:999px;font-style:normal;font-size:.72rem;font-weight:700;color:#0b0c18;background:var(--c1)}
+.gy{position:relative;padding-inline-start:calc(var(--x) + 26px);margin:6px 0 -2px}
+.gy span{font-family:var(--display);font-weight:700;font-size:1.05rem;color:color-mix(in srgb,var(--c1) 70%,var(--ink))}
+.gy::before{content:"";position:absolute;inset-inline-start:calc(var(--x) - 5px);top:calc(50% - 5px);width:10px;height:10px;transform:rotate(45deg);background:var(--c1)}
+@media (max-width:560px){.gn-b{grid-template-columns:52px minmax(0,1fr);gap:11px}.gn-b img,.gn-b .ph{width:52px}.gn .chip{grid-column:2;justify-self:start}.gn.side{padding-inline-start:calc(var(--x) + 44px)}.gn.side::after{width:18px}.gn.side::before{inset-inline-start:calc(var(--x) + 15px)}}
+
+/* ---------- العالم بالأرقام */
+.gw-types{display:flex;flex-wrap:wrap;gap:8px}
+.gw-types span{display:inline-flex;align-items:baseline;gap:6px;padding:6px 14px;border-radius:12px;background:color-mix(in srgb,var(--c1) 9%,transparent);border:1px solid color-mix(in srgb,var(--c1) 22%,transparent);font-size:.9rem}
+.gw-types b{font-family:var(--display);font-size:1.2rem;color:var(--c1)}
+.gw-river{display:flex;align-items:flex-end;gap:2px;height:64px;margin-top:16px;direction:ltr}
+.gw-river i{flex:1;min-width:2px;height:max(3px,calc(var(--h) * 100%));border-radius:3px 3px 0 0;background:linear-gradient(var(--c1),color-mix(in srgb,var(--c2) 60%,transparent))}
+.gw-river i:not([title]){background:color-mix(in srgb,var(--ink) 10%,transparent)}
+.gw-axis{display:flex;justify-content:space-between;direction:ltr;font-size:.78rem;color:var(--mute);margin-top:4px}
+.gw-facts{display:grid;gap:8px;margin-top:14px}
+.gw-facts div{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.gw-facts dt{color:var(--dim);font-size:.86rem}.gw-facts dd{font-weight:600}
+#wsheet.gw .scroll::after{content:"";display:block;height:56px}
+
+/* ---------- الدخول: البطاقة تتسع بلون العالم، وبطاقات Monogatari النصية */
+.gw-portal{position:fixed;z-index:2147483000;pointer-events:none;background:radial-gradient(90% 70% at 70% 20%,color-mix(in srgb,var(--c1) 30%,transparent),transparent 70%),var(--bg);will-change:transform}
+.gw-cards{position:fixed;inset:0;z-index:2147483001;display:grid;place-items:center;cursor:pointer;animation:gw-card .42s ease both}
+.gw-cards b{font:700 clamp(2.6rem,11vw,7rem)/1.1 var(--display);padding:0 6vw;text-align:center}
+.gw-cards.k1{background:#0a0909;color:#efe9dc}.gw-cards.k2{background:#e0262f;color:#0a0909}.gw-cards.k3{background:#efe9dc;color:#0a0909}
+@keyframes gw-card{from{opacity:.4}}
+
+/* البطاقة فوق البوابة تلبس ألوان عالمها */
+#sheet.themed{--cel:var(--wc1);--bg2:color-mix(in srgb,var(--wbg) 86%,#1d2148);--card:color-mix(in srgb,var(--wbg) 62%,#2b3166)}
+@media (prefers-reduced-motion:reduce){#wsheet.gw.in .scroll,.gw-sky .motif::before,.gw-sky .motif::after,.gw-glow,.gw-sea path,.gn.here::before{animation:none!important}}

@@ -2,19 +2,22 @@
 // صفحة صفحة، والوقوف على السهم ينسابها بهدوء. للماوس وحده: اللمس يسحبها أصلاً، والسهمان لا يظهران إلا لمؤشر دقيق يقف على العناصر.
 // السحب يبدأ من البوستر أو فراغ الشريط فقط، فالاسم والتفاصيل تبقى قابلة للتحديد والنسخ. وبعد السحب لا يُعدّ الإفلات نقرة تفتح العمل.
 // السهمان عنصران لاصقان داخل الشريط نفسه (position: sticky)، فلا غلاف يتغير به تنسيق الصفحات، وما يُعاد رسمه يُعاد تجهيزه تلقائياً.
-const SEL = '.rail, .strip, .reel, .shots, .gchips';
-// شكل السهمين في كل البوابات (تُحقن مرة واحدة بدل تكرارها في ملف كل بوابة): زجاج داكن بحافة فاتحة، يلمع بلون البوابة حين يقف عليه المؤشر
-const CSS = `.rl-a{--s:var(--rl-s,44px);position:sticky;z-index:6;flex:none;align-self:flex-start;margin-top:var(--rl-y,0px);width:var(--s);height:var(--s);display:grid;place-items:center;border-radius:50%;cursor:pointer;
+const SEL = '.rail, .strip, .reel, .shots, .gchips, .gw-legend, .mood-c';
+// شكل السهمين في كل البوابات (تُحقن مرة واحدة بدل تكرارها في ملف كل بوابة): زجاج داكن بحافة فاتحة، يلمع بلون البوابة حين يقف عليه المؤشر.
+// خصوصيتها مضاعفة (.rl-a.rl-a) لأن السهم زر داخل شرائط أزرارها منسّقة (تصنيفات، خطوط العالم): لا يأخذ حشوها ولا نقطتها
+const CSS = `.rl-a.rl-a{--s:var(--rl-s,44px);position:sticky;z-index:6;flex:none;align-self:flex-start;margin-top:var(--rl-y,0px);width:var(--s);height:var(--s);min-width:0;min-height:0;padding:0;gap:0;display:grid;place-items:center;border-radius:50%;cursor:pointer;
   color:#fff;background:rgba(10,12,30,.62);border:1px solid rgba(255,255,255,.26);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 6px 18px -6px #000;
   transition:opacity .25s ease,transform .2s ease,background-color .2s ease}
+.rl-a.rl-a::before,.rl-a.rl-a::after{content:none}
 .rl-a svg{width:calc(var(--s) * .5);height:calc(var(--s) * .5);fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .rl-a[data-d="1"]{right:6px}.rl-a[data-d="-1"]{left:6px}
 [dir=rtl] .rl-a[data-d="1"],[dir=ltr] .rl-a[data-d="-1"]{margin-inline-end:calc(-1 * var(--s) - var(--rl-gap,0px))}
 [dir=rtl] .rl-a[data-d="-1"],[dir=ltr] .rl-a[data-d="1"]{margin-inline-start:calc(-1 * var(--s) - var(--rl-gap,0px))}
-.rl-a.off{opacity:0;pointer-events:none}
-.rl-a:hover{background:color-mix(in srgb,var(--cel,var(--acc,#7fd4ff)) 34%,rgba(10,12,30,.8));transform:scale(1.06)}
+.rl-a.rl-a.off{opacity:0;pointer-events:none}
+.rl-a.rl-a:hover{background:color-mix(in srgb,var(--cel,var(--acc,#7fd4ff)) 34%,rgba(10,12,30,.8));transform:scale(1.06);border-color:rgba(255,255,255,.4);color:#fff}
 .rl-a:focus-visible{outline:2px solid var(--cel,var(--acc,#7fd4ff));outline-offset:2px}
 .rl-drag{cursor:grabbing;-webkit-user-select:none;user-select:none}.rl-drag *{pointer-events:none}
+.mood-c{--rl-s:40px}
 @media not ((hover:hover) and (pointer:fine)){.rl-a{display:none}}`;
 document.head.append(Object.assign(document.createElement('style'), { textContent: CSS }));
 const fine = matchMedia('(hover: hover) and (pointer: fine)'), calm = matchMedia('(prefers-reduced-motion: reduce)');
@@ -50,7 +53,8 @@ addEventListener('pointermove', e => { if (!drag || e.pointerType !== 'mouse') r
   const now = performance.now(), dt = Math.max(1, now - drag.t); drag.v = 0.8 * ((e.clientX - drag.lx) / dt) + 0.2 * drag.v; drag.t = now; drag.lx = e.clientX;
   drag.el.scrollLeft = drag.left - dx; });
 const end = () => { if (!drag) return; const d = drag; drag = null; if (!d.moved) return;
-  d.el.classList.remove('rl-drag'); const block = e => { e.stopPropagation(); e.preventDefault(); }; d.el.addEventListener('click', block, { capture: true, once: true }); setTimeout(() => d.el.removeEventListener('click', block, true), 60);
+  // النقرة التي تلي الإفلات لا تُعدّ نقرة، أينما وقعت: داخل الشريط فلا تفتح عملاً، وخارج البطاقة فلا تغلقها (E64)
+  d.el.classList.remove('rl-drag'); const block = e => { e.stopPropagation(); e.preventDefault(); }; document.addEventListener('click', block, { capture: true, once: true }); setTimeout(() => document.removeEventListener('click', block, true), 60);
   let v = calm.matches ? 0 : -d.v, last = performance.now();   // سرعة المؤشر (بكسل/ملي ثانية) بعكس اتجاه التمرير
   const glide = now => { const dt = now - last; last = now; if (Math.abs(v) < 0.03) { d.el.style.scrollSnapType = ''; return; } d.el.scrollLeft += v * dt; v *= Math.pow(0.94, dt / 16); requestAnimationFrame(glide); };
   requestAnimationFrame(glide); };
@@ -67,6 +71,12 @@ document.addEventListener('pointerover', e => { const a = e.target.closest?.('.r
   const step = now => { if (!gl) return; const dt = now - last; last = now; const speed = Math.min(0.3, (now - t0) / 1600 * 0.3 + 0.04); el.scrollLeft += d * speed * dt; gl.raf = requestAnimationFrame(step); };
   gl = { a, el, raf: requestAnimationFrame(step) }; });
 document.addEventListener('pointerout', e => { if (gl && e.target.closest?.('.rl-a') === gl.a && !gl.a.contains(e.relatedTarget)) stopGlide(); });
+
+// ---------- النوافذ: الضغط خارج البطاقة يغلقها، لكن الإفلات خارجها بعد ضغطة بدأت داخلها (سحب صور، أو تحديد نص) لا يغلقها. المتصفح يرسل النقرة
+// حينها إلى أقرب أصل مشترك، وهو النافذة نفسها، فتبدو كنقرة على خلفيتها. فتُترك النقرة على الخلفية إلا إن بدأت الضغطة على الخلفية نفسها (E64)
+let downOn = null;
+document.addEventListener('pointerdown', e => { downOn = e.target; }, true);
+document.addEventListener('click', e => { const t = e.target; if (t?.tagName === 'DIALOG' && downOn && downOn !== t && t.contains(downOn)) { e.stopPropagation(); e.preventDefault(); } }, true);
 
 // ما يُرسم لاحقاً (البطاقات والنوافذ تُعاد كتابتها) يُجهَّز حين يظهر
 new MutationObserver(ms => { for (const m of ms) { if (m.target.nodeType === 1 && m.target.dataset?.rail) enhance(m.target);
