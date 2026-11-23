@@ -8,6 +8,7 @@ import { prepare, find, fold } from './find.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
 import { posMap, ord } from './pos.js?v=__BUILD__'; // خريطة «موقعه من سلسلته» والعدد الترتيبي
+import { ROOM, covered, uncover, bare, showing, setShowing, drawEye, flip, roomBtn, roomBar, cover } from './adult.js?v=__BUILD__'; // مكتبة +18 (E61)
 const BUILD = '__BUILD__', KEY = 'filmsg.progress', PEND = 'filmsg.pending', PASS = 'filmsg.pass', IMG = 'https://image.tmdb.org/t/p/';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -42,9 +43,11 @@ function leader(date, note, now = 'يُعرض اليوم') { const t = date && l
   return `<div class="leader${date ? '' : ' tba'}"${date ? ` data-until="${date}" data-now="${now}"` : ''}><span class="ld-dial" aria-hidden="true"><i class="ld-sweep" style="animation-delay:-${t ? 60 - t.s : 0}s"></i>${date ? '' : '<b class="ld-q">؟</b>'}</span>${date ? `<span class="ck" aria-hidden="true">${clock(date, now)}</span><span class="sr sr-time">${spoken(date)}</span>` : ''}<p class="note">${note}</p></div>`; }
 // بلا بوستر بعد: لوح تصوير (كلاكيت) عليه اسم العمل وحالته، يُطبق ذراعه حين يمر عليه المؤشر
 const slate = o => `<span class="ph slate" aria-hidden="true"><span class="sl-top"><i class="sl-arm"></i><i class="sl-base"></i></span><span class="sl-body"><bdi class="sl-t" dir="ltr">${esc(o.title || '')}</bdi><span class="sl-f"><span><small>الحالة</small><b>${!o.date || o.date > today ? 'قريباً' : 'صدر'}</b></span><span><small>الموعد</small><b>${o.date ? `<bdi>${o.date.slice(0, 4)}</bdi>` : 'لم يُعلن'}</b></span></span></span></span>`;
-const poster = (p, sizes) => p ? `<img loading="lazy" decoding="async" alt="" src="${IMG}w342${p}" srcset="${IMG}w185${p} 185w, ${IMG}w342${p} 342w, ${IMG}w500${p} 500w" sizes="${sizes}">` : '';
+// cov: بوستر عمل +18 لم يُكشف بعد: مصغّرته وحدها مغطاة (cover في adult.js)
+const poster = (p, sizes, cov, hint) => !p ? '' : cov ? cover(`<img loading="lazy" decoding="async" alt="" src="${IMG}w92${p}">`, hint) : `<img loading="lazy" decoding="async" alt="" src="${IMG}w342${p}" srcset="${IMG}w185${p} 185w, ${IMG}w342${p} 342w, ${IMG}w500${p} 500w" sizes="${sizes}">`;
+const hid = f => !!f.adult && covered(f.id) && !!f.poster;
 
-const D = { films: [], byId: new Map(), byTmdb: new Map(), more: null, cols: {}, prov: {}, fr: {}, fx: {}, frOf: new Map(), recOf: new Map(), part: new Map(),
+const D = { films: [], byId: new Map(), known: new Set(), byTmdb: new Map(), more: null, cols: {}, prov: {}, fr: {}, fx: {}, frOf: new Map(), recOf: new Map(), part: new Map(),
   // خريطة العوالم (worlds.json): العوالم وترتيبها، وعوالم كل عمل وأعماله المرتبطة، ومعلومات الأعمال خارج القائمة. wlive: البحث المباشر لعمل جديد
   worlds: {}, wworks: {}, winfo: {}, memberOf: new Map(), wok: false, wlive: new Map(), wres: new Map(),
   // ترتيب أحداث مجموعات TMDB (من محرّك الأحداث): { رقم المجموعة: { order, moved } أو { chk } }
@@ -58,12 +61,12 @@ const ui = { q: '', status: 'todo', genre: '', decade: '', prov: '', sort: 'list
 
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${miniDoor}<span>البوابات</span></a><h1>قائمة أفلامي</h1>
-  <button class="btn pri add" data-act="add">${ic('plus')}<span>أضف فيلماً</span><span class="sr">أضف فيلماً</span></button><p class="tally" id="tally"></p></header>
-<section class="tonight" id="tonight" hidden><div class="bd"></div><p class="lbl">اقتراح الليلة</p><h2 dir="ltr"></h2><p class="meta"></p>
+  ${roomBtn()}<button class="btn pri add" data-act="add">${ic('plus')}<span>أضف فيلماً</span><span class="sr">أضف فيلماً</span></button><p class="tally" id="tally"></p></header>
+${roomBar('قائمتك العادية')}<section class="tonight" id="tonight" hidden><div class="bd"></div><p class="lbl">اقتراح الليلة</p><h2 dir="ltr"></h2><p class="meta"></p>
   <div class="acts"><button class="btn pri" data-act="open-tonight">افتح بطاقته</button><button class="btn sec" data-act="reroll">${ic('roll')}اقتراح آخر</button></div>
   <div class="mood" role="group" aria-labelledby="mood-l"><span class="mood-l" id="mood-l">مزاج السهرة</span><div class="mood-c" id="mood" data-drag></div></div><p class="mood-hint" id="mood-hint" hidden></p></section>
 <nav class="bar" aria-label="البحث والتصفية"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a><label class="search">${ic('search')}<span class="sr">ابحث في القائمة</span><input id="q" type="search" placeholder="ابحث: فيلم، مخرج، سنة" autocomplete="off" enterkeyhint="search"></label>
-  <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الأفلام</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
+  <div class="tabs" role="group" aria-label="طريقة العرض"${ROOM ? ' hidden' : ''}><button data-act="view" data-v="grid" aria-pressed="true">الأفلام</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
   <div class="chips" id="chips"></div></nav>
 <p class="count" id="count" aria-live="polite"></p>
 <main><div class="grid" id="grid"><p class="load">تُحمَّل القائمة…</p></div><div class="series" id="series" hidden></div></main>
@@ -71,13 +74,13 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <p><button class="syncb" data-sync-open><span data-sync-label></span></button></p></footer>
 <dialog id="sheet" aria-label="بطاقة الفيلم"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="sheet-body"></div></dialog>
 <dialog id="add" aria-labelledby="add-h"><button class="close" data-act="close-add" aria-label="إغلاق">${ic('x')}</button>
-  <form id="add-form"><h2 id="add-h">أضف فيلماً</h2>
-  <label for="add-q">اسم الفيلم أو المسلسل، بالعربي أو بالإنجليزي (والسنة إن أردت)</label>
+  <form id="add-form"><h2 id="add-h">${ROOM ? 'أضف إلى مكتبة <bdi dir="ltr">+18</bdi>' : 'أضف فيلماً'}</h2>
+  <label for="add-q">${ROOM ? 'اسم العمل كما في <bdi dir="ltr">TMDB</bdi> (والسنة إن أردت). يُبحث بين ما صُنّف هناك للبالغين وحده' : 'اسم الفيلم أو المسلسل، بالعربي أو بالإنجليزي (والسنة إن أردت)'}</label>
   <div class="sugbox"><input id="add-q" dir="auto" placeholder="جون ويك، Heat 1995…" autocomplete="off" autocapitalize="off" spellcheck="false" required role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="add-sug">
   <ul class="sug" id="add-sug" role="listbox" aria-label="اقتراحات" hidden></ul></div>
   <label id="add-pass-wrap">كلمة السر (تُطلب مرة واحدة على هذا الجهاز)<input id="add-pass" type="password" autocomplete="current-password"></label>
   <button class="btn pri" type="submit">ابحث عنه</button><p class="msg" id="add-msg" aria-live="polite"></p><div class="cands" id="cands"></div>
-  <p class="hint">الفيلم يظهر هنا فوراً، ويصل إلى بقية أجهزتك خلال دقائق. سلسلته وعالمه وأعماله المرتبطة تُجلب آلياً من <bdi dir="ltr">TMDB</bdi> و<bdi dir="ltr">Wikidata</bdi>.</p></form></dialog>
+  <p class="hint">${ROOM ? 'ما تضيفه يظهر في مكتبة <bdi dir="ltr">+18</bdi> فوراً ويصل إلى بقية أجهزتك خلال دقائق، ولا يدخل قائمتك العادية. بلا نبذة ولا سلسلة: اسمه وسنته وتقييمه وصورته.' : 'الفيلم يظهر هنا فوراً، ويصل إلى بقية أجهزتك خلال دقائق. سلسلته وعالمه وأعماله المرتبطة تُجلب آلياً من <bdi dir="ltr">TMDB</bdi> و<bdi dir="ltr">Wikidata</bdi>.'}</p></form></dialog>
 <div class="toast" id="toast" role="status"></div>`);
 portalBack('films');
 
@@ -85,7 +88,8 @@ const toast = (t, undo) => { const el = $('#toast'); el.textContent = t; if (und
   el.classList.toggle('act', !!undo); el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => { el.classList.remove('on', 'act'); setTimeout(() => { if (!el.classList.contains('on')) el.textContent = ''; }, 300); }, undo ? 5000 : 2600); };
 const get = (f) => fetch(`data/${f}?v=${BUILD}`).then(r => { if (!r.ok) throw new Error(f); return r.json(); });
 
-function register(f, heavy) { if (D.byId.has(f.id)) return; D.films.push(f); D.byId.set(f.id, f); if (f.kind === 'movie') D.byTmdb.set(f.tmdb, f); if (heavy) (D.more ||= {})[f.id] = heavy; }
+// القائمة قائمة المكتبة المفتوحة وحدها: العادية، أو +18 حين تُفتح (ROOM). known: كل ما عُرف من المكتبتين، لتنظيف المحفوظ محلياً
+function register(f, heavy) { D.known.add(f.id); if (!!f.adult !== ROOM || D.byId.has(f.id)) return; D.films.push(f); D.byId.set(f.id, f); if (f.kind === 'movie') D.byTmdb.set(f.tmdb, f); if (heavy) (D.more ||= {})[f.id] = heavy; }
 const HEAVY = ['overviewEn', 'overviewAr', 'cast', 'countries', 'arSource', 'titleAr', 'directors'];
 const split = full => { const light = {}, heavy = {}; for (const [k, v] of Object.entries(full)) (HEAVY.includes(k) ? heavy : light)[k] = v; return [light, heavy]; };
 
@@ -104,8 +108,8 @@ const tagOf = f => f.fresh ? '<span class="tag new">جديد</span>' : f.kind ==
 function retag() { for (const f of D.films) { const el = document.querySelector(`#f-${f.id} .poster`); if (!el) continue; const old = el.querySelector(':scope > .tag'), html = tagOf(f);
   if ((old?.outerHTML || '') === html) continue; old?.remove(); if (html) el.querySelector('.stamp').insertAdjacentHTML('beforebegin', html); } }
 function card(f) { const s = st(f.id);
-  return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}">
-<button class="poster" data-act="open" ${f.poster ? `data-zoom-pinch data-zoom-title="${esc(f.title)}" ` : ''}aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px') || slate(f)}${tagOf(f)}${marquee(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
+  return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}"${bare(f.id)}>
+<button class="poster${hid(f) ? ' x18' : ''}" data-act="open" ${f.poster && !hid(f) ? `data-zoom-pinch data-zoom-title="${esc(f.title)}" ` : ''}aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px', hid(f)) || slate(f)}${tagOf(f)}${marquee(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
 <div class="stub"><h3>${esc(f.title)}</h3><p class="meta">${f.year ? `<bdi>${f.year}</bdi>` : '<span>بلا موعد</span>'}${f.rating ? `<span class="rate"><bdi dir="ltr">${f.rating.toFixed(1)}</bdi></span>` : ''}${f.runtime ? `<span>${rt(f.runtime)}</span>` : f.seasons ? `<span>${count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم'])}</span>` : ''}</p>
 <button class="seen" data-act="seen" aria-pressed="${s === 'watched'}" aria-label="شاهدته: ${esc(f.title)}">${ic('check')}</button><div class="where">${whereHTML(f)}</div></div></article>`; }
 
@@ -147,6 +151,9 @@ function chipsHTML() { const c = (k, v, t) => `<button class="chip" data-act="st
 const filtered = () => ui.status !== 'todo' || ui.genre || ui.decade || ui.prov || ui.series || ui.q;
 function apply(resort) { const grid = $('#grid');
   if (resort) { const sorted = [...D.films].sort(SORTS[ui.sort][1]), frag = document.createDocumentFragment(); for (const f of sorted) { const el = document.getElementById('f-' + f.id); if (el) frag.append(el); } grid.append(frag); }
+  // مكتبة +18 ولا عمل فيها بعد: دعوة إلى البحث بدل الشبكة وشريطها
+  const none = ROOM && !D.films.length; document.body.classList.toggle('r18-empty', none); if (!none) $('.r18-none', grid)?.remove();
+  if (none) { grid.innerHTML = `<div class="r18-none"><h2>مكتبة <bdi dir="ltr">+18</bdi> فارغة</h2><p>ابحث عن فيلم أو مسلسل مما صنّفه <bdi dir="ltr">TMDB</bdi> للبالغين وأضفه، فيبقى هنا وحده: لا يدخل قائمتك العادية ولا بحثها ولا اقتراحاتها.</p><button class="btn pri" data-act="add">${ic('plus')}ابحث عن عمل <bdi dir="ltr">+18</bdi></button></div>`; $('#tally').textContent = ''; $('#count').innerHTML = ''; return; }
   let shown = 0; for (const f of D.films) { const el = document.getElementById('f-' + f.id); if (!el) continue; const ok = match(f); el.hidden = !ok; if (ok) shown++; }
   let empty = $('.empty', grid); if (!shown && !empty) grid.insertAdjacentHTML('beforeend', '<p class="empty">لا شيء يطابق هذه التصفية. جرّب إزالة أحد الشروط.</p>'); else if (shown && empty) empty.remove();
   const hid = D.films.filter(f => st(f.id) === 'watched').length;
@@ -384,24 +391,26 @@ function linksSec(f) { const ua = navigator.userAgent, ww = /android/i.test(ua) 
 // pv: بطاقة اطلاع لعمل ليس في القائمة (من TMDB مباشرة): معلوماته الكاملة، وبدل أزرار الحالة زر «أضفه إلى قائمتي»
 async function sheetHTML(f, pv = null) { await Promise.race([D.worldsReady, new Promise(r => setTimeout(r, 2500))]);
   const m = pv?.more || (await D.moreReady)?.[f.id] || {}, s = st(f.id), un = unreleased(f); slotOf.k = keyOf(f); slotOf.f = f;
-  const ov = m.overviewAr ? `<p>${ar(m.overviewAr)}</p>${m.arSource === 'guide' ? '' : '<p class="note">نبذة <bdi dir="ltr">TMDB</bdi> العربية كما هي، لم نراجعها بعد.</p>'}` : m.overviewEn ? `<p dir="ltr" lang="en" style="text-align:left">${esc(m.overviewEn)}</p><p class="note">النبذة بالإنجليزية، والترجمة قيد الإعداد.</p>` : '<p>لا توجد نبذة.</p>';
-  return `<div class="sh-hero">${f.backdrop ? `<img alt="" src="${IMG}w780${f.backdrop}" srcset="${IMG}w780${f.backdrop} 780w, ${IMG}w1280${f.backdrop} 1280w" sizes="(max-width:880px) 100vw, 880px">` : ''}</div>
-<div class="sh-head">${f.poster ? `<button type="button" class="poster" data-zoom="" data-zoom-title="${esc(f.title)}" aria-label="تكبير بوستر ${esc(f.title)}">${poster(f.poster, '170px')}</button>` : `<div class="poster">${slate(f)}</div>`}<div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
+  const ov = f.adult ? '<p class="note">نبذات أعمال <bdi dir="ltr">+18</bdi> لا تُعرض هنا ولا تُترجم. تجدها في صفحته على <bdi dir="ltr">TMDB</bdi> أدناه.</p>' : m.overviewAr ? `<p>${ar(m.overviewAr)}</p>${m.arSource === 'guide' ? '' : '<p class="note">نبذة <bdi dir="ltr">TMDB</bdi> العربية كما هي، لم نراجعها بعد.</p>'}` : m.overviewEn ? `<p dir="ltr" lang="en" style="text-align:left">${esc(m.overviewEn)}</p><p class="note">النبذة بالإنجليزية، والترجمة قيد الإعداد.</p>` : '<p>لا توجد نبذة.</p>';
+  return `<div class="sh-hero">${f.backdrop && !(f.adult && covered(f.id)) ? `<img alt="" src="${IMG}w780${f.backdrop}" srcset="${IMG}w780${f.backdrop} 780w, ${IMG}w1280${f.backdrop} 1280w" sizes="(max-width:880px) 100vw, 880px">` : ''}</div>
+<div class="sh-head">${hid(f) ? `<button type="button" class="poster x18" data-act="bare" data-id="${f.id}" aria-label="أظهر صورة ${esc(f.title)}">${poster(f.poster, '170px', true, 'اضغط لإظهارها')}</button>`
+  : f.poster ? `<button type="button" class="poster" data-zoom="" data-zoom-title="${esc(f.title)}" aria-label="تكبير بوستر ${esc(f.title)}">${poster(f.poster, '170px')}</button>` : `<div class="poster">${slate(f)}</div>`}<div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
 <p class="facts">${[f.kind === 'tv' ? 'مسلسل' : '', f.year ? `<bdi>${f.year}</bdi>` : '', rt(f.runtime), f.seasons ? count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم']) : '', f.cert ? `<bdi dir="ltr">${esc(f.cert)}</bdi>` : '', LANGS[f.lang] ? 'اللغة ' + LANGS[f.lang] : '', f.rating ? `<span class="rate">تقييم <bdi dir="ltr">TMDB ${f.rating.toFixed(1)}</bdi></span>` : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</p>
 <div class="tags">${f.genres.map(g => GENRES[g] ? `<span>${GENRES[g]}</span>` : '').join('')}</div></div></div>
-<div id="chslot" data-k="${keyOf(f)}">${chainHTML(f)}</div>${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>
+<div id="chslot" data-k="${keyOf(f)}">${f.adult ? '' : chainHTML(f)}</div>${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>
 <section class="sec"><p class="ask">ليس في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">TMDB</bdi>.</p></section>`
   : `<div class="sh-acts"><button class="btn sec" data-act="set" data-v="watched" aria-pressed="${s === 'watched'}">${ic('check')}شاهدته</button><button class="btn sec nx" data-act="set" data-v="next" aria-pressed="${s === 'next'}">${ic('mark')}التالي في المشاهدة</button></div>`}
-${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''}${f.src === 'added' ? '<section class="sec"><p class="ask">أُضيف بزر «أضف فيلماً»: معلوماته آلية من <bdi dir="ltr">TMDB</bdi> ولم تُراجَع يدوياً.</p></section>' : ''}
+${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''}${f.src === 'added' && !f.adult ? '<section class="sec"><p class="ask">أُضيف بزر «أضف فيلماً»: معلوماته آلية من <bdi dir="ltr">TMDB</bdi> ولم تُراجَع يدوياً.</p></section>' : ''}
 <section class="sec"><h3>القصة</h3>${ov}</section>${un ? `<section class="sec"><h3>موعد الصدور</h3>${f.date ? leader(f.date, `يصدر في <bdi>${dateAr(f.date)}</bdi> حسب <bdi dir="ltr">TMDB</bdi>، والموعد قابل للتغيير.`) : leader(null, 'معلن، ولم يُحدَّد موعد صدوره بعد.')}</section>` : ''}${nextEp(f) ? (n => `<section class="sec"><h3>${n.e === 1 ? 'الموسم القادم' : 'الحلقة القادمة'}</h3>${leader(n.date, `${n.e === 1 ? `الموسم ${n.s} يبدأ` : `الموسم ${n.s}، الحلقة ${n.e}: تُعرض`} في <bdi>${dateAr(n.date)}</bdi> حسب <bdi dir="ltr">TMDB</bdi>، والموعد قابل للتغيير.`, n.e === 1 ? 'يبدأ اليوم' : 'تُعرض اليوم')}</section>`)(nextEp(f)) : ''}
-${whereSec(f)}<div id="wslot" data-k="${keyOf(f)}">${worldHTML(f)}</div>
+${f.adult ? '' : whereSec(f)}<div id="wslot" data-k="${keyOf(f)}">${f.adult ? '' : worldHTML(f)}</div>
 ${(m.directors?.length || m.cast?.length) ? `<section class="sec"><h3>الطاقم</h3><p class="people">${m.directors?.length ? `<b>${f.kind === 'tv' ? 'صنّاع المسلسل' : 'الإخراج'}:</b> <bdi dir="ltr">${m.directors.map(esc).join(', ')}</bdi><br>` : ''}${m.cast?.length ? `<b>التمثيل:</b> <bdi dir="ltr">${m.cast.map(esc).join(', ')}</bdi>` : ''}</p></section>` : ''}
 ${linksSec(f)}`; }
-async function openFilm(id, push = true) { const f = D.byId.get(id); if (!f) return; openId = id; $('#sheet-body').innerHTML = await sheetHTML(f); $('#sheet-body').scrollTop = 0; if (f.fresh && !D.wworks[id]?.q) liveWorlds(f);
+async function openFilm(id, push = true) { const f = D.byId.get(id); if (!f) return; openId = id; $('#sheet-body').toggleAttribute('data-r18-bare', !!bare(id)); $('#sheet-body').innerHTML = await sheetHTML(f); $('#sheet-body').scrollTop = 0; if (f.fresh && !f.adult && !D.wworks[id]?.q) liveWorlds(f);
   if (!sheet.open) { sheet.showModal(); $('#sheet-body').scrollTop = 0;   // بعد العرض: المتصفح يعيد للنافذة موضع تمرير البطاقة السابقة حين تُعرض، وتصفيره وهي مخفية لا يؤثر
     if (!calm) sheet.animate(innerWidth <= 640 ? { transform: ['translateY(6%)', 'none'], opacity: [0, 1] } : { transform: ['scale(.97)', 'none'], opacity: [0, 1] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
     if (push) history.pushState({ film: id }, '', '#' + id); } else if (push) history.replaceState({ film: id }, '', '#' + id); }
-function closeFilm(fromPop) { if (!sheet.open) return; openId = null; const done = () => sheet.close();
+const redrawSheet = () => { if (!sheet.open) return; if (openId) openFilm(openId, false); else if (pvOpen) openPreview(pvOpen.tmdb, pvOpen.kind); };
+function closeFilm(fromPop) { if (!sheet.open) return; openId = null; pvOpen = null; const done = () => sheet.close();
   if (calm) done(); else { const a = sheet.animate({ opacity: [1, 0], transform: ['none', innerWidth <= 640 ? 'translateY(5%)' : 'scale(.98)'] }, { duration: 160, easing: 'ease-in' }); a.onfinish = done; setTimeout(done, 300); }
   if (!fromPop && history.state?.film) history.back(); else if (!fromPop && location.hash) history.replaceState(null, '', location.pathname + location.search); }
 addEventListener('popstate', () => { const id = location.hash.slice(1); if (id && D.byId.has(id)) openFilm(id, false); else closeFilm(true); });
@@ -417,7 +426,7 @@ function setStatus(id, v) { const cur = st(id); if (cur === v) delete P.films[id
 
 // ---------- أضف فيلماً ----------
 const pass = () => { try { return localStorage.getItem(PASS) || ''; } catch { return ''; } };
-async function api(body, password) { let r; try { r = await fetch('/api/add-film', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...body, password }) }); } catch { throw new Error('تعذّر الاتصال. تأكد من الإنترنت وحاول ثانية.'); }
+async function api(body, password) { let r; try { r = await fetch('/api/add-film', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...body, ...(ROOM ? { adult: true } : {}), password }) }); } catch { throw new Error('تعذّر الاتصال. تأكد من الإنترنت وحاول ثانية.'); }   // adult: الطلب من مكتبة +18
   if (r.status === 401) { try { localStorage.removeItem(PASS); } catch {} $('#add-pass-wrap').hidden = false; throw new Error('كلمة السر غير صحيحة.'); }
   if (r.status === 404 || r.status === 405) throw new Error('الإضافة تعمل من نسخة الموقع على Netlify فقط.');
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'حدث خطأ في الخادم. حاول بعد قليل.'); return j; }
@@ -436,7 +445,7 @@ $('#add-form').addEventListener('submit', async e => { e.preventDefault(); const
   } catch (err) { msg.textContent = err.message; } });
 // ---------- اقتراحات أثناء الكتابة، قبل Enter: من فهرس أشهر الأعمال (data/titles.json) بالبحث المتسامح، فيُفهم «جون ويك»
 // و«intersteller» و«the dark kn»، ثم من بحث TMDB نفسه لما ليس في الفهرس (الجديد والمغمور) إن كانت كلمة السر محفوظة
-let TI = null; const titles = () => TI ??= get('titles.json').then(j => prepare(j.items.map(r => ({ id: (r[1] ? 't' : 'm') + r[0], tmdb: r[0], kind: r[1] ? 'tv' : 'movie', y: r[2], v: r[3], title: r[4], ar: r[5] || '', names: [r[4], r[5], r[6]] }))))
+let TI = null; const titles = () => TI ??= ROOM ? Promise.resolve([]) : get('titles.json').then(j => prepare(j.items.map(r => ({ id: (r[1] ? 't' : 'm') + r[0], tmdb: r[0], kind: r[1] ? 'tv' : 'movie', y: r[2], v: r[3], title: r[4], ar: r[5] || '', names: [r[4], r[5], r[6]] }))))
   .catch(() => { TI = null; return []; });
 const addQ = $('#add-q'), sugEl = $('#add-sug'); let sug = [], sugAt = -1, sugT = 0, sugN = 0;
 function drawSug(list = [], meant = null) { sug = list; sugAt = -1; addQ.removeAttribute('aria-activedescendant');
@@ -472,7 +481,7 @@ async function addFilm(tmdb, kind, btn, label) { const msg = $('#add-msg'); btn.
 const addPick = btn => addFilm(+btn.dataset.tmdb, btn.dataset.kind, btn, 'أضفه');
 // بطاقة اطلاع: يجلب العمل كاملاً من TMDB عبر الخادم دون إضافته. تُحفظ في الذاكرة فلا يتكرر الطلب.
 // تُفتح فوق نافذة البحث (فإغلاقها يعيدك إلى النتائج) أو مكان البطاقة المفتوحة، وزر الرجوع في الجوال يغلقها.
-const previews = new Map();
+const previews = new Map(); let pvOpen = null;   // بطاقة الاطلاع المفتوحة، ليُعاد رسمها حين تُكشف صورتها
 async function openPreview(tmdb, kind, btn) { const id = (kind === 'tv' ? 't' : 'm') + tmdb; if (D.byId.has(id)) { if (addDlg.open) addDlg.close(); return openFilm(id); }
   if (!pass()) return openAdd(btn?.dataset.q || '');
   const label = btn?.innerHTML; if (btn) { btn.disabled = true; btn.textContent = 'يجهّز…'; }
@@ -480,12 +489,12 @@ async function openPreview(tmdb, kind, btn) { const id = (kind === 'tv' ? 't' : 
     Object.assign(D.prov, r.providers || {}); if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) if (!D.part.has(p.tmdb)) D.part.set(p.tmdb, p); }
     const [light, heavy] = split(r.film), k = keyOf(light); openId = null;
     D.winfo[k] ||= { title: light.title, date: light.date, year: light.year, poster: light.poster, rating: light.rating, votes: light.votes, genres: light.genres, lang: light.lang, runtime: light.runtime };
-    $('#sheet-body').innerHTML = await sheetHTML(light, { more: heavy }); $('#sheet-body').scrollTop = 0; liveWorlds(light);
+    $('#sheet-body').toggleAttribute('data-r18-bare', !!bare(id)); $('#sheet-body').innerHTML = await sheetHTML(light, { more: heavy }); $('#sheet-body').scrollTop = 0; if (!light.adult) liveWorlds(light); pvOpen = { tmdb, kind };
     if (!sheet.open) { sheet.showModal(); $('#sheet-body').scrollTop = 0; if (!calm) sheet.animate({ opacity: [0, 1], transform: [innerWidth <= 640 ? 'translateY(6%)' : 'scale(.97)', 'none'] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' }); history.pushState({ film: 'preview' }, '', location.pathname + location.search); }
   } catch (err) { if (addDlg.open) $('#add-msg').textContent = err.message; else toast(err.message); }
   finally { if (btn) { btn.disabled = false; btn.innerHTML = label; } } }
 // يُدخل فيلماً عاد من الخادم (أو محفوظاً بانتظار وصوله في البناء القادم) في القائمة المعروضة
-function adopt(r, draw) { if (!r?.film || D.byId.has(r.film.id)) return false; const [light, heavy] = split(r.film); light.fresh = true; light.ord = -Date.now(); stale(); Object.assign(D.prov, r.providers || {}); if (r.worlds) { mergeWorlds(r.worlds); D.wlive.set(light.id, 'done'); }
+function adopt(r, draw) { if (!r?.film || D.byId.has(r.film.id) || !!r.film.adult !== ROOM) return false; const [light, heavy] = split(r.film); light.fresh = true; light.ord = -Date.now(); stale(); Object.assign(D.prov, r.providers || {}); if (r.worlds) { mergeWorlds(r.worlds); D.wlive.set(light.id, 'done'); }
   if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) D.part.set(p.tmdb, p); } register(light, heavy);
   if (draw) { $('#grid').insertAdjacentHTML('afterbegin', card(light)); $('#chips').innerHTML = chipsHTML(); apply(false); } return true; }
 
@@ -508,6 +517,9 @@ document.addEventListener('click', e => { const t = e.target.closest('[data-act]
   else if (act === 'mood') { const g = t.dataset.g; moods = !g ? [] : moods.includes(g) ? moods.filter(x => x !== g) : [...moods, g]; try { localStorage.setItem('films.mood', moods.join()); } catch {} moodChips(); tonightId = null; reroll(false); }
   else if (act === 'open-tonight') openFilm(tonightId);
   else if (act === 'add') openAdd();
+  else if (act === 'room') flip(`<i></i><i></i><strong>${ROOM ? 'قائمة أفلامي' : 'أفلامي <bdi dir="ltr">+18</bdi>'}</strong>`);   // يفتح مكتبة +18 أو يخرج منها (site/adult.js)
+  else if (act === 'room-show') { setShowing(!showing()); drawEye(); renderGrid(); redrawSheet(); }                                 // صور المكتبة كلها: تُكشف أو تُغطى
+  else if (act === 'bare') { uncover(t.dataset.id); const el = document.getElementById('f-' + t.dataset.id), f = D.byId.get(t.dataset.id); if (el && f) { el.outerHTML = card(f); apply(false); } redrawSheet(); }   // صورة هذا العمل وحده (والتذكرة الجديدة تأخذ ظهورها من التصفية)
   else if (act === 'add-part') { if (t.dataset.tmdb && pass()) openPreview(+t.dataset.tmdb, t.dataset.kind, t); else { if (sheet.open) closeFilm(); openAdd(t.dataset.q); } }
   else if (act === 'preview') openPreview(+t.dataset.tmdb, t.dataset.kind, t);
   else if (act === 'preview-add') addFilm(+t.dataset.tmdb, t.dataset.kind, t, t.innerHTML);
@@ -530,8 +542,8 @@ try {
   // خريطة العوالم بعد القائمة: لا تؤخر الرسم الأول. حين تصل يُعاد رسم ما يعتمد عليها
   D.worldsReady = get('worlds.json').then(w => { mergeWorlds(w); D.wok = true; refreshSlot(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); apply(ui.sort === 'list'); }).catch(() => {});
   // ما أُضيف بالزر ولم يصل البناء بعد يبقى ظاهراً من الحفظ المحلي، ويُحذف منه عند وصوله
-  try { const pend = JSON.parse(localStorage.getItem(PEND) || '[]'), keep = pend.filter(r => r?.film && !D.byId.has(r.film.id)); D.more ||= {}; keep.forEach(r => adopt(r, false)); localStorage.setItem(PEND, JSON.stringify(keep)); } catch {}
-  renderGrid(); moodChips(); reroll(true); liftVeil();
+  try { const pend = JSON.parse(localStorage.getItem(PEND) || '[]'), keep = pend.filter(r => r?.film && !D.known.has(r.film.id)); D.more ||= {}; keep.forEach(r => adopt(r, false)); localStorage.setItem(PEND, JSON.stringify(keep)); } catch {}
+  renderGrid(); if (!ROOM) { moodChips(); reroll(true); } liftVeil();   // لا اقتراح في مكتبة +18
   // حين تغيب الترويسة ينزل زر البوابات إلى أول الشريط الثابت
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }
   // تغيير وصل من جهاز آخر: نعيد قراءة السجل ونرسم

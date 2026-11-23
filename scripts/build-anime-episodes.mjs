@@ -32,7 +32,7 @@ const mal = id => rd(new URL(id + '.json', MAL), null)?.d || null;
 const skip = why => { report.skipped[why] = (report.skipped[why] || 0) + 1; };
 // الأعمال التي تُبنى حلقاتها: ما في القائمة، مطابَق بمسلسل في TMDB، وليس فيلماً ولا ذا حلقة واحدة ولا منتظَراً
 const wanted = [], ownsEpisodes = a => a.type !== 'Movie' && a.eps !== 1 && a.st !== 'soon', inList = a => a.ord != null, tag = a => inList(a) ? '' : '~';
-for (const a of cat.anime) { const why = a.type === 'Movie' || a.eps === 1 ? 'فيلم أو حلقة واحدة' : a.st === 'soon' ? 'لم يُعرض بعد' : !a.tm ? 'بلا مطابقة في TMDB' : a.tm.k !== 'tv' ? 'مطابَق بفيلم' : '';
+for (const a of cat.anime) { const why = a.ad ? '+18' : a.type === 'Movie' || a.eps === 1 ? 'فيلم أو حلقة واحدة' : a.st === 'soon' ? 'لم يُعرض بعد' : !a.tm ? 'بلا مطابقة في TMDB' : a.tm.k !== 'tv' ? 'مطابَق بفيلم' : '';
   if (!why) wanted.push(a); else if (inList(a)) skip(why); }
 const shows = new Map(); for (const a of wanted) (shows.get(a.tm.id) || shows.set(a.tm.id, []).get(a.tm.id)).push(a);
 // كل ما في الكتالوج على المسلسل نفسه (ولو من أقرباء السلاسل): به تُعرف حدود كل عمل حين يتشارك عملان موسماً أو مسلسلاً
@@ -98,7 +98,7 @@ Object.assign(report, { shows: shows.size, showsFailed: failed, wanted: wanted.f
 // ---------- مرشحو المطابقة: أعمال القائمة التي لا مطابقة لها (فيلم أو مسلسل أو ONA أو OVA، لا الحلقات الخاصة والملخصات: مكانها الموسم 0 في مسلسلها)، وما سقط
 // من القائمة أو من أقربائها، وما حُذف مسلسله من TMDB. يُبحث بالاسم وبالاسم الإنجليزي وبهما بلا لاحقة الموسم وبالعنوان الفرعي، والعمل ذو الحلقة الواحدة يُبحث عنه فيلماً أيضاً
 const fixed = rd(new URL('data/anime/tmdb.json', root), {}), lost = new Set([...report.dropped.map(l => +l.replace(/^~/, '').split(' ')[0]), ...gone]);
-const orphans = cat.anime.filter(a => lost.has(a.id) || (inList(a) && a.st !== 'soon' && !a.tm && !(a.id in fixed) && ['Movie', 'TV', 'ONA', 'OVA'].includes(a.type)));
+const orphans = cat.anime.filter(a => !a.ad && (lost.has(a.id) || (inList(a) && a.st !== 'soon' && !a.tm && !(a.id in fixed) && ['Movie', 'TV', 'ONA', 'OVA'].includes(a.type))));
 const yearOf = d => +(d || '').slice(0, 4) || 0, cands = [];
 const variants = names => { const out = []; for (const n of names.filter(Boolean)) { out.push(n);
     const base = n.replace(/\s*[:\-–]?\s*(?:\d+(?:st|nd|rd|th) Season|Season \d+|Part \d+|\(\d{4}\)|\(TV\))\s*$/i, '').trim(); if (base && base !== n) out.push(base);

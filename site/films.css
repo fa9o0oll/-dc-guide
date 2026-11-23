@@ -416,3 +416,14 @@ section.sec{padding:20px clamp(14px,3vw,30px) 0}
 .pexit{position:fixed;inset:0;z-index:500;transform-origin:0 0;pointer-events:none;will-change:transform}
 /* «المزاج» بأكثر من نوع: سطر يقول هل الاقتراح يجمعها كلها أم أقربها */
 .mood-hint{margin-top:6px;font-size:.82rem;line-height:1.6;color:var(--mute);max-width:60ch}
+/* ---------- مكتبة +18 (E61، site/adult.js): الصالة نفسها بضوء أحمر بدل برتقالي التذاكر، وشريطها تحت الرأس، وبوستراتها مغطاة حتى تُكشف */
+html[data-room="18"]{--bg:#140b0e;--bg2:#1c0f14;--card:#24131a;--card2:#2d1820;--line:#4a2330;--dim:#d4b8c0;--mute:#9a7c86;--acc:#ff4d6d;--acc2:#ff8fa3;--on-acc:#2a0410}
+html[data-room="18"] .veil i,.veil.to18 i{background:#140b0e repeating-linear-gradient(90deg,rgba(255,77,109,.09) 0 2px,transparent 2px 38px);border-color:rgba(255,77,109,.55)}
+html[data-room] .veil.to0 i{background:#14100b repeating-linear-gradient(90deg,rgba(255,159,67,.07) 0 2px,transparent 2px 38px);border-color:rgba(255,159,67,.5)}
+html[data-room="18"] .bar{background:rgba(20,11,14,.94)}
+.r18-bar{margin:6px var(--pad) 4px;max-width:860px}
+.tk .poster.x18 .x18-i{border-radius:0}
+.r18-none{grid-column:1/-1;display:grid;justify-items:center;gap:12px;padding:52px 0 60px;text-align:center;color:var(--dim)}
+.r18-none h2{font-family:var(--display);font-size:1.4rem;color:var(--ink)}
+.r18-none p{max-width:52ch;line-height:1.8}
+body.r18-empty .bar,body.r18-empty .count{display:none}

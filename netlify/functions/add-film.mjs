@@ -1,5 +1,7 @@
 // دالة «أضف فيلماً»: تقترح أثناء الكتابة (suggest)، وتبحث في TMDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي نتيجة للاطلاع (preview)، ثم تضيف المختار إلى data/films/added.json في المستودع،
 // فيعاد بناء القائمة ويظهر الفيلم على كل الأجهزة. و worlds: سلسلة العمل وعالمه وأعماله المرتبطة من Wikidata (تطلبها الصفحة بعد فتح البطاقة، فلا تتأخر).
+// adult في الطلب: الطلب من مكتبة +18 (E61). البحث والاقتراح يعودان حينها بما وسمه TMDB للبالغين وحده، وبدونه لا يعودان بشيء منه؛ والإضافة والاطلاع يُرفضان
+// إن خالف العملُ المكتبةَ التي طُلب منها، فلا يدخل عمل +18 القائمة العادية ولا العكس. والمضاف منها يُوسم adult في الملف، وعنوان إيداعه برقمه بلا اسمه.
 // محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
 //   TMDB_API_KEY  مفتاح TMDB        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع        ADD_FILM_PASSWORD  كلمة السر
 import { createHash, timingSafeEqual } from 'node:crypto';
@@ -24,7 +26,7 @@ async function record(entry) {
     else if (cur.status !== 404) throw Object.assign(new Error('GitHub read ' + cur.status), { gh: cur.status });
     if (list.some(x => x.tmdb === entry.tmdb && (x.kind || 'movie') === entry.kind)) return 'exists';
     list.push(entry);
-    const put = await fetch(api, { method: 'PUT', headers, body: JSON.stringify({ message: `films: add ${entry.title}${entry.year ? ` (${entry.year})` : ''}`, branch: BRANCH, ...(sha ? { sha } : {}),
+    const put = await fetch(api, { method: 'PUT', headers, body: JSON.stringify({ message: entry.adult ? `films: add +18 (${entry.kind === 'tv' ? 't' : 'm'}${entry.tmdb})` : `films: add ${entry.title}${entry.year ? ` (${entry.year})` : ''}`, branch: BRANCH, ...(sha ? { sha } : {}),
       content: Buffer.from(JSON.stringify(list, null, 1) + '\n').toString('base64') }) });
     if (put.ok) return 'added';
     if (put.status !== 409 && put.status !== 422) throw Object.assign(new Error('GitHub write ' + put.status), { gh: put.status });
@@ -38,21 +40,22 @@ export default async req => {
   if (!process.env.ADD_FILM_PASSWORD || !process.env.GH_TOKEN || !hasKey()) return json(500, { error: 'إعدادات الخادم ناقصة: أحد المتغيرات الثلاثة غير موجود في Netlify.' });
   let b; try { b = await req.json(); } catch { return json(400, { error: 'طلب غير صالح.' }); }
   if (!b?.password || !same(b.password, process.env.ADD_FILM_PASSWORD)) { await wait(700); return json(401, { error: 'password' }); }
+  const adult = b.adult === true || b.adult === 1;
   try {
     // اقتراحات أثناء الكتابة لما ليس في فهرس الصفحة: بحث TMDB الموحد (أفلام ومسلسلات، ويطابق العناوين المترجمة والبديلة) بطلب واحد
     if (b.action === 'suggest') {
       const q = String(b.q || '').replace(/\s+/g, ' ').trim().slice(0, 80); if (q.length < 2) return json(200, { items: [] });
-      const r = await tmdb('/search/multi', { query: q, include_adult: false, language: 'en-US' });
-      const items = (r.results || []).filter(x => (x.media_type === 'movie' || x.media_type === 'tv') && !x.adult).slice(0, 6)
+      const r = await tmdb('/search/multi', { query: q, include_adult: adult, language: 'en-US' });
+      const items = (r.results || []).filter(x => (x.media_type === 'movie' || x.media_type === 'tv') && !!x.adult === adult).slice(0, 6)
         .map(x => ({ tmdb: x.id, kind: x.media_type, title: x.title || x.name, year: year(x), poster: x.poster_path || null }));
       return json(200, { items });
     }
     if (b.action === 'search') {
       const parsed = parseLine(String(b.q || '').slice(0, 200)); if (!parsed.title) return json(400, { error: 'اكتب اسم الفيلم.' });
-      const [mv, tv] = await Promise.all([search(tmdb, 'movie', parsed.title, parsed.year), search(tmdb, 'tv', parsed.title, parsed.year)]);
+      const [mv, tv] = await Promise.all([search(tmdb, 'movie', parsed.title, parsed.year, adult), search(tmdb, 'tv', parsed.title, parsed.year, adult)]);
       const movies = mv.scored.slice(0, 5).map(x => ({ kind: 'movie', c: x.c })), shows = tv.scored.filter(x => x.exact).slice(0, 2).map(x => ({ kind: 'tv', c: x.c }));
       const candidates = await Promise.all([...movies, ...shows].map(async ({ kind, c }, i) => {
-        const col = kind === 'movie' && i < 4 ? (await tmdb('/movie/' + c.id).catch(() => null))?.belongs_to_collection?.name?.replace(/\s+Collection$/i, '') : null;
+        const col = kind === 'movie' && i < 4 && !adult ? (await tmdb('/movie/' + c.id).catch(() => null))?.belongs_to_collection?.name?.replace(/\s+Collection$/i, '') : null;
         return { tmdb: c.id, kind, title: c.title || c.name, year: year(c), poster: c.poster_path || null, collection: col || undefined }; }));
       return json(200, { parsed, sure: mv.sure, candidates });
     }
@@ -60,9 +63,10 @@ export default async req => {
     if (b.action === 'add' || b.action === 'preview') {
       const kind = b.kind === 'tv' ? 'tv' : 'movie', id = +b.tmdb; if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
       const providers = {}, film = shape(kind, await tmdb(detailPath(kind, id), detailParams(kind)), providers);
+      if (!!film.adult !== adult) return json(422, { error: film.adult ? 'هذا العمل +18: يُضاف من مكتبة +18.' : 'هذا العمل ليس +18: يُضاف من قائمتك العادية.' });
       const collection = film.col ? await tmdb('/collection/' + film.col, { language: 'en-US' }).then(shapeCollection).catch(() => null) : null;
       if (b.action === 'preview') return json(200, { film, collection, providers });
-      const at = new Date().toISOString(), state = await record({ tmdb: id, kind, title: film.title, year: film.year, at });
+      const at = new Date().toISOString(), state = await record({ tmdb: id, kind, title: film.title, year: film.year, at, ...(film.adult ? { adult: 1 } : {}) });
       return json(200, { state, film: { ...film, src: 'added', addedAt: at }, collection, providers });
     }
     // العالم: مهلة كلية تحت حد Netlify (٦٠ ثانية)، واستعلامات أقصر من البناء اليومي. الفشل لا يعطّل البطاقة: الصفحة تعرض ما لديها.

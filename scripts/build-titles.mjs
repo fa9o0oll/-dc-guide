@@ -59,3 +59,8 @@ if (process.env.TITLES_PROBE) for (const q of ['جون ويك', 'jon wik', 'john
   const r = await tmdb('/search/multi', { query: q, include_adult: false, language: 'en-US' }).catch(e => ({ results: [], e: e.message }));
   console.log(`  TMDB «${q}» → ${(r.results || []).filter(x => x.media_type !== 'person').slice(0, 3).map(x => `${x.title || x.name} (${yearOf(x)})`).join(' | ') || '—'}`);
 }
+// وبحث مكتبة +18 (E61) كما تسأله دالة «أضف فيلماً»: هل يعيد include_adult ما وُسم للبالغين؟ أعداد فقط، بلا أسماء في السجل
+if (process.env.TITLES_PROBE) for (const q of ['love', 'night']) for (const adult of [false, true]) {
+  const r = await tmdb('/search/multi', { query: q, include_adult: adult, language: 'en-US' }).catch(e => ({ results: [], e: e.message })), list = (r.results || []).filter(x => x.media_type === 'movie' || x.media_type === 'tv');
+  console.log(`  TMDB adult probe «${q}» include_adult=${adult} → ${list.length} results, ${list.filter(x => x.adult).length} flagged adult${r.e ? ' ERR ' + r.e : ''}`);
+}

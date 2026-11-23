@@ -4,7 +4,7 @@ import zlib from 'node:zlib';
 const day = n => new Date(Date.now() + n * 864e5 - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
 const P = (stream = [], rent = []) => ({ link: 'https://www.themoviedb.org/tv/1/watch?locale=SA', stream, free: [], rent, buy: [] });
 export const catalog = () => ({ generatedAt: new Date().toISOString(), imageBase: 'https://image.tmdb.org/t/p/', malImages: 'https://cdn.myanimelist.net/images/anime/', country: 'SA',
-  providers: { 8: { name: 'Netflix', logo: '/n.jpg' }, 283: { name: 'Crunchyroll', logo: '/c.jpg' } }, genres: ['Action', 'Adventure', 'Comedy', 'Shounen'],
+  providers: { 8: { name: 'Netflix', logo: '/n.jpg' }, 283: { name: 'Crunchyroll', logo: '/c.jpg' } }, genres: ['Action', 'Adventure', 'Comedy', 'Shounen', 'Hentai'],
   anime: [
     { id: 11061, t: 'Hunter x Hunter (2011)', en: 'Hunter x Hunter', type: 'TV', eps: 148, ord: 0, y: 2011, se: 'fall', st: 'finished', from: '2011-10-02', img: '1337/99013', sc: 9.03, sv: 1900000, dur: 23, g: [0, 1, 3], studio: 'Madhouse', rating: 'PG-13', w: 136, tm: { k: 'tv', id: 46298 }, tp: '/hxh.jpg', bd: '/hxhb.jpg', pv: P([8, 283]), sk: 39507 },
     { id: 136, t: 'Hunter x Hunter', type: 'TV', eps: 62, ord: 1, y: 1999, se: 'fall', st: 'finished', from: '1999-10-16', img: '1305/132237', sc: 8.41, sv: 120000, dur: 23, studio: 'Nippon Animation', w: 136, tm: { k: 'tv', id: 45952, s: 1 }, pv: null },
@@ -20,13 +20,17 @@ export const catalog = () => ({ generatedAt: new Date().toISOString(), imageBase
     { id: 199, t: 'Sen to Chihiro no Kamikakushi', en: 'Spirited Away', type: 'Movie', eps: 1, ord: 10, y: 2001, st: 'finished', from: '2001-07-20', img: '6/79597', sc: 8.77, sv: 1300000, dur: 124, studio: 'Studio Ghibli', tm: { k: 'movie', id: 129 }, bd: '/sab.jpg', pv: P([8]) },
     { id: 60000, t: 'Brand New Show', type: 'TV', eps: 12, ord: 11, pending: 1 },
     { id: 61000, t: 'Upcoming Thing', type: 'TV', eps: 0, ord: 12, y: 2027, st: 'soon', from: '2027-04', img: '1/1', tm: { k: 'tv', id: 999 }, pv: null },
+    // عملان +18 (ad) بأسماء مختلَقة، كما يكتبهما البناء: بلا TMDB ولا سلسلة. لا يظهران إلا في مكتبة +18
+    { id: 70001, t: 'Midnight Sample', type: 'OVA', eps: 2, ord: 13, ad: 1, y: 2019, st: 'finished', from: '2019-05-01', img: '7/70001', sc: 6.4, sv: 2100, dur: 28, g: [4], studio: 'Studio Night', rating: 'Rx', sk: 990001 },
+    { id: 70002, t: 'Velvet Sample', en: 'Velvet', type: 'OVA', eps: 1, ord: 14, ad: 1, y: 2022, st: 'finished', from: '2022-02-01', img: '7/70002', sc: 6.9, sv: 800, dur: 30, g: [4], studio: 'Studio Night', rating: 'Rx' },
   ],
   // خطوط السلسلة كما يكتبها البناء (lib-anime: linesOf): الرئيسي مسلسل 1999 وحلقاته OVA، ومسلسل 2011 وفيلمه خط «نسخة أخرى» من مسلسل 1999
   worlds: [{ id: 136, name: 'Hunter x Hunter', head: 11061, ids: [136, 137, 11061, 13271], lk: 'ma', li: [0, 0, 1, 1], ri: [-1, 0, 0, 2] }, { id: 356, name: 'Fate/stay night', ids: [356, 22297], story: [22297, 356], sv: 1, sn: 'ترتيب القصة هنا يبدأ بالمسار الأحدث. من يشاهد أول مرة يبدأ بترتيب الصدور.' }] });
 export const texts = { 11061: { en: 'Hunters devote themselves to accomplishing hazardous tasks.', ar: 'الصيادون يكرّسون أنفسهم لمهام خطرة، وGon Freecss يخرج ليصير صياداً ويجد أباه.', jp: 'HUNTER×HUNTER', source: 'Manga', anilist: 11061,
     wa: 'مانغا يوشيهيرو توغاشي في عالم الصيادين.\n\nحُوّلت إلى الأنمي مرتين: نسخة 1999 وأوفاتها، ثم نسخة 2011 التي تعيد الحكاية من أولها.',
     rel: [{ r: 'Alternative Version', id: 136, name: 'Hunter x Hunter' }, { r: 'Sequel', id: 13271, name: 'Hunter x Hunter Movie 1: Phantom Rouge' }, { r: 'Other', id: 999999, name: 'Not here' }] },
-  52701: { en: 'After the Golden Kingdom is sunk underground by an insane magician, its king emerges.', jp: 'ダンジョン飯', source: 'Manga' } };
+  52701: { en: 'After the Golden Kingdom is sunk underground by an insane magician, its king emerges.', jp: 'ダンジョン飯', source: 'Manga' },
+  70001: { jp: 'ミッドナイト', source: 'Original', anilist: 170001 } };   // عمل +18: بلا نبذة
 // ملف التصدير: 13 عملاً. يشاهد 3، أكمل 4، مؤجَّل 1، ترك 1، سيشاهد 4
 const R = (id, title, type, eps, status, w = 0, score = 0, start = '0000-00-00', finish = '0000-00-00') => `<anime><series_animedb_id>${id}</series_animedb_id><series_title><![CDATA[${title}]]></series_title><series_type>${type}</series_type><series_episodes>${eps}</series_episodes><my_id>0</my_id>
 <my_watched_episodes>${w}</my_watched_episodes><my_start_date>${start}</my_start_date><my_finish_date>${finish}</my_finish_date><my_rated></my_rated><my_score>${score}</my_score><my_storage></my_storage><my_storage_value>0.00</my_storage_value><my_status>${status}</my_status>

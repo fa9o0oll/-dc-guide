@@ -15,7 +15,7 @@
 </head>
 <body>
 <div class="veil" id="veil" hidden><strong>ألعابي</strong></div>
-<script>try{if(sessionStorage.getItem("portal")){sessionStorage.removeItem("portal");document.getElementById("veil").hidden=false}}catch(e){}</script>
+<script>try{var s=sessionStorage,v=document.getElementById("veil"),k="adult.games",n=((performance.getEntriesByType&&performance.getEntriesByType("navigation")[0])||{}).type;if(n==="navigate")s.removeItem(k);if(s.getItem(k)==="1"){document.documentElement.dataset.room="18";v.querySelector("strong").textContent="ألعابي \u2066+18\u2069"}if(s.getItem("portal")){s.removeItem("portal");v.hidden=false}}catch(e){}</script>
 <script type="module" src="../games.js?v=__BUILD__"></script>
 </body>
 </html>

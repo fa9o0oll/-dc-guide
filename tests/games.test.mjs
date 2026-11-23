@@ -27,6 +27,10 @@ FX.subs = { at: '2026-11-21T09:00:00Z', n: { gp: 1, ps: 2 } };
 FX.games.find(g => g.id === 1942).subs = { gp: { on: ['xbox', 'pc'], u: 'https://www.xbox.com/games/store/the-witcher-3-wild-hunt/BR765873CQJD', out: 1 }, ps: { k: 'extra', on: ['ps5', 'ps4'], u: 'https://store.playstation.com/en-sa/concept/10000876' } };
 FX.games.find(g => g.id === 136625).subs = { gp: { on: ['xbox'], u: 'https://www.xbox.com/games/store/grand-theft-auto-vi/9NGTA6000000', soon: 1 } };   // قادمة إلى Game Pass: لا ختم ولا تُعد
 FX.games.find(g => g.id === 112875).subs = { ps: { k: 'extra', on: ['ps5', 'ps4'], u: 'https://store.playstation.com/en-sa/concept/10001850', n: 'God of War Ragnarök PS4 & PS5' } };
+// لعبتان +18 (adult) بأسماء مختلَقة كما يكتبهما البناء (lib-games: بلا نبذة ولا لقطات ولا سلسلة): لا تظهران إلا في مكتبة +18 (E61)، وكل ما قبلها من فحوص يجري وهما في الملف
+const ADULT = [1, 2].map(k => ({ ...FX.games[0], id: 9800000 + k, slug: 'sample-night-' + k, title: ['Sample Night Novel', 'Sample Velvet Academy'][k - 1], titleAr: '', alt: [], year: 2018 + k, date: `${2018 + k}-06-01`, cover: 'c98' + k, art: null, shots: [], videos: [], summary: '', story: '',
+  plats: ['pc'], also: undefined, dates: [{ p: 'pc', date: `${2018 + k}-06-01`, human: '' }], genres: ['رواية مرئية'], series: [], franchises: [], rel: {}, from: [], into: [], universe: null, subs: undefined, pc: undefined, place: undefined, adult: 1, ord: 900 + k }));
+FX.games.push(...ADULT);
 const server = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]);
   if (u === '/games/data/games.json') { r.writeHead(200, { 'content-type': 'application/json' }); return r.end(JSON.stringify(FX)); }
   if (u === '/games/data/texts.json') { r.writeHead(200, { 'content-type': 'application/json' }); return r.end(JSON.stringify({ built: FX.built, texts: TX })); }
@@ -40,9 +44,13 @@ const svg = (w, h) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" heig
 const asked = [];
 const newGame = { ...FX.games[2], id: 7346, slug: 'zelda-botw', title: 'The Legend of Zelda: Breath of the Wild', plats: ['switch'], series: [], into: [], from: [], cover: 'c7346', art: 'a7346', ord: undefined };
 async function mockApi(page) {
-  await page.route('**/api/add-game', async r => { const b = JSON.parse(r.request().postData() || '{}'); asked.push(b.action + ':' + (b.q || b.igdb || (b.items || []).map(x => x.igdb).join(',')));
+  await page.route('**/api/add-game', async r => { const b = JSON.parse(r.request().postData() || '{}'); asked.push((b.adult ? '18:' : '') + b.action + ':' + (b.q || b.igdb || (b.items || []).map(x => x.igdb).join(',')));
     if (b.password !== 'test') return r.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"password"}' });
     const J = o => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+    // طلبات مكتبة +18: ألعابها وحدها
+    if (b.adult && b.action === 'suggest') return J({ items: [] });
+    if (b.adult && b.action === 'search') return J({ parsed: { title: b.q, year: null }, candidates: [{ igdb: 9800009, title: 'Sample Found Game', year: 2023, cover: 'c989', plats: ['PC'], type: 'main' }, { igdb: 9800001, title: ADULT[0].title, year: ADULT[0].year, cover: ADULT[0].cover, plats: ['PC'], type: 'main' }] });
+    if (b.adult && (b.action === 'add' || b.action === 'preview')) return J({ ...(b.action === 'add' ? { state: 'added' } : {}), game: { ...ADULT[0], id: 9800009, slug: 'sample-found', title: 'Sample Found Game', year: 2023, cover: 'c989', src: 'added', at: new Date().toISOString(), ord: undefined }, series: {}, plats: {}, franchises: {} });
     if (b.action === 'suggest') return J({ items: [{ igdb: 999123, title: 'Obscure Gem', year: 2019, fams: 8, cover: null }] });
     if (b.action === 'search') return J({ parsed: { title: b.q.replace(/\s+\d{4}$/, ''), year: +(b.q.match(/(\d{4})$/)?.[1] || 0) || null }, candidates: [{ igdb: 7346, title: newGame.title, year: 2017, cover: 'c7346', plats: ['Switch', 'Wii U'], type: 'main' }, { igdb: 1942, title: 'The Witcher 3: Wild Hunt', year: 2015, cover: 'c1942', plats: ['PC'], type: 'main' }] });
     if (b.action === 'add') return J({ state: 'added', game: { ...(FX.games.find(g => g.id === b.igdb) || newGame), src: 'added', at: new Date().toISOString() }, series: {}, plats: { switch: FX.plats.switch }, franchises: {} });
@@ -534,6 +542,41 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   check('الجوال: توأمها ظاهر في بطاقتها عند فتحها بلا تمرير ولا تمدد، وأزراره بحجم اللمس', ms.seen && ms.fits && ms.tap, ms);
   check('duplicates (cover): بلا أخطاء برمجية', !m.errs.length, m.errs);
   await m.ctx.close(); }
+
+// ---------- مكتبة +18 (E61): ألعاب سمة Erotic لا تظهر حتى يُضغط زر «+18»، فتُفتح مكتبة فيها هي وحدها وبحثها وإضافتها، وأغلفتها مغطاة
+for (const [name, w, h, mobile] of [['+18', 1440, 900, false], ['+18 (cover)', 369, 905, true]]) { console.log('== ' + name);
+  const { ctx, page, errs } = await open(w, h, mobile), tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); return mobile ? l.tap() : l.click(); };
+  const flipTo = async on => { const nav = page.waitForEvent('load'); await tap('.top .r18'); await nav; await page.waitForFunction(on => (document.documentElement.dataset.room === '18') === on && !!document.querySelector('#grid .gc'), on); await page.waitForTimeout(300); };
+  await page.goto(`${base}/games/`); await page.waitForSelector('#grid .gc:not([hidden])'); await page.waitForTimeout(300);
+  const n0 = await page.locator('#grid .gc').count(), t0 = await page.textContent('#tally');
+  check(`${name}: زر «+18» في الرأس، وألعاب +18 ليست في القائمة العادية ولا في أعدادها`, n0 === FX.games.length - 2 && await page.evaluate(() => document.querySelector('.top .r18')?.getAttribute('aria-pressed') === 'false' && !document.getElementById('g-9800001') && !document.querySelector('.r18-bar') && !document.querySelector('.top .acc').hidden), [n0, t0]);
+  await page.evaluate(() => { location.hash = '#g9800001'; }); await page.waitForTimeout(200); check(`${name}: ولا تُفتح برابطها`, await page.evaluate(() => !document.querySelector('#sheet').open)); await page.evaluate(() => history.replaceState(null, '', location.pathname));
+  await flipTo(true);
+  check(`${name}: الزر يفتح مكتبة +18: ألعابها وحدها بعددها، وشريطها، بلا «حساباتي» ولا سلاسل`, await page.evaluate(() => document.querySelectorAll('#grid .gc').length === 2 && !!document.getElementById('g-9800001') && !!document.querySelector('.r18-bar') && document.querySelector('.top .r18').getAttribute('aria-pressed') === 'true'
+    && document.querySelector('.top .acc').hidden && document.querySelector('.tabs').hidden && /^لعبتان/.test(document.querySelector('#tally').textContent) && [...document.querySelectorAll('#mm-menu .mi')].find(b => b.dataset.v === 'all').querySelector('.n').textContent === '2'), await page.textContent('#tally'));
+  check(`${name}: أغلفتها مغطاة بمصغّرتها وعليها «+18»، ولا تُكبَّر بالقرص، وصورة القائمة الرئيسية مموّهة`, await page.evaluate(() => [...document.querySelectorAll('#grid .gc .cover')].every(c => c.classList.contains('x18') && /t_cover_small\/c98\d\.jpg$/.test(c.querySelector('.x18-i img').getAttribute('src')) && c.querySelector('.x18-m').textContent === '+18' && !c.hasAttribute('data-zoom-pinch') && /blur/.test(getComputedStyle(c.querySelector('img')).filter))
+    && [...document.querySelectorAll('#mm-art img')].every(i => /blur/.test(getComputedStyle(i).filter))));
+  { const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth })); check(`${name}: مكتبة +18 بلا تمدد أفقي`, o.sw <= o.iw, o); }
+  await tap('#g-9800001 .cover'); await page.waitForSelector('#sheet[open] .sh-head .cover.x18');
+  check(`${name}: بطاقة لعبة +18 بلا نبذة ولا لقطات ولا موقع من سلسلة، وملف حفظها كغيرها، وغلافها بزر يكشفه`, await page.evaluate(() => { const b = document.querySelector('#sheet-body'), c = b.querySelector('.sh-head .cover');
+    return c.dataset.act === 'bare' && !c.hasAttribute('data-zoom') && /اضغط لإظهاره/.test(c.textContent) && !b.querySelector('.chain') && !b.querySelector('.sh-hero img') && /لا تُعرض هنا ولا تُترجم/.test(b.querySelector('.about').textContent) && !b.querySelector('.tr') && !!b.querySelector('.save .lists'); }));
+  await tap('#sheet .sh-head .cover'); await page.waitForSelector('#sheet[open] .sh-head .cover[data-zoom]');
+  check(`${name}: لمس الغلاف يكشفه في بطاقتها وعلبتها وحدهما`, await page.evaluate(() => document.querySelector('#sheet-body').hasAttribute('data-r18-bare') && !document.querySelector('#g-9800001 .x18') && document.getElementById('g-9800001').hasAttribute('data-r18-bare') && !!document.querySelector('#g-9800002 .cover.x18')
+    && getComputedStyle(document.querySelector('#g-9800001 .cover img')).filter === 'none' && !document.querySelector('.pz[open]')));
+  await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(350);
+  await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open')); check(`${name}: «أظهر الصور» يكشفها كلها`, await page.evaluate(() => !document.querySelector('#grid .x18') && document.querySelectorAll('#grid .gc .cover img[srcset]').length === 2));
+  await tap('.r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open')); check(`${name}: و«غطِّ الصور» يغطيها كلها`, await page.evaluate(() => document.querySelectorAll('#grid .gc .cover.x18').length === 2));
+  const a0 = asked.length; await tap('.top [data-act=add]'); await page.waitForSelector('#add[open]'); check(`${name}: نافذة الإضافة فيها باسم المكتبة`, /مكتبة/.test(await page.textContent('#add-h')) && /\+18/.test(await page.textContent('#add-h')));
+  await page.fill('#add-q', 'sample'); await page.press('#add-q', 'Enter'); await page.waitForSelector('.cand');
+  check(`${name}: بحثها يُرسل موسوماً adult، وما في المكتبة من نتائجه يقال إنه فيها`, asked.slice(a0).includes('18:search:sample') && !asked.slice(a0).some(x => /^(search|suggest)/.test(x)) && await page.evaluate(() => { const c = [...document.querySelectorAll('.cand')]; return c.length === 2 && !!c[0].querySelector('[data-act=add-pick]') && /في قائمتك/.test(c[1].textContent); }), asked.slice(a0));
+  await tap('.cand [data-act=add-pick]'); await page.waitForSelector('.cand .pickl'); await tap('.cand .pickl [data-v=new]'); await page.waitForSelector('#g-9800009'); await page.waitForSelector('#sheet[open]');
+  check(`${name}: الإضافة منها موسومة adult، والمضافة تظهر فيها فوراً مغطاة وفي قائمتها`, asked.slice(a0).includes('18:add:9800009') && await page.evaluate(() => document.querySelectorAll('#grid .gc').length === 3 && !!document.querySelector('#g-9800009 .cover.x18') && JSON.parse(localStorage.getItem('gamesg.progress')).games[9800009]?.s === 'new'), asked.slice(a0));
+  await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(350);
+  await page.reload(); await page.waitForSelector('#grid .gc'); check(`${name}: تحديث الصفحة يبقيك في المكتبة وما أُضيف فيها باقٍ`, await page.evaluate(() => document.documentElement.dataset.room === '18' && !!document.getElementById('g-9800009')));
+  await flipTo(false);
+  check(`${name}: الزر نفسه يُخرج منها، والقائمة العادية كما كانت بلا ما أُضيف في المكتبة`, await page.evaluate(() => !document.documentElement.dataset.room && !document.getElementById('g-9800009') && !document.getElementById('g-9800001')) && await page.locator('#grid .gc').count() === n0 && await page.textContent('#tally') === t0, [await page.locator('#grid .gc').count(), await page.textContent('#tally')]);
+  check(`${name}: بلا أخطاء برمجية`, !errs.length, errs);
+  await ctx.close(); }
 
 // ---------- تقليل الحركة
 { console.log('== reduced-motion');

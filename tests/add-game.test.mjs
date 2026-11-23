@@ -18,6 +18,9 @@ const PL = [{ id: 167, name: 'PlayStation 5', abbreviation: 'PS5' }, { id: 6, na
 const GAME = { id: 1942, name: 'The Witcher 3: Wild Hunt', slug: 'the-witcher-3-wild-hunt', first_release_date: 1431993600, game_type: 0, platforms: [6, 167, 130], cover: { image_id: 'co1wyy' }, artworks: [{ image_id: 'ar1', width: 1920 }],
   genres: [{ name: 'Role-playing (RPG)' }], themes: [{ id: 1, name: 'Action' }], collections: [42], release_dates: [{ date: 1431993600, platform: 6, human: 'May 19, 2015' }], external_games: [{ uid: '292030', external_game_source: 1 }],
   involved_companies: [{ company: { name: 'CD Projekt RED' }, developer: true }], aggregated_rating: 92.6, summary: 'Geralt.', websites: [{ url: 'https://store.steampowered.com/app/292030' }, { url: 'https://thewitcher.com' }] };
+// لعبة +18 (سمة Erotic في IGDB): لها نبذة وقصة ولقطات وعرض وسلسلة هناك، ولا يدخل منها الموقعَ شيء من ذلك
+const ADULT = { id: 666, name: 'Witcher Adult Thing', slug: 'witcher-adult-thing', first_release_date: 1500000000, game_type: 0, platforms: [6], cover: { image_id: 'coad' }, artworks: [{ image_id: 'arad', width: 1920 }], screenshots: [{ image_id: 'scad' }],
+  genres: [{ name: 'Visual Novel' }], themes: [{ id: 42, name: 'Erotic' }], collections: [42], summary: 'explicit summary', storyline: 'explicit story', rating: 61.2, rating_count: 12, videos: [{ video_id: 'vid', name: 'Trailer' }], url: 'https://www.igdb.com/games/witcher-adult-thing' };
 const UP = { id: 9001, name: 'The Witcher 4', slug: 'the-witcher-4', game_type: 0, platforms: [167], hypes: 300, release_dates: [{ human: 'TBD' }] };
 const Q = { id: 9002, name: 'Witcher Quarter', slug: 'witcher-q', game_type: 0, first_release_date: Math.floor(Date.UTC(2099, 8, 30) / 1000), release_dates: [{ date: Math.floor(Date.UTC(2099, 8, 30) / 1000), human: 'Q3 2099' }] };
 globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
@@ -30,6 +33,8 @@ globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
       { id: 666, name: 'Witcher Adult Thing', themes: [42], platforms: [6] }, { id: 20, name: 'The Witcher', first_release_date: 1193875200, platforms: [6], total_rating_count: 900 }]);
     if (ep === 'games' && /^search "the witcher 3"/i.test(b)) return res(200, /first_release_date >= /.test(b) ? [] : [{ id: 20, name: 'The Witcher', total_rating_count: 900 }, { id: 1942, name: 'The Witcher 3: Wild Hunt', first_release_date: 1431993600, platforms: [6], collections: [{ name: 'The Witcher' }], total_rating_count: 3000 }]);
     if (ep === 'games' && /where id = \(1942\);/.test(b) && /storyline/.test(b)) return res(200, [GAME]);
+    if (ep === 'games' && /where id = \(666\);/.test(b) && /storyline/.test(b)) return res(200, [ADULT]);
+    if (ep === 'games' && /where id = \(666,1942\);/.test(b) && /storyline/.test(b)) return res(200, [ADULT, GAME]);
     if (ep === 'games' && /where id = \(/.test(b) && /^fields name,first_release_date,cover/.test(b)) return res(200, b.match(/where id = \(([^)]*)\)/)[1].split(',').map(Number).map(id => ({ id, name: id === 5555 ? 'Hades' : 'Game ' + id, first_release_date: 1600000000, cover: { image_id: 'c' + id } })));
     if (ep === 'games' && /where id = \(/.test(b)) return res(200, [{ id: 1942, name: GAME.name, slug: GAME.slug, first_release_date: GAME.first_release_date, game_type: 0, platforms: [6], cover: { image_id: 'co1wyy' } }, UP, Q, { id: 20, name: 'The Witcher', slug: 'the-witcher', first_release_date: 1193875200, game_type: 0, platforms: [6] }, { id: 21, name: 'Witcher DLC', game_type: 1, first_release_date: 1200000000 }]);
     if (ep === 'collections') return res(200, [{ id: 42, name: 'The Witcher', slug: 'the-witcher', games: [20, 1942, 9001, 9002, 21] }]);
@@ -164,4 +169,27 @@ check('مدة اللعب من PSN بالساعات', isoHours('PT228H56M33S') ==
   check('لعبة موسّعة بلا أساسي بالاسم نفسه، ولعبة بلا سجلات شقيقة: لا يُضم شيء', !r.has(7498) && !r.has(77) && !r.has(78), [...r.keys()]);
   const r2 = alsoPlatforms([[g(1247, 'Tekken 6', 2007, [52]), g(1236, 'Tekken 6', 2009, [9, 12]), g(195868, 'Tekken 6', 2009, [38])]], x => T[x.id], x => x.id === 195868);
   check('سجل شقيق ملغى أو لم يصدر لا تُضم منصاته', [...r2.get(1247)].join() === '9,12', [...r2.get(1247)]); }
+// مكتبة +18 (E61): الطلب يحمل adult فيعود بألعاب سمة Erotic وحدها، وبدونه لا يعود بشيء منها؛ واللعبة لا تُضاف إلا من مكتبتها
+{ const before = puts.length;
+  const sa = await call(add, { action: 'suggest', q: 'witcher', adult: true, password: PW });
+  check('اقتراحات مكتبة +18: ألعاب سمة Erotic وحدها', sa.status === 200 && sa.body.items.map(x => x.igdb).join() === '666', sa.body);
+  const full = [], of = globalThis.fetch; globalThis.fetch = async (u, o = {}) => { if (new URL(u).hostname === 'api.igdb.com') full.push(String(o.body || '')); return of(u, o); };
+  const xa = await call(add, { action: 'search', q: 'witcher', adult: true, password: PW }), xn = await call(add, { action: 'search', q: 'witcher', password: PW }); globalThis.fetch = of;
+  check('بحث المكتبة يقيّد IGDB بالسمة 42 ويعيد ألعابها وحدها، والبحث العادي بلا قيدها وبلا ألعابها', xa.body.candidates.map(c => c.igdb).join() === '666' && !xn.body.candidates.some(c => c.igdb === 666) && xn.body.candidates.length === 2
+    && full.filter(b => /^search "witcher"/.test(b)).map(b => /themes = \(42\)/.test(b)).join() === 'true,false', [xa.body.candidates, xn.body.candidates, full.filter(b => /^search/.test(b))]);
+  const pn = await call(add, { action: 'preview', igdb: 666, password: PW }), an = await call(add, { action: 'add', igdb: 666, password: PW });
+  check('لعبة +18 لا تُفتح ولا تُضاف من القائمة العادية', pn.status === 422 && an.status === 422 && /مكتبة \+18/.test(an.body.error) && puts.length === before, [pn, an]);
+  const pa = await call(add, { action: 'preview', igdb: 666, adult: true, password: PW }), g = pa.body.game;
+  check('بطاقتها من المكتبة: موسومة adult، باسمها وغلافها ومنصاتها وتقييمها، بلا نبذة ولا قصة ولا لقطات ولا عرض ولا سلسلة', pa.status === 200 && g.adult === 1 && g.title === 'Witcher Adult Thing' && g.cover === 'coad' && g.plats.join() === 'pc' && g.users === 61
+    && g.summary === '' && g.story === '' && g.art === null && g.shots.length === 0 && g.videos.length === 0 && g.series.length === 0 && Object.keys(g.rel).length === 0 && !/explicit/.test(JSON.stringify(pa.body)) && Object.keys(pa.body.series).length === 0, pa.body);
+  const aa = await call(add, { action: 'add', igdb: 666, adult: true, password: PW }), row = JSON.parse(stored).games.find(e => e.igdb === 666);
+  check('وإضافتها منها تكتبها موسومة في الملف، وعنوان الإيداع برقمها بلا اسمها', aa.status === 200 && aa.body.state === 'added' && aa.body.game.adult === 1 && row?.adult === 1 && puts.at(-1).message === 'games: add +18 (#666)', [aa.body.state, row, puts.at(-1)?.message]);
+  const na = await call(add, { action: 'add', igdb: 1942, adult: true, password: PW });
+  check('ولعبة عادية لا تُضاف من مكتبة +18', na.status === 422 && /ليست \+18/.test(na.body.error) && puts.length === before + 1, na);
+  // البناء الليلي يُبقيها موسومة (erotic: 'keep')، وبدونه تُحذف كما كانت. والسحب من الحسابات بلا +18
+  const { gamesFor } = await import('../scripts/lib-games.mjs'), keep = await gamesFor([666, 1942], { erotic: 'keep' }), drop = await gamesFor([666, 1942], {});
+  check('البناء: اللعبتان معاً، +18 موسومة بلا نصوص ولا سلسلة، والعادية كما هي بسلسلتها التي لا تدخلها لعبة +18', keep.games.map(x => x.id).sort((a, b) => a - b).join() === '666,1942' && keep.games.find(x => x.id === 666).adult === 1 && keep.games.find(x => x.id === 666).summary === ''
+    && keep.games.find(x => x.id === 1942).adult === undefined && keep.games.find(x => x.id === 1942).summary === 'Geralt.' && keep.games.find(x => x.id === 1942).series.join() === '42' && !keep.series[42].members.some(m => m.id === 666) && drop.games.map(x => x.id).join() === '1942', [keep.games.map(x => [x.id, x.adult]), drop.games.map(x => x.id)]);
+  const im = await call(add, { action: 'import', items: [{ igdb: 666 }], source: 'steam', password: PW });
+  check('السحب من الحسابات لا يُدخل لعبة +18', im.status === 200 && im.body.games.length === 0 && im.body.state.added === 0, im.body); }
 console.log(fails.length ? `\n❌ فشل ${fails.length}` : '\n✅ كل فحوص دالتي الألعاب نجحت'); process.exit(fails.length ? 1 : 0);

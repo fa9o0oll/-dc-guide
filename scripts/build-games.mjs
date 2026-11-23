@@ -28,6 +28,9 @@ if (process.env.GAMES_PROBE) {
   show('website_types', await igdb('website_types', 'fields type; limit 80;').catch(e => e.message));
   show('steam 292030 (Witcher 3)', await igdb('external_games', 'fields game,uid,external_game_source; where uid = "292030" & external_game_source = 1; limit 5;').catch(e => e.message));
   show('search', await igdb('games', 'search "god of war"; fields name,slug,first_release_date,game_type,collections,release_dates.human; limit 5;').catch(e => e.message));
+  // بحث مكتبة +18 (E61) كما تسأله دالة «أضف لعبة»: قيد سمة Erotic (42) مع البحث. أعداد فقط، بلا أسماء في السجل
+  for (const q of ['love', 'night']) { const rows = await igdb('games', `search ${JSON.stringify(q)}; fields name,themes; where version_parent = null & themes = (42); limit 10;`).catch(e => ({ err: e.message }));
+    console.log(`probe adult search "${q}": ${rows.err ? 'ERR ' + rows.err : `${rows.length} rows, all with theme 42: ${rows.every(g => (g.themes || []).includes(42))}`}`); }
   show('upcoming', await igdb('games', `fields name,first_release_date,release_dates.human,game_status,hypes; where first_release_date > ${Math.floor(Date.now() / 1000)} & hypes > 50; sort hypes desc; limit 5;`).catch(e => e.message));
   show('famous (GTA V, Witcher 3, Elden Ring, RDR2, GoW 2018)', await igdb('games', 'fields name,game_type,total_rating_count,rating_count,aggregated_rating_count,hypes,themes,version_parent; where id = (1020,1942,119133,25076,19560);').catch(e => e.message));
   show('top by total_rating_count, no type filter', await igdb('games', 'fields name,game_type,total_rating_count; where total_rating_count != null; sort total_rating_count desc; limit 12;').catch(e => e.message));
@@ -54,7 +57,8 @@ if (process.env.GAMES_PROBE) {
 if (!added.length) { await writeFile(OUT, JSON.stringify(empty)); await writeFile(TEXTS, JSON.stringify({ built: empty.built, texts: {} })); console.log('games: the list is empty'); process.exit(0); }
 const story = (await import('../data/games/story-orders.mjs')).default.series || [];
 const ids = added.map(g => +g.igdb).filter(Boolean);
-let r; try { r = await gamesFor(ids, { wikidata: true, story, log: m => console.log('games: ' + m) }); } catch (e) { console.log(`games: IGDB failed (${e.message}), keeping the previous file`); process.exit(0); }
+// ألعاب +18 مما أُضيف من مكتبتها تُبنى موسومة adult (lib-games: erotic)
+let r; try { r = await gamesFor(ids, { wikidata: true, story, erotic: 'keep', log: m => console.log('games: ' + m) }); } catch (e) { console.log(`games: IGDB failed (${e.message}), keeping the previous file`); process.exit(0); }
 if (!r.games.length) { console.log('games: IGDB returned nothing, keeping the previous file'); process.exit(0); }
 // ترتيب القائمة وتاريخ الإضافة من ملف المضافات
 const at = new Map(added.map((g, i) => [+g.igdb, { ord: i, at: g.at || null }]));
@@ -62,7 +66,7 @@ for (const g of r.games) Object.assign(g, at.get(g.id) || {});
 r.games.sort((a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9));
 // أين تُلعب على الكمبيوتر وهل هي مجانية الآن (scripts/lib-stores.mjs). ما تعذّر من مصادره يبقى له ما كان في الملف السابق، وإن تعذّر كله بقيت متاجر الملف السابق كما هي
 { const prev = new Map(((await read(OUT, null))?.games || []).map(g => [g.id, { pc: g.pc, f2p: g.f2p }]));
-  try { const st = await storesFor(r.games, { prev, fix: await read('data/games/pc.json', {}), log: m => console.log('games: ' + m) });
+  try { const st = await storesFor(r.games.filter(g => !g.adult), { prev, fix: await read('data/games/pc.json', {}), log: m => console.log('games: ' + m) });   // ألعاب +18 بلا بحث في المتاجر، فلا تدخل أسماؤها تقريره ولا سجل البناء
     for (const g of r.games) { if (st.rows.has(g.id)) g.pc = st.rows.get(g.id); if (st.f2p.has(g.id)) g.f2p = 1; }
     r.stores = st.meta; await mkdir('data/generated/games', { recursive: true }); await writeFile(STORES, JSON.stringify(st.report, null, 1) + '\n');
     if (process.env.GAMES_PROBE) {   // فروع العمل: الجدول كله في سجل البناء للمراجعة
@@ -72,7 +76,7 @@ r.games.sort((a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9));
   } catch (e) { console.log(`games: stores failed (${e.message}), keeping the previous stores`); for (const g of r.games) { const o = prev.get(g.id); if (o?.pc) g.pc = o.pc; if (o?.f2p) g.f2p = 1; } } }
 // ضمن Game Pass Ultimate أو PS Plus Deluxe الآن (scripts/lib-subs.mjs). ما تعذّر من مصدريه يبقى له ما كان في الملف السابق، وإن تعذّر كله بقي ما كان كما هو
 { const prev = new Map(((await read(OUT, null))?.games || []).map(g => [g.id, g.subs || {}]));
-  try { const sb = await subsFor(r.games, { prev, log: m => console.log('games: ' + m) });
+  try { const sb = await subsFor(r.games.filter(g => !g.adult), { prev, log: m => console.log('games: ' + m) });
     for (const g of r.games) { const row = sb.rows.get(g.id); if (row) g.subs = row; }
     r.subs = sb.meta; await mkdir('data/generated/games', { recursive: true }); await writeFile(SUBS, JSON.stringify(sb.report, null, 1) + '\n');
     if (process.env.GAMES_PROBE) {   // فروع العمل: الجدول كله في سجل البناء للمراجعة

@@ -2,6 +2,7 @@
 // بإيداع عنوانه يحمل [skip ci]: لا يعيد البناء ولا النشر الآن، وبناء الليل يسحب معلومات العمل وحلقاته فيظهر في القائمة. ما في «أنمياتي» أصلاً يدخل السجل من الصفحة بلا هذه الدالة.
 // محمية بكلمة سر «أضف لعبة» (ADD_GAME_PASSWORD، وإن لم توجد فكلمة سر «أضف فيلماً» ADD_FILM_PASSWORD). GH_TOKEN رمز GitHub بصلاحية الكتابة على المستودع.
 // المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف. ولا يصل من سجل صاحب الموقع شيء: رقم العمل في MyAnimeList واسمه ونوعه وعدد حلقاته، كما يكتبها scripts/anime-list.mjs --add.
+// وما أُضيف من بحث مكتبة +18 (E61) يُوسم ad في القائمة، فلا يظهر في القائمة العادية ولو سبق البناءُ سحبَ معلوماته، وعنوان إيداعه برقمه بلا اسمه.
 import { createHash, timingSafeEqual } from 'node:crypto';
 
 const REPO = process.env.GH_REPO || 'fa9o0oll/-dc-guide', BRANCH = 'main', FILE = 'data/anime/list.json';
@@ -23,7 +24,7 @@ export async function add(entry) {
     const j = await cur.json(); let list; try { list = JSON.parse(Buffer.from(j.content, 'base64').toString('utf8')); } catch {}
     if (!Array.isArray(list) || !list.length) throw Object.assign(new Error('list.json'), { broken: true });   // لا تُكتب قائمة فوق ملف لم يُقرأ
     if (list.some(x => +x.mal === entry.mal)) return false;
-    const put = await fetch(file, { method: 'PUT', headers, body: JSON.stringify({ message: `anime: add ${entry.title} (#${entry.mal}) [skip ci]`, branch: BRANCH, sha: j.sha,
+    const put = await fetch(file, { method: 'PUT', headers, body: JSON.stringify({ message: `anime: add ${entry.ad ? '+18' : entry.title} (#${entry.mal}) [skip ci]`, branch: BRANCH, sha: j.sha,
       content: Buffer.from(write(place(list, entry))).toString('base64') }) });
     if (put.ok) return true;
     if (put.status !== 409 && put.status !== 422) throw gh(put.status);
@@ -41,7 +42,7 @@ export default async req => {
   const type = TYPES.includes(b.type) ? b.type : 'TV', eps = Number.isInteger(+b.eps) && +b.eps >= 0 && +b.eps <= 5000 ? +b.eps : 0;
   if (!Number.isInteger(mal) || mal <= 0 || mal > 9999999 || !title) return json(400, { error: 'طلب غير صالح.' });
   if (!process.env.GH_TOKEN) return json(500, { error: 'إعدادات الخادم ناقصة: GH_TOKEN غير موجود في Netlify.' });
-  try { return json(200, { state: await add({ mal, title, type, eps }) ? 'added' : 'exists' }); }
+  try { return json(200, { state: await add({ mal, title, type, eps, ...(b.ad === 1 || b.ad === true ? { ad: 1 } : {}) }) ? 'added' : 'exists' }); }
   catch (e) { if (e.gh === 401 || e.gh === 403 || e.gh === 404) return json(502, { error: 'تعذّرت الإضافة في GitHub: الرمز GH_TOKEN غير صالح أو بلا صلاحية الكتابة على المستودع.' });
     if (e.broken) return json(502, { error: 'تعذّرت قراءة قائمة الأعمال في المستودع، فلم يُكتب شيء.' });
     console.error(e); return json(502, { error: 'تعذّرت الإضافة الآن. حاول بعد قليل.' }); }

@@ -5,7 +5,7 @@
 import { igdb, IMG, ymd, year } from './lib-igdb.mjs';
 export { IMG };
 
-export const EROTIC = 42;   // سمة المحتوى الإباحي في IGDB: لا يُعرض شيء منها
+export const EROTIC = 42;   // سمة Erotic في IGDB: ألعاب +18. لا تدخل القائمة العادية ولا بحثها؛ ما أُضيف منها من مكتبة +18 (E61) يُبنى موسوماً adult
 // ---------- الترجمة إلى العربية: الأنواع والسمات وأنماط اللعب والمنظور
 const AR = {
   'point-and-click': 'نقر وإشارة', fighting: 'قتال', shooter: 'تصويب', music: 'موسيقى', platform: 'منصات وقفز', puzzle: 'ألغاز', racing: 'سباق',
@@ -142,18 +142,20 @@ export function alsoPlatforms(groups, typeOf, skip = () => false) { const out = 
         for (const p of v.platforms || []) set.add(p); } } }
   return out; }
 
-// يجلب الألعاب المطلوبة ويشكّلها. opt.wikidata: يُثرى من Wikidata (البناء الليلي، وبمهلة قصيرة في الدالة)، opt.story: ترتيبات القصة، opt.log: سجل
+// يجلب الألعاب المطلوبة ويشكّلها. opt.wikidata: يُثرى من Wikidata (البناء الليلي، وبمهلة قصيرة في الدالة)، opt.story: ترتيبات القصة، opt.log: سجل.
+// opt.erotic: 'keep' يُبقي ألعاب +18 (سمة Erotic) موسومةً adult: غلافها واسمها ومنصاتها وتقييمها، بلا نبذة ولا لقطات ولا عروض ولا سلسلة ولا أقرباء
+// (البناء الليلي، وبطاقة مكتبة +18 وإضافتها). وبدونه تُحذف كما كانت. أقرباء الألعاب وأجزاء سلاسلها لا يدخلها شيء من +18 في الحالين
 export async function gamesFor(ids, opt = {}) {
   const log = opt.log || (() => {}), m = await meta(), now = Date.now();
-  const raw = (await igdbIn('games', FULL, ids)).filter(g => !erotic(g));
+  const all = (await igdbIn('games', FULL, ids)).filter(g => opt.erotic === 'keep' || !erotic(g)), raw = all.filter(g => !erotic(g));
   // الألعاب المرتبطة وأجزاء السلاسل (بمعلومات خفيفة)، والمنصات، وأوقات الختم
   const rel = new Set(); for (const g of raw) { for (const k of ['parent_game', 'version_parent']) if (g[k]) rel.add(g[k]); for (const k of ['dlcs', 'expansions', 'standalone_expansions', 'remakes', 'remasters', 'ports']) for (const x of g[k] || []) rel.add(x); }
   const [cols, frs, ttbs] = await Promise.all([igdbIn('collections', 'name,slug,games', raw.flatMap(g => g.collections || [])),
-    igdbIn('franchises', 'name,slug,games', raw.flatMap(g => [...(g.franchises || []), g.franchise].filter(Boolean))), igdbIn('game_time_to_beats', 'game_id,hastily,normally,completely,count', raw.map(g => g.id), 'game_id').catch(() => [])]);
+    igdbIn('franchises', 'name,slug,games', raw.flatMap(g => [...(g.franchises || []), g.franchise].filter(Boolean))), igdbIn('game_time_to_beats', 'game_id,hastily,normally,completely,count', all.map(g => g.id), 'game_id').catch(() => [])]);
   // السلاسل الضخمة (مئات الألعاب، كماريو) تُختصر إلى ما يناسب ترتيباً يُقرأ: أقرب ٦٠ جزءاً من الألعاب نفسها
   const light = new Map((await igdbIn('games', LIGHT, [...cols.flatMap(c => (c.games || []).slice(0, 400)), ...rel])).filter(g => !erotic(g)).map(g => [g.id, g]));
   const plats = {}, code = new Map();
-  for (const p of await igdbIn('platforms', 'name,abbreviation,slug', [...raw, ...light.values()].flatMap(g => g.platforms || []))) { const c = codeOf(p); code.set(p.id, c); plats[c] ||= { name: p.name, abbr: ABBR[c] || p.abbreviation || p.name, fam: famOf(p.name) }; }
+  for (const p of await igdbIn('platforms', 'name,abbreviation,slug', [...all, ...light.values()].flatMap(g => g.platforms || []))) { const c = codeOf(p); code.set(p.id, c); plats[c] ||= { name: p.name, abbr: ABBR[c] || p.abbreviation || p.name, fam: famOf(p.name) }; }
   const codes = list => [...new Set((list || []).map(id => code.get(id)).filter(Boolean))].sort(byRank);
   // IGDB يفرد أحياناً لنسخة الأركيد سجلاً ولنسخ الأجهزة المنزلية سجلات أخرى بالاسم نفسه (Tekken 6: الأركيد 2007 سجل رئيسي، وPS3 وXbox 360 سجل «موسّع» 2009، وPSP وPS5 سجلا «نقل»).
   // منصات تلك السجلات تُضم (also) إلى اللعبة الأساسية التي تحمل الاسم نفسه في السلسلة، وهي الأقرب صدوراً قبلها. والأساسيتان بالاسم نفسه (God of War 2005 و2018) لا تُخلطان
@@ -172,7 +174,7 @@ export async function gamesFor(ids, opt = {}) {
   }
   let wd = new Map(); if (opt.wikidata) { try { wd = await wikidataFor(raw.map(g => g.slug), { timeout: opt.wdTimeout || 60000 }); log(`wikidata matched ${wd.size} of ${raw.length}`); } catch (e) { log('wikidata skipped: ' + e.message); } }
   const ttbOf = new Map(ttbs.map(t => [t.game_id, { h: hours(t.hastily), n: hours(t.normally), c: hours(t.completely), count: t.count || 0 }]));
-  const games = raw.map(g => {
+  const games = all.map(g => {
     const w = when(g), x = wd.get(g.slug) || {}, art = (g.artworks || []).slice().sort((a, b) => (b.width || 0) - (a.width || 0))[0]?.image_id || g.screenshots?.[0]?.image_id || null;
     const ext = {}; for (const e of g.external_games || []) { const s = e.external_game_source; if (!e.uid) continue; if (s === STEAM) { ext.steam ||= e.uid; if (/^\d+$/.test(e.uid) && !(ext.sts ||= []).includes(e.uid)) ext.sts.push(e.uid); } else if (s === GOG) ext.gog ||= e.uid; else if (s === PSN) ext.psn ||= e.uid; else if (s === MS || s === XBOX) { ext.xbox ||= e.uid; if (/^[A-Z0-9]{12}$/.test(e.uid) && !(ext.ms ||= []).includes(e.uid)) ext.ms.push(e.uid); } else if (s === EPIC) ext.epic ||= e.uid; }
     const r = {}; for (const k of ['dlcs', 'expansions', 'standalone_expansions', 'remakes', 'remasters', 'ports']) { const list = (g[k] || []).map(id => light.get(id)).filter(Boolean).map(lightOf); if (list.length) r[k] = list.sort((a, b) => (a.date || '9999') < (b.date || '9999') ? -1 : 1); }
@@ -191,9 +193,10 @@ export async function gamesFor(ids, opt = {}) {
       ttb: ttbOf.get(g.id) || null, series: (g.collections || []).filter(c => series[c]), franchises: [...new Set([...(g.franchises || []), g.franchise].filter(Boolean))],
       rel: r, ext, sites, igdb: g.url || '', wd: x.q || '', universe: x.universe || null, from: x.from || [], into: x.into || [],
       videos: (g.videos || []).slice(0, 3).map(v => ({ id: v.video_id, name: v.name || '' })),
+      ...(erotic(g) ? { adult: 1, art: null, shots: [], videos: [], summary: '', story: '', series: [], franchises: [], rel: {}, universe: null, from: [], into: [] } : {}),
     };
   });
   const franchises = Object.fromEntries(frs.map(f => [f.id, { name: f.name, size: (f.games || []).length }]));
-  log(`igdb ${raw.length}/${[...new Set(ids)].length} games, ${Object.keys(series).length} series, ${light.size} related, ${Date.now() - now}ms`);
+  log(`igdb ${all.length}/${[...new Set(ids)].length} games${all.length > raw.length ? ` (${all.length - raw.length} adult)` : ''}, ${Object.keys(series).length} series, ${light.size} related, ${Date.now() - now}ms`);
   return { games, series, plats, franchises };
 }

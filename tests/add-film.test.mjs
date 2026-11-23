@@ -1,10 +1,16 @@
 // يفحص دالة «أضف فيلماً» بلا شبكة: TMDB و GitHub مُحاكيان. node tests/add-film.test.mjs
 process.env.TMDB_API_KEY = 'k'.repeat(32); process.env.GH_TOKEN = 'test-token'; process.env.ADD_FILM_PASSWORD = 'open-sesame-42';
 const fails = [], check = (n, ok, d = '') => { console.log(`${ok ? '  ✓' : '  ✗'} ${n}${ok ? '' : ' — ' + JSON.stringify(d)}`); if (!ok) fails.push(n); };
-let stored = null, puts = [], conflictOnce = true, wdDown = false, wdAsked = 0;
+let stored = null, puts = [], conflictOnce = true, wdDown = false, wdAsked = 0, adultAsked = [];
 const res = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
   if (u.hostname === 'api.themoviedb.org') { const p = u.pathname.replace('/3', '');
+    if (p.startsWith('/search/')) adultAsked.push(p + ' ' + u.searchParams.get('include_adult'));
+    // «velvet»: عمل للبالغين (adult) وآخر عادي بالاسم نفسه. TMDB لا يعيد الأول إلا إن طُلب include_adult
+    if (p === '/search/movie' && u.searchParams.get('query').toLowerCase() === 'velvet') return res(200, { results: [...(u.searchParams.get('include_adult') === 'true' ? [{ id: 700, title: 'Velvet', adult: true, release_date: '2020-01-01', vote_count: 10, poster_path: '/v.jpg' }] : []), { id: 701, title: 'Velvet', release_date: '2019-01-01', vote_count: 500 }] });
+    if (p === '/movie/700') return res(200, { id: 700, title: 'Velvet', original_title: 'Velvet', adult: true, overview: 'explicit synopsis', release_date: '2020-01-01', runtime: 80, genres: [{ id: 18 }], vote_average: 5.5, vote_count: 10, poster_path: '/v.jpg', backdrop_path: '/vb.jpg', imdb_id: 'tt7000000', status: 'Released', original_language: 'ja',
+      belongs_to_collection: { id: 9, name: 'Velvet Collection' }, credits: { crew: [{ job: 'Director', name: 'Someone' }], cast: [{ name: 'Performer' }] }, 'watch/providers': { results: { SA: { link: 'https://tmdb/watch', flatrate: [{ provider_id: 8, provider_name: 'Netflix', logo_path: '/n.jpg' }] } } }, translations: { translations: [{ iso_639_1: 'ar', iso_3166_1: 'SA', data: { title: 'مخمل', overview: 'نبذة' } }] } });
+    if (p === '/movie/701') return res(200, { id: 701, title: 'Velvet', release_date: '2019-01-01' });
     if (p === '/search/movie') return res(200, { results: u.searchParams.get('query').toLowerCase() === 'heat' ? [{ id: 949, title: 'Heat', release_date: '1995-12-15', vote_count: 7000, poster_path: '/h.jpg' }, { id: 1, title: 'The Heat', release_date: '2013-06-27', vote_count: 5000 }] : [] });
     if (p === '/search/tv') return res(200, { results: [] });
     if (p === '/search/multi') return res(200, { results: [{ id: 949, media_type: 'movie', title: 'Heat', release_date: '1995-12-15', poster_path: '/h.jpg' }, { id: 5, media_type: 'person', name: 'Someone' }, { id: 77, media_type: 'tv', name: 'Heat Wave', first_air_date: '2010-04-01' }, { id: 8, media_type: 'movie', title: 'X', adult: true }] });
@@ -56,5 +62,21 @@ check('ترتيب الأحداث: Heat 2 قبل Heat بدليل من Wikipedia،
 check('العالم يحتاج كلمة السر ولا يسأل Wikidata بدونها', await (async () => { const n = wdAsked, r = await call({ action: 'worlds', tmdb: 949, kind: 'movie', password: 'x' }); return r.status === 401 && wdAsked === n; })());
 wdDown = true; const wd = await call({ action: 'worlds', tmdb: 949, kind: 'movie', password: 'open-sesame-42' }); wdDown = false;
 check('تعطّل Wikidata يعيد خطأً واضحاً ولا يكتب شيئاً', wd.status === 502 && wd.body.error && puts.length === 1, wd);
+// مكتبة +18 (E61): الطلب يحمل adult فيعود بما وسمه TMDB للبالغين وحده، وبدونه لا يعود بشيء منه؛ والعمل لا يُضاف إلا من مكتبته
+{ const P = { password: 'open-sesame-42' }, before = puts.length; adultAsked = [];
+  const sa = await call({ action: 'suggest', q: 'heat', adult: true, ...P });
+  check('اقتراحات مكتبة +18: ما وُسم للبالغين وحده، وTMDB يُسأل بـinclude_adult', JSON.stringify(sa.body.items) === JSON.stringify([{ tmdb: 8, kind: 'movie', title: 'X', year: null, poster: null }]) && adultAsked.join() === '/search/multi true', [sa.body, adultAsked]);
+  adultAsked = []; const n = await call({ action: 'search', q: 'Velvet', ...P }), x = await call({ action: 'search', q: 'Velvet', adult: true, ...P });
+  check('البحث العادي لا يعيد عمل +18 ولا يطلبه، وبحث المكتبة يعيده وحده بلا اسم سلسلته', n.body.candidates.map(c => c.tmdb).join() === '701' && x.body.candidates.map(c => c.tmdb).join() === '700' && x.body.candidates[0].collection === undefined
+    && adultAsked.filter(a => / false$/.test(a)).length === 2 && adultAsked.filter(a => / true$/.test(a)).length === 2, [n.body.candidates, x.body.candidates, adultAsked]);
+  const pn = await call({ action: 'preview', tmdb: 700, kind: 'movie', ...P }), an = await call({ action: 'add', tmdb: 700, kind: 'movie', ...P });
+  check('عمل +18 لا يُفتح ولا يُضاف من القائمة العادية', pn.status === 422 && an.status === 422 && /مكتبة \+18/.test(an.body.error) && puts.length === before, [pn, an]);
+  const pa = await call({ action: 'preview', tmdb: 700, kind: 'movie', adult: true, ...P }), f = pa.body.film;
+  check('بطاقته من المكتبة: موسوم adult، باسمه وسنته وتقييمه وصورته، بلا نبذة ولا اسم عربي ولا طاقم ولا سلسلة ولا منصات', pa.status === 200 && f.adult === 1 && f.title === 'Velvet' && f.year === 2020 && f.rating === 5.5 && f.poster === '/v.jpg'
+    && f.overviewEn === null && f.overviewAr === undefined && f.titleAr === undefined && f.cast.length === 0 && f.directors.length === 0 && f.col === undefined && f.prov === null && pa.body.collection === null && !/explicit/.test(JSON.stringify(pa.body)), pa.body);
+  const aa = await call({ action: 'add', tmdb: 700, kind: 'movie', adult: true, ...P }), row = JSON.parse(stored).find(e => e.tmdb === 700);
+  check('وإضافته منها تكتبه موسوماً في الملف، وعنوان الإيداع برقمه بلا اسمه', aa.status === 200 && aa.body.state === 'added' && aa.body.film.adult === 1 && row?.adult === 1 && puts.at(-1).message === 'films: add +18 (m700)', [aa.body.state, row, puts.at(-1)?.message]);
+  const na = await call({ action: 'add', tmdb: 949, kind: 'movie', adult: true, ...P });
+  check('وعمل عادي لا يُضاف من مكتبة +18', na.status === 422 && /ليس \+18/.test(na.body.error) && puts.length === before + 1, na); }
 check('عمل غير موجود في TMDB برسالة واضحة', (await call({ action: 'add', tmdb: 123456, password: 'open-sesame-42' })).status === 422);
 console.log(fails.length ? `\n❌ فشل ${fails.length}` : '\n✅ كل الفحوص نجحت'); process.exit(fails.length ? 1 : 0);

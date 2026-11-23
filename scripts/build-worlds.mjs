@@ -11,7 +11,7 @@ const root = new URL('../', import.meta.url), dir = d => d && new URL(d.replace(
 // WORLDS_OUT: مجلد بديل للناتج (عند التجربة المحلية، كي لا تتغير ملفات الموقع)
 const OUT = dir(process.env.WORLDS_OUT) || new URL('site/films/data/', root), GEN = dir(process.env.WORLDS_OUT) || new URL('data/generated/films/', root), SRC = dir(process.env.WORLDS_SRC) || new URL('site/films/data/', root);
 const rd = (u, fb) => fs.existsSync(u) ? JSON.parse(fs.readFileSync(u)) : fb;
-const films = rd(new URL('films.json', SRC)).films, fr = rd(new URL('franchises.json', SRC), { items: {} }), cols = rd(new URL('collections.json', SRC), {});
+const films = rd(new URL('films.json', SRC)).films.filter(f => !f.adult), fr = rd(new URL('franchises.json', SRC), { items: {} }), cols = rd(new URL('collections.json', SRC), {});
 const keyOf = f => (f.kind === 'tv' ? 't' : 'm') + f.tmdb, focus = films.map(keyOf);
 const known = Object.fromEntries(films.map(f => [keyOf(f), JSON.parse(JSON.stringify({ title: f.title, date: f.date, year: f.year, poster: f.poster, rating: f.rating, votes: f.votes, lang: f.lang, genres: f.genres, runtime: f.runtime, tv: f.kind === 'tv' || undefined }))]));
 

@@ -13,6 +13,7 @@ import { ar } from './bidi.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
 import { posMap, ord } from './pos.js?v=__BUILD__'; // خريطة «موقعها من سلسلتها» والعدد الترتيبي
+import { ROOM, covered, uncover, bare, showing, setShowing, drawEye, flip, roomBtn, roomBar, cover } from './adult.js?v=__BUILD__'; // مكتبة +18 (E61)
 const BUILD = '__BUILD__', KEY = 'gamesg.progress', PEND = 'gamesg.pending', PASS = 'gamesg.pass', IGN = 'gamesg.ignored', STEAM = 'gamesg.steam', REM = 'gamesg.removed', ASK = 'gamesg.asked';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -93,19 +94,20 @@ const lst = id => rec(id).s || 'new';
 function setRec(id, patch) { const cur = { ...rec(id), ...patch }; for (const k of Object.keys(cur)) if (cur[k] === '' || cur[k] == null || Number.isNaN(cur[k])) delete cur[k];
   if (Object.keys(cur).length) P.games[id] = cur; else delete P.games[id]; save(); }
 const ui = { list: 'all', q: '', plat: '', genre: '', sort: 'list', view: 'grid', ov: 'release', sub: false };
-const register = g => { if (D.byId.has(g.id)) return false; D.games.push(g); D.byId.set(g.id, g); return true; };
+// القائمة قائمة المكتبة المفتوحة وحدها: العادية، أو +18 حين تُفتح (ROOM)
+const register = g => { if (!!g.adult !== ROOM || D.byId.has(g.id)) return false; D.games.push(g); D.byId.set(g.id, g); return true; };
 const merge = r => { Object.assign(D.series, r.series || {}); Object.assign(D.plats, r.plats || {}); Object.assign(D.fr, r.franchises || {}); };
 
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${miniDoor}<span>البوابات</span></a><h1>ألعابي</h1>
-  <button class="btn sec acc" data-act="accounts">${ic('pad')}<span>حساباتي</span></button><button class="btn pri add" data-act="add">${ic('plus')}<span>أضف لعبة</span></button><p class="tally" id="tally"></p></header>
-<div class="dupw" id="dup" hidden></div>
+  ${roomBtn()}<button class="btn sec acc" data-act="accounts"${ROOM ? ' hidden' : ''}>${ic('pad')}<span>حساباتي</span></button><button class="btn pri add" data-act="add">${ic('plus')}<span>أضف لعبة</span></button><p class="tally" id="tally"></p></header>
+${roomBar('قائمتك العادية')}<div class="dupw" id="dup" hidden></div>
 <section class="mm" id="mm" aria-label="القائمة الرئيسية"><div class="mm-art" id="mm-art" aria-hidden="true"></div>
   <nav class="mm-menu" id="mm-menu" aria-label="قوائمي"></nav><div class="mm-slot" id="slot"></div></section>
 <section class="soon shut" id="soon" hidden aria-label="قادم في سلاسلك"><h2><button type="button" class="soon-b" id="soon-b" data-act="soon" aria-expanded="false" aria-controls="soon-reel"></button></h2><div class="reel" id="soon-reel" hidden></div></section>
 <nav class="bar" aria-label="البحث والتصفية"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a>
   <label class="search">${ic('search')}<span class="sr">ابحث في ألعابي</span><input id="q" type="search" placeholder="ابحث: لعبة، مطوّر، سلسلة، سنة" autocomplete="off" enterkeyhint="search"></label>
-  <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الألعاب</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
+  <div class="tabs" role="group" aria-label="طريقة العرض"${ROOM ? ' hidden' : ''}><button data-act="view" data-v="grid" aria-pressed="true">الألعاب</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
   <div class="chips" id="chips"></div></nav>
 <div class="dupw at-list" id="dupbar" hidden></div>
 <p class="count" id="count" aria-live="polite"></p>
@@ -114,13 +116,13 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <p><button class="syncb" data-sync-open><span data-sync-label></span></button></p></footer>
 <dialog id="sheet" aria-label="بطاقة اللعبة"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="sheet-body"></div></dialog>
 <dialog id="add" aria-labelledby="add-h"><button class="close" data-act="close-add" aria-label="إغلاق">${ic('x')}</button>
-  <form id="add-form"><h2 id="add-h">أضف لعبة</h2>
-  <label for="add-q">اسم اللعبة، بالعربي أو بالإنجليزي (والسنة إن أردت)</label>
+  <form id="add-form"><h2 id="add-h">${ROOM ? 'أضف إلى مكتبة <bdi dir="ltr">+18</bdi>' : 'أضف لعبة'}</h2>
+  <label for="add-q">${ROOM ? 'اسم اللعبة كما في <bdi dir="ltr">IGDB</bdi> (والسنة إن أردت). يُبحث بين ما وُسم هناك بسمة البالغين وحده' : 'اسم اللعبة، بالعربي أو بالإنجليزي (والسنة إن أردت)'}</label>
   <div class="sugbox"><input id="add-q" dir="auto" placeholder="قود اوف وور، Elden Ring، GTA V…" autocomplete="off" autocapitalize="off" spellcheck="false" required role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="add-sug">
   <ul class="sug" id="add-sug" role="listbox" aria-label="اقتراحات" hidden></ul></div>
   <label class="pass-wrap" id="add-pass-wrap">كلمة السر (تُطلب مرة واحدة على هذا الجهاز)<input id="add-pass" type="password" autocomplete="current-password"></label>
   <button class="btn pri" type="submit">ابحث عنها</button><p class="msg" id="add-msg" aria-live="polite"></p><div class="cands" id="cands"></div>
-  <p class="hint">اللعبة تظهر هنا فوراً، وتصل إلى بقية أجهزتك خلال دقائق. سلسلتها وعالمها وما اقتُبس منها تُجلب آلياً من <bdi dir="ltr">IGDB</bdi> و<bdi dir="ltr">Wikidata</bdi>.</p></form></dialog>
+  <p class="hint">${ROOM ? 'ما تضيفه يظهر في مكتبة <bdi dir="ltr">+18</bdi> فوراً ويصل إلى بقية أجهزتك خلال دقائق، ولا يدخل قائمتك العادية. بلا نبذة ولا لقطات ولا سلسلة: اسمها وغلافها ومنصاتها وتقييمها.' : 'اللعبة تظهر هنا فوراً، وتصل إلى بقية أجهزتك خلال دقائق. سلسلتها وعالمها وما اقتُبس منها تُجلب آلياً من <bdi dir="ltr">IGDB</bdi> و<bdi dir="ltr">Wikidata</bdi>.'}</p></form></dialog>
 <dialog id="acc" aria-labelledby="acc-h"><button class="close" data-act="close-acc" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="acc-body"></div></dialog>
 <dialog id="inbox" aria-labelledby="ib-h"><div class="ib" id="ib"></div></dialog>
 <div class="qm" id="qm" role="menu" hidden></div>
@@ -136,7 +138,9 @@ const toast = (t, undo, ms) => { const el = $('#toast'); host(); el.textContent 
 const get = f => fetch(`data/${f}?v=${BUILD}`).then(r => { if (!r.ok) throw new Error(f); return r.json(); });
 
 // ---------- أجزاء البطاقة في الشبكة: غلاف اللعبة كعلبتها، وفوقه شريط المنصة بلونها، وملصق القائمة، ولوحة العدّ لما لم يصدر
-const coverImg = (id, sizes, lazy = true) => id ? `<img${lazy ? ' loading="lazy"' : ''} decoding="async" alt="" src="${img(id)}" srcset="${img(id, 'cover_small')} 90w, ${img(id)} 264w, ${img(id, 'cover_big_2x')} 528w" sizes="${sizes}">` : '';
+// cov: غلاف لعبة +18 لم يُكشف بعد: مصغّرته وحدها مغطاة (cover في adult.js)
+const coverImg = (id, sizes, lazy = true, cov = false, hint = '') => !id ? '' : cov ? cover(`<img${lazy ? ' loading="lazy"' : ''} decoding="async" alt="" src="${img(id, 'cover_small')}">`, hint) : `<img${lazy ? ' loading="lazy"' : ''} decoding="async" alt="" src="${img(id)}" srcset="${img(id, 'cover_small')} 90w, ${img(id)} 264w, ${img(id, 'cover_big_2x')} 528w" sizes="${sizes}">`;
+const hid = g => !!g.adult && covered(g.id) && !!g.cover;
 // بلا غلاف: خرطوشة لعبة عليها اسمها
 const cart = o => `<span class="ph" aria-hidden="true"><span class="ph-l"><b dir="ltr">${esc(o.title || '')}</b><small>${esc(soon(o) ? 'قريباً' : o.year || '')}</small></span><i></i></span>`;
 function band(g) { const on = rec(g.id).on, p = on && !WATCH.includes(on) ? on : g.plats?.[0]; if (!p) return '';
@@ -154,8 +158,8 @@ const lamps = g => subsOf(g).map(k => `<i class="sl-${k}${g.subs[k].out ? ' out'
 const subSeal = g => subsOf(g).length ? `<span class="seal" style="--d:${((g.id * 7) % 11) * .55}s" aria-hidden="true">${lamps(g)}</span>` : '';
 const subSay = g => { const s = subsOf(g); return s.length ? `، ضمن ${s.map(k => SUBN[k]).join(' و')}${g.subs.gp?.out ? '، وتغادر Game Pass قريباً' : ''}` : ''; };
 function card(g) { const s = rec(g.id).s || 'new';
-  return `<article class="gc s-${s}${g.fresh ? ' fresh' : ''}" id="g-${g.id}" data-id="${g.id}"><div class="case">${band(g)}
-<button class="cover" data-act="open" ${g.cover ? `data-zoom-pinch data-zoom-title="${esc(g.title)}" ` : ''}aria-label="افتح بطاقة ${esc(g.title)}${subSay(g)}">${coverImg(g.cover, '(max-width:520px) 45vw, 200px') || cart(g)}${badge(g)}${chip(g)}${subSeal(g)}</button></div>
+  return `<article class="gc s-${s}${g.fresh ? ' fresh' : ''}" id="g-${g.id}" data-id="${g.id}"${bare(g.id)}><div class="case">${band(g)}
+<button class="cover${hid(g) ? ' x18' : ''}" data-act="open" ${g.cover && !hid(g) ? `data-zoom-pinch data-zoom-title="${esc(g.title)}" ` : ''}aria-label="افتح بطاقة ${esc(g.title)}${subSay(g)}">${coverImg(g.cover, '(max-width:520px) 45vw, 200px', true, hid(g)) || cart(g)}${badge(g)}${chip(g)}${subSeal(g)}</button></div>
 <div class="info"><h3 dir="ltr">${esc(g.title)}</h3><p class="meta">${metaLine(g)}</p><button class="qm-b" data-act="qm" aria-haspopup="menu" aria-label="حالة «${esc(g.title)}» عندي وحذفها">${ic('dots')}</button></div></article>`; }
 
 // ---------- التصفية والترتيب والبحث
@@ -195,7 +199,7 @@ function apply(resort) { const grid = $('#grid'); dupTidy();
   const z = ui.q && fuzzyFor(ui.q), meant = z?.ids && z.meant ? `هل تقصد <button data-act="meant" data-q="${esc(z.meant.title)}"><bdi>${esc(z.meant.title)}</bdi></button>؟ ` : '';
   $('#count').innerHTML = ui.view === 'series' || ui.dup ? '' : filtered() ? `${meant}يظهر ${shown} من ${inList} <button data-act="reset">أزل التصفية</button>` : '';
   tally(); dupDraw(); }
-const emptyText = () => !D.games.length ? 'قائمتك فارغة. أضف أول لعبة، أو اسحب ما لعبته من حساباتك.' : filtered() ? 'لا لعبة تطابق هذه التصفية. جرّب إزالة أحد الشروط.' : ui.list === 'all' ? '' : `لا ألعاب في «${LISTS[ui.list].t}» بعد.`;
+const emptyText = () => !D.games.length ? (ROOM ? 'مكتبة +18 فارغة. ما تضيفه هنا يبقى هنا.' : 'قائمتك فارغة. أضف أول لعبة، أو اسحب ما لعبته من حساباتك.') : filtered() ? 'لا لعبة تطابق هذه التصفية. جرّب إزالة أحد الشروط.' : ui.list === 'all' ? '' : `لا ألعاب في «${LISTS[ui.list].t}» بعد.`;
 function tally() { const n = s => D.games.filter(g => lst(g.id) === s).length, hours = D.games.reduce((a, g) => a + (rec(g.id).h || 0), 0);
   $('#tally').textContent = D.games.length ? [nGames(D.games.length), n('done') && `ختمت ${n('done')}`, n('play') && `تلعب ${n('play')}`, hours && `${hrs(hours)} لعب`].filter(Boolean).join(' · ') : ''; }
 function renderGrid() { $('#grid').innerHTML = [...D.games].sort(SORTS[ui.sort][1]).map(card).join(''); $('#chips').innerHTML = chipsHTML(); apply(false); }
@@ -278,6 +282,8 @@ function featured() { const k = ui.list; if (!D.games.length) return null;
   if (k === 'new') return pickTonight(false); if (k === 'all') return D.byId.get(slotId) || byAt(D.games.filter(g => g.art || g.cover))[0] || D.games[0];
   return byAt(inL(k))[0] || null; }
 function slotHTML(g) { const k = ui.list, r = g ? rec(g.id) : {};
+  if (!D.games.length && ROOM) return `<p class="lbl">مكتبة <bdi dir="ltr">+18</bdi></p><h2>فارغة الآن</h2><p class="meta">ابحث عن لعبة مما وسمه <bdi dir="ltr">IGDB</bdi> بسمة البالغين وأضفها، فتبقى هنا وحدها: لا تدخل قائمتك العادية ولا بحثها ولا اقتراحاتها.</p>
+<div class="acts"><button class="btn pri" data-act="add">${ic('plus')}ابحث عن لعبة <bdi dir="ltr">+18</bdi></button></div>`;
   if (!D.games.length) return `<p class="lbl">ابدأ من هنا</p><h2>قائمتك فارغة</h2><p class="meta">أضف لعبة بالبحث عنها، أو اسحب ما لعبته من حساباتك في Steam وPlayStation وXbox وأجيبك عن كل لعبة: ختمتها؟ تلعبها؟ أم لاحقاً؟</p>
 <div class="acts"><button class="btn pri" data-act="add">${ic('plus')}أضف لعبة</button><button class="btn sec" data-act="accounts">${ic('pad')}اسحب من حساباتي</button></div>`;
   if (!g) return `<p class="lbl">${k === 'new' ? 'ماذا ألعب الليلة؟' : LISTS[k].t}</p><h2>${k === 'play' ? 'لا شيء تلعبه الآن' : k === 'done' ? 'لم تختم لعبة بعد' : k === 'seen' ? 'لم تشاهد لعبة بعد' : 'لا ألعاب تنتظر'}</h2>
@@ -299,7 +305,7 @@ function renderMenu(swap) { $('#mm-menu').innerHTML = menuHTML(); const g = feat
   if (!src) { old?.classList.add('out'); setTimeout(() => old?.remove(), 600); return; }
   const im = new Image(); im.alt = ''; im.decoding = 'async'; im.className = g.art || g.shots?.[0] ? '' : 'soft'; im.src = src;
   im.onload = () => { if (artFor !== src) return; box.append(im); requestAnimationFrame(() => { im.classList.add('in'); if (old) { old.classList.add('out'); setTimeout(() => old.remove(), 700); } }); }; }
-function setList(k, focus) { ui.list = k; store.set('games.list', k); $$('#mm-menu .mi').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === k))); renderMenu(true); apply(false);
+function setList(k, focus) { ui.list = k; if (!ROOM) store.set('games.list', k); $$('#mm-menu .mi').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === k))); renderMenu(true); apply(false);
   if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); if (focus) $(`#mm-menu .mi[data-v="${k}"]`)?.focus(); }
 
 // ---------- قادم في سلاسلك: الأجزاء المعلنة التي لم تصدر من سلاسل ألعابك، وألعابك القادمة، بعدّها التنازلي.
@@ -446,10 +452,11 @@ async function sheetHTML(g, pv) { if (g.from?.some(w => w.tmdb) || g.into?.some(
     g.critic && `<span class="rate">النقاد <bdi>${g.critic}</bdi></span>`, g.users && `<span class="rate">اللاعبون <bdi>${g.users}</bdi></span>`, g.status === 'cancelled' && 'أُلغيت'].filter(Boolean);
   const story = aboutSec(g, pv ? {} : (await texts())[g.id] || {}, pv);
   return `<div class="sh-hero">${art ? `<img alt="" src="${img(art, '720p')}" srcset="${img(art, '720p')} 1280w, ${img(art, '1080p')} 1920w" sizes="(max-width:900px) 100vw, 900px">` : ''}</div>
-<div class="sh-head">${g.cover ? `<button type="button" class="cover" data-zoom="${img(g.cover, '1080p')}" data-zoom-title="${esc(g.title)}" aria-label="كبّر غلاف ${esc(g.title)}">${coverImg(g.cover, '180px', false)}</button>` : `<div class="cover">${cart(g)}</div>`}
+<div class="sh-head">${hid(g) ? `<button type="button" class="cover x18" data-act="bare" data-id="${g.id}" aria-label="أظهر غلاف ${esc(g.title)}">${coverImg(g.cover, '180px', false, true, 'اضغط لإظهاره')}</button>`
+  : g.cover ? `<button type="button" class="cover" data-zoom="${img(g.cover, '1080p')}" data-zoom-title="${esc(g.title)}" aria-label="كبّر غلاف ${esc(g.title)}">${coverImg(g.cover, '180px', false)}</button>` : `<div class="cover">${cart(g)}</div>`}
 <div class="txt"><h2 dir="ltr">${esc(g.title)}</h2>${g.titleAr ? `<p class="ar">${esc(g.titleAr)}</p>` : ''}<p class="facts">${facts.map(x => `<span>${x}</span>`).join('')}</p><div class="tags">${(g.genres || []).map(x => `<span>${esc(x)}</span>`).join('')}${(g.modes || []).slice(0, 2).map(x => `<span class="m">${esc(x)}</span>`).join('')}</div>${!pv && subsOf(g).length ? `<p class="seal inl">${lamps(g)}<span>ضمن اشتراكك: تلعبها بلا ثمن${g.subs.gp?.out ? '، وتغادر <bdi dir="ltr">Game Pass</bdi> قريباً' : ''}</span></p>` : ''}</div></div>
-${chainHTML(g)}${pv ? `<section class="save pv">${twinHTML(g, true)}<h3>أضفها إلى مكتبتي</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${listBtn(k)}</button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
-${g.src === 'added' ? '<section class="sec"><p class="ask">أُضيفت بزر «أضف لعبة»: معلوماتها آلية من <bdi dir="ltr">IGDB</bdi>، وعالمها واقتباساتها تكتمل في البناء القادم.</p></section>' : ''}
+${g.adult ? '' : chainHTML(g)}${pv ? `<section class="save pv">${twinHTML(g, true)}<h3>أضفها إلى مكتبتي</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${listBtn(k)}</button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
+${g.adult ? '<section class="sec about"><h3>عن اللعبة</h3><p class="note">نبذات ألعاب <bdi dir="ltr">+18</bdi> ولقطاتها لا تُعرض هنا ولا تُترجم. تجدها في صفحتها على <bdi dir="ltr">IGDB</bdi> أدناه.</p></section>' : g.src === 'added' ? '<section class="sec"><p class="ask">أُضيفت بزر «أضف لعبة»: معلوماتها آلية من <bdi dir="ltr">IGDB</bdi>، وعالمها واقتباساتها تكتمل في البناء القادم.</p></section>' : ''}
 ${board(g)}${placeSec(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${subsSec(g, pv)}${pcSec(g)}${mediaSec(g)}${linksSec(g)}`; }
 // ---------- عن اللعبة. النصوص الطويلة (النبذة والقصة بلغتيهما) في ملف مستقل يُجلب مرة واحدة (ويُسبق جلبه بعد الإقلاع)، وما أُضيف للتو نصه في سجله.
 // المترجَم يُعرض بالعربية وتحته الأصل الإنجليزي لمن أراده؛ وغير المترجَم بالإنجليزية مع زر «ترجمها لي» يوصل الطلب إلى المترجم (فرع requests في المستودع).
@@ -514,12 +521,13 @@ function placeSec(g) { const p = g.place; if (!p || !PK[p.k]) return '';
   const src = p.src === 'igdb' ? `<p class="note">عن وصفها الرسمي في <bdi dir="ltr">IGDB</bdi>.</p>` : Array.isArray(p.src) ? `<p class="note">المصدر: ${p.src.map(x => ext(x.name, x.url)).join('، ')}.</p>` : '';
   return `<section class="sec place k-${p.k}"><h3>موقعها من أحداث عالمها</h3><div class="pl-card"><p class="pl-k"><i aria-hidden="true"></i>${PK[p.k]}</p><p class="pl-line">${ar(p.line)}</p>${track}${facts ? `<p class="pl-facts">${facts}</p>` : ''}${src}</div></section>`; }
 const filmsReady = () => D.filmsReady ??= fetch(`../films/data/films.json?v=${BUILD}`).then(r => r.ok ? r.json() : { films: [] }).then(j => { D.films = new Set((j.films || []).map(f => f.id)); }).catch(() => { D.films = new Set(); });
-async function openGame(id, push = true) { const g = D.byId.get(+id); if (!g) return; openId = g.id; $('#sheet-body').innerHTML = await sheetHTML(g); $('#sheet-body').scrollTop = 0; showSheet(push ? { game: g.id } : null, '#g' + g.id); }
+async function openGame(id, push = true) { const g = D.byId.get(+id); if (!g) return; openId = g.id; pvOpen = 0; $('#sheet-body').toggleAttribute('data-r18-bare', !!bare(g.id)); $('#sheet-body').innerHTML = await sheetHTML(g); $('#sheet-body').scrollTop = 0; showSheet(push ? { game: g.id } : null, '#g' + g.id); }
 function showSheet(state, hash) { if (!sheet.open) { showM(sheet); $('#sheet-body').scrollTop = 0;   // بعد العرض: المتصفح يعيد للنافذة موضع تمرير البطاقة السابقة حين تُعرض، وتصفيره وهي مخفية لا يؤثر
     if (!calm) sheet.animate(innerWidth <= 640 ? { transform: ['translateY(6%)', 'none'], opacity: [0, 1] } : { transform: ['scale(.97)', 'none'], opacity: [0, 1] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
     setTimeout(host, calm ? 0 : 260);   // تنبيه عابر سبق فتح البطاقة (كـ«أُضيفت…») يصعد إليها بعد أن تستقر حركتها
     if (state) history.pushState(state, '', hash || location.pathname + location.search); } else if (state) history.replaceState(state, '', hash || location.pathname + location.search); }
-function closeGame(fromPop) { if (!sheet.open) return; openId = null; sheet.dataset.out = '1'; const done = () => sheet.close();   // out: تُغلق الآن، فلا يسكنها تنبيه عابر
+const redrawSheet = () => { if (!sheet.open) return; if (openId) openGame(openId, false); else if (pvOpen) peek(pvOpen); };
+function closeGame(fromPop) { if (!sheet.open) return; openId = null; pvOpen = 0; sheet.dataset.out = '1'; const done = () => sheet.close();   // out: تُغلق الآن، فلا يسكنها تنبيه عابر
   if (calm) done(); else { const a = sheet.animate({ opacity: [1, 0], transform: ['none', innerWidth <= 640 ? 'translateY(5%)' : 'scale(.98)'] }, { duration: 160, easing: 'ease-in' }); a.onfinish = done; setTimeout(done, 300); }
   if (!fromPop && history.state?.game) history.back(); else if (!fromPop && location.hash) history.replaceState(null, '', location.pathname + location.search); }
 addEventListener('popstate', () => { if (/^#steam/.test(location.hash)) return route(); const m = location.hash.match(/^#g(\d+)$/); if (m && D.byId.has(+m[1])) openGame(+m[1], false); else closeGame(true); });
@@ -556,7 +564,7 @@ qm.addEventListener('keydown', e => { const b = $$('button', qm), i = b.indexOf(
 
 // ---------- أضف لعبة
 const pass = () => store.get(PASS) || (store.get('gamesg.nofilm') ? '' : store.get('filmsg.pass')) || '';
-async function api(path, body, password = pass()) { let r; try { r = await fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...body, password }) }); } catch { throw new Error('تعذّر الاتصال. تأكد من الإنترنت وحاول ثانية.'); }
+async function api(path, body, password = pass()) { let r; try { r = await fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...body, ...(ROOM && path === '/api/add-game' ? { adult: true } : {}), password }) }); } catch { throw new Error('تعذّر الاتصال. تأكد من الإنترنت وحاول ثانية.'); }   // adult: الطلب من مكتبة +18
   if (r.status === 401) { const j = await r.clone().json().catch(() => ({})); if (j.error === 'password') { store.del(PASS); store.set('gamesg.nofilm', '1'); $$('.pass-wrap').forEach(w => { w.hidden = false; }); throw Object.assign(new Error('كلمة السر غير صحيحة.'), { pw: true }); } }
   if (r.status === 404 || r.status === 405) throw new Error('هذه الخدمة تعمل من نسخة الموقع على Netlify فقط.');
   const j = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(j.error || 'حدث خطأ في الخادم. حاول بعد قليل.'), { need: j.need }); return j; }
@@ -605,20 +613,20 @@ async function restore(g, prev) { try { const r = await api('/api/add-game', { a
     refresh(g.id); toast(`عادت «${g.title}» إلى مكتبتك`);
   } catch (e) { toast('تعذّرت إعادتها: ' + e.message); } }
 // لعبة عادت من الخادم (أو محفوظة بانتظار البناء القادم) تدخل القائمة المعروضة
-function adopt(g, r, draw) { if (!g || D.byId.has(g.id)) return false; merge(r || {}); g.fresh = true; g.ord = -Date.now(); register(g); stale();
+function adopt(g, r, draw) { if (!g || D.byId.has(g.id) || !!g.adult !== ROOM) return false; merge(r || {}); g.fresh = true; g.ord = -Date.now(); register(g); stale();
   if (draw) { $('#grid').insertAdjacentHTML('afterbegin', card(g)); $('#chips').innerHTML = chipsHTML(); } return true; }
 // بطاقة اطلاع: اللعبة كاملة من IGDB عبر الخادم دون إضافتها، مرة واحدة لكل لعبة
-const previews = new Map();
+const previews = new Map(); let pvOpen = 0;   // بطاقة الاطلاع المفتوحة، ليُعاد رسمها حين يُكشف غلافها
 async function peek(id, btn) { if (D.byId.has(id)) { if (addDlg.open) addDlg.close(); return openGame(id); }
   if (!pass()) return openAdd(btn?.dataset.q || '');
   const label = btn?.innerHTML, busy = btn && btn.matches('.btn'); if (busy) { btn.disabled = true; btn.textContent = 'يجهّز…'; }
   try { let r = previews.get(id); if (!r) { r = await api('/api/add-game', { action: 'preview', igdb: id }); previews.set(id, r); } merge(r); openId = null;
-    $('#sheet-body').innerHTML = await sheetHTML(r.game, true); $('#sheet-body').scrollTop = 0; showSheet({ game: 'preview' });
+    $('#sheet-body').toggleAttribute('data-r18-bare', !!bare(id)); $('#sheet-body').innerHTML = await sheetHTML(r.game, true); $('#sheet-body').scrollTop = 0; pvOpen = id; showSheet({ game: 'preview' });
   } catch (err) { if (addDlg.open) $('#add-msg').textContent = err.message; else if (err.pw) openAdd(btn?.dataset.q || ''); else toast(err.message); }
   finally { if (busy) { btn.disabled = false; btn.innerHTML = label; } } }
 
 // ---------- اقتراحات أثناء الكتابة، قبل Enter: من فهرس أشهر الألعاب (data/titles.json) بالبحث المتسامح، ثم من بحث IGDB نفسه
-let TI = null; const titles = () => TI ??= get('titles.json').then(j => prepare(j.items.map(r => ({ id: r[0], y: r[1], v: r[2], f: r[3], title: r[4], ar: r[5] || '', names: [r[4], r[5] || '', ...(r[6] ? String(r[6]).split('|') : [])] }))))
+let TI = null; const titles = () => TI ??= ROOM ? Promise.resolve([]) : get('titles.json').then(j => prepare(j.items.map(r => ({ id: r[0], y: r[1], v: r[2], f: r[3], title: r[4], ar: r[5] || '', names: [r[4], r[5] || '', ...(r[6] ? String(r[6]).split('|') : [])] }))))
   .catch(() => { TI = null; return []; });
 const addQ = $('#add-q'), sugEl = $('#add-sug'); let sug = [], sugAt = -1, sugT = 0, sugN = 0;
 function drawSug(list = [], meant = null) { sug = list; sugAt = -1; addQ.removeAttribute('aria-activedescendant');
@@ -761,6 +769,9 @@ document.addEventListener('click', e => { if (!qm.hidden && !e.target.closest('#
   else if (act === 'subf') { ui.dup = null; ui.sub = !ui.sub; t.setAttribute('aria-pressed', String(ui.sub)); apply(false); }
   else if (act === 'reset') { Object.assign(ui, { q: '', plat: '', genre: '', sub: false }); $('#q').value = ''; $('#chips').innerHTML = chipsHTML(); apply(false); }
   else if (act === 'add') { if (accDlg.open) accDlg.close(); openAdd(); }
+  else if (act === 'room') flip(`<strong>ألعابي${ROOM ? '' : ' <bdi dir="ltr">+18</bdi>'}</strong>`);                       // يفتح مكتبة +18 أو يخرج منها (site/adult.js)
+  else if (act === 'room-show') { setShowing(!showing()); drawEye(); renderGrid(); redrawSheet(); }               // أغلفة المكتبة كلها: تُكشف أو تُغطى
+  else if (act === 'bare') { uncover(+t.dataset.id); const el = document.getElementById('g-' + t.dataset.id), g = D.byId.get(+t.dataset.id); if (el && g) { el.outerHTML = card(g); apply(false); } redrawSheet(); }   // غلاف هذه اللعبة وحدها (والعلبة الجديدة تأخذ ظهورها من التصفية)
   else if (act === 'accounts') openAccounts();
   else if (act === 'add-pick') askList(t);
   else if (act === 'add-to') addGame(+t.dataset.igdb, t.dataset.v, t);
@@ -807,7 +818,7 @@ try {
     const gone = g => rm[g.id] || (g.at && builtAt - Date.parse(g.at) > LAG);
     for (const r of pend) { const list = r?.games || (r?.game ? [r.game] : []), rest = list.filter(g => g && !D.byId.has(g.id) && !gone(g)); if (!rest.length) continue; for (const g of rest) adopt(g, r, false); left.push(r.game ? r : { ...r, games: rest }); }
     store.set(PEND, JSON.stringify(left)); } catch {}
-  const last = store.get('games.list'); ui.list = ORDER.includes(last) ? last : inL('play').length ? 'play' : inL('new').length ? 'new' : 'all';
+  const last = ROOM ? 'all' : store.get('games.list'); ui.list = ORDER.includes(last) ? last : inL('play').length ? 'play' : inL('new').length ? 'new' : 'all';
   renderGrid(); renderMenu(false); soonHTML(); liftVeil();
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }
   initSync(id => { if (id !== 'games') return; load(); renderGrid(); renderMenu(false); soonHTML(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); if (openId) { const sv = $('#sheet-body .save'), g = D.byId.get(openId); if (sv && g) sv.outerHTML = saveHTML(g); } });

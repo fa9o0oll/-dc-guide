@@ -86,7 +86,9 @@ const radius = (el, k) => { const cs = getComputedStyle(el), c = ['TopLeft', 'To
 const shapeOf = (t, im) => [t, im].find(e => ['TopLeft', 'BottomLeft'].some(c => parseFloat(getComputedStyle(e)[`border${c}Radius`]))) || t;
 const titleOf = (t, im) => t.dataset.zoomTitle || im?.alt.replace(/^بوستر\s+/, '') || '';
 // مجموعة الصور التي ينتمي إليها العنصر: كل ما يقبل التكبير داخل أقرب حاوية تحمل data-zoom-set، بترتيبها في الصفحة
-const okThumb = t => { const im = t.querySelector('img'); return !!im && !!(im.currentSrc || im.src) && !im.dataset.failed; };
+// في مكتبة +18 (site/adult.js) الصورة المغطاة لا تُكبَّر حتى تُكشف: كلها (data-r18-open على <html>) أو عملها (حاوية تحمل data-r18-bare)
+const veiled = t => { const h = document.documentElement; return h.dataset.room === '18' && !h.hasAttribute('data-r18-open') && !t.closest('[data-r18-bare]'); };
+const okThumb = t => { const im = t.querySelector('img'); return !!im && !!(im.currentSrc || im.src) && !im.dataset.failed && !veiled(t); };
 function setOf(t) { const box = t.closest('[data-zoom-set]'); if (!box) return null; const all = [...box.querySelectorAll(SEL)].filter(okThumb), i = all.indexOf(t);
   return all.length > 1 && i >= 0 ? { set: all, i, rtl: getComputedStyle(box).direction === 'rtl' } : null; }
 const PAGER = 60;   // ارتفاع شريط التنقل وفراغه تحت العنوان
@@ -219,7 +221,7 @@ function reveal(n) { for (let p = n.parentElement; p && p !== document.body; p =
 function bump(side) { if (reduce.matches || nav) return; D.fly.animate({ transform: ['none', `translateX(${-side * 18}px)`, 'none'] }, { duration: 260, easing: 'ease-out' }); }
 
 export function zoom(t, opt = {}) {
-  const im = t?.querySelector('img'); if (S !== 'closed' || !im || !(im.currentSrc || im.src) || im.dataset.failed) return false;
+  const im = t?.querySelector('img'); if (S !== 'closed' || !im || !(im.currentSrc || im.src) || im.dataset.failed || veiled(t)) return false;
   build(); S = 'opening'; askMotion();
   flatNow(t); const rt = t.getBoundingClientRect(), r0 = opt.from || rt, lo = opt.src || im.currentSrc || im.src; // الإطار لا الصورة: الصورة قد تكون مائلة
   cur = { ...setOf(t) }; D.d.classList.toggle('pz-set', !!cur.set); fill(t, lo); setZ({ s: 1, x: 0, y: 0 }); pager(); warm();
@@ -400,7 +402,7 @@ document.addEventListener('pointermove', e => { const p = T.get(e.pointerId); if
 const lift = e => { if (!T.has(e.pointerId)) return; T.delete(e.pointerId); if (pin) pinchEnd(e.type === 'pointerup'); };
 document.addEventListener('pointerup', lift, true); document.addEventListener('pointercancel', lift, true);
 function pinchStart(t, a, b) {
-  const im = t.querySelector('img'); if (!im || !(im.currentSrc || im.src) || im.dataset.failed) return;
+  const im = t.querySelector('img'); if (!im || !(im.currentSrc || im.src) || im.dataset.failed || veiled(t)) return;
   flatNow(t); const r = t.getBoundingClientRect(), host = t.closest('dialog[open]') || document.body, m = mid(a, b);
   const veil = Object.assign(document.createElement('div'), { className: 'pz-veil' }), g = Object.assign(document.createElement('figure'), { className: 'pz-ghost' });
   g.style.cssText = `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:${getComputedStyle(shapeOf(t, im)).borderRadius};transform-origin:${m.x - r.left}px ${m.y - r.top}px`;

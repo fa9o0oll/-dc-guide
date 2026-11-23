@@ -45,7 +45,7 @@ for (const l of lines.filter(l => l.ask)) report.ask.push({ line: l.key, note: l
 // 3) ترجماتنا العربية للنبذات تتقدم على ترجمة TMDB
 const tr = rd(new URL('translations.json', SRC), {});
 const list = [...films.values()].filter(f => f.id && !removed.has(f.id));
-for (const f of list) if (tr[f.id]) { f.overviewAr = tr[f.id]; f.arSource = 'guide'; }
+for (const f of list) if (tr[f.id] && !f.adult) { f.overviewAr = tr[f.id]; f.arSource = 'guide'; }   // أعمال +18 بلا نبذة (lib-films: shape)
 list.sort((a, b) => (a.ord ?? 9e9) - (b.ord ?? 9e9) || a.title.localeCompare(b.title, 'en'));
 
 // 4) الكتابة: films.json للبطاقات، more.json للتفاصيل التي تُحمَّل عند الحاجة
@@ -68,7 +68,7 @@ report.franchiseProblems = fr.problems;
 fs.writeFileSync(new URL('resolved.json', GEN), JSON.stringify(resolved, null, 1) + '\n');
 report.counts = { lines: lines.length, films: list.filter(f => f.kind === 'movie').length, tv: list.filter(f => f.kind === 'tv').length, added: list.filter(f => f.src === 'added').length,
   collections: Object.keys(usedCols).length, franchises: Object.keys(fr.items).length, withProviders: list.filter(f => f.prov && (f.prov.stream.length || f.prov.free.length || f.prov.rent.length || f.prov.buy.length)).length,
-  arabicOverviews: list.filter(f => f.overviewAr).length, ourArabic: list.filter(f => f.arSource === 'guide').length, noPoster: list.filter(f => !f.poster).length };
+  adult: list.filter(f => f.adult).length, arabicOverviews: list.filter(f => f.overviewAr).length, ourArabic: list.filter(f => f.arSource === 'guide').length, noPoster: list.filter(f => !f.poster).length };
 fs.writeFileSync(new URL('report.json', GEN), JSON.stringify(report, null, 1) + '\n');
 console.log('FILMS counts ' + JSON.stringify(report.counts));
 for (const g of report.guesses) console.log('FILMS guess ' + JSON.stringify(g));

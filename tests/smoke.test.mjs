@@ -86,7 +86,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await fits('Fate ترتيب المشاهدة');
   await tap('.views [data-view=timeline]'); await page.waitForSelector('.tl .node'); await fits('Fate الخط الزمني');
   // قائمة الأفلام
-  let previewCalls = 0, worldsCalls = 0; const FL = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/films.json'))).films, inCol = FL.find(f => f.col && f.kind === 'movie' && f.prov);
+  let previewCalls = 0, worldsCalls = 0; const FL = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/films.json'))).films.filter(f => !f.adult), inCol = FL.find(f => f.col && f.kind === 'movie' && f.prov);
   // خريطة عوالم للاختبار: فيلم من القائمة بلا ترتيب مراجَع ولا مجموعة TMDB، في عالم صغير (مع أنمي خارج القائمة) وسلسلة أوسع طويلة، وله أصل ورواية ورابط في دليل DC
   const FR = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/franchises.json'))), cur = new Set(Object.values(FR.items || {}).flatMap(g => g.order.map(x => x.m ? 'm' + x.m : x.t ? 't' + x.t : null)));
   const solo = FL.find(f => f.kind === 'movie' && !f.col && !cur.has(f.id) && f.poster), big = Array.from({ length: 20 }, (_, i) => 'm' + (888000 + i)); big.splice(10, 0, solo.id);
@@ -101,7 +101,9 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
       ...Object.fromEntries(big.filter(k => k !== solo.id).map((k, i) => [k, { title: 'Big Part ' + (i + 1), year: 1980 + i, date: `${1980 + i}-01-01` }])) },
     cols: { [CID]: { order: [cf.id, 'm777101'], moved: { [cf.id]: { w: 'prequel', ref: ['m777101'], src: ['wikipedia'], q: [{ s: 'wikipedia', t: 'It is a prequel to Col Original (1980).', u: 'https://en.wikipedia.org/wiki/X' }] } } } } };
   await page.route('**/films/data/worlds.json*', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(WORLDS) }));
-  await page.route('**/films/data/films.json*', async r => { const res = await r.fetch(), j = await res.json(); j.films.find(f => f.id === cf.id).col = CID; return r.fulfill({ response: res, json: j }); });
+  // فيلمان +18 (adult) بأسماء مختلَقة كما يكتبهما البناء: لا يظهران إلا في مكتبة +18 (E61)
+  const AD = [1, 2].map(k => ({ id: 'm' + (9900000 + k), tmdb: 9900000 + k, kind: 'movie', title: ['Sample Late Feature', 'Sample Velvet Hours'][k - 1], year: 2017 + k, date: `${2017 + k}-03-01`, status: 'Released', runtime: 80, genres: [18], lang: 'ja', rating: 5.5 + k / 2, votes: 100, poster: `/ad${k}.jpg`, backdrop: `/ad${k}b.jpg`, imdb: null, adult: 1, prov: null, src: 'added', ord: 2000000 + k }));
+  await page.route('**/films/data/films.json*', async r => { const res = await r.fetch(), j = await res.json(); j.films = [...j.films.filter(f => !f.adult), ...AD]; j.films.find(f => f.id === cf.id).col = CID; return r.fulfill({ response: res, json: j }); });
   await page.route('**/films/data/collections.json*', async r => { const res = await r.fetch(), j = await res.json();
     j[CID] = { id: CID, name: 'Chrono Test Collection', parts: [{ tmdb: 777101, title: 'Col Original', date: '1980-01-01', year: 1980 }, { tmdb: cf.tmdb, title: cf.title, date: cf.date, year: cf.year }] }; return r.fulfill({ response: res, json: j }); });
   // سلسلة مراجَعة بترتيب أحداثها: Prey (1719) أولاً، والصدور يصح أيضاً
@@ -248,6 +250,38 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await page.reload(); await page.waitForSelector('.tk'); check('الأفلام: المضاف يبقى بعد التحديث وكلمة السر لا تُطلب ثانية', await page.locator('#f-m999001').count() === 1 && await page.evaluate(() => localStorage.getItem('filmsg.pass') === 'pw'));
   await tap('#f-m999001 .poster'); await page.waitForSelector('#sheet[open] .order'); check('الأفلام: نافذة المضاف تعرض عالمه المحفوظ معه وتنبيه عدم المراجعة دون طلب جديد', await page.locator('#sheet .order li').count() === 3 && (await page.textContent('#sheet-body')).includes('لم تُراجَع يدوياً') && worldsCalls === 1);
   await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
+  // ---------- مكتبة +18 في الأفلام (E61): ما وسمه TMDB للبالغين لا يظهر حتى يُضغط زر «+18»، فتُفتح مكتبة فيها هو وحده وبحثه وإضافته، وبوستراته مغطاة
+  { const sent = []; await page.route('**/api/add-film', async r => { const b = r.request().postDataJSON(); if (!b.adult) return r.fallback(); sent.push(b);
+      const film = { id: 'm9900009', tmdb: 9900009, kind: 'movie', title: 'Sample Found Feature', year: 2021, date: '2021-01-01', genres: [18], rating: 6.1, votes: 9, poster: '/ad9.jpg', backdrop: '/ad9b.jpg', adult: 1, prov: null, src: 'added', overviewEn: null, cast: [], directors: [] };
+      if (b.action === 'search') return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ parsed: { title: 'Sample', year: null }, sure: false, candidates: [{ tmdb: 9900009, kind: 'movie', title: film.title, year: 2021, poster: '/ad9.jpg' }, { tmdb: 9900001, kind: 'movie', title: AD[0].title, year: AD[0].year, poster: AD[0].poster }] }) });
+      if (b.action === 'suggest') return r.fulfill({ contentType: 'application/json', body: '{"items":[]}' });
+      return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ ...(b.action === 'add' ? { state: 'added' } : {}), providers: {}, collection: null, film }) }); });
+    const flipTo = async on => { const nav = page.waitForEvent('load'); await tap('.top .r18'); await nav; await page.waitForFunction(on => (document.documentElement.dataset.room === '18') === on && !!document.querySelector('.tk'), on); };
+    const n0 = await page.locator('.tk').count();
+    check('الأفلام: زر «+18» في الرأس، وأعمال +18 ليست في القائمة العادية ولا تُفتح برابطها', await page.evaluate(() => document.querySelector('.top .r18')?.getAttribute('aria-pressed') === 'false' && !document.getElementById('f-m9900001') && !document.querySelector('.r18-bar')) && n0 === FL.length + 1, String(n0));
+    await flipTo(true);
+    check('الأفلام: الزر يفتح مكتبة +18: أعمالها وحدها بعددها، وشريطها، بلا اقتراح ولا سلاسل', await page.evaluate(() => document.querySelectorAll('.tk').length === 2 && !!document.getElementById('f-m9900001') && !!document.querySelector('.r18-bar') && document.querySelector('.top .r18').getAttribute('aria-pressed') === 'true'
+      && document.querySelector('#tonight').hidden && document.querySelector('.tabs').hidden && /^فيلمان/.test(document.querySelector('#tally').textContent)), await page.textContent('#tally'));
+    check('الأفلام: بوستراتها مغطاة بمصغّرتها وعليها «+18»، ولا تُكبَّر بالقرص', await page.evaluate(() => [...document.querySelectorAll('.tk .poster')].every(p => p.classList.contains('x18') && /\/w92\/ad\d\.jpg$/.test(p.querySelector('.x18-i img').getAttribute('src')) && p.querySelector('.x18-m').textContent === '+18' && !p.hasAttribute('data-zoom-pinch') && /blur/.test(getComputedStyle(p.querySelector('img')).filter))));
+    await fits('الأفلام: مكتبة +18');
+    await tap('#f-m9900001 .poster'); await page.waitForSelector('#sheet[open] .sh-head .poster.x18');
+    check('الأفلام: بطاقة عمل +18 بلا نبذة ولا موقع من سلسلة ولا منصات، وبوسترها بزر يكشفه', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.sh-head .poster');
+      return p.dataset.act === 'bare' && !p.hasAttribute('data-zoom') && !b.querySelector('.sh-hero img') && !b.querySelector('#chslot').innerHTML && !b.querySelector('#wslot').innerHTML && /لا تُعرض هنا ولا تُترجم/.test(b.textContent) && !/أين تشاهده/.test(b.textContent) && !!b.querySelector('[data-act=set]'); }));
+    await tap('#sheet .sh-head .poster'); await page.waitForSelector('#sheet[open] .sh-head .poster[data-zoom]');
+    check('الأفلام: لمس البوستر يكشفه في بطاقته وتذكرته وحدهما', await page.evaluate(() => document.querySelector('#sheet-body').hasAttribute('data-r18-bare') && !!document.querySelector('#sheet-body .sh-hero img') && !document.querySelector('#f-m9900001 .x18') && document.getElementById('f-m9900001').hasAttribute('data-r18-bare')
+      && !!document.querySelector('#f-m9900002 .poster.x18') && getComputedStyle(document.querySelector('#f-m9900001 .poster img')).filter === 'none' && !document.querySelector('.pz[open]')));
+    await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
+    await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open')); check('الأفلام: «أظهر الصور» يكشفها كلها', await page.evaluate(() => !document.querySelector('.tk .x18') && document.querySelectorAll('.tk .poster img[srcset]').length === 2));
+    await tap('.r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open')); check('الأفلام: و«غطِّ الصور» يغطيها كلها', await page.evaluate(() => document.querySelectorAll('.tk .poster.x18').length === 2));
+    await tap('.top [data-act=add]'); await page.waitForSelector('#add[open]'); check('الأفلام: نافذة الإضافة فيها باسم المكتبة', /مكتبة/.test(await page.textContent('#add-h')) && /\+18/.test(await page.textContent('#add-h')));
+    await page.fill('#add-q', 'Sample'); await page.press('#add-q', 'Enter'); await page.waitForSelector('.cand');
+    check('الأفلام: بحثها يُرسل موسوماً adult، وما في المكتبة من نتائجه يقال إنه فيها', sent.some(b => b.action === 'search' && b.adult === true) && await page.evaluate(() => { const c = [...document.querySelectorAll('.cand')]; return c.length === 2 && !!c[0].querySelector('[data-act=add-pick]') && /في قائمتك/.test(c[1].textContent); }), JSON.stringify(sent.map(b => [b.action, b.adult])));
+    await tap('.cand [data-act=add-pick]'); await page.waitForSelector('#f-m9900009'); await page.waitForSelector('#sheet[open]');
+    check('الأفلام: الإضافة منها موسومة adult، والمضاف يظهر فيها فوراً مغطى', sent.some(b => b.action === 'add' && b.adult === true && b.tmdb === 9900009) && await page.evaluate(() => document.querySelectorAll('.tk').length === 3 && !!document.querySelector('#f-m9900009 .poster.x18')));
+    await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
+    await page.reload(); await page.waitForSelector('.tk'); check('الأفلام: تحديث الصفحة يبقيك في المكتبة وما أُضيف فيها باقٍ', await page.evaluate(() => document.documentElement.dataset.room === '18' && !!document.getElementById('f-m9900009')));
+    await flipTo(false);
+    check('الأفلام: الزر نفسه يُخرج منها، والقائمة العادية كما كانت بلا ما أُضيف في المكتبة', await page.evaluate(() => !document.documentElement.dataset.room && !document.getElementById('f-m9900009') && !document.getElementById('f-m9900001') && !document.querySelector('#tonight').hidden) && await page.locator('.tk').count() === n0, String(await page.locator('.tk').count())); }
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3).join(' | '));
   await ctx.close();
 }
