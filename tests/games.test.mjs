@@ -49,6 +49,7 @@ async function mockApi(page) {
     const J = o => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
     // طلبات مكتبة +18: ألعابها وحدها
     if (b.adult && b.action === 'suggest') return J({ items: [] });
+    if (b.adult && b.action === 'search' && /^nothing/i.test(b.q)) return J({ parsed: { title: b.q, year: null }, candidates: [] });
     if (b.adult && b.action === 'search') return J({ parsed: { title: b.q, year: null }, candidates: [{ igdb: 9800009, title: 'Sample Found Game', year: 2023, cover: 'c989', plats: ['PC'], type: 'main' }, { igdb: 9800001, title: ADULT[0].title, year: ADULT[0].year, cover: ADULT[0].cover, plats: ['PC'], type: 'main' }] });
     if (b.adult && (b.action === 'add' || b.action === 'preview')) return J({ ...(b.action === 'add' ? { state: 'added' } : {}), game: { ...ADULT[0], id: 9800009, slug: 'sample-found', title: 'Sample Found Game', year: 2023, cover: 'c989', src: 'added', at: new Date().toISOString(), ord: undefined }, series: {}, plats: {}, franchises: {} });
     if (b.action === 'suggest') return J({ items: [{ igdb: 999123, title: 'Obscure Gem', year: 2019, fams: 8, cover: null }] });
@@ -567,6 +568,8 @@ for (const [name, w, h, mobile] of [['+18', 1440, 900, false], ['+18 (cover)', 3
   await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open')); check(`${name}: «أظهر الصور» يكشفها كلها`, await page.evaluate(() => !document.querySelector('#grid .x18') && document.querySelectorAll('#grid .gc .cover img[srcset]').length === 2));
   await tap('.r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open')); check(`${name}: و«غطِّ الصور» يغطيها كلها`, await page.evaluate(() => document.querySelectorAll('#grid .gc .cover.x18').length === 2));
   const a0 = asked.length; await tap('.top [data-act=add]'); await page.waitForSelector('#add[open]'); check(`${name}: نافذة الإضافة فيها باسم المكتبة`, /مكتبة/.test(await page.textContent('#add-h')) && /\+18/.test(await page.textContent('#add-h')));
+  await page.fill('#add-q', 'nothing here'); await page.press('#add-q', 'Enter'); await page.waitForFunction(() => /لم أجد/.test(document.querySelector('#add-msg')?.textContent || ''));
+  check(`${name}: بحث بلا نتيجة فيها يقول إنه بحث بين ما وُسم للبالغين، ويدلّ على القائمة العادية`, await page.evaluate(() => { const t = document.querySelector('#add-msg').textContent; return /nothing here/.test(t) && /للبالغين/.test(t) && /قائمتك العادية/.test(t) && !document.querySelector('.cand'); }), await page.textContent('#add-msg'));
   await page.fill('#add-q', 'sample'); await page.press('#add-q', 'Enter'); await page.waitForSelector('.cand');
   check(`${name}: بحثها يُرسل موسوماً adult، وما في المكتبة من نتائجه يقال إنه فيها`, asked.slice(a0).includes('18:search:sample') && !asked.slice(a0).some(x => /^(search|suggest)/.test(x)) && await page.evaluate(() => { const c = [...document.querySelectorAll('.cand')]; return c.length === 2 && !!c[0].querySelector('[data-act=add-pick]') && /في قائمتك/.test(c[1].textContent); }), asked.slice(a0));
   await tap('.cand [data-act=add-pick]'); await page.waitForSelector('.cand .pickl'); await tap('.cand .pickl [data-v=new]'); await page.waitForSelector('#g-9800009'); await page.waitForSelector('#sheet[open]');

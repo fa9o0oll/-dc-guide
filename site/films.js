@@ -436,6 +436,8 @@ $('#add-form').addEventListener('submit', async e => { e.preventDefault(); const
   msg.textContent = 'أبحث…'; $('#cands').innerHTML = '';
   try { const r = await api({ action: 'search', q }, pw); try { localStorage.setItem(PASS, pw); } catch {} $('#add-pass-wrap').hidden = true; $('#add-pass').value = '';
     if (!r.candidates.length) { const m = find(await titles(), q, { limit: 1, min: 52 }).hits[0];
+      // مكتبة +18: TMDB يرتب بالشهرة ويخلط ما وسمه للبالغين بغيره، فالاسم الشائع بلا سنة قد لا يبلغه البحث (lib-films: ADULT_PAGES)
+      if (ROOM) { msg.innerHTML = `لم أجد عملاً باسم «${esc(r.parsed.title)}»${r.parsed.year ? ` وسنة ${r.parsed.year}` : ''} بين ما صنّفه <bdi dir="ltr">TMDB</bdi> للبالغين. اكتب اسمه كاملاً كما هو هناك${r.parsed.year ? '' : '، وأضف سنته إن كان اسمه كلمة شائعة'}. وما سواه تجده من «أضف فيلماً» في قائمتك العادية.`; return; }
       msg.innerHTML = `لم أجد عملاً باسم «${esc(r.parsed.title)}»${r.parsed.year ? ` وسنة ${r.parsed.year}` : ''}.` + (m ? ` هل تقصد <button type="button" class="meant-btn" data-act="meant-add" data-q="${esc(m.title + (m.y ? ' ' + m.y : ''))}"><bdi>${esc(m.title)}</bdi>${m.y ? ` (${m.y})` : ''}</button>؟` : ' تأكد من الإملاء أو السنة.'); return; }
     msg.textContent = r.parsed.year ? `فهمت: «${r.parsed.title}»، سنة ${r.parsed.year}. اختر المقصود:` : `فهمت: «${r.parsed.title}» بلا سنة. اختر المقصود:`;
     $('#cands').innerHTML = r.candidates.map(c => { const has = D.byId.has((c.kind === 'tv' ? 't' : 'm') + c.tmdb);

@@ -575,6 +575,7 @@ $('#add-form').addEventListener('submit', async e => { e.preventDefault(); const
   msg.textContent = 'أبحث…'; $('#cands').innerHTML = '';
   try { const r = await api('/api/add-game', { action: 'search', q }, pw); remember(pw); $('#add-pass-wrap').hidden = true; $('#add-pass').value = '';
     if (!r.candidates.length) { const m = find(await titles(), q, { limit: 1, min: 52 }).hits[0];
+      if (ROOM) { msg.innerHTML = `لم أجد لعبة باسم «${esc(r.parsed.title)}»${r.parsed.year ? ` وسنة ${r.parsed.year}` : ''} بين ما وسمه <bdi dir="ltr">IGDB</bdi> للبالغين. تأكد من الإملاء${r.parsed.year ? ' أو السنة' : ''}، وما سواها تجده من «أضف لعبة» في قائمتك العادية.`; return; }
       msg.innerHTML = `لم أجد لعبة باسم «${esc(r.parsed.title)}»${r.parsed.year ? ` وسنة ${r.parsed.year}` : ''}.` + (m ? ` هل تقصد <button type="button" class="meant-btn" data-act="meant-add" data-q="${esc(m.title + (m.y ? ' ' + m.y : ''))}"><bdi>${esc(m.title)}</bdi>${m.y ? ` (${m.y})` : ''}</button>؟` : ' تأكد من الإملاء أو السنة.'); return; }
     msg.textContent = r.parsed.year ? `فهمت: «${r.parsed.title}»، سنة ${r.parsed.year}. اختر المقصودة:` : `فهمت: «${r.parsed.title}». اختر المقصودة:`;
     $('#cands').innerHTML = r.candidates.map(c => { const has = D.byId.has(c.igdb), tw = !has && twinOf(c.title);   // لعبة أخرى في القائمة بالاسم نفسه: يُقال قبل الإضافة، فلا تتكرر بلمسة خاطئة
