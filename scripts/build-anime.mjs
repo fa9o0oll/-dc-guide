@@ -199,11 +199,6 @@ Object.assign(report, { list: list.length, catalog: anime.length, relatives: ani
   withProviders: mine.filter(a => a.pv && ['stream', 'free', 'rent', 'buy'].some(k => a.pv[k].length)).length, providers: Object.keys(providers).length,
   airing: mine.filter(a => a.st === 'airing').length, withNext: mine.filter(a => a.nx).length, door, worlds: worlds.length, worldsWithStoryOrder: worlds.filter(w => w.story).length, worldsBiggest: worlds.slice().sort((a, b) => b.ids.length - a.ids.length).slice(0, 5).map(w => `${w.name} (${w.ids.length})`),
   arabic: mine.filter(a => translations[a.id]).length, cached: cache.size, missingRelatives: relatives().filter(id => !cache.has(id)).length });
-// فروع العمل: بحث Jikan كما تسأله الصفحة في «أضف أنمي» (E61). هل يحصر rating=rx النتائج في تصنيف Rx، وماذا يحجب sfw؟ أعداد فقط، بلا أسماء في السجل
-if (PROBE) for (const q of ['love', 'dxd', 'yosuga no sora']) for (const more of ['&rating=rx', '&sfw=true', '']) { try { const r = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=20${more}`, { headers: UA, signal: AbortSignal.timeout(15000) }), d = r.ok ? (await r.json())?.data || [] : [];
-    const rx = x => /^Rx/.test(x.rating || ''), tag = (x, re) => [...(x.genres || []), ...(x.explicit_genres || [])].some(g => re.test(g?.name || ''));
-    console.log(`probe jikan search "${q}" ${more || '(no filter)'}: HTTP ${r.status}, ${d.length} rows, Rx ${d.filter(rx).length}, Hentai-tagged ${d.filter(x => tag(x, /Hentai/)).length}, Erotica not Rx ${d.filter(x => !rx(x) && tag(x, /Erotica/)).length}, Ecchi not Rx ${d.filter(x => !rx(x) && tag(x, /Ecchi/)).length}`); }
-  catch (e) { console.log(`probe jikan search "${q}" ${more || '(no filter)'}: ${e.cause?.code || e.message}`); } await wait(1300); }
 if (PROBE) report.sample = { mal: cache.get(list[0].mal)?.d || null, entries: anime.slice(0, 3), text: texts[list[0].mal % 32][list[0].mal] || null }; // في فروع العمل: عيّنة تُقرأ في سجل البناء للتحقق من شكل البيانات
 wr(new URL('report.json', GEN), report);
 console.log(JSON.stringify(report, null, 1));

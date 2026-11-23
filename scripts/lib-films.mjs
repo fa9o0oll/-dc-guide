@@ -33,10 +33,13 @@ export function rank(cands, title, year) {
 }
 
 // يبحث عن عمل بالعنوان والسنة. يجرّب السنة نفسها، ثم بلا سنة (لأن تاريخ TMDB قد يكون سنة العرض التجاري لا المهرجان).
-// adult: بحث مكتبة +18 (E61): ما وسمه TMDB للبالغين وحده. وبدونه لا يعود شيء منه
+// adult: بحث مكتبة +18 (E61): ما وسمه TMDB للبالغين وحده، وبدونه لا يعود شيء منه. TMDB لا يبحث فيه وحده: يخلطه بغيره ويرتب بالشهرة، فيغيب عن الصفحة
+// الأولى؛ فتُقرأ في بحث المكتبة خمس صفحات (ADULT_PAGES) ويُبقى منها ما وُسم
+export const ADULT_PAGES = [1, 2, 3, 4, 5];
 export async function search(tmdb, kind, title, year, adult = false) {
   const yk = kind === 'tv' ? 'first_air_date_year' : 'year', seen = new Map();
-  const run = async p => { for (const c of (await tmdb('/search/' + kind, { query: title, include_adult: adult, ...p }).catch(() => ({}))).results || []) if (!seen.has(c.id) && !!c.adult === adult) seen.set(c.id, c); };
+  const run = async p => { for (const r of await Promise.all((adult ? ADULT_PAGES : [1]).map(page => tmdb('/search/' + kind, { query: title, include_adult: adult, ...(page > 1 ? { page } : {}), ...p }).catch(() => ({})))))
+    for (const c of r.results || []) if (!seen.has(c.id) && !!c.adult === adult) seen.set(c.id, c); };
   if (year) await run({ [yk]: year });
   if (!year || ![...seen.values()].some(c => [c.title, c.original_title, c.name, c.original_name].filter(Boolean).map(norm).includes(norm(title)))) await run({});
   return rank([...seen.values()], title, year);

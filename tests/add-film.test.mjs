@@ -65,10 +65,10 @@ check('تعطّل Wikidata يعيد خطأً واضحاً ولا يكتب شيئ
 // مكتبة +18 (E61): الطلب يحمل adult فيعود بما وسمه TMDB للبالغين وحده، وبدونه لا يعود بشيء منه؛ والعمل لا يُضاف إلا من مكتبته
 { const P = { password: 'open-sesame-42' }, before = puts.length; adultAsked = [];
   const sa = await call({ action: 'suggest', q: 'heat', adult: true, ...P });
-  check('اقتراحات مكتبة +18: ما وُسم للبالغين وحده، وTMDB يُسأل بـinclude_adult', JSON.stringify(sa.body.items) === JSON.stringify([{ tmdb: 8, kind: 'movie', title: 'X', year: null, poster: null }]) && adultAsked.join() === '/search/multi true', [sa.body, adultAsked]);
+  check('اقتراحات مكتبة +18: ما وُسم للبالغين وحده بلا تكرار، وTMDB يُسأل بـinclude_adult خمس صفحات', JSON.stringify(sa.body.items) === JSON.stringify([{ tmdb: 8, kind: 'movie', title: 'X', year: null, poster: null }]) && adultAsked.length === 5 && adultAsked.every(a => a === '/search/multi true'), [sa.body, adultAsked]);
   adultAsked = []; const n = await call({ action: 'search', q: 'Velvet', ...P }), x = await call({ action: 'search', q: 'Velvet', adult: true, ...P });
   check('البحث العادي لا يعيد عمل +18 ولا يطلبه، وبحث المكتبة يعيده وحده بلا اسم سلسلته', n.body.candidates.map(c => c.tmdb).join() === '701' && x.body.candidates.map(c => c.tmdb).join() === '700' && x.body.candidates[0].collection === undefined
-    && adultAsked.filter(a => / false$/.test(a)).length === 2 && adultAsked.filter(a => / true$/.test(a)).length === 2, [n.body.candidates, x.body.candidates, adultAsked]);
+    && adultAsked.filter(a => / false$/.test(a)).length === 2 && adultAsked.filter(a => / true$/.test(a)).length === 10, [n.body.candidates, x.body.candidates, adultAsked]);   // العادي صفحة لكل نوع، والمكتبة خمس
   const pn = await call({ action: 'preview', tmdb: 700, kind: 'movie', ...P }), an = await call({ action: 'add', tmdb: 700, kind: 'movie', ...P });
   check('عمل +18 لا يُفتح ولا يُضاف من القائمة العادية', pn.status === 422 && an.status === 422 && /مكتبة \+18/.test(an.body.error) && puts.length === before, [pn, an]);
   const pa = await call({ action: 'preview', tmdb: 700, kind: 'movie', adult: true, ...P }), f = pa.body.film;

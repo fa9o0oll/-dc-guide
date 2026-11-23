@@ -6,7 +6,7 @@
 //   TMDB_API_KEY  مفتاح TMDB        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع        ADD_FILM_PASSWORD  كلمة السر
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { tmdb, hasKey } from '../../scripts/lib-tmdb.mjs';
-import { parseLine, search, shape, shapeCollection, detailPath, detailParams } from '../../scripts/lib-films.mjs';
+import { parseLine, search, shape, shapeCollection, detailPath, detailParams, ADULT_PAGES } from '../../scripts/lib-films.mjs';
 import { worldsFor } from '../../scripts/lib-worlds.mjs';
 import { gatherEvidence, chronoOrder } from '../../scripts/lib-chrono.mjs';
 
@@ -45,8 +45,9 @@ export default async req => {
     // اقتراحات أثناء الكتابة لما ليس في فهرس الصفحة: بحث TMDB الموحد (أفلام ومسلسلات، ويطابق العناوين المترجمة والبديلة) بطلب واحد
     if (b.action === 'suggest') {
       const q = String(b.q || '').replace(/\s+/g, ' ').trim().slice(0, 80); if (q.length < 2) return json(200, { items: [] });
-      const r = await tmdb('/search/multi', { query: q, include_adult: adult, language: 'en-US' });
-      const items = (r.results || []).filter(x => (x.media_type === 'movie' || x.media_type === 'tv') && !!x.adult === adult).slice(0, 6)
+      // في مكتبة +18 تُقرأ خمس صفحات: ما وسمه TMDB للبالغين يغيب عن الأولى (lib-films: ADULT_PAGES)
+      const rs = await Promise.all((adult ? ADULT_PAGES : [1]).map(page => tmdb('/search/multi', { query: q, include_adult: adult, language: 'en-US', ...(page > 1 ? { page } : {}) }).catch(e => { if (page === 1) throw e; return {}; }))), seen = new Set();
+      const items = rs.flatMap(r => r.results || []).filter(x => (x.media_type === 'movie' || x.media_type === 'tv') && !!x.adult === adult && !seen.has(x.media_type + x.id) && seen.add(x.media_type + x.id)).slice(0, 6)
         .map(x => ({ tmdb: x.id, kind: x.media_type, title: x.title || x.name, year: year(x), poster: x.poster_path || null }));
       return json(200, { items });
     }
