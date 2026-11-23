@@ -3,7 +3,8 @@
 import zlib from 'node:zlib';
 import { parseMal, readMalFile, malDate, STATUSES } from '../site/anime-mal.js';
 import { shapeSimkl, bulkDays, simklAhead } from '../site/anime-simkl.js';
-import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, pickSpecials, epFit, epKey, epPrint, curatedOrder } from '../scripts/lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, pickSpecials, epFit, epKey, epPrint, curatedOrder, linesOf, packLines } from '../scripts/lib-anime.mjs';
+import { describe, ord } from '../site/anime-pos.js';
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -193,6 +194,43 @@ check('حلقة TMDB ← ما نحفظه، والاسم الآلي ليس عنو
   && shapeEpisode({ season_number: 1, episode_number: 1, overview: 'No description of the war survives, so Ann writes one.' }).ov === 'No description of the war survives, so Ann writes one.');
 const fp = s => s.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7).toString(16).padStart(12, '0');
 check('بصمة الحلقة تتبدل بتبدل عنوانها أو ملخصها', epPrint(fp, E).length === 10 && epPrint(fp, E) !== epPrint(fp, { ...E, ov: 'Other.' }) && epPrint(fp, E) !== epPrint(fp, { ...E, t: 'Else' }) && epPrint(fp, E) === epPrint(fp, { ...E, st: null }));
+
+{ // ---------- خطوط القصة و«موقعه من سلسلته» (E57): علاقات MyAnimeList ← خطوط وما يُعرَّف به كل عمل ← جمل عربية
+// سلسلة على هيئة Dr. Stone: موسمان، وحلقة خاصة بينهما وبين الثالث، وملخص للأول، وجزءان للموسم الثالث في TMDB، ونسخة أخرى
+const RL = (r, id) => ({ r, id });
+const GX = [{ id: 1, type: 'TV', from: '2019-07-05', rel: [RL('Sequel', 2), RL('Summary', 9)] }, { id: 9, type: 'Special', from: '2020-12-24', rel: [RL('Full Story', 1)] },
+  { id: 2, type: 'TV', from: '2021-01-14', rel: [RL('Prequel', 1), RL('Sequel', 3)] }, { id: 3, type: 'TV Special', from: '2022-07-10', rel: [RL('Prequel', 2), RL('Sequel', 4)] },
+  { id: 4, type: 'TV', from: '2023-04-06', rel: [RL('Prequel', 3), RL('Sequel', 5)] }, { id: 5, type: 'TV', from: '2023-10-12', rel: [RL('Prequel', 4)] },
+  { id: 7, type: 'TV', from: '2024-01-01', rel: [RL('Alternative Version', 1)] }];
+const ORDER = [1, 9, 2, 3, 4, 5, 7], L = linesOf(GX, ORDER);
+check('الخط الرئيسي سلسلة «السابق/اللاحق» التي فيها أقدم مسلسل، والملخص والنسخة الأخرى خطان بنوعيهما', same(L.ln, [['m', 1, 2, 3, 4, 5], ['r', 9], ['a', 7]]), L.ln);
+check('ما يكمله كل عمل في خطه، وأول خط غير رئيسي يُعرَّف بأصله', same(L.rf, { 2: ['p', 1], 3: ['p', 2], 4: ['p', 3], 5: ['p', 4], 9: ['r', 1], 7: ['a', 1] }), L.rf);
+check('الصيغة المختصرة بمحاذاة ترتيب القصة', same(packLines(ORDER, L), { lk: 'mra', li: [0, 1, 0, 0, 0, 0, 2], ri: [-1, 0, 0, 2, 3, 4, 0] }));
+check('ملخص لأكثر من عمل نوعه R ومرجعه آخر ما يلخّصه', (() => { const g = [...GX.slice(0, 3), { id: 8, type: 'Special', from: '2022-01-01', rel: [RL('Full Story', 1), RL('Full Story', 2)] }]; const x = linesOf(g, [1, 9, 2, 8]); return same(x.ln[2], ['R', 8]) && same(x.rf[8], ['R', 2]); })());
+check('تصحيحا orders.json: main يضم عملاً إلى الخط الرئيسي، وas يفصل أعمالاً إلى خط بنوع ومرجع ويبقي صلاتها ببعضها', (() => {
+  const g = [{ id: 1, type: 'TV', from: '1986', rel: [RL('Sequel', 2), RL('Sequel', 5)] }, { id: 2, type: 'TV', from: '1989', rel: [RL('Prequel', 1)] }, { id: 5, type: 'TV', from: '2009', rel: [RL('Prequel', 1), RL('Sequel', 6)] },
+    { id: 6, type: 'TV', from: '2014', rel: [RL('Prequel', 5)] }, { id: 3, type: 'TV', from: '2015', rel: [RL('Parent Story', 2)] }];
+  const x = linesOf(g, [1, 2, 5, 6, 3], { main: [3], as: { 5: ['a', 2], 6: ['a', 2] } }); return same(x.ln, [['m', 1, 2, 3], ['a', 5, 6]]) && same(x.rf, { 2: ['p', 1], 6: ['p', 5], 5: ['a', 2] }); })());
+check('العدد الترتيبي', ord(1) === 'الأول' && ord(11) === 'الحادي عشر' && ord(12) === 'الثاني عشر' && ord(20) === 'العشرون' && ord(21) === 'الحادي والعشرون' && ord(35) === 'الخامس والثلاثون');
+const byX = new Map([[1, { id: 1, t: 'Dr. Stone', type: 'TV', eps: 24, y: 2019, tm: { k: 'tv', id: 86031, s: 1 } }], [9, { id: 9, t: 'Kaisen Zenya', type: 'Special', eps: 1, y: 2020 }],
+  [2, { id: 2, t: 'Stone Wars', type: 'TV', eps: 11, y: 2021, tm: { k: 'tv', id: 86031, s: 2 } }], [3, { id: 3, t: 'Ryuusui', type: 'TV Special', eps: 1, y: 2022, tm: { k: 'tv', id: 86031, s: 0, o: 1 } }],
+  [4, { id: 4, t: 'New World', type: 'TV', eps: 11, y: 2023, tm: { k: 'tv', id: 86031, s: 3 } }], [5, { id: 5, t: 'New World Part 2', type: 'TV', eps: 11, y: 2023, tm: { k: 'tv', id: 86031, s: 3, o: 11 } }],
+  [7, { id: 7, t: 'Dr. Stone Again', type: 'TV', eps: 12, y: 2024, tm: { k: 'tv', id: 99, s: 1 } }]]);
+const W = { id: 1, name: 'Dr. Stone', ids: ORDER, ...packLines(ORDER, L) }, txt = h => h.replace(/<[^>]+>/g, '');
+const ctx = { by: byX, esc: s => s, title: a => a.t, link: id => `<b>${byX.get(id).t}</b>`, name: w => w.name, long: a => a.eps >= 100 };
+const say = id => { const d = describe(W, id, ctx); return [txt(d.badge), txt(d.sub), d.says.map(txt).join(' '), d.next ? txt(d.next.kind) : '', txt(d.hint)]; };
+check('بداية العالم: «الموسم الأول من Dr. Stone، ومنه تبدأ القصة.» والتالي الموسم الثاني', same(say(1), ['بداية العالم', '', 'الموسم الأول من Dr. Stone، ومنه تبدأ القصة.', 'الموسم الثاني', '']), say(1));
+check('الموسم الثاني يكمل الأول، والتالي حلقة خاصة بين الموسمين الثاني والثالث', same(say(2), ['الموسم الثاني', '', 'يكمل أحداث الموسم الأول Dr. Stone.', 'حلقة تلفزيونية خاصة بين الموسمين الثاني والثالث', 'يكمل الموسم الأول']), say(2));
+check('الحلقة الخاصة بنوعها وموضعها، وفعلها مؤنث', same(say(3).slice(0, 3), ['حلقة تلفزيونية خاصة', 'بين الموسمين الثاني والثالث', 'تكمل أحداث الموسم الثاني Stone Wars.']), say(3));
+check('الموسم الثالث يكمل «Ryuusui، وهي حلقة تلفزيونية خاصة بين الموسمين…»، وجزؤه الثاني باسمه', say(4)[0] === 'الجزء الأول من الموسم الثالث' && say(4)[2] === 'يكمل أحداث Ryuusui، وهي حلقة تلفزيونية خاصة بين الموسمين الثاني والثالث.'
+  && say(5)[0] === 'الجزء الثاني من الموسم الثالث' && say(5)[2] === 'يكمل أحداث الجزء الأول من الموسم الثالث New World.', [say(4), say(5)]);
+check('الملخص يقول ما يلخّصه ويمكن تخطيه، والنسخة الأخرى ليست تكملة', same(say(9).slice(0, 3), ['ملخص', 'حلقة خاصة', 'تلخّص أحداث Dr. Stone، ويمكن تخطيها إن شاهدته.']) && say(7)[2] === 'يعيد حكاية Dr. Stone بمعالجة أخرى، فليس تكملة له.', [say(9), say(7)]);
+check('ما صدر بعد ما يسبقه أحداثاً يقال فيه ذلك (Kizumonogatari قبل Bakemonogatari)', (() => { const b2 = new Map([[1, { id: 1, t: 'Kizu', type: 'Movie', eps: 1, y: 2016 }], [2, { id: 2, t: 'Bake', type: 'TV', eps: 15, y: 2009 }]]);
+  const w2 = { id: 2, name: 'Monogatari', ids: [2, 1], story: [1, 2], lk: 'm', li: [0, 0], ri: [-1, 0] }, d = describe(w2, 1, { ...ctx, by: b2, link: id => b2.get(id).t }), e = describe(w2, 2, { ...ctx, by: b2, link: id => b2.get(id).t });
+  return d.badge === 'بداية العالم' && d.warp === 'صدر بعد Bake بـ7 سنوات، لكن أحداثه تسبقه.' && e.warp === 'صدر قبل Kizu بـ7 سنوات، لكن أحداثه تأتي بعده.'; })());
+check('ترقيم مسلسل يخالف فيه اسمٌ رقمَ موسمه في TMDB يُترك (Monogatari Series: Second Season هو الثالث هناك)', (() => { const b3 = new Map([[1, { id: 1, t: 'Bake', type: 'TV', y: 2009, tm: { k: 'tv', id: 5, s: 1 } }], [2, { id: 2, t: 'Nise', type: 'TV', y: 2012, tm: { k: 'tv', id: 5, s: 2 } }], [3, { id: 3, t: 'Monogatari Series: Second Season', type: 'TV', y: 2013, tm: { k: 'tv', id: 5, s: 3 } }]]);
+  const w3 = { id: 1, name: 'Monogatari', ids: [1, 2, 3], lk: 'm', li: [0, 0, 0], ri: [-1, 0, 1] }; return describe(w3, 3, { ...ctx, by: b3, link: id => b3.get(id).t }).badge === 'الجزء الثالث من القصة'; })());
+}
 
 console.log(fail ? `\n❌ فشل ${fail}` : '\n✅ كل فحوص أنمياتي نجحت');
 process.exit(fail ? 1 : 0);

@@ -97,6 +97,48 @@ function storyOrder(g) { const ids = new Set(g.map(x => x.id)), at = new Map(g.m
   const left = g.slice(), done = new Set(), out = [];
   while (left.length) { let i = left.findIndex(x => [...pre.get(x.id)].every(p => done.has(p))); if (i < 0) i = 0; const [x] = left.splice(i, 1); done.add(x.id); out.push(x.id); }
   return out; }
+// خطوط القصة في السلسلة، ومنها «موقعه من سلسلته» في كل بطاقة وخطوط البوابة الزمنية. g: أعمال السلسلة بعلاقاتها، order: ترتيب القصة النهائي.
+// الخط أعمالٌ تصلها «السابق/اللاحق» ببعضها (قصة متصلة). الخط الرئيسي (m) هو الذي فيه أقدم مسلسلاتها، وكل خط غيره نوعه من صلته بما خارجه:
+//   a نسخة أخرى من القصة، t عالم بديل، f عمل متفرع، s قصة جانبية، r ملخص. الأولوية بهذا الترتيب، والصلة بالخط الرئيسي تُقدَّم على غيرها.
+// وصلات MyAnimeList متقابلة (صفحة الجانبية تقول «القصة الأم» وصفحة الأم تقول «قصة جانبية»)، فتُقرأ من الطرفين: يكفي أن يذكرها أحدهما.
+// ln: الخطوط، كلٌّ [النوع، ...الأعمال بترتيب القصة]، الرئيسي أولاً ثم الخطوط بترتيب أول أعمالها.
+// rf: لكل عمل ما يُعرَّف به: [p، الجزء الذي يكمله] لما له سابق في خطه، و[نوع خطه، العمل الذي تفرّع منه] لأول عمل في خط غير رئيسي. وأول الخط الرئيسي بلا مرجع
+const KIND_OF = { 'Alternative Version': 'a', 'Alternative Setting': 't', 'Spin-Off': 'f', 'Side Story': 's', Summary: 'r' }, MINE_OF = { 'Parent Story': 's', 'Full Story': 'r' }, KINDS = 'atfsr';
+export function linesOf(g, order, { main = [], as = {} } = {}) { const ids = new Set(g.map(x => x.id)), by = new Map(g.map(x => [x.id, x])), at = new Map(order.map((id, i) => [id, i]));
+  const root = new Map(g.map(x => [x.id, x.id])), find = a => { while (root.get(a) !== a) { root.set(a, root.get(root.get(a))); a = root.get(a); } return a; }, join = (a, b) => { a = find(a); b = find(b); if (a !== b) root.set(a, b); };
+  const says = (x, r, y) => (by.get(x)?.rel || []).some(e => e.r === r && e.id === y);
+  // «as» في orders.json: أعمال تُفصل عن خطها إلى خط بنوع ومرجع مُراجَعين (Dragon Ball Kai نسخة أخرى من Dragon Ball Z وإن قالت علاقاته إنه تكملة لـDragon Ball).
+  // تبقى صلات «السابق/اللاحق» بينها هي، وتُقطع صلاتها بما سواها
+  const cut = new Set(Object.keys(as).map(Number).filter(id => ids.has(id)));
+  for (const x of g) for (const e of x.rel || []) if (HARD.has(e.r) && ids.has(e.id) && e.id !== x.id && cut.has(x.id) === cut.has(e.id)) join(x.id, e.id);
+  const when = x => x.from || '9999', tv = g.filter(x => x.type === 'TV').sort((a, b) => when(a) < when(b) ? -1 : when(a) > when(b) ? 1 : a.id - b.id)[0] || g.slice().sort((a, b) => (at.get(a.id) ?? 1e9) - (at.get(b.id) ?? 1e9))[0];
+  for (const id of main) if (ids.has(id)) join(id, tv.id);   // ما يقول ترتيب مُراجَع إنه من القصة الرئيسية وإن لم تصله «السابق/اللاحق» بها (Dragon Ball Super)
+  const mainKey = find(tv.id), groups = new Map(); for (const id of order) if (ids.has(id)) { const k = find(id); (groups.get(k) || groups.set(k, []).get(k)).push(id); }
+  // ما يكمله العمل في خطه: أقرب سابق له بترتيب القصة مما يقول أحد الطرفين إنه سابقه. وما لا سابق له هكذا يُعرف موضعه من ترتيب القصة وحده
+  const rf = {}; for (const ln of groups.values()) for (const id of ln) { const pre = ln.filter(y => y !== id && (says(id, 'Prequel', y) || says(y, 'Sequel', id)) && at.get(y) < at.get(id)).sort((a, b) => at.get(b) - at.get(a))[0]; if (pre) rf[id] = ['p', pre]; }
+  const lex = (a, b) => { for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] - b[i]; return 0; };
+  // نوع الخط من أقوى صلة بين أحد أعماله (x) وعمل خارجه (y): صفحة y تقول إن x متفرع منه أو جانبي أو ملخص له، أو صفحة x تقول إن y قصته الأم
+  // أو قصته الكاملة، و«النسخة الأخرى» و«العالم البديل» من أي الطرفين
+  const kindOf = ln => { const inLn = new Set(ln); let best = null;
+    for (const x of ln) for (const y of ids) { if (inLn.has(y)) continue; let k = null; const take = c => { if (!k || KINDS.indexOf(c) < KINDS.indexOf(k)) k = c; };
+      for (const [r, c] of Object.entries(KIND_OF)) if (says(y, r, x) || ((c === 'a' || c === 't') && says(x, r, y))) take(c);
+      for (const [r, c] of Object.entries(MINE_OF)) if (says(x, r, y)) take(c);
+      if (!k) continue; const score = [find(y) === mainKey ? 0 : 1, KINDS.indexOf(k), at.get(y) ?? 1e9, at.get(x) ?? 1e9];
+      if (!best || lex(score, best.score) < 0) best = { k, y, score }; }
+    return best; };
+  // ملخص لأكثر من عمل (ملخص القصة حتى موضع ما): نوعه R، ومرجعه آخر ما يلخّصه بترتيب القصة
+  const sums = ln => { const t = new Set(); for (const x of ln) for (const y of ids) if (find(y) !== find(x) && (says(x, 'Full Story', y) || says(y, 'Summary', x))) t.add(y); return [...t].sort((a, b) => at.get(a) - at.get(b)); };
+  const out = [['m', ...(groups.get(mainKey) || [])]];
+  for (const [key, ln] of groups) { if (key === mainKey) continue; if (cut.has(ln[0])) { const [k, y] = as[ln[0]]; out.push([k, ...ln]); if (ids.has(y)) rf[ln[0]] = [k, y]; continue; }
+    let b = kindOf(ln); if (b?.k === 'r') { const t = sums(ln); if (t.length > 1) b = { k: 'R', y: t[t.length - 1] }; }
+    out.push([b?.k || 's', ...ln]); if (b && !rf[ln[0]]) rf[ln[0]] = [b.k, b.y]; }
+  out.sort((a, b) => a[0] === 'm' ? -1 : b[0] === 'm' ? 1 : at.get(a[1]) - at.get(b[1]));
+  return { ln: out, rf }; }
+// الخطوط بصيغة الكتالوج المختصرة، بمحاذاة ترتيب القصة: lk أنواع الخطوط (أولها الرئيسي)، li رقم خط كل عمل، ri موضع ما يُعرَّف به في الترتيب نفسه (-1: لا شيء).
+// والمرجع في خط العمل نفسه «يكمل أحداثه»، وفي خط آخر صلةٌ من نوع خطه (جانبية منه، متفرع منه، نسخة أخرى منه، ملخص له)
+export function packLines(order, { ln, rf }) { const pos = new Map(order.map((id, i) => [id, i])), li = order.map(() => 0);
+  ln.forEach((l, k) => l.slice(1).forEach(id => { if (pos.has(id)) li[pos.get(id)] = k; }));
+  return { lk: ln.map(l => l[0]).join(''), li, ri: order.map(id => rf[id] ? pos.get(rf[id][1]) ?? -1 : -1) }; }
 // اسم السلسلة من اسم أقدم أعمالها بلا لاحقة الموسم أو النوع: «Gintama (TV)» ← Gintama، «Kingdom Season 1» ← Kingdom، «Major S1» ← Major
 export const worldName = t => String(t || '').replace(/\s*\((?:TV|\d{4})\)\s*$/i, '').replace(/\s*(?::|-)?\s*(?:Season\s*\d+|\d+(?:st|nd|rd|th)\s+Season|Part\s*\d+|First Season|S\d+)\s*$/i, '').trim() || String(t || '');
 // اسم رأس السلسلة (أقدم مسلسلاتها) لا يصلح دائماً اسماً لها. يُؤخذ بدله أقصر اسم من أسماء أعمالها يبدأ به نصفها على الأقل (عند حد كلمة) في حالتين:

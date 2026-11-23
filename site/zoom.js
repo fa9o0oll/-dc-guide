@@ -27,7 +27,7 @@ dialog.pz::backdrop{background:none}
 .pz-zoom{position:relative;perspective:1400px;transform-origin:50% 50%}
 .pz-zoom.pz-ease{transition:transform .34s cubic-bezier(.2,.8,.2,1)}
 .pz-on .pz-zoom{will-change:transform}
-.pz-card{position:relative;overflow:hidden;background:#15151b;box-shadow:0 36px 80px -18px rgba(0,0,0,.85),0 10px 28px rgba(0,0,0,.45);transition:transform .3s cubic-bezier(.2,.8,.2,1);cursor:grab}
+.pz-card{position:relative;overflow:hidden;background:#15151b;box-shadow:0 36px 80px -18px rgba(0,0,0,.85),0 10px 28px rgba(0,0,0,.45);transition:transform .45s cubic-bezier(.2,.8,.2,1);cursor:grab}
 .pz-on .pz-card,.pz-gyro .pz-card{transition:none}
 .pz-on .pz-card{cursor:grabbing}
 .pz-zoomed .pz-card{cursor:move}
@@ -319,7 +319,8 @@ function rest() { if (!D.fly.style.transform && !D.card.style.transform) return;
 const cardBox = () => D.card.getBoundingClientRect();
 function shine(x, y) { const r = cardBox(); D.card.style.setProperty('--sx', `${((x - r.left) / r.width * 100).toFixed(1)}%`); D.card.style.setProperty('--sy', `${((y - r.top) / r.height * 100).toFixed(1)}%`); D.sheen.style.opacity = '1'; }
 // ميل البوستر المكبَّر: x وy بين -0.5 و0.5 تقريباً، والضوء ينعكس من الجهة المقابلة
-function tiltTo(x, y, deg) { if (S !== 'open' || Z.s > 1.01 || G) return; if (Math.abs(x) > .8 || Math.abs(y) > .8) return flat();
+// بالماوس يميل ما دام المؤشر داخل حدود الصورة نفسها، وإن خرج منها عادت مستوية بهدوء (الانتقال في .pz-card)؛ والجوال يميله ميلانه وإن تجاوز
+function tiltTo(x, y, deg) { if (S !== 'open' || Z.s > 1.01 || G) return; if (Math.abs(x) > (hover ? .5 : .8) || Math.abs(y) > (hover ? .5 : .8)) return flat();
   D.card.style.transform = `rotateY(${(x * deg).toFixed(2)}deg) rotateX(${(-y * deg).toFixed(2)}deg)`;
   D.card.style.setProperty('--sx', `${(50 - x * 90).toFixed(1)}%`); D.card.style.setProperty('--sy', `${(40 - y * 90).toFixed(1)}%`); D.sheen.style.opacity = Math.min(1, Math.hypot(x, y) * 3).toFixed(3); }
 function flat() { if (!D) return; D.card.style.transform = ''; D.sheen.style.opacity = ''; D.amb.style.translate = ''; D.d.classList.remove('pz-gyro'); }

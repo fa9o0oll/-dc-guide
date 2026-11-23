@@ -13,7 +13,7 @@ import net from 'node:net';
 net.setDefaultAutoSelectFamilyAttemptTimeout(5000);
 import { tmdb, hasKey } from './lib-tmdb.mjs';
 import { COUNTRY } from './lib-films.mjs';
-import { shapeMal, shapeMalApi, MAL_FIELDS, worldsOf, curatedOrder, pickTmdb, LINKS } from './lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, worldsOf, curatedOrder, linesOf, packLines, pickTmdb, LINKS } from './lib-anime.mjs';
 
 const root = new URL('../', import.meta.url), SRC = new URL('data/anime/', root), OUT = new URL('site/anime/data/', root), GEN = new URL('data/generated/anime/', root), MAL = new URL('mal/', GEN);
 for (const d of [OUT, GEN, MAL, new URL('texts/', OUT)]) fs.mkdirSync(d, { recursive: true });
@@ -119,7 +119,8 @@ if (!door && prevCat?.door) door = prevCat.door;
 if (prevCat && tmdbOk && !tv.size && !movie.size) { tmdbOk = false; Object.assign(providers, prevCat.providers || {}); report.problems.push('TMDB لم يرد بشيء: تبقى صور الكتالوج السابق ومنصاته'); }
 
 // ---------- 3) السلاسل
-const worlds = worldsOf(all.map(id => { const d = cache.get(id)?.d, b = basics.get(id); return { id, rel: d?.rel || [], from: d?.from || null, type: d?.type || b?.type || '', eps: d ? d.eps : b?.eps || 0, title: d?.title || b?.title || '', en: d?.en || null, mine: inList.has(id) }; }));
+const items = all.map(id => { const d = cache.get(id)?.d, b = basics.get(id); return { id, rel: d?.rel || [], from: d?.from || null, type: d?.type || b?.type || '', eps: d ? d.eps : b?.eps || 0, title: d?.title || b?.title || '', en: d?.en || null, mine: inList.has(id) }; });
+const worlds = worldsOf(items), itemBy = new Map(items.map(x => [x.id, x]));
 // ترتيب القصة المُراجَع (data/anime/orders.json): { "<رقم العمل الذي تحمل السلسلة اسمه>": { order: [أرقام الأعمال], note: "ملاحظة تظهر تحت الترتيب" } }.
 // الترتيب المحسوب من علاقات MyAnimeList يكفي أكثر السلاسل؛ وهذا لما يخالف فيه الترتيبُ الزمني المعروف تلك العلاقات (Dragon Ball GT بعد Super، Hanamonogatari في آخر Monogatari)
 const orders = rd(new URL('orders.json', SRC), {}); report.ordersApplied = 0; report.ordersLoose = [];
@@ -127,7 +128,32 @@ for (const w of worlds) { const o = orders[w.head] || orders[w.id]; if (!o) cont
   if (Array.isArray(o.order) && o.order.length) { const c = curatedOrder(w.story || w.ids, o.order); if (c.loose.length) report.ordersLoose.push(`${w.name}: ${c.loose.join(' ')}`);
     if (c.order.join() !== w.ids.join()) w.story = c.order; else delete w.story; w.sv = 1; }
   if (typeof o.note === 'string' && o.note.trim()) w.sn = o.note.trim(); }
+// خطوط القصة في كل سلسلة وما يُعرَّف به كل عمل (lib-anime: linesOf)، بعد الترتيب المُراجَع لأنها تتبعه. وفي orders.json تصحيحان مُراجَعان لما تخطئ فيه
+// علاقات MyAnimeList: «main» أعمال من القصة الرئيسية لا تصلها بها علاقة «سابق/لاحق» (Dragon Ball Super)، و«as» أعمال تُفصل إلى خط بنوع ومرجع
+// ({ "<رقم العمل>": ["a", <رقم أصله>] }؛ a نسخة أخرى، t عالم بديل، f متفرع، s جانبي، r ملخص)
+report.lines = { worlds: 0, side: 0 };
+for (const w of worlds) { const o = orders[w.head] || orders[w.id], order = w.story || w.ids;
+  try { const L = linesOf(w.ids.map(id => itemBy.get(id)), order, { main: Array.isArray(o?.main) ? o.main : [], as: o?.as && typeof o.as === 'object' ? o.as : {} });
+    if (L.ln.length > 1 || Object.keys(L.rf).length) { Object.assign(w, packLines(order, L)); report.lines.worlds++; report.lines.side += L.ln.length - 1; } }
+  catch (e) { report.problems.push(`خطوط ${w.name}: ${e.message}`); } }
 const worldOf = new Map(); for (const w of worlds) for (const id of w.ids) worldOf.set(id, w.id);
+
+// ---------- لون غلاف كل عمل من AniList (متوسط ألوان الغلاف كما يحسبه AniList: coverImage.color)، منه ألوان بوابة عالمه ولمسة بطاقته.
+// يُسأل خمسون عملاً في الطلب برقم MyAnimeList (طلب كل ثانيتين: حدّ AniList ثلاثون في الدقيقة حين يزدحم)، وما عُرف يُحفظ في
+// data/generated/anime/colors.json فلا يُسأل ثانية، وما لا لون له هناك يُعاد بعد 60 يوماً
+const COLORS = new URL('colors.json', GEN), colors = rd(COLORS, {}); report.colors = { asked: 0, got: 0 };
+{ const need = all.filter(id => { const c = colors[id]; return c === undefined || (c && typeof c === 'object' && daysAgo(c.at) > 60); });
+  for (let i = 0; i < need.length && report.colors.asked < (PROBE ? 3 : 90); i += 50) { const ids = need.slice(i, i + 50); report.colors.asked++;
+    try { const res = await fetch('https://graphql.anilist.co', { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json', ...UA },
+        body: JSON.stringify({ query: 'query($ids:[Int]){Page(perPage:50){media(idMal_in:$ids,type:ANIME){idMal coverImage{color}}}}', variables: { ids } }), signal: AbortSignal.timeout(20000) });
+      if (res.status === 429) { report.problems.push('AniList 429: تُكمَل الألوان في بناء قادم'); break; }
+      if (!res.ok) throw new Error(`AniList ${res.status}`);
+      const j = await res.json(), got = new Set();
+      for (const m of j?.data?.Page?.media || []) { const c = m?.coverImage?.color; if (m?.idMal && /^#[0-9a-f]{6}$/i.test(c || '')) { colors[m.idMal] = c.slice(1).toLowerCase(); got.add(m.idMal); report.colors.got++; } }
+      for (const id of ids) if (!got.has(id)) colors[id] = { at: TODAY };
+      await wait(2100); }
+    catch (e) { report.problems.push(`AniList: ${e.message}`); break; } }
+  fs.writeFileSync(COLORS, JSON.stringify(colors) + '\n'); }
 
 // ---------- الكتالوج الخفيف (ما تحتاجه القوائم) والنصوص (ما تحتاجه بطاقة العمل)، موزعةً على 32 ملفاً
 const genres = [], gi = name => { let i = genres.indexOf(name); if (i < 0) i = genres.push(name) - 1; return i; };
@@ -141,6 +167,7 @@ const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(
     const g = [...r.genres, ...r.themes, ...r.demo].map(gi); if (g.length) a.g = g; if (r.studios[0]) a.studio = r.studios[0]; if (r.rating) a.rating = r.rating; if (r.day) a.day = r.day; }
   else a.pending = 1;                                             // معلوماته تُسحب في بناء قادم
   if (worldOf.has(id)) a.w = worldOf.get(id);
+  if (typeof colors[id] === 'string') a.ac = colors[id];          // لون غلافه (AniList)، بلا #
   if (t) a.tm = t; if (m.simkl) a.sk = m.simkl;                    // رقم العمل في SIMKL: به يُطابَق سجل SIMKL حين لا يحمل رقم MyAnimeList
   if (tmdbOk) { const poster = (t?.k === 'tv' && t.s > 0 && S?.poster) || T?.poster; if (poster) a.tp = poster; if (T?.backdrop) a.bd = T.backdrop; if (T) { a.pv = T.prov; const sp = t.k === 'tv' && t.s >= 1 ? seasonProv.get(`${t.id}:${t.s}`) : null;
       if (sp?.here) { a.pv = sp.here; a.pvs = 1; } else if (sp?.away) { a.pvo = T.prov; a.pv = { stream: [], free: [], rent: [], buy: [] }; a.pvs = 1; } }
@@ -152,7 +179,7 @@ const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(
     texts[id % 32][id] = x; }
   return a; });
 wr(new URL('catalog.json', OUT), { generatedAt: report.generatedAt, imageBase: 'https://image.tmdb.org/t/p/', malImages: 'https://cdn.myanimelist.net/images/anime/', country: COUNTRY, providers, genres, anime,
-  worlds: worlds.map(w => ({ id: w.id, name: w.name, ...(w.en ? { en: w.en } : {}), head: w.head, ids: w.ids, ...(w.story ? { story: w.story } : {}), ...(w.sv ? { sv: 1 } : {}), ...(w.sn ? { sn: w.sn } : {}) })), ...(door ? { door } : {}) });
+  worlds: worlds.map(w => ({ id: w.id, name: w.name, ...(w.en ? { en: w.en } : {}), head: w.head, ids: w.ids, ...(w.story ? { story: w.story } : {}), ...(w.sv ? { sv: 1 } : {}), ...(w.sn ? { sn: w.sn } : {}), ...(w.lk ? { lk: w.lk, li: w.li, ri: w.ri } : {}) })), ...(door ? { door } : {}) });
 // نبذة العالم المكتوبة (data/anime/worlds.json: رقم العمل الذي تحمل السلسلة اسمه ← النص) تُحمل مع نصوص ذلك العمل (wa)، فتُقرأ حين تُفتح نافذة السلسلة
 const about = rd(new URL('worlds.json', SRC), {}); report.worldsAbout = 0;
 for (const w of worlds) { const t = about[w.head] || about[w.id], x = texts[w.head % 32][w.head]; if (typeof t === 'string' && t.trim() && x) { x.wa = t.trim(); report.worldsAbout++; } }

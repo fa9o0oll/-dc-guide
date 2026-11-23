@@ -84,27 +84,41 @@ bdi[dir=ltr]{unicode-bidi:isolate}
 .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .tools select{min-height:42px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);font-size:.86rem;max-width:100%}
 .tools .names{margin-inline-start:auto}
+/* شريط التصنيفات: خرز ملوّن على خيط في الفراغ بين «النوع» و«الأسماء». لكل تصنيف لونه، والمختار يمتلئ به */
+.gchips{--rl-s:40px;flex:1 1 240px;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;padding:1px;
+  -webkit-mask:linear-gradient(to left,transparent,#000 10px,#000 calc(100% - 10px),transparent);mask:linear-gradient(to left,transparent,#000 10px,#000 calc(100% - 10px),transparent)}
+.gchips::-webkit-scrollbar{display:none}
+.gchips.out{margin:12px var(--pad) 0;padding-inline:1px}
+.gchips button{flex:none;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 13px;border-radius:999px;border:1px solid var(--line);background:color-mix(in srgb,var(--bg2) 85%,transparent);color:var(--dim);font-weight:600;font-size:.84rem;white-space:nowrap;transition:background-color .2s ease,border-color .2s ease,color .2s ease}
+.gchips button[data-g]:not([data-g="-1"])::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:hsl(var(--gh) 82% 68%);box-shadow:0 0 0 3px hsl(var(--gh) 82% 68% / .18)}
+.gchips button b{font-weight:400;font-size:.76rem;color:var(--mute)}
+.gchips button[aria-pressed=true]{color:#0b0d26;background:hsl(var(--gh,0) 82% 72%);border-color:transparent;box-shadow:0 4px 16px -6px hsl(var(--gh,0) 82% 60% / .8)}
+.gchips button[aria-pressed=true]::before{background:#0b0d26;box-shadow:none}
+.gchips button[aria-pressed=true] b{color:rgba(11,13,38,.7)}
+.gchips button[data-g="-1"][aria-pressed=true]{background:var(--ink);color:var(--bg);box-shadow:none}
+@media (hover:hover){.gchips button:not([aria-pressed=true]):hover{border-color:hsl(var(--gh,220) 82% 68%);color:var(--ink)}}
 .count{padding:12px var(--pad) 0;color:var(--mute);font-size:.88rem}
 main{padding:12px var(--pad) 56px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cw),1fr));gap:22px 16px}
 .load,.none{grid-column:1/-1;padding:44px 0;text-align:center;color:var(--dim)}
 .more{grid-column:1/-1;height:1px}
 
-/* ---------- السِل: ورقة تحريك فوق ورقها، بثقوب التثبيت الثلاثة (مستطيل، دائرة، مستطيل) في حافتها العليا */
+/* ---------- السِل: ورقة التحريك الشفافة. الصورة تملؤها كلها، وثقوب التثبيت الثلاثة (شق، دائرة، شق) مثقوبة في أعلاها فيظهر منها ما خلفها،
+   وحافة الأسيتات خط لامع رفيع، وتعبرها لمعة مائلة حين يقف عليها المؤشر. الظل الملون المزاح هو الورقة التي تحتها */
 .cel{position:relative;display:grid;gap:7px;align-content:start;min-width:0}
-.cel-art{position:relative;display:block;width:100%;aspect-ratio:2/3.08;border-radius:5px 5px 9px 9px;background:var(--card);box-shadow:5px 6px 0 -1px rgba(127,212,255,.16),0 10px 22px -12px #000;transition:transform .25s cubic-bezier(.2,.8,.3,1),box-shadow .25s ease}
-.cel-art::before{content:"";position:absolute;inset:0 0 auto;z-index:2;height:17px;border-radius:5px 5px 0 0;background:
-  radial-gradient(circle at 50% 50%,var(--bg) 0 3.4px,transparent 3.9px),
-  linear-gradient(var(--bg),var(--bg)) 26% 50%/15px 5.5px no-repeat,linear-gradient(var(--bg),var(--bg)) 74% 50%/15px 5.5px no-repeat,
-  linear-gradient(rgba(243,239,230,.9),rgba(243,239,230,.9))}
-.cel-art img{position:absolute;inset:17px 0 0;width:100%;height:calc(100% - 17px);object-fit:cover;border-radius:0 0 9px 9px;background:var(--card)}
-.cel-art .ph{position:absolute;inset:17px 0 0;display:grid;place-items:center;border-radius:0 0 9px 9px;font-family:var(--display);font-weight:700;font-size:3rem;color:var(--line);background:repeating-linear-gradient(135deg,var(--card) 0 10px,var(--bg2) 10px 20px)}
-@media (hover:hover){.cel-art:hover{transform:translate(-2px,-4px) rotate(-.6deg);box-shadow:8px 11px 0 -1px rgba(127,212,255,.28),0 18px 28px -14px #000}}
+.cel-art{--holes:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 308'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='200' height='308' fill='%23fff'/%3E%3Crect x='61' y='8' width='21' height='7' rx='3.5'/%3E%3Ccircle cx='100' cy='11.5' r='5.2'/%3E%3Crect x='118' y='8' width='21' height='7' rx='3.5'/%3E%3C/mask%3E%3C/defs%3E%3Crect width='200' height='308' mask='url(%23m)'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat;position:relative;display:block;width:100%;aspect-ratio:2/3.08;border-radius:10px;background:none;box-shadow:5px 6px 0 -1px color-mix(in srgb,var(--ac,#7fd4ff) 24%,transparent),0 10px 22px -12px #000;transition:transform .25s cubic-bezier(.2,.8,.3,1),box-shadow .25s ease}
+.cel-art img,.cel-art .ph,.cel-art::after{-webkit-mask:var(--holes);mask:var(--holes)}
+.cel-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;background:var(--card)}
+.cel-art .ph{position:absolute;inset:0;display:grid;place-items:center;border-radius:10px;font-family:var(--display);font-weight:700;font-size:3rem;color:var(--line);background:repeating-linear-gradient(135deg,var(--card) 0 10px,var(--bg2) 10px 20px)}
+.cel-art::after{content:"";position:absolute;inset:0;z-index:2;border-radius:10px;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),inset 0 1px 0 rgba(255,255,255,.22);
+  background:linear-gradient(112deg,transparent 34%,rgba(255,255,255,.17) 46%,rgba(255,255,255,.05) 52%,transparent 62%) -160% 0/250% 100% no-repeat;transition:background-position .7s cubic-bezier(.2,.7,.3,1)}
+@media (hover:hover){.cel-art:hover::after{background-position:160% 0}}
+@media (hover:hover){.cel-art:hover{transform:translate(-2px,-4px) rotate(-.6deg);box-shadow:8px 11px 0 -1px color-mix(in srgb,var(--ac,#7fd4ff) 42%,transparent),0 18px 28px -14px #000}}
 .cel-art:active{transform:translate(1px,2px)}
 /* الختم: تقييمك بحبر أحمر مائل، كختم المراجعة على ورقة الرسم */
 .stamp{position:absolute;z-index:3;inset-block-end:8px;inset-inline-start:8px;min-width:38px;height:38px;padding:0 6px;display:grid;place-items:center;border-radius:50%;font-family:var(--display);font-weight:700;font-size:1.05rem;line-height:1;color:#fff;background:rgba(200,36,72,.9);box-shadow:0 0 0 2px rgba(200,36,72,.9),0 0 0 3.5px rgba(255,255,255,.85);transform:rotate(-9deg)}
 .stamp.top10{background:rgba(214,150,20,.95);box-shadow:0 0 0 2px rgba(214,150,20,.95),0 0 0 3.5px rgba(255,255,255,.9)}
-.flag{position:absolute;z-index:3;inset-block-start:23px;inset-inline-end:6px;padding:1px 8px;border-radius:999px;font-size:.7rem;font-weight:600;color:#0c0e24;background:var(--tone,var(--mute))}
+.flag{position:absolute;z-index:3;inset-block-start:24px;inset-inline-end:6px;padding:1px 8px;border-radius:999px;font-size:.7rem;font-weight:600;color:#0c0e24;background:var(--tone,var(--mute))}
 .next{position:absolute;z-index:3;inset:auto 0 0;padding:14px 8px 6px;border-radius:0 0 9px 9px;font-size:.74rem;font-weight:600;text-align:center;color:#fff;background:linear-gradient(transparent,rgba(9,10,30,.92) 55%)}
 .cel h3{font-size:.9rem;font-weight:600;line-height:1.35;min-height:2.7em;direction:ltr;text-align:right;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .cel .meta{font-size:.76rem;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -159,7 +173,7 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--bg2) 2%,transparent 60%)}
 .body{position:relative;display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding:0 clamp(14px,3vw,26px) 28px;overflow-x:clip}
 .head{display:grid;grid-template-columns:clamp(104px,22vw,170px) minmax(0,1fr);gap:16px;align-items:end;margin-top:clamp(-96px,-12vw,-60px)}
-.head .cel-art{box-shadow:6px 7px 0 -1px rgba(127,212,255,.2),0 14px 30px -12px #000}
+.head .cel-art{box-shadow:6px 7px 0 -1px color-mix(in srgb,var(--ac,#7fd4ff) 30%,transparent),0 14px 30px -12px #000}
 .head h2{font-size:clamp(1.2rem,3.2vw,1.7rem);direction:ltr;text-align:right;line-height:1.25}
 .head .alt{direction:ltr;text-align:right;color:var(--dim);font-size:.9rem}
 .facts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -167,13 +181,40 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
 .facts span b{color:var(--ink);font-weight:600}
 .facts .mal b{color:var(--amber)}
 /* سطر موقعه تحت العنوان: علاقته بما قبله، وما قبله وما بعده أسماء تُلمس فتُفتح، ورقمه في سلسلته */
-.chain{display:grid;grid-template-columns:minmax(0,1fr);gap:3px;padding:10px 14px 11px;border-radius:14px;background:color-mix(in srgb,var(--cel) 7%,var(--card));border:1px solid color-mix(in srgb,var(--cel) 30%,var(--line))}
-.ch-m{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:.96rem;line-height:1.75}
-.ch-k{font-family:var(--display);font-weight:700;font-size:1.05rem;line-height:1.3;color:var(--cel);white-space:nowrap}
-.ch-l{/* هدف لمس 40px على الأقل دون أن يتغير تباعد السطور: الحشو يلغيه هامش سالب */display:inline-block;max-width:100%;min-width:40px;text-align:center;padding:9px 3px;margin:-9px -3px;font-weight:600;color:var(--ink);text-decoration:underline 1.5px;text-decoration-color:color-mix(in srgb,var(--cel) 60%,transparent);text-underline-offset:4px;unicode-bidi:isolate;transition:color .15s ease}
-.ch-l:active{color:var(--cel)}
-@media (hover:hover){.ch-l:hover{color:var(--cel)}}
-.ch-n{color:var(--mute);font-size:.84rem;line-height:1.6}
+.ch-l{/* هدف لمس 40px على الأقل دون أن يتغير تباعد السطور: الحشو يلغيه هامش سالب */display:inline-block;max-width:100%;min-width:40px;text-align:center;padding:9px 3px;margin:-9px -3px;font-weight:600;color:var(--ink);text-decoration:underline 1.5px;text-decoration-color:color-mix(in srgb,var(--lc,var(--cel)) 60%,transparent);text-underline-offset:4px;unicode-bidi:isolate;transition:color .15s ease}
+.ch-l:active{color:var(--lc,var(--cel))}
+@media (hover:hover){.ch-l:hover{color:var(--lc,var(--cel))}}
+/* «موقعه من سلسلته»: لافتة محطة على خط السلسلة. لون الخط من نوعه: الرئيسي سماوي، والجانبي كهرماني، والنسخة الأخرى والعالم البديل بنفسجي،
+   والمتفرع وردي، والملخص رمادي. الجرأة في الشارة والنقطة المضيئة، وما حولهما هادئ */
+.pos{--lc:var(--cel);position:relative;display:grid;gap:4px;padding:10px 16px 0;border-radius:16px;overflow:hidden;
+  background:radial-gradient(120% 90% at 100% 0%,color-mix(in srgb,var(--lc) 16%,transparent),transparent 60%),color-mix(in srgb,var(--lc) 5%,var(--card));
+  border:1px solid color-mix(in srgb,var(--lc) 34%,var(--line));box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 7%,transparent)}
+.pos[data-k=solo]{--lc:var(--ok)}.pos[data-k=solo] .trk{stroke-dasharray:2 5}
+.pos[data-k=s]{--lc:var(--amber)}.pos[data-k=a],.pos[data-k=t]{--lc:var(--listed)}.pos[data-k=f]{--lc:var(--rose)}.pos[data-k=r],.pos[data-k=R]{--lc:var(--dim)}
+.pos-map{display:block;width:100%;overflow:visible;margin-bottom:2px}
+.pos-map .trk{stroke:color-mix(in srgb,var(--lc) 38%,transparent);stroke-width:2;stroke-linecap:round}
+.pos-map .trk.br{stroke-dasharray:3 4}
+.pos-map .d{fill:var(--bg2);stroke:color-mix(in srgb,var(--lc) 75%,transparent);stroke-width:1.6}
+.pos-map .d.done{fill:color-mix(in srgb,var(--lc) 70%,var(--bg2))}
+.pos-map .gap{fill:color-mix(in srgb,var(--lc) 60%,transparent)}
+.pos-map .here{fill:var(--lc);stroke:var(--ink);stroke-width:2}
+.pos-map .ring{fill:none;stroke:var(--lc);stroke-width:1.5;opacity:0;transform-box:fill-box;transform-origin:center;animation:ping 1.8s cubic-bezier(.2,.7,.3,1) .25s 2}
+@keyframes ping{0%{transform:scale(.55);opacity:.85}100%{transform:scale(1.7);opacity:0}}
+.pos-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 10px}
+.pos-b{font-family:var(--display);font-weight:700;font-size:1.24rem;line-height:1.45;color:var(--lc)}
+.pos-s{color:var(--dim);font-size:.86rem}
+.pos-t{font-size:.97rem;line-height:1.85}
+.pos-w{display:flex;gap:8px;align-items:flex-start;font-size:.88rem;line-height:1.75;color:var(--amber)}
+.pos-w .ic{margin-top:.3em}
+.pos-n{font-size:.9rem;line-height:1.85;color:var(--dim)}
+.pos-n b{display:inline-block;margin-inline-end:8px;font-size:.76rem;line-height:1.7;padding:0 9px;border-radius:999px;background:color-mix(in srgb,var(--lc) 18%,transparent);color:var(--lc)}
+.pos-f{display:flex;align-items:center;gap:8px;margin:6px -16px 0;padding:9px 16px;min-height:44px;text-align:start;font-size:.8rem;color:var(--mute);border-top:1px solid color-mix(in srgb,var(--lc) 20%,var(--line));background:color-mix(in srgb,var(--bg) 30%,transparent)}
+.pos-f span{flex:1}.pos-f b{color:var(--lc);font-weight:600;white-space:nowrap}.pos-f .ic{color:var(--lc)}
+@media (hover:hover){.pos-f:hover b{text-decoration:underline}}
+.otag{--lc:var(--cel);display:block;font-size:.76rem;line-height:1.5;color:var(--lc);font-weight:600;direction:rtl;text-align:start}
+.otag span{color:var(--dim);font-weight:400}
+.otag[data-k=s]{--lc:var(--amber)}.otag[data-k=a],.otag[data-k=t]{--lc:var(--listed)}.otag[data-k=f]{--lc:var(--rose)}.otag[data-k=r],.otag[data-k=R]{--lc:var(--dim)}
+@media (prefers-reduced-motion:reduce){.pos-map .ring{animation:none}}
 .sec{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
 .sec>h3{font-family:var(--display);font-weight:600;font-size:1.08rem}
 .lbl{font-size:.8rem;color:var(--mute)}

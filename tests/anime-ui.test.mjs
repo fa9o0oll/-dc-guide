@@ -144,12 +144,14 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.goto('about:blank'); await page.goto(base + '/anime/#a11061'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => !!document.querySelector('#sheet-body .ov:not(.en)'));
   check('نبذة مترجمة: لا زر طلب', await page.evaluate(() => !document.querySelector('#sheet .tr[data-what=about]')));
   check('رابط مباشر يفتح العمل بنبذته العربية وسلسلته', await page.evaluate(() => /Gon Freecss/.test(document.querySelector('#sheet-body .ov').textContent) && /من سلسلة Hunter x Hunter/.test(document.querySelector('#sheet-body').textContent) && /العمل 3 من 4/.test(document.querySelector('#sheet-body').textContent)
-    && document.querySelectorAll('#sheet .strip button').length === 4 && document.querySelector('#sheet .strip [aria-current=true]').getAttribute('aria-label') === 'Hunter x Hunter (2011)'));
-  // سطر موقعه تحت العنوان (E53): علاقته بما قبله من MyAnimeList والاسم يفتح بطاقته، وما يليه، ورقمه في سلسلته
-  const ch = await page.evaluate(() => { const c = document.querySelector('#sheet .head + .chain'); return c && { k: c.querySelector('.ch-k')?.textContent, text: c.querySelector('.ch-m span')?.textContent, ids: [...c.querySelectorAll('.ch-l')].map(x => x.dataset.id), n: c.querySelector('.ch-n')?.textContent }; });
-  check('سطر موقعه تحت العنوان: «نسخة أخرى من Hunter x Hunter · ويليه …» والاسمان يفتحان بطاقتيهما، و«3 من 4 في سلسلة Hunter x Hunter، بترتيب الصدور»',
-    ch?.k === 'نسخة أخرى' && ch.text === 'من Hunter x Hunter · ويليه Hunter x Hunter Movie 1: Phantom Rouge' && ch.ids.join() === '136,13271' && ch.n === '3 من 4 في سلسلة Hunter x Hunter، بترتيب الصدور', ch);
-  await tap('#sheet .chain .ch-l[data-id="136"]'); await page.waitForFunction(() => location.hash === '#a136');
+    && document.querySelectorAll('#sheet .strip button:not(.rl-a)').length === 4 && document.querySelector('#sheet .strip [aria-current=true]').getAttribute('aria-label') === 'Hunter x Hunter (2011)'));
+  // «موقعه من سلسلته» تحت العنوان (E53، E57): شارة نوعه وجملة صلته (الاسم يفتح بطاقته)، والتالي في خطه، وخريطة الخط بفرعه، ورقمه في سلسلته
+  const ch = await page.evaluate(() => { const c = document.querySelector('#sheet .head + .pos'); return c && { k: c.dataset.k, b: c.querySelector('.pos-b')?.textContent, t: c.querySelector('.pos-t')?.textContent,
+    ids: [...c.querySelectorAll('.ch-l')].map(x => x.dataset.id), next: c.querySelector('.pos-n')?.textContent, map: c.querySelectorAll('.pos-map circle.d, .pos-map circle.here').length, branch: !!c.querySelector('.pos-map .br'), f: c.querySelector('.pos-f span')?.textContent }; });
+  check('موقعه تحت العنوان: «نسخة أخرى من القصة» تعيد حكاية Hunter x Hunter (والاسم زر)، والتالي فيلمه، والخريطة بفرعها، و«3 من 4 في Hunter x Hunter، بترتيب الصدور»',
+    ch?.k === 'a' && ch.b === 'نسخة أخرى من القصة' && ch.t === 'تعيد حكاية Hunter x Hunter بمعالجة أخرى، فليست تكملة له.' && ch.ids.join() === '136,13271' && /^التالي\s*فيلم\s*Hunter x Hunter Movie 1: Phantom Rouge$/.test(ch.next)
+    && ch.map === 4 && ch.branch && ch.f === '3 من 4 في Hunter x Hunter، بترتيب الصدور', ch);
+  await tap('#sheet .pos .ch-l[data-id="136"]'); await page.waitForFunction(() => location.hash === '#a136');
   check('لمس اسم في سطر الموقع يفتح بطاقة ذلك العمل', await page.evaluate(() => /Hunter x Hunter/.test(document.querySelector('#sheet .head h2').textContent) && location.hash === '#a136'));
   await page.goto('about:blank'); await page.goto(base + '/anime/#a37989'); await page.waitForSelector('#sheet[open]');
   check('السجل محفوظ بعد إعادة التحميل', (await log())[37989].p === 11 && (await lists())[0] === 'أشاهده الآن 2');
@@ -327,7 +329,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     const full = id => page.waitForFunction(id => document.querySelector('#sheet').open && document.querySelector('#sheet-body').dataset.full === String(id), id), shut = sel => page.waitForSelector(sel, { state: 'hidden' });
     await tap('#lists [data-l=all]'); await tap('#grid .cel[data-id="136"] [data-act=open]'); await full(136);
     const y0 = await page.evaluate(() => { const b = document.querySelector('#sheet-body'); b.scrollTop = 99999; return Math.round(b.scrollTop); });
-    await tap('#sheet [data-act=world]'); await page.waitForSelector('#wsheet[open]'); let s = await st();
+    await tap('#sheet .acts [data-act=world]'); await page.waitForSelector('#wsheet[open]'); let s = await st();
     check('«افتح السلسلة بترتيبها» من بطاقة: تُطوى البطاقة وتُفتح السلسلة وحدها', !s.a && s.w && s.h === '#w136', s);
     await page.goBack(); await shut('#wsheet'); await page.waitForSelector('#sheet[open]'); s = await st();
     check('الرجوع من السلسلة يعيد البطاقة كما كانت وبموضع تمريرها', s.a === 'Hunter x Hunter' && !s.w && s.h === '#a136' && y0 > 0 && s.y === y0, [s, y0]);
