@@ -62,8 +62,8 @@ if (cmd === 'pending') {
 } else if (cmd === 'check') {
   const texts = existsSync(F.texts) ? prev : null, bad = checkCare(TR, PL, texts), ids = new Set(cat.games.map(g => String(g.id)));
   const orphan = [...Object.keys(TR), ...Object.keys(PL)].filter(id => !ids.has(id)), pend = pendingCare(cat.games, prev, TR, PL), has = k => pend.filter(x => x.need.includes(k)).length;
-  const withS = cat.games.filter(g => prev[g.id]?.s).length, withT = cat.games.filter(g => prev[g.id]?.t).length;
-  console.log(`العناية: النبذات ${withS - has('summary')}/${withS}، القصص ${withT - has('story')}/${withT}، المواقع ${cat.games.length - has('place')}/${cat.games.length}${has('changed') ? `، ${has('changed')} تغيّر نصها الإنجليزي` : ''}${orphan.length ? `، ${new Set(orphan).size} لألعاب خرجت من القائمة (تبقى إن عادت)` : ''}`);
+  const withS = cat.games.filter(g => prev[g.id]?.s).length, withT = cat.games.filter(g => prev[g.id]?.t).length, usual = cat.games.filter(g => !g.adult).length;   // ألعاب +18 خارج العناية
+  console.log(`العناية: النبذات ${withS - has('summary')}/${withS}، القصص ${withT - has('story')}/${withT}، المواقع ${usual - has('place')}/${usual}${has('changed') ? `، ${has('changed')} تغيّر نصها الإنجليزي` : ''}${orphan.length ? `، ${new Set(orphan).size} لألعاب خرجت من القائمة (تبقى إن عادت)` : ''}`);
   { const { checkFix } = await import('./lib-stores.mjs'), fix = existsSync('data/games/pc.json') ? JSON.parse(readFileSync('data/games/pc.json', 'utf8')) : {}; bad.push(...checkFix(fix, ids)); console.log(`متاجر الكمبيوتر: ${Object.keys(fix).length} تصحيح باليد (data/games/pc.json)`); }
   if (bad.length) { console.error(`✗ ${bad.length} مشكلة:\n  ` + bad.join('\n  ')); process.exit(1); }
   console.log('✓ ملفا العناية صالحان');

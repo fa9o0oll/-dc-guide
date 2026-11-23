@@ -15,7 +15,10 @@ console.log('== الدمج');
   const again = applyCare(games, texts, TR, PL);
   check('إعادة التطبيق بلا شبكة (النص من الخريطة السابقة) تعطي النتيجة نفسها', JSON.stringify(again.texts) === JSON.stringify(texts) && games[0].place?.k === 'first');
   const pend = pendingCare(games, texts, TR, PL), need = id => pend.find(x => x.id === id)?.need.join();
-  check('ما ينقص: نبذة، قصة، موقع، ونص تغيّر أصله', need(1) === undefined && need(2) === 'summary' && need(3) === 'place' && need(4) === 'story,place' && pendingCare(games, texts, { ...TR, 4: { s: 'أ', t: 'ب', h: '00000000' } }, { ...PL, 4: { k: 'alone', line: 'س' } }).find(x => x.id === 4)?.need.join() === 'changed', pend); }
+  check('ما ينقص: نبذة، قصة، موقع، ونص تغيّر أصله', need(1) === undefined && need(2) === 'summary' && need(3) === 'place' && need(4) === 'story,place' && pendingCare(games, texts, { ...TR, 4: { s: 'أ', t: 'ب', h: '00000000' } }, { ...PL, 4: { k: 'alone', line: 'س' } }).find(x => x.id === 4)?.need.join() === 'changed', pend);
+  // ألعاب +18 (E61) خارج العناية: لا نبذة ولا موقع يدخلان سجلها، ولا تظهر في ما ينقص
+  const ad = [{ id: 9, title: 'X', adult: 1, summary: '', story: '' }], rA = applyCare(ad, { 9: { s: 'Old text.' } }, { 9: { s: 'نص.' } }, { 9: { k: 'alone', line: 'س' } });
+  check('لعبة +18: بلا نص ولا موقع، ولا ينقصها شيء', !rA.texts[9] && !ad[0].place && rA.n.place === 0 && pendingCare(ad, {}, {}, {}).length === 0 && pendingCare([{ id: 9, title: 'X', adult: 1 }], { 9: { s: 'Old text.' } }, {}, {}).length === 0, rA); }
 
 console.log('== الفحص');
 { const en = { 1: { s: 'A reasonably long English summary about a game and its world.', t: 'x' } }, ok = 'نبذة عربية معقولة الطول عن لعبة وعالمها وما يجري فيها.';
