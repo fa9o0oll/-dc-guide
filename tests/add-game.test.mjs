@@ -169,23 +169,23 @@ check('مدة اللعب من PSN بالساعات', isoHours('PT228H56M33S') ==
   check('لعبة موسّعة بلا أساسي بالاسم نفسه، ولعبة بلا سجلات شقيقة: لا يُضم شيء', !r.has(7498) && !r.has(77) && !r.has(78), [...r.keys()]);
   const r2 = alsoPlatforms([[g(1247, 'Tekken 6', 2007, [52]), g(1236, 'Tekken 6', 2009, [9, 12]), g(195868, 'Tekken 6', 2009, [38])]], x => T[x.id], x => x.id === 195868);
   check('سجل شقيق ملغى أو لم يصدر لا تُضم منصاته', [...r2.get(1247)].join() === '9,12', [...r2.get(1247)]); }
-// مكتبة +18 (E61): الطلب يحمل adult فيعود بألعاب سمة Erotic وحدها، وبدونه لا يعود بشيء منها؛ واللعبة لا تُضاف إلا من مكتبتها
+// فلتر +18 (E65): الطلب يحمل adult حين يُرفع الفلتر، فيعود بالنتائج المعتادة ومعها ألعاب سمة Erotic موسومة، وبدونه لا يعود بشيء منها؛ ولعبة +18 لا تُفتح ولا تُضاف والفلتر قائم
 { const before = puts.length;
   const sa = await call(add, { action: 'suggest', q: 'witcher', adult: true, password: PW });
-  check('اقتراحات مكتبة +18: ألعاب سمة Erotic وحدها', sa.status === 200 && sa.body.items.map(x => x.igdb).join() === '666', sa.body);
+  check('الاقتراحات والفلتر مرفوع: المعتادة ثم ألعاب سمة Erotic موسومة', sa.status === 200 && sa.body.items.map(x => x.igdb + (x.adult ? '*' : '')).join() === '1942,20,666*', sa.body);
   const full = [], of = globalThis.fetch; globalThis.fetch = async (u, o = {}) => { if (new URL(u).hostname === 'api.igdb.com') full.push(String(o.body || '')); return of(u, o); };
   const xa = await call(add, { action: 'search', q: 'witcher', adult: true, password: PW }), xn = await call(add, { action: 'search', q: 'witcher', password: PW }); globalThis.fetch = of;
-  check('بحث المكتبة يقيّد IGDB بالسمة 42 ويعيد ألعابها وحدها، والبحث العادي بلا قيدها وبلا ألعابها', xa.body.candidates.map(c => c.igdb).join() === '666' && !xn.body.candidates.some(c => c.igdb === 666) && xn.body.candidates.length === 2
-    && full.filter(b => /^search "witcher"/.test(b)).map(b => /themes = \(42\)/.test(b)).join() === 'true,false', [xa.body.candidates, xn.body.candidates, full.filter(b => /^search/.test(b))]);
+  check('البحث والفلتر مرفوع يسأل IGDB مرتين (المعتاد، والمقصور على السمة 42) ويعيد المعتاد ومعه ألعابها موسومة بلا تكرار، والبحث والفلتر قائم بلا قيدها وبلا ألعابها', xa.body.candidates.map(c => c.igdb + (c.adult ? '*' : '')).sort().join() === '1942,20,666*'
+    && !xn.body.candidates.some(c => c.igdb === 666 || c.adult) && xn.body.candidates.length === 2 && full.filter(b => /^search "witcher"/.test(b)).map(b => /themes = \(42\)/.test(b)).join() === 'false,true,false', [xa.body.candidates, xn.body.candidates, full.filter(b => /^search/.test(b))]);
   const pn = await call(add, { action: 'preview', igdb: 666, password: PW }), an = await call(add, { action: 'add', igdb: 666, password: PW });
-  check('لعبة +18 لا تُفتح ولا تُضاف من القائمة العادية', pn.status === 422 && an.status === 422 && /مكتبة \+18/.test(an.body.error) && puts.length === before, [pn, an]);
+  check('لعبة +18 لا تُفتح ولا تُضاف والفلتر قائم، والرسالة تدلّ على العين بلا «+18»', pn.status === 422 && an.status === 422 && /للبالغين/.test(an.body.error) && /العين/.test(an.body.error) && !/\+18/.test(an.body.error) && puts.length === before, [pn, an]);
   const pa = await call(add, { action: 'preview', igdb: 666, adult: true, password: PW }), g = pa.body.game;
-  check('بطاقتها من المكتبة: موسومة adult، باسمها وغلافها ومنصاتها وتقييمها، بلا نبذة ولا قصة ولا لقطات ولا عرض ولا سلسلة', pa.status === 200 && g.adult === 1 && g.title === 'Witcher Adult Thing' && g.cover === 'coad' && g.plats.join() === 'pc' && g.users === 61
+  check('بطاقتها والفلتر مرفوع: موسومة adult، باسمها وغلافها ومنصاتها وتقييمها، بلا نبذة ولا قصة ولا لقطات ولا عرض ولا سلسلة', pa.status === 200 && g.adult === 1 && g.title === 'Witcher Adult Thing' && g.cover === 'coad' && g.plats.join() === 'pc' && g.users === 61
     && g.summary === '' && g.story === '' && g.art === null && g.shots.length === 0 && g.videos.length === 0 && g.series.length === 0 && Object.keys(g.rel).length === 0 && !/explicit/.test(JSON.stringify(pa.body)) && Object.keys(pa.body.series).length === 0, pa.body);
   const aa = await call(add, { action: 'add', igdb: 666, adult: true, password: PW }), row = JSON.parse(stored).games.find(e => e.igdb === 666);
-  check('وإضافتها منها تكتبها موسومة في الملف، وعنوان الإيداع برقمها بلا اسمها', aa.status === 200 && aa.body.state === 'added' && aa.body.game.adult === 1 && row?.adult === 1 && puts.at(-1).message === 'games: add +18 (#666)', [aa.body.state, row, puts.at(-1)?.message]);
+  check('وإضافتها حينها تكتبها موسومة في الملف، وعنوان الإيداع برقمها بلا اسمها', aa.status === 200 && aa.body.state === 'added' && aa.body.game.adult === 1 && row?.adult === 1 && puts.at(-1).message === 'games: add +18 (#666)', [aa.body.state, row, puts.at(-1)?.message]);
   const na = await call(add, { action: 'add', igdb: 1942, adult: true, password: PW });
-  check('ولعبة عادية لا تُضاف من مكتبة +18', na.status === 422 && /ليست \+18/.test(na.body.error) && puts.length === before + 1, na);
+  check('ولعبة عادية تُضاف والفلتر مرفوع كما تُضاف دائماً، بلا وسم', na.status === 200 && na.body.game.adult === undefined && na.body.game.id === 1942 && !JSON.parse(stored).games.find(e => e.igdb === 1942)?.adult, [na.status, na.body.state]);
   // البناء الليلي يُبقيها موسومة (erotic: 'keep')، وبدونه تُحذف كما كانت. والسحب من الحسابات بلا +18
   const { gamesFor } = await import('../scripts/lib-games.mjs'), keep = await gamesFor([666, 1942], { erotic: 'keep' }), drop = await gamesFor([666, 1942], {});
   check('البناء: اللعبتان معاً، +18 موسومة بلا نصوص ولا سلسلة، والعادية كما هي بسلسلتها التي لا تدخلها لعبة +18', keep.games.map(x => x.id).sort((a, b) => a - b).join() === '666,1942' && keep.games.find(x => x.id === 666).adult === 1 && keep.games.find(x => x.id === 666).summary === ''

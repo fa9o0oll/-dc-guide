@@ -416,27 +416,7 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
 @media (max-width:340px){.dates{grid-template-columns:minmax(0,1fr)}.rail .cel{width:138px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.sky-art b{display:none}.pdoor i,.sky-art i{animation:none!important}}
 
-/* ---------- مكتبة +18 (E61، site/adult.js): الصفحة نفسها بليل أحمر بدل الغسق، وشريطها تحت الرأس، وصور أعمالها مغطاة حتى تُكشف.
-   السِل المغطى يبقى بثقوبه: الغلاف المموّه هو الذي يُثقب، والصورة داخله بلا قناع */
-html[data-room="18"]{--bg:#150a11;--bg2:#1e0e18;--card:#28121e;--line:#51263a;--dim:#d9b8c4;--mute:#a37f8e;--rose:#ff4466;--cel:#ff8fa6}
-html[data-room="18"] .sky-art{background:
-  radial-gradient(1.4px 1.4px at 12% 18%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 27% 9%,#fff 50%,transparent 51%),radial-gradient(1.6px 1.6px at 41% 24%,#ffd9d9 50%,transparent 51%),
-  radial-gradient(1px 1px at 58% 12%,#fff 50%,transparent 51%),radial-gradient(1.3px 1.3px at 71% 21%,#ffd9e6 50%,transparent 51%),radial-gradient(1px 1px at 86% 8%,#fff 50%,transparent 51%),
-  radial-gradient(130% 62% at 50% 104%,#ff5a5f 0,#d42a55 22%,#8a1d4a 42%,rgba(84,24,58,.55) 60%,transparent 78%),
-  linear-gradient(180deg,#0c0508 0,#1c0a14 38%,#2e0f22 64%,#4a1632 100%)}
-html[data-room="18"] .sky-art i{background:linear-gradient(180deg,rgba(150,50,90,.5),rgba(255,90,110,.5))}
-html[data-room="18"] .top h1{text-shadow:0 2px 0 rgba(12,5,8,.4),0 0 34px rgba(255,68,102,.4)}
-html[data-room="18"] .hero{background:linear-gradient(180deg,#1c0a14,#4a1632 70%,#d42a55)}
-html[data-room="18"] dialog::backdrop{background:rgba(10,3,7,.82)}
-html[data-room="18"] .veil,.veil.to18{background:linear-gradient(180deg,#0c0508,#2e0f22 60%,#d42a55)}
-html[data-room="18"] .veil strong,.veil.to18 strong{text-shadow:0 0 34px rgba(255,68,102,.7)}
-html[data-room] .veil.to0{background:linear-gradient(180deg,#0d0f2c,#2c2666 60%,#b3508f)}
-html[data-room] .veil.to0 strong{text-shadow:0 0 34px rgba(255,150,170,.6)}
-.sky .r18-bar{margin:12px var(--pad) 8px;max-width:860px;color:#fbe9ee;background:linear-gradient(90deg,rgba(255,68,102,.2),rgba(12,5,8,.35))}
-.r18-none{display:grid;justify-items:center;gap:12px;padding:56px 0 64px}
-.r18-none h2{font-family:var(--display);font-size:1.5rem;color:var(--ink)}
-.r18-none p{max-width:52ch;line-height:1.8}
-body.r18-empty .bar,body.r18-empty .count,body.r18-empty #gchips{display:none}
+/* ---------- أعمال +18 (فلتر العين، site/adult.js): صورها مغطاة حتى تُكشف. السِل المغطى يبقى بثقوبه: الغلاف المموّه هو الذي يُثقب، والصورة داخله بلا قناع */
 .cel-art .x18-i{border-radius:10px;-webkit-mask:var(--holes);mask:var(--holes)}
 .cel-art .x18-i img{-webkit-mask:none;mask:none;border-radius:0}
 .aart.x18 .x18-m{font-size:.68rem;padding:0}

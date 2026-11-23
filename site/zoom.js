@@ -86,8 +86,8 @@ const radius = (el, k) => { const cs = getComputedStyle(el), c = ['TopLeft', 'To
 const shapeOf = (t, im) => [t, im].find(e => ['TopLeft', 'BottomLeft'].some(c => parseFloat(getComputedStyle(e)[`border${c}Radius`]))) || t;
 const titleOf = (t, im) => t.dataset.zoomTitle || im?.alt.replace(/^بوستر\s+/, '') || '';
 // مجموعة الصور التي ينتمي إليها العنصر: كل ما يقبل التكبير داخل أقرب حاوية تحمل data-zoom-set، بترتيبها في الصفحة
-// في مكتبة +18 (site/adult.js) الصورة المغطاة لا تُكبَّر حتى تُكشف: كلها (data-r18-open على <html>) أو عملها (حاوية تحمل data-r18-bare)
-const veiled = t => { const h = document.documentElement; return h.dataset.room === '18' && !h.hasAttribute('data-r18-open') && !t.closest('[data-r18-bare]'); };
+// صورة عمل +18 المغطاة (site/adult.js: حاويتها تحمل data-ad) لا تُكبَّر حتى تُكشف: كلها (data-r18-open على <html>) أو عملها (حاوية تحمل data-r18-bare)
+const veiled = t => !!t.closest('[data-ad]') && !document.documentElement.hasAttribute('data-r18-open') && !t.closest('[data-r18-bare]');
 const okThumb = t => { const im = t.querySelector('img'); return !!im && !!(im.currentSrc || im.src) && !im.dataset.failed && !veiled(t); };
 function setOf(t) { const box = t.closest('[data-zoom-set]'); if (!box) return null; const all = [...box.querySelectorAll(SEL)].filter(okThumb), i = all.indexOf(t);
   return all.length > 1 && i >= 0 ? { set: all, i, rtl: getComputedStyle(box).direction === 'rtl' } : null; }

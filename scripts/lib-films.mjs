@@ -33,13 +33,13 @@ export function rank(cands, title, year) {
 }
 
 // يبحث عن عمل بالعنوان والسنة. يجرّب السنة نفسها، ثم بلا سنة (لأن تاريخ TMDB قد يكون سنة العرض التجاري لا المهرجان).
-// adult: بحث مكتبة +18 (E61): ما وسمه TMDB للبالغين وحده، وبدونه لا يعود شيء منه. TMDB لا يبحث فيه وحده: يخلطه بغيره ويرتب بالشهرة، فيغيب عن الصفحة
-// الأولى؛ فتُقرأ في بحث المكتبة خمس صفحات (ADULT_PAGES) ويُبقى منها ما وُسم
+// adult: الفلتر مرفوع (E65): يعود مع النتائج ما وسمه TMDB للبالغين أيضاً، وبدونه لا يعود شيء منه. TMDB يخلطه بغيره ويرتب بالشهرة، فيغيب عن الصفحة
+// الأولى؛ فتُقرأ حينها خمس صفحات (ADULT_PAGES). والمستدعي يفرز الموسوم من غيره (c.adult)
 export const ADULT_PAGES = [1, 2, 3, 4, 5];
 export async function search(tmdb, kind, title, year, adult = false) {
   const yk = kind === 'tv' ? 'first_air_date_year' : 'year', seen = new Map();
   const run = async p => { for (const r of await Promise.all((adult ? ADULT_PAGES : [1]).map(page => tmdb('/search/' + kind, { query: title, include_adult: adult, ...(page > 1 ? { page } : {}), ...p }).catch(() => ({})))))
-    for (const c of r.results || []) if (!seen.has(c.id) && !!c.adult === adult) seen.set(c.id, c); };
+    for (const c of r.results || []) if (!seen.has(c.id) && (adult || !c.adult)) seen.set(c.id, c); };
   if (year) await run({ [yk]: year });
   if (!year || ![...seen.values()].some(c => [c.title, c.original_title, c.name, c.original_name].filter(Boolean).map(norm).includes(norm(title)))) await run({});
   return rank([...seen.values()], title, year);
@@ -70,7 +70,7 @@ export function shape(kind, d, providers = {}) {
     prov: wp ? { link: wp.link || undefined, stream: provIds(wp.flatrate, providers), free: provIds([...(wp.free || []), ...(wp.ads || [])], providers), rent: provIds(wp.rent, providers), buy: provIds(wp.buy, providers) } : null };
   if (kind === 'tv') { o.seasons = d.number_of_seasons || null; o.episodes = d.number_of_episodes || null; o.lastDate = d.last_air_date || null;
     const n = d.next_episode_to_air; if (n?.air_date) o.next = { s: n.season_number, e: n.episode_number, date: n.air_date }; } // الحلقة القادمة لمسلسل يُعرض الآن (لعدّادها)
-  // عمل +18 (مكتبة +18 في الصفحة): بلا نبذة ولا طاقم ولا سلسلة ولا منصات. يبقى اسمه وسنته وتقييمه وصورته
+  // عمل +18 (يخفيه فلتر العين في الصفحة): بلا نبذة ولا طاقم ولا سلسلة ولا منصات. يبقى اسمه وسنته وتقييمه وصورته
   if (o.adult) Object.assign(o, { overviewEn: null, overviewAr: undefined, titleAr: undefined, cast: [], directors: [], col: undefined, prov: null, next: undefined });
   return JSON.parse(JSON.stringify(o));
 }

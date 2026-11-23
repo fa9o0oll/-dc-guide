@@ -13,7 +13,7 @@ if (src === '--add') { const [id, title, type, eps] = process.argv.slice(3); if 
   if (prev.some(p => p.mal === +id)) { console.log(JSON.stringify({ entries: prev.length, already: +id })); process.exit(0); }
   place(prev, { mal: +id, title, type: type || 'TV', eps: +eps || 0 }); write(prev); console.log(JSON.stringify({ entries: prev.length, added: +id })); process.exit(0); }
 const buf = fs.readFileSync(src), xml = (buf[0] === 0x1f && buf[1] === 0x8b ? zlib.gunzipSync(buf) : buf).toString('utf8'), mal = parseMal(xml);
-// وسم +18 (ad) يضعه زر «أضف أنمي» في مكتبة +18: يبقى على العمل ولو جاء بعدها في ملف التصدير
+// وسم +18 (ad) يضعه زر «أضف أنمي» والفلتر مرفوع (E65): يبقى على العمل ولو جاء بعدها في ملف التصدير
 const ad = new Set(prev.filter(p => p.ad).map(p => p.mal));
 const seen = new Set(mal.entries.map(e => e.id)), list = mal.entries.map(e => ({ mal: e.id, title: e.title, type: e.type, eps: e.eps, ...(ad.has(e.id) ? { ad: 1 } : {}) })), kept = prev.filter(p => !seen.has(p.mal));
 for (const p of kept) place(list, p);

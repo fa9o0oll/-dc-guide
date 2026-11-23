@@ -28,7 +28,7 @@ if (process.env.GAMES_PROBE) {
   show('website_types', await igdb('website_types', 'fields type; limit 80;').catch(e => e.message));
   show('steam 292030 (Witcher 3)', await igdb('external_games', 'fields game,uid,external_game_source; where uid = "292030" & external_game_source = 1; limit 5;').catch(e => e.message));
   show('search', await igdb('games', 'search "god of war"; fields name,slug,first_release_date,game_type,collections,release_dates.human; limit 5;').catch(e => e.message));
-  // بحث مكتبة +18 (E61) كما تسأله دالة «أضف لعبة»: قيد سمة Erotic (42) مع البحث. أعداد فقط، بلا أسماء في السجل
+  // بحث ألعاب +18 (والفلتر مرفوع، E65) كما تسأله دالة «أضف لعبة»: قيد سمة Erotic (42) مع البحث. أعداد فقط، بلا أسماء في السجل
   for (const q of ['love', 'night']) { const rows = await igdb('games', `search ${JSON.stringify(q)}; fields name,themes; where version_parent = null & themes = (42); limit 10;`).catch(e => ({ err: e.message }));
     console.log(`probe adult search "${q}": ${rows.err ? 'ERR ' + rows.err : `${rows.length} rows, all with theme 42: ${rows.every(g => (g.themes || []).includes(42))}`}`); }
   show('upcoming', await igdb('games', `fields name,first_release_date,release_dates.human,game_status,hypes; where first_release_date > ${Math.floor(Date.now() / 1000)} & hypes > 50; sort hypes desc; limit 5;`).catch(e => e.message));

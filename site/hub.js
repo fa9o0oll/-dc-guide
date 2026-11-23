@@ -7,7 +7,7 @@ const films = (n) => { const m = n % 100; return n === 1 ? 'فيلم واحد' :
 const games = (n) => { const m = n % 100; return n === 1 ? 'لعبة واحدة' : n === 2 ? 'لعبتين' : `${n} ${m >= 3 && m <= 10 ? 'ألعاب' : 'لعبة'}`; };
 const progress = door => { try { return JSON.parse(localStorage.getItem(door.dataset.key) || '{}'); } catch { return {}; } };
 // العدّاد: ما شاهدته من كل دليل، وفي ألعابي ما ختمته
-// أعمال +18 (مكتبة +18 في بوابتها، site/adult.js) لا تدخل عدّاد الباب: لا في المجموع ولا في ما شوهد منها (door.x18: أرقامها في كتالوج البوابة)
+// أعمال +18 (يخفيها فلتر العين في بوابتها، site/adult.js) لا تدخل عدّاد الباب: لا في المجموع ولا في ما شوهد منها (door.x18: أرقامها في كتالوج البوابة)
 const stat = door => { if (!door.dataset.total) return; const pr = progress(door), isGames = door.dataset.guide === 'games', isAnime = door.dataset.guide === 'anime', x = door.x18 || new Set(), n = (o, ok) => Object.entries(o || {}).filter(([k, v]) => !x.has(String(k)) && ok(v)).length;
   const seen = isGames ? n(pr.games, v => v?.s === 'done') : isAnime ? n(pr.a, v => v?.s === 'completed') : n(pr.works || pr.films, v => v === 'watched');
   door.querySelector('[data-stat]').textContent = seen ? `${isGames ? 'ختمت' : isAnime ? 'أكملت' : 'شاهدت'} ${seen} من ${door.dataset.total}` : door.dataset.total; };

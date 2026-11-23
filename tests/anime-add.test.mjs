@@ -50,10 +50,10 @@ delete process.env.GH_TOKEN; r = await post({ ...ok, mal: 8, title: 'Bouken Ou B
 process.env.ADD_GAME_PASSWORD = 'games-pass'; r = await post({ ...ok, mal: 8, title: 'Bouken Ou Beet' }); const r2 = await post({ password: 'games-pass', mal: 8, title: 'Bouken Ou Beet' });
 check('كلمة سر «أضف لعبة» تتقدم حين توجد', r.status === 401 && r2.state === 'added', [r, r2]);
 delete process.env.ADD_GAME_PASSWORD; delete process.env.ADD_FILM_PASSWORD; r = await post({ ...ok, mal: 9, title: 'x' }); check('بلا كلمة سر في الخادم: خطأ إعداد', r.status === 500 && /كلمة السر/.test(r.error), r);
-// مكتبة +18 (E61): الإضافة منها تُوسم ad في القائمة، وعنوان إيداعها برقمها بلا اسمها
+// فلتر +18 (E65): عمل +18 يُضاف والفلتر مرفوع يُوسم ad في القائمة، وعنوان إيداعه برقمه بلا اسمه
 process.env.ADD_FILM_PASSWORD = 'open-sesame-42'; process.env.GH_TOKEN = 'test-token';
 r = await post({ ...ok, mal: 70010, title: 'Velvet Found', type: 'OVA', eps: 3, ad: 1 });
-check('عمل من مكتبة +18: يُوسم ad في القائمة، وعنوان إيداعه برقمه بلا اسمه ويحمل [skip ci]', r.state === 'added' && JSON.stringify(list().find(x => x.mal === 70010)) === '{"mal":70010,"title":"Velvet Found","type":"OVA","eps":3,"ad":1}' && GH.puts.at(-1) === 'anime: add +18 (#70010) [skip ci]', [r, GH.puts.at(-1), list().find(x => x.mal === 70010)]);
+check('عمل +18: يُوسم ad في القائمة، وعنوان إيداعه برقمه بلا اسمه ويحمل [skip ci]', r.state === 'added' && JSON.stringify(list().find(x => x.mal === 70010)) === '{"mal":70010,"title":"Velvet Found","type":"OVA","eps":3,"ad":1}' && GH.puts.at(-1) === 'anime: add +18 (#70010) [skip ci]', [r, GH.puts.at(-1), list().find(x => x.mal === 70010)]);
 r = await post({ ...ok, mal: 70011, title: 'Plain Thing', ad: 'yes' });
 check('وسم غير صريح (ليس 1 ولا true) لا يُكتب، والعمل عادي باسمه في العنوان', r.state === 'added' && !('ad' in list().find(x => x.mal === 70011)) && GH.puts.at(-1) === 'anime: add Plain Thing (#70011) [skip ci]', [list().find(x => x.mal === 70011), GH.puts.at(-1)]);
 check('ترتيب الأسماء كما في scripts/anime-list.mjs', place([{ title: 'b' }, { title: 'D' }], { title: 'C' }).map(x => x.title).join() === 'b,C,D' && place([{ title: 'a' }], { title: 'z' }).map(x => x.title).join() === 'a,z');

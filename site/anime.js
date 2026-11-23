@@ -14,7 +14,7 @@ import { describe, noun, model } from './anime-pos.js?v=__BUILD__';
 import { themeOf } from './anime-theme.js?v=__BUILD__';
 import { GENRE } from './anime-genres.js?v=__BUILD__';
 import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead } from './anime-simkl.js?v=__BUILD__';
-import { ROOM, covered, uncover, bare, showing, setShowing, drawEye, flip, roomBtn, roomBar, cover } from './adult.js?v=__BUILD__'; // مكتبة +18 (E61)
+import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
 const BUILD = '__BUILD__', KEY = 'animeg.progress', UI = 'anime.ui', ASK = 'animeg.asked', PASS = 'animeg.pass', ADDK = 'animeg.added';
@@ -66,12 +66,11 @@ const hasLog = () => { for (const _ in P.a) return true; return false; };
 load();
 
 // ---------- البيانات
-// list وby: أعمال المكتبة المفتوحة وحدها (العادية، أو +18 حين تُفتح: ROOM). all وknown: كل ما في الكتالوج، للاستيراد والمطابقة. adult: أرقام أعمال +18
+// list وby: ما يظهر الآن: أعمالك، ومعها أعمال +18 حين يُرفع الفلتر (isOpen، وrelist تعيد بناءهما عند التبديل). all وknown: كل ما في الكتالوج، للاستيراد والمطابقة. adult: أرقام أعمال +18
 const D = { list: [], by: new Map(), all: [], known: new Set(), adult: new Set(), worlds: [], wby: new Map(), prov: {}, genres: [], base: 'https://image.tmdb.org/t/p/', mal: 'https://cdn.myanimelist.net/images/anime/', texts: new Map(), found: null, eps: {}, epc: new Map() };
 const ui = { list: 'watching', view: 'list', q: '', sort: 'mal', type: '', genre: -1, shown: 60, names: 'romaji' };
 try { const u = JSON.parse(store.get(UI) || '{}'); for (const k of ['list', 'sort', 'names']) if (typeof u[k] === 'string') ui[k] = u[k]; } catch {}
-const usualList = ui.list; if (ROOM) ui.list = 'all';   // مكتبة +18 تفتح على «الكل»، واختيار القائمة فيها لا يُحفظ فوق اختيار المكتبة العادية
-const keep = () => store.set(UI, JSON.stringify({ list: ROOM ? usualList : ui.list, sort: ui.sort, names: ui.names }));
+const keep = () => store.set(UI, JSON.stringify({ list: ui.list, sort: ui.sort, names: ui.names }));
 const get = async f => { const r = await fetch(`data/${f}?v=${BUILD}`); if (!r.ok) throw new Error(f + ' ' + r.status); return r.json(); };
 const title = a => ui.names === 'english' && a.en ? a.en : a.t;
 const poster = (a, big) => a.img ? `${D.mal}${a.img}${big ? 'l' : ''}.webp` : a.tp ? `${D.base}${big ? 'w500' : 'w342'}${a.tp}` : '';
@@ -90,14 +89,14 @@ const daysTo = d => Math.ceil((Date.parse(d) - Date.parse(today)) / 864e5);
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <section class="sky" id="sky"><div class="sky-art" aria-hidden="true"><i></i><i></i><b></b></div>
   <header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${miniDoor}<span>البوابات</span></a><h1>أنمياتي</h1>
-    ${roomBtn()}<button class="btn ghost" data-act="import">${ic('in')}<span>قائمتي وحساباتي</span></button><button class="btn pri" data-act="add">${ic('plus')}<span>أضف أنمي</span></button></header>
-  ${roomBar('قائمتك العادية')}<p class="tally" id="tally"></p><div id="now"></div><div id="tonight"></div>
+    ${eyeBtn()}<button class="btn ghost" data-act="import">${ic('in')}<span>قائمتي وحساباتي</span></button><button class="btn pri" data-act="add">${ic('plus')}<span>أضف أنمي</span></button></header>
+  <p class="tally" id="tally"></p><div id="now"></div><div id="tonight"></div>
   <svg class="sky-line" viewBox="0 0 1200 96" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M0 96V70l60-3 40 4 70-9 50 6 90-4 60 5 80-8 70 6 110-5 60 4 90-7 70 6 120-4 80 5 150-6v36z"/>
     <g fill="none" stroke="currentColor" stroke-width="1.2" vector-effect="non-scaling-stroke"><path d="M0 34q150 26 300 2t300 0 300 2 300-4"/><path d="M0 44q150 24 300 2t300 0 300 2 300-4"/><path d="M0 26q150 22 300 0"/></g>
     <g fill="currentColor"><path d="M297 14h6v70h-6zM282 22h36v3h-36zM286 34h28v3h-28zM597 18h6v62h-6zM584 26h32v3h-32zM897 12h6v72h-6zM880 20h40v3h-40zM886 32h28v3h-28z"/></g></svg></section>
 <nav class="bar" aria-label="البحث والقوائم"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a>
   <label class="search">${ic('search')}<span class="sr">ابحث في أنمياتي</span><input id="q" type="search" placeholder="ابحث: أنمي، استوديو، سنة" autocomplete="off" enterkeyhint="search"></label>
-  <div class="views" role="group" aria-label="طريقة العرض"${ROOM ? ' hidden' : ''}><button data-act="view" data-v="list" aria-pressed="true">الأعمال</button><button data-act="view" data-v="worlds" aria-pressed="false">السلاسل</button></div></div>
+  <div class="views" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="list" aria-pressed="true">الأعمال</button><button data-act="view" data-v="worlds" aria-pressed="false">السلاسل</button></div></div>
   <div class="lists" id="lists" role="group" aria-label="قوائمي"></div>
   <div class="tools" id="tools"><select id="sort" aria-label="الترتيب"><option value="mal">ترتيب قائمتي</option><option value="score">تقييمي، الأعلى أولاً</option><option value="pub">تقييم MyAnimeList</option><option value="new">الأحدث صدوراً</option><option value="old">الأقدم صدوراً</option><option value="prog">الأقرب إلى الإكمال</option></select>
     <select id="type" aria-label="النوع"><option value="">كل الأنواع</option></select>
@@ -128,21 +127,21 @@ function progHTML(a, m, plus = true) { const tot = a.eps || 0, p = m?.p || 0, ti
 function celHTML(a, where, i = 0) { const m = me(a.id), s = m?.s, live = s === 'watching' || s === 'hold', next = a.nx && live && a.nx.date >= today ? daysTo(a.nx.date) : null;
   const sizes = where === 'rail' ? '(max-width:560px) 150px, 206px' : '(max-width:560px) 46vw, 190px';
   const meta = [typeOf(a), a.y || '', s === 'completed' && m.e ? `أكملته ${m.e.slice(0, 4)}` : a.type !== 'Movie' && a.eps ? nEps(a.eps) : a.st === 'airing' ? 'يُعرض الآن' : a.st === 'soon' ? 'لم يُعرض بعد' : ''].filter(Boolean).join(' · ');
-  return `<article class="cel${a.x && !m ? ' out' : ''}" data-id="${a.id}"${bare(a.id)} style="--i:${i}${a.ac ? `;--ac:#${a.ac}` : ''}">
+  return `<article class="cel${a.x && !m ? ' out' : ''}" data-id="${a.id}"${marks(a.id, a.ad)} style="--i:${i}${a.ac ? `;--ac:#${a.ac}` : ''}">
     <button class="cel-art${xc(a)}" data-act="open" data-id="${a.id}" aria-label="بطاقة ${esc(a.t)}">${art(a, sizes, where === 'rail' && i < 6)}
       ${where !== 'rail' && ui.list === 'all' && ui.view === 'list' ? flag(s) : ''}${m?.r ? `<span class="stamp${m.r === 10 ? ' top10' : ''}" title="تقييمك ${m.r} من 10">${m.r}</span>` : ''}
       ${next != null ? `<span class="next">الحلقة ${a.nx.ep} ${next <= 0 ? 'اليوم' : next === 1 ? 'غداً' : 'بعد ' + nDays(next)}</span>` : ''}</button>
     <h3>${esc(title(a))}</h3><p class="meta">${meta}</p>${live ? progHTML(a, m) : ''}</article>`; }
 
 // ---------- السماء: أرقامك، ثم ما تشاهده الآن
-function tallyHTML() { const all = Object.entries(P.a).filter(([id]) => D.adult.has(+id) === ROOM); if (!all.length) return '';   // سجل المكتبة المفتوحة وحدها
+function tallyHTML() { const all = Object.entries(P.a).filter(([id]) => isOpen() || !D.adult.has(+id)); if (!all.length) return '';   // سجل ما يظهر الآن: بلا أعمال +18 والفلتر قائم
   let eps = 0, min = 0, sum = 0, rated = 0; for (const [id, m] of all) { const a = D.by.get(+id); eps += m.p || 0; min += (m.p || 0) * (a?.dur || 24); if (m.r) { sum += m.r; rated++; } }
   const bold = (t, shown) => /^\d/.test(t) ? t.replace(/^[\d,]+/, m => `<b>${shown ?? m}</b>`) : `<b>${t}</b>`, days = Math.round(min / 144) / 10;
-  return `<span>${bold(nWorks(all.length))} في ${ROOM ? `مكتبة ${ltr('+18')}` : 'قائمتك'}</span><span>${eps ? bold(nEps(eps)) + ' شاهدتها' : 'لم تسجّل حلقات بعد'}</span>${days >= .1 ? `<span>${days < 3 ? `<b>${num(days)}</b> يوم` : bold(nDays(Math.floor(days)), num(days))} من المشاهدة</span>` : ''}${rated ? `<span>متوسط تقييمك <b>${(sum / rated).toFixed(2)}</b></span>` : ''}`; }
+  return `<span>${bold(nWorks(all.length))} في قائمتك</span><span>${eps ? bold(nEps(eps)) + ' شاهدتها' : 'لم تسجّل حلقات بعد'}</span>${days >= .1 ? `<span>${days < 3 ? `<b>${num(days)}</b> يوم` : bold(nDays(Math.floor(days)), num(days))} من المشاهدة</span>` : ''}${rated ? `<span>متوسط تقييمك <b>${(sum / rated).toFixed(2)}</b></span>` : ''}`; }
 // الأولوية لما بدأته (الأقرب إلى الإكمال أولاً)، ثم ما له حلقة قادمة، ثم الباقي بترتيب القائمة
 function nowList() { const l = inList('watching'), k = a => { const m = me(a.id), p = m.p || 0; return p ? 2 + (a.eps ? p / a.eps : .5) : a.nx ? 1 : 0; };
   return l.sort((a, b) => k(b) - k(a) || (a.ord ?? 1e9) - (b.ord ?? 1e9)); }
-function nowHTML() { if (!hasLog()) return D.list.length && !ROOM ? `<div class="invite"><h2>هذه قائمتك: ${nWorks(D.list.filter(a => a.ord != null).length)}</h2>
+function nowHTML() { if (!hasLog()) return D.list.length ? `<div class="invite"><h2>هذه قائمتك: ${nWorks(D.list.filter(a => a.ord != null).length)}</h2>
     <p>سجلّك (ما شاهدته وما أكملته وتقييماتك وتواريخك) لا يُحفظ في الموقع العام. استورده من ملف تصدير ${ltr('MyAnimeList')} مرة واحدة على أي جهاز، ثم اربط ${ltr('SIMKL')} ليكمله بما عنده، وتنقله المزامنة إلى بقية أجهزتك.</p>
     <button class="btn pri" data-act="import">${ic('in')}<span>استورد سجلّي</span></button></div>` : '';
   const l = nowList(); if (!l.length) return '';
@@ -155,13 +154,13 @@ let tonightId = 0, amoods = []; try { amoods = (store.get('anime.mood') || '').s
 // يصلح بدايةً: ما قبله في خطه أكملته (أو هو أوله)، وما كان فرعاً (جانبياً، نسخة أخرى، ملخصاً…) فأصله أكملته أيضاً
 const startable = a => { const w = D.wby.get(a.w); if (!w) return true; const M = model(w, D.by), L = M.lines[M.lineOf.get(a.id)]; if (!L) return true; const i = L.ids.indexOf(a.id), done = id => me(id)?.s === 'completed';
   if (i > 0 && !done(L.ids[i - 1])) return false; const root = M.refOf.get(L.ids[0]); return L.i === 0 || !root || done(root); };
-const tonightOk = a => me(a.id)?.s === 'plan' && a.st !== 'soon' && !a.pending && (a.img || a.tp) && startable(a);
+const tonightOk = a => !a.ad && me(a.id)?.s === 'plan' && a.st !== 'soon' && !a.pending && (a.img || a.tp) && startable(a);
 const gfits = a => amoods.filter(g => (a.g || []).includes(g)).length;
 function pickTonight(fresh) { const all = D.list.filter(tonightOk); let best = 0; for (const a of all) best = Math.max(best, gfits(a)); const good = a => !amoods.length || !best || gfits(a) === best;
   const cur = D.by.get(tonightId); if (!fresh && cur && tonightOk(cur) && good(cur)) return { a: cur, best };
   const pool = all.filter(a => good(a) && a.id !== tonightId), from0 = pool.length ? pool : all.filter(good); if (!from0.length) return { a: null, best };
   const strong = from0.filter(a => (a.sc || 0) >= 7.8), from = strong.length >= 4 ? strong : from0, a = from[Math.floor(Math.random() * from.length)]; tonightId = a.id; return { a, best }; }
-function renderTonight(fresh) { const box = $('#tonight'); if (!box) return; if (!hasLog() || ROOM) { box.innerHTML = ''; return; }   // لا اقتراح في مكتبة +18
+function renderTonight(fresh) { const box = $('#tonight'); if (!box) return; if (!hasLog()) { box.innerHTML = ''; return; }   // والاقتراح لا يختار عمل +18 (tonightOk)
   const n = new Map(); for (const a of D.list) if (tonightOk(a)) for (const g of a.g || []) n.set(g, (n.get(g) || 0) + 1); amoods = amoods.filter(g => n.has(g));
   const { a, best } = pickTonight(fresh), total = D.list.filter(tonightOk).length; if (!total) { box.innerHTML = ''; return; }
   const chip = (g, name, c) => `<button type="button" data-act="amood" data-g="${g}" aria-pressed="${g < 0 ? !amoods.length : amoods.includes(g)}"${g >= 0 ? ` style="--gh:${ghue(D.genres[g])}"` : ''}>${name}<b>${num(c)}</b></button>`;
@@ -188,12 +187,10 @@ function visible() { const log = hasLog(), list = log ? ui.list : 'all'; let l =
     old: (a, b) => (a.from || '9') < (b.from || '9') ? -1 : (a.from || '9') > (b.from || '9') ? 1 : ord(a, b), prog: (a, b) => ratio(b) - ratio(a) || ord(a, b) };
   return l.sort(S[ui.sort] || ord); }
 let cur = [];
-function renderGrid(keepShown) { cur = visible(); if (!keepShown) ui.shown = 60; const g = $('#grid'), log = hasLog(), bare = ROOM && !D.list.some(mine);   // bare: مكتبة +18 ولا عمل فيها بعد
+function renderGrid(keepShown) { cur = visible(); if (!keepShown) ui.shown = 60; const g = $('#grid'), log = hasLog();
   $('#count').innerHTML = !D.list.length ? '' : ui.view === 'worlds' ? `${count(D.worlds.length, ['سلسلة واحدة', 'سلسلتان', 'سلاسل', 'سلسلة', 'سلسلة'])} فيها أعمال من قائمتك، الأكثر حضوراً فيها أولاً` : `${nWorks(cur.length)}${ui.genre >= 0 ? ` من تصنيف ${genreOf(D.genres[ui.genre])}` : ''}${ui.q ? ` تطابق «${esc(ui.q)}»` : ''}${D.found ? `، هل تقصد ${ltr(D.found)}؟` : ''}${log ? '' : ' · بلا سجل على هذا الجهاز'}`;
   g.innerHTML = cur.length ? cur.slice(0, ui.shown).map((a, i) => celHTML(a, 'grid', i)).join('') + (cur.length > ui.shown ? '<i class="more" id="more"></i>' : '')
-    : bare ? `<div class="none r18-none"><h2>مكتبة ${ltr('+18')} فارغة</h2><p>ابحث في ${ltr('MyAnimeList')} عن عمل وأضفه، فيبقى هنا وحده: لا يدخل قائمتك العادية ولا بحثها ولا اقتراحاتها.</p><button class="btn pri" data-act="add">${ic('search')}<span>ابحث عن عمل ${ltr('+18')}</span></button></div>`
-    : `<p class="none">${ui.q ? 'لا عمل في هذه القائمة يطابق ما كتبت.' : log || ROOM ? 'هذه القائمة فارغة.' : 'تُحمَّل القائمة…'}</p>`;
-  document.body.classList.toggle('r18-empty', bare);
+    : `<p class="none">${ui.q ? 'لا عمل في هذه القائمة يطابق ما كتبت.' : log ? 'هذه القائمة فارغة.' : 'تُحمَّل القائمة…'}</p>`;
   const more = $('#more'); if (more) moreIO.observe(more); renderGenres(); }
 // ---------- شريط التصنيفات: تصنيفات القائمة الظاهرة بأعدادها، الأكثر أولاً، ولكل تصنيف لون ثابت يُعرف به. لمسة تفرز بها الشبكة ولمسة ثانية ترفع الفرز،
 // ويُسحب بالماوس كبقية الشرائط (site/rail.js). الأعداد من القائمة والنوع المختارين قبل التصنيف (D.pool)
@@ -304,7 +301,7 @@ function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `
       <div class="facts">${facts.map(f => `<span>${f[0]}</span>`).join('')}${a.sc ? `<span class="mal">${ltr('MyAnimeList')} <b>${a.sc.toFixed(2)}</b></span>${a.sv ? `<span>${num(a.sv)} تقييماً</span>` : ''}` : ''}</div></div></div>
     ${posHTML(a)}${mineHTML(a)}
     ${D.eps[a.id] ? `<section class="sec xs" id="xs" aria-busy="true"><h3>الحلقات</h3><p class="lbl">تُحمَّل الحلقات…</p></section>` : ''}
-    ${a.pending ? '<p class="lbl">معلومات هذا العمل تُجلب في البناء القادم.</p>' : a.ad ? `<section class="sec"><h3>القصة</h3><p class="lbl">نبذات أعمال ${ltr('+18')} لا تُعرض هنا ولا تُترجم. تجدها في صفحته على ${ltr('MyAnimeList')} أدناه.</p></section>` : x?.ar ? `<section class="sec"><h3>القصة</h3><p class="ov">${esc(x.ar)}</p></section>` : x?.en ? `<section class="sec"><h3>القصة</h3><span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')}، ولم تُترجم بعد.</span><p class="ov en">${esc(x.en)}</p>${trHTML(a, 'about')}</section>` : ''}
+    ${a.pending ? '<p class="lbl">معلومات هذا العمل تُجلب في البناء القادم.</p>' : a.ad ? `<section class="sec"><h3>القصة</h3><p class="lbl">نبذة هذا العمل لا تُعرض هنا ولا تُترجم. تجدها في صفحته على ${ltr('MyAnimeList')} أدناه.</p></section>` : x?.ar ? `<section class="sec"><h3>القصة</h3><p class="ov">${esc(x.ar)}</p></section>` : x?.en ? `<section class="sec"><h3>القصة</h3><span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')}، ولم تُترجم بعد.</span><p class="ov en">${esc(x.en)}</p>${trHTML(a, 'about')}</section>` : ''}
     ${(a.g || []).length ? `<div class="glinks" role="group" aria-label="تصنيفاته: اضغط تصنيفاً لترى أعماله في قائمتك">${a.g.map(i => `<button type="button" data-act="genre-go" data-g="${i}" style="--gh:${ghue(D.genres[i])}">${genreOf(D.genres[i])}</button>`).join('')}</div>` : ''}
     ${whereHTML(a)}${worldStrip(a)}
     <section class="sec"><h3>صفحاته</h3><div class="links">${links.map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}${ic('ext')}</a>`).join('')}</div></section></div>`; }
@@ -313,7 +310,7 @@ function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `
 // والبطاقة فوق سلسلتها دائماً، ولا تُفتح سلسلة فوق بطاقة: فتح السلسلة من بطاقة يطويها (stash) والرجوع يعيدها كما كانت (reshow)
 async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; kept = null; const d = $('#sheet'), body = $('#sheet-body');
   // فوق بوابة عالم تلبس البطاقة ألوانه
-  const gw = GM && $('#wsheet').open && D.wby.get(wopen), th = gw && themeOf(gw, D.by, D.genres); d.classList.toggle('themed', !!th); if (th) { d.style.setProperty('--wbg', th.bg); d.style.setProperty('--wc1', th.c1); } delete body.dataset.full; body.toggleAttribute('data-r18-bare', !!bare(a.id)); body.innerHTML = sheetHTML(a, null); body.scrollTo(0, 0); showEps(a);
+  const gw = GM && $('#wsheet').open && D.wby.get(wopen), th = gw && themeOf(gw, D.by, D.genres); d.classList.toggle('themed', !!th); if (th) { d.style.setProperty('--wbg', th.bg); d.style.setProperty('--wc1', th.c1); } delete body.dataset.full; markEl(body, a.id, a.ad); body.innerHTML = sheetHTML(a, null); body.scrollTo(0, 0); showEps(a);
   if (!d.open) { d.showModal(); body.scrollTo(0, 0); if (push) history.pushState({ a: id, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1, n: depth() + 1 }, '', `#a${id}`); }   // التصفير بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
   else if (push) history.replaceState(history.state?.p ? { ...history.state, a: id } : null, '', `#a${id}`);
   const x = await texts(id); if (open !== id) return; if (x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; showEps(a); } body.dataset.full = id; }
@@ -361,13 +358,18 @@ document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.ma
 // ---------- «أضف أنمي»: البحث في كل ما في «أنمياتي» (أعمالك وأقرباء سلاسلها)، وما ليس فيه ففي MyAnimeList (Jikan، من المتصفح بلا مفتاح).
 // ما في «أنمياتي» يدخل سجلّك مباشرة. وما ليس فيه يُضاف رقمه إلى data/anime/list.json في المستودع (دالة /api/anime-add بكلمة سر «أضف لعبة»، بإيداع لا يعيد البناء)،
 // ويدخل سجلّك وقائمتك من الآن ببطاقة مؤقتة مما عاد به البحث (localOf)، وتكتمل معلوماته مع البناء القادم. لا يُرسل من السجل شيء: رقم العمل واسمه ونوعه وعدد حلقاته.
-// في مكتبة +18 (ROOM): البحث في أعمالها وحدها، وفي MyAnimeList بين ما تصنيفه Rx وحده، وما يُضاف يُوسم ad في القائمة فلا يظهر خارجها
-const ADD = { q: '', mal: null, malQ: '', busy: false, msg: '', need: null };
+// والفلتر مرفوع (isOpen): البحث في كل ما يظهر، وفي MyAnimeList بلا قيد، وما تصنيفه Rx مما يُضاف يُوسم ad في القائمة فلا يظهر والفلتر قائم
+const ADD = { q: '', mal: null, malQ: '', busy: 0, via: '', msg: '', need: null };
 const addedMap = () => { try { const m = JSON.parse(store.get(ADDK) || '{}'); return m && typeof m === 'object' ? m : {}; } catch { return {}; } };
 // بطاقة مؤقتة لعمل أُضيف من MyAnimeList ولم يدخل الكتالوج بعد: مما حُفظ من نتيجة البحث (الاسم والنوع والحلقات والسنة والصورة)
 const localOf = (id, m) => ({ id: +id, t: String(m.t || id), type: m.ty || '', eps: +m.n || 0, ...(m.y ? { y: +m.y } : {}), ...(/^\d+\/\d+$/.test(m.im || '') ? { img: m.im } : {}), ...(m.ad ? { ad: 1 } : {}), pending: 1, ord: 1e7 + +id });
-// يُدخل عملاً في بيانات الصفحة: في all وknown دائماً، وفي قائمة المكتبة المفتوحة إن كان منها
-function enroll(a) { if (D.known.has(a.id)) return; D.known.add(a.id); D.all.push(a); if (a.ad) D.adult.add(a.id); if (!!a.ad === ROOM) { D.list.push(a); D.by.set(a.id, a); D.prep = D.prepAll = null; } }
+// يُدخل عملاً في بيانات الصفحة: في all وknown دائماً، وفي ما يظهر إن لم يخفه الفلتر
+function enroll(a) { if (D.known.has(a.id)) return; D.known.add(a.id); D.all.push(a); if (a.ad) D.adult.add(a.id); if (!hides(a)) { D.list.push(a); D.by.set(a.id, a); D.prep = D.prepAll = null; } }
+// العين (site/adult.js) ترفع الفلتر أو تعيده في مكانها، بلا إعادة تحميل: list وby يُعاد بناؤهما من all، وكل ما بعدهما يُرسم من جديد
+function relist() { D.list.length = 0; D.by.clear(); for (const a of D.all) if (!hides(a)) { D.list.push(a); D.by.set(a.id, a); } D.prep = D.prepAll = null; }
+function fillTypes() { const s = $('#type'), types = [...new Set(D.list.filter(a => a.ord != null).map(a => a.type).filter(Boolean))]; s.innerHTML = '<option value="">كل الأنواع</option>' + types.map(t => `<option value="${esc(t)}">${TYPE[t] || esc(t)}</option>`).join(''); s.value = types.includes(ui.type) ? ui.type : ''; ui.type = s.value; }
+function toggleEye() { setOpen(!isOpen()); relist(); drawEye(); fillTypes(); if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';
+  renderAll(); toast(isOpen() ? 'رُفع الفلتر: تظهر الأعمال كلها.' : 'عاد الفلتر.'); }
 const byFrom = (a, b) => (a.from || '9999') < (b.from || '9999') ? -1 : (a.from || '9999') > (b.from || '9999') ? 1 : a.id - b.id;
 function addLocal(q) { const f = fold(q).trim(); if (!f) return [];
   const name = a => a.ht ||= fold(`${a.t} ${a.en || ''}`), rank = a => { const t = fold(a.t), e = fold(a.en || ''); return t === f || e === f ? 0 : t.startsWith(f) || e.startsWith(f) ? 1 : 2; };
@@ -378,50 +380,69 @@ const metaOf = a => [typeOf(a), a.y || '', a.type !== 'Movie' && a.eps ? nEps(a.
 const addBtns = (id, act) => `<button class="btn pri" data-act="${act}" data-id="${id}" data-s="plan">${ic('mark')}<span>سأشاهده</span></button><button class="btn ghost" data-act="${act}" data-id="${id}" data-s="watching">${ic('play')}<span>أشاهده الآن</span></button>`;
 const LIC = Object.fromEntries(LISTS.map(l => [l[0], l[2]]));
 function addRow(a) { const m = me(a.id);
-  return `<li class="arow" data-id="${a.id}"${bare(a.id)}><button class="aart${xc(a)}" data-act="open" data-id="${a.id}" aria-label="بطاقة ${esc(a.t)}">${art(a, '52px')}</button>
+  return `<li class="arow" data-id="${a.id}"${marks(a.id, a.ad)}><button class="aart${xc(a)}" data-act="open" data-id="${a.id}" aria-label="بطاقة ${esc(a.t)}">${art(a, '52px')}</button>
     <div class="ainfo"><b>${esc(title(a))}</b><span class="meta">${metaOf(a)}</span></div>
     <div class="aacts">${m ? `<span class="astate" data-l="${m.s}">${ic(LIC[m.s])}في «${LNAME[m.s]}»</span><button class="btn quiet" data-act="open" data-id="${a.id}">بطاقته</button>` : addBtns(a.id, 'add-to')}</div></li>`; }
 function malRow(x) { const done = addedMap()[x.id], need = ADD.need?.id === x.id, ph = esc((x.t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase());
-  return `<li class="arow" data-mal="${x.id}"${bare(x.id)}><span class="aart${x.img && covered(x.id) ? ' x18' : ''}">${x.img ? (i => covered(x.id) ? cover(i) : i)(`<img loading="lazy" decoding="async" alt="" src="${esc(x.img)}">`) : `<span class="ph">${ph}</span>`}</span>
+  return `<li class="arow" data-mal="${x.id}"${marks(x.id, x.ad)}><span class="aart${x.img && x.ad && covered(x.id) ? ' x18' : ''}">${x.img ? (i => x.ad && covered(x.id) ? cover(i) : i)(`<img loading="lazy" decoding="async" alt="" src="${esc(x.img)}">`) : `<span class="ph">${ph}</span>`}</span>
     <div class="ainfo"><b>${esc(ui.names === 'english' && x.en ? x.en : x.t)}</b><span class="meta">${[x.type ? typeOf(x) : '', x.y || '', x.type !== 'Movie' && x.eps ? nEps(x.eps) : ''].filter(Boolean).join(' · ')}</span></div>
     <div class="aacts">${done ? `<span class="astate" data-l="${me(x.id)?.s || done.s}">${ic('check')}أُضيف إلى «${LNAME[me(x.id)?.s || done.s] || LNAME.plan}»</span>${D.by.has(x.id) ? `<button class="btn quiet" data-act="open" data-id="${x.id}">بطاقته</button>` : ''}` : addBtns(x.id, 'add-mal')}</div>
     ${need ? `<div class="apass"><label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة» أو «أضف فيلماً»)<input class="add-pass" type="password" autocomplete="current-password"></label><p class="msg" aria-live="polite">${ADD.need.msg || ''}</p></div>` : ''}</li>`; }
-const HERE = ROOM ? `مكتبة ${ltr('+18')}` : '«أنمياتي»';
+const HERE = '«أنمياتي»';
 function addResHTML() { const q = ADD.q.trim(); if (!q) return `<p class="lbl">اكتب اسم العمل كما في ${ltr('MyAnimeList')} أو بالإنجليزية.</p>`;
   // ما أُضيف للتوّ من نتائج MyAnimeList يبقى في موضعه بينها بحالته (stay)، فلا يقفز الصف إلى أعلى النافذة تحت الإصبع
   const mal = ADD.malQ === q ? ADD.mal : null, am = addedMap(), stay = new Set((mal || []).filter(x => am[x.id] && D.by.get(x.id)?.pending).map(x => x.id));
   const loc = addLocal(q).filter(a => !stay.has(a.id)), shown = new Set(loc.map(a => a.id));
+  const via = !mal || !ADD.via ? '' : `<p class="lbl">${ADD.via === 'al0' ? `بحث ${ltr('MyAnimeList')} لم يجد شيئاً بهذا الاسم` : `${ltr('MyAnimeList')} لم يُجب الآن`}، فهذه النتائج من ${ltr('AniList')} بأرقام أعمالها في ${ltr('MyAnimeList')}.</p>`;
   const extra = mal ? mal.filter(x => D.by.has(x.id) && !shown.has(x.id) && !stay.has(x.id)).map(x => D.by.get(x.id)) : [], fresh = mal ? mal.filter(x => !D.by.has(x.id) || stay.has(x.id)) : [];
   return `<h3 class="ah">في ${HERE}</h3>${loc.length + extra.length ? `<ul class="ares">${[...loc, ...extra].map(addRow).join('')}</ul>` : `<p class="lbl">لا عمل في ${HERE} بهذا الاسم.</p>`}
-    <h3 class="ah">في ${ltr('MyAnimeList')}</h3>${ADD.busy && ADD.malQ === q ? `<p class="lbl">يُبحث في ${ltr('MyAnimeList')}…</p>`
-      : mal ? (fresh.length ? `<ul class="ares">${fresh.map(malRow).join('')}</ul><p class="lbl">${ROOM ? `ما تضيفه من هنا يدخل مكتبة ${ltr('+18')} وسجلّك الآن، وتكتمل معلوماته مع البناء القادم.` : 'ما تضيفه من هنا يدخل سجلّك وقائمتك الآن، وتكتمل معلوماته وحلقاته مع البناء القادم.'}</p>` : `<p class="lbl">${mal.length ? `كل ما وُجد هناك في ${HERE} أعلاه.` : ROOM ? `لا عمل هناك بهذا الاسم بين ما تصنيفه ${ltr('+18')}. ما سواه تجده من «أضف أنمي» في قائمتك العادية.` : 'لا نتيجة هناك بهذا الاسم.'}</p>`)
+    <h3 class="ah">في ${ltr('MyAnimeList')}</h3>${ADD.busy && ADD.malQ === q ? `<p class="lbl" aria-live="polite">${ADD.busy === 2 ? `${ltr('MyAnimeList')} لم يُجب، فيُبحث في ${ltr('AniList')}…` : ADD.busy === 3 ? `لا نتيجة في ${ltr('MyAnimeList')}، فيُبحث في ${ltr('AniList')}…` : `يُبحث في ${ltr('MyAnimeList')}…`}</p>`
+      : mal ? (fresh.length ? via + `<ul class="ares">${fresh.map(malRow).join('')}</ul><p class="lbl">ما تضيفه من هنا يدخل سجلّك وقائمتك الآن، وتكتمل معلوماته وحلقاته مع البناء القادم.</p>` : `<p class="lbl">${mal.length ? `كل ما وُجد هناك في ${HERE} أعلاه.` : ADD.via === 'al' ? `${ltr('MyAnimeList')} لم يُجب الآن، و${ltr('AniList')} لم يجد شيئاً بهذا الاسم.` : 'لا نتيجة هناك بهذا الاسم.'}</p>`)
       : q.length < 2 ? `<p class="lbl">اكتب حرفين على الأقل.</p>` : `${ADD.msg && ADD.malQ === q ? `<p class="msg" aria-live="polite">${ADD.msg}</p>` : ''}<button type="button" class="btn ghost" data-act="add-find">${ic('search')}<span>ابحث في ${ltr('MyAnimeList')} عن «${esc(q)}»</span></button>`}`; }
 // يُعاد رسم النتائج مع كل تعديل في السجل (وبالمزامنة)، وما كُتب في خانة كلمة السر يبقى
 const drawAddRes = () => { const box = $('#add-res'); if (!box) return; const f = box.querySelector('.add-pass'), v = f?.value, foc = f && document.activeElement === f; box.innerHTML = addResHTML(); const g = box.querySelector('.add-pass'); if (g && v) g.value = v; if (g && foc) g.focus(); };
-function openAdd() { ADD.need = null; $('#add-body').innerHTML = `<h2 id="add-h">${ROOM ? `أضف إلى مكتبة ${ltr('+18')}` : 'أضف أنمي'}</h2><p class="lbl">${ROOM ? `ابحث في ما في مكتبة ${ltr('+18')}، وما ليس فيها تجده في ${ltr('MyAnimeList')} بين أعماله المصنفة ${ltr('+18')}.` : `ابحث في كل ما في «أنمياتي»: أعمالك وأقرباء سلاسلها. وما ليس هنا تجده في ${ltr('MyAnimeList')}.`}</p>
+function openAdd() { ADD.need = null; $('#add-body').innerHTML = `<h2 id="add-h">أضف أنمي</h2><p class="lbl">ابحث في كل ما في «أنمياتي»: أعمالك وأقرباء سلاسلها. وما ليس هنا تجده في ${ltr('MyAnimeList')}.</p>
   <label class="search">${ic('search')}<span class="sr">اسم الأنمي</span><input id="add-q" type="search" placeholder="اسم الأنمي" autocomplete="off" enterkeyhint="search" value="${esc(ADD.q)}"></label><div id="add-res">${addResHTML()}</div>`;
   const d = $('#addd'); if (!d.open) { d.showModal(); history.pushState({ add: 1, p: 1, n: depth() + 1 }, '', '#add'); } const i = $('#add-q'); i.focus(); i.select(); }
-async function findMal() { const q = ADD.q.trim(); if (q.length < 2 || (ADD.busy && ADD.malQ === q)) return; ADD.busy = true; ADD.msg = ''; ADD.malQ = q; ADD.mal = null; ADD.need = null; drawAddRes();
-  let list = null, msg = '';
-  // المكتبة العادية: بلا ما تصنيفه Rx (sfw). مكتبة +18: ما تصنيفه Rx وحده (rating=rx)، وإن رُفض الطلب بهذا القيد فبلا قيد ويُفرز هنا
-  const rx = x => /^Rx/.test(x.rating || '') || [...(x.genres || []), ...(x.explicit_genres || [])].some(g => g?.name === 'Hentai'), url = more => `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=${ROOM ? 20 : 12}${more}`;
-  try { let r = await fetch(url(ROOM ? '&rating=rx' : '&sfw=true')); if (ROOM && r.status === 400) r = await fetch(url('')); if (r.status === 429) throw new Error('busy'); if (!r.ok) throw new Error('http');
-    const j = await r.json(); list = (Array.isArray(j?.data) ? j.data : []).filter(x => Number.isInteger(x?.mal_id) && x.title && rx(x) === ROOM).slice(0, 12)
-      .map(x => ({ id: x.mal_id, t: x.title, en: x.title_english || '', type: x.type || '', eps: Number.isInteger(x.episodes) ? x.episodes : 0, y: x.year || x.aired?.prop?.from?.year || '', img: x.images?.webp?.small_image_url || x.images?.jpg?.small_image_url || '',
-        im: (/\/images\/anime\/(\d+\/\d+)[a-z]?\.(?:jpe?g|webp)/.exec(x.images?.webp?.image_url || x.images?.jpg?.image_url || '') || [])[1] || '' }));
-  } catch (e) { msg = e.message === 'busy' ? `${ltr('MyAnimeList')} مشغول الآن. انتظر ثواني ثم ابحث ثانية.` : e instanceof TypeError ? `تعذّر الاتصال بـ${ltr('MyAnimeList')}. تحقق من الشبكة ثم حاول.` : `تعذّر البحث في ${ltr('MyAnimeList')} الآن. حاول بعد قليل.`; }
-  if (ADD.malQ !== q) return; ADD.busy = false; ADD.mal = list; ADD.msg = msg; if (!list) ADD.malQ = q; drawAddRes(); }
+// البحث عمّا ليس في «أنمياتي» من مصدرين: Jikan (واجهة MyAnimeList المفتوحة)، وإن تعطّل أو لم يُجب في 8 ثوانٍ فـAniList (يحمل رقم كل عمل في MyAnimeList).
+// لكلٍّ مهلته، فلا يبقى البحث معلّقاً (E66)، والنافذة تقول أيهما يُسأل الآن ومن أيهما جاءت النتائج. والفلتر قائم: بلا أعمال +18 (sfw في Jikan، وisAdult:false
+// في AniList). وحين يُرفع: كل ما يطابق، وأعمال +18 منه تُوسم ad. ولا يُطلب من Jikan بقيد rating=rx أبداً: ذلك الطلب يتأخر حتى ينقطع بلا جواب
+const timed = (ms, run) => { const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms); return run(ac.signal).finally(() => clearTimeout(t)); };
+async function askJikan(q, lifted, signal) { const rx = x => /^Rx/.test(x.rating || '') || [...(x.genres || []), ...(x.explicit_genres || [])].some(g => g?.name === 'Hentai');
+  const r = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=${lifted ? 25 : 12}${lifted ? '' : '&sfw=true'}`, { signal }); if (!r.ok) throw new Error('http ' + r.status);
+  const j = await r.json(); if (!Array.isArray(j?.data)) throw new Error('shape');
+  return j.data.filter(x => Number.isInteger(x?.mal_id) && x.title && (lifted || !rx(x))).slice(0, lifted ? 20 : 12)
+    .map(x => ({ id: x.mal_id, t: x.title, en: x.title_english || '', type: x.type || '', eps: Number.isInteger(x.episodes) ? x.episodes : 0, y: x.year || x.aired?.prop?.from?.year || '', img: x.images?.webp?.small_image_url || x.images?.jpg?.small_image_url || '',
+      im: (/\/images\/anime\/(\d+\/\d+)[a-z]?\.(?:jpe?g|webp)/.exec(x.images?.webp?.image_url || x.images?.jpg?.image_url || '') || [])[1] || '', ...(rx(x) ? { ad: 1 } : {}) })); }
+const AL_TYPE = { TV: 'TV', TV_SHORT: 'TV', MOVIE: 'Movie', SPECIAL: 'Special', OVA: 'OVA', ONA: 'ONA', MUSIC: 'Music' };
+async function askAniList(q, lifted, signal) {
+  const query = `query($q:String,$n:Int){Page(perPage:$n){media(search:$q,type:ANIME${lifted ? '' : ',isAdult:false'}){idMal title{romaji english} format episodes startDate{year} coverImage{medium} isAdult}}}`;
+  const r = await fetch('https://graphql.anilist.co', { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify({ query, variables: { q, n: lifted ? 25 : 12 } }), signal }); if (!r.ok) throw new Error('http ' + r.status);
+  const j = await r.json(), seen = new Set(); if (!Array.isArray(j?.data?.Page?.media)) throw new Error('shape');
+  return j.data.Page.media.filter(x => Number.isInteger(x?.idMal) && x.title?.romaji && (lifted || !x.isAdult) && !seen.has(x.idMal) && seen.add(x.idMal)).slice(0, lifted ? 20 : 12)
+    .map(x => ({ id: x.idMal, t: x.title.romaji, en: x.title.english || '', type: AL_TYPE[x.format] || '', eps: Number.isInteger(x.episodes) ? x.episodes : 0, y: x.startDate?.year || '', img: x.coverImage?.medium || '', im: '', ...(x.isAdult ? { ad: 1 } : {}) })); }
+// busy: 1 يُسأل Jikan، 2 لم يُجب فيُسأل AniList، 3 أجاب بلا نتيجة فيُسأل AniList (فهرس بحث Jikan يفوته أحياناً ما في MyAnimeList). via: النتائج من AniList: 'al' لأن Jikan لم يُجب، 'al0' لأنه لم يجد.
+// وما كُتب في الخانة أثناء البحث لا يُفسد نتيجته: تُعرض لاسمها (malQ) وحده
+async function findMal() { const q = ADD.q.trim(); if (q.length < 2 || (ADD.busy && ADD.malQ === q)) return; ADD.busy = 1; ADD.msg = ''; ADD.via = ''; ADD.malQ = q; ADD.mal = null; ADD.need = null; drawAddRes();
+  const lifted = isOpen(); let list = null, via = '', msg = '';
+  try { list = await timed(8000, s => askJikan(q, lifted, s)); } catch {}
+  if (ADD.malQ !== q) return;
+  if (!list?.length) { const none = !!list; ADD.busy = none ? 3 : 2; drawAddRes();
+    try { const more = await timed(8000, s => askAniList(q, lifted, s)); if (more.length || !none) { list = more; via = none ? 'al0' : 'al'; } }
+    catch { if (!none) msg = `لم يُجب ${ltr('MyAnimeList')} ولا ${ltr('AniList')} الآن. تحقق من الشبكة ثم ابحث ثانية.`; }
+    if (ADD.malQ !== q) return; }
+  ADD.busy = 0; ADD.mal = list; ADD.via = via; ADD.msg = msg; drawAddRes(); }
 async function addMal(btn) { const row = btn.closest('.arow'), id = +row.dataset.mal, s = btn.dataset.s, x = ADD.mal?.find(m => m.id === id); if (!x || !LNAME[s]) return;
   const field = row.querySelector('.add-pass'), pw = field?.value || pass();
   if (!pw) { if (ADD.need?.id === id) ADD.need.msg = 'اكتب كلمة السر أولاً.'; else ADD.need = { id, msg: '' }; ADD.need.s = s; drawAddRes(); $(`.arow[data-mal="${id}"] .add-pass`)?.focus(); return; }
   for (const b of row.querySelectorAll('[data-act=add-mal]')) b.disabled = true; btn.querySelector('span').textContent = 'يُضاف…';
-  try { const r = await fetch('/api/anime-add', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw, mal: id, title: x.t, type: x.type, eps: x.eps, ...(ROOM ? { ad: 1 } : {}) }) }), j = await r.json().catch(() => ({}));
+  try { const r = await fetch('/api/anime-add', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw, mal: id, title: x.t, type: x.type, eps: x.eps, ...(x.ad ? { ad: 1 } : {}) }) }), j = await r.json().catch(() => ({}));
     if (r.status === 401 && j.error === 'password') { store.del(PASS); throw Object.assign(new Error('كلمة السر غير صحيحة.'), { pw: true }); }
     if (r.status === 404 || r.status === 405) throw new Error(`الإضافة تعمل من نسخة الموقع على ${ltr('Netlify')}، لا من هذه النسخة.`);
     if (!r.ok) throw new Error(j.error ? esc(j.error) : 'تعذّرت الإضافة الآن. حاول بعد قليل.');
-    store.set(PASS, pw); const m = addedMap(); m[id] = { t: x.t, s, at: today, ty: x.type, n: x.eps, y: x.y, im: x.im, ...(ROOM ? { ad: 1 } : {}) }; store.set(ADDK, JSON.stringify(m)); ADD.need = null;
+    store.set(PASS, pw); const m = addedMap(); m[id] = { t: x.t, s, at: today, ty: x.type, n: x.eps, y: x.y, im: x.im, ...(x.ad ? { ad: 1 } : {}) }; store.set(ADDK, JSON.stringify(m)); ADD.need = null;
     enroll(localOf(id, m[id])); if (!P.a[id]) { P.a[id] = { s }; save(); } renderAll(true); drawAddRes();
-    toast(`${ltr(x.t)} في «${LNAME[s]}»${ROOM ? ` من مكتبة ${ltr('+18')}` : ''}. تكتمل معلوماته مع البناء القادم.`);
+    toast(`${ltr(x.t)} في «${LNAME[s]}». تكتمل معلوماته مع البناء القادم.`);
   } catch (e) { ADD.need = { id, s, msg: e instanceof TypeError ? 'تعذّر الاتصال. تحقق من الشبكة ثم حاول.' : e.message }; drawAddRes();
     const f = $(`.arow[data-mal="${id}"] .add-pass`); if (f) { if (e.pw) f.value = ''; else f.value = pw; f.focus(); } } }
 let addT = 0; document.addEventListener('input', e => { if (e.target.id !== 'add-q') return; clearTimeout(addT); addT = setTimeout(() => { ADD.q = e.target.value; ADD.need = null; drawAddRes(); }, 140); });
@@ -574,8 +595,8 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'close': shut(t.closest('dialog')); break;
     case 'import': openImport(); break;
     case 'add': openAdd(); break;
-    case 'room': flip(`<strong>أنمياتي${ROOM ? '' : ` ${ltr('+18')}`}</strong>`); break;                                             // يفتح مكتبة +18 أو يخرج منها (site/adult.js)
-    case 'room-show': setShowing(!showing()); drawEye(); renderAll(true); if (open) openWork(open, false); break;   // صور المكتبة كلها: تُكشف أو تُغطى
+    case 'room': toggleEye(); break;                                             // العين: ترفع الفلتر أو تعيده (site/adult.js)
+    case 'room-show': setShowing(!showing()); drawEye(); renderAll(true); if (open) openWork(open, false); break;   // أغلفة أعمال +18 كلها: تُكشف أو تُغطى
     case 'bare': uncover(id); renderAll(true); if (open === id) openWork(id, false); break;                          // صورة هذا العمل وحده
     case 'add-to': setStatus(id, d.s); drawAddRes(); break;
     case 'add-find': findMal(); break;
@@ -628,11 +649,11 @@ const liftVeil = () => { const v = $('#veil'); if (!v || v.hidden) return; reque
 function route() { const h = location.hash.slice(1), st = at(); if (st.a || st.w) { if (st.w && !st.a && D.wby.has(+st.w)) setView('worlds'); apply(st); } else if (h === 'worlds') setView('worlds'); else if (h === 'import') { history.replaceState(null, '', location.pathname); openImport(); } else if (h === 'add') { history.replaceState(null, '', location.pathname); openAdd(); } }
 try {
   const [cat, epi] = await Promise.all([get('catalog.json'), get('eps/index.json').catch(() => ({}))]); D.eps = epi || {}; D.base = cat.imageBase || D.base; D.mal = cat.malImages || D.mal; D.prov = cat.providers || {}; D.genres = cat.genres || [];
-  for (const a of cat.anime || []) enroll(a);   // كل عمل في مكتبته: +18 (ad) في مكتبة +18 وحدها، وغيره في العادية وحدها
+  for (const a of cat.anime || []) enroll(a);   // أعمال +18 (ad) تدخل all وحده حتى يُرفع الفلتر
   // ما أُضيف من MyAnimeList ولم يدخل الكتالوج بعد يبقى ببطاقته المؤقتة، ويُنسى ما دخل الكتالوج أو مضى عليه شهر
   { const m = addedMap(); let ch = 0; for (const k of Object.keys(m)) if (D.known.has(+k) || !(Date.parse(today) - Date.parse(m[k]?.at) < 30 * 864e5)) { delete m[k]; ch = 1; } else enroll(localOf(k, m[k])); if (ch) store.set(ADDK, JSON.stringify(m)); }
-  D.worlds = ROOM ? [] : (cat.worlds || []).filter(w => w.ids.some(id => D.by.get(id)?.ord != null)); for (const w of D.worlds) D.wby.set(w.id, w);   // أعمال +18 بلا سلاسل
-  const types = [...new Set(D.list.filter(a => a.ord != null).map(a => a.type).filter(Boolean))]; $('#type').insertAdjacentHTML('beforeend', types.map(t => `<option value="${esc(t)}">${TYPE[t] || esc(t)}</option>`).join(''));
+  D.worlds = (cat.worlds || []).filter(w => w.ids.some(id => D.by.get(id)?.ord != null)); for (const w of D.worlds) D.wby.set(w.id, w);   // أعمال +18 بلا سلاسل
+  fillTypes();
   $('#sort').value = ui.sort; $('#names').value = ui.names; if (!LNAME[ui.list] && ui.list !== 'all') ui.list = 'watching'; if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';
   placeChips(); renderAll(); liftVeil();
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }

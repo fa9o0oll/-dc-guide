@@ -1,8 +1,8 @@
 // دالة «أضف لعبة» (/api/add-game): تقترح أثناء الكتابة (suggest)، وتبحث في IGDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي لعبة للاطلاع (preview)،
 // ثم تضيف المختارة إلى data/games/added.json في المستودع (add)، أو دفعة ألعاب سُحبت من حساباتك في المنصات (import) بإيداع واحد، فيعاد بناء القائمة وتظهر على كل الأجهزة.
 // وتحذف لعبة منه (remove) فتختفي من كل الأجهزة مع البناء القادم. وتسجّل طلب ترجمة نبذة (ask) على فرع requests ليبدأ به المترجم.
-// adult في الطلب: الطلب من مكتبة +18 (E61). البحث والاقتراح يعودان حينها بألعاب سمة Erotic في IGDB وحدها، وبدونه لا يعودان بشيء منها؛ والاطلاع والإضافة
-// يُرفضان إن خالفت اللعبةُ المكتبةَ التي طُلبت منها. والمضافة منها تُوسم adult في الملف، وعنوان إيداعها برقمها بلا اسمها. السحب من الحسابات (import) بلا +18.
+// adult في الطلب: الفلتر مرفوع في الصفحة (E65، العين). البحث والاقتراح يعودان حينها بنتائجهما المعتادة ومعها ألعاب سمة Erotic في IGDB (موسومة adult)، وبدونه
+// لا يعودان بشيء منها؛ والاطلاع والإضافة يُرفضان للعبة +18 والفلتر قائم. والمضافة منها تُوسم adult في الملف، وعنوان إيداعها برقمها بلا اسمها. السحب من الحسابات (import) بلا +18.
 // محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
 //   IGDB_CLIENT_ID وIGDB_CLIENT_SECRET  تطبيق في لوحة مطوري تويتش        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع
 //   ADD_GAME_PASSWORD  كلمة السر (وإن لم توجد فكلمة سر «أضف فيلماً» ADD_FILM_PASSWORD)
@@ -125,34 +125,38 @@ export default async req => {
     catch (e) { if (e.gh === 401 || e.gh === 403 || e.gh === 404) return json(502, { error: 'تعذّر تسجيل الطلب في GitHub: الرمز GH_TOKEN غير صالح أو بلا صلاحية الكتابة على المستودع.' }); console.error(e); return json(502, { error: 'تعذّر تسجيل الطلب الآن. حاول بعد قليل.' }); }
   }
   if (!hasIgdb()) return json(503, { error: 'مفاتيح IGDB غير موجودة في Netlify بعد (IGDB_CLIENT_ID وIGDB_CLIENT_SECRET). أضفها ثم أعد نشر الموقع.', need: 'igdb' });
-  const adult = b.adult === true || b.adult === 1, pick = g => (g.themes || []).includes(EROTIC) === adult, A = adult ? ` & themes = (${EROTIC})` : '';
+  // والفلتر مرفوع يُسأل IGDB مرتين معاً: السؤال المعتاد، وسؤال مقصور على سمة Erotic (ألعابها تُدفن تحت الأشهر فلا تبلغها حدود السؤال الأول)
+  const adult = b.adult === true || b.adult === 1, erotic = g => (g.themes || []).includes(EROTIC), A = ` & themes = (${EROTIC})`;
+  const both = async ask => { const [usual, hot] = await Promise.all([ask(''), adult ? ask(A).catch(() => []) : []]), ids = new Set(usual.map(g => g.id)); return [...usual.filter(g => adult || !erotic(g)), ...hot.filter(g => !ids.has(g.id))]; };
   try {
     const m = await meta(), types = gameyIds(m), T = types.length ? ` & game_type = (${types.join(',')})` : '';
     // اقتراحات أثناء الكتابة لما ليس في فهرس الصفحة: بحث IGDB نفسه بطلب واحد
     if (b.action === 'suggest') {
       const q = String(b.q || '').replace(/\s+/g, ' ').trim().slice(0, 80); if (q.length < 2) return json(200, { items: [] });
-      const [list, P] = await Promise.all([igdb('games', `search ${quote(q)}; fields name,first_release_date,platforms,cover.image_id,themes; where version_parent = null${T}${A}; limit 10;`), plats()]);
-      return json(200, { items: list.filter(pick).slice(0, 6).map(g => ({ igdb: g.id, title: g.name, year: year(g.first_release_date), fams: fams(g.platforms, P), cover: g.cover?.image_id || null })) });
+      const [list, P] = await Promise.all([both(a => igdb('games', `search ${quote(q)}; fields name,first_release_date,platforms,cover.image_id,themes; where version_parent = null${T}${a}; limit ${a ? 4 : 10};`)), plats()]);
+      const top = list.filter(g => !erotic(g)).slice(0, adult ? 4 : 6), items = [...top, ...list.filter(erotic).slice(0, 2)];
+      return json(200, { items: items.map(g => ({ igdb: g.id, title: g.name, year: year(g.first_release_date), fams: fams(g.platforms, P), cover: g.cover?.image_id || null, adult: erotic(g) ? 1 : undefined })) });
     }
     if (b.action === 'search') {
       const parsed = parseLine(String(b.q || '').slice(0, 200)); if (!parsed.title) return json(400, { error: 'اكتب اسم اللعبة.' });
       const F = `search ${quote(parsed.title)}; fields name,slug,first_release_date,game_type,cover.image_id,platforms,collections.name,themes,total_rating_count,hypes;`;
       const Y = parsed.year ? ` & first_release_date >= ${Date.UTC(parsed.year, 0, 1) / 1000} & first_release_date < ${Date.UTC(parsed.year + 1, 0, 1) / 1000}` : '';
       const P = await plats();
-      let list = await igdb('games', `${F} where version_parent = null${T}${A}${Y}; limit 15;`);
-      if (!list.length && Y) list = await igdb('games', `${F} where version_parent = null${T}${A}; limit 15;`);
-      const want = norm(parsed.title), score = g => (norm(g.name) === want ? 1e6 : norm(g.name).startsWith(want) ? 1e5 : 0) + (g.total_rating_count || 0) * 10 + (g.hypes || 0);
-      const candidates = list.filter(pick).sort((a, b) => score(b) - score(a)).slice(0, 8)
-        .map(g => ({ igdb: g.id, title: g.name, year: year(g.first_release_date), cover: g.cover?.image_id || null, plats: abbrs(g.platforms, P), series: g.collections?.[0]?.name || undefined, type: m.type.get(g.game_type) || 'main' }));
+      let list = await both(a => igdb('games', `${F} where version_parent = null${T}${a}${Y}; limit ${a ? 8 : 15};`));
+      if (!list.length && Y) list = await both(a => igdb('games', `${F} where version_parent = null${T}${a}; limit ${a ? 8 : 15};`));
+      const want = norm(parsed.title), score = g => (norm(g.name) === want ? 1e6 : norm(g.name).startsWith(want) ? 1e5 : 0) + (g.total_rating_count || 0) * 10 + (g.hypes || 0), byScore = (a, b) => score(b) - score(a);
+      // النتائج المعتادة ثمانٍ، والفلتر مرفوع: تُضاف إليها أقرب أربع من ألعاب +18، وكلٌّ في موضعها من الترتيب
+      const candidates = [...list.filter(g => !erotic(g)).sort(byScore).slice(0, 8), ...list.filter(erotic).sort(byScore).slice(0, 4)].sort(byScore)
+        .map(g => ({ igdb: g.id, title: g.name, year: year(g.first_release_date), cover: g.cover?.image_id || null, plats: abbrs(g.platforms, P), series: g.collections?.[0]?.name || undefined, type: m.type.get(g.game_type) || 'main', adult: erotic(g) ? 1 : undefined }));
       return json(200, { parsed, candidates });
     }
     // preview: بطاقة كاملة للعبة ليست في القائمة، دون إضافتها. add: البطاقة نفسها ثم الحفظ في المستودع
     if (b.action === 'preview' || b.action === 'add') {
       const id = +b.igdb; if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
       if (b.action === 'add' && !process.env.GH_TOKEN) return json(500, { error: 'إعدادات الخادم ناقصة: GH_TOKEN غير موجود في Netlify.' });
-      const r = await gamesFor([id], { wikidata: !adult, wdTimeout: 9000, story: story.series, erotic: 'keep' }), game = r.games[0];
+      const r = await gamesFor([id], { wikidata: true, wdTimeout: 9000, story: story.series, erotic: 'keep' }), game = r.games[0];   // ولعبة +18 لا تُسأل عنها Wikidata (gamesFor)
       if (!game) return json(404, { error: 'هذه اللعبة غير موجودة في IGDB.' });
-      if (!!game.adult !== adult) return json(422, { error: game.adult ? 'هذه اللعبة +18: تُضاف من مكتبة +18.' : 'هذه اللعبة ليست +18: تُضاف من قائمتك العادية.' });
+      if (game.adult && !adult) return json(422, { error: 'هذه اللعبة مصنَّفة للبالغين: افتح العين أعلى الصفحة ثم أضفها.' });
       if (b.action === 'preview') return json(200, { game, series: r.series, plats: r.plats, franchises: r.franchises });
       const at = new Date().toISOString(), state = await record([{ igdb: id, title: game.title, year: game.year, at, ...(game.adult ? { adult: 1 } : {}) }], f => f[0].adult ? `games: add +18 (#${f[0].igdb})` : `games: add ${f[0].title}${f[0].year ? ` (${f[0].year})` : ''}`);
       return json(200, { state: state.added ? 'added' : 'exists', game: { ...game, src: 'added', at }, series: r.series, plats: r.plats, franchises: r.franchises });

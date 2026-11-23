@@ -20,7 +20,7 @@ export const catalog = () => ({ generatedAt: new Date().toISOString(), imageBase
     { id: 199, t: 'Sen to Chihiro no Kamikakushi', en: 'Spirited Away', type: 'Movie', eps: 1, ord: 10, y: 2001, st: 'finished', from: '2001-07-20', img: '6/79597', sc: 8.77, sv: 1300000, dur: 124, studio: 'Studio Ghibli', tm: { k: 'movie', id: 129 }, bd: '/sab.jpg', pv: P([8]) },
     { id: 60000, t: 'Brand New Show', type: 'TV', eps: 12, ord: 11, pending: 1 },
     { id: 61000, t: 'Upcoming Thing', type: 'TV', eps: 0, ord: 12, y: 2027, st: 'soon', from: '2027-04', img: '1/1', tm: { k: 'tv', id: 999 }, pv: null },
-    // عملان +18 (ad) بأسماء مختلَقة، كما يكتبهما البناء: بلا TMDB ولا سلسلة. لا يظهران إلا في مكتبة +18
+    // عملان +18 (ad) بأسماء مختلَقة، كما يكتبهما البناء: بلا TMDB ولا سلسلة. لا يظهران إلا والفلتر مرفوع (العين)
     { id: 70001, t: 'Midnight Sample', type: 'OVA', eps: 2, ord: 13, ad: 1, y: 2019, st: 'finished', from: '2019-05-01', img: '7/70001', sc: 6.4, sv: 2100, dur: 28, g: [4], studio: 'Studio Night', rating: 'Rx', sk: 990001 },
     { id: 70002, t: 'Velvet Sample', en: 'Velvet', type: 'OVA', eps: 1, ord: 14, ad: 1, y: 2022, st: 'finished', from: '2022-02-01', img: '7/70002', sc: 6.9, sv: 800, dur: 30, g: [4], studio: 'Studio Night', rating: 'Rx' },
   ],

@@ -413,12 +413,15 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check('لا يُقترح جزء قبل إكمال ما قبله في خطه', [...seen].join() === '22297', [...seen]); }
   await tap('#tonight [data-act=status]'); await page.waitForTimeout(150);
   check('«سأبدأه الآن» ينقله إلى ما تشاهده، ولا يبقى ما يُقترح', (await log())[22297].s === 'watching' && await page.locator('.rail .cel[data-id="22297"]').count() === 1 && await page.locator('#tonight .tn').count() === 0, await log());
-  // ---------- مكتبة +18 (E61): أعمال +18 (ad) لا تظهر في الصفحة حتى يُضغط زر «+18»، فتُفتح مكتبة ثانية فيها هي وحدها وبحثها وإضافتها، وصورها مغطاة حتى تُكشف
+  // ---------- فلتر +18 (E65): أعمال +18 (ad) لا تظهر حتى تُفتح العين أعلى البوابة، فتندمج في القائمة نفسها وبحثها وإضافتها وأعدادها، في مكانها بلا إعادة تحميل، وصورها مغطاة حتى تُكشف
   { const cells = () => page.$$eval('#grid .cel', c => c.map(x => +x.dataset.id)), tallyN = () => page.evaluate(() => +(document.querySelector('#tally b')?.textContent || '').replace(/\D/g, '') || 0);
-    const room = () => page.evaluate(() => document.documentElement.dataset.room || ''), flipTo = async on => { const nav = page.waitForEvent('load'); await tap('.top .r18'); await nav; await page.waitForFunction(on => (document.documentElement.dataset.room === '18') === on && !!document.querySelector('#grid .cel, #grid .none'), on); };
+    const lifted = () => page.evaluate(() => document.querySelector('.top .r18').getAttribute('aria-pressed') === 'true'), same = () => page.evaluate(() => window.__same === 1), sorted = a => [...a].sort((x, y) => x - y).join();
+    // العين تبدّل في مكانها: علامة تُكتب في الصفحة قبل اللمس وتبقى بعده، فلا تحميل جديد
+    const eye = async on => { await page.evaluate(() => { window.__same = 1; }); await tap('.top .r18'); await page.waitForFunction(on => document.querySelector('.top .r18').getAttribute('aria-pressed') === String(on), on); await page.waitForTimeout(150); };
     await setLog({ 70001: { s: 'completed', p: 2, r: 8 }, 70002: { s: 'plan' } }); await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=all]');
     const all0 = await cells(), n0 = await tallyN();
-    check('المكتبة العادية: زر «+18» في الرأس، وأعمال +18 ليست في القائمة ولا في أعدادها ولو كان لها سجل', await page.evaluate(() => { const b = document.querySelector('.top .r18'); return !!b && b.getAttribute('aria-pressed') === 'false' && !document.documentElement.dataset.room && !document.querySelector('.r18-bar'); })
+    check('الفلتر قائم: عين مغمضة في الرأس بلا نص ولا رقم، وأعمال +18 ليست في القائمة ولا في أعدادها ولو كان لها سجل', await page.evaluate(() => { const b = document.querySelector('.top .r18'), c = document.querySelector('.top .r18-eye');
+        return !!b && b.getAttribute('aria-pressed') === 'false' && b.textContent.trim() === '' && !!b.querySelector('svg.eye') && !/\d/.test(b.getAttribute('aria-label') + b.title) && c.hidden && !/\+\s*18/.test(document.querySelector('.top').textContent) && !document.querySelector('.r18-bar'); })
       && !all0.includes(70001) && !all0.includes(70002) && all0.length === 14 && n0 === 14, [all0, n0]);
     await page.fill('#q', 'midnight'); await page.waitForFunction(() => /لا عمل في هذه القائمة يطابق/.test(document.querySelector('#grid').textContent));
     await page.fill('#q', ''); await page.evaluate(() => { location.hash = '#a70001'; }); await page.waitForTimeout(200);
@@ -427,16 +430,21 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check('ولا بحث «أضف أنمي» فيها', await page.locator('#add-res .arow').count() === 0); await tap('#addd [data-act=close]'); await page.waitForSelector('#addd', { state: 'hidden' });
     await page.goto(base + '/'); await page.waitForFunction(() => /\d/.test(document.querySelector('.door.anime [data-stat]')?.textContent || ''));
     check('وعدّاد باب «أنمياتي» في القاعة بلا أعمال +18: لا في المجموع ولا في ما أكملته', /^أكملت 4 من 13 عملاً$/.test((await page.textContent('.door.anime [data-stat]')).trim()), await page.textContent('.door.anime [data-stat]'));
-    await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel');
-    // الدخول
-    await flipTo(true);
-    check('زر «+18» يفتح المكتبة: أعمالها وحدها، وشريطها، وأعدادها هي، بلا سلاسل ولا اقتراح', (await cells()).join() === '70001,70002' && await page.evaluate(() => { const b = document.querySelector('.top .r18'), bar = document.querySelector('.r18-bar');
-      return b.getAttribute('aria-pressed') === 'true' && !!bar && /مكتبة/.test(bar.textContent) && /عملان في مكتبة/.test(document.querySelector('#tally').textContent.replace(/\s+/g, ' ')) && document.querySelector('.views').hidden
-        && !document.querySelector('#tonight').innerHTML && !document.querySelector('.invite') && document.querySelector('#lists [data-l=all]').getAttribute('aria-pressed') === 'true'; }), [await cells(), await page.textContent('#tally')]);
-    check('صور المكتبة مغطاة: مصغّرة العمل وحدها مموّهة وعليها «+18»، ولا تُحمَّل الصورة الكاملة', await page.evaluate(() => { const c = [...document.querySelectorAll('#grid .cel-art')];
-      return c.length === 2 && c.every(x => x.classList.contains('x18') && /\/7\/7000[12]t\.webp$/.test(x.querySelector('.x18-i img').getAttribute('src')) && !x.querySelector('img[srcset]') && x.querySelector('.x18-m').textContent === '+18' && /blur/.test(getComputedStyle(x.querySelector('img')).filter)); }));
-    await snap('18-room'); await overflow('مكتبة +18');
-    await page.fill('#q', 'velvet'); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 1); check('وبحث القائمة فيها يجد أعمالها', (await cells()).join() === '70002'); await page.fill('#q', ''); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 2);
+    await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=all]');
+    const pick0 = await page.evaluate(() => document.querySelector('#tonight [data-act=open]')?.dataset.id || '');
+    // الرفع
+    await eye(true);
+    check('العين ترفع الفلتر في مكانها بلا تحميل: أعمال +18 تندمج في القائمة نفسها وأعدادها، والقوائم والسلاسل والاقتراح كما هي، ورسالة تقول ما جرى', await same() && sorted(await cells()) === sorted([...all0, 70001, 70002]) && await tallyN() === n0 + 2
+      && /رُفع الفلتر/.test(await toastText()) && await page.evaluate(pick0 => { const b = document.querySelector('.top .r18'), c = document.querySelector('.top .r18-eye');
+        return b.getAttribute('aria-pressed') === 'true' && b.textContent.trim() === '' && !c.hidden && !document.querySelector('.r18-bar') && !document.querySelector('.views').hidden && !/\+\s*18/.test(document.querySelector('.top').textContent)
+          && (document.querySelector('#tonight [data-act=open]')?.dataset.id || '') === pick0 && document.querySelector('#lists [data-l=all]').getAttribute('aria-pressed') === 'true'; }, pick0), [await cells(), await tallyN(), await toastText()]);
+    check('صور أعمال +18 مغطاة: مصغّرتها وحدها مموّهة وعليها عين مغمضة بلا نص، ولا تُحمَّل الصورة الكاملة، وصور غيرها كما هي', await page.evaluate(() => { const ad = [...document.querySelectorAll('#grid .cel[data-ad] .cel-art')], rest = [...document.querySelectorAll('#grid .cel:not([data-ad]) .cel-art')];
+      return ad.length === 2 && ad.every(x => x.classList.contains('x18') && /\/7\/7000[12]t\.webp$/.test(x.querySelector('.x18-i img').getAttribute('src')) && !x.querySelector('img[srcset]') && x.querySelector('.x18-m').textContent === '' && !!x.querySelector('.x18-m svg') && /blur/.test(getComputedStyle(x.querySelector('img')).filter))
+        && rest.length === 14 && rest.every(x => !x.classList.contains('x18') && [...x.querySelectorAll('img')].every(i => !/blur/.test(getComputedStyle(i).filter))); }));
+    await snap('18-open'); await overflow('الفلتر مرفوع');
+    await page.fill('#q', 'velvet'); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 1); check('وبحث القائمة يجدها', (await cells()).join() === '70002'); await page.fill('#q', ''); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 16);
+    if (await page.locator('#tonight [data-act=treroll]').count()) { const seen = new Set(); for (let i = 0; i < 8; i++) { seen.add(await page.getAttribute('#tonight [data-act=open]', 'data-id')); await tap('#tonight [data-act=treroll]'); await page.waitForTimeout(40); }
+      check('والاقتراح لا يختار عمل +18 ولو كان في «سأشاهده»', !seen.has('70002') && !seen.has('70001'), [...seen]); }
     // البطاقة
     await tap('#grid .cel[data-id="70001"] [data-act=open]'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => document.querySelector('#sheet-body').dataset.full === '70001');
     check('بطاقة عمل +18: سجلّه كغيره، بلا نبذة ولا موقع من سلسلة ولا حلقات، وصورته مغطاة بزر يكشفها', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.head .cel-art');
@@ -449,11 +457,11 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
         && !document.querySelector('#grid .cel[data-id="70001"] .x18') && document.querySelector('#grid .cel[data-id="70001"]').hasAttribute('data-r18-bare') && !!document.querySelector('#grid .cel[data-id="70002"] .cel-art.x18'); }));
     await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' });
     await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open'));
-    check('«أظهر الصور» يكشف صور المكتبة كلها، وزرها يصير «غطِّ الصور»', await page.evaluate(() => !document.querySelector('#grid .x18') && document.querySelectorAll('#grid .cel-art img[srcset]').length === 2 && /غطِّ الصور/.test(document.querySelector('.r18-eye').textContent) && document.querySelector('.r18-eye').getAttribute('aria-pressed') === 'true'
-      && getComputedStyle(document.querySelector('#grid .cel-art img')).filter === 'none'));
+    check('زر الأغلفة بجانب العين يكشف صور أعمال +18 كلها، ويصير «غطِّ الصور»', await page.evaluate(() => !document.querySelector('#grid .x18') && document.querySelectorAll('#grid .cel[data-ad] .cel-art img[srcset]').length === 2 && /غطِّ الصور/.test(document.querySelector('.r18-eye').textContent) && document.querySelector('.r18-eye').getAttribute('aria-pressed') === 'true'
+      && getComputedStyle(document.querySelector('#grid .cel[data-ad] .cel-art img')).filter === 'none'));
     await tap('.r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open'));
     check('و«غطِّ الصور» يغطيها كلها ثانية، وما كُشف وحده معها', await page.evaluate(() => document.querySelectorAll('#grid .cel-art.x18').length === 2 && !document.querySelector('#grid [data-r18-bare]')));
-    // البحث والإضافة: MyAnimeList بين ما تصنيفه Rx وحده، والإضافة تحمل الوسم
+    // البحث والإضافة: MyAnimeList بلا قيد حين يُرفع الفلتر، وما تصنيفه Rx منه يُوسم ويُغطى، والإضافة تحمل الوسم
     { const jik = [], adds = [], im = n => ({ webp: { image_url: `https://cdn.myanimelist.net/images/anime/9/${n}.webp`, small_image_url: `https://cdn.myanimelist.net/images/anime/9/${n}t.webp` } });
       await page.route('https://api.jikan.moe/**', r => { const u = new URL(r.request().url()); jik.push(u.search);
         return r.fulfill({ headers: { 'access-control-allow-origin': '*' }, contentType: 'application/json', body: JSON.stringify({ data: [
@@ -461,24 +469,52 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
           { mal_id: 70011, title: 'Velvet Clean', type: 'TV', episodes: 12, year: 2020, images: im(70011), rating: 'PG-13 - Teens 13 or older' }, { mal_id: 70012, title: 'Velvet Tagged', type: 'OVA', episodes: 2, year: 2018, images: im(70012), rating: null, explicit_genres: [{ name: 'Hentai' }] }] }) }); });
       await page.route(base + '/api/anime-add', r => { adds.push(JSON.parse(r.request().postData() || '{}')); return r.fulfill({ contentType: 'application/json', body: '{"state":"added"}' }); });
       await tap('.top [data-act=add]'); await page.waitForSelector('#addd[open]');
-      check('«أضف» في المكتبة: نافذتها باسمها', /أضف إلى مكتبة/.test(await page.textContent('#add-h')) && /\+18/.test(await page.textContent('#add-h')));
+      check('«أضف أنمي» والفلتر مرفوع: النافذة نفسها باسمها', (await page.textContent('#add-h')).trim() === 'أضف أنمي' && !/\+\s*18/.test(await page.textContent('#add-body')));
       await page.fill('#add-q', 'velvet'); await page.waitForSelector('#add-res .arow[data-id="70002"]'); await page.press('#add-q', 'Enter'); await page.waitForSelector('#add-res .arow[data-mal]');
       const rows = () => page.$$eval('#add-res .arow', r => r.map(x => (x.dataset.id || 'mal' + x.dataset.mal) + ':' + (x.querySelector('.astate')?.textContent.trim() || x.querySelectorAll('.aacts .btn').length)));
-      check('بحث MyAnimeList فيها بقيد التصنيف Rx وبلا sfw، ولا يظهر منه إلا +18، وما في المكتبة منه أعلاه، والصور مغطاة', jik.length === 1 && /rating=rx/.test(jik[0]) && !/sfw/.test(jik[0])
-        && (await rows()).join(' | ') === '70002:في «سأشاهده» | mal70010:2 | mal70012:2' && await page.evaluate(() => [...document.querySelectorAll('#add-res .aart')].every(a => a.classList.contains('x18') && !!a.querySelector('.x18-m'))), [jik, await rows()]);
-      await snap('18-add'); await overflow('أضف إلى +18');
+      check('بحث MyAnimeList والفلتر مرفوع: بلا قيد تصنيف وبلا sfw، فيعود بكل ما يطابق، وما في قائمتك منه أعلاه، وصور أعمال +18 وحدها مغطاة', jik.length === 1 && !/rating=/.test(jik[0]) && !/sfw/.test(jik[0]) && /limit=25/.test(jik[0])
+        && (await rows()).join(' | ') === '70002:في «سأشاهده» | mal70010:2 | mal70011:2 | mal70012:2' && await page.evaluate(() => { const a = id => document.querySelector(`#add-res .arow[data-mal="${id}"]`), cov = r => r.hasAttribute('data-ad') && r.querySelector('.aart').classList.contains('x18') && !!r.querySelector('.x18-m svg') && r.querySelector('.x18-m').textContent === '';
+          return cov(a(70010)) && cov(a(70012)) && cov(document.querySelector('#add-res .arow[data-id="70002"]')) && !a(70011).hasAttribute('data-ad') && !a(70011).querySelector('.x18') && getComputedStyle(a(70011).querySelector('img')).filter === 'none'; }), [jik, await rows()]);
+      await snap('18-add'); await overflow('أضف والفلتر مرفوع');
       await tap('#add-res .arow[data-mal="70010"] [data-act=add-mal][data-s=watching]'); await page.waitForSelector('#add-res .arow[data-mal="70010"] .astate');
-      check('الإضافة منها تحمل الوسم ad، وتدخل المكتبة والسجل فوراً ببطاقة مؤقتة مغطاة', adds.length === 1 && adds[0].ad === 1 && adds[0].mal === 70010 && Object.keys(adds[0]).sort().join() === 'ad,eps,mal,password,title,type' && (await log())[70010]?.s === 'watching'
+      check('إضافة عمل +18 تحمل الوسم ad، وتدخل القائمة والسجل فوراً ببطاقة مؤقتة مغطاة', adds.length === 1 && adds[0].ad === 1 && adds[0].mal === 70010 && Object.keys(adds[0]).sort().join() === 'ad,eps,mal,password,title,type' && (await log())[70010]?.s === 'watching'
         && await page.evaluate(() => { const a = JSON.parse(localStorage.getItem('animeg.added'))[70010], c = document.querySelector('.rail .cel[data-id="70010"]'); return a?.ad === 1 && a.im === '9/70010' && !!c && c.querySelector('.cel-art').classList.contains('x18') && /\/9\/70010t\.webp$/.test(c.querySelector('img').getAttribute('src')); }), [adds, await rows()]);
       await tap('#addd [data-act=close]'); await page.waitForSelector('#addd', { state: 'hidden' }); }
-    await page.reload(); await page.waitForSelector('#grid .cel');
-    check('تحديث الصفحة يبقيك في المكتبة، وما أُضيف فيها باقٍ', await room() === '18' && (await cells()).includes(70010) && await page.evaluate(() => /3 أعمال في مكتبة/.test(document.querySelector('#tally').textContent.replace(/\s+/g, ' '))), [await room(), await cells()]);
-    // الخروج
-    await flipTo(false); await tap('#lists [data-l=all]');
-    check('الزر نفسه يُخرج منها: القائمة العادية كما كانت، وما أُضيف في المكتبة لا يظهر فيها', await room() === '' && (await cells()).join() === all0.join() && await tallyN() === n0 && await page.locator('.rail .cel[data-id="70010"]').count() === 0
-      && await page.evaluate(() => JSON.parse(localStorage.getItem('animeg.added'))[70010]?.ad === 1 && document.querySelector('.top .r18').getAttribute('aria-pressed') === 'false'), [await room(), await cells(), await tallyN()]);
+    await page.reload(); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=all]');
+    check('تحديث الصفحة يبقي الفلتر مرفوعاً، وما أُضيف باقٍ في القائمة وأعدادها', await lifted() && (await cells()).includes(70010) && await tallyN() === n0 + 3, [await lifted(), await cells(), await tallyN()]);
+    // الإعادة
+    await eye(false);
+    check('العين نفسها تعيد الفلتر في مكانها: القائمة كما كانت، وأعمال +18 وما أُضيف منها لا تظهر', await same() && !(await lifted()) && sorted(await cells()) === sorted(all0) && await tallyN() === n0 && await page.locator('.rail .cel[data-id="70010"]').count() === 0 && /عاد الفلتر/.test(await toastText())
+      && await page.evaluate(() => JSON.parse(localStorage.getItem('animeg.added'))[70010]?.ad === 1 && document.querySelector('.top .r18-eye').hidden && !document.querySelector('#grid [data-ad]')), [await cells(), await tallyN(), await toastText()]);
     await page.evaluate(() => sessionStorage.setItem('adult.anime', '1')); await page.goto('about:blank'); await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel');
-    check('الدخول إلى البوابة من جديد يبدأ بالمكتبة العادية دائماً', await room() === '' && await page.evaluate(() => sessionStorage.getItem('adult.anime') === null)); }
+    check('الدخول إلى البوابة من جديد يبدأ والفلتر قائم دائماً', !(await lifted()) && await page.evaluate(() => sessionStorage.getItem('adult.anime') === null));
+    // ---------- E66: البحث لا يبقى معلّقاً. Jikan تعطّل فيُسأل AniList، ونتائجه بأرقام MyAnimeList ويقال من أين جاءت؛ وإن تعطّلا معاً فرسالة وزر يعيد البحث
+    { const al = []; let alOk = true; const media = [
+        { idMal: 88001, title: { romaji: 'Fallback Show', english: 'Fallback' }, format: 'TV', episodes: 24, startDate: { year: 2023 }, coverImage: { medium: 'https://s4.anilist.co/file/a/88001.jpg' }, isAdult: false },
+        { idMal: null, title: { romaji: 'Fallback Without Number' }, format: 'ONA', episodes: 1, startDate: { year: 2020 }, coverImage: {}, isAdult: false },
+        { idMal: 88002, title: { romaji: 'Fallback Short' }, format: 'TV_SHORT', episodes: 12, startDate: { year: 2021 }, coverImage: { medium: 'https://s4.anilist.co/file/a/88002.jpg' }, isAdult: false },
+        { idMal: 88003, title: { romaji: 'Fallback Night' }, format: 'OVA', episodes: 2, startDate: { year: 2019 }, coverImage: { medium: 'https://s4.anilist.co/file/a/88003.jpg' }, isAdult: true }];
+      await page.route(/s4\.anilist\.co/, r => r.fulfill({ contentType: 'image/svg+xml', body: svg(100, 140, '#7a4a2a') }));
+      let jEmpty = false; await page.route('https://api.jikan.moe/**', r => jEmpty ? r.fulfill({ headers: cors, contentType: 'application/json', body: '{"data":[]}' }) : r.fulfill({ status: 503, headers: cors, contentType: 'application/json', body: '{"status":503}' }));
+      await page.route(/graphql\.anilist\.co/, r => { const q = r.request(); if (q.method() === 'OPTIONS') return r.fulfill({ status: 204, headers: cors });
+        al.push(JSON.parse(q.postData() || '{}')); return alOk ? r.fulfill({ headers: cors, contentType: 'application/json', body: JSON.stringify({ data: { Page: { media } } }) }) : r.fulfill({ status: 500, headers: cors, contentType: 'application/json', body: '{}' }); });
+      const rows = () => page.$$eval('#add-res .arow[data-mal]', r => r.map(x => x.dataset.mal).join());
+      await tap('.top [data-act=add]'); await page.waitForSelector('#addd[open]'); await page.fill('#add-q', 'fallback'); await page.waitForSelector('#add-res [data-act=add-find]'); await page.press('#add-q', 'Enter'); await page.waitForSelector('#add-res .arow[data-mal]');
+      check('Jikan لا يجيب: يُسأل AniList بلا أعمال +18، ونتائجه بأرقام MyAnimeList (وما لا رقم له يسقط)، ويقال من أين جاءت', al.length === 1 && al[0].variables?.q === 'fallback' && al[0].variables?.n === 12 && /isAdult:false/.test(al[0].query) && await rows() === '88001,88002'
+        && /النتائج من\s*AniList/.test((await page.textContent('#add-res')).replace(/[⁦-⁩]/g, '')) && /24 حلقة/.test(await page.textContent('#add-res .arow[data-mal="88001"] .meta')) && /2021/.test(await page.textContent('#add-res .arow[data-mal="88002"] .meta')), [al, await rows(), await page.textContent('#add-res')]);
+      alOk = false; await page.fill('#add-q', 'fallback two'); await page.waitForSelector('#add-res [data-act=add-find]'); await page.press('#add-q', 'Enter'); await page.waitForSelector('#add-res .msg');
+      check('والمصدران لا يجيبان: رسالة تقول ذلك، وزر البحث باقٍ ليعاد، ولا يبقى «يُبحث…» معلّقاً', /لم يُجب/.test(await page.textContent('#add-res .msg')) && /AniList/.test(await page.textContent('#add-res .msg')) && await page.locator('#add-res [data-act=add-find]').count() === 1 && !/يُبحث في/.test(await page.textContent('#add-res')), await page.textContent('#add-res'));
+      alOk = true; await tap('#add-res [data-act=add-find]'); await page.waitForSelector('#add-res .arow[data-mal]'); check('والزر يعيد البحث فتأتي نتائجه', await rows() === '88001,88002', await rows());
+      jEmpty = true; await page.fill('#add-q', 'fallback three'); await page.waitForSelector('#add-res [data-act=add-find]'); await page.press('#add-q', 'Enter'); await page.waitForSelector('#add-res .arow[data-mal]');
+      check('وJikan يجيب بلا نتيجة: يُسأل AniList أيضاً، وتُعرض نتائجه ويقال إن بحث MyAnimeList لم يجد', await rows() === '88001,88002' && /لم يجد شيئاً بهذا الاسم/.test(await page.textContent('#add-res')) && !/لم يُجب الآن/.test(await page.textContent('#add-res')), await page.textContent('#add-res'));
+      alOk = false; await page.fill('#add-q', 'fallback four'); await page.waitForSelector('#add-res [data-act=add-find]'); await page.press('#add-q', 'Enter'); await page.waitForFunction(() => /لا نتيجة هناك بهذا الاسم/.test(document.querySelector('#add-res').textContent));
+      check('وإن لم يُجب AniList بعدها بقي جواب MyAnimeList: لا نتيجة، بلا رسالة خطأ', !(await page.locator('#add-res .msg').count()) && await rows() === '', await page.textContent('#add-res'));
+      alOk = true; jEmpty = false;
+      await tap('#addd [data-act=close]'); await page.waitForSelector('#addd', { state: 'hidden' });
+      await eye(true); await tap('.top [data-act=add]'); await page.waitForSelector('#addd[open]'); await page.fill('#add-q', 'fallback'); await page.waitForSelector('#add-res [data-act=add-find]'); await page.press('#add-q', 'Enter'); await page.waitForSelector('#add-res .arow[data-mal="88003"]');
+      check('والفلتر مرفوع: AniList يُسأل بلا قيد، وعمل +18 منه يظهر موسوماً مغطى', !/isAdult/.test(al.at(-1).query.split('{idMal')[0]) && al.at(-1).variables?.n === 25 && await rows() === '88001,88002,88003'
+        && await page.evaluate(() => { const r = document.querySelector('#add-res .arow[data-mal="88003"]'); return r.hasAttribute('data-ad') && r.querySelector('.aart').classList.contains('x18') && !document.querySelector('#add-res .arow[data-mal="88001"]').hasAttribute('data-ad'); }), [al.at(-1), await rows()]);
+      await tap('#addd [data-act=close]'); await page.waitForSelector('#addd', { state: 'hidden' }); await eye(false); } }
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3));
   await ctx.close();
 }

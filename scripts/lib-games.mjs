@@ -5,7 +5,7 @@
 import { igdb, IMG, ymd, year } from './lib-igdb.mjs';
 export { IMG };
 
-export const EROTIC = 42;   // سمة Erotic في IGDB: ألعاب +18. لا تدخل القائمة العادية ولا بحثها؛ ما أُضيف منها من مكتبة +18 (E61) يُبنى موسوماً adult
+export const EROTIC = 42;   // سمة Erotic في IGDB: ألعاب +18. يخفيها فلتر العين في الصفحة (E65)؛ ما أُضيف منها يُبنى موسوماً adult
 // ---------- الترجمة إلى العربية: الأنواع والسمات وأنماط اللعب والمنظور
 const AR = {
   'point-and-click': 'نقر وإشارة', fighting: 'قتال', shooter: 'تصويب', music: 'موسيقى', platform: 'منصات وقفز', puzzle: 'ألغاز', racing: 'سباق',
@@ -144,7 +144,7 @@ export function alsoPlatforms(groups, typeOf, skip = () => false) { const out = 
 
 // يجلب الألعاب المطلوبة ويشكّلها. opt.wikidata: يُثرى من Wikidata (البناء الليلي، وبمهلة قصيرة في الدالة)، opt.story: ترتيبات القصة، opt.log: سجل.
 // opt.erotic: 'keep' يُبقي ألعاب +18 (سمة Erotic) موسومةً adult: غلافها واسمها ومنصاتها وتقييمها، بلا نبذة ولا لقطات ولا عروض ولا سلسلة ولا أقرباء
-// (البناء الليلي، وبطاقة مكتبة +18 وإضافتها). وبدونه تُحذف كما كانت. أقرباء الألعاب وأجزاء سلاسلها لا يدخلها شيء من +18 في الحالين
+// (البناء الليلي، وبطاقة لعبة +18 وإضافتها والفلتر مرفوع). وبدونه تُحذف كما كانت. أقرباء الألعاب وأجزاء سلاسلها لا يدخلها شيء من +18 في الحالين
 export async function gamesFor(ids, opt = {}) {
   const log = opt.log || (() => {}), m = await meta(), now = Date.now();
   const all = (await igdbIn('games', FULL, ids)).filter(g => opt.erotic === 'keep' || !erotic(g)), raw = all.filter(g => !erotic(g));

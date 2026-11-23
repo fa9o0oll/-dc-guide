@@ -1,7 +1,7 @@
 // دالة «أضف فيلماً»: تقترح أثناء الكتابة (suggest)، وتبحث في TMDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي نتيجة للاطلاع (preview)، ثم تضيف المختار إلى data/films/added.json في المستودع،
 // فيعاد بناء القائمة ويظهر الفيلم على كل الأجهزة. و worlds: سلسلة العمل وعالمه وأعماله المرتبطة من Wikidata (تطلبها الصفحة بعد فتح البطاقة، فلا تتأخر).
-// adult في الطلب: الطلب من مكتبة +18 (E61). البحث والاقتراح يعودان حينها بما وسمه TMDB للبالغين وحده، وبدونه لا يعودان بشيء منه؛ والإضافة والاطلاع يُرفضان
-// إن خالف العملُ المكتبةَ التي طُلب منها، فلا يدخل عمل +18 القائمة العادية ولا العكس. والمضاف منها يُوسم adult في الملف، وعنوان إيداعه برقمه بلا اسمه.
+// adult في الطلب: الفلتر مرفوع في الصفحة (E65، العين). البحث والاقتراح يعودان حينها بنتائجهما المعتادة ومعها ما وسمه TMDB للبالغين (موسوماً adult)، وبدونه
+// لا يعودان بشيء منه؛ والإضافة والاطلاع يُرفضان لعمل +18 والفلتر قائم. والمضاف منها يُوسم adult في الملف، وعنوان إيداعه برقمه بلا اسمه.
 // محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
 //   TMDB_API_KEY  مفتاح TMDB        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع        ADD_FILM_PASSWORD  كلمة السر
 import { createHash, timingSafeEqual } from 'node:crypto';
@@ -45,27 +45,30 @@ export default async req => {
     // اقتراحات أثناء الكتابة لما ليس في فهرس الصفحة: بحث TMDB الموحد (أفلام ومسلسلات، ويطابق العناوين المترجمة والبديلة) بطلب واحد
     if (b.action === 'suggest') {
       const q = String(b.q || '').replace(/\s+/g, ' ').trim().slice(0, 80); if (q.length < 2) return json(200, { items: [] });
-      // في مكتبة +18 تُقرأ خمس صفحات: ما وسمه TMDB للبالغين يغيب عن الأولى (lib-films: ADULT_PAGES)
+      // والفلتر مرفوع تُقرأ خمس صفحات: ما وسمه TMDB للبالغين يغيب عن الأولى (lib-films: ADULT_PAGES). فالأربعة الأولى كما يرتبها TMDB، ثم اثنان مما وُسم ودُفن تحتها
       const rs = await Promise.all((adult ? ADULT_PAGES : [1]).map(page => tmdb('/search/multi', { query: q, include_adult: adult, language: 'en-US', ...(page > 1 ? { page } : {}) }).catch(e => { if (page === 1) throw e; return {}; }))), seen = new Set();
-      const items = rs.flatMap(r => r.results || []).filter(x => (x.media_type === 'movie' || x.media_type === 'tv') && !!x.adult === adult && !seen.has(x.media_type + x.id) && seen.add(x.media_type + x.id)).slice(0, 6)
-        .map(x => ({ tmdb: x.id, kind: x.media_type, title: x.title || x.name, year: year(x), poster: x.poster_path || null }));
+      const all = rs.flatMap(r => r.results || []).filter(x => (x.media_type === 'movie' || x.media_type === 'tv') && (adult || !x.adult) && !seen.has(x.media_type + x.id) && seen.add(x.media_type + x.id));
+      const top = all.slice(0, adult ? 4 : 6), items = [...top, ...(adult ? all.filter(x => x.adult && !top.includes(x)).slice(0, 2) : [])]
+        .map(x => ({ tmdb: x.id, kind: x.media_type, title: x.title || x.name, year: year(x), poster: x.poster_path || null, adult: x.adult ? 1 : undefined }));
       return json(200, { items });
     }
     if (b.action === 'search') {
       const parsed = parseLine(String(b.q || '').slice(0, 200)); if (!parsed.title) return json(400, { error: 'اكتب اسم الفيلم.' });
       const [mv, tv] = await Promise.all([search(tmdb, 'movie', parsed.title, parsed.year, adult), search(tmdb, 'tv', parsed.title, parsed.year, adult)]);
-      // المسلسلات: ما طابق اسمه تماماً فقط، إلا في مكتبة +18 (كثير من أعمالها مسلسلات قصيرة في TMDB، والنتائج قليلة أصلاً)
-      const movies = mv.scored.slice(0, 5).map(x => ({ kind: 'movie', c: x.c })), shows = (adult ? tv.scored.slice(0, 4) : tv.scored.filter(x => x.exact).slice(0, 2)).map(x => ({ kind: 'tv', c: x.c }));
+      // النتائج المعتادة: خمسة أفلام، ومن المسلسلات ما طابق اسمه تماماً فقط. والفلتر مرفوع: تُضاف إليها أقرب أعمال +18 (ثلاثة أفلام وثلاثة مسلسلات، ولو لم
+      // يطابق اسمها تماماً: كثير منها مسلسلات قصيرة في TMDB)، وكلٌّ في موضعه من الترتيب
+      const usual = s => s.filter(x => !x.c.adult), x18 = s => adult ? s.filter(x => x.c.adult).slice(0, 3) : [], byScore = (a, b) => b.score - a.score;
+      const movies = [...usual(mv.scored).slice(0, 5), ...x18(mv.scored)].sort(byScore).map(x => ({ kind: 'movie', c: x.c })), shows = [...usual(tv.scored).filter(x => x.exact).slice(0, 2), ...x18(tv.scored)].sort(byScore).map(x => ({ kind: 'tv', c: x.c }));
       const candidates = await Promise.all([...movies, ...shows].map(async ({ kind, c }, i) => {
-        const col = kind === 'movie' && i < 4 && !adult ? (await tmdb('/movie/' + c.id).catch(() => null))?.belongs_to_collection?.name?.replace(/\s+Collection$/i, '') : null;
-        return { tmdb: c.id, kind, title: c.title || c.name, year: year(c), poster: c.poster_path || null, collection: col || undefined }; }));
+        const col = kind === 'movie' && i < 4 && !c.adult ? (await tmdb('/movie/' + c.id).catch(() => null))?.belongs_to_collection?.name?.replace(/\s+Collection$/i, '') : null;
+        return { tmdb: c.id, kind, title: c.title || c.name, year: year(c), poster: c.poster_path || null, collection: col || undefined, adult: c.adult ? 1 : undefined }; }));
       return json(200, { parsed, sure: mv.sure, candidates });
     }
     // preview: بطاقة كاملة لعمل ليس في القائمة، دون إضافته. add: البطاقة نفسها ثم الحفظ في المستودع
     if (b.action === 'add' || b.action === 'preview') {
       const kind = b.kind === 'tv' ? 'tv' : 'movie', id = +b.tmdb; if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
       const providers = {}, film = shape(kind, await tmdb(detailPath(kind, id), detailParams(kind)), providers);
-      if (!!film.adult !== adult) return json(422, { error: film.adult ? 'هذا العمل +18: يُضاف من مكتبة +18.' : 'هذا العمل ليس +18: يُضاف من قائمتك العادية.' });
+      if (film.adult && !adult) return json(422, { error: 'هذا العمل مصنَّف للبالغين: افتح العين أعلى الصفحة ثم أضفه.' });
       const collection = film.col ? await tmdb('/collection/' + film.col, { language: 'en-US' }).then(shapeCollection).catch(() => null) : null;
       if (b.action === 'preview') return json(200, { film, collection, providers });
       const at = new Date().toISOString(), state = await record({ tmdb: id, kind, title: film.title, year: film.year, at, ...(film.adult ? { adult: 1 } : {}) });

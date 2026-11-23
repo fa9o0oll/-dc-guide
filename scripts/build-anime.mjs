@@ -6,7 +6,7 @@
 //   2) مطابقة كل عمل بـTMDB من خريطة Fribb/anime-lists (رقم المسلسل والموسم وإزاحة الحلقات)، ومن TMDB: البوستر بدقته العالية والخلفية،
 //      والحلقة القادمة، وأين يُعرض رسمياً في السعودية (بيانات JustWatch) كما في بقية البوابات.
 //   3) السلاسل: كل مجموعة أعمال تربطها علاقات القصة تصير «عالماً»، وأعماله التي ليست في القائمة تُسحب أيضاً ليكتمل الترتيب.
-// أعمال +18 (تصنيف Rx في MyAnimeList): ما في القائمة منها يدخل الكتالوج موسوماً (ad) لمكتبة +18 في الصفحة (E61)، بلا نبذة ولا صور TMDB ولا حلقات ولا سلسلة،
+// أعمال +18 (تصنيف Rx في MyAnimeList): ما في القائمة منها يدخل الكتالوج موسوماً (ad) فيخفيه فلتر العين في الصفحة (E65)، بلا نبذة ولا صور TMDB ولا حلقات ولا سلسلة،
 // وما ليس في القائمة (قريب في سلسلة) لا يدخل أصلاً. السجل الشخصي (الحالة والحلقات والتقييم) ليس هنا: يبقى في متصفح صاحبه.
 // عند تعذّر مصدر تبقى بياناته السابقة كما هي، ويُكتب ما حدث في data/generated/anime/report.json.
 import fs from 'node:fs';
@@ -167,7 +167,7 @@ const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(
   const T = t && tmdbOk ? (t.k === 'tv' ? tv.get(t.id) : movie.get(t.id)) : null, S = T?.seasons?.[t?.s];
   const a = { id, t: r?.title || b?.title || String(id), type: r?.type || b?.type || '', eps: r ? r.eps : b?.eps || 0 };
   if (inList.has(id)) a.ord = ord; else a.x = 1;                 // x: ليس في القائمة، دخل لإكمال سلسلته
-  if (ad) a.ad = 1;                                               // +18: لمكتبة +18 وحدها. صورته من MyAnimeList، ولا شيء له من TMDB
+  if (ad) a.ad = 1;                                               // +18: يخفيه فلتر العين. صورته من MyAnimeList، ولا شيء له من TMDB
   if (r) { if (r.en && r.en !== a.t) a.en = r.en; if (r.year) a.y = r.year; if (r.season) a.se = r.season; a.st = r.status; if (r.from) a.from = r.from;
     if (r.img) a.img = r.img; if (r.score) { a.sc = r.score; a.sv = r.votes; } if (r.dur) a.dur = r.dur;
     const g = [...r.genres, ...r.themes, ...r.demo].map(gi); if (g.length) a.g = g; if (r.studios[0]) a.studio = r.studios[0]; if (r.rating) a.rating = r.rating; if (r.day) a.day = r.day; }
