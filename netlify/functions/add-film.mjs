@@ -54,7 +54,8 @@ export default async req => {
     if (b.action === 'search') {
       const parsed = parseLine(String(b.q || '').slice(0, 200)); if (!parsed.title) return json(400, { error: 'اكتب اسم الفيلم.' });
       const [mv, tv] = await Promise.all([search(tmdb, 'movie', parsed.title, parsed.year, adult), search(tmdb, 'tv', parsed.title, parsed.year, adult)]);
-      const movies = mv.scored.slice(0, 5).map(x => ({ kind: 'movie', c: x.c })), shows = tv.scored.filter(x => x.exact).slice(0, 2).map(x => ({ kind: 'tv', c: x.c }));
+      // المسلسلات: ما طابق اسمه تماماً فقط، إلا في مكتبة +18 (كثير من أعمالها مسلسلات قصيرة في TMDB، والنتائج قليلة أصلاً)
+      const movies = mv.scored.slice(0, 5).map(x => ({ kind: 'movie', c: x.c })), shows = (adult ? tv.scored.slice(0, 4) : tv.scored.filter(x => x.exact).slice(0, 2)).map(x => ({ kind: 'tv', c: x.c }));
       const candidates = await Promise.all([...movies, ...shows].map(async ({ kind, c }, i) => {
         const col = kind === 'movie' && i < 4 && !adult ? (await tmdb('/movie/' + c.id).catch(() => null))?.belongs_to_collection?.name?.replace(/\s+Collection$/i, '') : null;
         return { tmdb: c.id, kind, title: c.title || c.name, year: year(c), poster: c.poster_path || null, collection: col || undefined }; }));

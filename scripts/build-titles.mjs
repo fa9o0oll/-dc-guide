@@ -60,7 +60,7 @@ if (process.env.TITLES_PROBE) for (const q of ['جون ويك', 'jon wik', 'john
   console.log(`  TMDB «${q}» → ${(r.results || []).filter(x => x.media_type !== 'person').slice(0, 3).map(x => `${x.title || x.name} (${yearOf(x)})`).join(' | ') || '—'}`);
 }
 // وبحث مكتبة +18 (E61) كما تسأله دالة «أضف فيلماً»: هل يعيد include_adult ما وُسم للبالغين، وفي أي صفحة؟ أعداد فقط، بلا أسماء في السجل
-if (process.env.TITLES_PROBE) for (const q of ['love', 'night']) { const tot = {}, flagged = {};
-  for (const adult of [false, true]) { const rs = await Promise.all([1, 2, 3, 4, 5].map(page => tmdb('/search/movie', { query: q, include_adult: adult, page }).catch(e => ({ results: [], e: e.message }))));
+if (process.env.TITLES_PROBE) for (const q of ['love', 'hentai']) for (const ep of ['/search/movie', '/search/tv', '/search/multi']) { const tot = {}, flagged = {};
+  for (const adult of [false, true]) { const rs = await Promise.all([1, 2, 3, 4, 5].map(page => tmdb(ep, { query: q, include_adult: adult, page }).catch(e => ({ results: [], e: e.message }))));
     tot[adult] = rs[0].total_results ?? rs[0].e; flagged[adult] = rs.map(r => (r.results || []).filter(x => x.adult).length).join('+'); }
-  console.log(`  TMDB adult probe «${q}» /search/movie total_results: without ${tot.false}, with ${tot.true}; flagged adult in pages 1-5: without ${flagged.false}, with ${flagged.true}`); }
+  console.log(`  TMDB adult probe «${q}» ${ep} total_results: without ${tot.false}, with ${tot.true}; flagged adult in pages 1-5: without ${flagged.false}, with ${flagged.true}`); }
