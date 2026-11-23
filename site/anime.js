@@ -12,6 +12,7 @@ import { prepare, find, fold } from './find.js?v=__BUILD__';
 import { readMalFile } from './anime-mal.js?v=__BUILD__';
 import { describe, noun, model } from './anime-pos.js?v=__BUILD__';
 import { themeOf } from './anime-theme.js?v=__BUILD__';
+import { GENRE } from './anime-genres.js?v=__BUILD__';
 import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead } from './anime-simkl.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
@@ -37,13 +38,7 @@ const LNAME = Object.fromEntries(LISTS.map(l => [l[0], l[1]]));
 const TYPE = { TV: 'مسلسل', Movie: 'فيلم', OVA: 'OVA', ONA: 'ONA', Special: 'حلقة خاصة', 'TV Special': 'خاصة تلفزيونية', PV: 'عرض ترويجي', Music: 'موسيقي', CM: 'إعلان' };
 const typeOf = a => TYPE[a.type] ? (/^[A-Z]+$/.test(TYPE[a.type]) ? ltr(TYPE[a.type]) : TYPE[a.type]) : esc(a.type || '');
 const SEASON = { winter: 'شتاء', spring: 'ربيع', summer: 'صيف', fall: 'خريف' };
-// تصنيفات MyAnimeList وفئاتها العمرية ومصادر القصة بالعربية. ما لا مقابل له هنا يُعرض باسمه هناك
-const GENRE = { Action: 'أكشن', Adventure: 'مغامرات', Comedy: 'كوميديا', Drama: 'دراما', Fantasy: 'فانتازيا', Horror: 'رعب', Mystery: 'غموض', Romance: 'رومانسي', 'Sci-Fi': 'خيال علمي', 'Slice of Life': 'شريحة من الحياة', Sports: 'رياضة', Supernatural: 'خوارق', Suspense: 'تشويق',
-  'Award Winning': 'حائز جوائز', 'Avant Garde': 'طليعي', Gourmet: 'طعام', Ecchi: 'إيتشي', Shounen: 'شونين', Seinen: 'سينين', Shoujo: 'شوجو', Josei: 'جوسي', Kids: 'للأطفال', School: 'مدرسي', 'Adult Cast': 'أبطال بالغون', 'Super Power': 'قوى خارقة', Historical: 'تاريخي',
-  Psychological: 'نفسي', Gore: 'دموي', Military: 'عسكري', Isekai: 'إيسيكاي', Mecha: 'ميكا', 'Urban Fantasy': 'فانتازيا حضرية', Mythology: 'أساطير', 'Martial Arts': 'فنون قتالية', Parody: 'محاكاة ساخرة', 'Team Sports': 'رياضات جماعية', Samurai: 'ساموراي', 'Gag Humor': 'فكاهة هزلية',
-  Harem: 'حريم', 'Reverse Harem': 'حريم معكوس', Space: 'فضاء', Reincarnation: 'إعادة تجسّد', Vampire: 'مصاصو دماء', 'Organized Crime': 'جريمة منظمة', Music: 'موسيقى', 'Time Travel': 'سفر عبر الزمن', Survival: 'نجاة', Detective: 'تحرٍّ', Iyashikei: 'إياشيكي', 'Love Polygon': 'مضلّع حب',
-  'Love Status Quo': 'حب معلَّق', Anthropomorphic: 'حيوانات بصفات بشرية', 'Video Game': 'ألعاب فيديو', CGDCT: 'فتيات لطيفات', 'Strategy Game': 'ألعاب استراتيجية', 'High Stakes Game': 'ألعاب مصيرية', Workplace: 'بيئة العمل', 'Otaku Culture': 'ثقافة الأوتاكو', 'Mahou Shoujo': 'فتيات ساحرات',
-  Childcare: 'رعاية أطفال', Delinquents: 'جانحون', 'Combat Sports': 'رياضات قتالية', 'Performing Arts': 'فنون أدائية', Racing: 'سباقات', Medical: 'طبي', 'Visual Arts': 'فنون بصرية', Showbiz: 'عالم الفن', 'Idols (Female)': 'آيدول (فتيات)', 'Idols (Male)': 'آيدول (فتيان)', Educational: 'تعليمي', Villainess: 'الشريرة', Pets: 'حيوانات أليفة' };
+// تصنيفات MyAnimeList بالعربية في site/anime-genres.js (يشاركها دليل Fate). وهنا فئاتها العمرية ومصادر القصة. ما لا مقابل له يُعرض باسمه هناك
 const genreOf = n => GENRE[n] || ltr(n);
 const SOURCE = { Original: 'أصلي', Manga: 'مانغا', 'Web Manga': 'مانغا ويب', '4 Koma Manga': 'مانغا يونكوما', 'Light Novel': 'رواية خفيفة', Novel: 'رواية', 'Web Novel': 'رواية ويب', 'Visual Novel': 'رواية مرئية', Game: 'لعبة', 'Card Game': 'لعبة ورق', 'Mixed Media': 'وسائط متعددة', Book: 'كتاب', 'Picture Book': 'كتاب مصور', Music: 'موسيقى', Radio: 'إذاعة' };
 const RATING = { G: 'لكل الأعمار', PG: 'للأطفال', 'PG-13': '+13', R: '+17', 'R+': '+17' };

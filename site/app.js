@@ -7,9 +7,12 @@ import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
 import { portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
+import { posMap, ord } from './pos.js?v=__BUILD__'; // خريطة «موقعه من عالمه» والعدد الترتيبي
+import './rail.js?v=__BUILD__'; // شريط المزاج في «اقتراح الليلة»: السحب بالماوس والسهمان
 const BUILD = '__BUILD__'; // يُستبدل برقم النشر حتى لا يعرض المتصفح نسخة قديمة من الملفات
 const G = GUIDES[document.documentElement.dataset.guide] || GUIDES.dc;
 const { THEMES, SHOW_COLORS = {} } = await import(`./themes-${G.id}.js?v=${BUILD}`);
+const { GENRE = {} } = G.suggest ? await import(`./anime-genres.js?v=${BUILD}`) : {};   // أسماء تصنيفات MyAnimeList بالعربية، للدليل الذي فيه «اقتراح الليلة»
 document.body.insertAdjacentHTML('afterbegin', shell(G));
 portalBack(document.documentElement.dataset.guide || 'dc');
 // حين تغيب الترويسة عن الشاشة ينتقل شعار الدليل إلى أول الشريط الثابت، زرّاً للعودة إلى البوابات، ويعود حين تظهر
@@ -279,7 +282,7 @@ function card(p) {
 }
 function renderCards() {
   const secs = sections();
-  $('#main').innerHTML = secs.length ? meantBar() + secs.map(({ u, all, list }) => `<section class="uni" id="u-${u.id}" data-uni="${u.id}" style="${themeVars(u.id)}">${uniHead(u, all)}<div class="grid">${list.map(card).join('')}</div></section>`).join('')
+  $('#main').innerHTML = secs.length ? meantBar() + pickHTML(0) + secs.map(({ u, all, list }) => `<section class="uni" id="u-${u.id}" data-uni="${u.id}" style="${themeVars(u.id)}">${uniHead(u, all)}<div class="grid">${list.map(card).join('')}</div></section>`).join('')
     : '<p class="empty">لا توجد أعمال تطابق البحث أو التصفية الحالية.</p>';
 }
 
@@ -476,13 +479,27 @@ addEventListener('popstate', () => { if (ui.skipPop) { ui.skipPop = false; retur
     sh.style.transform = ''; if (d.dy && !reduce.matches) sh.animate({ transform: [`translateY(${d.dy}px)`, 'none'] }, { duration: 240, easing: EASE }); };
   head.addEventListener('pointerup', end); head.addEventListener('pointercancel', end); }
 
-// ---------- سطر موقعه تحت العنوان، لتعرف وأنت في البطاقة أين تقع: رقمه في خط زمن عالمه وما قبله وما بعده فيه، كما في الخط الزمني، لعالم يُشاهد
-// بالترتيب. كل اسم يفتح بطاقته في العالم نفسه
-function chainHTML(pl) { const u = uniOf(pl.universe); if (!u?.serial) return '';
-  const all = D.placements.filter(p => p.universe === pl.universe).sort((a, b) => a.position - b.position), i = all.indexOf(pl); if (i < 0 || all.length < 2) return '';
-  const L = p => `<button type="button" class="ch-l" data-act="open" data-id="${p.work}"${p.season ? ` data-season="${p.season}"` : ''} data-uni="${p.universe}">${ltr(titleOf(p))}</button>`;
-  const bits = [i > 0 && `بعد ${L(all[i - 1])}`, all[i + 1] && `${i > 0 ? 'و' : ''}قبل ${L(all[i + 1])}`].filter(Boolean);
-  return `<nav class="chain" aria-label="موقعه من خط زمن عالمه"><p class="ch-m"><b class="ch-k">${i + 1} من ${all.length}</b>${bits.length ? `<span>${bits.join(' · ')}</span>` : ''}</p><p class="ch-n">في ${esc(u.name)}، بترتيب المشاهدة</p></nav>`; }
+// ---------- «موقعه من عالمه» تحت العنوان (E53، E58): لافتة تقول ما هذا العمل من عالمه بجملة واضحة (بداية العالم، العمل الثالث يأتي بعد…، الموسم الثاني
+// يكمل الأول)، وفوقها خريطة العالم بنقاط (site/pos.js): ما شاهدته ممتلئ وموضع هذا العمل مضيء. وما بين قوسين في ترتيبه المكتوب (ما قبل القصة، الختام…)
+// يُذكر بجانب شارته. والعمل في عالم أعماله منفردة لافتته «منفرد». كل اسم فيها يفتح بطاقته في العالم نفسه
+const nth = k => k <= 99 ? ord(k) : `رقم ${k}`;
+function chainHTML(pl) { const u = uniOf(pl.universe); if (!u) return '';
+  const all = D.placements.filter(p => p.universe === pl.universe).sort((a, b) => a.position - b.position), i = all.indexOf(pl), w = D.works.get(pl.work); if (i < 0) return '';
+  const L = p => p ? `<button type="button" class="ch-l" data-act="open" data-id="${p.work}"${p.season ? ` data-season="${p.season}"` : ''} data-uni="${p.universe}">${ltr(titleOf(p))}</button>${isSoon(D.works.get(p.work)) ? ' (لم يُعرض بعد)' : ''}` : '';
+  const label = pl.label || '', paren = (/\(([^)]+)\)\s*$/.exec(label) || [])[1] || '', where = G.id === 'fate' ? 'الخط' : 'العالم', kind = w.kind === 'series' ? 'مسلسل' : 'فيلم';
+  const head = (b, sub, map) => `${map}<p class="ch-m"><b class="ch-k">${b}</b>${sub ? `<span class="ch-s">${esc(sub)}</span>` : ''}</p>`;
+  // عالم أعماله منفردة: كل عمل قائم بذاته. وما كُتب في ترتيبه غير «منفرد» و«مستقل» (اختياري، بعد الخط الأساسي…) يُذكر بجانب الشارة
+  if (!u.serial) { const tag = /^(منفرد|مستقل)/.test(label) ? '' : label, after = /^بعد /.test(tag), line = G.id === 'fate' ? 'خط متسلسل' : 'عالم متسلسل';
+    return `<nav class="chain solo" aria-label="موقعه من عالمه">${head(`${kind} منفرد`, after ? '' : tag, posMap({ solo: true }))}<p class="ch-t">${after ? `قائم بذاته وليس جزءاً من ${line}، ويُشاهد ${esc(tag)}.` : `قائم بذاته: يُشاهد وحده ${G.id === 'fate' ? 'متى شئت' : 'بأي ترتيب'}، وليس جزءاً من ${line}.`}</p><p class="ch-n">من ${esc(u.name)}</p></nav>`; }
+  const no = /^\d+/.test(label) ? parseInt(label, 10) : 0, alt = /^\d+-بديل/.test(label), intro = /^مقدمة/.test(label);
+  const prev = all[i - 1], next = all[i + 1], a = L(prev), b = L(next), sameShow = pl.season > 1 && prev?.work === pl.work && prev.season === pl.season - 1, soon = isSoon(w);
+  const badge = alt ? 'نسخة بديلة' : intro ? esc(label.replace(/\s*\([^)]*\)\s*$/, '')) : pl.season ? `الموسم ${nth(pl.season)}` : i === 0 ? `بداية ${where}` : soon && !no ? 'عمل قادم' : `العمل ${nth(no || i + 1)}`;
+  const sub = [alt ? `من العمل ${nth(no)}` : pl.season && i > 0 && !intro ? `${nth(no || i + 1)} في الترتيب` : '', paren, soon ? 'لم يُعرض بعد' : ''].filter(Boolean).join(' · ');
+  // آروفيرس: مسلسلاته متداخلة بالحلقات، فترتيبها هنا بسنة البداية فقط والترتيب الفعلي في «ترتيب آروفيرس»
+  const st = avStart(pl), say = u.id === 'arrow' ? `مواسمه تتداخل مع بقية مسلسلات هذا العالم حلقةً بحلقة${st ? `، ويبدأ في الخطوة ${st.n} من ترتيب المشاهدة` : ''}.`
+    : sameShow ? `يكمل الموسم ${nth(pl.season - 1)}${b ? `، ويليه ${b}` : `، وهو آخر ما في هذا ${where} حتى الآن`}.`
+    : i === 0 ? `منه تبدأ مشاهدة هذا ${where}${b ? `، ويليه ${b}` : ''}.` : `يأتي بعد ${a}${b ? ` وقبل ${b}` : `، وهو آخر ما في هذا ${where} حتى الآن`}.`;
+  return `<nav class="chain" aria-label="موقعه من عالمه">${head(badge, sub, all.length > 1 ? posMap({ n: all.length, at: i, done: k => statusOf(all[k]) === 'watched' }) : '')}<p class="ch-t">${say}</p><p class="ch-n">${i + 1} من ${all.length} في ${esc(u.name)}، ${u.id === 'arrow' ? 'بترتيب سنة البداية' : 'بترتيب المشاهدة'}</p></nav>`; }
 function openWork(id, season, from, uniHint) {
   const w = D.works.get(id), soon = isSoon(w);
   const places = D.placements.filter(p => p.work === id);
@@ -505,7 +522,8 @@ function openWork(id, season, from, uniHint) {
 }
 async function showSeason(id, n) { prevClose();
   $$('#seasonTabs button').forEach(b => b.classList.toggle('on', +b.dataset.season === n));
-  $('#seasonTabs .on')?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  // تبويب الموسم المختار إلى وسط شريط التبويبات، بتمرير الشريط وحده: scrollIntoView كان ينزل بالنافذة كلها إلى التبويبات حين تُفتح البطاقة
+  { const box = $('#seasonTabs'), t = box && $('.on', box); if (t) { const r = t.getBoundingClientRect(), b = box.getBoundingClientRect(); box.scrollLeft += (r.left + r.width / 2) - (b.left + b.width / 2); } }
   const box = $('#eps');
   try { if (!D.episodes.has(id)) D.episodes.set(id, await getJSON(`data/episodes/${id}.json`)); }
   catch { box.innerHTML = '<p class="empty">تعذّر تحميل الحلقات. تحقق من الاتصال وحاول مرة أخرى.</p>'; return; }
@@ -620,6 +638,50 @@ function tonight() {
   if (!pick) return toast('شاهدت كل الأعمال الصادرة');
   openWork(pick.w.id, pick.p.season); toast('اقتراح: الأعلى تقييماً مما لم تشاهده');
 }
+// ---------- «اقتراح الليلة» (E62) في الدليل الذي يطلبه (G.suggest: دليل Fate. دليل DC يُشاهد بترتيب أحداثه فلا اقتراح فيه): بطاقة أعلى البطاقات
+// تقترح ما يصلح أن تبدأه الآن بترتيب الدليل نفسه: أول ما لم تشاهده في كل خط متسلسل (لا جزء قبل ما قبله)، والأعمال المنفردة ما دام شرطها تحقق
+// (after في placements.json: عمل جانبي لا يُقترح قبل إكمال خطه). الأولوية: ما تشاهده الآن، ثم التالي في ترتيب المشاهدة الموصى به (أول مسارات الدليل)،
+// ثم التالي في كل خط، ثم بدايات الخطوط المستقلة، ثم الأعمال المنفردة، والأعلى تقييماً أولاً. «اقتراح آخر» يأتي بالتالي في هذا الترتيب.
+// ومزاجها نوع العمل وتصنيفاته في MyAnimeList (g في mal.json)، بأي عدد: لمسة تضيف ولمسة ترفع، ويُقدَّم ما يجمعها كلها ثم ما يجمع أكثرها.
+// وإن اخترت خطاً من شريط الخطوط فالاقتراح منه
+const SG = G.suggest ? { id: '', moods: [] } : null;
+if (SG) try { SG.moods = (localStorage.getItem(KEY + '.mood') || '').split('|').filter(Boolean); } catch {}
+const sgDone = p => ['watched', 'skip'].includes(statusOf(p));
+const sgLineDone = uid => D.placements.filter(p => p.universe === uid && !isSoon(D.works.get(p.work))).every(sgDone);
+const sgKey = c => `${c.p.universe}|${sKey(c.p)}`;
+const sgTags = c => ['t:' + typeOf(c.w), ...(D.mal[c.p.mal]?.g || [])];   // نوعه كما يُكتب على بطاقته (مسلسل أنمي، فيلم أنمي، حلقة خاصة…) ثم تصنيفاته
+const sgName = t => t.startsWith('t:') ? esc(t.slice(2)) : GENRE[t] || ltr(t);
+const SGW = { watching: 0, begin: 1, path: 1, next: 2, start: 3, free: 4 };
+const SGWHY = { watching: 'تشاهده الآن: كمّل من حيث وقفت', begin: 'بداية ترتيب المشاهدة الموصى به', path: 'التالي في ترتيب المشاهدة الموصى به', next: 'التالي في هذا الخط', start: 'بداية خط قصته مستقلة', free: 'عمل منفرد يُشاهد متى شئت' };
+function sgPool() { const out = [], used = new Set(), steps = D.order?.paths?.[0]?.steps || [];
+  const add = (p, why) => { const k = sKey(p), w = D.works.get(p.work); if (used.has(k) || isSoon(w)) return; used.add(k); out.push({ p, w, u: uniOf(p.universe), why: statusOf(p) === 'watching' ? 'watching' : why }); };
+  for (const u of D.universes) { if (ui.uni !== 'all' && u.id !== ui.uni) continue;
+    const all = D.placements.filter(p => p.universe === u.id).sort((a, b) => a.position - b.position);
+    if (u.serial) { const p = all.find(p => !sgDone(p)); if (p) add(p, all.indexOf(p) === 0 ? 'start' : 'next'); }
+    else for (const p of all) if (!sgDone(p) && (!p.after || sgLineDone(p.after))) add(p, 'free'); }
+  const place = st => D.placements.find(p => p.work === st.work && (p.season ?? null) === (st.season ?? null)), nx = steps.map(place).find(p => p && !sgDone(p) && !isSoon(D.works.get(p.work)));
+  const c = nx && out.find(c => sKey(c.p) === sKey(nx)); if (c && c.why !== 'watching') c.why = nx === place(steps[0]) ? 'begin' : 'path';
+  return out.sort((a, b) => SGW[a.why] - SGW[b.why] || (rating(b.w, b.p)?.v || 0) - (rating(a.w, a.p)?.v || 0)); }
+function pickHTML(step) { if (!SG || ui.view !== 'cards' || $('#q').value.trim() || $('#fType').value || $('#fStatus').value) return '';
+  const pool = sgPool(); if (!pool.length) return '';
+  const n = new Map(); for (const c of pool) for (const t of sgTags(c)) n.set(t, (n.get(t) || 0) + 1); SG.moods = SG.moods.filter(m => n.has(m));
+  const fit = c => SG.moods.filter(m => sgTags(c).includes(m)).length, best = Math.max(0, ...pool.map(fit)), good = pool.filter(c => !SG.moods.length || !best || fit(c) === best);
+  let i = good.findIndex(c => sgKey(c) === SG.id); i = i < 0 ? 0 : (i + step + good.length) % good.length; const c = good[i], { p, w, u, why } = c; SG.id = sgKey(c);
+  const chip = (t, name, k) => `<button type="button" class="chip" data-act="pick-mood" data-g="${esc(t)}" aria-pressed="${t ? SG.moods.includes(t) : !SG.moods.length}">${name}<small>${k}</small></button>`;
+  const chips = [...n].sort((a, b) => b[0].startsWith('t:') - a[0].startsWith('t:') || b[1] - a[1]).map(([t, k]) => chip(t, sgName(t), k)).join('');   // النوع (فيلم، مسلسل) أولاً ثم التصنيفات بعددها
+  const hint = SG.moods.length >= 2 ? `<p class="pick-h">${best === SG.moods.length ? `عمل يجمع ${SG.moods.map(sgName).join(' و')}.` : best ? `لا عمل مما ينتظرك يجمعها كلها، فهذا أقربها: يجمع ${best} من ${SG.moods.length}.` : 'لا عمل مما ينتظرك بهذا المزاج.'}</p>` : '';
+  const r = rating(w, p), gs = sgTags(c).filter(t => !t.startsWith('t:')), mine = [...gs.filter(t => SG.moods.includes(t)), ...gs.filter(t => !SG.moods.includes(t))].slice(0, 3).map(sgName).join('، ');
+  const meta = [esc(typeOf(w)), esc(yearOf(w, p)), w.seasons ? cnt(seasonTotal(w, p.season), 'ep') : w.runtime ? cnt(w.runtime, 'min') : '', r ? `${ltr(r.name)} ${r.v}` : '', mine].filter(Boolean).join(' · ');
+  return `<section class="pick m-${THEMES[u.id]?.motif || 'stars'}" id="pick" style="${themeVars(u.id)}" aria-label="اقتراح الليلة">${w.backdrop ? `<img class="pick-img" decoding="async" src="${img(w.backdrop, 'w780')}" srcset="${img(w.backdrop, 'w780')} 780w, ${img(w.backdrop, 'w1280')} 1280w" sizes="(max-width:640px) 100vw, 60vw" alt="">` : ''}<div class="motif" aria-hidden="true"></div>
+    <div class="pick-in"><p class="pick-l">اقتراح الليلة${good.length > 1 ? `<small>${i + 1} من ${good.length}</small>` : ''}</p><h2>${ltr(titleOf(p))}</h2>
+      <p class="pick-w"><b>${SGWHY[why]}</b><span>${esc(u.name)}</span></p><p class="pick-m">${meta}</p>
+      <div class="actions"><button class="cta" data-act="open" data-id="${w.id}"${p.season ? ` data-season="${p.season}"` : ''} data-uni="${u.id}"><span>افتح بطاقته</span></button>${good.length > 1 ? `<button data-act="pick-next">${ic('pick')}<span>اقتراح آخر</span></button>` : ''}${why === 'watching' ? '' : `<button data-act="pick-start" data-k="${esc(sKey(p))}">${ic('play')}<span>سأبدأه الآن</span></button>`}</div>
+      <div class="pick-mood" role="group" aria-label="مزاجك الليلة"><span>مزاجك الليلة</span><div class="mood-c pick-c" data-drag>${chip('', 'أي شيء', pool.length)}${chips}</div></div>${hint}</div></section>`; }
+// يعيد رسم الاقتراح في مكانه (بعد تغيير حالة عمل، أو مزاج، أو «اقتراح آخر») بلا إعادة رسم الصفحة
+function refreshPick(step = 0) { if (!SG) return; const el = $('#pick'), html = pickHTML(step); if (el) { if (html) el.outerHTML = html; else el.remove(); } else if (html && $('#main .uni')) $('#main .uni').insertAdjacentHTML('beforebegin', html); }
+// زر «ماذا أشاهد؟»: يأخذك إلى الاقتراح في صفحة البطاقات بلا تصفية
+function pickGo() { $('#q').value = ''; $('#fType').value = ''; $('#fStatus').value = ''; ui.view = 'cards'; render(); const el = $('#pick'); if (!el) return toast('شاهدت كل ما صدر');
+  scrollTo(0, 0); el.scrollIntoView({ block: 'center', behavior: 'instant' }); flash(el); }
 
 // ---------- الأحداث
 document.addEventListener('click', ev => {
@@ -637,7 +699,7 @@ document.addEventListener('click', ev => {
     case 'status': { const k = b.closest('[data-k]').dataset.k; if (store.works[k] === d.s) delete store.works[k]; else store.works[k] = d.s; save();
       if (store.works[k] === 'watched') offerEps(k); else if (ask.fn) { ask.fn = null; $('#toast').hidden = true; }
       if ($('#fStatus').value) { render(true); break; } // مع تصفية الحالة قد يخرج العمل من القائمة نفسها
-      syncStatus(k); stats(); refreshProgress(); break; }
+      syncStatus(k); stats(); refreshProgress(); refreshPick(); break; }
     case 'goto': { const force = d.force; if (ui.sheet) closeSheet(); if (force) ui.uni = d.uni; setTimeout(() => goTo(d.to === 't' ? 'timeline' : 'cards', d.uni, d.target), force ? 60 : 0); break; }
     case 'ep': { const on = !epDone(id, season, +d.ep), row = b.closest('.ep'), ov = $('.ov.blur', row); setEp(id, season, +d.ep, on); save();
       row.classList.remove('swept'); row.classList.toggle('done', on); b.innerHTML = tick(on, 'شاهدتها', 'علّمها كمشاهَدة'); b.setAttribute('aria-pressed', on); if (on && ov) unblur(ov);
@@ -657,7 +719,10 @@ document.addEventListener('click', ev => {
     case 'bkcopy': navigator.clipboard?.writeText($('#bk').value).then(() => toast('تم النسخ'), () => { $('#bk').select(); toast('حدّد النص وانسخه يدوياً'); }); break;
     case 'bkimport': importCode(); break;
     case 'guide': openGuide(); break;
-    case 'tonight': if (ui.sheet) closeSheet(); setTimeout(tonight, 60); break;
+    case 'tonight': if (ui.sheet) closeSheet(); setTimeout(SG ? pickGo : tonight, 60); break;
+    case 'pick-next': refreshPick(1); break;
+    case 'pick-mood': { const g = d.g; SG.moods = !g ? [] : SG.moods.includes(g) ? SG.moods.filter(x => x !== g) : [...SG.moods, g]; try { localStorage.setItem(KEY + '.mood', SG.moods.join('|')); } catch {} SG.id = ''; refreshPick(); break; }
+    case 'pick-start': { const k = d.k; store.works[k] = 'watching'; save(); syncStatus(k); stats(); refreshProgress(); refreshPick(); toast('بدأته: صار في «أشاهده»'); break; }
   }
 });
 addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });

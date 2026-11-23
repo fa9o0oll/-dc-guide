@@ -7,6 +7,7 @@ import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
+import { posMap, ord } from './pos.js?v=__BUILD__'; // خريطة «موقعه من سلسلته» والعدد الترتيبي
 const BUILD = '__BUILD__', KEY = 'filmsg.progress', PEND = 'filmsg.pending', PASS = 'filmsg.pass', IMG = 'https://image.tmdb.org/t/p/';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -317,19 +318,51 @@ function relatedHTML(f) { const w = D.wworks[keyOf(f)]; if (!w) return '';
   return `<section class="sec"><h3>أعمال مرتبطة</h3>${src ? `<ul class="srcs">${src}</ul>` : ''}${rel.length ? `<div class="reel rels">${rel.map(relCard).join('')}</div>` : ''}
 <p class="note">العلاقات آلية من ${ext('Wikidata', 'https://www.wikidata.org/wiki/' + (w.q || ''))}: الأصل الذي اقتُبس منه العمل، وما اقتُبس عنه من ريميك أو مسلسل، واقتباسات أخرى للمصدر نفسه.</p></section>`; }
 const worldHTML = f => orderHTML(f) + relatedHTML(f);
-// ---------- سطر موقعه تحت العنوان، لتعرف وأنت في البطاقة أين تقع: رقمه في سلسلته وما قبله وما بعده فيها بالترتيب الظاهر في «ترتيب المشاهدة» أسفل،
-// وأصله إن كان إعادة صنع لعمل آخر أو مقتبساً عنه (من Wikidata). كل اسم فيه يفتح بطاقته
+// ---------- «موقعه من سلسلته» تحت العنوان (E53، E58): لافتة تقول بجملة واضحة ما هذا العمل من سلسلته (الجزء الثاني: تكملة السلسلة بعد…) وما قبله
+// وما بعده، وفوقها خريطة السلسلة بنقاط (site/pos.js): ما شاهدته ممتلئ وموضع هذا العمل مضيء. والعمل الذي لا سلسلة له لافتته «فيلم منفرد».
+// الصياغة بقدر ما نعرف: «بداية السلسلة» لأولها، و«تكملة السلسلة بعد…» لسلسلة بترتيب صدورها، و«أحداثه بعد…» لما رتّبه محرّك الأحداث بدليل،
+// وملاحظة الدليل نفسها لما راجعناه يدوياً (ريبوت منفصل، تكملة مباشرة…)، و«يأتي بعد…» لعالم مشترك أو امتياز لا يلزم أن يكمل كل عمل فيه ما قبله.
+// ثم أصله إن كان إعادة صنع لعمل آخر أو مقتبساً عنه (من Wikidata). كل اسم فيها يفتح بطاقته، وآخرها يأخذك إلى الترتيب كاملاً أسفل البطاقة
 // y: تُذكر السنة مع الاسم حين يتكرر الاسم نفسه حوله (Aladdin بعد Aladdin وقبل Aladdin)
 const chainLink = (s, y) => { const l = listedOf(s), o = infoOf(s), t = esc(o.title || '') + (y && o.year ? ` (${o.year})` : ''); if (!o.title) return '';
   return l ? `<button type="button" class="ch-l" data-act="open" data-id="${l.id}" dir="ltr">${t}</button>` : s.m || s.t ? `<button type="button" class="ch-l" data-act="add-part"${outRef(s)} data-q="${esc(o.title)}${o.year ? ' ' + o.year : ''}" dir="ltr">${t}</button>` : `<bdi dir="ltr">${t}</bdi>`; };
-function chainHTML(f) { const g = groupOf(f), o = g?.order || [], i = o.findIndex(s => isHere(f, s)), rows = [];
-  if (i >= 0 && o.length > 1) { const nm = s => infoOf(s).title || '', y = s => [f.title, ...[o[i - 1], o[i + 1]].filter(Boolean).map(nm)].filter(t => t === nm(s)).length > 1;
-    const a = i > 0 && chainLink(o[i - 1], y(o[i - 1])), b = o[i + 1] && chainLink(o[i + 1], y(o[i + 1])), bits = [a && `بعد ${a}`, b && `${a ? 'و' : ''}قبل ${b}`].filter(Boolean);
-    rows.push(`<p class="ch-m"><b class="ch-k">${i + 1} من ${o.length}</b>${bits.length ? `<span>${bits.join(' · ')}</span>` : ''}</p><p class="ch-n">في <bdi dir="ltr">${esc(g.name)}</bdi>، ${g.curated ? 'بترتيب المشاهدة الذي يوصي به الدليل' : g.chrono ? 'بترتيب الأحداث' : 'بترتيب الصدور'}</p>`); }
-  const orig = (D.wworks[keyOf(f)]?.rel || []).find(r => r.r === 'original' && infoOf(stepOf(r.k)).title);
+const nth = k => k <= 99 ? ord(k) : `رقم ${k}`;
+// ما ليس من أجزاء السلسلة المرقّمة: مسلسل أو عمل خارجي، أو ما تصفه ملاحظة الدليل بأنه فرعي أو مستقل أو ريبوت أو ريميك أو فيلم قصير أو نسخة أخرى…
+const SIDE = /فرعي|جانبي|مستقل|منفصل|ريبوت|ريميك|قصير|مختارات|بديل|النسخة|اقتباس|الأصلي|الأصل الكلاسيكي|كلاسيكية|إعادة|مرافق|تقاطع|خط خاص|عن شخصية|بداية جديدة|خلفية/;
+const sideStep = s => !!(s.t || s.x) || !!(s.note && SIDE.test(s.note));
+// رقم الجزء إن قاله الاسم نفسه: «Saw X» و«Ip Man 4: The Finale» و«Rambo III». لا يُعدّ ما بعد Part وVol وChapter وEpisode (جزء من قصة لا من السلسلة) ولا أول كلمة
+const ROMAN = { II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8, IX: 9, X: 10 };
+const titleNo = t => { const m = /(Part |Vol\. |Chapter |Episode )?\b(\d{1,2}|I{2,3}|IV|VI{0,3}|IX|X)(?:\.0)?\s*(?::|-|–|$)/.exec(String(t || '').replace(/^\s*\S+/, '')); return m && !m[1] ? ROMAN[m[2]] || +m[2] : 0; };
+function placeHTML(f, g, o, i) { const n = o.length, me = o[i], rel = byRelease(o), ri = rel.indexOf(me), differs = o.some((s, k) => s !== rel[k]), wide = !!g.auto && g.kind !== 'series', basis = g.curated ? 'ترتيب الدليل' : 'ترتيب الأحداث';
+  const nm = s => infoOf(s).title || '', unborn = s => { const x = infoOf(s); return x.date ? x.date > today : !x.year; }, dup = s => o.filter(x => nm(x) === nm(s)).length > 1;
+  const L = s => { const l = s && chainLink(s, dup(s)); return l ? l + (unborn(s) ? ' (لم يصدر بعد)' : '') : ''; }, tip = s => g.curated && s?.note && s.note.length <= 34 ? ` (${ar(s.note)})` : '';
+  const done = k => { const l = listedOf(o[k]); return !!l && st(l.id) === 'watched'; }, map = posMap({ n, at: i, done });
+  const head = (b, sub) => `${map}<p class="ch-m"><b class="ch-k">${b}</b>${sub ? `<span class="ch-s">${sub}</span>` : ''}</p>`, line = t => t ? `<p class="ch-t">${t.trim()}</p>` : '';
+  const a = L(o[i - 1]), b = L(o[i + 1]), around = a ? `بعد ${a}${b ? ` وقبل ${b}` : ''}` : b ? `قبل ${b}` : '', note = g.curated && me.note ? `${ar(me.note)}. ` : '';
+  // عالم مشترك أو امتياز: ترتيبه كما هو، ولا يلزم أن يكمل كل عمل ما قبله
+  if (wide) return head(`العمل ${nth(i + 1)}`, `من ${n}`) + line(i === 0 ? `بداية هذا العالم: أول أعماله${b ? `، ويليه ${b}` : ''}.` : `يأتي ${around} في هذا العالم.`);
+  // عمل خارج ترقيم الأجزاء: شارته ملاحظة الدليل إن قصرت، وجملته موضعه في الترتيب
+  if (sideStep(me)) { const short = me.note && me.note.length <= 26 && !/[،:.]/.test(me.note);
+    return head(short ? ar(me.note) : me.t ? 'مسلسل من السلسلة' : me.x ? `${XKIND[me.x] || 'عمل'} من السلسلة` : 'عمل مرتبط بالسلسلة', `خارج ترقيم الأجزاء`) + line(`${short ? '' : note}${around ? `في ${g.curated ? 'ترتيب الدليل' : 'الترتيب'} ${around}.` : ''}`); }
+  // جزء مرقّم: رقمه من اسمه إن قاله، وإلا فترتيب صدوره بين الأجزاء. وما قبله وما بعده أقرب جزأين مرقّمين في الترتيب الظاهر
+  const mains = o.filter(s => !sideStep(s)), byRel = rel.filter(s => !sideStep(s)), r = byRel.indexOf(me) + 1, t = titleNo(nm(me)), k = t > 1 && t <= mains.length + 2 ? t : r, at = mains.indexOf(me);
+  if (mains.length < 2) return head(`${nth(i + 1)} في ${g.curated ? 'ترتيب الدليل' : 'الترتيب'}`, `من ${n}`) + line(`${note}${b ? `يليه ${b}${tip(o[i + 1])}.` : a ? `بعد ${a}${tip(o[i - 1])}.` : ''}`);
+  const P = mains[at - 1], N = mains[at + 1], pl = L(P), nl = N ? L(N) + tip(N) : '', early = P && rel.indexOf(P) < ri, off = at + 1 !== k;
+  let say;
+  if (!P) say = k === 1 ? `${/^(البداية|الأصل)$/.test(me.note || '') ? '' : note}بداية السلسلة: منه تبدأ القصة${nl ? `، ويليه ${nl}` : ''}.` : `${note}يبدأ به ${basis} مع أنه صدر ${nth(r)}${nl ? `، ويليه ${nl}` : ''}.`;
+  else if (early) say = `${note}تكملة السلسلة بعد ${pl}${nl ? `، ويليه ${nl}` : '، وهو آخر أجزائها حتى الآن'}.`;
+  else say = `${note}${k === 1 ? 'أول ما صدر من السلسلة، و' : ''}في ${basis} بعد ${pl}${nl ? ` وقبل ${nl}` : ''}.`;
+  const mv = g.chrono?.moved?.[keyOfStep(me)]; if (mv && !g.curated) say += ` ${mv.w === 'year' ? '' : 'أحداثه '}${movedNote(mv, true)}.`;
+  return head(`الجزء ${nth(k)}${off ? ' صدوراً' : ''}`, [`من ${mains.length}`, off ? `${nth(at + 1)} في ${basis}` : ''].filter(Boolean).join(' · ')) + line(say); }
+function chainHTML(f) { const g = groupOf(f), o = g?.order || [], i = o.findIndex(s => isHere(f, s)), inSeries = i >= 0 && o.length > 1, solo = !g || o.length < 2; let body = '', foot = '';
+  if (inSeries) { body = placeHTML(f, g, o, i);
+    foot = `<button type="button" class="ch-n" data-act="to-order"><span>${i + 1} من ${o.length} في <bdi dir="ltr">${esc(g.name)}</bdi>، ${g.curated ? 'بترتيب المشاهدة الذي يوصي به الدليل' : g.chrono ? 'بترتيب الأحداث' : 'بترتيب الصدور'}</span><b>الترتيب كاملاً</b></button>`; }
+  else if (solo) body = `${posMap({ solo: true })}<p class="ch-m"><b class="ch-k">${f.kind === 'tv' ? 'مسلسل منفرد' : 'فيلم منفرد'}</b></p><p class="ch-t">${D.wlive.get(keyOf(f)) === 'wait' ? '<span class="wait">أبحث عن سلسلته وعالمه…</span>'
+    : `قائم بذاته: ${f.kind === 'tv' ? 'لا تجمعه سلسلة ولا عالم مشترك بأعمال أخرى' : 'لا أجزاء أخرى له ولا عالم مشترك بأعمال أخرى'}.`}</p>`;
+  const orig = (D.wworks[keyOf(f)]?.rel || []).find(r => r.r === 'original' && infoOf(stepOf(r.k)).title); let from = '';
   if (orig) { const s = stepOf(orig.k), y = infoOf(s).year, same = (s.t ? 'tv' : 'movie') === f.kind;
-    rows.push(`<p class="ch-m"><b class="ch-k">${same ? 'إعادة صنع' : 'مقتبس'}</b><span>${same ? (f.kind === 'tv' ? 'لمسلسل' : 'لفيلم') : s.t ? 'عن مسلسل' : 'عن فيلم'} ${chainLink(s)}${y ? ` <bdi>(${y})</bdi>` : ''}</span></p>`); }
-  return rows.length ? `<nav class="chain" aria-label="موقعه من سلسلته">${rows.join('')}</nav>` : ''; }
+    from = `<p class="ch-m ch-o"><b class="ch-k">${same ? 'إعادة صنع' : 'مقتبس'}</b><span>${same ? (f.kind === 'tv' ? 'لمسلسل' : 'لفيلم') : s.t ? 'عن مسلسل' : 'عن فيلم'} ${chainLink(s)}${y ? ` <bdi>(${y})</bdi>` : ''}</span></p>`; }
+  return body || from ? `<nav class="chain${inSeries ? '' : solo ? ' solo' : ' bare'}" aria-label="موقعه من سلسلته">${body}${from}${foot}</nav>` : ''; }
 // يعيد رسم قسم العالم وسطر الموقع في البطاقة المفتوحة (بعد وصول خريطة العوالم أو نتيجة البحث المباشر)
 const slotOf = { k: null, f: null };
 const refreshSlot = () => { const el = $('#wslot'), ch = $('#chslot'); if (!sheet.open || !slotOf.f) return;
@@ -471,6 +504,7 @@ document.addEventListener('click', e => { const t = e.target.closest('[data-act]
   else if (act === 'reset') { Object.assign(ui, { q: '', status: 'todo', genre: '', decade: '', prov: '', series: false }); $('#q').value = ''; $('#chips').innerHTML = chipsHTML(); apply(false); }
   else if (act === 'view') setView(t.dataset.v);
   else if (act === 'reroll') reroll(false);
+  else if (act === 'to-order') $('#wslot')?.scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' });
   else if (act === 'mood') { const g = t.dataset.g; moods = !g ? [] : moods.includes(g) ? moods.filter(x => x !== g) : [...moods, g]; try { localStorage.setItem('films.mood', moods.join()); } catch {} moodChips(); tonightId = null; reroll(false); }
   else if (act === 'open-tonight') openFilm(tonightId);
   else if (act === 'add') openAdd();

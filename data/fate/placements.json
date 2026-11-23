@@ -286,6 +286,7 @@
   "work": "todays-menu-for-the-emiya-family-2018",
   "position": 1,
   "label": "بعد الخط الأساسي",
+  "after": "fuyuki",
   "note": "شيرو يطبخ لأهل البيت وضيوفه، وكل حلقة طبق. شخصيات حرب الكأس الخامسة في حياة يومية هادئة بلا قتال.",
   "mal": 37033,
   "simkl": 751069
@@ -295,6 +296,7 @@
   "work": "carnival-phantasm-2011",
   "position": 2,
   "label": "بعد الخط الأساسي",
+  "after": "fuyuki",
   "note": "اسكتشات ساخرة تجمع شخصيات Fate/stay night مع شخصيات Tsukihime (عمل آخر لنفس الشركة). النكات مبنية على معرفة الشخصيات.",
   "mal": 10012,
   "simkl": 41640
@@ -304,6 +306,7 @@
   "work": "fate-grand-carnival-2021",
   "position": 3,
   "label": "بعد Grand Order",
+  "after": "fgo",
   "note": "النسخة الساخرة لشخصيات Grand Order، في أربع حلقات على موسمين.",
   "mal": 44248,
   "simkl": 1491359
@@ -313,6 +316,7 @@
   "work": "fate-grand-order-fujimaru-ritsuka-doesnt-get-it-2023",
   "position": 4,
   "label": "بعد Grand Order",
+  "after": "fgo",
   "note": "حلقات كوميدية قصيرة جداً عن يوميات ريتسوكا في كالديا.",
   "mal": 54042,
   "simkl": 2066926
@@ -322,6 +326,7 @@
   "work": "learning-with-manga-fate-grand-order-2018",
   "position": 5,
   "label": "بعد Grand Order",
+  "after": "fgo",
   "note": "حلقة ساخرة قصيرة مقتبسة من مانغا هزلية عن اللعبة.",
   "mal": 38958,
   "simkl": 1003793
@@ -331,6 +336,7 @@
   "work": "fate-prototype-2011",
   "position": 6,
   "label": "للفضول",
+  "after": "fuyuki",
   "note": "اثنتا عشرة دقيقة تعرض التصوّر الأصلي للقصة قبل أن تصير Fate/stay night: البطلة فتاة، وسيبر فارس. لمحة لا قصة كاملة.",
   "mal": 12565
  }

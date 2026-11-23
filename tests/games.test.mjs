@@ -163,9 +163,10 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   check('كم تأخذ لتختمها: ثلاثة أشرطة وشريط ساعاتك', sh.ttb.join() === 't-h,t-n,t-c,t-m', sh.ttb);
   // سطر موقعها تحت العنوان (E53): نوع موقعها من الأحداث، والجزء الذي قبلها اسماً يُلمس (خارج القائمة: بطاقة اطلاع برقمه)، ورقمها في سلسلتها
   const ch = await page.evaluate(() => { const c = document.querySelector('#sheet .sh-head + .chain'); return c && { k: c.className, label: c.querySelector('.ch-k')?.textContent, text: c.querySelector('.ch-m span')?.textContent,
-    link: c.querySelector('.ch-l') && { act: c.querySelector('.ch-l').dataset.act, id: c.querySelector('.ch-l').dataset.id, t: c.querySelector('.ch-l').textContent }, n: c.querySelector('.ch-n')?.textContent }; });
-  check('سطر موقعها تحت العنوان: «تكملة لأحداث God of War (2018)» والاسم يفتح بطاقة الجزء 19560، و«رقمها في سلسلة God of War: 8 من 8 بترتيب الصدور»',
-    ch?.k === 'chain k-sequel' && ch.label === 'تكملة' && ch.text === 'لأحداث God of War (2018)' && ch.link?.act === 'peek' && ch.link.id === '19560' && ch.n === 'رقمها في سلسلة God of War: 8 من 8 بترتيب الصدور', ch);
+    link: c.querySelector('.ch-l') && { act: c.querySelector('.ch-l').dataset.act, id: c.querySelector('.ch-l').dataset.id, t: c.querySelector('.ch-l').textContent }, n: c.querySelector('.ch-n')?.textContent,
+    map: c.querySelectorAll('.pos-map .d, .pos-map .here').length, here: c.querySelectorAll('.pos-map .here').length, done: c.querySelectorAll('.pos-map .d.done').length }; });
+  check('لافتة موقعها تحت العنوان: «تكملة لأحداث God of War (2018)» والاسم يفتح بطاقة الجزء 19560، و«رقمها في سلسلة God of War: 8 من 8 بترتيب الصدور»، وخريطة السلسلة بثماني نقاط وموضعها مضيء (E58)',
+    ch?.k === 'chain k-sequel' && ch.label === 'تكملة' && ch.text === 'لأحداث God of War (2018)' && ch.link?.act === 'peek' && ch.link.id === '19560' && ch.n === 'رقمها في سلسلة God of War: 8 من 8 بترتيب الصدور' && ch.map === 8 && ch.here === 1, ch);
   check('السلسلة بترتيب الصدور وهذه اللعبة في موضعها (8 من 8)، وترتيب القصة الرسمي مخفي حتى يُختار ويبدأ بـ Ascension، ومصدره رابط', sh.ord.length === 8 && sh.ord[7] === '8*' && sh.storyHidden && sh.story[0] === 'God of War: Ascension' && sh.story[7] === 'God of War Ragnarök' && /playstation/.test(sh.src || ''), sh);
   check('المحتوى الإضافي، والاقتباس إلى مسلسل (خارج أفلامي): TMDB و«أضفه إلى أفلامي»، وروابط المتاجر والتختيم', sh.dlc === 'God of War Ragnarök: Valhalla' && sh.tv.includes('https://www.themoviedb.org/tv/999001') && sh.tv.some(h => /^\.\.\/films\/#add=God%20of%20War%202027$/.test(h)) && sh.links.includes('YouTube') && sh.links.includes('HowLongToBeat'), sh);
   await page.click('#sheet [data-act=ordv][data-v=story]'); await page.waitForTimeout(150);
@@ -370,6 +371,12 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   check('بعد التحديث يبقى الطلب مذكوراً ولا يُطلب ثانية', asked.filter(a => a === 'ask:119133').length === 1 && await page.evaluate(() => !document.querySelector('#sheet [data-act=tr-ask]')));
   // لعبة نصها في سجلها (بلا ملف نصوص): تُعرض منه
   await page.goto(`${base}/games/#g11208`); await page.waitForSelector('#sheet[open]'); await page.waitForTimeout(300);
+  // E58: لعبة لا سلسلة لها لافتتها «لعبة منفردة»، ولعبة في سلسلة بلا موقع مكتوب تُعرَّف برقمها وما صدر بعدها
+  { const sign = () => page.evaluate(() => { const c = document.querySelector('#sheet .sh-head + .chain'); return c && { k: c.className, label: c.querySelector('.ch-k')?.textContent, text: c.querySelector('.ch-m span')?.textContent || '', n: c.querySelector('.ch-n')?.textContent || '', dots: c.querySelectorAll('.pos-map .d, .pos-map .here').length }; });
+    const solo = await sign(); check('لعبة لا سلسلة لها ولا أصل: لافتتها «لعبة منفردة: قائمة بذاتها» بنقطة وحدها', solo?.k === 'chain k-alone solo' && solo.label === 'لعبة منفردة' && /^قائمة بذاتها/.test(solo.text) && !solo.n && solo.dots === 1, solo);
+    await page.goto(`${base}/games/#g14593`); await page.waitForSelector('#sheet[open] .chain'); await page.waitForTimeout(300); const part = await sign();
+    check('لعبة في سلسلة بلا موقع مكتوب: «الجزء الأول: أول أجزاء السلسلة صدوراً، وتليها…» مع ما لم يصدر، ورقمها وخريطة السلسلة', part?.k === 'chain' && part.label === 'الجزء الأول' && /^أول أجزاء السلسلة صدوراً · وتليها Hollow Knight: Silksong \(لم تصدر بعد\)$/.test(part.text) && part.n === 'رقمها في سلسلة Hollow Knight: 1 من 2 بترتيب الصدور' && part.dots === 2, part);
+    await page.goto(`${base}/games/#g11208`); await page.waitForSelector('#sheet[open]'); await page.waitForTimeout(300); }
   check('لعبة نبذتها في سجلها لا في ملف النصوص (أُضيفت للتو) تُعرض منه مع زر الترجمة', await page.evaluate(() => { const a = document.querySelector('#sheet .about'); return !a || (!!a.querySelector('p.en') && !!a.querySelector('[data-act=tr-ask]')); }));
   // نبذة مترجمة وقصة لم تُترجم بعد: النبذة بالعربية والقصة بالإنجليزية، والزر يطلب القصة بعينها
   const taWas = TX[112875].ta; delete TX[112875].ta;

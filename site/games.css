@@ -363,13 +363,16 @@ section.sec{padding:22px clamp(14px,3vw,30px) 0}
 /* موقعها من أحداث عالمها: لون لكل نوع، وعقدة «بكسل»، ومسار مراحل منقّط: قبلها ← هذه اللعبة ← بعدها */
 :is(.place,.chain){--pc:var(--cy)}:is(.place,.chain):is(.k-prequel,.k-first){--pc:var(--au)}:is(.place,.chain):is(.k-side,.k-alt,.k-between,.k-parallel){--pc:var(--vi)}:is(.place,.chain):is(.k-alone,.k-nostory,.k-bundle){--pc:var(--ok)}:is(.place,.chain):is(.k-reboot,.k-remake,.k-same,.k-retell){--pc:var(--co)}
 /* سطر موقعها تحت العنوان: نوعها بلونه وعقدته، وما قبلها وما بعدها أسماء تُلمس فتُفتح، ورقمها في سلسلتها */
-.chain{display:grid;gap:3px;margin:14px clamp(14px,3vw,30px) 0;padding:10px 14px 11px;border-radius:12px;background:color-mix(in srgb,var(--pc) 7%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 28%,var(--line))}
+.chain{--lc:var(--pc);--pos-bg:var(--card);--pos-ink:var(--ink);display:grid;gap:3px;margin:14px clamp(14px,3vw,30px) 0;padding:10px 14px 11px;border-radius:12px;background:color-mix(in srgb,var(--pc) 7%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 28%,var(--line))}
+.chain .pos-map{margin-bottom:3px}
 .ch-m{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:.98rem;line-height:1.75}
 .ch-k{display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;font-size:1.3rem;line-height:1.2;color:var(--pc)}
 .ch-k::before{content:"";flex:none;width:9px;height:9px;background:var(--pc);box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 22%,transparent)}
 .ch-l{/* هدف لمس 40px على الأقل دون أن يتغير تباعد السطور: الحشو يلغيه هامش سالب */display:inline-block;max-width:100%;min-width:40px;text-align:center;padding:9px 3px;margin:-9px -3px;font-weight:600;color:var(--ink);text-decoration:underline 1.5px;text-decoration-color:color-mix(in srgb,var(--pc) 60%,transparent);text-underline-offset:4px;unicode-bidi:isolate;transition:color .15s ease}
 .ch-l:active{color:var(--pc)}
 @media (hover:hover){.ch-l:hover{color:var(--pc)}}
+/* اسم طويل ينكسر داخل الجملة: سطوره بمحاذاة النص العربي لا في الوسط */
+.ch-m span .ch-l{text-align:right}
 .ch-n{color:var(--mute);font-size:.86rem;line-height:1.6}
 .pl-card{padding:14px 16px 12px;border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--pc) 9%,var(--card)),var(--card) 70%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pc) 30%,var(--line))}
 .pl-k{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:1.6rem;line-height:1;color:var(--pc)}

@@ -82,23 +82,25 @@ for (const r of guide === 'dc' ? rows.filter(r => r.seasons && r.imdb) : []) {
   try { const res = await fetch('https://api.tvmaze.com/lookup/shows?imdb=' + r.imdb); if (res.ok) r.tvmaze = (await res.json()).id; } catch {}
   await new Promise(z => setTimeout(z, 600));
 }
-// تقييمات MyAnimeList لكل إدراج له رقم MAL (عبر Jikan، بلا مفتاح). عند تعذّر السحب تبقى القيم السابقة.
+// تقييمات MyAnimeList وتصنيفاته لكل إدراج له رقم MAL. عند تعذّر السحب تبقى القيم السابقة.
 const malIds = [...new Set(rdSrc('placements.json').map(p => p.mal).filter(Boolean))];
 if (malIds.length) {
   const prevPath = new URL('mal.json', outDir), prev = fs.existsSync(prevPath) ? JSON.parse(fs.readFileSync(prevPath)).anime || {} : {}, anime = {};
   const UA = { 'User-Agent': 'watch-guide-build/1.0 (https://github.com/fa9o0oll/-dc-guide)' }, CLIENT = (process.env.MAL_CLIENT_ID || '').trim();
   // المصدر الأول واجهة MyAnimeList الرسمية إن وُجد مفتاحها (MAL_CLIENT_ID)، ثم Jikan بلا مفتاح. عند تعذّر الاثنين تبقى القيم السابقة كما هي.
-  const viaMal = async id => { const res = await fetch(`https://api.myanimelist.net/v2/anime/${id}?fields=mean,num_scoring_users`, { headers: { ...UA, 'X-MAL-CLIENT-ID': CLIENT }, signal: AbortSignal.timeout(15000) }); if (!res.ok) throw new Error('MAL API ' + res.status);
-    const a = await res.json(); return { score: a.mean ?? null, votes: a.num_scoring_users ?? 0 }; };
+  // g: تصنيفات العمل (الأنواع والثيمات والفئات بأسمائها في MyAnimeList)، لمزاج «اقتراح الليلة» في الدليل
+  const withG = (o, names) => { const g = [...new Set(names.filter(Boolean))]; return g.length ? { ...o, g } : o; };
+  const viaMal = async id => { const res = await fetch(`https://api.myanimelist.net/v2/anime/${id}?fields=mean,num_scoring_users,genres`, { headers: { ...UA, 'X-MAL-CLIENT-ID': CLIENT }, signal: AbortSignal.timeout(15000) }); if (!res.ok) throw new Error('MAL API ' + res.status);
+    const a = await res.json(); return withG({ score: a.mean ?? null, votes: a.num_scoring_users ?? 0 }, (a.genres || []).map(x => x.name)); };
   const viaJikan = async id => { const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`, { headers: UA, signal: AbortSignal.timeout(15000) }); if (!res.ok) throw new Error('Jikan ' + res.status);
-    const a = (await res.json()).data; return { score: a.score ?? null, votes: a.scored_by ?? 0 }; };
+    const a = (await res.json()).data; return withG({ score: a.score ?? null, votes: a.scored_by ?? 0 }, [...(a.genres || []), ...(a.themes || []), ...(a.demographics || [])].map(x => x.name)); };
   const sources = [...(CLIENT ? [['MAL API', viaMal]] : []), ['Jikan', viaJikan]], down = {};
   Object.assign(anime, prev);
   for (const id of malIds) {
     let got = null; const errs = [];
     for (const [name, fn] of sources) { if (got || down[name] >= 2) continue;
       try { got = await fn(id); down[name] = 0; } catch (e) { errs.push(`${name}: ${e.message}${e.cause ? ' (' + (e.cause.code || e.cause.message) + ')' : ''}`); down[name] = (down[name] || 0) + 1; } }
-    if (got) anime[id] = got; else if (errs.length) problems.push(`MAL ${id}: ${errs.join(' | ')}`);
+    if (got) anime[id] = got.g ? got : { ...got, ...(prev[id]?.g ? { g: prev[id].g } : {}) }; else if (errs.length) problems.push(`MAL ${id}: ${errs.join(' | ')}`);
     if (sources.every(([n]) => down[n] >= 2)) { problems.push(`MAL: لا مصدر متاح الآن (${sources.map(x => x[0]).join('، ')})، تبقى القيم السابقة`); break; }
     await new Promise(z => setTimeout(z, 700));
   }

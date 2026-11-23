@@ -37,6 +37,37 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await page.goto(base + '/fate/'); await page.waitForSelector('.card'); await page.evaluate(() => { try { localStorage.removeItem('fateg.progress'); } catch {} }); await page.reload(); await page.waitForSelector('.card');
   check(`Fate: ${P.length} بطاقة في ${U.length} خطوط`, await page.locator('.card').count() === P.length && await page.locator('section.uni').count() === U.length);
   check('Fate: سجل منفصل عن دي سي، والعودة إلى «أنمياتي» التي يسكن داخلها', await page.getAttribute('.top .home', 'href') === '../anime/#worlds' && (await page.textContent('.top .home')).trim() === 'أنمياتي' && await page.title() === 'دليل عالم Fate');
+  // ---------- «اقتراح الليلة» في دليل Fate (E62): بترتيب الدليل نفسه، ومزاج بأكثر من تصنيف. البيانات كما سيكتبها البناء: after من placements.json، وتصنيفات g في mal.json
+  { const baseJ = JSON.parse(fs.readFileSync(path.join(siteDir, 'fate/data/base.json'))), malJ = JSON.parse(fs.readFileSync(path.join(siteDir, 'fate/data/mal.json'))); baseJ.placements = P;
+    const G0 = { fuyuki: ['Action', 'Fantasy'], deen: ['Action', 'Romance'], fgo: ['Action', 'Fantasy'], illya: ['Comedy', 'Fantasy'], apocrypha: ['Action'], strangefake: ['Action', 'Mystery'], extra: ['Fantasy'], side: ['Comedy'] };
+    for (const x of P) if (x.mal) malJ.anime[x.mal] = { score: 7, votes: 10, ...malJ.anime[x.mal], g: G0[x.universe] };
+    await page.route(/\/fate\/data\/base\.json/, r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(baseJ) })); await page.route(/\/fate\/data\/mal\.json/, r => r.fulfill({ contentType: 'application/json', body: JSON.stringify(malJ) }));
+    await page.evaluate(() => { try { localStorage.removeItem('fateg.progress.mood'); } catch {} }); await page.reload(); await page.waitForSelector('#pick');
+    const pk = () => page.evaluate(() => { const b = document.querySelector('#pick'); return b && { t: b.querySelector('h2').textContent, why: b.querySelector('.pick-w b').textContent, n: b.querySelector('.pick-l small')?.textContent || '', on: [...b.querySelectorAll('.chip[aria-pressed=true]')].map(x => x.dataset.g).sort().join('|'), hint: b.querySelector('.pick-h')?.textContent || '', start: !!b.querySelector('[data-act=pick-start]'), id: b.querySelector('[data-act=open]').dataset.id }; });
+    let k = await pk(); const side = new Set(P.filter(x => x.after).map(x => x.work)), serial = new Set(U.filter(u => u.serial).map(u => u.id)), starts = P.filter(x => serial.has(x.universe) ? x.position === 1 : !x.after).length;
+    check('Fate: «اقتراح الليلة» أعلى البطاقات يبدأ ببداية ترتيب المشاهدة الموصى به، وعدده بدايات الخطوط والأعمال المنفردة بلا شرط', k?.id === P[0].work && k.why === 'بداية ترتيب المشاهدة الموصى به' && k.n === `1 من ${starts}` && k.on === '' && k.start, [k, starts]);
+    { const seen = []; for (let i = 0; i < starts; i++) { seen.push((await pk()).id); await tap('#pick [data-act=pick-next]'); await page.waitForTimeout(40); }
+      check('Fate: «اقتراح آخر» يدور على ما يصلح بدايةً فقط: لا جزء قبل ما قبله في خطه، ولا عمل جانبي قبل إكمال خطه', new Set(seen).size === starts && seen.every(id => !side.has(id) && P.some(x => x.work === id && (serial.has(x.universe) ? x.position === 1 : true))) && (await pk()).id === P[0].work, seen); }
+    await tap('#pick .chip[data-g="Comedy"]'); k = await pk();
+    check('Fate: مزاج واحد يأتي بما فيه (Prisma☆Illya أول خطها)', k.on === 'Comedy' && k.id === P.find(x => x.universe === 'illya' && x.position === 1).work && !k.hint, k);
+    await tap('#pick .chip[data-g="Mystery"]'); k = await pk();
+    check('Fate: مزاجان لا يجمعهما عمل: يُقدَّم أقربها ويقال كم يجمع، ويُحفظان', k.on === 'Comedy|Mystery' && /يجمع 1 من 2/.test(k.hint) && await page.evaluate(() => localStorage.getItem('fateg.progress.mood')) === 'Comedy|Mystery', k);
+    await tap('#pick .chip[data-g="Comedy"]'); await tap('#pick .chip[data-g="Action"]'); k = await pk();
+    check('Fate: لمسة ثانية ترفع التصنيف، ومزاجان يجمعهما عمل يُقال فيه ذلك', k.on === 'Action|Mystery' && k.id === P.find(x => x.universe === 'strangefake' && x.position === 1).work && /^عمل يجمع /.test(k.hint), k);
+    await tap('#pick .chip[data-g=""]'); k = await pk(); check('Fate: «أي شيء» يرفعها كلها ويعود إلى الأول', k.on === '' && k.id === P[0].work && !k.hint, k);
+    await tap('#pick [data-act=pick-start]'); k = await pk();
+    check('Fate: «سأبدأه الآن» يجعله «أشاهده» فيصير الاقتراح «كمّل من حيث وقفت»', k.id === P[0].work && /^تشاهده الآن/.test(k.why) && !k.start && await page.evaluate(key => JSON.parse(localStorage.getItem('fateg.progress')).works[key] === 'watching', `${P[0].work}#${P[0].season}`), k);
+    await tap(`#${await page.locator('.card').first().getAttribute('id')} [data-s=watched]`); k = await pk();
+    check('Fate: بعد مشاهدته يصير الاقتراح التالي في الترتيب الموصى به، بلا إعادة رسم الصفحة', /Season 2$/.test(k.t) && k.why === 'التالي في ترتيب المشاهدة الموصى به', k);
+    await tap('#unibar [data-uni=fgo]'); await page.waitForTimeout(150); k = await pk();
+    check('Fate: مع اختيار خط من الشريط يأتي الاقتراح منه', k.id === P.find(x => x.universe === 'fgo' && x.position === 1).work && k.why === 'بداية خط قصته مستقلة' && k.n === '', k);
+    await tap('#unibar [data-uni=all]'); await page.fill('#q', 'zero'); await page.waitForTimeout(350);
+    check('Fate: مع البحث أو التصفية لا اقتراح', await page.locator('#pick').count() === 0 && await page.locator('.card').count() >= 1);
+    await tap('.tools [data-act=tonight]'); await page.waitForSelector('#pick'); await page.waitForTimeout(200);
+    check('Fate: «ماذا أشاهد؟» يمسح التصفية ويأخذك إلى الاقتراح', await page.inputValue('#q') === '' && await page.evaluate(() => { const r = document.querySelector('#pick').getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }));
+    await fits('Fate اقتراح الليلة');
+    await page.unroute(/\/fate\/data\/base\.json/); await page.unroute(/\/fate\/data\/mal\.json/);
+    await page.evaluate(() => { try { localStorage.removeItem('fateg.progress'); localStorage.removeItem('fateg.progress.mood'); } catch {} }); await page.reload(); await page.waitForSelector('.card'); }
   const first = P[0], sel = '#' + await page.locator('.card').first().getAttribute('id');
   check('Fate: زرّا MyAnimeList وSimkl بروابط الإدراج نفسه', await page.evaluate(([s, mal, simkl]) => { const h = [...document.querySelectorAll(`${s} .xlinks a`)].map(a => a.href); return h.includes(`https://myanimelist.net/anime/${mal}`) && h.includes(`https://simkl.com/anime/${simkl}`); }, [sel, first.mal, first.simkl]));
   { const hasMal = !!JSON.parse(fs.readFileSync(path.join(siteDir, 'fate/data/mal.json'))).anime?.[first.mal]?.score, src = await page.textContent(sel + ' .rates .src');
@@ -108,12 +139,22 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   check('الأفلام: النافذة فيها أين يُعرض وترتيب السلسلة والروابط', await page.evaluate(([t, imdb]) => { const h = [...document.querySelectorAll('#sheet .links a')].map(a => a.href), o = document.querySelectorAll('#sheet .order li');
     return o.length >= 2 && [...document.querySelectorAll('#sheet .order li.here')].filter(li => li.offsetParent).length === 1 && h.includes(`https://letterboxd.com/tmdb/${t}`) && h.includes(`https://www.imdb.com/title/${imdb}/`) && h.some(x => /whattawatch/.test(x)) && document.querySelectorAll('#sheet .wgroup').length >= 1; }, [inCol.tmdb, inCol.imdb]));
   check('الأفلام: رابط الفيلم في العنوان', (await page.evaluate(() => location.hash)) === '#' + inCol.id);
-  check('الأفلام: سطر موقعه تحت العنوان يطابق موضعه في ترتيب المشاهدة الظاهر، وما قبله أو بعده أزرار (E53)', await page.evaluate(() => { const c = document.querySelector('#sheet #chslot .chain'), li = [...document.querySelectorAll('#sheet .order li.here')].find(x => x.offsetParent), ol = li?.closest('ol');
-    return !!c && !!li && c.querySelector('.ch-k').textContent === `${li.dataset.n} من ${ol.children.length}` && c.querySelectorAll('.ch-l').length >= 1 && /بترتيب/.test(c.querySelector('.ch-n').textContent); }));
+  check('الأفلام: لافتة موقعه تحت العنوان (E53، E58): شارته وجملته، وخريطتها بنقطة مضيئة واحدة، ورقمه يطابق موضعه في ترتيب المشاهدة الظاهر، وما قبله أو بعده أزرار', await page.evaluate(() => { const c = document.querySelector('#sheet #chslot .chain'), li = [...document.querySelectorAll('#sheet .order li.here')].find(x => x.offsetParent), ol = li?.closest('ol');
+    return !!c && !!li && c.querySelector('.ch-n span').textContent.startsWith(`${li.dataset.n} من ${ol.children.length} في `) && /بترتيب/.test(c.querySelector('.ch-n').textContent) && /\S/.test(c.querySelector('.ch-k').textContent) && !!c.querySelector('.ch-t')
+      && c.querySelectorAll('.pos-map .here').length === 1 && c.querySelectorAll('.pos-map .d, .pos-map .here').length >= 2 && c.querySelectorAll('.ch-l').length >= 1; }), await page.evaluate(() => document.querySelector('#sheet #chslot')?.textContent));
+  await tap('#sheet .chain .ch-n'); await page.waitForTimeout(900);
+  check('الأفلام: «الترتيب كاملاً» في اللافتة ينزل إلى ترتيب المشاهدة', await page.evaluate(() => { const r = document.querySelector('#wslot').getBoundingClientRect(), b = document.getElementById('sheet-body').getBoundingClientRect(); return r.top >= b.top - 4 && r.top < b.top + b.height * .7; }));
   { await page.evaluate(() => { document.getElementById('sheet-body').scrollTop = 99999; }); const y = await page.evaluate(() => document.getElementById('sheet-body').scrollTop);
     await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
     await tap(`#f-${inCol.id} .poster`); await page.waitForSelector('#sheet[open] .sh-head'); await page.waitForTimeout(350);
     check('الأفلام: نافذة تُفتح بعد أخرى أُغلقت وهي ممرَّرة تبدأ من أعلاها', y > 0 && await page.evaluate(() => document.getElementById('sheet-body').scrollTop) === 0, y); }
+  // الفيلم الذي لا تجمعه سلسلة ولا عالم يُقال فيه ذلك صراحة (E58)
+  { await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(250); let solo = null;
+    for (const f of FL.filter(f => !f.col && f.kind === 'movie').slice(0, 10)) { await page.evaluate(id => { location.hash = '#' + id; }, f.id); await page.waitForSelector('#sheet[open] #chslot'); await page.waitForTimeout(250);
+      solo = await page.evaluate(() => { const c = document.querySelector('#sheet #chslot .chain.solo'); return c && { k: c.querySelector('.ch-k').textContent, t: c.querySelector('.ch-t')?.textContent, dots: c.querySelectorAll('.pos-map .here').length, n: !!c.querySelector('.ch-n') }; });
+      await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(200); if (solo) break; }
+    check('الأفلام: الفيلم الذي لا سلسلة له لافتته «فيلم منفرد: قائم بذاته» بنقطة وحدها', solo?.k === 'فيلم منفرد' && /^قائم بذاته/.test(solo.t) && solo.dots === 1 && !solo.n, solo);
+    await tap(`#f-${inCol.id} .poster`); await page.waitForSelector('#sheet[open] .sh-head'); await page.waitForTimeout(350); }
   // تكبير البوستر (zoom.js المشترك): يُرفع من مكانه فوق النافذة، وEsc والرجوع والسحب تغلقه وحده وتبقى نافذة الفيلم ورابطها
   await tap('#sheet .sh-head [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(950);
   check('الأفلام: البوستر يُكبَّر فوق النافذة بعنوانه وبدقة أعلى، ومكانه فارغ', await page.evaluate(t => { const d = document.querySelector('dialog.pz'), r = d.querySelector('.pz-card').getBoundingClientRect();

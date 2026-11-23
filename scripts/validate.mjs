@@ -27,6 +27,7 @@ for (const p of P) {
   if (p.canon && !/^https:\/\//.test(p.canon.source)) errs.push('حالة اعتماد بلا مصدر: ' + p.work);
   if (p.order && !/^https:\/\//.test(p.order.source)) errs.push('ملاحظة ترتيب بلا مصدر: ' + p.work);
   for (const k of ['mal', 'simkl']) if (p[k] != null && !Number.isInteger(p[k])) errs.push(`رقم ${k} غير صالح: ` + p.work);
+  if (p.after != null && (!uIds.has(p.after) || p.after === p.universe)) errs.push('after يشير لعالم غير معروف أو لعالمه نفسه: ' + p.work);   // عمل منفرد لا يُقترح قبل إكمال ذلك الخط
 }
 for (const u of U) { const n = P.filter(p => p.universe === u.id).map(p => p.position).sort((a, b) => a - b);
   if (!n.length) errs.push('عالم بلا أعمال: ' + u.id); n.forEach((v, i) => { if (v !== i + 1) errs.push('فجوة في ترتيب: ' + u.id); }); }

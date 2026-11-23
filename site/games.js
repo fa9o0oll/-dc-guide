@@ -12,6 +12,7 @@ import { prepare, find, fold } from './find.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
+import { posMap, ord } from './pos.js?v=__BUILD__'; // خريطة «موقعها من سلسلتها» والعدد الترتيبي
 const BUILD = '__BUILD__', KEY = 'gamesg.progress', PEND = 'gamesg.pending', PASS = 'gamesg.pass', IGN = 'gamesg.ignored', STEAM = 'gamesg.steam', REM = 'gamesg.removed', ASK = 'gamesg.asked';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -492,13 +493,18 @@ const CHAIN = { sequel: (a, b) => [a && `لأحداث ${a}`, b && `وتليها 
   alt: (a, b) => [b && `تليها ${b}`], reboot: () => ['لا تحتاج ما قبلها'], alone: () => ['لا تحتاج ما قبلها'], remake: (a, b, p) => [p && `للعبة ${p}`], same: (a, b, p) => [p && `التي في ${p}`] };
 const OFTYPE = { remake: 'للعبة', remaster: 'للعبة', standalone: 'للعبة', dlc: 'للعبة', expansion: 'للعبة', expanded: 'من', port: 'من' };
 const chainLink = (m, t) => m ? `<button type="button" class="ch-l" data-act="${D.byId.has(m.id) ? 'open' : 'peek'}" data-id="${m.id}" data-q="${esc(m.title)}${m.year ? ' ' + m.year : ''}" dir="ltr">${esc(t || m.title)}</button>` : `<bdi dir="ltr">${esc(t)}</bdi>`;
+// الخريطة فوقها (site/pos.js): أجزاء سلسلتها بترتيب الصدور، وما ختمته أو شاهدته ممتلئ، وموضعها نقطة مضيئة. واللعبة التي لا موقع مكتوب لها تُعرَّف
+// برقمها بين أجزاء سلسلتها وما صدر قبلها وبعدها، والتي لا سلسلة لها ولا أصل لافتتها «لعبة منفردة» (E58)
 function chainHTML(g) { const p = g.place, k = p && PK[p.k] ? p.k : null, par = g.rel?.parent_game || g.rel?.version_parent;
   const P = par && chainLink(par, par.title + (par.year && par.year !== g.year ? ` (${par.year})` : '')), A = p?.after && chainLink(byTitle(g, p.after), p.after), B = p?.before && chainLink(byTitle(g, p.before), p.before);
-  const [label, bits] = k ? [PK[k], (CHAIN[k] || (() => []))(A, B, P)] : OFTYPE[g.type] && par ? [TYPES[g.type], [`${OFTYPE[g.type]} ${P}`]] : [null, []];
-  const s = (g.series || []).map(id => D.series[id]).find(x => x?.members?.some(m => m.id === g.id)), i = s ? s.members.findIndex(m => m.id === g.id) : -1, j = s?.story?.order?.indexOf(g.id) ?? -1;
-  const pos = i < 0 ? '' : `رقمها في سلسلة <bdi dir="ltr">${esc(s.name)}</bdi>: ${i + 1} من ${s.members.length} بترتيب الصدور${j >= 0 && j !== i ? `، و${j + 1} بترتيب القصة` : ''}`;
+  const s = (g.series || []).map(id => D.series[id]).find(x => x?.members?.some(m => m.id === g.id)), i = s ? s.members.findIndex(m => m.id === g.id) : -1, j = s?.story?.order?.indexOf(g.id) ?? -1, M = s?.members || [];
+  const solo = i < 0 && !par && (!k || k === 'alone' || k === 'nostory'), out = m => m.status && m.status !== 'released' ? ' (لم تصدر بعد)' : '';
+  const [label, bits] = solo ? ['لعبة منفردة', ['قائمة بذاتها: لا سلسلة لها ولا أجزاء أخرى']] : k ? [PK[k], (CHAIN[k] || (() => []))(A, B, P)] : OFTYPE[g.type] && par ? [TYPES[g.type], [`${OFTYPE[g.type]} ${P}`]]
+    : i >= 0 && M.length > 1 ? [`الجزء ${i < 99 ? ord(i + 1) : i + 1}`, i === 0 ? ['أول أجزاء السلسلة صدوراً', M[1] && `وتليها ${chainLink(M[1])}${out(M[1])}`] : [`صدرت بعد ${chainLink(M[i - 1])}`, M[i + 1] ? `وقبل ${chainLink(M[i + 1])}${out(M[i + 1])}` : 'وهي آخر أجزائها حتى الآن']] : [null, []];
+  const pos = i < 0 ? '' : `رقمها في سلسلة <bdi dir="ltr">${esc(s.name)}</bdi>: ${i + 1} من ${M.length} بترتيب الصدور${j >= 0 && j !== i ? `، و${j + 1} بترتيب القصة` : ''}`;
   const text = bits.filter(Boolean).map((t, n) => n ? t : t.replace(/^و/, '')); if (!label && !pos) return '';
-  return `<nav class="chain${k ? ' k-' + k : ''}" aria-label="موقعها من سلسلتها">${label ? `<p class="ch-m"><b class="ch-k">${label}</b>${text.length ? `<span>${text.join(' · ')}</span>` : ''}</p>` : ''}${pos ? `<p class="ch-n">${pos}</p>` : ''}</nav>`; }
+  const map = solo ? posMap({ solo: true }) : i >= 0 && M.length > 1 ? posMap({ n: M.length, at: i, done: x => ['done', 'seen'].includes(lst(M[x].id)) }) : '';
+  return `<nav class="chain${solo ? ' k-alone solo' : k ? ' k-' + k : ''}" aria-label="موقعها من سلسلتها">${map}${label ? `<p class="ch-m"><b class="ch-k">${label}</b>${text.length ? `<span>${text.join(' · ')}</span>` : ''}</p>` : ''}${pos ? `<p class="ch-n">${pos}</p>` : ''}</nav>`; }
 function placeSec(g) { const p = g.place; if (!p || !PK[p.k]) return '';
   const find1 = t => byTitle(g, t);
   const stop = (cls, label, title) => { const m = cls === 'here' ? null : find1(title), own = m && D.byId.has(m.id), inner = `<small>${label}</small><b dir="ltr">${esc(title)}</b>`;

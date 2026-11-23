@@ -293,7 +293,7 @@ if (!only || only === 'set-reduced') { console.log('== set-reduced');
 // كل بوستر في كل عرض من البوابات يقبل التكبير (ما ليس بوستراً مستثنى: الخلفيات وشعارات المنصات وصور الحلقات ونتائج البحث)
 if (!only || only === 'coverage') { console.log('== coverage');
   const { ctx, page, errs, pause } = await session('coverage', 1200, 900, false);
-  const NOT = '.where,.wline,.wlist,.tonight,.sh-hero,.opener,.hero,.epthumb,.tile,.hit,.door,.pz,.pz-ghost';   // .where و.wline: شعارات منصات «أين تشاهده»
+  const NOT = '.where,.wline,.wlist,.tonight,.pick,.sh-hero,.opener,.hero,.epthumb,.tile,.hit,.door,.pz,.pz-ghost';   // .where و.wline: شعارات منصات «أين تشاهده»، و.tonight و.pick: خلفية «اقتراح الليلة»
   const bare = () => page.evaluate(x => [...document.querySelectorAll('img')].filter(i => /image\.tmdb\.org/.test(i.src) && !i.closest('[data-zoom],[data-zoom-pinch],' + x)).map(i => i.parentElement.className || i.parentElement.tagName).slice(0, 4), NOT);
   const marked = () => page.evaluate(() => document.querySelectorAll('[data-zoom],[data-zoom-pinch]').length);
   await page.goto(base + '/films/'); await page.waitForSelector('.tk .poster img'); await pause(400);

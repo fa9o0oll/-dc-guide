@@ -76,14 +76,16 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await tap('#c-dcu-the-suicide-squad-2021 [data-s=watched]');
   check('«شاهدته» تنعكس على نفس العمل في العالم الآخر', await page.getAttribute('#c-dceu-the-suicide-squad-2021 [data-s=watched]', 'aria-pressed') === 'true');
   // نافذة فيلم
+  check('دليل DC بلا «اقتراح الليلة»: يُشاهد بترتيب أحداثه (E62)', await page.locator('#pick').count() === 0);
   await tap('#c-nolan-the-dark-knight-2008 [data-act=open]'); await page.waitForSelector('#sheet:not([hidden])');
   check('نافذة الفيلم: نبذة عربية وروابط دقيقة', await page.locator('#sheet .ov').count() === 1 && (await page.getAttribute('#sheet .rates a[href*="imdb.com/title/tt0468569"]', 'href')) !== null && await page.locator('#sheet .rates a[href*="rottentomatoes.com/m/"]').count() === 1);
   check('نافذة الفيلم: أين تشاهده في السعودية بصفوف الإتاحة', await page.evaluate(() => { const w = document.querySelector('#sheet .where'); if (!w) return false;
     const rows = [...w.querySelectorAll('.wrow')].map(r => r.querySelector('b').textContent + ':' + [...r.querySelectorAll('a')].map(a => a.textContent).join('+'));
     return w.querySelector('h4').textContent === 'أين تشاهده في السعودية' && rows.join(' | ') === 'باشتراك:Netflix+OSN+ | إيجار:Apple TV | شراء:Apple TV+Google Play Movies' && [...w.querySelectorAll('a')].every(a => a.href === 'https://www.themoviedb.org/movie/155/watch?locale=SA' && a.target === '_blank' && a.querySelector('img')) && /JustWatch/.test(w.querySelector('.lbl').textContent); }));
   // سطر موقعه تحت العنوان (E53): رقمه في خط زمن عالمه، وما قبله وما بعده أزرار تفتح بطاقتيهما في العالم نفسه
-  check('نافذة الفيلم: سطر موقعه «2 من 3 · بعد Batman Begins · وقبل The Dark Knight Rises» في ثلاثية فارس الظلام', await page.evaluate(() => { const c = document.querySelector('#sheet .dw-top + .chain'); if (!c) return false;
-    return c.querySelector('.ch-k').textContent === '2 من 3' && [...c.querySelectorAll('.ch-l')].map(x => x.textContent + '@' + x.dataset.uni).join('|') === 'Batman Begins@nolan|The Dark Knight Rises@nolan' && /ثلاثية فارس الظلام، بترتيب المشاهدة/.test(c.querySelector('.ch-n').textContent); }));
+  check('نافذة الفيلم: لافتة موقعه «العمل الثاني: يأتي بعد Batman Begins وقبل The Dark Knight Rises» وخريطتها بنقطته، و«2 من 3 في ثلاثية فارس الظلام» (E53، E58)', await page.evaluate(() => { const c = document.querySelector('#sheet .dw-top + .chain'); if (!c) return false;
+    return c.querySelector('.ch-k').textContent === 'العمل الثاني' && c.querySelector('.ch-t').textContent === 'يأتي بعد Batman Begins وقبل The Dark Knight Rises.' && [...c.querySelectorAll('.ch-l')].map(x => x.textContent + '@' + x.dataset.uni).join('|') === 'Batman Begins@nolan|The Dark Knight Rises@nolan'
+      && c.querySelectorAll('.pos-map .d, .pos-map .here').length === 3 && c.querySelectorAll('.pos-map .here').length === 1 && c.querySelector('.ch-n').textContent === '2 من 3 في ثلاثية فارس الظلام، بترتيب المشاهدة'; }), await page.evaluate(() => document.querySelector('#sheet .chain')?.textContent));
   await overflow('نافذة الفيلم'); await snap('2-film');
   // تكبير البوستر (zoom.js المشترك بين البوابات)
   await tap('#sheet [data-zoom]'); await page.waitForSelector('dialog.pz[open]'); await page.waitForTimeout(950);
@@ -102,6 +104,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   // نافذة مسلسل + حلقات
   await tap('#c-dcu-peacemaker-2022-s2 [data-act=open]'); await page.waitForSelector('.ep:not(.skel)');
   check('نافذة المسلسل تفتح على الموسم الصحيح', (await page.textContent('#seasonTabs .on')).includes('2') && await page.locator('.ep').count() === 8);
+  check('نافذة المسلسل تفتح من أعلاها: توسيط تبويب الموسم لا ينزل بالنافذة إلى التبويبات', await page.evaluate(() => document.getElementById('sheetBody').scrollTop) === 0, await page.evaluate(() => document.getElementById('sheetBody').scrollTop));
   { const wh = () => page.evaluate(() => { const w = document.querySelector('#sheet .where'); return w && w.querySelector('h4').textContent + ':' + [...w.querySelectorAll('.wl a')].map(a => a.textContent).join('+'); });
     const s2 = await wh(); await tap('#seasonTabs [data-season="1"]'); await page.waitForSelector('#seasonTabs [data-season="1"].on'); await page.waitForTimeout(250); const s1 = await wh();
     await tap('#seasonTabs [data-season="2"]'); await page.waitForSelector('#seasonTabs [data-season="2"].on'); await page.waitForTimeout(250); const back = await wh();

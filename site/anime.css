@@ -206,6 +206,8 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
 .ch-l{/* هدف لمس 40px على الأقل دون أن يتغير تباعد السطور: الحشو يلغيه هامش سالب */display:inline-block;max-width:100%;min-width:40px;text-align:center;padding:9px 3px;margin:-9px -3px;font-weight:600;color:var(--ink);text-decoration:underline 1.5px;text-decoration-color:color-mix(in srgb,var(--lc,var(--cel)) 60%,transparent);text-underline-offset:4px;unicode-bidi:isolate;transition:color .15s ease}
 .ch-l:active{color:var(--lc,var(--cel))}
 @media (hover:hover){.ch-l:hover{color:var(--lc,var(--cel))}}
+/* اسم طويل ينكسر داخل الجملة: سطوره بمحاذاة النص العربي لا في الوسط */
+.pos-t .ch-l,.pos-n .ch-l{text-align:right}
 /* «موقعه من سلسلته»: لافتة محطة على خط السلسلة. لون الخط من نوعه: الرئيسي سماوي، والجانبي كهرماني، والنسخة الأخرى والعالم البديل بنفسجي،
    والمتفرع وردي، والملخص رمادي. الجرأة في الشارة والنقطة المضيئة، وما حولهما هادئ */
 .pos{--lc:var(--cel);position:relative;display:grid;gap:4px;padding:10px 16px 0;border-radius:16px;overflow:hidden;
