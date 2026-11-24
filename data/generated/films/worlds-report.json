@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-23T14:09:55.565Z",
+ "generatedAt": "2026-11-24T13:46:33.374Z",
  "counts": {
   "works": 629,
   "withEntry": 375,
@@ -16,9 +16,9 @@
   "chronoReviewed": 2,
   "chronoMissed": 28,
   "chronoAuto": 31,
-  "infoEntries": 467,
-  "bytes": 203250,
-  "seconds": 281
+  "infoEntries": 466,
+  "bytes": 203020,
+  "seconds": 13
  },
  "missing": [
   {
@@ -830,8 +830,7 @@
      "2036: Nexus Dawn",
      "2048: Nowhere to Run",
      "Blade Runner 2049",
-     "Blade Runner: Black Lotus",
-     "Blade Runner 2099"
+     "Blade Runner: Black Lotus"
     ],
     "moved": [
      "Blade Runner: Black Out 2022 ← prequel Blade Runner 2049 [wikipedia,title]"
@@ -4645,21 +4644,21 @@
    ]
   },
   {
-   "g": "Q2732470",
-   "name": "list of Pixar films",
-   "why": "list",
-   "size": 28,
-   "types": [
-    "Wikimedia list article"
-   ]
-  },
-  {
    "g": "Q104830727",
    "name": "Studio Ghibli Feature Films",
    "why": "catalog",
    "size": 23,
    "types": [
     "animated film series"
+   ]
+  },
+  {
+   "g": "Q2732470",
+   "name": "list of Pixar films",
+   "why": "list",
+   "size": 28,
+   "types": [
+    "Wikimedia list article"
    ]
   },
   {
