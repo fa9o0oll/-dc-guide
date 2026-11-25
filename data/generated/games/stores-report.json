@@ -1,5 +1,5 @@
 {
- "at": "2026-11-25T13:05:03.321Z",
+ "at": "2026-11-25T17:54:15.821Z",
  "failed": [],
  "games": {
   "Limbo": "steam epic gog:gone xbox:pass",
@@ -57,7 +57,6 @@
   "Solo Leveling: Arise Overdrive": "steam xbox",
   "Little Nightmares: Enhanced Edition": "steam xbox:pass",
   "Bubsy 4D": "steam epic gog xbox",
-  "Machine Party": "steam",
   "Far Cry": "steam epic gog ubi~pub",
   "Final Fantasy XV": "steam:off",
   "Far Cry 2": "steam epic gog ubi~pub",
@@ -73,7 +72,6 @@
   "Assassin's Creed Unity": "steam epic xbox:pass ubi~pub",
   "Killing Floor 2": "steam epic",
   "Mortal Kombat X": "steam",
-  "Tera": "steam:gone",
   "Killer Instinct": "steam:f2p xbox:f2p",
   "Bloodstained: Ritual of the Night": "steam epic gog xbox",
   "Naruto Shippuden: Ultimate Ninja Storm 4": "steam",
@@ -85,7 +83,6 @@
   "Yakuza 0": "steam:gone gog",
   "Mugen Souls": "steam",
   "Yakuza Kiwami": "steam gog",
-  "Keep Talking and Nobody Explodes": "steam",
   "Dex": "steam gog",
   "Borderlands 3": "steam epic",
   "Ori and the Blind Forest: Definitive Edition": "steam gog xbox:pass",
@@ -117,7 +114,6 @@
   "DNF Duel": "steam epic",
   "Solo Leveling: Arise": "other(Netmarble Launcher):f2p~fix",
   "Street Fighter 6": "steam",
-  "Where Winds Meet": "steam:f2p epic xbox:f2p:pass",
   "Dragon Ball: Sparking! Zero": "steam",
   "Sniper Elite III": "steam",
   "Onechanbara Z2: Chaos": "steam",
@@ -209,8 +205,8 @@
   "Teenage Mutant Ninja Turtles: Mutants in Manhattan"
  ],
  "steam": {
-  "n": 203,
-  "odd": 31
+  "n": 198,
+  "odd": 28
  },
  "gogSearch": [
   "Limbo → —",
