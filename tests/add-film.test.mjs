@@ -73,8 +73,8 @@ check('تعطّل Wikidata يعيد خطأً واضحاً ولا يكتب شيئ
   const pn = await call({ action: 'preview', tmdb: 700, kind: 'movie', ...P }), an = await call({ action: 'add', tmdb: 700, kind: 'movie', ...P });
   check('عمل +18 لا يُفتح ولا يُضاف والفلتر قائم، والرسالة تدلّ على العين بلا «+18»', pn.status === 422 && an.status === 422 && /للبالغين/.test(an.body.error) && /العين/.test(an.body.error) && !/\+18/.test(an.body.error) && puts.length === before, [pn, an]);
   const pa = await call({ action: 'preview', tmdb: 700, kind: 'movie', adult: true, ...P }), f = pa.body.film;
-  check('بطاقته والفلتر مرفوع: موسوم adult، باسمه وسنته وتقييمه وصورته، بلا نبذة ولا اسم عربي ولا طاقم ولا سلسلة ولا منصات', pa.status === 200 && f.adult === 1 && f.title === 'Velvet' && f.year === 2020 && f.rating === 5.5 && f.poster === '/v.jpg'
-    && f.overviewEn === null && f.overviewAr === undefined && f.titleAr === undefined && f.cast.length === 0 && f.directors.length === 0 && f.col === undefined && f.prov === null && pa.body.collection === null && !/explicit/.test(JSON.stringify(pa.body)), pa.body);
+  check('بطاقته والفلتر مرفوع: موسوم adult، باسمه وسنته وتقييمه وصورته ونبذته بلغتيها كغيره (E69)، بلا اسم عربي ولا طاقم ولا سلسلة ولا منصات', pa.status === 200 && f.adult === 1 && f.title === 'Velvet' && f.year === 2020 && f.rating === 5.5 && f.poster === '/v.jpg'
+    && f.overviewEn === 'explicit synopsis' && f.overviewAr === 'نبذة' && f.titleAr === undefined && f.cast.length === 0 && f.directors.length === 0 && f.col === undefined && f.prov === null && pa.body.collection === null, pa.body);
   const aa = await call({ action: 'add', tmdb: 700, kind: 'movie', adult: true, ...P }), row = JSON.parse(stored).find(e => e.tmdb === 700);
   check('وإضافته حينها تكتبه موسوماً في الملف، وعنوان الإيداع برقمه بلا اسمه', aa.status === 200 && aa.body.state === 'added' && aa.body.film.adult === 1 && row?.adult === 1 && puts.at(-1).message === 'films: add +18 (m700)', [aa.body.state, row, puts.at(-1)?.message]);
   const na = await call({ action: 'add', tmdb: 949, kind: 'movie', adult: true, ...P });

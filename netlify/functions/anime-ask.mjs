@@ -2,6 +2,7 @@
 // لا على main، فلا يعيد بناء الموقع ولا نشره. المترجم (docs/GAMES-CARE.md، قسم «أنمياتي») يقرأ الفرع ويبدأ بما طُلب: node scripts/anime-care.mjs asked
 // محمية بكلمة سر «أضف لعبة» (ADD_GAME_PASSWORD، وإن لم توجد فكلمة سر «أضف فيلماً» ADD_FILM_PASSWORD). GH_TOKEN رمز GitHub بصلاحية الكتابة على المستودع.
 // المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف. ولا يصل من سجل صاحب الموقع شيء: رقم العمل في MyAnimeList واسمه ونوع الطلب فقط.
+// وعمل +18 (ad) برقمه وحده: لا يدخل اسمه الطلب ولا عنوان الإيداع (E69).
 import { createHash, timingSafeEqual } from 'node:crypto';
 
 const REPO = process.env.GH_REPO || 'fa9o0oll/-dc-guide', BRANCH = 'main', REQ_BRANCH = 'requests', REQ_FILE = 'data/anime/requests.json', KEEP = 800;
@@ -40,7 +41,7 @@ export default async req => {
   if (!password()) return json(500, { error: 'إعدادات الخادم ناقصة: كلمة السر (ADD_GAME_PASSWORD أو ADD_FILM_PASSWORD) غير موجودة في Netlify.' });
   let b; try { b = await req.json(); } catch { return json(400, { error: 'طلب غير صالح.' }); }
   if (!b?.password || !same(b.password, password())) { await wait(700); return json(401, { error: 'password' }); }
-  const mal = +b.mal, what = String(b.what || ''), title = String(b.title || '').replace(/[^\p{L}\p{N} .,:;!?'’&()+\-\/☆]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 100);
+  const mal = +b.mal, what = String(b.what || ''), title = b.ad ? '' : String(b.title || '').replace(/[^\p{L}\p{N} .,:;!?'’&()+\-\/☆]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 100);
   if (!Number.isInteger(mal) || mal <= 0 || mal > 9999999 || !WHAT.includes(what)) return json(400, { error: 'طلب غير صالح.' });
   if (!process.env.GH_TOKEN) return json(500, { error: 'إعدادات الخادم ناقصة: GH_TOKEN غير موجود في Netlify.' });
   try { return json(200, { state: await request(mal, what, title) ? 'asked' : 'exists' }); }

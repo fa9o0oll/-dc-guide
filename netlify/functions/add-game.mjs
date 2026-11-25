@@ -118,7 +118,8 @@ export default async req => {
   }
   // طلب الترجمة لا يحتاج IGDB كذلك
   if (b.action === 'ask') {
-    const id = +b.igdb, title = String(b.title || '').replace(/[^\p{L}\p{N} .,:;!?'’&()+\-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 80);
+    // لعبة +18 (adult) برقمها وحده: لا يدخل اسمها الطلب ولا عنوان الإيداع (E69)
+    const id = +b.igdb, title = b.adult ? '' : String(b.title || '').replace(/[^\p{L}\p{N} .,:;!?'’&()+\-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 80);
     if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
     if (!process.env.GH_TOKEN) return json(500, { error: 'إعدادات الخادم ناقصة: GH_TOKEN غير موجود في Netlify.' });
     try { return json(200, { state: await request(id, title) ? 'asked' : 'exists' }); }

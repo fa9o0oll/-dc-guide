@@ -70,8 +70,8 @@ export function shape(kind, d, providers = {}) {
     prov: wp ? { link: wp.link || undefined, stream: provIds(wp.flatrate, providers), free: provIds([...(wp.free || []), ...(wp.ads || [])], providers), rent: provIds(wp.rent, providers), buy: provIds(wp.buy, providers) } : null };
   if (kind === 'tv') { o.seasons = d.number_of_seasons || null; o.episodes = d.number_of_episodes || null; o.lastDate = d.last_air_date || null;
     const n = d.next_episode_to_air; if (n?.air_date) o.next = { s: n.season_number, e: n.episode_number, date: n.air_date }; } // الحلقة القادمة لمسلسل يُعرض الآن (لعدّادها)
-  // عمل +18 (يخفيه فلتر العين في الصفحة): بلا نبذة ولا طاقم ولا سلسلة ولا منصات. يبقى اسمه وسنته وتقييمه وصورته
-  if (o.adult) Object.assign(o, { overviewEn: null, overviewAr: undefined, titleAr: undefined, cast: [], directors: [], col: undefined, prov: null, next: undefined });
+  // عمل +18 (يخفيه فلتر العين في الصفحة): اسمه وسنته وتقييمه وصورته ونبذته كغيره (E69)، بلا طاقم ولا سلسلة ولا منصات
+  if (o.adult) Object.assign(o, { titleAr: undefined, cast: [], directors: [], col: undefined, prov: null, next: undefined });
   return JSON.parse(JSON.stringify(o));
 }
 

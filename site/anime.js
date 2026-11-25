@@ -9,6 +9,7 @@
 import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
+import { clock, spoken } from './count.js?v=__BUILD__';
 import { readMalFile } from './anime-mal.js?v=__BUILD__';
 import { describe, noun, model } from './anime-pos.js?v=__BUILD__';
 import { themeOf } from './anime-theme.js?v=__BUILD__';
@@ -73,10 +74,10 @@ try { const u = JSON.parse(store.get(UI) || '{}'); for (const k of ['list', 'sor
 const keep = () => store.set(UI, JSON.stringify({ list: ui.list, sort: ui.sort, names: ui.names }));
 const get = async f => { const r = await fetch(`data/${f}?v=${BUILD}`); if (!r.ok) throw new Error(f + ' ' + r.status); return r.json(); };
 const title = a => ui.names === 'english' && a.en ? a.en : a.t;
-const poster = (a, big) => a.img ? `${D.mal}${a.img}${big ? 'l' : ''}.webp` : a.tp ? `${D.base}${big ? 'w500' : 'w342'}${a.tp}` : '';
+const poster = (a, big) => a.img ? `${D.mal}${a.img}${big ? 'l' : ''}.webp` : a.tp ? `${D.base}${big ? 'w500' : 'w342'}${a.tp}` : a.iu || '';   // iu: غلاف بعنوانه كاملاً (AniList) لبطاقة من MyAnimeList مباشرة بلا صورة هناك
 const srcset = a => a.img ? `${D.mal}${a.img}.webp 225w, ${D.mal}${a.img}l.webp 425w` : a.tp ? `${D.base}w185${a.tp} 185w, ${D.base}w342${a.tp} 342w, ${D.base}w500${a.tp} 500w` : '';
 // صورة عمل +18 مغطاة حتى تُكشف: مصغّرته وحدها مموّهة (cover في adult.js)، وحاويتها تأخذ الصنف x18
-const hid = a => !!a.ad && covered(a.id) && !!poster(a), xc = a => hid(a) ? ' x18' : '', tiny = a => a.img ? `${D.mal}${a.img}t.webp` : `${D.base}w92${a.tp}`;
+const hid = a => !!a.ad && covered(a.id) && !!poster(a), xc = a => hid(a) ? ' x18' : '', tiny = a => a.img ? `${D.mal}${a.img}t.webp` : a.tp ? `${D.base}w92${a.tp}` : a.iu || '';
 const art = (a, sizes, eager, hint) => hid(a) ? cover(`<img ${eager ? '' : 'loading="lazy" '}decoding="async" alt="" src="${esc(tiny(a))}">`, hint) : poster(a) ? `<img ${eager ? '' : 'loading="lazy" '}decoding="async" alt="" src="${esc(poster(a))}" srcset="${esc(srcset(a))}" sizes="${sizes}">` : `<span class="ph">${esc((a.t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase())}</span>`;
 // صور MyAnimeList كلها بصيغة webp، وإن تعذّرت واحدة فنسختها jpg
 document.addEventListener('error', e => { const i = e.target; if (i.tagName === 'IMG' && /cdn\.myanimelist\.net/.test(i.src) && /\.webp$/.test(i.src) && !i.dataset.jpg) { i.dataset.jpg = 1; i.removeAttribute('srcset'); i.src = i.src.replace(/\.webp$/, '.jpg'); } }, true);
@@ -84,6 +85,34 @@ document.addEventListener('error', e => { const i = e.target; if (i.tagName === 
 const mine = a => hasLog() ? !!P.a[a.id] : a.ord != null;
 const inList = l => D.list.filter(a => P.a[a.id]?.s === l);
 const daysTo = d => Math.ceil((Date.parse(d) - Date.parse(today)) / 864e5);
+// ---------- موعد ما لم يُعرض بعد (E70): بدقة ما يُعرف منه في MyAnimeList (يوم، أو شهر، أو موسم، أو سنة). عليه ختم كختم الحبر الياباني:
+// «قريباً» إن كان في الموسم القادم أو قبله، و«مستقبلاً» إن كان أبعد أو لم يُعلن موعده. وعدّه الحي (count.js) حين يُعرف اليوم نفسه، وإلا فالمدة
+// تقريباً بالأشهر أو الأعوام، فلا يُدّعى يوم لا يُعرف. ومثله موعد الحلقة القادمة لما يُعرض الآن (من TMDB)
+const SEASON_M = { winter: 1, spring: 4, summer: 7, fall: 10 };
+const nMonths = n => count(n, ['شهر واحد', 'شهران', 'أشهر', 'شهراً', 'شهر']), nYears = n => count(n, ['عام واحد', 'عامان', 'أعوام', 'عاماً', 'عام']);
+const weekday = d => new Date(d + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { weekday: 'long' });
+function airOf(a) { if (a?.st !== 'soon') return null;
+  const f = String(a.from || ''), [Y, M, d] = f.split('-').map(Number), y = Y || a.y || 0, m = M || (y && SEASON_M[a.se]) || 0, ny = +today.slice(0, 4), nm = +today.slice(5, 7);
+  const exact = d && f >= today ? f : '', season = a.se && y ? `${SEASON[a.se]} ${y}` : '', mo = y && m ? (y - ny) * 12 + m - nm : null;
+  const label = M ? dateAr(f) : season || (y ? String(y) : ''), near = exact ? daysTo(exact) <= 92 : d ? true : mo != null ? mo <= 3 : !!y && y <= ny;
+  const rough = exact || d || !label ? '' : mo != null ? (mo <= 0 ? 'هذا الشهر' : mo === 1 ? 'الشهر القادم' : `بعد نحو ${nMonths(mo)}`) : y <= ny ? 'هذا العام' : y === ny + 1 ? 'العام القادم' : `بعد نحو ${nYears(y - ny)}`;
+  return { exact, label, near, rough, season, word: near ? 'قريباً' : 'مستقبلاً', now: a.type === 'Movie' ? 'يُعرض اليوم' : 'يبدأ اليوم' }; }
+const nextAir = a => a?.st === 'airing' && a.nx?.date >= today ? a.nx : null;
+const hanko = (word, k, sm) => `<span class="hanko${sm ? ' sm' : ''} ${k}" aria-hidden="true"><b>${word}</b></span>`;
+const ticker = (date, now) => `<span class="ck" aria-hidden="true">${clock(date, now)}</span><span class="sr sr-time">${spoken(date)}</span>`;
+// في البطاقة: الختم، والموعد بيومه وموسمه، وعدّه الحي أو مدته تقريباً
+function airHTML(a) { const s = airOf(a), n = s ? null : nextAir(a); if (!s && !n) return '';
+  const date = s ? s.exact : n.date, now = s ? s.now : 'تُعرض اليوم', word = s ? s.word : 'يُعرض الآن', k = s ? (s.near ? 'near' : 'far') : 'on';
+  const sub = [date ? weekday(date) : '', s?.season && s.label !== s.season ? s.season : ''].filter(Boolean).join(' · ');
+  return `<section class="air ${k}"${date ? ` data-until="${date}" data-now="${now}"` : ''}>${hanko(word, k)}
+    <div class="air-t"><small>${s ? 'موعد عرضه' : `الحلقة ${num(n.ep)}${a.eps ? ` من ${num(a.eps)}` : ''}`}<span class="sr">، ${word}</span></small><b class="air-d">${date ? dateAr(date) : s.label || 'لم يُعلن موعده'}</b>${sub ? `<span class="air-s">${sub}</span>` : ''}</div>
+    ${date ? ticker(date, now) : s.rough ? `<span class="air-r">${s.rough}</span>` : ''}</section>`; }
+// في خانته: الختم على الصورة، وشريط العدّ أسفلها حين يُعرف اليوم، وإلا فالمدة تقريباً
+const airCel = s => hanko(s.word, s.near ? 'near' : 'far', 1) + (s.exact ? `<span class="next air-band" data-until="${s.exact}" data-now="${s.now}"><small>يُعرض بعد</small>${ticker(s.exact, s.now)}</span>`
+  : `<span class="next">${s.rough || s.label || 'لم يُعلن موعده'}</span>`);
+// في خط العالم: الختم والموعد وعدّه، سطراً تحت اسمه
+const airTag = a => { const s = airOf(a); if (!s) return '';
+  return `<span class="gn-air ${s.near ? 'near' : 'far'}"${s.exact ? ` data-until="${s.exact}" data-now="${s.now}"` : ''}>${hanko(s.word, s.near ? 'near' : 'far', 1)}<b class="gn-ad">${s.label || 'لم يُعلن موعده'}</b>${s.exact ? ticker(s.exact, s.now) : s.rough ? `<span class="gn-ar">${s.rough}</span>` : ''}</span>`; };
 
 // ---------- الصفحة
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
@@ -124,13 +153,13 @@ const flag = s => s ? `<span class="flag" data-l="${s}">${LNAME[s]}</span>` : ''
 function progHTML(a, m, plus = true) { const tot = a.eps || 0, p = m?.p || 0, ticks = tot > 1 && tot <= 26;
   return `<div class="prog"><span class="tc" ${ticks ? `style="--n:${tot};--p:${p / tot}"` : `style="--p:${tot ? p / tot : p ? 1 : 0}"`}><i></i><span><b>${num(p)}</b>${tot ? ` من ${num(tot)}` : ' · العدد لم يُعلن'}</span></span>
     ${plus && (!tot || p < tot) ? `<button class="plus" data-act="plus" data-id="${a.id}" aria-label="شاهدت الحلقة ${p + 1} من ${esc(a.t)}">${ic('plus')}</button>` : ''}</div>`; }
-function celHTML(a, where, i = 0) { const m = me(a.id), s = m?.s, live = s === 'watching' || s === 'hold', next = a.nx && live && a.nx.date >= today ? daysTo(a.nx.date) : null;
+function celHTML(a, where, i = 0) { const m = me(a.id), s = m?.s, live = s === 'watching' || s === 'hold', next = a.nx && live && a.nx.date >= today ? daysTo(a.nx.date) : null, air = airOf(a);
   const sizes = where === 'rail' ? '(max-width:560px) 150px, 206px' : '(max-width:560px) 46vw, 190px';
-  const meta = [typeOf(a), a.y || '', s === 'completed' && m.e ? `أكملته ${m.e.slice(0, 4)}` : a.type !== 'Movie' && a.eps ? nEps(a.eps) : a.st === 'airing' ? 'يُعرض الآن' : a.st === 'soon' ? 'لم يُعرض بعد' : ''].filter(Boolean).join(' · ');
+  const meta = (air ? [typeOf(a), air.label || 'لم يُعلن موعده'] : [typeOf(a), a.y || '', s === 'completed' && m.e ? `أكملته ${m.e.slice(0, 4)}` : a.type !== 'Movie' && a.eps ? nEps(a.eps) : a.st === 'airing' ? 'يُعرض الآن' : '']).filter(Boolean).join(' · ');
   return `<article class="cel${a.x && !m ? ' out' : ''}" data-id="${a.id}"${marks(a.id, a.ad)} style="--i:${i}${a.ac ? `;--ac:#${a.ac}` : ''}">
     <button class="cel-art${xc(a)}" data-act="open" data-id="${a.id}" aria-label="بطاقة ${esc(a.t)}">${art(a, sizes, where === 'rail' && i < 6)}
       ${where !== 'rail' && ui.list === 'all' && ui.view === 'list' ? flag(s) : ''}${m?.r ? `<span class="stamp${m.r === 10 ? ' top10' : ''}" title="تقييمك ${m.r} من 10">${m.r}</span>` : ''}
-      ${next != null ? `<span class="next">الحلقة ${a.nx.ep} ${next <= 0 ? 'اليوم' : next === 1 ? 'غداً' : 'بعد ' + nDays(next)}</span>` : ''}</button>
+      ${next != null ? `<span class="next">الحلقة ${a.nx.ep} ${next <= 0 ? 'اليوم' : next === 1 ? 'غداً' : 'بعد ' + nDays(next)}</span>` : air ? airCel(air) : ''}</button>
     <h3>${esc(title(a))}</h3><p class="meta">${meta}</p>${live ? progHTML(a, m) : ''}</article>`; }
 
 // ---------- السماء: أرقامك، ثم ما تشاهده الآن
@@ -176,12 +205,17 @@ function renderTonight(fresh) { const box = $('#tonight'); if (!box) return; if 
 function renderLists() { const n = l => inList(l).length, log = hasLog();
   $('#lists').innerHTML = (log ? LISTS.map(([k, name]) => `<button data-act="list" data-l="${k}" aria-pressed="${ui.list === k}">${name} <b>${num(n(k))}</b></button>`).join('') : '')
     + `<button data-act="list" data-l="all" aria-pressed="${ui.list === 'all' || !log}">الكل <b>${num(D.list.filter(mine).length)}</b></button>`; }
+// الأسماء العربية (E70): أعمال «أنمياتي» تُعرف بأسمائها العربية في TMDB (an، يكتبها البناء)، فيُبحث بها وحدها ولا تُعرض أسماءً لها. تُقارن بلا «ال»
+// التعريف وبلا فرق همزة وتاء وألف مقصورة، فمن كتب «العمالقة» وجد ما اسمه العربي «هجوم عمالقة». arHit: الاسم العربي الذي طابق ما كُتب
+const isArQ = s => /[\u0621-\u064a]/.test(s || '');
+const arKey = s => fold(s).split(' ').map(w => w.replace(/^(?:[وفبك]?ال|لل)(?=\S{2})/, '')).join(' ');
+const arHit = (a, q) => { if (!a?.an || !isArQ(q)) return ''; const k = arKey(q); return (k && a.an.find(n => arKey(n).includes(k))) || ''; };
 const hay = a => a.h ||= fold(`${a.t} ${a.en || ''} ${a.studio || ''} ${a.y || ''}`);
 function visible() { const log = hasLog(), list = log ? ui.list : 'all'; let l = D.list.filter(a => list === 'all' ? mine(a) : P.a[a.id]?.s === list);
   if (ui.type) l = l.filter(a => a.type === ui.type);
   D.pool = l; if (ui.genre >= 0) l = l.filter(a => (a.g || []).includes(ui.genre));   // pool: ما قبل التصنيف، منه أعداد شريط التصنيفات
   D.found = null; const q = fold(ui.q || '').trim();
-  if (q) { const hit = l.filter(a => hay(a).includes(q)); if (hit.length) l = hit; else { const r = find(D.prep ||= prepare(D.list.filter(mine), a => [a.t, a.en]), ui.q, { limit: 12, min: 50 }); const ids = new Set(r.hits.map(h => h.id)); l = l.filter(a => ids.has(a.id)); D.found = r.meant?.name || null; } }
+  if (q) { const hit = l.filter(a => hay(a).includes(q) || arHit(a, ui.q)); if (hit.length) l = hit; else { const r = find(D.prep ||= prepare(D.list.filter(mine), a => [a.t, a.en, ...(a.an || [])]), ui.q, { limit: 12, min: 50 }); const ids = new Set(r.hits.map(h => h.id)); l = l.filter(a => ids.has(a.id)); D.found = r.meant?.name || null; } }
   const sc = a => me(a.id)?.r || 0, ratio = a => { const m = me(a.id); return a.eps && m?.p ? m.p / a.eps : 0; }, ord = (a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9) || a.id - b.id;
   const S = { mal: ord, score: (a, b) => sc(b) - sc(a) || ord(a, b), pub: (a, b) => (b.sc || 0) - (a.sc || 0) || ord(a, b), new: (a, b) => (b.from || '0') < (a.from || '0') ? -1 : (b.from || '0') > (a.from || '0') ? 1 : ord(a, b),
     old: (a, b) => (a.from || '9') < (b.from || '9') ? -1 : (a.from || '9') > (b.from || '9') ? 1 : ord(a, b), prog: (a, b) => ratio(b) - ratio(a) || ord(a, b) };
@@ -278,7 +312,7 @@ function posMap(d) { const { ids, at, branch } = d.map, n = ids.length, MAX = 13
     for (let j = 0; j < show; j++) { const id = branch.ids[first + j]; out += dot(bx(j), 34, id, first + j === branch.at); } }
   return `<svg class="pos-map" height="${branch ? 46 : 24}" aria-hidden="true">${out}</svg>`; }
 // العمل المنفرد يُقال فيه ذلك صراحة: لا سلسلة له في علاقات MyAnimeList، فلا أجزاء قبله ولا بعده حتى الآن
-function soloHTML(a) { if (a.pending) return ''; const [n, g] = noun(a);
+function soloHTML(a) { if (a.pending || a.pk) return ''; const [n, g] = noun(a);
   return `<section class="pos" data-k="solo" aria-label="موقعه من سلسلته"><svg class="pos-map" height="24" aria-hidden="true"><line class="trk" x1="38%" x2="62%" y1="12" y2="12"/><circle class="ring" cx="50%" cy="12" r="9"/><circle class="here" cx="50%" cy="12" r="5.5"/></svg>
     <p class="pos-h"><b class="pos-b">عمل منفرد</b>${n !== 'عمل' && n !== 'جزء قادم' ? `<span class="pos-s">${n}</span>` : ''}</p><p class="pos-t">${g === 'f' ? 'قائمة بذاتها' : 'قائم بذاته'}: ليس جزءاً من سلسلة، فلا أجزاء قبله ولا بعده حتى الآن.</p></section>`; }
 function posHTML(a) { if (a.ad) return ''; const w = D.wby.get(a.w); if (!w || w.ids.length < 2) return soloHTML(a); const d = pos(w, a.id); if (!d) return '';
@@ -291,41 +325,117 @@ function posHTML(a) { if (a.ad) return ''; const w = D.wby.get(a.w); if (!w || w
 // شارة موقعه في صفوف ترتيب السلسلة: نوعه وما يكمله، بلا روابط (الصف كله زر)
 const posTag = (w, id) => { const d = pos(w, id); return d ? `<span class="otag" data-k="${d.kind}">${d.badge}${d.hint ? `<span> · ${d.hint}</span>` : ''}</span>` : ''; };
 function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `${D.base}w780${a.tp}` : poster(a, true), facts = [[typeOf(a)], a.type !== 'Movie' && a.eps ? [nEps(a.eps)] : a.eps === 0 && a.st === 'airing' ? ['مستمر'] : null, a.dur ? [`${a.dur} دقيقة${a.type === 'Movie' ? '' : ' للحلقة'}`] : null,
-    a.se && a.y ? [`${SEASON[a.se]} ${a.y}`] : a.y ? [a.y] : null, a.st === 'airing' ? ['يُعرض الآن'] : a.st === 'soon' ? ['لم يُعرض بعد'] : null, a.studio ? [ltr(a.studio)] : null, x?.source ? [`المصدر: ${SOURCE[x.source] || ltr(x.source)}`] : null, a.rating ? [/^\+/.test(RATING[a.rating] || a.rating) ? ltr(RATING[a.rating] || a.rating) : RATING[a.rating] || ltr(a.rating)] : null].filter(Boolean);
+    a.se && a.y ? [`${SEASON[a.se]} ${a.y}`] : a.y ? [a.y] : null, a.st === 'airing' ? ['يُعرض الآن'] : null, a.studio ? [ltr(a.studio)] : null, x?.source ? [`المصدر: ${SOURCE[x.source] || ltr(x.source)}`] : null, a.rating ? [/^\+/.test(RATING[a.rating] || a.rating) ? ltr(RATING[a.rating] || a.rating) : RATING[a.rating] || ltr(a.rating)] : null].filter(Boolean);
   const alt = [a.en && a.en !== a.t ? a.en : '', ui.names === 'english' && a.en ? a.t : '', x?.jp || ''].filter(Boolean);
-  const links = [['MyAnimeList', `https://myanimelist.net/anime/${a.id}`], a.sk ? ['SIMKL', `https://simkl.com/anime/${a.sk}`] : null, x?.anilist ? ['AniList', `https://anilist.co/anime/${x.anilist}`] : null, a.tm ? ['TMDB', `https://www.themoviedb.org/${a.tm.k}/${a.tm.id}`] : null].filter(Boolean);
-  return `<div class="hero">${a.bd ? `<img decoding="async" alt="" src="${D.base}w1280${a.bd}">` : ''}</div>
+  const links = [['MyAnimeList', `https://myanimelist.net/anime/${a.id}`], a.sk ? ['SIMKL', `https://simkl.com/anime/${a.sk}`] : null, x?.anilist ? ['AniList', `https://anilist.co/anime/${x.anilist}`] : null, a.tm ? ['TMDB', `https://www.themoviedb.org/${a.tm.k}/${a.tm.id}`] : null, x?.yt ? ['YouTube', `https://www.youtube.com/watch?v=${encodeURIComponent(x.yt)}`] : null].filter(Boolean);
+  return `<div class="hero">${a.bd ? `<img decoding="async" alt="" src="${D.base}w1280${a.bd}">` : a.bn && !hid(a) ? `<img decoding="async" alt="" src="${esc(a.bn)}">` : ''}</div>
   <div class="body"><div class="head">${hid(a) ? `<button class="cel-art x18"${a.ac ? ` style="--ac:#${a.ac}"` : ''} data-act="bare" data-id="${a.id}" aria-label="أظهر صورة ${esc(a.t)}">${art(a, '170px', true, 'اضغط لإظهارها')}</button>`
       : `<button class="cel-art"${a.ac ? ` style="--ac:#${a.ac}"` : ''} ${poster(a) ? `data-zoom="${esc(big)}" data-zoom-title="${esc(a.t)}"` : 'disabled'} aria-label="تكبير بوستر ${esc(a.t)}">${art(a, '170px', true)}</button>`}
     <div><h2>${esc(title(a))}</h2>${alt.map(t => `<p class="alt">${esc(t)}</p>`).join('')}
       <div class="facts">${facts.map(f => `<span>${f[0]}</span>`).join('')}${a.sc ? `<span class="mal">${ltr('MyAnimeList')} <b>${a.sc.toFixed(2)}</b></span>${a.sv ? `<span>${num(a.sv)} تقييماً</span>` : ''}` : ''}</div></div></div>
-    ${posHTML(a)}${mineHTML(a)}
+    ${airHTML(a)}${posHTML(a)}${a.pk ? pkAddHTML(a) : mineHTML(a)}${a.pending || a.pk ? liveNote(a, x) : ''}
     ${D.eps[a.id] ? `<section class="sec xs" id="xs" aria-busy="true"><h3>الحلقات</h3><p class="lbl">تُحمَّل الحلقات…</p></section>` : ''}
-    ${a.pending ? '<p class="lbl">معلومات هذا العمل تُجلب في البناء القادم.</p>' : a.ad ? `<section class="sec"><h3>القصة</h3><p class="lbl">نبذة هذا العمل لا تُعرض هنا ولا تُترجم. تجدها في صفحته على ${ltr('MyAnimeList')} أدناه.</p></section>` : x?.ar ? `<section class="sec"><h3>القصة</h3><p class="ov">${esc(x.ar)}</p></section>` : x?.en ? `<section class="sec"><h3>القصة</h3><span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')}، ولم تُترجم بعد.</span><p class="ov en">${esc(x.en)}</p>${trHTML(a, 'about')}</section>` : ''}
+    ${x?.ar ? `<section class="sec"><h3>القصة</h3><p class="ov">${esc(x.ar)}</p></section>` : x?.en ? `<section class="sec"><h3>القصة</h3><span class="lbl">النبذة بالإنجليزية من ${ltr('MyAnimeList')}${a.pk ? '' : '، ولم تُترجم بعد'}.</span><p class="ov en">${esc(x.en)}</p>${a.pk ? '' : trHTML(a, 'about')}</section>` : ''}
     ${(a.g || []).length ? `<div class="glinks" role="group" aria-label="تصنيفاته: اضغط تصنيفاً لترى أعماله في قائمتك">${a.g.map(i => `<button type="button" data-act="genre-go" data-g="${i}" style="--gh:${ghue(D.genres[i])}">${genreOf(D.genres[i])}</button>`).join('')}</div>` : ''}
-    ${whereHTML(a)}${worldStrip(a)}
+    ${whereHTML(a)}${worldStrip(a)}${x?.live ? liveMore(a, x) : ''}
     <section class="sec"><h3>صفحاته</h3><div class="links">${links.map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}${ic('ext')}</a>`).join('')}</div></section></div>`; }
 // السجل: كل نافذة يفتحها الموقع خطوة فيه، وحالتها تصف ما هو مفتوح عندها: a العمل، وw السلسلة التي تحته إن فُتح منها، وp أنها خطوة أضافها الموقع فإغلاق نافذتها رجوع.
 // الرابط المباشر والعنوان المكتوب أو الملصوق باليد خطوة بلا حالة: يُقرأ ما يُفتح من الرابط نفسه (at)، وإغلاق نافذتها يغلقها وينظف الرابط (shut).
 // والبطاقة فوق سلسلتها دائماً، ولا تُفتح سلسلة فوق بطاقة: فتح السلسلة من بطاقة يطويها (stash) والرجوع يعيدها كما كانت (reshow)
-async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; kept = null; const d = $('#sheet'), body = $('#sheet-body');
+async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; pkOpen = 0; kept = null; const d = $('#sheet'), body = $('#sheet-body');
   // فوق بوابة عالم تلبس البطاقة ألوانه
   const gw = GM && $('#wsheet').open && D.wby.get(wopen), th = gw && themeOf(gw, D.by, D.genres); d.classList.toggle('themed', !!th); if (th) { d.style.setProperty('--wbg', th.bg); d.style.setProperty('--wc1', th.c1); } delete body.dataset.full; markEl(body, a.id, a.ad); body.innerHTML = sheetHTML(a, null); body.scrollTo(0, 0); showEps(a);
   if (!d.open) { d.showModal(); body.scrollTo(0, 0); if (push) history.pushState({ a: id, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1, n: depth() + 1 }, '', `#a${id}`); }   // التصفير بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
   else if (push) history.replaceState(history.state?.p ? { ...history.state, a: id } : null, '', `#a${id}`);
+  if (a.pending) { const v = await liveOf(id); if (open !== id) return; if (v && fillPending(a, v)) { keepLive(id, v); renderAll(true); }
+    const top = body.scrollTop; markEl(body, a.id, a.ad); body.innerHTML = sheetHTML(a, v ? { ...v.x, live: 1 } : { failed: 1 }); body.scrollTop = top; body.dataset.full = id; return; }
   const x = await texts(id); if (open !== id) return; if (x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; showEps(a); } body.dataset.full = id; }
 const stash = () => { const d = $('#sheet'); if (!d.open) return; kept = { id: open, y: $('#sheet-body').scrollTop }; d.close(); };
 function reshow() { const a = D.by.get(kept.id), body = $('#sheet-body'), y = kept.y; kept = null; open = a.id; $('#sheet').showModal(); body.scrollTop = y; const box = body.querySelector('.mine'); if (box) box.outerHTML = mineHTML(a); drawXs(a); }
 const at = () => { const st = history.state; if (st && (st.a || st.w || st.imp || st.add)) return st; const h = location.hash.slice(1); let m; return (m = h.match(/^a(\d+)$/)) ? { a: +m[1] } : (m = h.match(/^w(\d+)$/)) ? { w: +m[1] } : {}; };
 // يجعل النوافذ المفتوحة كما تصفها خطوة السجل
-function apply(st) { const sh = $('#sheet'), ws = $('#wsheet'), a = D.by.has(+st.a) ? +st.a : 0, w = D.wby.has(+st.w) ? +st.w : 0;
+function apply(st) { const sh = $('#sheet'), ws = $('#wsheet'), a = D.by.has(+st.a) ? +st.a : 0, pk = !a && +st.a > 0 && !D.known.has(+st.a) ? +st.a : 0, w = D.wby.has(+st.w) ? +st.w : 0;
   if (!st.imp && $('#imp').open) $('#imp').close();
   if (!st.add && $('#addd').open) $('#addd').close();
-  if (sh.open && (!a || (w && !ws.open))) stash();
+  if (sh.open && ((!a && !pk) || (w && !ws.open))) stash();
   if (ws.open && !w) ws.close();
   if (w && (wopen !== w || !ws.open)) openWorld(w, false);
-  if (a && (open !== a || !sh.open)) { if (!sh.open && kept?.id === a && +$('#sheet-body').dataset.full === a) reshow(); else openWork(a, false); } }
+  if (a && (open !== a || !sh.open)) { if (!sh.open && kept?.id === a && +$('#sheet-body').dataset.full === a) reshow(); else openWork(a, false); }
+  else if (pk && (pkOpen !== pk || !sh.open)) peekWork(pk, false); }
 const shut = d => { if (history.state?.p) return history.back(); d.close(); if (/^#[aw]\d+$/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); };
+
+// ---------- من MyAnimeList مباشرة (E69): عمل ليس في «أنمياتي» تُفتح له بطاقة اطلاع (peek) من نتائج البحث ومن أقرباء ما أُضيف، وعمل أُضيف للتو تمتلئ
+// بطاقته المؤقتة بدل أن تبقى فارغة حتى البناء القادم. يُسأل Jikan وAniList معاً، ولكلٍّ مهلته: Jikan لما في MyAnimeList نفسه (النبذة والتقييم والتصنيفات
+// والأقرباء والمنصات)، وAniList لغلاف عريض ولون ولرقم العمل هناك ولصور الأقرباء، وهو البديل كله إن لم يُجب Jikan. ما يعود يُحفظ للجلسة، وما أُضيف تُحفظ
+// صورته وسنته وحلقاته مع إضافته (ADDK) فيظهر غلافه في القائمة من أول تحميل. وعمل +18 لا تُفتح له بطاقة والفلتر قائم، ولا يظهر بين الأقرباء
+const LIVE = new Map(), SEED = new Map(); let pkOpen = 0;   // SEED: ما يُعرف عن قريب قبل أن تُفتح بطاقته (اسمه وصورته)، فتُرسم فوراً
+const MAL = ltr('MyAnimeList'), malPath = u => (/\/images\/anime\/(\d+\/\d+)[a-z]?\.(?:jpe?g|webp)/.exec(u || '') || [])[1] || '';
+const durMin = s => +(/(\d+)\s*hr/.exec(s || '') || [0, 0])[1] * 60 + +(/(\d+)\s*min/.exec(s || '') || [0, 0])[1];
+const LST = { 'Currently Airing': 'airing', 'Not yet aired': 'soon', RELEASING: 'airing', NOT_YET_RELEASED: 'soon', HIATUS: 'airing' };
+const ALSRC = { ORIGINAL: 'Original', MANGA: 'Manga', LIGHT_NOVEL: 'Light Novel', VISUAL_NOVEL: 'Visual Novel', VIDEO_GAME: 'Game', GAME: 'Game', NOVEL: 'Novel', WEB_NOVEL: 'Web Novel', DOUJINSHI: 'Manga', PICTURE_BOOK: 'Picture Book', MUSIC: 'Music', MULTIMEDIA_PROJECT: 'Mixed Media' };
+const REL = { sequel: 'الجزء التالي', prequel: 'الجزء السابق', 'side story': 'قصة جانبية', 'alternative version': 'نسخة أخرى', alternative: 'نسخة أخرى', 'alternative setting': 'عالم بديل', summary: 'ملخص', compilation: 'تجميع', 'spin-off': 'عمل متفرع', 'spin off': 'عمل متفرع', 'parent story': 'القصة الأم', parent: 'القصة الأم', 'full story': 'القصة الكاملة', contains: 'يضمّه', character: 'شخصياته في عمل آخر' };
+const relOf = k => REL[String(k || '').replace(/_/g, ' ').toLowerCase()] || 'عمل مرتبط', srcKey = s => Object.keys(SOURCE).find(k => k.toLowerCase().replace(/\W/g, '') === String(s || '').toLowerCase().replace(/\W/g, '')) || '';
+const gIdx = n => { let i = D.genres.indexOf(n); if (i < 0) i = D.genres.push(n) - 1; return i; };
+const plain = s => String(s || '').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+  .replace(/\s*\[Written by MAL Rewrite\]\s*$/, '').replace(/\s*\(Source: [^)]*\)\s*$/i, '').replace(/\n{3,}/g, '\n\n').trim();
+function fromJikan(d) { const rx = /^Rx/.test(d.rating || '') || [...(d.genres || []), ...(d.explicit_genres || [])].some(g => g?.name === 'Hentai'), y = d.year || d.aired?.prop?.from?.year, img = malPath(d.images?.webp?.image_url || d.images?.jpg?.image_url), dur = durMin(d.duration), r = (d.rating || '').split(' - ')[0].trim();
+  const a = { id: d.mal_id, t: d.title, type: d.type || '', eps: Number.isInteger(d.episodes) ? d.episodes : 0, st: LST[d.status] || 'finished' };
+  if (d.title_english && d.title_english !== d.title) a.en = d.title_english; if (y) a.y = y; if (d.season) a.se = d.season; { const pf = d.aired?.prop?.from || {}, two = n => String(n).padStart(2, '0'); if (pf.year) a.from = `${pf.year}${pf.month ? `-${two(pf.month)}${pf.day ? `-${two(pf.day)}` : ''}` : ''}`; else if (/^\d{4}-\d{2}-\d{2}/.test(d.aired?.from || '')) a.from = d.aired.from.slice(0, 10); } if (img) a.img = img;
+  if (d.score) { a.sc = d.score; a.sv = d.scored_by || 0; } if (dur) a.dur = dur; if (d.studios?.[0]?.name) a.studio = d.studios[0].name; if (RATING[r]) a.rating = r; if (rx) a.ad = 1;
+  const g = [...(d.genres || []), ...(d.explicit_genres || []), ...(d.themes || []), ...(d.demographics || [])].map(z => z?.name).filter(Boolean); if (g.length) a.g = [...new Set(g)].map(gIdx);
+  const x = { en: plain(d.synopsis) || null }; if (d.title_japanese) x.jp = d.title_japanese; if (srcKey(d.source)) x.source = srcKey(d.source); if (/^[\w-]{6,20}$/.test(d.trailer?.youtube_id || '')) x.yt = d.trailer.youtube_id;
+  x.rel = (d.relations || []).flatMap(z => (z?.entry || []).filter(e => e?.type === 'anime' && Number.isInteger(e.mal_id) && e.name).map(e => ({ id: e.mal_id, t: e.name, k: relOf(z.relation) })));
+  x.stream = (d.streaming || []).filter(s => s?.name && /^https:\/\//.test(s.url || '')).map(s => ({ n: s.name, u: s.url }));
+  return { a, x }; }
+const ALQ = 'query($id:Int){Media(idMal:$id,type:ANIME){id title{romaji english native} description(asHtml:false) format episodes duration status startDate{year month day} season seasonYear genres studios(isMain:true){nodes{name}} coverImage{extraLarge large color} bannerImage isAdult source trailer{id site} relations{edges{relationType node{idMal type title{romaji} startDate{year} coverImage{medium} isAdult}}}}}';
+function fromAniList(m, id) { const sd = m.startDate || {}, two = n => String(n).padStart(2, '0'), y = m.seasonYear || sd.year;
+  const a = { id, t: m.title?.romaji || String(id), type: AL_TYPE[m.format] || '', eps: Number.isInteger(m.episodes) ? m.episodes : 0, st: LST[m.status] || 'finished' };
+  if (m.title?.english && m.title.english !== a.t) a.en = m.title.english; if (y) a.y = y; if (SEASON[String(m.season || '').toLowerCase()]) a.se = m.season.toLowerCase(); if (sd.year) a.from = `${sd.year}${sd.month ? `-${two(sd.month)}${sd.day ? `-${two(sd.day)}` : ''}` : ''}`;
+  if (m.duration) a.dur = m.duration; if ((m.genres || []).length) a.g = m.genres.map(gIdx); if (m.studios?.nodes?.[0]?.name) a.studio = m.studios.nodes[0].name; if (m.isAdult) a.ad = 1;
+  const x = { en: plain(m.description) || null, anilist: m.id }; if (m.title?.native) x.jp = m.title.native; if (ALSRC[m.source]) x.source = ALSRC[m.source]; if (m.trailer?.site === 'youtube' && /^[\w-]{6,20}$/.test(m.trailer.id || '')) x.yt = m.trailer.id;
+  x.rel = (m.relations?.edges || []).filter(e => e?.node?.type === 'ANIME' && Number.isInteger(e.node.idMal)).map(e => ({ id: e.node.idMal, t: e.node.title?.romaji || String(e.node.idMal), k: relOf(e.relationType), ...(e.node.startDate?.year ? { y: e.node.startDate.year } : {}), ...(/^https:\/\//.test(e.node.coverImage?.medium || '') ? { iu: e.node.coverImage.medium } : {}), ...(e.node.isAdult ? { ad: 1 } : {}) }));
+  const iu = m.coverImage?.extraLarge || m.coverImage?.large || ''; return { a, x, iu: /^https:\/\//.test(iu) ? iu : '', ac: /^#[0-9a-f]{6}$/i.test(m.coverImage?.color || '') ? m.coverImage.color.slice(1) : '', bn: /^https:\/\//.test(m.bannerImage || '') ? m.bannerImage : '' }; }
+// يعود بـ{ a, x } (a بصيغة الكتالوج، x بصيغة النصوص ومعه rel وstream وyt) أو null إن لم يُجب أحدهما. الفشل لا يُحفظ: الفتح التالي يسأل من جديد
+function liveOf(id) { if (!LIVE.has(id)) LIVE.set(id, (async () => {
+    const [j, l] = await Promise.allSettled([
+      timed(8000, async sig => { const r = await fetch(`https://api.jikan.moe/v4/anime/${id}/full`, { signal: sig }); if (!r.ok) throw new Error('http ' + r.status); const d = (await r.json())?.data; if (d?.mal_id !== id || !d.title) throw new Error('shape'); return fromJikan(d); }),
+      timed(8000, async sig => { const r = await fetch('https://graphql.anilist.co', { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify({ query: ALQ, variables: { id } }), signal: sig }); if (!r.ok) throw new Error('http ' + r.status);
+        const m = (await r.json())?.data?.Media; if (!m) throw new Error('none'); return fromAniList(m, id); })]);
+    const J = j.status === 'fulfilled' ? j.value : null, L = l.status === 'fulfilled' ? l.value : null; if (!J && !L) { LIVE.delete(id); return null; }
+    const v = { a: { ...(J || L).a }, x: { ...(J || L).x } };
+    if (L) { if (!v.a.img && L.iu) v.a.iu = L.iu; if (L.ac) v.a.ac = L.ac; if (L.bn) v.a.bn = L.bn; v.x.anilist = L.x.anilist; if (!v.x.en) v.x.en = L.x.en; if (L.a.ad) v.a.ad = 1;
+      const pic = new Map(L.x.rel.map(r => [r.id, r])); v.x.rel = (J?.x.rel.length ? J.x.rel : L.x.rel).map(r => ({ ...pic.get(r.id), ...r })); }
+    return v; })());
+  return LIVE.get(id); }
+// بطاقة ما أُضيف تأخذ مما عاد ما ينقصها (ولا يُمسّ سجلّه). تعود بـtrue إن تغيّر ما يُرى في القائمة
+function fillPending(a, v) { let ch = 0; for (const k of ['img', 'iu', 'ac', 'bn', 'y', 'se', 'st', 'from', 'en', 'dur', 'sc', 'sv', 'g', 'studio', 'rating']) if (v.a[k] !== undefined && a[k] === undefined) { a[k] = v.a[k]; ch = 1; }
+  if (!a.eps && v.a.eps) { a.eps = v.a.eps; ch = 1; } if (!a.type && v.a.type) { a.type = v.a.type; ch = 1; } return !!ch; }
+const keepLive = (id, v) => { const m = addedMap(), e = m[id]; if (!e) return; let ch = 0; const set = (k, val) => { if (val && !e[k]) { e[k] = val; ch = 1; } };
+  set('im', v.a.img); if (!v.a.img) set('iu', v.a.iu); set('y', v.a.y); set('n', v.a.eps); if (ch) store.set(ADDK, JSON.stringify(m)); };
+const liveNote = (a, x) => x?.live ? (a.pending ? `<p class="lbl">أُضيف من ${MAL} ولم يدخل بياناتك بعد، فمعلوماته هنا من هناك مباشرة. حلقاته وأماكن عرضه في السعودية وموقعه من سلسلته تكتمل مع البناء القادم.</p>` : '')
+  : `<p class="lbl" aria-live="polite">${x?.failed ? `تعذّر جلب معلوماته من ${MAL} الآن${a.pending ? '، وتكتمل مع البناء القادم' : '. أغلق البطاقة وافتحها بعد قليل'}.` : `تُجلب معلوماته من ${MAL}…`}</p>`;
+const pkAddHTML = a => `<section class="sec mine pkadd" data-id="${a.id}"><h3>سجلّي</h3><p class="lbl">ليس في «أنمياتي». هذه بطاقة للاطلاع، ومعلوماته من ${MAL} مباشرة. ما تضيفه منها يدخل سجلّك وقائمتك الآن.</p>
+  <div class="acts">${addBtns(a.id, 'add-live')}</div><div class="pk-pass" hidden><label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة» أو «أضف فيلماً»)<input class="add-pass" type="password" autocomplete="current-password"></label></div><p class="msg" aria-live="polite"></p></section>`;
+// أقرباؤه ومنصاته كما يذكرها MyAnimeList: كل قريب يفتح بطاقته إن كان في «أنمياتي»، وإلا بطاقة اطلاع. والفلتر قائم: لا يظهر منها عمل +18
+function liveMore(a, x) { const seen = new Set(), rel = (x.rel || []).filter(r => r.id !== a.id && !seen.has(r.id) && seen.add(r.id) && (D.by.has(r.id) || (!D.known.has(r.id) && !(r.ad && !isOpen())))), stream = x.stream || [];
+  for (const r of rel) if (!D.by.has(r.id)) SEED.set(r.id, r);
+  const item = r => { const b = D.by.get(r.id), img = b ? poster(b) && !hid(b) ? poster(b) : '' : r.iu && !r.ad ? r.iu : '', t = b ? title(b) : r.t;
+    return `<button data-act="${b ? 'open' : 'peek'}" data-id="${r.id}" aria-label="${esc(r.k)}: ${esc(t)}">${b ? dot(r.id) : ''}${img ? `<img loading="lazy" alt="" src="${esc(img)}">` : `<span class="ph">${esc((t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase())}</span>`}<small>${esc(r.k)}</small><span>${esc(t)}</span></button>`; };
+  return (rel.length ? `<section class="sec"><h3>أقرباؤه</h3><p class="lbl">كما في ${MAL}. ما في «أنمياتي» يفتح بطاقته، وما ليس فيها بطاقة للاطلاع.</p><div class="strip rel">${rel.map(item).join('')}</div></section>` : '')
+    + (stream.length ? `<section class="sec where"><h3>منصاته الرسمية</h3><div class="wl">${stream.map(s => `<a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.n)}</a>`).join('')}</div><p class="lbl">كما يذكرها ${MAL}، وقد لا يكون كلها متاحاً في السعودية${a.pending ? '. أماكن عرضه في السعودية تظهر مع البناء القادم' : ''}.</p></section>` : ''); }
+// بطاقة اطلاع: تُفتح فوراً بما يُعرف عن العمل (من نتيجة البحث أو من قريبه) وتمتلئ حين يعود MyAnimeList. فوق نافذة البحث أو فوق البطاقة التي فُتحت منها،
+// وكل منها خطوة في السجل، فالرجوع يعيدك إلى ما كنت فيه. وما دخل «أنمياتي» تُفتح بطاقته هو
+async function peekWork(id, push = true, seed = null) { if (D.by.has(id)) return openWork(id, push); if (!(id > 0) || D.known.has(id)) return;
+  const d = $('#sheet'), body = $('#sheet-body'), s0 = seed?.id === id ? seed : null; if (s0?.ad && !isOpen()) return;
+  open = 0; kept = null; pkOpen = id; d.classList.remove('themed'); delete body.dataset.full;
+  const draw = (a, x) => { markEl(body, id, a.ad); body.innerHTML = sheetHTML(a, x); };
+  const stub = { id, t: s0?.t || String(id), ...(s0?.en ? { en: s0.en } : {}), type: s0?.type || '', eps: s0?.eps || 0, ...(s0?.y ? { y: +s0.y } : {}), ...(/^\d+\/\d+$/.test(s0?.im || '') ? { img: s0.im } : s0?.iu ? { iu: s0.iu } : {}), ...(s0?.ad ? { ad: 1 } : {}), pk: 1 };
+  draw(stub, null); const step = { ...(history.state?.p ? history.state : {}), a: id, pk: 1, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1, n: depth() + 1 };
+  if (!d.open) { d.showModal(); body.scrollTo(0, 0); if (push) history.pushState(step, '', `#a${id}`); } else { body.scrollTo(0, 0); if (push) history.pushState(step, '', `#a${id}`); }
+  const v = await liveOf(id); if (pkOpen !== id || !d.open) return;
+  if (!v) return draw(stub, { failed: 1 });
+  if (v.a.ad && !isOpen()) { pkOpen = 0; shut(d); toast('لا يُعرض هذا العمل الآن.'); return; }
+  const top = body.scrollTop; draw({ ...v.a, pk: 1 }, { ...v.x, live: 1 }); body.scrollTop = top; }
 
 // ---------- ورقة التوقيت: حلقات العمل. تفتح على الحلقة التالية وما حولها، و«كل الحلقات» تفتح الورقة كلها صفحةً صفحة.
 // fit من البناء: 'odd' عدد الحلقات هنا أقل بقليل من عدد MyAnimeList (تنبيه)، و'loose' المصدر يعدّها عدّاً آخر، فلا يقابل رقمُ الخانة رقمَ الحلقة
@@ -345,7 +455,7 @@ async function askTr(btn) { const box = btn.closest('.tr'), id = +box.dataset.id
     box.querySelector('.msg').textContent = msg; box.querySelector('.tr-pass').focus(); };
   if (!pw) { field(box.querySelector('.tr-pass') ? 'اكتب كلمة السر أولاً.' : ''); return; }
   btn.disabled = true; btn.textContent = 'يُرسل الطلب…';
-  try { const r = await fetch('/api/anime-ask', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw, mal: id, what, title: D.by.get(id)?.t || '' }) }), j = await r.json().catch(() => ({}));
+  try { const r = await fetch('/api/anime-ask', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw, mal: id, what, ...(D.by.get(id)?.ad ? { ad: 1 } : { title: D.by.get(id)?.t || '' }) }) }), j = await r.json().catch(() => ({}));
     if (r.status === 401 && j.error === 'password') { store.del(PASS); throw Object.assign(new Error('كلمة السر غير صحيحة.'), { pw: true }); }
     if (r.status === 404 || r.status === 405) throw new Error(`طلب الترجمة يعمل من نسخة الموقع على ${ltr('Netlify')}، لا من هذه النسخة.`);
     if (!r.ok) throw new Error(j.error || 'تعذّر إرسال الطلب الآن. حاول بعد قليل.');
@@ -359,10 +469,10 @@ document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.ma
 // ما في «أنمياتي» يدخل سجلّك مباشرة. وما ليس فيه يُضاف رقمه إلى data/anime/list.json في المستودع (دالة /api/anime-add بكلمة سر «أضف لعبة»، بإيداع لا يعيد البناء)،
 // ويدخل سجلّك وقائمتك من الآن ببطاقة مؤقتة مما عاد به البحث (localOf)، وتكتمل معلوماته مع البناء القادم. لا يُرسل من السجل شيء: رقم العمل واسمه ونوعه وعدد حلقاته.
 // والفلتر مرفوع (isOpen): البحث في كل ما يظهر، وفي MyAnimeList بلا قيد، وما تصنيفه Rx مما يُضاف يُوسم ad في القائمة فلا يظهر والفلتر قائم
-const ADD = { q: '', mal: null, malQ: '', busy: 0, via: '', msg: '', need: null };
+const ADD = { q: '', mal: null, malQ: '', busy: 0, via: '', msg: '', need: null, near: false, ar: null, arPass: null };   // ar: ما وجده TMDB بالاسم العربي، arPass: يُسأل عن كلمة السر له
 const addedMap = () => { try { const m = JSON.parse(store.get(ADDK) || '{}'); return m && typeof m === 'object' ? m : {}; } catch { return {}; } };
 // بطاقة مؤقتة لعمل أُضيف من MyAnimeList ولم يدخل الكتالوج بعد: مما حُفظ من نتيجة البحث (الاسم والنوع والحلقات والسنة والصورة)
-const localOf = (id, m) => ({ id: +id, t: String(m.t || id), type: m.ty || '', eps: +m.n || 0, ...(m.y ? { y: +m.y } : {}), ...(/^\d+\/\d+$/.test(m.im || '') ? { img: m.im } : {}), ...(m.ad ? { ad: 1 } : {}), pending: 1, ord: 1e7 + +id });
+const localOf = (id, m) => ({ id: +id, t: String(m.t || id), type: m.ty || '', eps: +m.n || 0, ...(m.y ? { y: +m.y } : {}), ...(/^\d+\/\d+$/.test(m.im || '') ? { img: m.im } : /^https:\/\/s\d*\.anilist\.co\//.test(m.iu || '') ? { iu: m.iu } : {}), ...(m.ad ? { ad: 1 } : {}), pending: 1, ord: 1e7 + +id });
 // يُدخل عملاً في بيانات الصفحة: في all وknown دائماً، وفي ما يظهر إن لم يخفه الفلتر
 function enroll(a) { if (D.known.has(a.id)) return; D.known.add(a.id); D.all.push(a); if (a.ad) D.adult.add(a.id); if (!hides(a)) { D.list.push(a); D.by.set(a.id, a); D.prep = D.prepAll = null; } }
 // العين (site/adult.js) ترفع الفلتر أو تعيده في مكانها، بلا إعادة تحميل: list وby يُعاد بناؤهما من all، وكل ما بعدهما يُرسم من جديد
@@ -373,32 +483,40 @@ function toggleEye() { setOpen(!isOpen()); relist(); drawEye(); fillTypes(); if 
 const byFrom = (a, b) => (a.from || '9999') < (b.from || '9999') ? -1 : (a.from || '9999') > (b.from || '9999') ? 1 : a.id - b.id;
 function addLocal(q) { const f = fold(q).trim(); if (!f) return [];
   const name = a => a.ht ||= fold(`${a.t} ${a.en || ''}`), rank = a => { const t = fold(a.t), e = fold(a.en || ''); return t === f || e === f ? 0 : t.startsWith(f) || e.startsWith(f) ? 1 : 2; };
-  let hit = D.list.filter(a => name(a).includes(f));
-  if (!hit.length) hit = find(D.prepAll ||= prepare(D.list, a => [a.t, a.en]), q, { limit: 8, min: 50 }).hits.map(h => D.by.get(h.id)).filter(Boolean);
+  let hit = D.list.filter(a => name(a).includes(f) || arHit(a, q)); ADD.near = !hit.length;
+  if (!hit.length) hit = find(D.prepAll ||= prepare(D.list, a => [a.t, a.en, ...(a.an || [])]), q, { limit: 8, min: 50 }).hits.map(h => D.by.get(h.id)).filter(Boolean);
   return hit.sort((a, b) => rank(a) - rank(b) || byFrom(a, b)).slice(0, 12); }
-const metaOf = a => [typeOf(a), a.y || '', a.type !== 'Movie' && a.eps ? nEps(a.eps) : a.st === 'airing' ? 'يُعرض الآن' : a.st === 'soon' ? 'لم يُعرض بعد' : ''].filter(Boolean).join(' · ');
+const metaOf = a => { const s = airOf(a); return (s ? [typeOf(a), s.label ? (/^\d{4}$/.test(s.label) ? 'يُعرض عام ' : 'يُعرض في ') + s.label : 'لم يُعلن موعده'] : [typeOf(a), a.y || '', a.type !== 'Movie' && a.eps ? nEps(a.eps) : a.st === 'airing' ? 'يُعرض الآن' : '']).filter(Boolean).join(' · '); };
 const addBtns = (id, act) => `<button class="btn pri" data-act="${act}" data-id="${id}" data-s="plan">${ic('mark')}<span>سأشاهده</span></button><button class="btn ghost" data-act="${act}" data-id="${id}" data-s="watching">${ic('play')}<span>أشاهده الآن</span></button>`;
 const LIC = Object.fromEntries(LISTS.map(l => [l[0], l[2]]));
 function addRow(a) { const m = me(a.id);
   return `<li class="arow" data-id="${a.id}"${marks(a.id, a.ad)}><button class="aart${xc(a)}" data-act="open" data-id="${a.id}" aria-label="بطاقة ${esc(a.t)}">${art(a, '52px')}</button>
-    <div class="ainfo"><b>${esc(title(a))}</b><span class="meta">${metaOf(a)}</span></div>
+    <button class="ainfo" data-act="open" data-id="${a.id}"><b>${esc(title(a))}</b>${(h => h ? `<span class="aar" lang="ar">${esc(h)}</span>` : '')(arHit(a, ADD.q))}<span class="meta">${metaOf(a)}</span></button>
     <div class="aacts">${m ? `<span class="astate" data-l="${m.s}">${ic(LIC[m.s])}في «${LNAME[m.s]}»</span><button class="btn quiet" data-act="open" data-id="${a.id}">بطاقته</button>` : addBtns(a.id, 'add-to')}</div></li>`; }
-function malRow(x) { const done = addedMap()[x.id], need = ADD.need?.id === x.id, ph = esc((x.t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase());
-  return `<li class="arow" data-mal="${x.id}"${marks(x.id, x.ad)}><span class="aart${x.img && x.ad && covered(x.id) ? ' x18' : ''}">${x.img ? (i => x.ad && covered(x.id) ? cover(i) : i)(`<img loading="lazy" decoding="async" alt="" src="${esc(x.img)}">`) : `<span class="ph">${ph}</span>`}</span>
-    <div class="ainfo"><b>${esc(ui.names === 'english' && x.en ? x.en : x.t)}</b><span class="meta">${[x.type ? typeOf(x) : '', x.y || '', x.type !== 'Movie' && x.eps ? nEps(x.eps) : ''].filter(Boolean).join(' · ')}</span></div>
+function malRow(x) { const done = addedMap()[x.id], need = ADD.need?.id === x.id, ph = esc((x.t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase()), go = `data-act="${D.by.has(x.id) ? 'open' : 'peek'}" data-id="${x.id}"`, name = ui.names === 'english' && x.en ? x.en : x.t;
+  return `<li class="arow" data-mal="${x.id}"${marks(x.id, x.ad)}><button class="aart${x.img && x.ad && covered(x.id) ? ' x18' : ''}" ${go} aria-label="بطاقة ${esc(name)}">${x.img ? (i => x.ad && covered(x.id) ? cover(i) : i)(`<img loading="lazy" decoding="async" alt="" src="${esc(x.img)}">`) : `<span class="ph">${ph}</span>`}</button>
+    <button class="ainfo" ${go}><b>${esc(name)}</b><span class="meta">${[x.type ? typeOf(x) : '', x.y || '', x.type !== 'Movie' && x.eps ? nEps(x.eps) : ''].filter(Boolean).join(' · ')}</span></button>
     <div class="aacts">${done ? `<span class="astate" data-l="${me(x.id)?.s || done.s}">${ic('check')}أُضيف إلى «${LNAME[me(x.id)?.s || done.s] || LNAME.plan}»</span>${D.by.has(x.id) ? `<button class="btn quiet" data-act="open" data-id="${x.id}">بطاقته</button>` : ''}` : addBtns(x.id, 'add-mal')}</div>
     ${need ? `<div class="apass"><label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة» أو «أضف فيلماً»)<input class="add-pass" type="password" autocomplete="current-password"></label><p class="msg" aria-live="polite">${ADD.need.msg || ''}</p></div>` : ''}</li>`; }
 const HERE = '«أنمياتي»';
 function addResHTML() { const q = ADD.q.trim(); if (!q) return `<p class="lbl">اكتب اسم العمل كما في ${ltr('MyAnimeList')} أو بالإنجليزية.</p>`;
   // ما أُضيف للتوّ من نتائج MyAnimeList يبقى في موضعه بينها بحالته (stay)، فلا يقفز الصف إلى أعلى النافذة تحت الإصبع
   const mal = ADD.malQ === q ? ADD.mal : null, am = addedMap(), stay = new Set((mal || []).filter(x => am[x.id] && D.by.get(x.id)?.pending).map(x => x.id));
-  const loc = addLocal(q).filter(a => !stay.has(a.id)), shown = new Set(loc.map(a => a.id));
-  const via = !mal || !ADD.via ? '' : `<p class="lbl">${ADD.via === 'al0' ? `بحث ${ltr('MyAnimeList')} لم يجد شيئاً بهذا الاسم` : `${ltr('MyAnimeList')} لم يُجب الآن`}، فهذه النتائج من ${ltr('AniList')} بأرقام أعمالها في ${ltr('MyAnimeList')}.</p>`;
+  const loc = addLocal(q).filter(a => !stay.has(a.id)), shown = new Set(loc.map(a => a.id)), ar = isArQ(q), names = (ADD.ar || []).map(x => `<button type="button" class="lnk" data-act="add-as" data-q="${esc(x.en)}">${ltr(x.en)}</button>`).join('، ');
+  const via = !mal || !ADD.via ? '' : ADD.via === 'ar' ? `<p class="lbl">${ltr('MyAnimeList')} لا يعرف الأسماء العربية، فبحثنا في ${ltr('TMDB')} فوجدنا: ${names}. وهذه نتائجها من ${ltr('AniList')} بأرقام أعمالها في ${ltr('MyAnimeList')}.</p>`
+    : `<p class="lbl">${ADD.via === 'al0' ? `بحث ${ltr('MyAnimeList')} لم يجد شيئاً بهذا الاسم` : `${ltr('MyAnimeList')} لم يُجب الآن`}، فهذه النتائج من ${ltr('AniList')} بأرقام أعمالها في ${ltr('MyAnimeList')}.</p>`;
+  const none = ADD.via === 'ar' ? (ADD.ar?.length ? `وجد ${ltr('TMDB')} بهذا الاسم: ${names}، ولم يجد ${ltr('AniList')} له شيئاً. اضغط الاسم تبحث به.` : `لم يجد ${ltr('TMDB')} أنمي بهذا الاسم العربي. اكتب اسمه بالإنجليزية أو اليابانية.`)
+    : ADD.via === 'al' ? `${ltr('MyAnimeList')} لم يُجب الآن، و${ltr('AniList')} لم يجد شيئاً بهذا الاسم.` : 'لا نتيجة هناك بهذا الاسم.';
+  const busy = { 2: `${ltr('MyAnimeList')} لم يُجب، فيُبحث في ${ltr('AniList')}…`, 3: `لا نتيجة في ${ltr('MyAnimeList')}، فيُبحث في ${ltr('AniList')}…`, 4: `يُبحث عن الاسم العربي في ${ltr('TMDB')}…`, 5: `وُجد في ${ltr('TMDB')}، فيُبحث عنه في ${ltr('MyAnimeList')}…` }[ADD.busy] || `يُبحث في ${ltr('MyAnimeList')}…`;
   const extra = mal ? mal.filter(x => D.by.has(x.id) && !shown.has(x.id) && !stay.has(x.id)).map(x => D.by.get(x.id)) : [], fresh = mal ? mal.filter(x => !D.by.has(x.id) || stay.has(x.id)) : [];
-  return `<h3 class="ah">في ${HERE}</h3>${loc.length + extra.length ? `<ul class="ares">${[...loc, ...extra].map(addRow).join('')}</ul>` : `<p class="lbl">لا عمل في ${HERE} بهذا الاسم.</p>`}
-    <h3 class="ah">في ${ltr('MyAnimeList')}</h3>${ADD.busy && ADD.malQ === q ? `<p class="lbl" aria-live="polite">${ADD.busy === 2 ? `${ltr('MyAnimeList')} لم يُجب، فيُبحث في ${ltr('AniList')}…` : ADD.busy === 3 ? `لا نتيجة في ${ltr('MyAnimeList')}، فيُبحث في ${ltr('AniList')}…` : `يُبحث في ${ltr('MyAnimeList')}…`}</p>`
-      : mal ? (fresh.length ? via + `<ul class="ares">${fresh.map(malRow).join('')}</ul><p class="lbl">ما تضيفه من هنا يدخل سجلّك وقائمتك الآن، وتكتمل معلوماته وحلقاته مع البناء القادم.</p>` : `<p class="lbl">${mal.length ? `كل ما وُجد هناك في ${HERE} أعلاه.` : ADD.via === 'al' ? `${ltr('MyAnimeList')} لم يُجب الآن، و${ltr('AniList')} لم يجد شيئاً بهذا الاسم.` : 'لا نتيجة هناك بهذا الاسم.'}</p>`)
-      : q.length < 2 ? `<p class="lbl">اكتب حرفين على الأقل.</p>` : `${ADD.msg && ADD.malQ === q ? `<p class="msg" aria-live="polite">${ADD.msg}</p>` : ''}<button type="button" class="btn ghost" data-act="add-find">${ic('search')}<span>ابحث في ${ltr('MyAnimeList')} عن «${esc(q)}»</span></button>`}`; }
+  // ما وُجد بالنطق وحده (لا بالاسم حرفياً) يقال إنه أقرب الأسماء نطقاً، فلا يُحسب العمل نفسه
+  const near = ADD.near && loc.length ? `<p class="lbl">لا عمل في ${HERE} بهذا الاسم حرفياً${ar ? ' ولا باسمه العربي' : ''}. هذه أقرب الأسماء إليه نطقاً:</p>` : '';
+  return `<h3 class="ah">في ${HERE}</h3>${loc.length + extra.length ? `${near}<ul class="ares">${[...loc, ...extra].map(addRow).join('')}</ul>` : `<p class="lbl">لا عمل في ${HERE} بهذا الاسم.</p>`}
+    <h3 class="ah">في ${ltr('MyAnimeList')}</h3>${ADD.busy && ADD.malQ === q ? `<p class="lbl" aria-live="polite">${busy}</p>`
+      : mal ? (fresh.length ? via + `<ul class="ares">${fresh.map(malRow).join('')}</ul><p class="lbl">اضغط اسم العمل أو غلافه تفتح بطاقته من ${ltr('MyAnimeList')}. وما تضيفه يدخل سجلّك وقائمتك الآن، وتكتمل حلقاته وأماكن عرضه مع البناء القادم.</p>` : (mal.length ? via : '') + `<p class="lbl">${mal.length ? `كل ما وُجد هناك في ${HERE} أعلاه.` : none}</p>`)
+      : q.length < 2 ? `<p class="lbl">اكتب حرفين على الأقل.</p>` : ADD.arPass && ADD.malQ === q ? `<div class="apass arpass"><p class="lbl">${ltr('MyAnimeList')} لا يعرف الأسماء العربية، فيُبحث عنها في ${ltr('TMDB')} عبر الموقع بكلمة سر الإضافة، مرة واحدة ثم تُحفظ.</p>
+        <label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة» أو «أضف فيلماً»)<input class="add-pass" type="password" autocomplete="current-password"></label><p class="msg" aria-live="polite">${ADD.arPass.msg || ''}</p><button type="button" class="btn ghost" data-act="ar-go">${ic('search')}<span>ابحث باسمه العربي</span></button></div>`
+      : `${ADD.msg && ADD.malQ === q ? `<p class="msg" aria-live="polite">${ADD.msg}</p>` : ''}<button type="button" class="btn ghost" data-act="add-find">${ic('search')}<span>${ar ? `ابحث عن «${esc(q)}» باسمه العربي` : `ابحث في ${ltr('MyAnimeList')} عن «${esc(q)}»`}</span></button>`}`; }
 // يُعاد رسم النتائج مع كل تعديل في السجل (وبالمزامنة)، وما كُتب في خانة كلمة السر يبقى
 const drawAddRes = () => { const box = $('#add-res'); if (!box) return; const f = box.querySelector('.add-pass'), v = f?.value, foc = f && document.activeElement === f; box.innerHTML = addResHTML(); const g = box.querySelector('.add-pass'); if (g && v) g.value = v; if (g && foc) g.focus(); };
 function openAdd() { ADD.need = null; $('#add-body').innerHTML = `<h2 id="add-h">أضف أنمي</h2><p class="lbl">ابحث في كل ما في «أنمياتي»: أعمالك وأقرباء سلاسلها. وما ليس هنا تجده في ${ltr('MyAnimeList')}.</p>
@@ -419,11 +537,17 @@ async function askAniList(q, lifted, signal) {
   const query = `query($q:String,$n:Int){Page(perPage:$n){media(search:$q,type:ANIME${lifted ? '' : ',isAdult:false'}){idMal title{romaji english} format episodes startDate{year} coverImage{medium} isAdult}}}`;
   const r = await fetch('https://graphql.anilist.co', { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify({ query, variables: { q, n: lifted ? 25 : 12 } }), signal }); if (!r.ok) throw new Error('http ' + r.status);
   const j = await r.json(), seen = new Set(); if (!Array.isArray(j?.data?.Page?.media)) throw new Error('shape');
-  return j.data.Page.media.filter(x => Number.isInteger(x?.idMal) && x.title?.romaji && (lifted || !x.isAdult) && !seen.has(x.idMal) && seen.add(x.idMal)).slice(0, lifted ? 20 : 12)
-    .map(x => ({ id: x.idMal, t: x.title.romaji, en: x.title.english || '', type: AL_TYPE[x.format] || '', eps: Number.isInteger(x.episodes) ? x.episodes : 0, y: x.startDate?.year || '', img: x.coverImage?.medium || '', im: '', ...(x.isAdult ? { ad: 1 } : {}) })); }
+  return j.data.Page.media.filter(x => Number.isInteger(x?.idMal) && x.title?.romaji && (lifted || !x.isAdult) && !seen.has(x.idMal) && seen.add(x.idMal)).slice(0, lifted ? 20 : 12).map(alRow); }
+const alRow = x => ({ id: x.idMal, t: x.title.romaji, en: x.title.english || '', type: AL_TYPE[x.format] || '', eps: Number.isInteger(x.episodes) ? x.episodes : 0, y: x.startDate?.year || '', img: x.coverImage?.medium || '', im: '', ...(x.isAdult ? { ad: 1 } : {}) });
+// بعدة أسماء معاً (ما وجده TMDB بالاسم العربي): صفحة لكل اسم في طلب واحد، والنتائج بترتيب الأسماء بلا تكرار
+async function askAniListMany(names, lifted, signal) {
+  const F = 'idMal title{romaji english} format episodes startDate{year} coverImage{medium} isAdult', query = `query(${names.map((_, i) => `$q${i}:String`).join(',')}){${names.map((_, i) => `p${i}:Page(perPage:10){media(search:$q${i},type:ANIME${lifted ? '' : ',isAdult:false'}){${F}}}`).join(' ')}}`;
+  const r = await fetch('https://graphql.anilist.co', { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify({ query, variables: Object.fromEntries(names.map((n, i) => ['q' + i, n])) }), signal }); if (!r.ok) throw new Error('http ' + r.status);
+  const j = await r.json(), seen = new Set(); if (!j?.data) throw new Error('shape');
+  return names.flatMap((_, i) => j.data['p' + i]?.media || []).filter(x => Number.isInteger(x?.idMal) && x.title?.romaji && (lifted || !x.isAdult) && !seen.has(x.idMal) && seen.add(x.idMal)).slice(0, 20).map(alRow); }
 // busy: 1 يُسأل Jikan، 2 لم يُجب فيُسأل AniList، 3 أجاب بلا نتيجة فيُسأل AniList (فهرس بحث Jikan يفوته أحياناً ما في MyAnimeList). via: النتائج من AniList: 'al' لأن Jikan لم يُجب، 'al0' لأنه لم يجد.
 // وما كُتب في الخانة أثناء البحث لا يُفسد نتيجته: تُعرض لاسمها (malQ) وحده
-async function findMal() { const q = ADD.q.trim(); if (q.length < 2 || (ADD.busy && ADD.malQ === q)) return; ADD.busy = 1; ADD.msg = ''; ADD.via = ''; ADD.malQ = q; ADD.mal = null; ADD.need = null; drawAddRes();
+async function findMal() { const q = ADD.q.trim(); if (q.length < 2 || (ADD.busy && ADD.malQ === q)) return; ADD.ar = null; ADD.arPass = null; if (isArQ(q)) return findAr(q); ADD.busy = 1; ADD.msg = ''; ADD.via = ''; ADD.malQ = q; ADD.mal = null; ADD.need = null; drawAddRes();
   const lifted = isOpen(); let list = null, via = '', msg = '';
   try { list = await timed(8000, s => askJikan(q, lifted, s)); } catch {}
   if (ADD.malQ !== q) return;
@@ -432,23 +556,56 @@ async function findMal() { const q = ADD.q.trim(); if (q.length < 2 || (ADD.busy
     catch { if (!none) msg = `لم يُجب ${ltr('MyAnimeList')} ولا ${ltr('AniList')} الآن. تحقق من الشبكة ثم ابحث ثانية.`; }
     if (ADD.malQ !== q) return; }
   ADD.busy = 0; ADD.mal = list; ADD.via = via; ADD.msg = msg; drawAddRes(); }
+// الاسم العربي (E70): MyAnimeList وAniList لا يعرفانه، فيُسأل TMDB عبر دالة الإضافة (مفتاحه في الخادم، وبكلمة سرها) عن أعمال الأنمي بهذا الاسم، ثم يُبحث
+// في AniList بأسمائها الإنجليزية عن أرقامها في MyAnimeList. typed: كلمة سر كُتبت للتو (تُحفظ إن صحّت)، وإلا فالمحفوظة، وإلا فتُسأل
+async function findAr(q, typed = '') { const pw = typed || pass(), lifted = isOpen(); Object.assign(ADD, { msg: '', via: '', malQ: q, mal: null, need: null, ar: null, arPass: null });
+  if (!pw) { ADD.arPass = { msg: '' }; drawAddRes(); $('#add-res .arpass .add-pass')?.focus(); return; }
+  ADD.busy = 4; drawAddRes(); let items;
+  try { const r = await timed(10000, signal => fetch('/api/anime-add', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw, action: 'ar', q, ...(lifted ? { adult: 1 } : {}) }), signal }));
+    const j = await r.json().catch(() => ({})); if (ADD.malQ !== q) return;
+    if (r.status === 401) { ADD.busy = 0; ADD.arPass = { msg: typed ? 'كلمة السر غير صحيحة.' : '' }; if (!typed) store.del?.(PASS); drawAddRes(); $('#add-res .arpass .add-pass')?.focus(); return; }
+    if (r.status === 404 || r.status === 405) throw new Error(`البحث بالاسم العربي يعمل من نسخة الموقع على ${ltr('Netlify')}، لا من هذه النسخة.`);
+    if (!r.ok) throw new Error(j.error ? esc(j.error) : 'تعذّر البحث بالاسم العربي الآن. حاول بعد قليل.');
+    if (typed) store.set(PASS, typed); items = Array.isArray(j.items) ? j.items.filter(x => x?.en) : []; }
+  catch (e) { if (ADD.malQ !== q) return; ADD.busy = 0; ADD.msg = e.name === 'AbortError' ? 'لم يُجب البحث بالاسم العربي الآن. حاول بعد قليل.' : addFail(e); drawAddRes(); return; }
+  ADD.ar = items; let list = items.length ? null : [];
+  if (items.length) { ADD.busy = 5; drawAddRes();
+    try { list = await timed(8000, s => askAniListMany([...new Set(items.slice(0, 3).map(x => x.en))], lifted, s)); } catch { ADD.msg = `وُجد في ${ltr('TMDB')} باسم ${ltr(items[0].en)}، ولم يُجب ${ltr('AniList')} الآن. حاول بعد قليل.`; }
+    if (ADD.malQ !== q) return; }
+  ADD.busy = 0; ADD.mal = list; ADD.via = list ? 'ar' : ''; drawAddRes(); }
+// الإضافة: تُرسل رقم العمل واسمه ونوعه وحلقاته إلى /api/anime-add، ثم يدخل سجلّك وقائمتك ببطاقة مؤقتة (localOf) حتى يدخل الكتالوج. info: ما يُعرف عنه
+// (من نتيجة البحث، أو من MyAnimeList مباشرة في بطاقة الاطلاع). ترمي خطأ رسالته للعرض، وخطأ كلمة السر يحمل pw
+async function sendAdd(id, s, info, pw) {
+  const r = await fetch('/api/anime-add', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw, mal: id, title: info.t, type: info.type, eps: info.eps, ...(info.ad ? { ad: 1 } : {}) }) }), j = await r.json().catch(() => ({}));
+  if (r.status === 401 && j.error === 'password') { store.del(PASS); throw Object.assign(new Error('كلمة السر غير صحيحة.'), { pw: true }); }
+  if (r.status === 404 || r.status === 405) throw new Error(`الإضافة تعمل من نسخة الموقع على ${ltr('Netlify')}، لا من هذه النسخة.`);
+  if (!r.ok) throw new Error(j.error ? esc(j.error) : 'تعذّرت الإضافة الآن. حاول بعد قليل.');
+  store.set(PASS, pw); const m = addedMap(); m[id] = { t: info.t, s, at: today, ty: info.type, n: info.eps, y: info.y, im: info.im, ...(!info.im && info.iu ? { iu: info.iu } : {}), ...(info.ad ? { ad: 1 } : {}) }; store.set(ADDK, JSON.stringify(m));
+  enroll(localOf(id, m[id])); const v = LIVE.has(id) ? await LIVE.get(id) : null, a = D.by.get(id); if (v && a) fillPending(a, v);
+  if (!P.a[id]) { P.a[id] = { s }; save(); } renderAll(true); drawAddRes(); toast(`${ltr(info.t)} في «${LNAME[s]}». تكتمل حلقاته وأماكن عرضه مع البناء القادم.`); }
+const addFail = e => e instanceof TypeError ? 'تعذّر الاتصال. تحقق من الشبكة ثم حاول.' : e.message;
 async function addMal(btn) { const row = btn.closest('.arow'), id = +row.dataset.mal, s = btn.dataset.s, x = ADD.mal?.find(m => m.id === id); if (!x || !LNAME[s]) return;
   const field = row.querySelector('.add-pass'), pw = field?.value || pass();
   if (!pw) { if (ADD.need?.id === id) ADD.need.msg = 'اكتب كلمة السر أولاً.'; else ADD.need = { id, msg: '' }; ADD.need.s = s; drawAddRes(); $(`.arow[data-mal="${id}"] .add-pass`)?.focus(); return; }
   for (const b of row.querySelectorAll('[data-act=add-mal]')) b.disabled = true; btn.querySelector('span').textContent = 'يُضاف…';
-  try { const r = await fetch('/api/anime-add', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: pw, mal: id, title: x.t, type: x.type, eps: x.eps, ...(x.ad ? { ad: 1 } : {}) }) }), j = await r.json().catch(() => ({}));
-    if (r.status === 401 && j.error === 'password') { store.del(PASS); throw Object.assign(new Error('كلمة السر غير صحيحة.'), { pw: true }); }
-    if (r.status === 404 || r.status === 405) throw new Error(`الإضافة تعمل من نسخة الموقع على ${ltr('Netlify')}، لا من هذه النسخة.`);
-    if (!r.ok) throw new Error(j.error ? esc(j.error) : 'تعذّرت الإضافة الآن. حاول بعد قليل.');
-    store.set(PASS, pw); const m = addedMap(); m[id] = { t: x.t, s, at: today, ty: x.type, n: x.eps, y: x.y, im: x.im, ...(x.ad ? { ad: 1 } : {}) }; store.set(ADDK, JSON.stringify(m)); ADD.need = null;
-    enroll(localOf(id, m[id])); if (!P.a[id]) { P.a[id] = { s }; save(); } renderAll(true); drawAddRes();
-    toast(`${ltr(x.t)} في «${LNAME[s]}». تكتمل معلوماته مع البناء القادم.`);
-  } catch (e) { ADD.need = { id, s, msg: e instanceof TypeError ? 'تعذّر الاتصال. تحقق من الشبكة ثم حاول.' : e.message }; drawAddRes();
+  try { await sendAdd(id, s, x, pw); ADD.need = null; drawAddRes(); }
+  catch (e) { ADD.need = { id, s, msg: addFail(e) }; drawAddRes();
     const f = $(`.arow[data-mal="${id}"] .add-pass`); if (f) { if (e.pw) f.value = ''; else f.value = pw; f.focus(); } } }
+// من بطاقة الاطلاع: بما عاد من MyAnimeList، ثم تصير البطاقة بطاقته في قائمتك (وخطوتها في السجل خطوة بطاقته)
+async function addLive(btn) { const box = btn.closest('.pkadd'), id = +box.dataset.id, s = btn.dataset.s, v = LIVE.has(id) ? await LIVE.get(id) : null; if (!LNAME[s] || pkOpen !== id) return;
+  const info = v ? { t: v.a.t, type: v.a.type, eps: v.a.eps, y: v.a.y, im: v.a.img, iu: v.a.iu, ad: v.a.ad } : SEED.get(id) || ADD.mal?.find(m => m.id === id); if (!info) return;
+  const field = box.querySelector('.add-pass'), pw = field.value || pass(), msg = box.querySelector('.msg'); box.dataset.s = s;
+  if (!pw) { box.querySelector('.pk-pass').hidden = false; msg.textContent = field.dataset.asked ? 'اكتب كلمة السر أولاً.' : ''; field.dataset.asked = 1; field.focus(); return; }
+  const btns = [...box.querySelectorAll('[data-act=add-live]')], label = btn.innerHTML; for (const b of btns) b.disabled = true; btn.querySelector('span').textContent = 'يُضاف…'; msg.textContent = '';
+  try { await sendAdd(id, s, info, pw); pkOpen = 0; if (history.state?.pk) history.replaceState({ ...history.state, pk: 0 }, '', `#a${id}`); openWork(id, false); }
+  catch (e) { for (const b of btns) b.disabled = false; btn.innerHTML = label; box.querySelector('.pk-pass').hidden = false; msg.innerHTML = addFail(e); if (e.pw) field.value = ''; field.focus(); } }
 let addT = 0; document.addEventListener('input', e => { if (e.target.id !== 'add-q') return; clearTimeout(addT); addT = setTimeout(() => { ADD.q = e.target.value; ADD.need = null; drawAddRes(); }, 140); });
 document.addEventListener('keydown', e => { if (e.key !== 'Enter') return;
   if (e.target.id === 'add-q') { e.preventDefault(); clearTimeout(addT); ADD.q = e.target.value; findMal(); }
-  else if (e.target.matches?.('.add-pass')) { e.preventDefault(); const row = e.target.closest('.arow'); row.querySelector(`[data-act=add-mal][data-s="${ADD.need?.s || 'plan'}"]`)?.click(); } });
+  else if (e.target.matches?.('.add-pass')) { e.preventDefault(); const row = e.target.closest('.arow'), pk = e.target.closest('.pkadd');
+    if (row) row.querySelector(`[data-act=add-mal][data-s="${ADD.need?.s || 'plan'}"]`)?.click(); else if (pk) pk.querySelector(`[data-act=add-live][data-s="${pk.dataset.s || 'plan'}"]`)?.click();
+    else if (e.target.closest('.arpass')) arGo(); } });
+const arGo = () => { const v = $('#add-res .arpass .add-pass')?.value || ''; if (!v) { ADD.arPass = { msg: 'اكتب كلمة السر أولاً.' }; drawAddRes(); $('#add-res .arpass .add-pass')?.focus(); return; } findAr(ADD.q.trim(), v); };
 
 const pageOf = n => n <= 60 ? n : n <= 300 ? 25 : 50;
 // ما لم يُعرض بعد: بتاريخه إن عُرف، وإلا فما بعد آخر حلقة عُرضت في عمل ما زال يُعرض
@@ -510,7 +667,7 @@ const span = min => { const h = Math.round(min / 60); return h >= 48 ? `${nDays(
 // ---------- بوابة العالم (E57): وحدتها وتنسيقها يُحمَّلان حين تُفتح أول بوابة (site/anime-gate.js وanime-gate.css)، ونافذتها نافذة السلسلة (#wsheet) بسجلها
 let GM = null;
 const gateMod = () => GM ? Promise.resolve(GM) : Promise.all([import(`./anime-gate.js?v=${BUILD}`), new Promise(ok => { const l = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: `../anime-gate.css?v=${BUILD}` }); l.onload = l.onerror = ok; document.head.append(l); })])
-  .then(([m]) => { m.init({ D, ui, me, esc, ltr, num, nEps, nWorks, count, span, typeOf, ic, LNAME, poster, title, texts, art: wArt, isFate, calm, pos, model: w => model(w, D.by) }); return GM = m; });
+  .then(([m]) => { m.init({ D, ui, me, esc, ltr, num, nEps, nWorks, count, span, typeOf, ic, LNAME, poster, title, texts, art: wArt, isFate, calm, pos, air: airTag, model: w => model(w, D.by) }); return GM = m; });
 async function openWorld(wid, push = true, from = null) { const w = D.wby.get(wid); if (!w) return; wopen = wid; const d = $('#wsheet'), fresh = !d.open, g = await gateMod(); if (wopen !== wid) return;
   if (fresh) g.resetView();
   const show = () => { if (wopen !== wid) return; d.className = 'gw'; d.style.cssText = g.themeStyle(w); d.querySelector('.gw-sky')?.remove(); d.insertAdjacentHTML('afterbegin', g.skyHTML(w));
@@ -569,6 +726,8 @@ function applyEntries(list, how) { store.set(KEY + '.bak', JSON.stringify(P)); c
 document.addEventListener('click', async e => { const t = e.target.closest('[data-act]'); if (!t) return; const d = t.dataset, id = +d.id;
   switch (d.act) {
     case 'open': openWork(id); break;
+    case 'peek': peekWork(id, true, ADD.mal?.find(m => m.id === id) || SEED.get(id)); break;
+    case 'add-live': addLive(t); break;
     case 'plus': bump(id, 1); break;
     case 'minus': bump(id, -1); break;
     case 'status': setStatus(id, d.s); break;
@@ -596,10 +755,12 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'import': openImport(); break;
     case 'add': openAdd(); break;
     case 'room': toggleEye(); break;                                             // العين: ترفع الفلتر أو تعيده (site/adult.js)
-    case 'room-show': setShowing(!showing()); drawEye(); renderAll(true); if (open) openWork(open, false); break;   // أغلفة أعمال +18 كلها: تُكشف أو تُغطى
-    case 'bare': uncover(id); renderAll(true); if (open === id) openWork(id, false); break;                          // صورة هذا العمل وحده
+    case 'room-show': setShowing(!showing()); drawEye(); renderAll(true); if (open) openWork(open, false); else if (pkOpen) peekWork(pkOpen, false); break;   // أغلفة أعمال +18 كلها: تُكشف أو تُغطى
+    case 'bare': uncover(id); renderAll(true); if (open === id) openWork(id, false); else if (pkOpen === id) peekWork(id, false); break;                          // صورة هذا العمل وحده
     case 'add-to': setStatus(id, d.s); drawAddRes(); break;
     case 'add-find': findMal(); break;
+    case 'ar-go': arGo(); break;
+    case 'add-as': { const f = $('#add-q'); ADD.q = t.dataset.q || ''; if (f) f.value = ADD.q; findMal(); break; }
     case 'add-mal': addMal(t); break;
     case 'imp-clear': IMP.mal = null; IMP.msg = ''; drawImp(); break;
     case 'imp-apply': { const { n } = applyEntries(IMP.mal.entries, 'file'); IMP.ok = true; IMP.msg = `دخل سجلّك: ${nWorks(n)}. المزامنة تنقله إلى بقية أجهزتك.`; IMP.mal = null; ui.list = inList('watching').length ? 'watching' : 'all'; renderAll(); drawImp(); break; }
@@ -622,7 +783,7 @@ async function skPull() { IMP.ok = false; IMP.msg = `يُسحب سجلّك من 
   try { const r = await simklPull(D.all); IMP.sk = { ...r, diff: diff(r.entries, true) }; IMP.msg = ''; } catch (e) { IMP.msg = esc(e.message || 'تعذّر السحب من SIMKL.'); } drawImp(); }
 document.addEventListener('change', e => { const t = e.target;
   if (t.id === 'sort') { ui.sort = t.value; keep(); renderGrid(); } else if (t.id === 'type') { ui.type = t.value; renderGrid(); }
-  else if (t.id === 'names') { ui.names = t.value; keep(); renderAll(); if (open) openWork(open, false); }
+  else if (t.id === 'names') { ui.names = t.value; keep(); renderAll(); if (open) openWork(open, false); else if (pkOpen) peekWork(pkOpen, false); }
   else if (t.id === 'imp-file') readFile(t.files[0]);
   else if (t.id === 'ep-n') setProgress(+t.dataset.id, parseInt(t.value, 10) || 0);
   else if (t.type === 'date' && t.dataset.k) setDate(+t.dataset.id, t.dataset.k, t.value); });
@@ -632,7 +793,7 @@ document.addEventListener('dragleave', e => e.target.closest?.('#drop')?.classLi
 document.addEventListener('drop', e => { const z = e.target.closest?.('#drop'); if (z) { e.preventDefault(); z.classList.remove('over'); readFile(e.dataTransfer.files[0]); } });
 // الرجوع (زر المتصفح أو إيماءة الجوال) يغلق النافذة المفتوحة، وEsc مثله
 for (const d of $$('dialog')) { d.addEventListener('cancel', e => { e.preventDefault(); shut(d); });
-  d.addEventListener('close', () => { if (d.open) return; if (d.id === 'sheet') open = 0; if (d.id === 'wsheet') { wopen = 0; d.classList.remove('in'); } if (d.id === 'imp') IMP.simkl = null; });   // ما أُغلق وأُعيد فتحه في اللحظة نفسها مفتوح
+  d.addEventListener('close', () => { if (d.open) return; if (d.id === 'sheet') { open = 0; pkOpen = 0; } if (d.id === 'wsheet') { wopen = 0; d.classList.remove('in'); } if (d.id === 'imp') IMP.simkl = null; });   // ما أُغلق وأُعيد فتحه في اللحظة نفسها مفتوح
   d.addEventListener('click', e => { if (e.target === d) shut(d); }); }
 addEventListener('popstate', () => { apply(at()); if (leaving && !history.state?.p) { const f = leaving; leaving = null; f(); } });
 // عمق النوافذ في السجل: كل نافذة يفتحها الموقع خطوة عليه (n). والخروج من النوافذ كلها إلى الصفحة يرجع بعددها فلا يبقى في السجل ما يعيد فتحها
@@ -651,7 +812,8 @@ try {
   const [cat, epi] = await Promise.all([get('catalog.json'), get('eps/index.json').catch(() => ({}))]); D.eps = epi || {}; D.base = cat.imageBase || D.base; D.mal = cat.malImages || D.mal; D.prov = cat.providers || {}; D.genres = cat.genres || [];
   for (const a of cat.anime || []) enroll(a);   // أعمال +18 (ad) تدخل all وحده حتى يُرفع الفلتر
   // ما أُضيف من MyAnimeList ولم يدخل الكتالوج بعد يبقى ببطاقته المؤقتة، ويُنسى ما دخل الكتالوج أو مضى عليه شهر
-  { const m = addedMap(); let ch = 0; for (const k of Object.keys(m)) if (D.known.has(+k) || !(Date.parse(today) - Date.parse(m[k]?.at) < 30 * 864e5)) { delete m[k]; ch = 1; } else enroll(localOf(k, m[k])); if (ch) store.set(ADDK, JSON.stringify(m)); }
+  { const m = addedMap(); let ch = 0; for (const k of Object.keys(m)) if (D.known.has(+k) || !(Date.parse(today) - Date.parse(m[k]?.at) < 30 * 864e5)) { delete m[k]; ch = 1; } else enroll(localOf(k, m[k])); if (ch) store.set(ADDK, JSON.stringify(m));
+    for (const k of Object.keys(m)) { const a = D.by.get(+k); if (a?.pending && !a.img && !a.iu) liveOf(a.id).then(v => { if (v && fillPending(a, v)) { keepLive(a.id, v); renderAll(true); } }); } }
   D.worlds = (cat.worlds || []).filter(w => w.ids.some(id => D.by.get(id)?.ord != null)); for (const w of D.worlds) D.wby.set(w.id, w);   // أعمال +18 بلا سلاسل
   fillTypes();
   $('#sort').value = ui.sort; $('#names').value = ui.names; if (!LNAME[ui.list] && ui.list !== 'all') ui.list = 'watching'; if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';

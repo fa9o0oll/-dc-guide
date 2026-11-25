@@ -36,8 +36,9 @@ if (cmd === 'pending') {
   const list = pendingCare(cat.games, prev, TR, PL).sort((a, b) => rank(a.id) - rank(b.id)), lim = +(args[args.indexOf('--limit') + 1] || 0) || list.length;
   console.log(`pending: ${list.length} of ${cat.games.length} games${req.length ? `, ${list.filter(x => req.includes(x.id)).length} asked for with the button` : ''}`);
   for (const x of list.slice(0, lim)) { const g = byId.get(x.id);
-    if (args.includes('--full')) console.log(JSON.stringify({ need: x.need, asked: req.includes(x.id) || undefined, ...info(g) }));
-    else console.log(`${x.id}\t${x.need.join(',')}${req.includes(x.id) ? '\tasked' : ''}\t${g.title} (${g.year ?? '?'})`); }
+    // لعبة +18 (E69): تُترجم كغيرها بأمانة، وعنوان إيداعها برقمها وحده بلا اسمها
+    if (args.includes('--full')) console.log(JSON.stringify({ need: x.need, asked: req.includes(x.id) || undefined, adult: x.adult ? '+18: عنوان الإيداع برقمها وحده' : undefined, ...info(g) }));
+    else console.log(`${x.id}\t${x.need.join(',')}${req.includes(x.id) ? '\tasked' : ''}${x.adult ? '\t+18' : ''}\t${g.title} (${g.year ?? '?'})`); }
 } else if (cmd === 'show') {
   for (const id of args.map(Number)) { const g = byId.get(id); console.log(g ? JSON.stringify(info(g)) : `${id}: ليست في القائمة`); }
 } else if (cmd === 'apply') {

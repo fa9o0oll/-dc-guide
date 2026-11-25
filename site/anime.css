@@ -141,6 +141,35 @@ main{padding:12px var(--pad) 56px}
 .stamp.top10{background:rgba(214,150,20,.95);box-shadow:0 0 0 2px rgba(214,150,20,.95),0 0 0 3.5px rgba(255,255,255,.9)}
 .flag{position:absolute;z-index:3;inset-block-start:24px;inset-inline-end:6px;padding:1px 8px;border-radius:999px;font-size:.7rem;font-weight:600;color:#0c0e24;background:var(--tone,var(--mute))}
 .next{position:absolute;z-index:3;inset:auto 0 0;padding:14px 8px 6px;border-radius:0 0 9px 9px;font-size:.74rem;font-weight:600;text-align:center;color:#fff;background:linear-gradient(transparent,rgba(9,10,30,.92) 55%)}
+/* ---------- موعد ما لم يُعرض بعد (E70): ختم كختم الحبر الياباني (هانكو): «قريباً» بالقرمزي، و«مستقبلاً» بحبر باهت، و«يُعرض الآن» بالأخضر.
+   حبره غير مستوٍ (قناع ضجيج)، ويُختم حين تُفتح البطاقة. والعدّ الحي تكتبه site/count.js */
+:root{--ink:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.2 0 0 0 2.75'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E")}
+.hanko,.air,.gn-air{--hk:#ff5d4f}.hanko.far,.air.far,.gn-air.far{--hk:#a3abde}.hanko.on,.air.on{--hk:#35d07f}
+.hanko{display:inline-grid;place-items:center;flex:none;min-width:66px;min-height:66px;padding:6px 10px;border:2px solid var(--hk);border-radius:15px;color:var(--hk);
+  font-family:var(--display);font-weight:700;font-size:.95rem;line-height:1.05;text-align:center;white-space:nowrap;transform:rotate(-8deg);
+  background:color-mix(in srgb,var(--hk) 12%,rgba(11,13,38,.6));box-shadow:inset 0 0 0 3px rgba(11,13,38,.55),inset 0 0 0 4.5px var(--hk);-webkit-mask:var(--ink) center/90px;mask:var(--ink) center/90px}
+.hanko.sm{min-width:0;min-height:0;padding:4px 8px 5px;border-width:1.5px;border-radius:9px;font-size:.76rem;transform:rotate(-5deg);box-shadow:inset 0 0 0 2px rgba(11,13,38,.55),inset 0 0 0 3px var(--hk)}
+.cel-art .hanko{position:absolute;z-index:3;inset-block-start:24px;inset-inline-start:7px;background:color-mix(in srgb,var(--hk) 14%,rgba(9,10,30,.82))}
+.dg{display:inline-flex;direction:ltr}.dg span{display:inline-block;min-width:.6em;text-align:center}
+.ck-t u{text-decoration:none;margin:0 1px;color:var(--hk,var(--cel));animation:ck-blink 1s steps(1) infinite}
+@keyframes ck-blink{50%{opacity:.25}}
+.air-band{display:grid;justify-items:center;padding-top:22px}
+.air-band small{font-size:.66rem;font-weight:600;color:#ffd7d2}
+.air-band .ck{display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:0 6px;font-family:var(--display);font-weight:700;line-height:1.15}
+.air-band .ck-d{display:inline-flex;align-items:baseline;gap:4px}.air-band .ck-d .dg{font-size:1.1rem;color:#ff8f84}.air-band .ck-d i{font-style:normal;font-size:.68rem}
+.air-band .ck-t{font-size:.78rem}.air-band .ck-now{font-size:.9rem;color:#ff8f84}
+.air{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px 18px;margin-top:18px;padding:14px 18px 14px 20px;border-radius:18px;
+  border:1px solid color-mix(in srgb,var(--hk) 40%,var(--line));background:linear-gradient(105deg,color-mix(in srgb,var(--hk) 13%,var(--card)),var(--card) 58%)}
+.air .hanko{animation:hanko .55s cubic-bezier(.25,1.5,.5,1) .12s both}
+@keyframes hanko{from{transform:rotate(-20deg) scale(1.35);opacity:0}55%{opacity:1}}
+.air-t{display:grid;gap:2px;min-width:0}.air-t small{font-size:.8rem;color:var(--dim)}
+.air-d{font-family:var(--display);font-weight:700;font-size:clamp(1.25rem,3.4vw,1.6rem);line-height:1.25;color:#fff}
+.air-s{font-size:.82rem;color:var(--mute)}
+.air-r{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--hk);white-space:nowrap}
+.air .ck{display:grid;justify-items:end;gap:2px;font-family:var(--display);font-weight:700;line-height:1.05}
+.air .ck-d{display:inline-flex;align-items:baseline;gap:6px}.air .ck-d .dg{font-size:2.3rem;color:var(--hk);text-shadow:0 0 22px color-mix(in srgb,var(--hk) 45%,transparent)}
+.air .ck-d i{font-style:normal;font-size:.9rem;color:var(--dim)}.air .ck-t{font-size:1.05rem;color:var(--ink)}.air .ck-now{font-size:1.15rem;color:var(--hk)}
+@media (max-width:560px){.air{grid-template-columns:auto minmax(0,1fr);gap:8px 14px;padding:12px 14px}.air .ck,.air-r{grid-column:2;justify-items:start}}
 .cel h3{font-size:.9rem;font-weight:600;line-height:1.35;min-height:2.7em;direction:ltr;text-align:right;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .cel .meta{font-size:.76rem;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cel .meta bdi{color:var(--dim)}
@@ -367,6 +396,16 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
 .ainfo{display:grid;gap:2px;min-width:0}
 .ainfo b{font-weight:600;line-height:1.35;direction:ltr;text-align:right;overflow-wrap:anywhere}
 .ainfo .meta{font-size:.8rem;color:var(--dim)}
+.ainfo .aar{font-size:.84rem;font-weight:600;line-height:1.4;color:var(--amber)}
+.lnk{display:inline;min-height:0;padding:12px 0;border:0;background:none;color:var(--cel);font:inherit;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.apass.arpass{margin-top:4px}.apass.arpass .btn{justify-self:start}
+/* اسم العمل وغلافه في نتائج «أضف أنمي» زرّان يفتحان بطاقته، وما ليس في «أنمياتي» بطاقة اطلاع من MyAnimeList (E69) */
+button.ainfo{text-align:start;min-height:44px;align-content:center;padding:0}
+button.ainfo:hover b,button.ainfo:focus-visible b{text-decoration:underline;text-underline-offset:3px}
+button.aart{padding:0}
+/* أقرباء عمل من MyAnimeList مباشرة: صلة كل منهم فوق اسمه */
+.strip.rel small{font-size:.68rem;font-weight:700;color:var(--cel);line-height:1.25}
+.pkadd .pk-pass{margin-top:10px}.pkadd .msg:empty{display:none}.pkadd .msg{margin:8px 0 0}
 .aacts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:flex-end}
 .aacts .btn{padding:0 12px;font-size:.84rem}
 .astate{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;font-weight:600;color:var(--tone,var(--ok))}

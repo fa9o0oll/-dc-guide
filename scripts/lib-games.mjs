@@ -143,7 +143,7 @@ export function alsoPlatforms(groups, typeOf, skip = () => false) { const out = 
   return out; }
 
 // يجلب الألعاب المطلوبة ويشكّلها. opt.wikidata: يُثرى من Wikidata (البناء الليلي، وبمهلة قصيرة في الدالة)، opt.story: ترتيبات القصة، opt.log: سجل.
-// opt.erotic: 'keep' يُبقي ألعاب +18 (سمة Erotic) موسومةً adult: غلافها واسمها ومنصاتها وتقييمها، بلا نبذة ولا لقطات ولا عروض ولا سلسلة ولا أقرباء
+// opt.erotic: 'keep' يُبقي ألعاب +18 (سمة Erotic) موسومةً adult: غلافها واسمها ومنصاتها وتقييمها ونبذتها وقصتها (E69)، بلا لقطات ولا عروض ولا سلسلة ولا أقرباء
 // (البناء الليلي، وبطاقة لعبة +18 وإضافتها والفلتر مرفوع). وبدونه تُحذف كما كانت. أقرباء الألعاب وأجزاء سلاسلها لا يدخلها شيء من +18 في الحالين
 export async function gamesFor(ids, opt = {}) {
   const log = opt.log || (() => {}), m = await meta(), now = Date.now();
@@ -193,7 +193,7 @@ export async function gamesFor(ids, opt = {}) {
       ttb: ttbOf.get(g.id) || null, series: (g.collections || []).filter(c => series[c]), franchises: [...new Set([...(g.franchises || []), g.franchise].filter(Boolean))],
       rel: r, ext, sites, igdb: g.url || '', wd: x.q || '', universe: x.universe || null, from: x.from || [], into: x.into || [],
       videos: (g.videos || []).slice(0, 3).map(v => ({ id: v.video_id, name: v.name || '' })),
-      ...(erotic(g) ? { adult: 1, art: null, shots: [], videos: [], summary: '', story: '', series: [], franchises: [], rel: {}, universe: null, from: [], into: [] } : {}),
+      ...(erotic(g) ? { adult: 1, art: null, shots: [], videos: [], series: [], franchises: [], rel: {}, universe: null, from: [], into: [] } : {}),
     };
   });
   const franchises = Object.fromEntries(frs.map(f => [f.id, { name: f.name, size: (f.games || []).length }]));

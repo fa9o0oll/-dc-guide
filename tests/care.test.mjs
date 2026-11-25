@@ -16,9 +16,10 @@ console.log('== الدمج');
   check('إعادة التطبيق بلا شبكة (النص من الخريطة السابقة) تعطي النتيجة نفسها', JSON.stringify(again.texts) === JSON.stringify(texts) && games[0].place?.k === 'first');
   const pend = pendingCare(games, texts, TR, PL), need = id => pend.find(x => x.id === id)?.need.join();
   check('ما ينقص: نبذة، قصة، موقع، ونص تغيّر أصله', need(1) === undefined && need(2) === 'summary' && need(3) === 'place' && need(4) === 'story,place' && pendingCare(games, texts, { ...TR, 4: { s: 'أ', t: 'ب', h: '00000000' } }, { ...PL, 4: { k: 'alone', line: 'س' } }).find(x => x.id === 4)?.need.join() === 'changed', pend);
-  // ألعاب +18 (E61) خارج العناية: لا نبذة ولا موقع يدخلان سجلها، ولا تظهر في ما ينقص
-  const ad = [{ id: 9, title: 'X', adult: 1, summary: '', story: '' }], rA = applyCare(ad, { 9: { s: 'Old text.' } }, { 9: { s: 'نص.' } }, { 9: { k: 'alone', line: 'س' } });
-  check('لعبة +18: بلا نص ولا موقع، ولا ينقصها شيء', !rA.texts[9] && !ad[0].place && rA.n.place === 0 && pendingCare(ad, {}, {}, {}).length === 0 && pendingCare([{ id: 9, title: 'X', adult: 1 }], { 9: { s: 'Old text.' } }, {}, {}).length === 0, rA); }
+  // ألعاب +18: نبذتها وترجمتها كغيرها (E69)، بلا موقع من الأحداث (لا سلسلة لها)، وما ينقصها موسوم adult (عنوان إيداعها برقمها وحده)
+  const ad = [{ id: 9, title: 'X', adult: 1, summary: 'A text.', story: '' }], rA = applyCare(ad, {}, { 9: { s: 'نص.' } }, { 9: { k: 'alone', line: 'س' } }), pA = pendingCare([{ id: 9, title: 'X', adult: 1 }], { 9: { s: 'A text.' } }, {}, {});
+  check('لعبة +18: نبذتها وترجمتها كغيرها، بلا موقع، وما ينقصها ترجمة نبذتها وحدها موسوماً', rA.texts[9]?.s === 'A text.' && rA.texts[9]?.sa === 'نص.' && !ad[0].place && rA.n.place === 0
+    && JSON.stringify(pA) === '[{"id":9,"need":["summary"],"adult":1}]' && pendingCare([{ id: 9, title: 'X', adult: 1 }], {}, {}, {}).length === 0, [rA, pA]); }
 
 console.log('== الفحص');
 { const en = { 1: { s: 'A reasonably long English summary about a game and its world.', t: 'x' } }, ok = 'نبذة عربية معقولة الطول عن لعبة وعالمها وما يجري فيها.';

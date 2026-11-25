@@ -4,6 +4,7 @@
 // المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف. ولا يصل من سجل صاحب الموقع شيء: رقم العمل في MyAnimeList واسمه ونوعه وعدد حلقاته، كما يكتبها scripts/anime-list.mjs --add.
 // وعمل +18 (تصنيفه Rx: يظهر في البحث والفلتر مرفوع وحده، E65) يُوسم ad في القائمة، فلا يظهر والفلتر قائم ولو سبق البناءُ سحبَ معلوماته، وعنوان إيداعه برقمه بلا اسمه.
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { tmdb, hasKey } from '../../scripts/lib-tmdb.mjs';
 
 const REPO = process.env.GH_REPO || 'fa9o0oll/-dc-guide', BRANCH = 'main', FILE = 'data/anime/list.json';
 export const TYPES = ['TV', 'Movie', 'OVA', 'ONA', 'Special', 'TV Special', 'Music', 'PV', 'CM'];
@@ -33,11 +34,30 @@ export async function add(entry) {
   throw new Error('GitHub conflict');
 }
 
+// البحث باسم عربي (E70): MyAnimeList وAniList لا يعرفان الأسماء العربية، وTMDB يعرفها (يبحث في أسماء الأعمال المترجمة والأخرى). يعيد ما فيه من رسوم
+// متحركة يابانية بأسمائها الإنجليزية والأصلية، فتبحث الصفحة بها في AniList عن أرقامها في MyAnimeList. يُسأل بالاسم كما كُتب، وبلا «ال» التعريف
+// («العمالقة» تجد «هجوم عمالقة»). ومفتاح TMDB_API_KEY في Netlify فلا يصل إلى الصفحة، لذا يمرّ البحث بهذه الدالة وكلمة سرها
+export async function arabicFind(q, adult = false) {
+  const bare = q.split(' ').map(w => w.replace(/^(?:[وفبك]?ال|لل)(?=\S{2})/, '')).join(' '), qs = [...new Set([q, bare])];
+  const runs = await Promise.allSettled(qs.flatMap(query => ['tv', 'movie'].map(k => tmdb(`/search/${k}`, { query, language: 'en-US', include_adult: adult ? 'true' : 'false' }).then(r => (r.results || []).map(x => ({ ...x, k }))))));
+  if (runs.every(r => r.status === 'rejected')) throw runs[0].reason;
+  const seen = new Set(), out = [];
+  for (const x of runs.flatMap(r => r.status === 'fulfilled' ? r.value : [])) { if (seen.has(x.k + x.id)) continue; seen.add(x.k + x.id);
+    if (!(x.genre_ids || []).includes(16) || !(x.original_language === 'ja' || (x.origin_country || []).includes('JP'))) continue;   // أنمي: رسوم متحركة يابانية
+    const en = String(x.name || x.title || '').trim(), orig = String(x.original_name || x.original_title || '').trim(); if (!en && !orig) continue;
+    out.push({ tmdb: x.id, kind: x.k, en: en || orig, ...(orig && orig !== en ? { orig } : {}), year: +String(x.first_air_date || x.release_date || '').slice(0, 4) || null }); }
+  return out.slice(0, 5); }
+
 export default async req => {
   if (req.method !== 'POST') return json(405, { error: 'POST only' });
   if (!password()) return json(500, { error: 'إعدادات الخادم ناقصة: كلمة السر (ADD_GAME_PASSWORD أو ADD_FILM_PASSWORD) غير موجودة في Netlify.' });
   let b; try { b = await req.json(); } catch { return json(400, { error: 'طلب غير صالح.' }); }
   if (!b?.password || !same(b.password, password())) { await wait(700); return json(401, { error: 'password' }); }
+  if (b.action === 'ar') { const q = String(b.q || '').replace(/[\p{C}<>"`\\]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+    if (!/[\u0621-\u064a]/.test(q)) return json(400, { error: 'طلب غير صالح.' });
+    if (!hasKey()) return json(500, { error: 'إعدادات الخادم ناقصة: TMDB_API_KEY غير موجود في Netlify.' });
+    try { return json(200, { items: await arabicFind(q, b.adult === 1 || b.adult === true) }); }
+    catch (e) { if (e.status === 401) return json(502, { error: 'مفتاح TMDB_API_KEY في Netlify غير صالح.' }); console.error(e.message); return json(502, { error: 'تعذّر البحث بالاسم العربي الآن. حاول بعد قليل.' }); } }
   const mal = +b.mal, title = String(b.title || '').replace(/[\p{C}<>"`\\]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);   // أسماء MyAnimeList فيها @ و☆ و【】 وغيرها
   const type = TYPES.includes(b.type) ? b.type : 'TV', eps = Number.isInteger(+b.eps) && +b.eps >= 0 && +b.eps <= 5000 ? +b.eps : 0;
   if (!Number.isInteger(mal) || mal <= 0 || mal > 9999999 || !title) return json(400, { error: 'طلب غير صالح.' });

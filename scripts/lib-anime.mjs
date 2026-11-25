@@ -206,3 +206,13 @@ export const epFit = (eps, built, over = 0) => { if (!eps) return null; const sh
 // بصمة النص الإنجليزي للحلقة (عنوانها وملخصها): تُحفظ مع ترجمتها، فإن تغيّر النص أو تبدّل موضع الحلقة عُرف ولم تُلصق ترجمة بغير حلقتها
 export const epPrint = (hash, e) => hash(`${e.t || ''}\n${e.ov || ''}`).slice(0, 10);
 export const epKey = e => `${e.se}x${e.ep}`;
+
+// الأسماء العربية لعمل في TMDB (E70): من ترجماته العربية (أي بلد) وأسمائه الأخرى المكتوبة بحروف عربية، بلا تكرار (يُقارن بلا تشكيل ولا اختلاف همزة
+// وتاء مربوطة)، وثلاثة على الأكثر. لا تُعرض أسماءً للعمل (أسماؤه بحروفها اللاتينية): يُبحث بها في «أنمياتي»، فمن كتب الاسم العربي وجد العمل.
+// d: تفاصيل العمل وقد أُلحقت بها translations وalternative_titles (للمسلسل results، وللفيلم titles)
+export function arNames(d) { const ar = /[\u0621-\u064a]/, seen = new Set(), out = [];
+  const tr = (d?.translations?.translations || []).filter(x => x?.iso_639_1 === 'ar').map(x => x.data?.name || x.data?.title);
+  const alt = (d?.alternative_titles?.results || d?.alternative_titles?.titles || []).map(x => x?.title);
+  for (const n of [...tr, ...alt]) { const s = String(n || '').replace(/\s+/g, ' ').trim(); if (!s || !ar.test(s) || s.length > 80) continue;
+    const k = s.replace(/[\u064b-\u0652\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي'); if (seen.has(k)) continue; seen.add(k); out.push(s); }
+  return out.slice(0, 3); }

@@ -116,6 +116,8 @@ check('الدفعة من الحسابات: إيداع واحد بلا تكرار
     && doc1.ar?.length === 1 && doc1.ar[0].igdb === 1942 && doc1.ar[0].title === 'The Witcher 3: Wild Hunt b' && /^\d{4}-/.test(doc1.ar[0].at) && REQ.puts[0].branch === 'requests' && /^games: translate The Witcher 3/.test(REQ.puts[0].message) && puts.length === mainPuts, { a1: a1.body, REQ });
   const a2 = await call(add, { action: 'ask', igdb: 1942, password: PW }), a3 = await call(add, { action: 'ask', igdb: 5555, title: 'Hades', password: PW }), doc3 = JSON.parse(REQ.stored);
   check('طلبها ثانية لا يكرر، وطلب لعبة أخرى يُضاف إلى الملف نفسه بلا إنشاء الفرع من جديد', a2.body.state === 'exists' && a3.body.state === 'asked' && REQ.puts.length === 2 && doc3.ar.map(x => x.igdb).join() === '1942,5555' && REQ.puts[1].sha === 'q1', { a2: a2.body, a3: a3.body, n: REQ.puts.length });
+  const a6 = await call(add, { action: 'ask', igdb: 666, title: 'Witcher Adult Thing', adult: 1, password: PW }), doc6 = JSON.parse(REQ.stored);
+  check('طلب ترجمة لعبة +18 (E69): برقمها وحده، فلا يدخل اسمها الطلب ولا عنوان الإيداع', a6.body.state === 'asked' && doc6.ar.at(-1).igdb === 666 && !doc6.ar.at(-1).title && REQ.puts.at(-1).message === 'games: translate #666', [doc6.ar.at(-1), REQ.puts.at(-1)?.message]);
   const a4 = await call(add, { action: 'ask', igdb: 1942, password: 'wrong' }), a5 = await call(add, { action: 'ask', igdb: -3, password: PW });
   check('طلب الترجمة بكلمة السر فقط، والمعرّف غير الصالح مرفوض، وبلا أي طلب إلى IGDB', a4.status === 401 && a5.status === 400 && igdbAsked.length === n0, [a4.status, a5.status]); }
 // حساباتي
@@ -180,15 +182,15 @@ check('مدة اللعب من PSN بالساعات', isoHours('PT228H56M33S') ==
   const pn = await call(add, { action: 'preview', igdb: 666, password: PW }), an = await call(add, { action: 'add', igdb: 666, password: PW });
   check('لعبة +18 لا تُفتح ولا تُضاف والفلتر قائم، والرسالة تدلّ على العين بلا «+18»', pn.status === 422 && an.status === 422 && /للبالغين/.test(an.body.error) && /العين/.test(an.body.error) && !/\+18/.test(an.body.error) && puts.length === before, [pn, an]);
   const pa = await call(add, { action: 'preview', igdb: 666, adult: true, password: PW }), g = pa.body.game;
-  check('بطاقتها والفلتر مرفوع: موسومة adult، باسمها وغلافها ومنصاتها وتقييمها، بلا نبذة ولا قصة ولا لقطات ولا عرض ولا سلسلة', pa.status === 200 && g.adult === 1 && g.title === 'Witcher Adult Thing' && g.cover === 'coad' && g.plats.join() === 'pc' && g.users === 61
-    && g.summary === '' && g.story === '' && g.art === null && g.shots.length === 0 && g.videos.length === 0 && g.series.length === 0 && Object.keys(g.rel).length === 0 && !/explicit/.test(JSON.stringify(pa.body)) && Object.keys(pa.body.series).length === 0, pa.body);
+  check('بطاقتها والفلتر مرفوع: موسومة adult، باسمها وغلافها ومنصاتها وتقييمها ونبذتها وقصتها كغيرها (E69)، بلا لقطات ولا عرض ولا سلسلة', pa.status === 200 && g.adult === 1 && g.title === 'Witcher Adult Thing' && g.cover === 'coad' && g.plats.join() === 'pc' && g.users === 61
+    && g.summary === 'explicit summary' && g.story === 'explicit story' && g.art === null && g.shots.length === 0 && g.videos.length === 0 && g.series.length === 0 && Object.keys(g.rel).length === 0 && Object.keys(pa.body.series).length === 0, pa.body);
   const aa = await call(add, { action: 'add', igdb: 666, adult: true, password: PW }), row = JSON.parse(stored).games.find(e => e.igdb === 666);
   check('وإضافتها حينها تكتبها موسومة في الملف، وعنوان الإيداع برقمها بلا اسمها', aa.status === 200 && aa.body.state === 'added' && aa.body.game.adult === 1 && row?.adult === 1 && puts.at(-1).message === 'games: add +18 (#666)', [aa.body.state, row, puts.at(-1)?.message]);
   const na = await call(add, { action: 'add', igdb: 1942, adult: true, password: PW });
   check('ولعبة عادية تُضاف والفلتر مرفوع كما تُضاف دائماً، بلا وسم', na.status === 200 && na.body.game.adult === undefined && na.body.game.id === 1942 && !JSON.parse(stored).games.find(e => e.igdb === 1942)?.adult, [na.status, na.body.state]);
   // البناء الليلي يُبقيها موسومة (erotic: 'keep')، وبدونه تُحذف كما كانت. والسحب من الحسابات بلا +18
   const { gamesFor } = await import('../scripts/lib-games.mjs'), keep = await gamesFor([666, 1942], { erotic: 'keep' }), drop = await gamesFor([666, 1942], {});
-  check('البناء: اللعبتان معاً، +18 موسومة بلا نصوص ولا سلسلة، والعادية كما هي بسلسلتها التي لا تدخلها لعبة +18', keep.games.map(x => x.id).sort((a, b) => a - b).join() === '666,1942' && keep.games.find(x => x.id === 666).adult === 1 && keep.games.find(x => x.id === 666).summary === ''
+  check('البناء: اللعبتان معاً، +18 موسومة بنصوصها كغيرها (E69) بلا سلسلة، والعادية كما هي بسلسلتها التي لا تدخلها لعبة +18', keep.games.map(x => x.id).sort((a, b) => a - b).join() === '666,1942' && keep.games.find(x => x.id === 666).adult === 1 && keep.games.find(x => x.id === 666).summary === 'explicit summary' && keep.games.find(x => x.id === 666).series.length === 0
     && keep.games.find(x => x.id === 1942).adult === undefined && keep.games.find(x => x.id === 1942).summary === 'Geralt.' && keep.games.find(x => x.id === 1942).series.join() === '42' && !keep.series[42].members.some(m => m.id === 666) && drop.games.map(x => x.id).join() === '1942', [keep.games.map(x => [x.id, x.adult]), drop.games.map(x => x.id)]);
   const im = await call(add, { action: 'import', items: [{ igdb: 666 }], source: 'steam', password: PW });
   check('السحب من الحسابات لا يُدخل لعبة +18', im.status === 200 && im.body.games.length === 0 && im.body.state.added === 0, im.body); }

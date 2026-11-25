@@ -3,7 +3,7 @@
 import zlib from 'node:zlib';
 import { parseMal, readMalFile, malDate, STATUSES } from '../site/anime-mal.js';
 import { shapeSimkl, bulkDays, simklAhead } from '../site/anime-simkl.js';
-import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, pickSpecials, epFit, epKey, epPrint, curatedOrder, linesOf, packLines } from '../scripts/lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, pickSpecials, epFit, epKey, epPrint, curatedOrder, linesOf, packLines, arNames } from '../scripts/lib-anime.mjs';
 import { describe, ord } from '../site/anime-pos.js';
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -59,6 +59,11 @@ check('السجل يُشكَّل: الأسماء والنوع والحلقات �
 check('الصورة مسار بلا مقاس، والاستوديو والتصنيفات بأسمائها', s.img === '1517/100633' && same(s.studios, ['Wit Studio']) && same(s.genres, ['Action', 'Drama']) && same(s.themes, ['Gore', 'Military']) && same(s.demo, ['Shounen']) && s.trailer === 'hKHepjfj5Tw', s);
 check('علاقات الأنمي فقط (لا المانغا)، والنبذة بلا توقيع المصدر، وروابط البث السليمة فقط', same(s.rel, [{ r: 'Prequel', id: 35760, name: 'Shingeki no Kyojin Season 3' }, { r: 'Sequel', id: 40028, name: 'Shingeki no Kyojin: The Final Season' }]) && s.synopsis === 'Seeking to restore humanity\'s diminishing hope, the Survey Corps embark on a mission.' && same(s.stream, [{ name: 'Crunchyroll', url: 'https://www.crunchyroll.com/series/GR751KNZY' }]), s);
 check('سجل ناقص الحقول لا يكسر شيئاً', (() => { const x = shapeMal({ mal_id: 1, title: 'X', status: 'Not yet aired', aired: {}, duration: 'Unknown', rating: null }); return x.status === 'soon' && x.eps === 0 && x.dur === null && x.rating === null && x.img === null && same(x.rel, []) && x.year === null && x.synopsis === null; })());
+// الأسماء العربية من TMDB للبحث (E70): من الترجمات العربية بأي بلد ومن الأسماء الأخرى بحروف عربية، بلا تكرار يختلف بالهمزة أو التاء أو التشكيل، وثلاثة على الأكثر
+check('الأسماء العربية من TMDB: الترجمات العربية والأسماء الأخرى العربية، بلا تكرار ولا لاتيني، وثلاثة على الأكثر', JSON.stringify(arNames({ translations: { translations: [
+    { iso_639_1: 'ar', iso_3166_1: 'SA', data: { name: 'هجوم  العمالقة' } }, { iso_639_1: 'ar', iso_3166_1: 'AE', data: { name: 'هجوم العمالقه' } }, { iso_639_1: 'en', data: { name: 'Attack on Titan' } }, { iso_639_1: 'ar', iso_3166_1: 'EG', data: { name: '' } }] },
+  alternative_titles: { results: [{ iso_3166_1: 'SA', title: 'غزو العمالقة' }, { iso_3166_1: 'US', title: 'Shingeki no Kyojin' }, { iso_3166_1: 'EG', title: 'العمالقة' }, { iso_3166_1: 'AE', title: 'هجمة العمالقة' }] } }))
+  === '["هجوم العمالقة","غزو العمالقة","العمالقة"]' && JSON.stringify(arNames({ title: 'X', alternative_titles: { titles: [{ title: 'المخطوفة' }] } })) === '["المخطوفة"]' && arNames({}).length === 0 && arNames(null).length === 0);
 check('المدة بالدقائق، والتصنيف الإباحي يُعرف', minutes('1 hr 45 min') === 105 && minutes('24 min per ep') === 24 && minutes('2 hr') === 120 && minutes('30 sec per ep') === 1 && minutes('Unknown') === null && shapeMal({ ...jikan, rating: 'Rx - Hentai' }).rating === 'Rx' && shapeMal({ ...jikan, rating: 'R+ - Mild Nudity' }).rating === 'R+' && shapeMal({ ...jikan, rating: 'PG-13 - Teens 13 or older' }).rating === 'PG-13');
 check('صورة MAL من أي مقاس أو امتداد', malImage({ jpg: { image_url: 'https://cdn.myanimelist.net/images/anime/4/19644.jpg' } }) === '4/19644' && malImage({ jpg: { image_url: 'https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png' } }) === null && malImage(undefined) === null);
 

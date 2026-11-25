@@ -44,10 +44,10 @@ export function heroHTML(w) { const { D, me, esc, ltr, num, nEps, nWorks, ic } =
 // ---------- الخط الزمني
 let view = { order: 'story', line: -1 };
 function nodeHTML(w, id, here, rel) { const { D, me, esc, ic, LNAME, poster } = X, a = D.by.get(id), M = X.model(w), L = M.lines[M.lineOf.get(id)], m = me(id), d = X.pos(w, id);
-  const meta = [X.typeOf(a), year(a) || '', a.type !== 'Movie' && a.eps ? X.nEps(a.eps) : '', released(a) ? '' : 'لم يُعرض بعد'].filter(Boolean).join(' · ');
+  const meta = [X.typeOf(a), year(a) || '', a.type !== 'Movie' && a.eps ? X.nEps(a.eps) : '', released(a) || a.st === 'soon' ? '' : 'لم يُعرض بعد'].filter(Boolean).join(' · ');   // موعد ما لم يُعرض: سطره تحته (X.air)
   return `<li class="gn${L.i ? ' side' : ''}${m?.s === 'completed' ? ' done' : ''}${here ? ' here' : ''}" data-k="${L.k}" data-l="${L.i}"${a.ac ? ` style="--ac:#${a.ac}"` : ''}>
     <button class="gn-b" data-act="open" data-id="${id}">${poster(a) ? `<img loading="lazy" decoding="async" alt="" src="${esc(poster(a))}">` : `<span class="ph">${esc((a.t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase())}</span>`}
-      <span class="gn-t">${d ? `<b class="gn-k">${d.badge}${d.hint ? `<span> · ${d.hint}</span>` : ''}</b>` : ''}<span class="gn-n" dir="ltr">${esc(X.title(a))}</span><small>${meta}</small>
+      <span class="gn-t">${d ? `<b class="gn-k">${d.badge}${d.hint ? `<span> · ${d.hint}</span>` : ''}</b>` : ''}<span class="gn-n" dir="ltr">${esc(X.title(a))}</span><small>${meta}</small>${X.air(a)}
         ${rel ? `<small class="gn-w">${ic('warp')}${rel}</small>` : ''}</span>
       ${m ? `<span class="chip" data-l="${m.s}">${LNAME[m.s]}${m.r ? ` · ${m.r}` : ''}</span>` : ''}${here ? `<em class="gn-here">${here === 'gap' ? 'فاتك' : here === 'start' ? 'ابدأ هنا' : 'أنت هنا'}</em>` : ''}</button></li>`; }
 export function lineHTML(w) { const { D } = X, M = X.model(w), nx = nextOf(w), story = view.order === 'story' && !!w.story;

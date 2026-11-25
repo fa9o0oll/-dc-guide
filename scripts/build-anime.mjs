@@ -6,7 +6,7 @@
 //   2) مطابقة كل عمل بـTMDB من خريطة Fribb/anime-lists (رقم المسلسل والموسم وإزاحة الحلقات)، ومن TMDB: البوستر بدقته العالية والخلفية،
 //      والحلقة القادمة، وأين يُعرض رسمياً في السعودية (بيانات JustWatch) كما في بقية البوابات.
 //   3) السلاسل: كل مجموعة أعمال تربطها علاقات القصة تصير «عالماً»، وأعماله التي ليست في القائمة تُسحب أيضاً ليكتمل الترتيب.
-// أعمال +18 (تصنيف Rx في MyAnimeList): ما في القائمة منها يدخل الكتالوج موسوماً (ad) فيخفيه فلتر العين في الصفحة (E65)، بلا نبذة ولا صور TMDB ولا حلقات ولا سلسلة،
+// أعمال +18 (تصنيف Rx في MyAnimeList): ما في القائمة منها يدخل الكتالوج موسوماً (ad) فيخفيه فلتر العين في الصفحة (E65)، بنبذته وترجمتها كغيره (E69)، بلا صور TMDB ولا حلقات ولا سلسلة،
 // وما ليس في القائمة (قريب في سلسلة) لا يدخل أصلاً. السجل الشخصي (الحالة والحلقات والتقييم) ليس هنا: يبقى في متصفح صاحبه.
 // عند تعذّر مصدر تبقى بياناته السابقة كما هي، ويُكتب ما حدث في data/generated/anime/report.json.
 import fs from 'node:fs';
@@ -14,7 +14,7 @@ import net from 'node:net';
 net.setDefaultAutoSelectFamilyAttemptTimeout(5000);
 import { tmdb, hasKey } from './lib-tmdb.mjs';
 import { COUNTRY } from './lib-films.mjs';
-import { shapeMal, shapeMalApi, MAL_FIELDS, worldsOf, curatedOrder, linesOf, packLines, pickTmdb, LINKS } from './lib-anime.mjs';
+import { shapeMal, shapeMalApi, MAL_FIELDS, worldsOf, curatedOrder, linesOf, packLines, pickTmdb, LINKS, arNames } from './lib-anime.mjs';
 
 const root = new URL('../', import.meta.url), SRC = new URL('data/anime/', root), OUT = new URL('site/anime/data/', root), GEN = new URL('data/generated/anime/', root), MAL = new URL('mal/', GEN);
 for (const d of [OUT, GEN, MAL, new URL('texts/', OUT)]) fs.mkdirSync(d, { recursive: true });
@@ -96,8 +96,9 @@ else {
   const ids = { tv: [...need.tv], movie: [...need.movie] }; if (PROBE) { ids.tv.length = Math.min(ids.tv.length, 40); ids.movie.length = Math.min(ids.movie.length, 10); }
   let fails = 0;
   await Promise.all([...ids.tv.map(id => ['tv', id]), ...ids.movie.map(id => ['movie', id])].map(async ([k, id]) => {
-    try { const d = await tmdb(`/${k}/${id}`, { language: 'en-US', append_to_response: 'watch/providers' });
-      (k === 'tv' ? tv : movie).set(id, { poster: d.poster_path || null, backdrop: d.backdrop_path || null, prov: provOf(d['watch/providers']?.results?.[COUNTRY]),
+    // ومعها أسماؤه العربية (ترجماته وأسماؤه الأخرى) للبحث بها في «أنمياتي» (E70)، في الطلب نفسه
+    try { const d = await tmdb(`/${k}/${id}`, { language: 'en-US', append_to_response: 'watch/providers,translations,alternative_titles' }), an = arNames(d);
+      (k === 'tv' ? tv : movie).set(id, { poster: d.poster_path || null, backdrop: d.backdrop_path || null, prov: provOf(d['watch/providers']?.results?.[COUNTRY]), ...(an.length ? { an } : {}),
         ...(k === 'tv' ? { seasons: Object.fromEntries((d.seasons || []).map(s => [s.season_number, { poster: s.poster_path || null, date: s.air_date || null, eps: s.episode_count || 0 }])),
           next: d.next_episode_to_air ? { season: d.next_episode_to_air.season_number, episode: d.next_episode_to_air.episode_number, date: d.next_episode_to_air.air_date } : null } : {}) }); }
     catch (e) { fails++; if (e.status !== 404 && report.problems.length < 60) report.problems.push(`TMDB ${k}/${id}: ${e.message}`); } }));
@@ -175,12 +176,13 @@ const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(
   if (worldOf.has(id)) a.w = worldOf.get(id);
   if (typeof colors[id] === 'string') a.ac = colors[id];          // لون غلافه (AniList)، بلا #
   if (t) a.tm = t; if (m.simkl) a.sk = m.simkl;                    // رقم العمل في SIMKL: به يُطابَق سجل SIMKL حين لا يحمل رقم MyAnimeList
-  if (tmdbOk) { const poster = (t?.k === 'tv' && t.s > 0 && S?.poster) || T?.poster; if (poster) a.tp = poster; if (T?.backdrop) a.bd = T.backdrop; if (T) { a.pv = T.prov; const sp = t.k === 'tv' && t.s >= 1 ? seasonProv.get(`${t.id}:${t.s}`) : null;
+  // من TMDB: البوستر والخلفية، وأسماؤه العربية للبحث بها وحده (an، E70)، وأماكن العرض والحلقة القادمة
+  if (tmdbOk) { const poster = (t?.k === 'tv' && t.s > 0 && S?.poster) || T?.poster; if (poster) a.tp = poster; if (T?.backdrop) a.bd = T.backdrop; if (T?.an) a.an = T.an; if (T) { a.pv = T.prov; const sp = t.k === 'tv' && t.s >= 1 ? seasonProv.get(`${t.id}:${t.s}`) : null;
       if (sp?.here) { a.pv = sp.here; a.pvs = 1; } else if (sp?.away) { a.pvo = T.prov; a.pv = { stream: [], free: [], rent: [], buy: [] }; a.pvs = 1; } }
     if (T?.next && r?.status === 'airing' && (t.s == null || T.next.season === t.s)) a.nx = { ep: T.next.episode - (t.o || 0), date: T.next.date }; }
-  else if (prev) for (const k of ['tp', 'bd', 'pv', 'pvs', 'pvo', 'nx']) if (prev[k] !== undefined) a[k] = prev[k];
-  if (r && ad) { const x = {}; if (r.jp) x.jp = r.jp; if (r.syn.length) x.syn = r.syn; if (r.studios.length > 1) x.studios = r.studios; if (r.source) x.source = r.source; if (r.to) x.to = r.to;
-    if (m.simkl) x.simkl = m.simkl; if (m.anilist) x.anilist = m.anilist; texts[id % 32][id] = x; }   // بلا نبذة ولا عرض دعائي ولا روابط أقرباء
+  else if (prev) for (const k of ['tp', 'bd', 'pv', 'pvs', 'pvo', 'nx', 'an']) if (prev[k] !== undefined) a[k] = prev[k];
+  if (r && ad) { const x = { en: r.synopsis || null }; if (translations[id]) x.ar = translations[id]; if (r.jp) x.jp = r.jp; if (r.syn.length) x.syn = r.syn; if (r.studios.length > 1) x.studios = r.studios; if (r.source) x.source = r.source; if (r.to) x.to = r.to;
+    if (m.simkl) x.simkl = m.simkl; if (m.anilist) x.anilist = m.anilist; texts[id % 32][id] = x; }   // نبذته وترجمتها (E69)، بلا عرض دعائي ولا منصات ولا روابط أقرباء
   else if (r) { const x = { en: r.synopsis || null }; if (translations[id]) x.ar = translations[id]; if (r.jp) x.jp = r.jp; if (r.syn.length) x.syn = r.syn; if (r.studios.length > 1) x.studios = r.studios; if (r.source) x.source = r.source;
     if (r.to) x.to = r.to; if (r.rank) x.rank = r.rank; if (r.trailer) x.trailer = r.trailer; if (r.stream.length) x.stream = r.stream; if (r.time) x.time = r.time;
     const rl = r.rel.filter(z => !isAdult(cache.get(z.id)) && !adult.has(z.id)); if (rl.length) x.rel = rl; if (m.simkl) x.simkl = m.simkl; if (m.anilist) x.anilist = m.anilist; if (m.imdb) x.imdb = m.imdb;
@@ -198,7 +200,7 @@ Object.assign(report, { list: list.length, catalog: anime.length, relatives: ani
   withTmdb: mine.filter(a => a.tm).length, withPoster: mine.filter(a => a.img || a.tp).length, withBackdrop: mine.filter(a => a.bd).length,
   withProviders: mine.filter(a => a.pv && ['stream', 'free', 'rent', 'buy'].some(k => a.pv[k].length)).length, providers: Object.keys(providers).length,
   airing: mine.filter(a => a.st === 'airing').length, withNext: mine.filter(a => a.nx).length, door, worlds: worlds.length, worldsWithStoryOrder: worlds.filter(w => w.story).length, worldsBiggest: worlds.slice().sort((a, b) => b.ids.length - a.ids.length).slice(0, 5).map(w => `${w.name} (${w.ids.length})`),
-  arabic: mine.filter(a => translations[a.id]).length, cached: cache.size, missingRelatives: relatives().filter(id => !cache.has(id)).length });
+  arabic: mine.filter(a => translations[a.id]).length, arabicNames: { mine: mine.filter(a => a.an).length, all: anime.filter(a => a.an).length }, cached: cache.size, missingRelatives: relatives().filter(id => !cache.has(id)).length });
 if (PROBE) report.sample = { mal: cache.get(list[0].mal)?.d || null, entries: anime.slice(0, 3), text: texts[list[0].mal % 32][list[0].mal] || null }; // في فروع العمل: عيّنة تُقرأ في سجل البناء للتحقق من شكل البيانات
 wr(new URL('report.json', GEN), report);
 console.log(JSON.stringify(report, null, 1));

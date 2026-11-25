@@ -1,12 +1,20 @@
 // يفحص دالة «أضف أنمي» في «أنمياتي» بلا شبكة: GitHub مُحاكى. node tests/anime-add.test.mjs
-process.env.GH_TOKEN = 'test-token'; process.env.ADD_FILM_PASSWORD = 'open-sesame-42'; delete process.env.ADD_GAME_PASSWORD;
+process.env.GH_TOKEN = 'test-token'; process.env.ADD_FILM_PASSWORD = 'open-sesame-42'; delete process.env.ADD_GAME_PASSWORD; process.env.TMDB_API_KEY = 'test-tmdb';
 const fails = [], check = (n, ok, d = '') => { console.log(`${ok ? '  ✓' : '  ✗'} ${n}${ok ? '' : ' — ' + JSON.stringify(d).slice(0, 600)}`); if (!ok) fails.push(n); };
 const res = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 const write = list => '[\n' + list.map(x => JSON.stringify(x)).join(',\n') + '\n]\n';
 // مستودع في الذاكرة: قائمة الأعمال على main، والكتابة قد تصطدم مرة
 const START = [{ mal: 5525, title: '07-Ghost', type: 'TV', eps: 25 }, { mal: 21, title: 'One Piece', type: 'TV', eps: 0 }, { mal: 1535, title: 'Death Note', type: 'TV', eps: 37 }].sort((a, b) => a.title.toUpperCase() < b.title.toUpperCase() ? -1 : 1);
 const GH = { file: write(START), sha: 0, puts: [], clash: 0, deny: 0, calls: [] };
-globalThis.fetch = async (url, opt = {}) => { const u = new URL(url), m = opt.method || 'GET'; GH.calls.push(`${m} ${u.pathname}${u.search}`);
+// TMDB مُحاكى للبحث بالاسم العربي (E70): المسلسل والفيلم بالاسم كما كُتب، ثم بلا «ال»؛ وفيها ما ليس أنمي (أمريكي، وغير رسوم)
+const AOT = { id: 1429, name: 'Attack on Titan', original_name: '進撃の巨人', original_language: 'ja', origin_country: ['JP'], genre_ids: [16, 10759], first_air_date: '2013-04-07' };
+const TM = { calls: [], deny: 0, results: { 'tv العمالقة': [AOT, { id: 1, name: 'Titans', original_language: 'en', origin_country: ['US'], genre_ids: [10759] }],
+  'movie العمالقة': [{ id: 5, title: 'Attack on Titan: The Last Attack', original_title: '劇場版 進撃の巨人 完結編 THE LAST ATTACK', original_language: 'ja', genre_ids: [16], release_date: '2024-11-08' }, { id: 6, title: 'Clash of the Titans', original_language: 'en', genre_ids: [28] }],
+  'tv عمالقة': [AOT, { id: 77, name: 'Star of the Giants', original_name: '巨人の星', original_language: 'ja', origin_country: ['JP'], genre_ids: [16], first_air_date: '1968-03-30' }], 'movie عمالقة': [] } };
+globalThis.fetch = async (url, opt = {}) => { const u = new URL(url), m = opt.method || 'GET';
+  if (u.hostname === 'api.themoviedb.org') { const k = /\/search\/(tv|movie)$/.exec(u.pathname)?.[1]; TM.calls.push(`${k} ${u.searchParams.get('query')} ${u.searchParams.get('include_adult')}`);
+    if (TM.deny) return res(TM.deny, {}); return u.searchParams.get('api_key') === 'test-tmdb' && k ? res(200, { results: TM.results[`${k} ${u.searchParams.get('query')}`] || [] }) : res(404, {}); }
+  GH.calls.push(`${m} ${u.pathname}${u.search}`);
   if (u.hostname !== 'api.github.com') return res(500, {}); if (opt.headers?.Authorization !== 'Bearer test-token' || GH.deny) return res(GH.deny || 401, {});
   if (m === 'GET' && u.pathname.endsWith('/contents/data/anime/list.json')) { if (u.searchParams.get('ref') !== 'main') return res(400, {});
     return GH.file === null ? res(404, {}) : res(200, { sha: 's' + GH.sha, content: Buffer.from(GH.file).toString('base64') }); }
@@ -58,4 +66,15 @@ r = await post({ ...ok, mal: 70011, title: 'Plain Thing', ad: 'yes' });
 check('وسم غير صريح (ليس 1 ولا true) لا يُكتب، والعمل عادي باسمه في العنوان', r.state === 'added' && !('ad' in list().find(x => x.mal === 70011)) && GH.puts.at(-1) === 'anime: add Plain Thing (#70011) [skip ci]', [list().find(x => x.mal === 70011), GH.puts.at(-1)]);
 check('ترتيب الأسماء كما في scripts/anime-list.mjs', place([{ title: 'b' }, { title: 'D' }], { title: 'C' }).map(x => x.title).join() === 'b,C,D' && place([{ title: 'a' }], { title: 'z' }).map(x => x.title).join() === 'a,z');
 
+// ---------- البحث بالاسم العربي (E70)
+{ const n0 = GH.calls.length; let a = await post({ action: 'ar', q: 'العمالقة' });
+  check('البحث بالاسم العربي بكلمة السر وحدها', a.status === 401 && !TM.calls.length, a);
+  a = await post({ ...ok, action: 'ar', q: 'Shingeki' }); check('وما ليس فيه حرف عربي مرفوض بلا سؤال TMDB', a.status === 400 && !TM.calls.length, a);
+  a = await post({ ...ok, action: 'ar', q: '  العمالقة  ' });
+  check('يُسأل TMDB عن المسلسلات والأفلام بالاسم كما كُتب وبلا «ال»، ويعود الأنمي وحده (رسوم متحركة يابانية) بأسمائه الإنجليزية والأصلية وسنته، بلا تكرار ولا كتابة في GitHub', a.status === 200
+    && JSON.stringify(a.items) === JSON.stringify([{ tmdb: 1429, kind: 'tv', en: 'Attack on Titan', orig: '進撃の巨人', year: 2013 }, { tmdb: 5, kind: 'movie', en: 'Attack on Titan: The Last Attack', orig: '劇場版 進撃の巨人 完結編 THE LAST ATTACK', year: 2024 }, { tmdb: 77, kind: 'tv', en: 'Star of the Giants', orig: '巨人の星', year: 1968 }])
+    && TM.calls.sort().join(' | ') === 'movie العمالقة false | movie عمالقة false | tv العمالقة false | tv عمالقة false' && GH.calls.length === n0, [a, TM.calls]);
+  TM.calls = []; a = await post({ ...ok, action: 'ar', q: 'العمالقة', adult: 1 }); check('والفلتر مرفوع: يُسأل بما وُسم للبالغين أيضاً', a.status === 200 && TM.calls.every(c => / true$/.test(c)) && TM.calls.length === 4, TM.calls);
+  TM.deny = 401; const err = console.error; console.error = () => {}; a = await post({ ...ok, action: 'ar', q: 'العمالقة' }); console.error = err; TM.deny = 0;
+  check('ومفتاح TMDB مرفوض: رسالة تقول ذلك', a.status === 502 && /TMDB_API_KEY/.test(a.error), a); }
 console.log(fails.length ? `\n❌ فشل ${fails.length}: ${fails.join(' | ')}` : '\n✅ كل فحوص «أضف أنمي» نجحت'); process.exit(fails.length ? 1 : 0);

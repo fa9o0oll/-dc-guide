@@ -2,6 +2,8 @@
 // الأسماء أسماء أعمال حقيقية لتبدو الصفحة كما هي، والسجل الشخصي فيها مختلَق للفحص (ليس سجل أحد).
 import zlib from 'node:zlib';
 const day = n => new Date(Date.now() + n * 864e5 - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
+// الشهر بعد n شهراً من الآن (سنة-شهر): موعد عمل لم يُعرض يُعرف شهره بلا يومه (E70)
+const month = n => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; };
 const P = (stream = [], rent = []) => ({ link: 'https://www.themoviedb.org/tv/1/watch?locale=SA', stream, free: [], rent, buy: [] });
 export const catalog = () => ({ generatedAt: new Date().toISOString(), imageBase: 'https://image.tmdb.org/t/p/', malImages: 'https://cdn.myanimelist.net/images/anime/', country: 'SA',
   providers: { 8: { name: 'Netflix', logo: '/n.jpg' }, 283: { name: 'Crunchyroll', logo: '/c.jpg' } }, genres: ['Action', 'Adventure', 'Comedy', 'Shounen', 'Hentai'],
@@ -17,9 +19,9 @@ export const catalog = () => ({ generatedAt: new Date().toISOString(), imageBase
     { id: 5114, t: 'Fullmetal Alchemist: Brotherhood', type: 'TV', eps: 64, ord: 7, y: 2009, se: 'spring', st: 'finished', from: '2009-04-05', img: '1208/94745', sc: 9.1, sv: 2200000, dur: 24, studio: 'Bones', tm: { k: 'tv', id: 31911, s: 1 }, pv: P([283]), pvs: 1 },   // منصات الموسم نفسه
     { id: 22297, t: 'Fate/stay night: Unlimited Blade Works', type: 'TV', eps: 12, ord: 8, y: 2014, se: 'fall', st: 'finished', from: '2014-10-12', img: '12/67333', sc: 8.18, sv: 740000, dur: 28, g: [0, 2], studio: 'ufotable', w: 356, tm: { k: 'tv', id: 61415, s: 1 }, bd: '/ubw.jpg', pv: null },
     { id: 356, t: 'Fate/stay night', type: 'TV', eps: 24, ord: 9, y: 2006, se: 'winter', st: 'finished', from: '2006-01-07', img: '8/82299', sc: 7.27, sv: 550000, dur: 24, studio: 'Studio Deen', w: 356, tm: { k: 'tv', id: 45845, s: 1 }, pv: null },
-    { id: 199, t: 'Sen to Chihiro no Kamikakushi', en: 'Spirited Away', type: 'Movie', eps: 1, ord: 10, y: 2001, st: 'finished', from: '2001-07-20', img: '6/79597', sc: 8.77, sv: 1300000, dur: 124, studio: 'Studio Ghibli', tm: { k: 'movie', id: 129 }, bd: '/sab.jpg', pv: P([8]) },
+    { id: 199, t: 'Sen to Chihiro no Kamikakushi', en: 'Spirited Away', an: ['المخطوفة'], type: 'Movie', eps: 1, ord: 10, y: 2001, st: 'finished', from: '2001-07-20', img: '6/79597', sc: 8.77, sv: 1300000, dur: 124, studio: 'Studio Ghibli', tm: { k: 'movie', id: 129 }, bd: '/sab.jpg', pv: P([8]) },
     { id: 60000, t: 'Brand New Show', type: 'TV', eps: 12, ord: 11, pending: 1 },
-    { id: 61000, t: 'Upcoming Thing', type: 'TV', eps: 0, ord: 12, y: 2027, st: 'soon', from: '2027-04', img: '1/1', tm: { k: 'tv', id: 999 }, pv: null },
+    { id: 61000, t: 'Upcoming Thing', type: 'TV', eps: 0, ord: 12, y: +month(5).slice(0, 4), st: 'soon', from: month(5), img: '1/1', tm: { k: 'tv', id: 999 }, pv: null },
     // عملان +18 (ad) بأسماء مختلَقة، كما يكتبهما البناء: بلا TMDB ولا سلسلة. لا يظهران إلا والفلتر مرفوع (العين)
     { id: 70001, t: 'Midnight Sample', type: 'OVA', eps: 2, ord: 13, ad: 1, y: 2019, st: 'finished', from: '2019-05-01', img: '7/70001', sc: 6.4, sv: 2100, dur: 28, g: [4], studio: 'Studio Night', rating: 'Rx', sk: 990001 },
     { id: 70002, t: 'Velvet Sample', en: 'Velvet', type: 'OVA', eps: 1, ord: 14, ad: 1, y: 2022, st: 'finished', from: '2022-02-01', img: '7/70002', sc: 6.9, sv: 800, dur: 30, g: [4], studio: 'Studio Night', rating: 'Rx' },
@@ -30,7 +32,7 @@ export const texts = { 11061: { en: 'Hunters devote themselves to accomplishing 
     wa: 'مانغا يوشيهيرو توغاشي في عالم الصيادين.\n\nحُوّلت إلى الأنمي مرتين: نسخة 1999 وأوفاتها، ثم نسخة 2011 التي تعيد الحكاية من أولها.',
     rel: [{ r: 'Alternative Version', id: 136, name: 'Hunter x Hunter' }, { r: 'Sequel', id: 13271, name: 'Hunter x Hunter Movie 1: Phantom Rouge' }, { r: 'Other', id: 999999, name: 'Not here' }] },
   52701: { en: 'After the Golden Kingdom is sunk underground by an insane magician, its king emerges.', jp: 'ダンジョン飯', source: 'Manga' },
-  70001: { jp: 'ミッドナイト', source: 'Original', anilist: 170001 } };   // عمل +18: بلا نبذة
+  70001: { en: 'Two strangers share one long night in a sleepless city.', jp: 'ミッドナイト', source: 'Original', anilist: 170001 } };   // عمل +18: نبذته كغيره (E69)، بلا عرض ولا منصات ولا أقرباء
 // ملف التصدير: 13 عملاً. يشاهد 3، أكمل 4، مؤجَّل 1، ترك 1، سيشاهد 4
 const R = (id, title, type, eps, status, w = 0, score = 0, start = '0000-00-00', finish = '0000-00-00') => `<anime><series_animedb_id>${id}</series_animedb_id><series_title><![CDATA[${title}]]></series_title><series_type>${type}</series_type><series_episodes>${eps}</series_episodes><my_id>0</my_id>
 <my_watched_episodes>${w}</my_watched_episodes><my_start_date>${start}</my_start_date><my_finish_date>${finish}</my_finish_date><my_rated></my_rated><my_score>${score}</my_score><my_storage></my_storage><my_storage_value>0.00</my_storage_value><my_status>${status}</my_status>

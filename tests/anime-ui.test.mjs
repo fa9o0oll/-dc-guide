@@ -184,6 +184,8 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('البحث بالاستوديو', (await page.$$eval('#grid .cel', c => c.map(x => x.dataset.id))).join(',') === '11061,13271');
   await page.fill('#q', 'هنتر'); await page.waitForFunction(() => /هل تقصد/.test(document.querySelector('#count').textContent)).catch(() => {});
   check('البحث بالحروف العربية يجد العمل ويقول «هل تقصد»', await page.evaluate(() => /هل تقصد Hunter x Hunter/.test(document.querySelector('#count').textContent) && [...document.querySelectorAll('#grid .cel')].every(c => /Hunter/.test(c.textContent)) && document.querySelectorAll('#grid .cel').length >= 2), await page.textContent('#count'));
+  await page.fill('#q', 'المخطوفه'); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 1).catch(() => {});
+  check('والبحث بالاسم العربي من TMDB (E70): بلا فرق التاء، ولا «هل تقصد»', (await page.$$eval('#grid .cel', c => c.map(x => x.dataset.id))).join() === '199' && !/هل تقصد/.test(await page.textContent('#count')), await page.$$eval('#grid .cel', c => c.map(x => x.dataset.id)));
   await page.fill('#q', ''); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 13);
   await page.selectOption('#type', 'Movie'); check('تصفية النوع', (await page.$$eval('#grid .cel', c => c.map(x => x.dataset.id))).join(',') === '13271,199'); await page.selectOption('#type', '');
   await tap('#lists [data-l=completed]'); await page.selectOption('#sort', 'pub');
@@ -192,15 +194,35 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.selectOption('#names', 'english'); check('الأسماء بالإنجليزية لمن له اسم إنجليزي', await page.textContent('#grid .cel[data-id="11061"] h3') === 'Hunter x Hunter' && await page.textContent('#grid .cel[data-id="5114"] h3') === 'Fullmetal Alchemist: Brotherhood'); await page.selectOption('#names', 'romaji');
 
   // ---------- «أضف أنمي»: البحث في «أنمياتي» (ومعه أقرباء السلاسل)، ثم في MyAnimeList (Jikan مُحاكى)، والإضافة بكلمة السر (الدالة مُحاكاة)
-  { const jik = [], adds = [];
-    await page.route('https://api.jikan.moe/**', r => { const u = new URL(r.request().url()); jik.push(u.pathname + u.search); const q = u.searchParams.get('q');
+  { const jik = [], adds = [], ars = [], alq = [];
+    // تفاصيل العمل كاملة لبطاقة الاطلاع ولبطاقة ما أُضيف (E69): Frieren بصورته في MyAnimeList وأقربائه ومنصته، وجزؤه الثاني بلا صورة هناك فغلافه من AniList
+    const NEXT_Y = new Date().getFullYear() + 1, FULL = { 52991: { mal_id: 52991, title: 'Sousou no Frieren', title_english: "Frieren: Beyond Journey's End", title_japanese: '葬送のフリーレン', type: 'TV', source: 'Manga', episodes: 28, status: 'Finished Airing', aired: { from: '2023-09-29T00:00:00+00:00', prop: { from: { year: 2023 } } },
+        duration: '24 min per ep', rating: 'PG-13 - Teens 13 or older', score: 9.3, scored_by: 600000, season: 'fall', year: 2023, images: { webp: { image_url: 'https://cdn.myanimelist.net/images/anime/1015/138006.webp' } }, studios: [{ name: 'Madhouse' }],
+        genres: [{ name: 'Adventure' }, { name: 'Drama' }, { name: 'Fantasy' }], themes: [], demographics: [{ name: 'Shounen' }], synopsis: "During their decade-long quest to defeat the Demon King, the members of the hero's party grew close.\n\n[Written by MAL Rewrite]", trailer: { youtube_id: 'qgQ3wBnB6dE' },
+        relations: [{ relation: 'Sequel', entry: [{ mal_id: 56876, type: 'anime', name: 'Sousou no Frieren 2nd Season' }] }, { relation: 'Adaptation', entry: [{ mal_id: 126287, type: 'manga', name: 'Sousou no Frieren' }] }, { relation: 'Side Story', entry: [{ mal_id: 11061, type: 'anime', name: 'Hunter x Hunter (2011)' }] }],
+        streaming: [{ name: 'Crunchyroll', url: 'https://www.crunchyroll.com/series/GG5H5XQX4' }] },
+      56876: { mal_id: 56876, title: 'Sousou no Frieren 2nd Season', type: 'TV', episodes: null, status: 'Not yet aired', aired: { prop: { from: { year: NEXT_Y, month: null, day: null } } }, images: { jpg: { image_url: 'https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png' } }, rating: 'PG-13 - Teens 13 or older', synopsis: null,
+        relations: [{ relation: 'Prequel', entry: [{ mal_id: 52991, type: 'anime', name: 'Sousou no Frieren' }] }], streaming: [] } };
+    const AL = { 52991: { id: 154587, title: { romaji: 'Sousou no Frieren' }, coverImage: { color: '#e4a15d' }, bannerImage: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587.jpg', relations: { edges: [{ relationType: 'SEQUEL', node: { idMal: 56876, type: 'ANIME', title: { romaji: 'Sousou no Frieren 2nd Season' }, coverImage: { medium: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx182255.jpg' } } }] } },
+      56876: { id: 182255, title: { romaji: 'Sousou no Frieren 2nd Season' }, description: 'The second season of <i>Frieren</i>.<br><br>(Source: Crunchyroll)', format: 'TV', status: 'NOT_YET_RELEASED', startDate: { year: NEXT_Y }, coverImage: { extraLarge: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx182255.jpg', color: '#5d8fe4' }, relations: { edges: [] } } };
+    const al = [];
+    const ALS = { 'Attack on Titan': [{ idMal: 16498, title: { romaji: 'Shingeki no Kyojin', english: 'Attack on Titan' }, format: 'TV', episodes: 25, startDate: { year: 2013 }, coverImage: { medium: '' } },
+      { idMal: 25777, title: { romaji: 'Shingeki no Kyojin Season 2', english: 'Attack on Titan Season 2' }, format: 'TV', episodes: 12, startDate: { year: 2017 }, coverImage: { medium: '' } }] };
+    await page.route('https://graphql.anilist.co/**', r => { const b = JSON.parse(r.request().postData() || '{}');
+      if (b.variables && 'q0' in b.variables) { const v = Object.entries(b.variables); alq.push(v.map(x => x[1])); return r.fulfill({ headers: { 'access-control-allow-origin': '*' }, contentType: 'application/json', body: JSON.stringify({ data: Object.fromEntries(v.map(([k, q]) => ['p' + k.slice(1), { media: ALS[q] || [] }])) }) }); }
+      al.push(b.variables?.id); return r.fulfill({ headers: { 'access-control-allow-origin': '*' }, contentType: 'application/json', body: JSON.stringify({ data: { Media: AL[b.variables?.id] || null } }) }); });
+    await page.route('https://api.jikan.moe/**', r => { const u = new URL(r.request().url()); jik.push(u.pathname + u.search); const q = u.searchParams.get('q'), full = /\/anime\/(\d+)\/full$/.exec(u.pathname);
+      if (full) return r.fulfill({ status: FULL[full[1]] ? 200 : 404, headers: { 'access-control-allow-origin': '*' }, contentType: 'application/json', body: JSON.stringify(FULL[full[1]] ? { data: FULL[full[1]] } : { status: 404 }) });
       const im = n => ({ webp: { small_image_url: `https://cdn.myanimelist.net/images/anime/1/${n}t.webp` } });
       return r.fulfill({ headers: { 'access-control-allow-origin': '*' }, contentType: 'application/json', body: JSON.stringify({ data: q === 'frieren' ? [
         { mal_id: 52991, title: 'Sousou no Frieren', title_english: "Frieren: Beyond Journey's End", type: 'TV', episodes: 28, year: 2023, images: im(1), rating: 'PG-13 - Teens 13 or older' },
         { mal_id: 11061, title: 'Hunter x Hunter (2011)', type: 'TV', episodes: 148, year: 2011, images: im(2), rating: 'PG-13 - Teens 13 or older' },
         { mal_id: 99990, title: 'Should Not Appear', type: 'OVA', episodes: 2, images: im(3), rating: 'Rx - Hentai' },
         { mal_id: 56876, title: 'Sousou no Frieren 2nd Season', type: 'TV', episodes: null, year: null, aired: { prop: { from: { year: 2026 } } }, images: {}, rating: 'PG-13 - Teens 13 or older' }] : [] }) }); });
-    await page.route(base + '/api/anime-add', r => { const b = JSON.parse(r.request().postData() || '{}'); adds.push(b);
+    await page.route(base + '/api/anime-add', r => { const b = JSON.parse(r.request().postData() || '{}');
+      if (b.action === 'ar') { ars.push(b); return b.password !== 'open-sesame' ? r.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"password"}' })
+        : r.fulfill({ contentType: 'application/json', body: JSON.stringify({ items: b.q === 'العمالقة' ? [{ tmdb: 1429, kind: 'tv', en: 'Attack on Titan', orig: '進撃の巨人', year: 2013 }] : [] }) }); }
+      adds.push(b);
       return b.password !== 'open-sesame' ? r.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"password"}' }) : r.fulfill({ contentType: 'application/json', body: '{"state":"added"}' }); });
     const rows = () => page.$$eval('#add-res .arow', r => r.map(x => (x.dataset.id || 'mal' + x.dataset.mal) + ':' + (x.querySelector('.astate')?.textContent.trim() || x.querySelectorAll('.aacts .btn').length)));
     const works = () => page.evaluate(() => +(document.querySelector('#tally b')?.textContent || '').replace(/\D/g, '') || 0);
@@ -222,6 +244,40 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check('Enter يبحث في MyAnimeList: الجديد تحت عنوانه، وما في «أنمياتي» منه معه أعلاه، والإباحي لا يظهر', jik.length === 1 && /q=frieren/.test(jik[0]) && /sfw=true/.test(jik[0])
       && (await rows()).join(' | ') === '11061:في «أكملته» | mal52991:2 | mal56876:2' && /2026/.test(await page.textContent('#add-res .arow[data-mal="56876"] .meta')) && /28 حلقة/.test(await page.textContent('#add-res .arow[data-mal="52991"] .meta')), [jik, await rows()]);
     await snap('9-add'); await overflow('أضف أنمي');
+    // بطاقة اطلاع لما ليس في «أنمياتي» (E69): اسمه أو غلافه في النتائج يفتحها فوق النافذة، معلوماته من MyAnimeList مباشرة، وأقرباؤه يُفتحون منها
+    await tap('#add-res .arow[data-mal="52991"] .ainfo'); await page.waitForSelector('#sheet[open] .pkadd'); await page.waitForSelector('#sheet-body .strip.rel');
+    const pk = () => page.evaluate(() => { const b = document.querySelector('#sheet-body'); return { hash: location.hash, h: b.querySelector('h2')?.textContent, alt: [...b.querySelectorAll('.alt')].map(x => x.textContent), facts: b.querySelector('.facts')?.textContent || '', ov: b.querySelector('.ov.en')?.textContent || '', tr: !!b.querySelector('.tr'),
+      adds: [...b.querySelectorAll('.pkadd [data-act=add-live]')].map(x => x.dataset.s).join(), mine: !!b.querySelector('.mine:not(.pkadd)'), pos: !!b.querySelector('.pos'), rel: [...b.querySelectorAll('.strip.rel button[data-id]')].map(x => x.dataset.act + ':' + x.dataset.id + ':' + x.querySelector('small')?.textContent),
+      stream: [...b.querySelectorAll('.where .wl a')].map(a => a.textContent).join(), links: [...b.querySelectorAll('.links a')].map(a => a.textContent.trim()).join(), img: b.querySelector('.cel-art img')?.getAttribute('src') || '', air: [...b.querySelectorAll('.air :is(.hanko, .air-d, .air-r)')].map(x => x.textContent).join('|'), hero: b.querySelector('.hero img')?.getAttribute('src') || '', note: [...b.querySelectorAll('.lbl')].map(x => x.textContent).join(' | ') }; });
+    let v = await pk();
+    check('بطاقة اطلاع من النتائج: فوق النافذة برابطها، باسمه ونوعه وحلقاته وتقييمه واستوديوه من MyAnimeList، والنبذة بالإنجليزية بلا توقيعها، ولا سجل ولا سلسلة من الكتالوج', v.hash === '#a52991' && v.h === 'Sousou no Frieren' && v.alt.includes("Frieren: Beyond Journey's End") && v.alt.includes('葬送のフリーレン')
+      && /28 حلقة/.test(v.facts) && /24 دقيقة للحلقة/.test(v.facts) && /خريف 2023/.test(v.facts) && /Madhouse/.test(v.facts) && /9\.30/.test(v.facts) && /^During their decade-long quest/.test(v.ov) && !/Written by/.test(v.ov) && !v.tr && !v.mine && !v.pos
+      && v.adds === 'plan,watching' && /ليس في «أنمياتي». هذه بطاقة للاطلاع/.test(v.note) && /cdn\.myanimelist\.net\/images\/anime\/1015\/138006\.webp$/.test(v.img) && /anilist\.co.*banner/.test(v.hero) && await page.evaluate(() => document.querySelector('#addd').open), v);
+    check('وأقرباؤه كما في MyAnimeList: الأنمي وحده (لا المانغا)، بصلته، وما في «أنمياتي» يفتح بطاقته وما ليس فيها بطاقة اطلاع؛ ومنصته الرسمية، وصفحاته معها AniList والإعلان', v.rel.join() === 'peek:56876:الجزء التالي,open:11061:قصة جانبية' && v.stream === 'Crunchyroll' && v.links === 'MyAnimeList,AniList,YouTube', v);
+    await overflow('بطاقة الاطلاع'); await snap('9b-peek');
+    await tap('#sheet-body .strip.rel button[data-id="56876"]'); await page.waitForFunction(() => location.hash === '#a56876' && /second season/i.test(document.querySelector('#sheet-body .ov.en')?.textContent || ''));
+    v = await pk();
+    check('وقريب ليس في «أنمياتي» بطاقة اطلاع خطوةً في السجل: ما لا صورة له في MyAnimeList غلافه من AniList، ونبذته من هناك بلا وسومها ولا مصدرها، وموعده سنة بلا شهر: ختم «مستقبلاً» و«العام القادم» (E70)', /s4\.anilist\.co.*cover\/large\/bx182255/.test(v.img) && v.ov === 'The second season of Frieren.' && v.facts.includes(String(NEXT_Y)) && v.air === `مستقبلاً|${NEXT_Y}|العام القادم` && v.rel.join() === 'peek:52991:الجزء السابق', v);
+    await page.goBack(); await page.waitForFunction(() => location.hash === '#a52991' && document.querySelector('#sheet-body h2')?.textContent === 'Sousou no Frieren');
+    await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' });
+    check('والرجوع يعيد البطاقة التي فُتح منها، ثم يغلقها إلى النافذة', await page.evaluate(() => document.querySelector('#addd').open && location.hash === '#add'));
+    // الاسم العربي (E70): أعمال «أنمياتي» تُعرف بأسمائها العربية من TMDB (an)، وما ليس فيها يُبحث عنه في TMDB عبر الموقع ثم في AniList بأسمائه الإنجليزية
+    await page.fill('#add-q', 'مخطوفه'); await page.waitForFunction(() => document.querySelectorAll('#add-res .arow').length === 1 && !!document.querySelector('#add-res .aar'));
+    check('اسم عربي لعمل في «أنمياتي»: يُعرف باسمه العربي من TMDB بلا «ال» ولا فرق التاء، والاسم المطابق تحت اسمه، وزر البحث خارجها باسمه العربي', await page.evaluate(() => { const r = document.querySelector('#add-res .arow'); return r.dataset.id === '199' && r.querySelector('.aar').textContent === 'المخطوفة'; })
+      && /ابحث عن «مخطوفه» باسمه العربي/.test(await page.textContent('#add-res [data-act=add-find]')));
+    await page.fill('#add-q', 'العمالقة'); await page.waitForFunction(() => /ابحث عن «العمالقة» باسمه العربي/.test(document.querySelector('#add-res').textContent));
+    check('وما لا يطابق اسماً حرفياً فما يظهر من «أنمياتي» يقال إنه أقرب الأسماء نطقاً، لا العمل نفسه', await page.evaluate(() => { const n = document.querySelectorAll('#add-res .ares .arow').length, t = document.querySelector('#add-res').textContent; return n ? /أقرب الأسماء إليه نطقاً/.test(t) : /لا عمل في «أنمياتي» بهذا الاسم/.test(t); }));
+    const j0 = jik.length; await page.evaluate(() => localStorage.removeItem('animeg.pass'));   // حفظها قسم «ترجمها لي»
+    await page.press('#add-q', 'Enter'); await page.waitForSelector('#add-res .arpass .add-pass');
+    check('وما ليس فيها: البحث باسمه العربي يمرّ بـTMDB عبر الموقع، فتُطلب كلمة السر أول مرة، ولا يُسأل MyAnimeList بالعربية', !ars.length && jik.length === j0 && /لا يعرف الأسماء العربية/.test(await page.textContent('#add-res .arpass')), [ars, jik.slice(j0)]);
+    await page.fill('#add-res .arpass .add-pass', 'nope'); await page.press('#add-res .arpass .add-pass', 'Enter'); await page.waitForFunction(() => /كلمة السر غير صحيحة/.test(document.querySelector('#add-res .arpass')?.textContent || ''));
+    await page.fill('#add-res .arpass .add-pass', 'open-sesame'); await tap('#add-res [data-act=ar-go]'); await page.waitForSelector('#add-res .arow[data-mal]');
+    check('كلمة السر الصحيحة: يجد TMDB الاسم، وتُبحث أسماؤه الإنجليزية في AniList، فالنتائج بأرقام MyAnimeList ومعها ما وُجد في TMDB، وكلمة السر تُحفظ', ars.length === 2 && ars[1].q === 'العمالقة' && alq.at(-1)?.join() === 'Attack on Titan'
+      && (await rows()).filter(r => r.startsWith('mal')).join(' | ') === 'mal16498:2 | mal25777:2' && /فوجدنا: Attack on Titan/.test(await page.textContent('#add-res')) && !!(await page.$('#add-res [data-act=add-as][data-q="Attack on Titan"]')) && await page.evaluate(() => localStorage.getItem('animeg.pass') === 'open-sesame'), [ars, alq, await rows()]);
+    await snap('9c-ar'); await overflow('البحث بالاسم العربي');
+    await page.fill('#add-q', 'غرابة'); await page.press('#add-q', 'Enter'); await page.waitForFunction(() => /لم يجد TMDB أنمي بهذا الاسم العربي/.test(document.querySelector('#add-res').textContent));
+    check('وما لا يجده TMDB يقال ذلك ويُقترح اسمه بالإنجليزية أو اليابانية، بكلمة السر المحفوظة بلا سؤال', ars.length === 3 && ars[2].password === 'open-sesame', ars.length);
+    await page.fill('#add-q', 'frieren'); await page.press('#add-q', 'Enter'); await page.waitForSelector('#add-res .arow[data-mal="52991"]');
     const w0 = await works(); await page.evaluate(() => localStorage.removeItem('animeg.pass'));   // حفظها قسم «ترجمها لي»
     await tap('#add-res .arow[data-mal="52991"] [data-act=add-mal][data-s=plan]'); await page.waitForSelector('#add-res .add-pass');
     check('أول إضافة من MyAnimeList بلا كلمة سر محفوظة: تُطلب كلمة السر ولا يُرسل شيء', !adds.length && await page.evaluate(() => document.activeElement?.classList.contains('add-pass')));
@@ -230,22 +286,66 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await page.fill('#add-res .add-pass', 'open-sesame'); await tap('#add-res .arow[data-mal="52991"] [data-act=add-mal][data-s=plan]'); await page.waitForSelector('#add-res .arow[data-mal="52991"] .astate');
     const sent = adds.at(-1), keys = Object.keys(sent).sort().join();
     check('تُرسل الإضافة رقم العمل واسمه ونوعه وحلقاته فقط، ويدخل سجلّك «سأشاهده»، وصفّه يبقى في موضعه بحالته ومعه «بطاقته»', keys === 'eps,mal,password,title,type' && sent.mal === 52991 && sent.title === 'Sousou no Frieren' && sent.type === 'TV' && sent.eps === 28
-      && JSON.stringify((await log())[52991]) === '{"s":"plan"}' && /أُضيف إلى «سأشاهده»/.test(await page.textContent('#add-res .arow[data-mal="52991"] .astate')) && await page.locator('#add-res .arow[data-mal="52991"] [data-act=open][data-id="52991"]').count() === 1 && await works() === w0 + 1
-      && (await rows()).join(' | ') === '11061:في «أكملته» | mal52991:أُضيف إلى «سأشاهده» | mal56876:2' && /تكتمل معلوماته وحلقاته مع البناء القادم/.test(await page.textContent('#add-res'))
+      && JSON.stringify((await log())[52991]) === '{"s":"plan"}' && /أُضيف إلى «سأشاهده»/.test(await page.textContent('#add-res .arow[data-mal="52991"] .astate')) && await page.locator('#add-res .arow[data-mal="52991"] .aacts [data-act=open][data-id="52991"]').count() === 1 && await page.locator('#add-res .arow[data-mal="52991"] :is(.aart, .ainfo)[data-act=open]').count() === 2 && await works() === w0 + 1
+      && (await rows()).join(' | ') === '11061:في «أكملته» | mal52991:أُضيف إلى «سأشاهده» | mal56876:2' && /اضغط اسم العمل أو غلافه تفتح بطاقته/.test(await page.textContent('#add-res'))
       && await page.evaluate(() => { const a = JSON.parse(localStorage.getItem('animeg.added'))[52991]; return a?.s === 'plan' && a.ty === 'TV' && a.n === 28 && a.y === 2023 && a.ad === undefined && localStorage.getItem('animeg.pass') === 'open-sesame'; }), [sent, await works(), w0, await rows()]);
-    await tap('#add-res .arow[data-mal="56876"] [data-act=add-mal][data-s=watching]'); await page.waitForSelector('#add-res .arow[data-mal="56876"] .astate');
-    check('وكلمة السر محفوظة بعدها: إضافة أخرى بلا سؤال، وفي القائمة التي اخترتها', adds.length === 3 && adds[2].password === 'open-sesame' && adds[2].eps === 0 && JSON.stringify((await log())[56876]) === '{"s":"watching"}', adds.slice(2));
+    await tap('#add-res .arow[data-mal="56876"] .aart'); await page.waitForSelector('#sheet[open] .pkadd'); await page.waitForFunction(() => /second season/i.test(document.querySelector('#sheet-body .ov.en')?.textContent || ''));
+    await tap('#sheet-body .pkadd [data-act=add-live][data-s=watching]'); await page.waitForSelector('#sheet-body .mine:not(.pkadd)');
+    v = await pk();
+    check('ومن بطاقة الاطلاع: كلمة السر محفوظة فيُضاف بلا سؤال إلى القائمة التي اخترتها، وتصير البطاقة بطاقته في قائمتك بغلافه ونبذته (وطلب ترجمتها)، وصفّه في النافذة يتحدث', adds.length === 3 && adds[2].password === 'open-sesame' && adds[2].mal === 56876 && adds[2].eps === 0
+      && JSON.stringify((await log())[56876]) === '{"s":"watching"}' && v.hash === '#a56876' && v.mine && v.tr && !v.adds && /أُضيف من MyAnimeList ولم يدخل بياناتك بعد/.test(v.note) && /s4\.anilist\.co/.test(v.img) && /أُضيف إلى «أشاهده الآن»/.test(await page.textContent('#add-res .arow[data-mal="56876"] .astate'))
+      && await page.evaluate(() => /^https:\/\/s4\.anilist\.co\//.test(JSON.parse(localStorage.getItem('animeg.added'))[56876]?.iu || '')), [adds.slice(2), v]);
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
     await page.keyboard.press('Escape'); await page.waitForSelector('#addd', { state: 'hidden' });
     await tap('#lists [data-l=plan]');
     check('Esc يغلق النافذة برابط نظيف، وما أضفته يظهر في قائمته فوراً ببطاقة مؤقتة مما عاد به البحث', await page.evaluate(() => { const c = document.querySelector('#grid .cel[data-id="52991"]');
-      return location.hash === '' && !!c && c.querySelector('h3').textContent === 'Sousou no Frieren' && /2023/.test(c.querySelector('.meta').textContent) && /28 حلقة/.test(c.querySelector('.meta').textContent) && !!document.querySelector('.rail .cel[data-id="56876"]'); }), await page.$$eval('#grid .cel', c => c.map(x => x.dataset.id)));
+      return location.hash === '' && !!c && c.querySelector('h3').textContent === 'Sousou no Frieren' && /2023/.test(c.querySelector('.meta').textContent) && /28 حلقة/.test(c.querySelector('.meta').textContent) && /s4\.anilist\.co/.test(document.querySelector('.rail .cel[data-id="56876"] img')?.getAttribute('src') || ''); }), await page.$$eval('#grid .cel', c => c.map(x => x.dataset.id)));
     await tap('#grid .cel[data-id="52991"] [data-act=open]'); await page.waitForSelector('#sheet[open]');
-    check('وبطاقته تقول إن معلوماته تُجلب في البناء القادم، وسجلّه فيها يُعدَّل', /معلومات هذا العمل تُجلب في البناء القادم/.test(await page.textContent('#sheet-body')) && await page.locator('#sheet-body .mine').count() === 1 && await page.locator('#sheet-body .pos').count() === 0);
+    await page.waitForSelector('#sheet-body .ov.en'); v = await pk();
+    check('وبطاقته ليست فارغة (E69): معلوماته من MyAnimeList مباشرة وتقول ذلك، ونبذته وطلب ترجمتها وأقرباؤه، وسجلّه فيها يُعدَّل، ولا سلسلة من الكتالوج بعد', /أُضيف من MyAnimeList ولم يدخل بياناتك بعد/.test(v.note) && /^During their decade-long quest/.test(v.ov) && v.tr && v.mine && !v.pos && /Madhouse/.test(v.facts)
+      && v.rel.join() === 'open:56876:الجزء التالي,open:11061:قصة جانبية' && /1015\/138006\.webp$/.test(v.img), v);
     await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' });
     await page.reload(); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=plan]');
     check('وتبقى بطاقته المؤقتة بعد تحديث الصفحة حتى يدخل الكتالوج', await page.locator('#grid .cel[data-id="52991"]').count() === 1);
     await page.evaluate(() => { const p = JSON.parse(localStorage.getItem('animeg.progress')); delete p.a[52991]; delete p.a[56876]; localStorage.setItem('animeg.progress', JSON.stringify(p)); localStorage.removeItem('animeg.added'); });
     await page.reload(); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=completed]'); }
+
+  // ---------- موعد ما لم يُعرض بعد (E70): ختم «قريباً» أو «مستقبلاً»، والموعد بدقة ما يُعرف منه، وعدّه الحي حين يُعرف اليوم وإلا فالمدة تقريباً:
+  // في خانته وبطاقته وخط عالمه. وعدّ الحلقة القادمة لما يُعرض الآن
+  { const MON = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'], up = FX.anime.find(a => a.id === 61000), ova = FX.anime.find(a => a.id === 137), keep = [{ ...up }, { ...ova }];
+    const atDay = n => new Date(Date.now() + n * 864e5 - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10), arDate = d => { const [y, m, dd] = d.split('-').map(Number); return `${dd} ${MON[m - 1]} ${y}`; }, [uy, um] = up.from.split('-').map(Number);
+    const cel = () => page.evaluate(() => { const c = document.querySelector('#grid .cel[data-id="61000"]'); return { seal: c.querySelector('.hanko')?.textContent, band: c.querySelector('.next')?.textContent.replace(/\s+/g, ' ').trim(), until: c.querySelector('.next')?.dataset.until || '', meta: c.querySelector('.meta').textContent, dg: c.querySelector('.ck-d .dg')?.textContent || '' }; });
+    const air = () => page.evaluate(() => { const s = document.querySelector('#sheet-body .air'); return s && { k: s.className, seal: s.querySelector('.hanko').textContent, lbl: s.querySelector('.air-t small').textContent, d: s.querySelector('.air-d').textContent, sub: s.querySelector('.air-s')?.textContent || '', r: s.querySelector('.air-r')?.textContent || '', until: s.dataset.until || '',
+      dg: s.querySelector('.ck-d .dg')?.textContent || '', t: s.querySelector('.ck-t')?.textContent || '', sr: s.querySelector('.sr-time')?.textContent || '', facts: document.querySelector('#sheet-body .facts').textContent }; });
+    await tap('#lists [data-l=plan]'); await page.waitForSelector('#grid .cel[data-id="61000"]');
+    let c = await cel();
+    check('ما لم يُعرض وموعده شهر بلا يوم: ختم «مستقبلاً» على صورته، والمدة تقريباً بلا عدّاد يدّعي يوماً، والشهر في سطره', c.seal === 'مستقبلاً' && c.band === 'بعد نحو 5 أشهر' && !c.until && c.meta === `مسلسل · ${MON[um - 1]} ${uy}`, c);
+    await tap('#grid .cel[data-id="61000"] [data-act=open]'); await page.waitForSelector('#sheet[open] .air');
+    let s = await air();
+    check('وفي بطاقته: الختم والشهر والمدة تقريباً، و«لم يُعرض بعد» لا تتكرر في حقائقه', s.k === 'air far' && s.seal === 'مستقبلاً' && s.lbl.startsWith('موعد عرضه') && s.d === `${MON[um - 1]} ${uy}` && s.r === 'بعد نحو 5 أشهر' && !s.until && !s.t && !/لم يُعرض بعد/.test(s.facts), s);
+    const stamped = () => page.waitForFunction(() => [...document.querySelectorAll('#sheet-body .air .hanko')].every(h => h.getAnimations().every(a => a.playState === 'finished')));
+    await stamped(); await snap('20-air-far'); await overflow('موعد بلا يوم');
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    // يُعرف اليوم: «قريباً» وعدّ حي، في الخانة والبطاقة وخط العالم
+    const when = atDay(20); Object.assign(up, { from: when, y: +when.slice(0, 4) }); Object.assign(ova, { st: 'soon', from: when });
+    await page.reload(); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=plan]'); await page.waitForSelector('#grid .cel[data-id="61000"] .air-band');
+    c = await cel();
+    check('ما عُرف يومه وهو قريب: ختم «قريباً»، وشريط عدّ حي على صورته بالأيام والساعات، وتاريخه في سطره', c.seal === 'قريباً' && c.until === when && /^(19|20)$/.test(c.dg) && /^يُعرض بعد/.test(c.band) && c.meta === `مسلسل · ${arDate(when)}`, c);
+    await page.locator('#grid .cel[data-id="61000"]').scrollIntoViewIfNeeded(); await snap('21a-air-cel');
+    await tap('#grid .cel[data-id="61000"] [data-act=open]'); await page.waitForSelector('#sheet[open] .air .ck'); s = await air(); await page.waitForTimeout(1300); const t2 = (await air()).t;
+    check('وفي بطاقته: الختم والتاريخ بيومه من الأسبوع، والعدّ يتحرك كل ثانية، ولقارئ الشاشة المدة بالكلمات', s.k === 'air near' && s.seal === 'قريباً' && s.d === arDate(when) && s.sub === new Date(when + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { weekday: 'long' })
+      && s.until === when && /^(19|20)$/.test(s.dg) && s.t !== t2 && /^باقٍ (19|20) يوماً/.test(s.sr), [s, t2]);
+    await stamped(); await snap('21-air-near'); await overflow('عدّ ما لم يُعرض');
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    await page.evaluate(() => { location.hash = '#a21'; }); await page.waitForSelector('#sheet[open] .air'); s = await air();
+    check('ويُعرض الآن: الحلقة القادمة برقمها وتاريخها وعدّها، بختم «يُعرض الآن»', s.k === 'air on' && s.seal === 'يُعرض الآن' && s.lbl.startsWith('الحلقة 1,156') && s.d === arDate(atDay(3)) && /^[23]$/.test(s.dg), s);
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    await tap('[data-act=view][data-v=worlds]'); await page.waitForSelector('#worlds .wc'); await tap('#worlds button.wc'); await page.waitForSelector('#wsheet .gn');
+    const g = await page.evaluate(() => { const n = document.querySelector('#wsheet .gn-b[data-id="137"]').closest('.gn'), a = n.querySelector('.gn-air'); return { k: a?.className, seal: a?.querySelector('.hanko').textContent, d: a?.querySelector('.gn-ad').textContent, until: a?.dataset.until, dg: a?.querySelector('.ck-d .dg')?.textContent || '', meta: n.querySelector('.gn-t small').textContent }; });
+    check('وفي خط العالم: سطر تحت اسمه بالختم والتاريخ والعدّ، وسطر نوعه بلا «لم يُعرض بعد»', g.k === 'gn-air near' && g.seal === 'قريباً' && g.d === arDate(when) && g.until === when && /^(19|20)$/.test(g.dg) && !/لم يُعرض بعد/.test(g.meta), g);
+    await page.locator('#wsheet .gn-b[data-id="137"]').scrollIntoViewIfNeeded(); await snap('22-air-gate'); await overflow('موعد في خط العالم');
+    Object.assign(up, keep[0]); Object.assign(ova, keep[1]);
+    await page.keyboard.press('Escape'); await page.goto(base + '/anime/'); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=completed]'); }
 
   // ---------- السلاسل
   await tap('[data-act=view][data-v=worlds]'); await page.waitForSelector('#worlds .wc');
@@ -447,9 +547,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
       check('والاقتراح لا يختار عمل +18 ولو كان في «سأشاهده»', !seen.has('70002') && !seen.has('70001'), [...seen]); }
     // البطاقة
     await tap('#grid .cel[data-id="70001"] [data-act=open]'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => document.querySelector('#sheet-body').dataset.full === '70001');
-    check('بطاقة عمل +18: سجلّه كغيره، بلا نبذة ولا موقع من سلسلة ولا حلقات، وصورته مغطاة بزر يكشفها', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.head .cel-art');
-      return p.classList.contains('x18') && p.dataset.act === 'bare' && !p.hasAttribute('data-zoom') && /اضغط لإظهارها/.test(p.textContent) && !b.querySelector('.pos') && !b.querySelector('#xs') && !!b.querySelector('.mine') && /لا تُعرض هنا ولا تُترجم/.test(b.textContent)
-        && !b.querySelector('.ov') && !b.querySelector('.tr') && [...b.querySelectorAll('.facts span')].some(x => x.textContent === '+18') && [...b.querySelectorAll('.links a')].map(a => a.textContent.trim()).join() === 'MyAnimeList,SIMKL,AniList'; }), await page.textContent('#sheet-body .facts'));
+    check('بطاقة عمل +18: سجلّه كغيره، ونبذته بالإنجليزية وطلب ترجمتها كغيره (E69)، بلا موقع من سلسلة ولا حلقات، وصورته مغطاة بزر يكشفها', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.head .cel-art');
+      return p.classList.contains('x18') && p.dataset.act === 'bare' && !p.hasAttribute('data-zoom') && /اضغط لإظهارها/.test(p.textContent) && !b.querySelector('.pos') && !b.querySelector('#xs') && !!b.querySelector('.mine') && !/لا تُعرض هنا/.test(b.textContent)
+        && b.querySelector('.ov.en')?.textContent === 'Two strangers share one long night in a sleepless city.' && !!b.querySelector('.tr [data-act]') && [...b.querySelectorAll('.facts span')].some(x => x.textContent === '+18') && [...b.querySelectorAll('.links a')].map(a => a.textContent.trim()).join() === 'MyAnimeList,SIMKL,AniList'; }), await page.textContent('#sheet-body'));
     await snap('18-card'); await overflow('بطاقة +18');
     await tap('#sheet-body .head .cel-art'); await page.waitForFunction(() => !document.querySelector('#sheet-body .head .cel-art.x18'));
     check('لمس الصورة يكشفها وحدها: في بطاقته وفي خانته، والباقي مغطى، ولا يُفتح المكبّر بتلك اللمسة', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.head .cel-art');

@@ -468,7 +468,7 @@ async function sheetHTML(g, pv) { if (g.from?.some(w => w.tmdb) || g.into?.some(
   : g.cover ? `<button type="button" class="cover" data-zoom="${img(g.cover, '1080p')}" data-zoom-title="${esc(g.title)}" aria-label="كبّر غلاف ${esc(g.title)}">${coverImg(g.cover, '180px', false)}</button>` : `<div class="cover">${cart(g)}</div>`}
 <div class="txt"><h2 dir="ltr">${esc(g.title)}</h2>${g.titleAr ? `<p class="ar">${esc(g.titleAr)}</p>` : ''}<p class="facts">${facts.map(x => `<span>${x}</span>`).join('')}</p><div class="tags">${(g.genres || []).map(x => `<span>${esc(x)}</span>`).join('')}${(g.modes || []).slice(0, 2).map(x => `<span class="m">${esc(x)}</span>`).join('')}</div>${!pv && subsOf(g).length ? `<p class="seal inl">${lamps(g)}<span>ضمن اشتراكك: تلعبها بلا ثمن${g.subs.gp?.out ? '، وتغادر <bdi dir="ltr">Game Pass</bdi> قريباً' : ''}</span></p>` : ''}</div></div>
 ${g.adult ? '' : chainHTML(g)}${pv ? `<section class="save pv">${twinHTML(g, true)}<h3>أضفها إلى مكتبتي</h3><div class="lists">${['play', 'new', 'done', 'seen'].map(k => `<button type="button" class="li m-${k}" data-act="pv-add" data-v="${k}" data-igdb="${g.id}">${listBtn(k)}</button>`).join('')}</div><p class="note">ليست في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">IGDB</bdi>.</p></section>` : saveHTML(g)}
-${g.adult ? '<section class="sec about"><h3>عن اللعبة</h3><p class="note">نبذة هذه اللعبة ولقطاتها لا تُعرض هنا ولا تُترجم. تجدها في صفحتها على <bdi dir="ltr">IGDB</bdi> أدناه.</p></section>' : g.src === 'added' ? '<section class="sec"><p class="ask">أُضيفت بزر «أضف لعبة»: معلوماتها آلية من <bdi dir="ltr">IGDB</bdi>، وعالمها واقتباساتها تكتمل في البناء القادم.</p></section>' : ''}
+${g.adult ? '' : g.src === 'added' ? '<section class="sec"><p class="ask">أُضيفت بزر «أضف لعبة»: معلوماتها آلية من <bdi dir="ltr">IGDB</bdi>، وعالمها واقتباساتها تكتمل في البناء القادم.</p></section>' : ''}
 ${board(g)}${placeSec(g)}${story}${ttbHTML(g)}${seriesSec(g)}${relSec(g)}${adaptSec(g)}${platsSec(g)}${subsSec(g, pv)}${pcSec(g, pv)}${mediaSec(g)}${linksSec(g)}`; }
 // ---------- عن اللعبة. النصوص الطويلة (النبذة والقصة بلغتيهما) في ملف مستقل يُجلب مرة واحدة (ويُسبق جلبه بعد الإقلاع)، وما أُضيف للتو نصه في سجله.
 // المترجَم يُعرض بالعربية وتحته الأصل الإنجليزي لمن أراده؛ وغير المترجَم بالإنجليزية مع زر «ترجمها لي» يوصل الطلب إلى المترجم (فرع requests في المستودع).
@@ -485,13 +485,13 @@ function aboutSec(g, T, pv) { const s = T.s || g.summary || '', t = T.t || g.sto
   const body = `${sa ? arP(sa) : enP(s)}${t ? `<details class="more-t"><summary>القصة</summary>${ta ? arP(ta) : enP(t)}</details>` : ''}`;
   const foot = pv ? `<p class="note">النبذة من <bdi dir="ltr">IGDB</bdi> بالإنجليزية كما هي.</p>`
     : full ? `<details class="orig"><summary>النص الأصلي بالإنجليزية</summary>${enP(s)}${t ? `<p class="kh">القصة</p>${enP(t)}` : ''}</details><p class="note">ترجمتنا عن نبذتها في <bdi dir="ltr">IGDB</bdi>.</p>`
-    : `<div class="tr" data-id="${g.id}" data-t="${esc(g.title)}">${trBox(g.id, !!(sa || ta))}</div>`;
+    : `<div class="tr" data-id="${g.id}"${g.adult ? ' data-ad="1"' : ` data-t="${esc(g.title)}"`}>${trBox(g.id, !!(sa || ta))}</div>`;   // لعبة +18 يُطلب ترجمتها برقمها وحده (E69)
   return `<section class="sec about"><h3>عن اللعبة</h3>${body}${foot}</section>`; }
 async function askTr(btn) { const box = btn.closest('.tr'), id = +box.dataset.id, pw = box.querySelector('.tr-pass')?.value || pass(), label = btn.innerHTML;
   if (!pw) { if (!box.querySelector('.tr-pass')) { box.innerHTML = `<label class="pass-wrap">كلمة السر (كلمة سر «أضف لعبة»)<input class="tr-pass" type="password" autocomplete="current-password"></label><button type="button" class="btn sec" data-act="tr-ask">${ic('globe')}ترجمها لي</button><p class="msg" aria-live="polite"></p>`; }
     else box.querySelector('.msg').textContent = 'اكتب كلمة السر أولاً.'; box.querySelector('.tr-pass').focus(); return; }
   btn.disabled = true; btn.textContent = 'يُرسل الطلب…';
-  try { await api('/api/add-game', { action: 'ask', igdb: id, title: box.dataset.t || '' }, pw); if (!pass()) remember(pw);
+  try { await api('/api/add-game', { action: 'ask', igdb: id, ...(box.dataset.ad ? { adult: 1 } : { title: box.dataset.t || '' }) }, pw); if (!pass()) remember(pw);
     const m = askedMap(); m[id] = Date.now(); store.set(ASK, JSON.stringify(m)); box.innerHTML = trBox(id);
   } catch (e) { btn.disabled = false; btn.innerHTML = label; const msg = box.querySelector('.msg'); if (msg) msg.textContent = e.message; else toast(e.message); } }
 

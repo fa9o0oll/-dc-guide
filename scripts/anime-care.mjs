@@ -38,10 +38,11 @@ const saveTr = (tv, T) => { const keys = Object.keys(T).sort((a, b) => { const [
 const badText = v => /"|  | [،؛؟.!:]/.test(v) ? 'علامة اقتباس لاتينية أو فراغان أو فراغ قبل علامة ترقيم' : !/[\u0600-\u06ff]/.test(v) ? 'بلا حروف عربية' : '';
 if (cmd === 'pending') { const n = +(args.find(a => /^\d+$/.test(a)) || 15), full = args.includes('--full'), asked = [...new Set([...String(flag('ids') || '').split(',').map(Number).filter(Boolean), ...askedFor('about')])];   // ما سُمّي بأرقامه، ثم ما طُلب بزر «ترجمها لي»
   // المطلوب بأرقامه قد يكون من أقرباء السلاسل (ليس في القائمة): نبذة العمل الذي تحمل السلسلة اسمه تظهر في نافذتها
-  const pool = cat.anime.filter(a => !a.ad && !a.pending && !tr[a.id] && textOf(a.id)?.en), todo = pool.filter(a => a.ord != null), first = asked.map(id => pool.find(a => a.id === id)).filter(Boolean);
+  const pool = cat.anime.filter(a => !a.pending && !tr[a.id] && textOf(a.id)?.en), todo = pool.filter(a => a.ord != null), first = asked.map(id => pool.find(a => a.id === id)).filter(Boolean);
   const rest = todo.filter(a => !asked.includes(a.id)).sort((a, b) => (b.sv || 0) - (a.sv || 0));
   console.log(JSON.stringify({ translated: Object.keys(tr).length, pending: todo.length, noTextYet: cat.anime.filter(a => a.ord != null && (a.pending || !textOf(a.id)?.en)).length }));
-  for (const a of [...first, ...rest].slice(0, n)) console.log(full ? `\n### ${a.id} | ${a.t}${a.en ? ' | ' + a.en : ''}\n${textOf(a.id).en}` : `${a.id}\t${a.t}`); }
+  // عمل +18 (E69): يُترجم كغيره بأمانة، وعنوان إيداعه برقمه وحده بلا اسمه
+  for (const a of [...first, ...rest].slice(0, n)) console.log(full ? `\n### ${a.id}${a.ad ? ' | +18: عنوان الإيداع برقمه وحده' : ''} | ${a.t}${a.en ? ' | ' + a.en : ''}\n${textOf(a.id).en}` : `${a.id}${a.ad ? '\t+18' : ''}\t${a.t}`); }
 else if (cmd === 'asked') { const req = requested(), about = askedFor('about').filter(id => by.has(id) && !tr[id] && textOf(id)?.en), eps = askedFor('eps').map(id => [id, epsTodo(id)]).filter(([, x]) => x && x.left);
   console.log(JSON.stringify({ requests: req.length, about: about.length, eps: eps.length }));
   if (about.length) console.log(`\nنبذات مطلوبة (${about.length}): ${about.map(id => `${id} ${by.get(id).t}`).join(' ؛ ')}\n  node scripts/anime-care.mjs pending ${about.length} --full`);
