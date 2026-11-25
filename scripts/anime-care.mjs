@@ -12,9 +12,8 @@
 //   node scripts/anime-care.mjs eps-add <ملف.json>           يدمج { "رقم العمل": { "رقم الحلقة": { "t": "العنوان", "o": "الملخص" } } } في ملفات الترجمة ببصماتها
 //                                                        ("t": "=" لعنوان هو اسم عمل آخر يبقى بحروفه اللاتينية، كعناوين Akudama Drive بأسماء أفلام)
 //   node scripts/anime-care.mjs eps-left [رقم…]              كم بقي من حلقات كل عمل بلا ترجمة (الأعمال المذكورة، وإلا كل ما له حلقات)
-//   node scripts/anime-care.mjs eps-next [أعمال] [حلقات]     الدفعة التالية: الأعمال التي بدأت ترجمة حلقاتها ولم تكتمل، الأقل تقدّماً أولاً، ولكل عمل حلقاته
-//                                                        التالية بعد آخر ما تُرجم (الافتراضي 10 أعمال × 3 حلقات)، ومعه الأسماء التي بين «» في نبذته لتوحيدها.
-//                                                        سجله الشخصي ليس في المستودع، فما بدأته دفعة سابقة (مما سمّاه أو مما يشاهده) هو الدليل على ما يُكمَل
+//   node scripts/anime-care.mjs eps-next [أعمال] [حلقات]     الدفعة التالية: كل عمل فيه حلقة بنص لم يُترجم (جديدة، أو تغيّر نصها الإنجليزي بعد ترجمتها)، الأقل تقدّماً أولاً، ولكل عمل أول ما لم يُترجم منه
+//                                                        (الافتراضي 10 أعمال × 3 حلقات)، ومعه الأسماء التي بين «» في نبذته لتوحيدها
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -101,15 +100,18 @@ else if (cmd === 'eps-left') { const ids = args.map(Number).filter(Boolean), ind
   const sum = k => rows.reduce((s, r) => s + r[k], 0); console.log(JSON.stringify({ works: rows.length, episodes: sum(2), withText: sum(3), translated: sum(4) }));
   if (ids.length) for (const r of rows) console.log(`${r[0]}\t${r[1]}\t${r[4]} من ${r[3]} (حلقاته ${r[2]})`); }
 else if (cmd === 'eps-next') { const works = +args[0] || 10, each = +args[1] || 3, rows = [];
-  for (const id of Object.keys(rd('site/anime/data/eps/index.json', {})).map(Number)) { const j = epsOf(id); if (!j || j.fit === 'loose') continue; const T = trOf(j.tv); if (!Object.keys(T).length) continue;
-    const text = j.eps.filter(hasText), ok = text.filter(e => done(e, T)); if (!ok.length || ok.length === text.length) continue;
-    const last = ok.at(-1).n, next = text.filter(e => e.n > last && !done(e, T)).slice(0, each); if (next.length) rows.push({ id, j, ok: ok.length, next }); }
+  // اكتملت الترجمة الأولى كلها (E50)، فالدفعة كل عمل فيه حلقة بنص لم يُترجم: حلقة جديدة، أو عمل جديد، أو حلقة غيّر TMDB نصها بعد ترجمتها فلم تعد بصمتها تطابق،
+  // وأول ما لم يُترجم في كل عمل أولاً. وكانت تقتصر على أعمال بدأت ولم تكتمل وتبدأ بعد آخر ما تُرجم، فلا ترى عملاً جديداً ولا ما تقادمت ترجمته
+  for (const id of Object.keys(rd('site/anime/data/eps/index.json', {})).map(Number)) { const j = epsOf(id); if (!j) continue; const T = trOf(j.tv);
+    const text = j.eps.filter(hasText), ok = text.filter(e => done(e, T)); if (ok.length === text.length) continue;
+    const next = text.filter(e => !done(e, T)).slice(0, each); rows.push({ id, j, ok: ok.length, next }); }
   // ما طُلبت حلقاته بزر «ترجم لي حلقاته» يتقدم، ولو لم تبدأ ترجمته: من أول حلقة لم تُترجم
   const want = askedFor('eps'), front = []; for (const id of want) { const x = epsTodo(id); if (!x || !x.left) continue; const i = rows.findIndex(r => r.id === id); if (i >= 0) rows.splice(i, 1);
     front.push({ id, j: x.j, ok: x.ok.length, next: x.text.filter(e => !done(e, x.T)).slice(0, Math.max(each, 12)), asked: true }); }
   rows.sort((a, b) => a.ok - b.ok || a.id - b.id); rows.unshift(...front);
   console.log(JSON.stringify({ started: rows.length, shown: Math.min(works, rows.length), episodes: rows.slice(0, works).reduce((n, r) => n + r.next.length, 0) }));
   for (const r of rows.slice(0, works)) { const names = [...new Set((tr[r.id] || '').match(/«[^»]+»/g) || [])].join(' ');
-    console.log(`\n# ${r.id} | ${by.get(r.id)?.t || ''} | تُرجم ${r.ok} من ${r.j.eps.filter(hasText).length}${r.asked ? ' | مطلوب بالزر' : ''}${names ? '\n' + names : ''}`);
+    const T = trOf(r.j.tv), changed = r.next.filter(e => T[epKey(e)]).length;
+    console.log(`\n# ${r.id} | ${by.get(r.id)?.t || ''} | تُرجم ${r.ok} من ${r.j.eps.filter(hasText).length}${changed ? ` | ${changed} منها تغيّر نصها الإنجليزي بعد ترجمتها` : ''}${r.asked ? ' | مطلوب بالزر' : ''}${names ? '\n' + names : ''}`);
     for (const e of r.next) console.log(`${e.n} | ${e.t || '—'} | ${e.ov || '—'}`); } }
 else console.log('الأوامر: pending [عدد] [--full] [--ids 1,2] | asked | heads [عدد] | show <رقم> | check | eps <رقم العمل> [من] [إلى] | eps-add <ملف> | eps-left [رقم…] | eps-next [أعمال] [حلقات]');

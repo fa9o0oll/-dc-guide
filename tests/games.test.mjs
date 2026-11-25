@@ -57,7 +57,7 @@ async function mockApi(page) {
     if (b.action === 'add') return J({ state: 'added', game: { ...(FX.games.find(g => g.id === b.igdb) || newGame), src: 'added', at: new Date().toISOString() }, series: {}, plats: { switch: FX.plats.switch }, franchises: {} });
     if (b.action === 'remove') return J({ state: 'removed' });
     if (b.action === 'ask') return J({ state: 'asked' });
-    if (b.action === 'preview') return J({ game: { ...FX.series[5].members[0], ...FX.games[0], id: b.igdb, title: 'Preview Game', series: [5] }, series: {}, plats: {}, franchises: {} });
+    if (b.action === 'preview') return J({ game: { ...FX.series[5].members[0], ...FX.games[0], pc: undefined, subs: undefined, f2p: undefined, ext: b.igdb === 551 ? { steam: 551 } : {}, id: b.igdb, title: 'Preview Game', series: [5] }, series: {}, plats: {}, franchises: {} });   // كالخادم: بطاقة الاطلاع بلا متاجر البناء ولا اشتراكاته
     if (b.action === 'import') return J({ state: { added: b.items.length, exists: 0 }, games: b.items.map(x => ({ ...FX.games[3], id: x.igdb, title: 'Imported ' + x.igdb, slug: 'imp-' + x.igdb, series: [], src: 'added' })), series: {}, plats: {}, franchises: {} });
     return r.fulfill({ status: 400, body: '{}' }); });
   await page.route('**/api/game-accounts', async r => { const b = JSON.parse(r.request().postData() || '{}'); asked.push('acc:' + b.action + (b.steamid ? ':' + b.steamid : '') + (b.npsso ? ':npsso' : ''));
@@ -191,6 +191,13 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   // عمل خارج القائمة من السلسلة: بطاقة اطلاع وزر الإضافة إلى قائمة
   await page.goto(`${base}/games/#g112875`); await page.waitForSelector('#sheet[open] .order:not([hidden])'); await page.click('#sheet [data-act=ordv][data-v=release]'); await page.click('#sheet .order[data-ov=release] li:first-child .go'); await page.waitForSelector('#sheet [data-act=pv-add]');
   check('جزء خارج القائمة من السلسلة: بطاقة اطلاع من الخادم، وبدل ملف الحفظ «أضفها إلى» بالقوائم الأربع', asked.includes('preview:549') && await page.locator('#sheet [data-act=pv-add]').count() === 4);
+  { const pvPc = () => page.evaluate(() => ({ tiles: [...document.querySelectorAll('#sheet .pcsec .pcs a')].map(a => a.dataset.s + ':' + a.querySelector('small').textContent), f: !!document.querySelector('#sheet .pcsec .pcf'), note: document.querySelector('#sheet .pcsec .note')?.textContent || '', subs: !!document.querySelector('#sheet .subsec') }));
+    let x = await pvPc();
+    check('بطاقة الاطلاع لا تَعِد بفحص لا يقع: ليست في المكتبة فمتاجرها لا تُفحص إلا إن أُضيفت، ولا قسم للاشتراكات', !x.tiles.length && !x.f && !x.subs && x.note === 'ليست في مكتبتك، فمتاجرها لا تُفحص، وليس لها في IGDB رابط متجر. إن أضفتها فُحصت في البناء القادم.', x);
+    await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+    await page.goto(`${base}/games/#g112875`); await page.waitForSelector('#sheet[open] .order:not([hidden])'); await page.click('#sheet [data-act=ordv][data-v=release]'); await page.waitForSelector('#sheet .order[data-ov=release]:not([hidden]) li:nth-child(3) .go[data-act=peek]'); await page.waitForTimeout(200);
+    await page.click('#sheet .order[data-ov=release] li:nth-child(3) .go'); await page.waitForSelector('#sheet [data-act=pv-add]');
+    x = await pvPc(); check('وبروابط متاجرها في IGDB: بلاطاتها كما هي بلا حكم على المجانية، والملاحظة تقول إنها لا تُفحص', asked.includes('preview:551') && x.tiles.join() === 'steam:المتجر' && !x.f && x.note === 'ليست في مكتبتك، فهذه روابط متاجرها في IGDB كما هي، بلا فحص لمجانيتها. إن أضفتها فُحصت في البناء القادم.', x); }
   await page.keyboard.press('Escape'); await page.waitForTimeout(300);
   // السلاسل
   await page.click('[data-act=view][data-v=series]'); await page.waitForTimeout(300);
@@ -569,6 +576,7 @@ for (const [name, w, h, mobile] of [['+18', 1440, 900, false], ['+18 (cover)', 3
   await tap('#g-9800001 .cover'); await page.waitForSelector('#sheet[open] .sh-head .cover.x18');
   check(`${name}: بطاقة لعبة +18 بلا نبذة ولا لقطات ولا موقع من سلسلة، وملف حفظها كغيرها، وغلافها بزر يكشفه`, await page.evaluate(() => { const b = document.querySelector('#sheet-body'), c = b.querySelector('.sh-head .cover');
     return c.dataset.act === 'bare' && !c.hasAttribute('data-zoom') && /اضغط لإظهاره/.test(c.textContent) && !b.querySelector('.chain') && !b.querySelector('.sh-hero img') && /لا تُعرض هنا ولا تُترجم/.test(b.querySelector('.about').textContent) && !/\+\s*18/.test(b.querySelector('.about').textContent) && !b.querySelector('.tr') && !!b.querySelector('.save .lists'); }));
+  check(`${name}: لعبة +18 لا تُفحص متاجرها ولا اشتراكاتها (البناء لا يسأل عنها): يقال ذلك بلا وعد بفحص، ولا قسم للاشتراكات`, await page.evaluate(() => (document.querySelector('#sheet .pcsec .note')?.textContent || '') === 'متاجر هذه اللعبة لا تُفحص، وليس لها في IGDB رابط متجر.' && !document.querySelector('#sheet .subsec')), await page.evaluate(() => [document.querySelector('#sheet .pcsec')?.textContent, !!document.querySelector('#sheet .subsec')]));
   await tap('#sheet .sh-head .cover'); await page.waitForSelector('#sheet[open] .sh-head .cover[data-zoom]');
   check(`${name}: لمس الغلاف يكشفه في بطاقتها وعلبتها وحدهما`, await page.evaluate(() => document.querySelector('#sheet-body').hasAttribute('data-r18-bare') && !document.querySelector('#g-9800001 .x18') && document.getElementById('g-9800001').hasAttribute('data-r18-bare') && !!document.querySelector('#g-9800002 .cover.x18')
     && getComputedStyle(document.querySelector('#g-9800001 .cover img')).filter === 'none' && !document.querySelector('.pz[open]')));
