@@ -73,6 +73,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   check('السجل يدخل كاملاً: الحالة والحلقات والتقييم والتاريخان، بلا حقول فارغة', Object.keys(L0).length === 13 && JSON.stringify(L0[11061]) === '{"s":"completed","p":148,"r":10,"b":"2016-02-03","e":"2016-02-21"}' && JSON.stringify(L0[21]) === '{"s":"hold","p":1155,"r":10,"b":"2004-02-28"}'
     && JSON.stringify(L0[52701]) === '{"s":"watching"}' && JSON.stringify(L0[356]) === '{"s":"dropped","p":3,"r":4}' && JSON.stringify(L0[13271]) === '{"s":"plan"}', L0);
   await page.keyboard.press('Escape'); await page.waitForSelector('#imp', { state: 'hidden' });
+  // ألوان الصفحة: --ink لون الحبر، لا يطغى عليه متغير آخر بالاسم نفسه (كان نسيج ختم «قريباً» يحمله فصار الزر المضغوط صورةً داكنة)
+  check('لون الحبر لون، والزر المضغوط في «الأعمال/السلاسل» لونه صريح لا صورة', await page.evaluate(() => { const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(), b = document.querySelector('.views [aria-pressed=true]'), cs = b && getComputedStyle(b);
+    return /^#[0-9a-f]{3,8}$|^rgb/i.test(ink) && !!cs && cs.backgroundImage === 'none' && cs.backgroundColor !== 'rgba(0, 0, 0, 0)'; }));
   check('القوائم الخمس بترتيب MyAnimeList وأعدادها، ثم الكل', (await lists()).join('|') === 'أشاهده الآن 3|أكملته 4|مؤجَّل 1|تركته 1|سأشاهده 4|الكل 13', await lists());
   check('أرقام السماء: الأعمال والحلقات والأيام ومتوسط التقييم', await page.evaluate(() => { const t = document.querySelector('#tally').textContent; return /13 عملاً في قائمتك/.test(t) && /1,833 حلقة شاهدتها/.test(t) && /30\.2 يوماً من المشاهدة/.test(t) && /متوسط تقييمك 8\.63/.test(t); }), await page.textContent('#tally'));
   check('«أكمل المشاهدة»: الأقرب إلى الإكمال أولاً، ثم ما لم يبدأ', (await page.$$eval('.rail .cel', c => c.map(x => x.dataset.id))).join(',') === '1735,37989,52701' && (await page.$$eval('.rail .tc span', s => s.map(x => x.textContent.trim()))).join('|') === '393 من 500|7 من 12|0 من 24', await page.$$eval('.rail .tc span', s => s.map(x => x.textContent.trim())));
@@ -332,9 +335,10 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     c = await cel();
     check('ما عُرف يومه وهو قريب: ختم «قريباً»، وشريط عدّ حي على صورته بالأيام والساعات، وتاريخه في سطره', c.seal === 'قريباً' && c.until === when && /^(19|20)$/.test(c.dg) && /^يُعرض بعد/.test(c.band) && c.meta === `مسلسل · ${arDate(when)}`, c);
     await page.locator('#grid .cel[data-id="61000"]').scrollIntoViewIfNeeded(); await snap('21a-air-cel');
-    await tap('#grid .cel[data-id="61000"] [data-act=open]'); await page.waitForSelector('#sheet[open] .air .ck'); s = await air(); await page.waitForTimeout(1300); const t2 = (await air()).t;
+    await tap('#grid .cel[data-id="61000"] [data-act=open]'); await page.waitForSelector('#sheet[open] .air .ck'); s = await air();
+    await page.waitForFunction(t => document.querySelector('#sheet-body .air .ck-t')?.textContent !== t, s.t, { timeout: 4000 }).catch(() => {}); const t2 = (await air()).t, vis = await page.evaluate(() => document.visibilityState);
     check('وفي بطاقته: الختم والتاريخ بيومه من الأسبوع، والعدّ يتحرك كل ثانية، ولقارئ الشاشة المدة بالكلمات', s.k === 'air near' && s.seal === 'قريباً' && s.d === arDate(when) && s.sub === new Date(when + 'T00:00:00').toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { weekday: 'long' })
-      && s.until === when && /^(19|20)$/.test(s.dg) && s.t !== t2 && /^باقٍ (19|20) يوماً/.test(s.sr), [s, t2]);
+      && s.until === when && /^(19|20)$/.test(s.dg) && s.t !== t2 && /^باقٍ (19|20) يوماً/.test(s.sr), [s, t2, vis]);
     await stamped(); await snap('21-air-near'); await overflow('عدّ ما لم يُعرض');
     await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
     await page.evaluate(() => { location.hash = '#a21'; }); await page.waitForSelector('#sheet[open] .air'); s = await air();

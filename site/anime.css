@@ -143,11 +143,11 @@ main{padding:12px var(--pad) 56px}
 .next{position:absolute;z-index:3;inset:auto 0 0;padding:14px 8px 6px;border-radius:0 0 9px 9px;font-size:.74rem;font-weight:600;text-align:center;color:#fff;background:linear-gradient(transparent,rgba(9,10,30,.92) 55%)}
 /* ---------- موعد ما لم يُعرض بعد (E70): ختم كختم الحبر الياباني (هانكو): «قريباً» بالقرمزي، و«مستقبلاً» بحبر باهت، و«يُعرض الآن» بالأخضر.
    حبره غير مستوٍ (قناع ضجيج)، ويُختم حين تُفتح البطاقة. والعدّ الحي تكتبه site/count.js */
-:root{--ink:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.2 0 0 0 2.75'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E")}
+:root{--hk-ink:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.2 0 0 0 2.75'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E")}
 .hanko,.air,.gn-air{--hk:#ff5d4f}.hanko.far,.air.far,.gn-air.far{--hk:#a3abde}.hanko.on,.air.on{--hk:#35d07f}
 .hanko{display:inline-grid;place-items:center;flex:none;min-width:66px;min-height:66px;padding:6px 10px;border:2px solid var(--hk);border-radius:15px;color:var(--hk);
   font-family:var(--display);font-weight:700;font-size:.95rem;line-height:1.05;text-align:center;white-space:nowrap;transform:rotate(-8deg);
-  background:color-mix(in srgb,var(--hk) 12%,rgba(11,13,38,.6));box-shadow:inset 0 0 0 3px rgba(11,13,38,.55),inset 0 0 0 4.5px var(--hk);-webkit-mask:var(--ink) center/90px;mask:var(--ink) center/90px}
+  background:color-mix(in srgb,var(--hk) 12%,rgba(11,13,38,.6));box-shadow:inset 0 0 0 3px rgba(11,13,38,.55),inset 0 0 0 4.5px var(--hk);-webkit-mask:var(--hk-ink) center/90px;mask:var(--hk-ink) center/90px}
 .hanko.sm{min-width:0;min-height:0;padding:4px 8px 5px;border-width:1.5px;border-radius:9px;font-size:.76rem;transform:rotate(-5deg);box-shadow:inset 0 0 0 2px rgba(11,13,38,.55),inset 0 0 0 3px var(--hk)}
 .cel-art .hanko{position:absolute;z-index:3;inset-block-start:24px;inset-inline-start:7px;background:color-mix(in srgb,var(--hk) 14%,rgba(9,10,30,.82))}
 .dg{display:inline-flex;direction:ltr}.dg span{display:inline-block;min-width:.6em;text-align:center}
