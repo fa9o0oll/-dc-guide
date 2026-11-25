@@ -1,5 +1,5 @@
 {
- "at": "2026-11-25T17:55:12.903Z",
+ "at": "2026-11-25T18:18:34.894Z",
  "failed": [],
  "lists": {
   "gp.console": "All Console Games (582)",
@@ -220,7 +220,8 @@
   "Anomaly Agent": "—",
   "Rise of the Ronin": "ps:extra:ps5",
   "Nine Sols": "gp:xbox+pc",
-  "Contrast": "gp:xbox"
+  "Contrast": "gp:xbox",
+  "Hot Wheels Unleashed 2: Turbocharged": "—"
  },
  "byTitle": [
   "gp BPMJ413V6BB2,9NKD0MLJ3Z3X \"Assassin's Creed® III Remastered\" → Assassin's Creed III",
