@@ -209,10 +209,12 @@ export const epKey = e => `${e.se}x${e.ep}`;
 
 // الأسماء العربية لعمل في TMDB (E70): من ترجماته العربية (أي بلد) وأسمائه الأخرى المكتوبة بحروف عربية، بلا تكرار (يُقارن بلا تشكيل ولا اختلاف همزة
 // وتاء مربوطة)، وثلاثة على الأكثر. لا تُعرض أسماءً للعمل (أسماؤه بحروفها اللاتينية): يُبحث بها في «أنمياتي»، فمن كتب الاسم العربي وجد العمل.
-// d: تفاصيل العمل وقد أُلحقت بها translations وalternative_titles (للمسلسل results، وللفيلم titles)
-export function arNames(d) { const ar = /[\u0621-\u064a]/, seen = new Set(), out = [];
+// d: تفاصيل العمل وقد أُلحقت بها translations وalternative_titles (للمسلسل results، وللفيلم titles). والأسماء الأخرى من بلدان عربية وحدها:
+// الفارسية والأردية تُكتب بالحروف نفسها (خاطرات داروساز)، فلا يُقبل اسم فيه حرف لا تعرفه العربية (پ چ ژ گ ک ی ۀ ے)
+const ARAB = new Set(['SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM', 'JO', 'LB', 'SY', 'IQ', 'PS', 'YE', 'MA', 'DZ', 'TN', 'LY', 'SD', 'MR', 'SO', 'DJ', 'KM']);
+export function arNames(d) { const ar = /[\u0621-\u064a]/, alien = /[پچژگکیۀےڈٹڑں]/, seen = new Set(), out = [];
   const tr = (d?.translations?.translations || []).filter(x => x?.iso_639_1 === 'ar').map(x => x.data?.name || x.data?.title);
-  const alt = (d?.alternative_titles?.results || d?.alternative_titles?.titles || []).map(x => x?.title);
-  for (const n of [...tr, ...alt]) { const s = String(n || '').replace(/\s+/g, ' ').trim(); if (!s || !ar.test(s) || s.length > 80) continue;
+  const alt = (d?.alternative_titles?.results || d?.alternative_titles?.titles || []).filter(x => ARAB.has(x?.iso_3166_1)).map(x => x?.title);
+  for (const n of [...tr, ...alt]) { const s = String(n || '').replace(/\s+/g, ' ').trim(); if (!s || !ar.test(s) || alien.test(s) || s.length > 80) continue;
     const k = s.replace(/[\u064b-\u0652\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي'); if (seen.has(k)) continue; seen.add(k); out.push(s); }
   return out.slice(0, 3); }
