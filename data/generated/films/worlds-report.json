@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-26T19:46:58.044Z",
+ "generatedAt": "2026-11-26T21:29:08.549Z",
  "counts": {
   "works": 629,
   "withEntry": 375,
@@ -18,7 +18,7 @@
   "chronoAuto": 31,
   "infoEntries": 466,
   "bytes": 203020,
-  "seconds": 25
+  "seconds": 61
  },
  "missing": [
   {
@@ -2536,8 +2536,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "musical:Wicked",
     "novel:The Wonderful Wizard of Oz",
+    "musical:Wicked",
     "novel:Wicked"
    ]
   },
@@ -4626,15 +4626,6 @@
  ],
  "excludedGroups": [
   {
-   "g": "Q65120698",
-   "name": "list of Illumination films",
-   "why": "list",
-   "size": 15,
-   "types": [
-    "Wikimedia list article"
-   ]
-  },
-  {
    "g": "Q26705935",
    "name": "BBC's 100 Greatest Films of the 21st Century",
    "why": "list",
@@ -4644,12 +4635,21 @@
    ]
   },
   {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
-   "why": "catalog",
-   "size": 23,
+   "g": "Q65120698",
+   "name": "list of Illumination films",
+   "why": "list",
+   "size": 15,
    "types": [
-    "animated film series"
+    "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q2732470",
+   "name": "list of Pixar films",
+   "why": "list",
+   "size": 28,
+   "types": [
+    "Wikimedia list article"
    ]
   },
   {
@@ -4662,12 +4662,12 @@
    ]
   },
   {
-   "g": "Q2732470",
-   "name": "list of Pixar films",
-   "why": "list",
-   "size": 28,
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
+   "why": "catalog",
+   "size": 23,
    "types": [
-    "Wikimedia list article"
+    "animated film series"
    ]
   }
  ],
