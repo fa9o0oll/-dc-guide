@@ -22,19 +22,18 @@ export function applyCare(games, prev = {}, TR = {}, PLACES = {}) {
     if (tr) { if (tr.s && s) o.sa = tr.s; if (tr.t && t) o.ta = tr.t; if (o.sa || o.ta) n.ar++; if (tr.h && tr.h !== textKey(s, t)) { o.old = 1; n.old++; } }
     if (Object.keys(o).length) { texts[g.id] = o; n.text++; }
     delete g.summary; delete g.story; delete g.place;
-    const pl = PLACES[g.id]; if (pl && pl.k !== 'none' && !g.adult) { g.place = pl; n.place++; }   // ألعاب +18 بلا موقع من الأحداث (لا سلسلة لها)، ونبذتها وترجمتها كغيرها (E69)
+    const pl = PLACES[g.id]; if (pl && pl.k !== 'none') { g.place = pl; n.place++; }   // ألعاب +18 كغيرها: موقعها من الأحداث (E75)، ونبذتها وترجمتها (E69)
   }
   return { texts, n };
 }
 
-// ما ينقص كل لعبة: ترجمة النبذة، ترجمة القصة، مراجعة نص تغيّر، الموقع من الأحداث. ألعاب +18 تُترجم كغيرها (E69) وتُوسم adult (عنوان إيداعها برقمها وحده)،
-// ولا يُكتب لها موقع (لا سلسلة لها)
+// ما ينقص كل لعبة: ترجمة النبذة، ترجمة القصة، مراجعة نص تغيّر، الموقع من الأحداث. ألعاب +18 كغيرها في ذلك كله (E69، E75)، وتُوسم adult (عنوان إيداعها برقمها وحده)
 export function pendingCare(games, texts = {}, TR = {}, PLACES = {}) {
   const out = [];
   for (const g of games) { const x = texts[g.id] || {}, tr = TR[g.id] || {}, need = [];
     if (x.s && !tr.s) need.push('summary'); if (x.t && !tr.t) need.push('story');
     if (!need.length && tr.h && (x.s || x.t) && tr.h !== textKey(x.s, x.t)) need.push('changed');
-    if (!PLACES[g.id] && !g.adult) need.push('place');
+    if (!PLACES[g.id]) need.push('place');
     if (need.length) out.push({ id: g.id, need, ...(g.adult ? { adult: 1 } : {}) }); }
   return out;
 }

@@ -5,7 +5,7 @@
 // وتحديث الصفحة والرجوع إليها يبقيانه كما تُرك.
 // أغلفة أعمال +18 مغطاة حتى تُكشف: زر مرافق بجانب العين (يظهر حين تُفتح) يكشفها كلها أو يغطيها، وغلاف العمل في بطاقته يُكشف بلمسه.
 // وما كُشف لا يبقى (E74): إغلاق العين يغطي الصور كلها ثانية، وكل رفع للفلتر وكل تحميل للصفحة يبدأ والصور مغطاة، فلا يرى أحد ما لم يُقصد كشفه. التغطية بطبقتين: حاوية كل عمل +18 تحمل data-ad (marks ومarkEl)، وكل صورة فيها مموّهة بقاعدة واحدة
-// (فلا تفلت صورة نُسيت في قالب) إلا إن حملت الحاوية data-r18-bare (عمل كُشف) أو حمل <html> السمة data-r18-open (كُشفت كلها).
+// (فلا تفلت صورة نُسيت في قالب) إلا إن حملت الحاوية data-r18-bare (عمل كُشف) أو حمل <html> السمة data-r18-open (كُشفت كلها). وشعارات المنصات (.where و.wlist) لا تُموَّه.
 // وفوقها غلاف الشبكة (cover): مصغّرة الصورة وحدها وعليها عين مغمضة، فلا تُحمَّل الصورة الكاملة قبل كشفها. والمكبّر (site/zoom.js) لا يفتح صورة مغطاة.
 const root = document.documentElement, G = root.dataset.guide || 'site', K = 'adult.' + G;
 const box = s => ({ get(k) { try { return s().getItem(k); } catch { return null; } }, set(k, v) { try { if (v == null) s().removeItem(k); else s().setItem(k, v); } catch {} } });
@@ -90,7 +90,7 @@ html[data-guide=games]{--eye-iris:var(--cy);--eye-deep:var(--bg);--eye-bg:var(--
 .r18-eye{position:relative}
 .r18-eye span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .r18-eye[aria-pressed=true]{color:var(--ink,#fff)}
-html:not([data-r18-open]) [data-ad]:not([data-r18-bare]) img:not(.pz img):not(.pz-ghost img){filter:blur(12px) saturate(.75) brightness(.72)!important}
+html:not([data-r18-open]) [data-ad]:not([data-r18-bare]) img:not(.pz img):not(.pz-ghost img):not(.where img):not(.wlist img){filter:blur(12px) saturate(.75) brightness(.72)!important}
 .x18{position:relative}
 .x18-i{position:absolute;inset:0;overflow:hidden;border-radius:inherit}
 .x18-i img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.3)!important;filter:blur(12px) saturate(.75) brightness(.72)!important}

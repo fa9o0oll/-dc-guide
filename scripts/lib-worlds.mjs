@@ -167,11 +167,14 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
   for (const [q, n] of Object.entries(info)) bind(q, n.tm ? 'm' + n.tm : n.tt ? 't' + n.tt : null);
   for (const r of mem) bind(r.m, r.tm ? 'm' + r.tm : r.tt ? 't' + r.tt : null);
   for (const r of adapt) bind(r.x, r.tm ? 'm' + r.tm : r.tt ? 't' + r.tt : null);
-  const bad = k => { const b = basic[k]; return !!(b && (b.adult || ADULT.test(b.title || ''))); };
+  const fs = new Set(focus), today = new Date().toISOString().slice(0, 10), shown = k => fs.has(k) || !!basic[k]?.title;
+  // أعمال +18 (E75): ما في القائمة منها لا يُستبعد، وعالمه أو ما يرتبط به (ok: سياق فيه عمل +18 من القائمة) يدخله ما خارجها من +18 كغيره.
+  // أما عوالم الأعمال العادية فتبقى بلا ما وسمه TMDB للبالغين وبلا المحاكاة الساخرة (اقتباسات Wikidata الإباحية لأفلام عادية ليست من سلسلتها)
+  const adultFocus = new Set(focus.filter(k => basic[k]?.adult)), adultG = g => [...(G.get(g)?.keys() || [])].some(k => adultFocus.has(k));
+  const bad = (k, ok = false) => { const b = basic[k]; return !fs.has(k) && !ok && !!(b && (b.adult || ADULT.test(b.title || ''))); };
   // يُعرض ما نعرف اسمه من TMDB، والأعمال المطلوبة نفسها. رقم محذوف أو خاطئ في Wikidata لا يظهر عملاً بلا اسم.
   // وعمل صدر وله أقل من عشرة أصوات في TMDB (فيلم معجبين، أو ربط خاطئ في Wikidata) لا يظهر. ما لم يصدر بعد يظهر.
-  const fs = new Set(focus), today = new Date().toISOString().slice(0, 10), shown = k => fs.has(k) || !!basic[k]?.title;
-  const heard = (k, n = minVotes) => fs.has(k) || !basic[k]?.date || basic[k].date > today || (basic[k].votes || 0) >= n, fine = k => shown(k) && !bad(k) && heard(k);
+  const heard = (k, n = minVotes) => fs.has(k) || !basic[k]?.date || basic[k].date > today || (basic[k].votes || 0) >= n, fine = (k, ok) => shown(k) && !bad(k, ok) && heard(k);
   const dateOf = (k, wd) => basic[k]?.date || wd || null;
   const typeList = q => (info[q]?.types || []).map(t => typeNames[t] || t);
 
@@ -192,31 +195,31 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
   // العمل المقتبس من امتياز عضو فيه (أعضاؤه الآخرون من «جزء من السلسلة» أو «امتياز» في Wikidata)
   for (const [k, w] of W) for (const x of w.groups) if (x.prop === 'P144' && G.has(x.g) && !G.get(x.g).has(k)) G.get(x.g).set(k, { k, ord: null, date: null });
   const groupOk = new Map();
-  for (const [g, ms] of G) { const names = typeList(g), size = [...ms.keys()].filter(k => !bad(k)).length;
+  for (const [g, ms] of G) { const names = typeList(g), size = [...ms.keys()].filter(k => !bad(k, adultG(g))).length;
     let why = null;
     if (names.some(n => NOT_GROUP.test(n)) || NOT_GROUP.test(info[g]?.label || '')) why = 'list';
     else if (size > maxGroup) why = 'too-big';
     else if (size > 12 && (CATALOG.test(info[g]?.label || '') || !names.some(n => /film series|series of films|trilogy|franchise|universe|saga/i.test(n)))) why = 'catalog';
     else if (size < 2) why = 'single';
-    if (why) { if (why !== 'single') report.excludedGroups.push({ g, name: info[g]?.label, why, size, types: names }); continue; }
+    if (why) { if (why !== 'single') report.excludedGroups.push({ g, name: adultG(g) ? '+18' : info[g]?.label, why, size, types: names }); continue; }   // ولا يُسمّى في التقرير ما فيه عمل +18
     groupOk.set(g, { kind: groupKind(names), size }); }
 
   // ترتيب أعضاء مجموعة: برقمها في السلسلة إن غطّى معظمها، وإلا بتاريخ الصدور. ما لا تاريخ له آخراً.
-  const byOrd = g => { const ms = [...G.get(g).values()].filter(m => fine(m.k)); return ms.filter(m => m.ord != null).length >= ms.length * 0.7; };
-  const orderOf = g => { const ms = [...G.get(g).values()].filter(m => fine(m.k)), d = m => dateOf(m.k, m.date) || '9999';
+  const byOrd = g => { const ms = [...G.get(g).values()].filter(m => fine(m.k, adultG(g))); return ms.filter(m => m.ord != null).length >= ms.length * 0.7; };
+  const orderOf = g => { const ms = [...G.get(g).values()].filter(m => fine(m.k, adultG(g))), d = m => dateOf(m.k, m.date) || '9999';
     return ms.sort(byOrd(g) ? (a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9) || d(a).localeCompare(d(b)) : (a, b) => d(a).localeCompare(d(b)) || (a.k > b.k ? 1 : -1)).map(m => m.k); };
   const worlds = {}, works = {};
   const addWorld = (id, w) => (worlds[id] ||= w);
 
   // أعمال يلي بعضها بعضاً دون مجموعة: نقبل الرابط إن كان متبادلاً، أو تشابه العنوانان، أو اختلف المخرجان.
   // (بعض صفحات Wikidata تستعمل «يليه» لفيلم المخرج التالي، وهذا ليس تكملة.)
-  const followOk = (aK, aQ, bQ) => { const bK = keyOfQ.get(bQ); if (!bK || !fine(bK)) return false;
+  const followOk = (aK, aQ, bQ, x18) => { const bK = keyOfQ.get(bQ); if (!bK || !fine(bK, x18)) return false;
     const a = info[aQ] || { prev: W.get(aK)?.prev || [], next: W.get(aK)?.next || [], dir: W.get(aK)?.dir || [] }, b = info[bQ] || {};
     const back = (b.prev || []).includes(aQ) || (b.next || []).includes(aQ);
     const ta = basic[aK]?.title || info[aQ]?.label, tb = basic[bK]?.title || info[bQ]?.label, same = similar(ta, tb);
     const da = uniq([...(W.get(aK)?.dir || []), ...(a.dir || [])]), db = b.dir || [], diffDir = da.length && db.length && !da.some(x => db.includes(x));
     const ok = same || diffDir || (back && !(da.length && db.length && da.some(x => db.includes(x))));
-    if (!ok) report.rejectedFollows.push({ from: aK, to: bK, a: ta, b: tb }); return ok; };
+    if (!ok) report.rejectedFollows.push({ from: aK, to: bK, a: adultFocus.has(aK) || basic[aK]?.adult ? '+18' : ta, b: basic[bK]?.adult ? '+18' : tb }); return ok; };
 
   for (const k of focus) { const w = W.get(k); if (!w) continue;
     const mine = uniq([...w.groups.map(x => x.g), ...[...G.keys()].filter(g => G.get(g).has(k))]).filter(g => groupOk.has(g) && G.get(g).has(k));
@@ -237,7 +240,7 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
     if (!chosen.length) { const chain = new Set([k]), todo = [[k, w.q]];
       while (todo.length) { const [ck, cq] = todo.pop(); const n = info[cq] || {}, wn = W.get(ck) || {};
         for (const nq of uniq([...(wn.prev || []), ...(wn.next || []), ...(n.prev || []), ...(n.next || [])])) { const nk = keyOfQ.get(nq);
-          if (nk && !chain.has(nk) && chain.size < 30 && followOk(ck, cq, nq)) { chain.add(nk); todo.push([nk, nq]); } } }
+          if (nk && !chain.has(nk) && chain.size < 30 && followOk(ck, cq, nq, adultFocus.has(k))) { chain.add(nk); todo.push([nk, nq]); } } }
       if (chain.size > 1) { const o = [...chain].sort((a, b) => (dateOf(a, info[qOfKey.get(a)]?.date) || '9999').localeCompare(dateOf(b, info[qOfKey.get(b)]?.date) || '9999'));
         const id = 'c:' + o[0]; report.chains++;
         addWorld(id, { name: basic[o[0]]?.title || info[qOfKey.get(o[0])]?.label || o[0], kind: 'chain', by: 'date', wd: qOfKey.get(o[0]) || null, wiki: info[qOfKey.get(o[0])]?.wiki || null, order: o, size: o.length });
@@ -245,7 +248,7 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
     // أعمال مرتبطة: الأصل، وما اقتُبس عنه، واقتباسات أخرى للمصدر نفسه، والمصدر نفسه إن لم يكن له رقم في TMDB
     // الأقوى أولاً: ما اقتُبس منه العمل مباشرة، ثم ما اقتُبس عنه (ريميك فيلم 1998 لـ Psycho مقتبس عنه، وليس مجرد اقتباس آخر للرواية)، ثم اقتباسات المصدر الأخرى.
     // وهنا عتبة أعلى للجمهور (٢٠ صوتاً) لأن «مقتبس عن» في Wikidata يشمل أعمالاً مغمورة أو متأثرة فقط
-    const relx = [], src = [], seen = new Set([k]), add = (t, r, via) => { if (t && !seen.has(t) && fine(t) && heard(t, relVotes)) { seen.add(t); relx.push(via ? { k: t, r, via } : { k: t, r }); } };
+    const relx = [], src = [], seen = new Set([k]), add = (t, r, via) => { if (t && !seen.has(t) && fine(t, adultFocus.has(k)) && heard(t, relVotes)) { seen.add(t); relx.push(via ? { k: t, r, via } : { k: t, r }); } };
     for (const q of uniq(w.based)) add(keyOfQ.get(q), 'original');
     for (const q of uniq(w.derived)) add(keyOfQ.get(q), 'derived');
     for (const q of uniq(w.based)) { if (keyOfQ.get(q) || entry.worlds.includes(q)) continue;
@@ -261,7 +264,7 @@ export function assemble({ focus, rel, info, mem, adapt = [], typeNames = {}, ba
 
   // معلومات الأعمال المذكورة (للصورة والتاريخ)، من TMDB
   const used = new Set(); for (const w of Object.values(worlds)) w.order.forEach(k => used.add(k)); for (const w of Object.values(works)) (w.rel || []).forEach(r => used.add(r.k));
-  const outInfo = {}; for (const k of used) if (basic[k] && !fs.has(k)) { const { adult, ...b } = basic[k]; outInfo[k] = b; }
+  const outInfo = {}; for (const k of used) if (basic[k] && !fs.has(k)) { const { adult, ...b } = basic[k]; outInfo[k] = adult ? { ...b, adult: 1 } : b; }   // +18 موسوم: الصفحة تخفيه والفلتر قائم
   return { worlds, works, info: outInfo, report };
 }
 

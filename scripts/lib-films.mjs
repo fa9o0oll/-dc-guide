@@ -70,14 +70,13 @@ export function shape(kind, d, providers = {}) {
     prov: wp ? { link: wp.link || undefined, stream: provIds(wp.flatrate, providers), free: provIds([...(wp.free || []), ...(wp.ads || [])], providers), rent: provIds(wp.rent, providers), buy: provIds(wp.buy, providers) } : null };
   if (kind === 'tv') { o.seasons = d.number_of_seasons || null; o.episodes = d.number_of_episodes || null; o.lastDate = d.last_air_date || null;
     const n = d.next_episode_to_air; if (n?.air_date) o.next = { s: n.season_number, e: n.episode_number, date: n.air_date }; } // الحلقة القادمة لمسلسل يُعرض الآن (لعدّادها)
-  // عمل +18 (يخفيه فلتر العين في الصفحة): اسمه وسنته وتقييمه وصورته ونبذته كغيره (E69)، بلا طاقم ولا سلسلة ولا منصات
-  if (o.adult) Object.assign(o, { titleAr: undefined, cast: [], directors: [], col: undefined, prov: null, next: undefined });
+  // عمل +18 (يخفيه فلتر العين في الصفحة) بمعلوماته كلها كغيره (E69، E75): طاقمه وسلسلته ومنصاته، وموسوم adult
   return JSON.parse(JSON.stringify(o));
 }
 
 // أجزاء السلسلة مرتبة بتاريخ الصدور. الأجزاء التي لم يُعلن تاريخها تأتي آخراً.
 export const shapeCollection = c => ({ id: c.id, name: c.name.replace(/\s+Collection$/i, ''), poster: c.poster_path || null, backdrop: c.backdrop_path || null,
-  parts: (c.parts || []).map(p => ({ tmdb: p.id, title: p.title, date: p.release_date || null, year: p.release_date ? +p.release_date.slice(0, 4) : null, poster: p.poster_path || null, rating: p.vote_count ? Math.round(p.vote_average * 10) / 10 : null }))
+  parts: (c.parts || []).map(p => ({ tmdb: p.id, title: p.title, date: p.release_date || null, year: p.release_date ? +p.release_date.slice(0, 4) : null, poster: p.poster_path || null, rating: p.vote_count ? Math.round(p.vote_average * 10) / 10 : null, ...(p.adult ? { adult: 1 } : {}) }))
     .sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999')) });
 
 // السلاسل المراجَعة يدوياً (data/films/franchises.json): ترتيب مشاهدة يجمع أفلاماً من أكثر من مجموعة، ومسلسلات مرتبطة، وتوصية لكل عمل (watch | optional | skip).

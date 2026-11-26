@@ -60,6 +60,10 @@ check('in neither', !r.rows.has(14), at(14));
 check('coming soon: platforms from the coming lists, marked soon, not counted as included', at(15).gp?.soon === 1 && JSON.stringify(at(15).gp.on) === '["xbox","pc"]' && !at(15).gp.out, at(15));
 check('meta counts', r.meta.n.gp === 5 && r.meta.n.ps === 5 && !r.meta.failed, r.meta);
 
+// +18 (E75): checked like any other game, but the report names it by its number alone, with no title from either catalog
+{ const AD = new Set([3, 7]), a = await subsFor(games.map(g => AD.has(g.id) ? { ...g, adult: 1 } : g), { fetch: mock(), pause: 0 }), txt = JSON.stringify(a.report);
+  check('+18: rows as usual, report by number only', [...AD].every(id => JSON.stringify(a.rows.get(id)) === JSON.stringify(r.rows.get(id))) && !/Forza Track|Ghost Isle/i.test(txt) && '+18 #3' in a.report.games && '+18 #7' in a.report.games && /Halo Quest/.test(txt),
+    [Object.keys(a.report.games), a.report.byTitle]); }
 const prev = new Map([[13, { gp: { on: ['xbox'], u: 'x' } }], [6, { ps: { k: 'deluxe', on: [], u: 'old' } }], [14, { gp: { on: ['pc'], u: 'gone' } }]]);
 const down = await subsFor(games, { fetch: mock({ gpDown: true }), pause: 0, prev });
 check('Game Pass unreachable: previous rows kept, failure reported', down.rows.get(13)?.gp?.u === 'x' && down.rows.get(14)?.gp?.u === 'gone' && down.meta.failed.includes('gamepass'), [down.rows.get(13), down.meta]);

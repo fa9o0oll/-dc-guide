@@ -414,6 +414,7 @@ section.sec{padding:22px clamp(14px,3vw,30px) 0}
 .order li.here{box-shadow:inset 0 0 0 1.5px var(--cy)}.order li.here::before{color:var(--cy)}
 .order .th{width:40px;aspect-ratio:264/374;border-radius:5px;overflow:hidden;background:var(--card2)}
 .order .th img{width:100%;height:100%;object-fit:cover}
+.order .th .x18-m{font-size:.55rem;padding:2px}   /* جزء +18 مغطى في ترتيب السلسلة: عين البوابة بحجم المصغّرة */
 .order .t{min-width:0;display:grid}
 .order .t b{font-weight:600;font-size:.92rem;direction:ltr;text-align:right;overflow-wrap:anywhere}
 .order .t small{color:var(--mute);font-size:.8rem}
@@ -446,6 +447,7 @@ section.sec{padding:22px clamp(14px,3vw,30px) 0}
 .shots{display:flex;gap:10px}
 .shot{flex:none;width:260px;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--card2)}
 .shot img{width:100%;height:100%;object-fit:cover}
+.shot.x18{display:block}   /* لقطة لعبة +18 لم تُكشف (E75) */
 .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .links a{display:grid;text-align:start;min-height:56px;padding:8px 14px;border-radius:10px;background:var(--card);text-decoration:none;box-shadow:inset 0 0 0 1px var(--line);align-content:center}
 .links b{font-weight:600}.links b[dir=ltr]{text-align:right}

@@ -18,6 +18,7 @@ globalThis.fetch = async (url, opt = {}) => { const u = new URL(url);
       belongs_to_collection: { id: 77, name: 'Heat Collection' }, credits: { crew: [{ job: 'Director', name: 'Michael Mann' }], cast: [{ name: 'Al Pacino' }] }, 'watch/providers': { results: { SA: { link: 'https://tmdb/watch', flatrate: [{ provider_id: 8, provider_name: 'Netflix', logo_path: '/n.jpg' }] } } }, translations: { translations: [] } });
     if (p === '/movie/1') return res(200, { id: 1, title: 'The Heat' });
     if (p === '/movie/950') return res(200, { id: 950, title: 'Heat 2', release_date: '', vote_count: 0, poster_path: '/h2.jpg', genres: [{ id: 80 }] });
+    if (p === '/collection/9') return res(200, { id: 9, name: 'Velvet Collection', parts: [{ id: 700, title: 'Velvet', release_date: '2020-01-01', adult: true }, { id: 702, title: 'Velvet Two', release_date: '2022-01-01', adult: true, poster_path: '/v2.jpg' }] });
     if (p === '/collection/77') return res(200, { id: 77, name: 'Heat Collection', parts: [{ id: 950, title: 'Heat 2', release_date: '' }, { id: 949, title: 'Heat', release_date: '1995-12-15', vote_count: 5, vote_average: 7.9 }] });
     return res(404, {}); }
   // Wikidata: Heat يليه Heat 2 (المخرج نفسه، والعنوانان متشابهان، فهي تكملة)
@@ -68,13 +69,16 @@ check('تعطّل Wikidata يعيد خطأً واضحاً ولا يكتب شيئ
   check('الاقتراحات والفلتر مرفوع: المعتادة ومعها ما وُسم للبالغين موسوماً بلا تكرار، وTMDB يُسأل بـinclude_adult خمس صفحات', JSON.stringify(sa.body.items) === JSON.stringify([{ tmdb: 949, kind: 'movie', title: 'Heat', year: 1995, poster: '/h.jpg' }, { tmdb: 77, kind: 'tv', title: 'Heat Wave', year: 2010, poster: null }, { tmdb: 8, kind: 'movie', title: 'X', year: null, poster: null, adult: 1 }])
     && adultAsked.length === 5 && adultAsked.every(a => a === '/search/multi true'), [sa.body, adultAsked]);
   adultAsked = []; const n = await call({ action: 'search', q: 'Velvet', ...P }), x = await call({ action: 'search', q: 'Velvet', adult: true, ...P });
-  check('البحث والفلتر قائم لا يعيد عمل +18 ولا يطلبه، وحين يُرفع يعيد المعتاد ومعه عمل +18 موسوماً بلا اسم سلسلته، كلٌّ في موضعه', n.body.candidates.map(c => c.tmdb).join() === '701' && !n.body.candidates[0].adult && x.body.candidates.map(c => c.tmdb + (c.adult ? '*' : '')).join() === '701,700*'
-    && x.body.candidates[1].collection === undefined && adultAsked.filter(a => / false$/.test(a)).length === 2 && adultAsked.filter(a => / true$/.test(a)).length === 10, [n.body.candidates, x.body.candidates, adultAsked]);   // والفلتر قائم صفحة لكل نوع، ومرفوعاً خمس
+  check('البحث والفلتر قائم لا يعيد عمل +18 ولا يطلبه، وحين يُرفع يعيد المعتاد ومعه عمل +18 موسوماً باسم سلسلته كغيره (E75)، كلٌّ في موضعه', n.body.candidates.map(c => c.tmdb).join() === '701' && !n.body.candidates[0].adult && x.body.candidates.map(c => c.tmdb + (c.adult ? '*' : '')).join() === '701,700*'
+    && x.body.candidates[1].collection === 'Velvet' && adultAsked.filter(a => / false$/.test(a)).length === 2 && adultAsked.filter(a => / true$/.test(a)).length === 10, [n.body.candidates, x.body.candidates, adultAsked]);   // والفلتر قائم صفحة لكل نوع، ومرفوعاً خمس
   const pn = await call({ action: 'preview', tmdb: 700, kind: 'movie', ...P }), an = await call({ action: 'add', tmdb: 700, kind: 'movie', ...P });
   check('عمل +18 لا يُفتح ولا يُضاف والفلتر قائم، والرسالة تدلّ على العين بلا «+18»', pn.status === 422 && an.status === 422 && /للبالغين/.test(an.body.error) && /العين/.test(an.body.error) && !/\+18/.test(an.body.error) && puts.length === before, [pn, an]);
+  { const n0 = wdAsked, wn = await call({ action: 'worlds', tmdb: 700, kind: 'movie', ...P });
+    check('ولا يُبحث له عن عالم والفلتر قائم (E75)، ولا تُسأل Wikidata', wn.status === 422 && /العين/.test(wn.body.error) && wdAsked === n0, [wn.status, wn.body, wdAsked - n0]); }
   const pa = await call({ action: 'preview', tmdb: 700, kind: 'movie', adult: true, ...P }), f = pa.body.film;
-  check('بطاقته والفلتر مرفوع: موسوم adult، باسمه وسنته وتقييمه وصورته ونبذته بلغتيها كغيره (E69)، بلا اسم عربي ولا طاقم ولا سلسلة ولا منصات', pa.status === 200 && f.adult === 1 && f.title === 'Velvet' && f.year === 2020 && f.rating === 5.5 && f.poster === '/v.jpg'
-    && f.overviewEn === 'explicit synopsis' && f.overviewAr === 'نبذة' && f.titleAr === undefined && f.cast.length === 0 && f.directors.length === 0 && f.col === undefined && f.prov === null && pa.body.collection === null, pa.body);
+  check('بطاقته والفلتر مرفوع: موسوم adult، بمعلوماته كلها كغيره (E69، E75): اسمه العربي وطاقمه وسلسلته بأجزائها الموسومة ومنصاته', pa.status === 200 && f.adult === 1 && f.title === 'Velvet' && f.year === 2020 && f.rating === 5.5 && f.poster === '/v.jpg'
+    && f.overviewEn === 'explicit synopsis' && f.overviewAr === 'نبذة' && f.titleAr === 'مخمل' && f.cast.join() === 'Performer' && f.directors.join() === 'Someone' && f.col === 9 && f.prov?.stream.join() === '8'
+    && pa.body.collection?.parts.map(x => x.tmdb + (x.adult ? '*' : '')).join() === '700*,702*', pa.body);
   const aa = await call({ action: 'add', tmdb: 700, kind: 'movie', adult: true, ...P }), row = JSON.parse(stored).find(e => e.tmdb === 700);
   check('وإضافته حينها تكتبه موسوماً في الملف، وعنوان الإيداع برقمه بلا اسمه', aa.status === 200 && aa.body.state === 'added' && aa.body.film.adult === 1 && row?.adult === 1 && puts.at(-1).message === 'films: add +18 (m700)', [aa.body.state, row, puts.at(-1)?.message]);
   const na = await call({ action: 'add', tmdb: 949, kind: 'movie', adult: true, ...P });

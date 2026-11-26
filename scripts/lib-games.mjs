@@ -142,18 +142,26 @@ export function alsoPlatforms(groups, typeOf, skip = () => false) { const out = 
         for (const p of v.platforms || []) set.add(p); } } }
   return out; }
 
+// والفلتر قائم (طلب بلا adult في الدالة): لا يعود من +18 شيء، لا جزءاً من سلسلة ولا لعبةً مرتبطة (E75). يغيّر r في مكانه ويعيده
+export function withoutAdult(r) { const series = r.series || {};
+  for (const [id, s] of Object.entries(series)) { s.members = s.members.filter(m => !m.adult); if (s.members.length < 2) delete series[id]; }
+  for (const g of r.games || []) { g.series = (g.series || []).filter(id => series[id]);
+    for (const [k, v] of Object.entries(g.rel || {})) { if (Array.isArray(v)) { g.rel[k] = v.filter(m => !m.adult); if (!g.rel[k].length) delete g.rel[k]; } else if (v?.adult) delete g.rel[k]; } }
+  return r; }
+
 // يجلب الألعاب المطلوبة ويشكّلها. opt.wikidata: يُثرى من Wikidata (البناء الليلي، وبمهلة قصيرة في الدالة)، opt.story: ترتيبات القصة، opt.log: سجل.
-// opt.erotic: 'keep' يُبقي ألعاب +18 (سمة Erotic) موسومةً adult: غلافها واسمها ومنصاتها وتقييمها ونبذتها وقصتها (E69)، بلا لقطات ولا عروض ولا سلسلة ولا أقرباء
-// (البناء الليلي، وبطاقة لعبة +18 وإضافتها والفلتر مرفوع). وبدونه تُحذف كما كانت. أقرباء الألعاب وأجزاء سلاسلها لا يدخلها شيء من +18 في الحالين
+// opt.erotic: 'keep' يُبقي ألعاب +18 (سمة Erotic) موسومةً adult، بمعلوماتها كلها كغيرها (E75): لقطاتها وعروضها وسلسلتها وأقرباؤها وعالمها واقتباساتها،
+// وأجزاء السلاسل والألعاب المرتبطة منها تدخل موسومةً adult أيضاً، والصفحة تخفيها والفلتر قائم (البناء الليلي، وبطاقة لعبة +18 وإضافتها والفلتر مرفوع).
+// وبدونه لا يدخل شيء من +18، لا لعبةً ولا قريباً
 export async function gamesFor(ids, opt = {}) {
   const log = opt.log || (() => {}), m = await meta(), now = Date.now();
-  const all = (await igdbIn('games', FULL, ids)).filter(g => opt.erotic === 'keep' || !erotic(g)), raw = all.filter(g => !erotic(g));
+  const keep = opt.erotic === 'keep', all = (await igdbIn('games', FULL, ids)).filter(g => keep || !erotic(g)), raw = all.filter(g => !erotic(g));
   // الألعاب المرتبطة وأجزاء السلاسل (بمعلومات خفيفة)، والمنصات، وأوقات الختم
-  const rel = new Set(); for (const g of raw) { for (const k of ['parent_game', 'version_parent']) if (g[k]) rel.add(g[k]); for (const k of ['dlcs', 'expansions', 'standalone_expansions', 'remakes', 'remasters', 'ports']) for (const x of g[k] || []) rel.add(x); }
-  const [cols, frs, ttbs] = await Promise.all([igdbIn('collections', 'name,slug,games', raw.flatMap(g => g.collections || [])),
-    igdbIn('franchises', 'name,slug,games', raw.flatMap(g => [...(g.franchises || []), g.franchise].filter(Boolean))), igdbIn('game_time_to_beats', 'game_id,hastily,normally,completely,count', all.map(g => g.id), 'game_id').catch(() => [])]);
+  const rel = new Set(); for (const g of all) { for (const k of ['parent_game', 'version_parent']) if (g[k]) rel.add(g[k]); for (const k of ['dlcs', 'expansions', 'standalone_expansions', 'remakes', 'remasters', 'ports']) for (const x of g[k] || []) rel.add(x); }
+  const [cols, frs, ttbs] = await Promise.all([igdbIn('collections', 'name,slug,games', all.flatMap(g => g.collections || [])),
+    igdbIn('franchises', 'name,slug,games', all.flatMap(g => [...(g.franchises || []), g.franchise].filter(Boolean))), igdbIn('game_time_to_beats', 'game_id,hastily,normally,completely,count', all.map(g => g.id), 'game_id').catch(() => [])]);
   // السلاسل الضخمة (مئات الألعاب، كماريو) تُختصر إلى ما يناسب ترتيباً يُقرأ: أقرب ٦٠ جزءاً من الألعاب نفسها
-  const light = new Map((await igdbIn('games', LIGHT, [...cols.flatMap(c => (c.games || []).slice(0, 400)), ...rel])).filter(g => !erotic(g)).map(g => [g.id, g]));
+  const light = new Map((await igdbIn('games', LIGHT, [...cols.flatMap(c => (c.games || []).slice(0, 400)), ...rel])).filter(g => keep || !erotic(g)).map(g => [g.id, g]));
   const plats = {}, code = new Map();
   for (const p of await igdbIn('platforms', 'name,abbreviation,slug', [...all, ...light.values()].flatMap(g => g.platforms || []))) { const c = codeOf(p); code.set(p.id, c); plats[c] ||= { name: p.name, abbr: ABBR[c] || p.abbreviation || p.name, fam: famOf(p.name) }; }
   const codes = list => [...new Set((list || []).map(id => code.get(id)).filter(Boolean))].sort(byRank);
@@ -162,7 +170,7 @@ export async function gamesFor(ids, opt = {}) {
   // نسخة أُلغيت أو لم تصدر بعد (Mortal Kombat X على PS3 أُلغيت، وسجلها باقٍ في IGDB) لا تُضم منصاتها
   const out = g => ['cancelled', 'rumored'].includes(m.status.get(g.game_status)) || !g.first_release_date || g.first_release_date * 1000 > now;
   const also = alsoPlatforms(cols.map(c => (c.games || []).map(id => light.get(id)).filter(Boolean)), g => m.type.get(g.game_type) || 'main', out);
-  const lightOf = g => { const w = when(g); return { id: g.id, slug: g.slug, title: g.name, ...w, year: year(g.first_release_date), cover: g.cover?.image_id || null, type: m.type.get(g.game_type) || 'main', status: stage(g, m, w), plats: codes(g.platforms), hype: g.hypes || 0 }; };
+  const lightOf = g => { const w = when(g); return { id: g.id, slug: g.slug, title: g.name, ...w, year: year(g.first_release_date), cover: g.cover?.image_id || null, type: m.type.get(g.game_type) || 'main', status: stage(g, m, w), plats: codes(g.platforms), hype: g.hypes || 0, ...(erotic(g) ? { adult: 1 } : {}) }; };
   // السلسلة: كل أجزائها الرئيسية (لا الإضافات) بترتيب الصدور، وما لا موعد له آخراً، وترتيب القصة إن وُجد له مصدر
   const series = {};
   for (const c of cols) {
@@ -172,7 +180,7 @@ export async function gamesFor(ids, opt = {}) {
     series[c.id] = { name: c.name, slug: c.slug, members, size: (c.games || []).length };
     const st = storyFor(members, opt.story || [], log); if (st) series[c.id].story = st;
   }
-  let wd = new Map(); if (opt.wikidata) { try { wd = await wikidataFor(raw.map(g => g.slug), { timeout: opt.wdTimeout || 60000 }); log(`wikidata matched ${wd.size} of ${raw.length}`); } catch (e) { log('wikidata skipped: ' + e.message); } }
+  let wd = new Map(); if (opt.wikidata) { try { wd = await wikidataFor(all.map(g => g.slug), { timeout: opt.wdTimeout || 60000 }); log(`wikidata matched ${wd.size} of ${all.length}`); } catch (e) { log('wikidata skipped: ' + e.message); } }
   const ttbOf = new Map(ttbs.map(t => [t.game_id, { h: hours(t.hastily), n: hours(t.normally), c: hours(t.completely), count: t.count || 0 }]));
   const games = all.map(g => {
     const w = when(g), x = wd.get(g.slug) || {}, art = (g.artworks || []).slice().sort((a, b) => (b.width || 0) - (a.width || 0))[0]?.image_id || g.screenshots?.[0]?.image_id || null;
@@ -193,7 +201,7 @@ export async function gamesFor(ids, opt = {}) {
       ttb: ttbOf.get(g.id) || null, series: (g.collections || []).filter(c => series[c]), franchises: [...new Set([...(g.franchises || []), g.franchise].filter(Boolean))],
       rel: r, ext, sites, igdb: g.url || '', wd: x.q || '', universe: x.universe || null, from: x.from || [], into: x.into || [],
       videos: (g.videos || []).slice(0, 3).map(v => ({ id: v.video_id, name: v.name || '' })),
-      ...(erotic(g) ? { adult: 1, art: null, shots: [], videos: [], series: [], franchises: [], rel: {}, universe: null, from: [], into: [] } : {}),
+      ...(erotic(g) ? { adult: 1 } : {}),
     };
   });
   const franchises = Object.fromEntries(frs.map(f => [f.id, { name: f.name, size: (f.games || []).length }]));

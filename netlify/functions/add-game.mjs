@@ -8,7 +8,7 @@
 //   ADD_GAME_PASSWORD  كلمة السر (وإن لم توجد فكلمة سر «أضف فيلماً» ADD_FILM_PASSWORD)
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { igdb, igdbHealth, hasIgdb, quote, year } from '../../scripts/lib-igdb.mjs';
-import { meta, gameyIds, gamesFor, famOf, codeOf, ABBR, EROTIC } from '../../scripts/lib-games.mjs';
+import { meta, gameyIds, gamesFor, withoutAdult, famOf, codeOf, ABBR, EROTIC } from '../../scripts/lib-games.mjs';
 import story from '../../data/games/story-orders.mjs';
 
 const REPO = process.env.GH_REPO || 'fa9o0oll/-dc-guide', BRANCH = 'main', FILE = 'data/games/added.json';
@@ -155,9 +155,10 @@ export default async req => {
     if (b.action === 'preview' || b.action === 'add') {
       const id = +b.igdb; if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
       if (b.action === 'add' && !process.env.GH_TOKEN) return json(500, { error: 'إعدادات الخادم ناقصة: GH_TOKEN غير موجود في Netlify.' });
-      const r = await gamesFor([id], { wikidata: true, wdTimeout: 9000, story: story.series, erotic: 'keep' }), game = r.games[0];   // ولعبة +18 لا تُسأل عنها Wikidata (gamesFor)
+      const r = await gamesFor([id], { wikidata: true, wdTimeout: 9000, story: story.series, erotic: 'keep' }), game = r.games[0];   // ولعبة +18 بمعلوماتها كلها كغيرها (E75)، وما فيها من +18 موسوم تخفيه الصفحة والفلتر قائم
       if (!game) return json(404, { error: 'هذه اللعبة غير موجودة في IGDB.' });
       if (game.adult && !adult) return json(422, { error: 'هذه اللعبة مصنَّفة للبالغين: افتح العين أعلى الصفحة ثم أضفها.' });
+      if (!adult) withoutAdult(r);   // والفلتر قائم: لا جزء +18 في سلاسلها ولا لعبة +18 بين ما يرتبط بها
       if (b.action === 'preview') return json(200, { game, series: r.series, plats: r.plats, franchises: r.franchises });
       const at = new Date().toISOString(), state = await record([{ igdb: id, title: game.title, year: game.year, at, ...(game.adult ? { adult: 1 } : {}) }], f => f[0].adult ? `games: add +18 (#${f[0].igdb})` : `games: add ${f[0].title}${f[0].year ? ` (${f[0].year})` : ''}`);
       return json(200, { state: state.added ? 'added' : 'exists', game: { ...game, src: 'added', at }, series: r.series, plats: r.plats, franchises: r.franchises });

@@ -27,9 +27,15 @@ FX.subs = { at: '2026-11-21T09:00:00Z', n: { gp: 1, ps: 2 } };
 FX.games.find(g => g.id === 1942).subs = { gp: { on: ['xbox', 'pc'], u: 'https://www.xbox.com/games/store/the-witcher-3-wild-hunt/BR765873CQJD', out: 1 }, ps: { k: 'extra', on: ['ps5', 'ps4'], u: 'https://store.playstation.com/en-sa/concept/10000876' } };
 FX.games.find(g => g.id === 136625).subs = { gp: { on: ['xbox'], u: 'https://www.xbox.com/games/store/grand-theft-auto-vi/9NGTA6000000', soon: 1 } };   // قادمة إلى Game Pass: لا ختم ولا تُعد
 FX.games.find(g => g.id === 112875).subs = { ps: { k: 'extra', on: ['ps5', 'ps4'], u: 'https://store.playstation.com/en-sa/concept/10001850', n: 'God of War Ragnarök PS4 & PS5' } };
-// لعبتان +18 (adult) بأسماء مختلَقة كما يكتبهما البناء (lib-games: نبذتها كغيرها (E69)، بلا لقطات ولا سلسلة): لا تظهران إلا والفلتر مرفوع (E65)، وكل ما قبلها من فحوص يجري وهما في الملف
+// لعبتان +18 (adult) بأسماء مختلَقة كما يكتبهما البناء: بمعلوماتهما كلها كغيرهما (E69، E75)، لا تظهران إلا والفلتر مرفوع (E65)، وكل ما قبلها من فحوص يجري وهما في الملف.
+// الأولى بخلفيتها ولقطتيها ومتجرها واشتراكها، وفي سلسلة +18 مع الثانية؛ وفي سلسلة GTA جزء +18 ليس في القائمة، يخفيه الفلتر القائم
 const ADULT = [1, 2].map(k => ({ ...FX.games[0], id: 9800000 + k, slug: 'sample-night-' + k, title: ['Sample Night Novel', 'Sample Velvet Academy'][k - 1], titleAr: '', alt: [], year: 2018 + k, date: `${2018 + k}-06-01`, cover: 'c98' + k, art: null, shots: [], videos: [], summary: '', story: '',
   plats: ['pc'], also: undefined, dates: [{ p: 'pc', date: `${2018 + k}-06-01`, human: '' }], genres: ['رواية مرئية'], series: [], franchises: [], rel: {}, from: [], into: [], universe: null, subs: undefined, pc: undefined, place: undefined, adult: 1, ord: 900 + k }));
+Object.assign(ADULT[0], { art: 'ar981', shots: ['sh981a', 'sh981b'], series: [77], pc: [{ s: 'steam', u: 'https://store.steampowered.com/app/9800001' }], subs: { gp: { on: ['pc'], u: 'https://www.xbox.com/games/store/sample/9N0000000981' } } });
+ADULT[1].series = [77];
+const LA = (g, x = {}) => ({ id: g.id, slug: g.slug, title: g.title, date: g.date, prec: 'd', human: null, year: g.year, cover: g.cover, type: 'main', status: 'released', plats: ['pc'], hype: 0, adult: 1, ...x });
+FX.series[77] = { name: 'Sample Night', slug: 'sample-night', size: 2, members: ADULT.map(g => LA(g)) };
+FX.series[8].members.splice(1, 0, LA({ id: 9800050, slug: 'grand-theft-night', title: 'Grand Theft Night', date: '2015-05-05', year: 2015, cover: 'c9850' }));
 FX.games.push(...ADULT); TX[9800001] = { s: 'A quiet visual novel about one long night.' };
 const server = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]);
   if (u === '/games/data/games.json') { r.writeHead(200, { 'content-type': 'application/json' }); return r.end(JSON.stringify(FX)); }
@@ -82,6 +88,8 @@ async function open(width, height, mobile, extra = {}) {
   await page.addInitScript(p => { try { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('gamesg.progress', p); localStorage.setItem('gamesg.pass', 'test'); } } catch {} }, JSON.stringify(progress));   // وصفحة about:blank بلا تخزين
   await mockApi(page); return { ctx, page, errs };
 }
+// رابط بطاقة بعد إغلاق أخرى بـEsc: الإغلاق يرجع في السجل، وقد يصل رجوعه بعد طلب الرابط فيغلق ما فُتح للتو (سباق في أداة الفحص لا في الصفحة)، فيُعاد الطلب
+const hashOpen = async (page, h, sel) => { for (let i = 0; ; i++) { await page.goto(`${base}/games/${h}`); try { return await page.waitForSelector(sel, { timeout: 8000 }); } catch (e) { if (i === 2) throw e; } } };
 const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .gc')].filter(e => !e.hidden).map(e => +e.dataset.id));
 
 // ---------- الكمبيوتر
@@ -195,7 +203,7 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
     let x = await pvPc();
     check('بطاقة الاطلاع لا تَعِد بفحص لا يقع: ليست في المكتبة فمتاجرها لا تُفحص إلا إن أُضيفت، ولا قسم للاشتراكات', !x.tiles.length && !x.f && !x.subs && x.note === 'ليست في مكتبتك، فمتاجرها لا تُفحص، وليس لها في IGDB رابط متجر. إن أضفتها فُحصت في البناء القادم.', x);
     await page.keyboard.press('Escape'); await page.waitForTimeout(300);
-    await page.goto(`${base}/games/#g112875`); await page.waitForSelector('#sheet[open] .order:not([hidden])'); await page.click('#sheet [data-act=ordv][data-v=release]'); await page.waitForSelector('#sheet .order[data-ov=release]:not([hidden]) li:nth-child(3) .go[data-act=peek]'); await page.waitForTimeout(200);
+    await hashOpen(page, '#g112875', '#sheet[open] .order:not([hidden])'); await page.click('#sheet [data-act=ordv][data-v=release]'); await page.waitForSelector('#sheet .order[data-ov=release]:not([hidden]) li:nth-child(3) .go[data-act=peek]'); await page.waitForTimeout(200);
     await page.click('#sheet .order[data-ov=release] li:nth-child(3) .go'); await page.waitForSelector('#sheet [data-act=pv-add]');
     x = await pvPc(); check('وبروابط متاجرها في IGDB: بلاطاتها كما هي بلا حكم على المجانية، والملاحظة تقول إنها لا تُفحص', asked.includes('preview:551') && x.tiles.join() === 'steam:المتجر' && !x.f && x.note === 'ليست في مكتبتك، فهذه روابط متاجرها في IGDB كما هي، بلا فحص لمجانيتها. إن أضفتها فُحصت في البناء القادم.', x); }
   await page.keyboard.press('Escape'); await page.waitForTimeout(300);
@@ -378,7 +386,7 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   check('زمن الأحداث ومكانها ومصدرها، ونوع موقعها بجانب سنتها في قائمة السلسلة', pl.facts.length === 2 && /زمن الأحداث/.test(pl.facts[0]) && /العوالم التسعة/.test(pl.facts[1]) && /IGDB/.test(pl.note) && /تكملة/.test(pl.row), pl);
   await page.keyboard.press('Escape'); await page.waitForTimeout(300);
   // لعبة لم تُترجم: نبذتها بالإنجليزية وزر «ترجمها لي»، والطلب يُحفظ
-  await page.goto(`${base}/games/#g119133`); await page.waitForSelector('#sheet[open] .about .tr');
+  await hashOpen(page, '#g119133', '#sheet[open] .about .tr');
   const en = await page.evaluate(() => { const a = document.querySelector('#sheet .about'); return { en: a.querySelector(':scope > p.en')?.textContent, btn: a.querySelector('[data-act=tr-ask]')?.textContent.trim(), orig: !!a.querySelector('.orig'), place: !!document.querySelector('#sheet .place') }; });
   check('غير المترجمة: نبذتها بالإنجليزية كما هي، وتحتها زر «ترجمها لي»، وبلا قسم موقع لما لم يُكتب موقعه', en.en === 'Rise, Tarnished.' && en.btn === 'ترجمها لي' && !en.orig && !en.place, en);
   await page.click('#sheet [data-act=tr-ask]'); await page.waitForSelector('#sheet .tr-ok');
@@ -567,21 +575,31 @@ for (const [name, w, h, mobile] of [['+18', 1440, 900, false], ['+18 (cover)', 3
     && !document.querySelector('.r18-bar') && document.querySelector('.top .r18').getAttribute('aria-pressed') === 'true' && !document.querySelector('.top .r18-eye').hidden && !document.querySelector('.top .acc').hidden && !document.querySelector('.tabs').hidden, n0), [await page.locator('#grid .gc').count(), await page.textContent('#tally'), await toastNow()]);
   check(`${name}: أغلفة ألعاب +18 مغطاة بمصغّرتها وعليها عين مغمضة بلا نص، ولا تُكبَّر بالقرص، وأغلفة غيرها كما هي، وصورة القائمة الرئيسية ليست لواحدة منها`, await page.evaluate(() => { const ad = [...document.querySelectorAll('#grid .gc[data-ad] .cover')], rest = [...document.querySelectorAll('#grid .gc:not([data-ad]) .cover')];
     return ad.length === 2 && ad.every(c => c.classList.contains('x18') && /t_cover_small\/c98\d\.jpg$/.test(c.querySelector('.x18-i img').getAttribute('src')) && c.querySelector('.x18-m').textContent === '' && !!c.querySelector('.x18-m svg') && !c.hasAttribute('data-zoom-pinch') && /blur/.test(getComputedStyle(c.querySelector('img')).filter))
-      && rest.length > 0 && rest.every(c => !c.classList.contains('x18') && [...c.querySelectorAll('img')].every(i => !/blur/.test(getComputedStyle(i).filter))) && ![...document.querySelectorAll('#mm-art img')].some(i => /c98\d/.test(i.src)); }));
+      && rest.length > 0 && rest.every(c => !c.classList.contains('x18') && [...c.querySelectorAll('img')].every(i => !/blur/.test(getComputedStyle(i).filter))) && ![...document.querySelectorAll('#mm-art img')].some(i => /c98\d|ar981|sh981/.test(i.src)); }));
   { const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth })); check(`${name}: الفلتر مرفوع بلا تمدد أفقي`, o.sw <= o.iw, o); }
   // صورة القائمة الرئيسية لا تكون للعبة +18 في أي قائمة، واقتراح «ماذا ألعب الليلة؟» لا يختارها
   { const seen = []; for (const k of ['play', 'new', 'done', 'seen', 'all']) { await page.evaluate(k => document.querySelector(`#mm-menu .mi[data-v="${k}"]`).click(), k); await page.waitForTimeout(160);
       seen.push(await page.evaluate(() => [...document.querySelectorAll('#mm-art img')].map(i => i.src).join(' ') + ' | ' + (document.querySelector('#slot h2')?.textContent || ''))); }
-    check(`${name}: صورة القائمة الرئيسية واقتراحها لا يكونان للعبة +18`, !seen.some(s => /c98\d/.test(s)) && !/Sample (Night Novel|Velvet Academy)/.test(seen[1]), seen); }
+    check(`${name}: صورة القائمة الرئيسية واقتراحها لا يكونان للعبة +18`, !seen.some(s => /c98\d|ar981|sh981/.test(s)) && !/Sample (Night Novel|Velvet Academy)/.test(seen[1]), seen); }
   await tap('#g-9800001 .cover'); await page.waitForSelector('#sheet[open] .sh-head .cover.x18');
-  check(`${name}: بطاقة لعبة +18 بنبذتها وطلب ترجمتها كغيرها (E69)، بلا لقطات ولا موقع من سلسلة، وملف حفظها كغيرها، وغلافها بزر يكشفه`, await page.evaluate(() => { const b = document.querySelector('#sheet-body'), c = b.querySelector('.sh-head .cover'), tr = b.querySelector('.about .tr');
-    return c.dataset.act === 'bare' && !c.hasAttribute('data-zoom') && /اضغط لإظهاره/.test(c.textContent) && !b.querySelector('.chain') && !b.querySelector('.sh-hero img') && b.querySelector('.about p.en')?.textContent === 'A quiet visual novel about one long night.' && !/لا تُعرض هنا/.test(b.textContent)
-      && !/\+\s*18/.test(b.querySelector('.about').textContent) && !!tr?.querySelector('[data-act=tr-ask]') && tr.dataset.ad === '1' && tr.dataset.t === undefined && !b.querySelector('.shots') && !!b.querySelector('.save .lists'); }), await page.evaluate(() => document.querySelector('#sheet-body .about')?.outerHTML.slice(0, 600)));
-  check(`${name}: لعبة +18 لا تُفحص متاجرها ولا اشتراكاتها (البناء لا يسأل عنها): يقال ذلك بلا وعد بفحص، ولا قسم للاشتراكات`, await page.evaluate(() => (document.querySelector('#sheet .pcsec .note')?.textContent || '') === 'متاجر هذه اللعبة لا تُفحص، وليس لها في IGDB رابط متجر.' && !document.querySelector('#sheet .subsec')), await page.evaluate(() => [document.querySelector('#sheet .pcsec')?.textContent, !!document.querySelector('#sheet .subsec')]));
+  check(`${name}: بطاقة لعبة +18 كغيرها (E69، E75): نبذتها وطلب ترجمتها، وموقعها من سلسلتها وترتيبها، وملف حفظها؛ وغلافها بزر يكشفه، ولقطاتها مغطاة لا تُكبَّر، ولا خلفية قبل كشفها`, await page.evaluate(() => { const b = document.querySelector('#sheet-body'), c = b.querySelector('.sh-head .cover'), tr = b.querySelector('.about .tr'), sh = [...b.querySelectorAll('.shots .shot')];
+    return c.dataset.act === 'bare' && !c.hasAttribute('data-zoom') && /اضغط لإظهاره/.test(c.textContent) && !!b.querySelector('.chain') && !b.querySelector('.sh-hero img') && b.querySelector('.about p.en')?.textContent === 'A quiet visual novel about one long night.' && !/لا تُعرض هنا/.test(b.textContent)
+      && !/\+\s*18/.test(b.querySelector('.about').textContent) && !!tr?.querySelector('[data-act=tr-ask]') && tr.dataset.ad === '1' && tr.dataset.t === undefined && !!b.querySelector('.save .lists')
+      && sh.length === 2 && sh.every(x => x.classList.contains('x18') && !x.hasAttribute('data-zoom') && /t_thumb\/sh981[ab]\.jpg$/.test(x.querySelector('img').getAttribute('src'))) && !b.querySelector('[data-zoom-set]')
+      && /Sample Night/.test(b.textContent) && b.querySelectorAll('.order li').length === 2 && !!b.querySelector('.order li[data-ad] .th.x18 .x18-m svg'); }), await page.evaluate(() => document.querySelector('#sheet-body')?.innerHTML.slice(0, 900)));
+  check(`${name}: ولعبة +18 تُفحص متاجرها واشتراكاتها كغيرها (E75)`, await page.evaluate(() => !!document.querySelector('#sheet .pcsec a.st[data-s=steam]') && !/لا تُفحص/.test(document.querySelector('#sheet .pcsec').textContent) && !!document.querySelector('#sheet .subsec .mem-gp.on')), await page.evaluate(() => [document.querySelector('#sheet .pcsec')?.textContent, document.querySelector('#sheet .subsec')?.textContent]));
   await tap('#sheet .sh-head .cover'); await page.waitForSelector('#sheet[open] .sh-head .cover[data-zoom]');
   check(`${name}: لمس الغلاف يكشفه في بطاقتها وعلبتها وحدهما`, await page.evaluate(() => document.querySelector('#sheet-body').hasAttribute('data-r18-bare') && !document.querySelector('#g-9800001 .x18') && document.getElementById('g-9800001').hasAttribute('data-r18-bare') && !!document.querySelector('#g-9800002 .cover.x18')
     && getComputedStyle(document.querySelector('#g-9800001 .cover img')).filter === 'none' && !document.querySelector('.pz[open]')));
+  check(`${name}: وبكشفه تظهر خلفيتها ولقطاتها وتُكبَّر، وجزء +18 آخر في سلسلتها باقٍ مغطى`, await page.evaluate(() => { const b = document.querySelector('#sheet-body'), sh = [...b.querySelectorAll('.shots .shot')];
+    return /ar981/.test(b.querySelector('.sh-hero img')?.getAttribute('src') || '') && sh.length === 2 && sh.every(x => x.matches('button[data-zoom]') && !x.classList.contains('x18')) && !!b.querySelector('[data-zoom-set]') && !!b.querySelector('.order li[data-ad] .th.x18'); }));
   await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(350);
+  // السلاسل والفلتر مرفوع (E75): سلسلة +18 بين السلاسل، وجزء +18 في سلسلة عادية يظهر فيها مغطى الغلاف
+  await tap('.tabs [data-v=series]'); await page.waitForSelector('#series .fr');
+  check(`${name}: السلاسل والفلتر مرفوع: سلسلة ألعاب +18 بينها، وجزء +18 في سلسلة GTA يظهر فيها مغطى ويُعدّ`, await page.evaluate(() => { const fr = [...document.querySelectorAll('#series .fr')], gta = fr.find(x => /Grand Theft Auto/.test(x.querySelector('h3').textContent));
+    return fr.some(x => /Sample Night/.test(x.querySelector('h3').textContent)) && /3 ألعاب/.test(gta.querySelector('header span').textContent) && !!gta.querySelector('.part[data-ad] .p.x18 .x18-m svg') && /Grand Theft Night/.test(gta.textContent); }),
+    await page.evaluate(() => [...document.querySelectorAll('#series .fr header')].map(h => h.textContent.trim())));
+  await tap('.tabs [data-v=grid]'); await page.waitForSelector('#grid .gc');
   await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open')); check(`${name}: زر الأغلفة بجانب العين يكشفها كلها`, await page.evaluate(() => !document.querySelector('#grid .x18') && document.querySelectorAll('#grid .gc[data-ad] .cover img[srcset]').length === 2));
   await tap('.r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open')); check(`${name}: ويغطيها كلها ثانية`, await page.evaluate(() => document.querySelectorAll('#grid .gc .cover.x18').length === 2));
   // E74: ما كُشف لا يبقى: إغلاق العين والصور مكشوفة ثم فتحها يبدأ والصور مغطاة
@@ -616,6 +634,10 @@ for (const [name, w, h, mobile] of [['+18', 1440, 900, false], ['+18 (cover)', 3
   await eye(false);
   check(`${name}: العين نفسها تعيد الفلتر في مكانها، والقائمة وأعدادها كما كانت بلا ألعاب +18 وما أُضيف منها`, await same() && /عاد الفلتر/.test(await toastNow()) && await page.evaluate(() => document.querySelector('.top .r18').getAttribute('aria-pressed') === 'false' && document.querySelector('.top .r18-eye').hidden && !document.getElementById('g-9800009') && !document.getElementById('g-9800001') && !document.querySelector('#grid [data-ad]'))
     && await page.locator('#grid .gc').count() === n0 && await page.textContent('#tally') === t0 && await allN() === a0n, [await page.locator('#grid .gc').count(), await page.textContent('#tally'), await allN()]);
+  await tap('.tabs [data-v=series]'); await page.waitForSelector('#series .fr');
+  check(`${name}: والفلتر قائم: لا سلسلة +18 بين السلاسل، وسلسلة GTA بلا جزئها +18 ولا يُعدّ`, await page.evaluate(() => { const fr = [...document.querySelectorAll('#series .fr')], gta = fr.find(x => /Grand Theft Auto/.test(x.querySelector('h3').textContent));
+    return !fr.some(x => /Sample Night/.test(x.textContent)) && !/Grand Theft Night/.test(gta.textContent) && !gta.querySelector('[data-ad]') && /لعبتان/.test(gta.querySelector('header span').textContent); }), await page.evaluate(() => [...document.querySelectorAll('#series .fr header')].map(h => h.textContent.trim())));
+  await tap('.tabs [data-v=grid]'); await page.waitForSelector('#grid .gc');
   await page.evaluate(() => sessionStorage.setItem('adult.games', '1')); await page.goto('about:blank'); await page.goto(`${base}/games/`); await page.waitForSelector('#grid .gc');
   check(`${name}: الدخول من جديد يبدأ والفلتر قائم دائماً`, await page.evaluate(() => document.querySelector('.top .r18').getAttribute('aria-pressed') === 'false' && sessionStorage.getItem('adult.games') === null && !document.querySelector('#grid [data-ad]')));
   check(`${name}: بلا أخطاء برمجية`, !errs.length, errs);

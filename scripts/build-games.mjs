@@ -57,7 +57,8 @@ if (process.env.GAMES_PROBE) {
 if (!added.length) { await writeFile(OUT, JSON.stringify(empty)); await writeFile(TEXTS, JSON.stringify({ built: empty.built, texts: {} })); console.log('games: the list is empty'); process.exit(0); }
 const story = (await import('../data/games/story-orders.mjs')).default.series || [];
 const ids = added.map(g => +g.igdb).filter(Boolean);
-// ألعاب +18 مما أُضيف من مكتبتها تُبنى موسومة adult (lib-games: erotic)
+// ألعاب +18 مما أُضيف من مكتبتها تُبنى موسومة adult بمعلوماتها كلها (lib-games: erotic، E75). وتُذكر في السجل والتقارير برقمها وحده (+18 #الرقم)
+const nm = g => g.adult ? `+18 #${g.id}` : g.title;
 let r; try { r = await gamesFor(ids, { wikidata: true, story, erotic: 'keep', log: m => console.log('games: ' + m) }); } catch (e) { console.log(`games: IGDB failed (${e.message}), keeping the previous file`); process.exit(0); }
 if (!r.games.length) { console.log('games: IGDB returned nothing, keeping the previous file'); process.exit(0); }
 // ترتيب القائمة وتاريخ الإضافة من ملف المضافات
@@ -66,17 +67,17 @@ for (const g of r.games) Object.assign(g, at.get(g.id) || {});
 r.games.sort((a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9));
 // أين تُلعب على الكمبيوتر وهل هي مجانية الآن (scripts/lib-stores.mjs). ما تعذّر من مصادره يبقى له ما كان في الملف السابق، وإن تعذّر كله بقيت متاجر الملف السابق كما هي
 { const prev = new Map(((await read(OUT, null))?.games || []).map(g => [g.id, { pc: g.pc, f2p: g.f2p }]));
-  try { const st = await storesFor(r.games.filter(g => !g.adult), { prev, fix: await read('data/games/pc.json', {}), log: m => console.log('games: ' + m) });   // ألعاب +18 بلا بحث في المتاجر، فلا تدخل أسماؤها تقريره ولا سجل البناء
+  try { const st = await storesFor(r.games, { prev, fix: await read('data/games/pc.json', {}), log: m => console.log('games: ' + m) });   // ألعاب +18 تُفحص كغيرها، وتقريره يذكرها برقمها وحده
     for (const g of r.games) { if (st.rows.has(g.id)) g.pc = st.rows.get(g.id); if (st.f2p.has(g.id)) g.f2p = 1; }
     r.stores = st.meta; await mkdir('data/generated/games', { recursive: true }); await writeFile(STORES, JSON.stringify(st.report, null, 1) + '\n');
     if (process.env.GAMES_PROBE) {   // فروع العمل: الجدول كله في سجل البناء للمراجعة
       for (const [id, f] of Object.entries(await read('data/games/pc.json', {}))) if (f.ids?.steam) { const j = await fetch(`https://store.steampowered.com/api/appdetails?appids=${f.ids.steam}&cc=us&l=en`).then(x => x.json()).catch(() => null), d = j?.[f.ids.steam]?.data;
-        console.log(`stores: fix ${id} (${r.games.find(g => String(g.id) === id)?.title}) steam ${f.ids.steam} = ${d?.name ?? '?'} [${d?.type ?? '?'}]`); }   // ما صُحّح باليد يُرى اسمه في المتجر
+        const g = r.games.find(g => String(g.id) === id); console.log(`stores: fix ${id} (${g ? nm(g) : '?'}) steam ${f.ids.steam} = ${g?.adult ? '+18' : d?.name ?? '?'} [${d?.type ?? '?'}]`); }   // ما صُحّح باليد يُرى اسمه في المتجر
       for (const [n, v] of Object.entries(st.report.games)) console.log(`stores: ${n} => ${v}`); console.log('stores: pass by title: ' + st.report.passByTitle.join(' | ')); console.log('stores: epic free: ' + st.report.epicFree.join(' | ')); console.log('stores: none: ' + st.report.none.join(' | ')); console.log('stores: gog search: ' + st.report.gogSearch.join(' | ')); console.log('stores: epic guess: ' + st.report.epicGuess.join(' | ')); }
   } catch (e) { console.log(`games: stores failed (${e.message}), keeping the previous stores`); for (const g of r.games) { const o = prev.get(g.id); if (o?.pc) g.pc = o.pc; if (o?.f2p) g.f2p = 1; } } }
 // ضمن Game Pass Ultimate أو PS Plus Deluxe الآن (scripts/lib-subs.mjs). ما تعذّر من مصدريه يبقى له ما كان في الملف السابق، وإن تعذّر كله بقي ما كان كما هو
 { const prev = new Map(((await read(OUT, null))?.games || []).map(g => [g.id, g.subs || {}]));
-  try { const sb = await subsFor(r.games.filter(g => !g.adult), { prev, log: m => console.log('games: ' + m) });
+  try { const sb = await subsFor(r.games, { prev, log: m => console.log('games: ' + m) });
     for (const g of r.games) { const row = sb.rows.get(g.id); if (row) g.subs = row; }
     r.subs = sb.meta; await mkdir('data/generated/games', { recursive: true }); await writeFile(SUBS, JSON.stringify(sb.report, null, 1) + '\n');
     if (process.env.GAMES_PROBE) {   // فروع العمل: الجدول كله في سجل البناء للمراجعة
@@ -87,6 +88,6 @@ const TR = await read('data/games/translations.json', {}), PLACES = await read('
 const built = new Date().toISOString(), { texts, n } = applyCare(r.games, {}, TR, PLACES);
 await writeFile(TEXTS, JSON.stringify({ built, texts }));
 await writeFile(OUT, JSON.stringify({ built, img: IMG, ...r, ...(Object.keys(moved).length ? { moved } : {}) }));
-{ const sib = r.games.filter(g => g.also?.length); if (sib.length) console.log(`games: ${sib.length} with platforms from same-named sibling records: ` + sib.slice(0, 12).map(g => `${g.title} (${g.plats.join('.')} + ${g.also.join('.')})`).join(' | ')); }
+{ const sib = r.games.filter(g => g.also?.length); if (sib.length) console.log(`games: ${sib.length} with platforms from same-named sibling records: ` + sib.slice(0, 12).map(g => `${nm(g)} (${g.plats.join('.')} + ${g.also.join('.')})`).join(' | ')); }
 console.log(`games: wrote ${OUT}: ${r.games.length} games, ${Object.keys(r.series).length} series, ${Object.values(r.series).filter(s => s.story).length} with a story order`);
 console.log(`games: wrote ${TEXTS}: ${n.text} with text, ${n.ar} in Arabic${n.old ? ` (${n.old} whose English changed since)` : ''}, ${n.place} with a place in their world`);

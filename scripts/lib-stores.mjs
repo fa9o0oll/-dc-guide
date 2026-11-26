@@ -123,8 +123,10 @@ export function checkFix(fix, known = null) { const bad = [], url = u => u === '
 // الصف: { s: المتجر, u: الرابط, free?: 'f2p' | 'gift', from?, until? (مدة الهدية), pass?: 1 (ضمن PC Game Pass), off?: 1 (ليست في متجر السعودية), gone?: 1 (لا تُباع فيه الآن),
 //         how?: 'pub' | 'wd' | 'fix' (من أين عُرف حين ليس من المتجر نفسه), n?: الاسم (للمتاجر الأخرى) }
 // التصحيح باليد (opt.fix، مفتاحه رقم اللعبة): ids {steam, gog, ms: [..], epic: رابط} تُفحص كأنها من IGDB، وadd [{s, u ('official' = موقعها الرسمي), n?, free?}] يُضاف كما هو، وdrop [..] يُحذف
+// لعبة +18 (adult) تُفحص متاجرها كغيرها (E75)، ويُبحث عنها باسمها، لكنها تُذكر في التقرير برقمها وحده (+18 #الرقم) بلا اسمها ولا ما يدل عليه
 export async function storesFor(games, opt = {}) {
   const get = client(opt), pause = opt.pause ?? 400, now = opt.now ?? Date.now(), log = opt.log || (() => {}), prev = opt.prev || new Map(), fix = opt.fix || {};
+  const nm = g => g.adult ? `+18 #${g.id}` : g.title, veil = new Set(games.filter(g => g.adult).map(g => g.title)), veilN = new Set([...veil].map(norm));
   const view = g => { const f = fix[g.id]?.ids; if (!f) return g; const ext = { ...g.ext }, sites = (g.sites || []).filter(x => !(f.steam && x.t === 'steam') && !(f.epic && x.t === 'epic'));
     if (f.steam) { ext.steam = String(f.steam); ext.sts = [String(f.steam)]; } if (f.gog) ext.gog = String(f.gog); if (f.ms) ext.ms = [...new Set([...(ext.ms || []), ...[].concat(f.ms)])]; if (f.epic) sites.push({ t: 'epic', url: f.epic });
     return { ...g, ext, sites }; };
@@ -146,10 +148,10 @@ export async function storesFor(games, opt = {}) {
   const byName = new Map(), dup = new Set(); for (const g of pc) { const k = norm(g.title); if (byName.has(k)) dup.add(k); byName.set(k, g); }
   const passByTitle = new Map(), titled = [];
   if (pass) { const rest = await msCatalog([...pass].filter(id => !own.has(id)), get, pause); if (!rest.ok) failed.push('gamepass-titles');
-    for (const p of rest.out.values()) { const k = norm(p.title), g = byName.get(k); if (g && !dup.has(k)) { passByTitle.set(g.id, p); titled.push(`${p.id} "${p.title}" → ${g.title}`); } } }
+    for (const p of rest.out.values()) { const k = norm(p.title), g = byName.get(k); if (g && !dup.has(k)) { passByTitle.set(g.id, p); titled.push(g.adult ? `${p.id} → ${nm(g)}` : `${p.id} "${p.title}" → ${g.title}`); } } }
 
-  const rows = new Map(), f2p = new Set(), report = { at: new Date(now).toISOString(), failed, games: {}, passByTitle: titled, none: [], steam: { n: st.n, odd: st.odd }, gogSearch: [...found.out].map(([t, v]) => `${t} → ${v ? v.u : '—'}`), epicGuess: [],
-    epicFree: (ep || []).map(e => `${e.title}: ${e.win.map(w => w.from.slice(0, 10) + '→' + w.until.slice(0, 10)).join(', ')}`) };
+  const rows = new Map(), f2p = new Set(), report = { at: new Date(now).toISOString(), failed, games: {}, passByTitle: titled, none: [], steam: { n: st.n, odd: st.odd }, gogSearch: [...found.out].map(([t, v]) => veil.has(t) ? `+18 → ${v ? '✓' : '—'}` : `${t} → ${v ? v.u : '—'}`), epicGuess: [],
+    epicFree: (ep || []).map(e => `${veilN.has(norm(e.title)) ? '+18' : e.title}: ${e.win.map(w => w.from.slice(0, 10) + '→' + w.until.slice(0, 10)).join(', ')}`) };
   for (const g of pc) { const list = [], add = r => { if (r && !list.some(x => x.s === r.s && r.s !== 'other')) list.push(r); }, f = fix[g.id] || {};
     // Steam: أصلح أرقامها (ما يُباع، ثم المجاني، ثم ما في المتجر بلا سعر، ثم ما لا يُعرض في السعودية، ثم ما لم يعد يُباع)
     { const ids = steamIds(g), known = ids.filter(id => st.out.has(id)), best = known.sort((a, b) => STEAM_RANK[st.out.get(b).k] - STEAM_RANK[st.out.get(a).k])[0], k = best ? st.out.get(best).k : '';
@@ -159,7 +161,7 @@ export async function storesFor(games, opt = {}) {
     { const slug = epicSlug(site(g, 'epic'))?.slug, hit = (ep || []).find(e => (slug && e.slugs.includes(slug)) || (g.ext?.epic && (e.ns === g.ext.epic || e.id === g.ext.epic)) || (e.type !== 'ADD_ON' && e.type !== 'DLC' && norm(e.title) === norm(g.title)));
       const w = hit ? windowAt(hit.win, now) : null, gift = w ? { free: 'gift', from: w.from, until: w.until } : {};
       if (site(g, 'epic')) add({ s: 'epic', u: epicUrl(site(g, 'epic')), ...gift }); else if (hit && w && hit.url) add({ s: 'epic', u: hit.url, ...gift });
-      else if (g.ext?.epic || viaWd(g, 'epic')) { const guess = slugify(g.title), there = await epicPage(guess, get); await wait(pause / 3); report.epicGuess.push(`${g.title}: ${guess} ${there === true ? '✓' : there === false ? '✗' : '?'}`);
+      else if (g.ext?.epic || viaWd(g, 'epic')) { const guess = slugify(g.title), there = await epicPage(guess, get); await wait(pause / 3); report.epicGuess.push(`${nm(g)}: ${g.adult ? '' : guess + ' '}${there === true ? '✓' : there === false ? '✗' : '?'}`);
         if (there) add({ s: 'epic', u: `https://store.epicgames.com/p/${guess}` }); else if (there === null) add(old(g.id, 'epic')); }
       if (!ep) { const o = old(g.id, 'epic'), r = list.find(x => x.s === 'epic'); if (o?.free && r && Date.parse(o.until) > now) Object.assign(r, { free: o.free, from: o.from, until: o.until }); } }
     // GOG: برقمها إن كان يُباع، وإلا بما وجده البحث، وإلا فصفحتها باقية ولا تُباع فيه الآن
@@ -184,8 +186,8 @@ export async function storesFor(games, opt = {}) {
     for (const a of f.add || []) { const i = list.findIndex(r => r.s === a.s && a.s !== 'other'); if (i >= 0) list.splice(i, 1); const u = a.u === 'official' ? site(g, 'official') : a.u; if (u) list.push({ s: a.s, u, ...(a.n ? { n: a.n } : {}), ...(a.free ? { free: a.free } : {}), how: 'fix' }); }
     list.sort((a, b) => STORES.indexOf(a.s) - STORES.indexOf(b.s));
     if (list.some(r => r.free === 'f2p')) f2p.add(g.id);
-    rows.set(g.id, list); if (!list.length) report.none.push(g.title);
-    report.games[g.title] = list.map(r => r.s + (r.n ? `(${r.n})` : '') + (r.free ? ':' + r.free + (r.until ? '→' + r.until.slice(0, 10) : '') : '') + (r.pass ? ':pass' : '') + (r.off ? ':off' : '') + (r.gone ? ':gone' : '') + (r.how ? '~' + r.how : '')).join(' ') || '—'; }
+    rows.set(g.id, list); if (!list.length) report.none.push(nm(g));
+    report.games[nm(g)] = list.map(r => r.s + (r.n ? `(${r.n})` : '') + (r.free ? ':' + r.free + (r.until ? '→' + r.until.slice(0, 10) : '') : '') + (r.pass ? ':pass' : '') + (r.off ? ':off' : '') + (r.gone ? ':gone' : '') + (r.how ? '~' + r.how : '')).join(' ') || '—'; }
   const count = k => [...rows.values()].filter(l => l.some(r => r.s === k)).length, some = fn => [...rows.values()].filter(l => l.some(fn)).length;
   log(`stores: ${pc.length} PC games: steam ${count('steam')}, epic ${count('epic')}, gog ${count('gog')}, xbox ${count('xbox')} (${some(r => r.pass)} in PC Game Pass, ${titled.length} matched by title), publisher launchers ${['ubi', 'ea', 'rockstar', 'battlenet'].map(k => `${k} ${count(k)}`).join(', ')}; free to play ${f2p.size}, gifts ${some(r => r.free === 'gift')}, not in the Saudi store ${some(r => r.off)}, not sold now ${some(r => r.gone)}, with no store ${report.none.length}${failed.length ? '; FAILED: ' + failed.join(', ') : ''}`);
   return { rows, f2p, meta: { at: report.at, ...(failed.length ? { failed } : {}) }, report };

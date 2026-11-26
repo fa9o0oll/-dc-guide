@@ -72,14 +72,14 @@ export async function subsFor(games, opt = {}) {
   const rows = new Map();
   for (const g of games) { const row = {}, old = prev.get(g.id) || {}, how = {};
     { const inNow = msIds(g).filter(id => every.has(id)), mine = inNow.length ? inNow : msIds(g).filter(id => coming.has(id)), byN = gpByName.get(g.id) || [];
-      if (mine.length) row.gp = gpRow(g, mine); else if (byN.length) { row.gp = gpRow(g, byN); how.gp = 1; report.byTitle.push(`gp ${byN.join(',')} "${cat.out.get(byN[0])?.title}" → ${g.title}`); }
+      if (mine.length) row.gp = gpRow(g, mine); else if (byN.length) { row.gp = gpRow(g, byN); how.gp = 1; report.byTitle.push(g.adult ? `gp ${byN.join(',')} → +18 #${g.id}` : `gp ${byN.join(',')} "${cat.out.get(byN[0])?.title}" → ${g.title}`); }
       else if (!gpOk && old.gp) row.gp = old.gp; }   // الكتالوج لم يُجب: يبقى ما كان
     { const c = g.ext?.psn && byConcept.get(String(g.ext.psn)), byN = psByName.get(g.id) || [];
-      if (c) row.ps = psRow(g, [...c, ...byN.filter(x => !c.includes(x))]); else if (byN.length) { row.ps = psRow(g, byN); how.ps = 1; report.byTitle.push(`ps ${byN.map(x => x.conceptId).join(',')} "${byN[0].nameEn || byN[0].name}" → ${g.title}`); }
+      if (c) row.ps = psRow(g, [...c, ...byN.filter(x => !c.includes(x))]); else if (byN.length) { row.ps = psRow(g, byN); how.ps = 1; report.byTitle.push(g.adult ? `ps ${byN.map(x => x.conceptId).join(',')} → +18 #${g.id}` : `ps ${byN.map(x => x.conceptId).join(',')} "${byN[0].nameEn || byN[0].name}" → ${g.title}`); }
       else if (!psOk && old.ps) row.ps = old.ps; }
     if (row.gp || row.ps) rows.set(g.id, row);
-    const gpT = row.gp ? `gp:${row.gp.on.join('+') || '?'}${row.gp.ea ? ':ea' : ''}${row.gp.out ? ':leaving' : ''}${row.gp.soon ? ':coming' : ''}${how.gp ? '~title' : ''}${row.gp.n ? `(${row.gp.n})` : ''}` : '', psT = row.ps ? `ps:${row.ps.k}:${row.ps.on.join('+') || '?'}${how.ps ? '~title' : ''}${row.ps.n ? `(${row.ps.n})` : ''}` : '';
-    report.games[g.title] = [gpT, psT].filter(Boolean).join(' ') || '—'; }
+    const gpT = row.gp ? `gp:${row.gp.on.join('+') || '?'}${row.gp.ea ? ':ea' : ''}${row.gp.out ? ':leaving' : ''}${row.gp.soon ? ':coming' : ''}${how.gp ? '~title' : ''}${row.gp.n && !g.adult ? `(${row.gp.n})` : ''}` : '', psT = row.ps ? `ps:${row.ps.k}:${row.ps.on.join('+') || '?'}${how.ps ? '~title' : ''}${row.ps.n && !g.adult ? `(${row.ps.n})` : ''}` : '';
+    report.games[g.adult ? `+18 #${g.id}` : g.title] = [gpT, psT].filter(Boolean).join(' ') || '—'; }   // لعبة +18 (E75): تُفحص كغيرها وتُذكر برقمها وحده
   const n = { gp: [...rows.values()].filter(r => r.gp && !r.gp.soon).length, ps: [...rows.values()].filter(r => r.ps).length };
   log(`subs: ${games.length} games: Game Pass ${n.gp} (${[...rows.values()].filter(r => r.gp?.out).length} leaving soon, ${[...rows.values()].filter(r => r.gp?.soon).length} coming soon, ${[...rows.values()].filter(r => r.gp?.ea).length} via EA Play), PS Plus ${n.ps} (${PS_RANK.map(k => `${k} ${[...rows.values()].filter(r => r.ps?.k === k).length}`).join(', ')}); lists ${Object.entries(report.lists).map(([k, v]) => `${k} ${v}`).join(', ')}${failed.length ? '; FAILED: ' + failed.join(', ') : ''}`);
   return { rows, meta: { at: report.at, n, ...(failed.length ? { failed } : {}) }, report };

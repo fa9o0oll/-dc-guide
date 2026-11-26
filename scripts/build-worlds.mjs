@@ -11,9 +11,10 @@ const root = new URL('../', import.meta.url), dir = d => d && new URL(d.replace(
 // WORLDS_OUT: مجلد بديل للناتج (عند التجربة المحلية، كي لا تتغير ملفات الموقع)
 const OUT = dir(process.env.WORLDS_OUT) || new URL('site/films/data/', root), GEN = dir(process.env.WORLDS_OUT) || new URL('data/generated/films/', root), SRC = dir(process.env.WORLDS_SRC) || new URL('site/films/data/', root);
 const rd = (u, fb) => fs.existsSync(u) ? JSON.parse(fs.readFileSync(u)) : fb;
-const films = rd(new URL('films.json', SRC)).films.filter(f => !f.adult), fr = rd(new URL('franchises.json', SRC), { items: {} }), cols = rd(new URL('collections.json', SRC), {});
+// أعمال +18 في القائمة كغيرها (E75): لها عوالمها وترتيبها وما يرتبط بها (lib-worlds يُدخل ما خارجها من +18 في عوالمها هي وحدها)
+const films = rd(new URL('films.json', SRC)).films, fr = rd(new URL('franchises.json', SRC), { items: {} }), cols = rd(new URL('collections.json', SRC), {});
 const keyOf = f => (f.kind === 'tv' ? 't' : 'm') + f.tmdb, focus = films.map(keyOf);
-const known = Object.fromEntries(films.map(f => [keyOf(f), JSON.parse(JSON.stringify({ title: f.title, date: f.date, year: f.year, poster: f.poster, rating: f.rating, votes: f.votes, lang: f.lang, genres: f.genres, runtime: f.runtime, tv: f.kind === 'tv' || undefined }))]));
+const known = Object.fromEntries(films.map(f => [keyOf(f), JSON.parse(JSON.stringify({ title: f.title, date: f.date, year: f.year, poster: f.poster, rating: f.rating, votes: f.votes, lang: f.lang, genres: f.genres, runtime: f.runtime, tv: f.kind === 'tv' || undefined, adult: f.adult ? true : undefined }))]));
 
 // ذاكرة TMDB للأعمال خارج القائمة: ما صدر يُحدَّث كل ١٤ يوماً، وما لم يصدر كل يومين (تتغير مواعيده)
 const CACHE = new URL('data/generated/films/tmdb-basic.json', root), cache = rd(CACHE, {}), now = Date.now(), today = new Date().toISOString().slice(0, 10);
@@ -38,7 +39,11 @@ for (const [door, file] of [['dc', 'site/dc/data/catalog.json'], ['fate', 'site/
 // لكل عالم آلي (40 عملاً فأقل) ولكل مجموعة TMDB في القائمة: ترتيب أحداثه من أدلة Wikipedia وTMDB وWikidata، يُعرض حين لا ترتيب مراجَع.
 // ويُحسب للترتيبات المراجَعة أيضاً لا للعرض، بل ليقيس التقرير دقة المحرك عليها ويكشف ما قد يفوت المراجعة.
 const partOf = new Map(); for (const c of Object.values(cols)) for (const p of c.parts || []) partOf.set('m' + p.tmdb, p);
+// أعمال +18 تُذكر في التقرير والسجل برقمها وحده (+18 #المفتاح)، وما فيه شيء منها من عوالم ومجموعات برقمه
+const adultK = new Set([...films.filter(f => f.adult).map(keyOf), ...Object.entries(res.info).filter(([, v]) => v?.adult).map(([k]) => k), ...[...partOf].filter(([, p]) => p.adult).map(([k]) => k)]);
+const tt = (k, t) => adultK.has(k) ? `+18 #${k}` : t, wn = (w, id) => w.order.some(k => adultK.has(k)) ? `+18${id != null ? ' #' + id : ''}` : w.name, cn = c => c.parts.some(p => adultK.has('m' + p.tmdb)) ? `+18 #c${c.id}` : c.name;
 const meta = k => { const o = known[k] || res.info[k] || res.basic?.[k] || fr.extras?.[k] || partOf.get(k) || {}; return { k, title: o.title || k, date: o.date || null, year: o.year || (o.date ? +o.date.slice(0, 4) : null) }; };
+const metaT = k => tt(k, meta(k).title);
 const CHRONO = new URL('data/generated/films/chrono-cache.json', root), ccache = rd(CHRONO, {});
 const cfresh = Object.fromEntries(Object.entries(ccache).filter(([k, v]) => now - (v.at || 0) < ((meta(k).date || '9999') <= today ? 14 : 2) * 864e5));
 const groupsC = [];
@@ -58,12 +63,12 @@ for (const g of groupsC) { const ms = g.keys.map(meta), r = chronoOrder(ms, evid
   // chk: فُحصت أدلة كل الأجزاء ولم يُذكر جزء يسبق القصة. إن تعذّر جلب دليل جزء لا يُدّعى ذلك
   if (g.kind === 'world') { if (moved.length) res.worlds[g.id].chrono = r; else if (seen) res.worlds[g.id].chk = 1; }
   else if (g.kind === 'col' && (moved.length || seen)) outCols[g.id] = moved.length ? r : { chk: 1 };
-  if (g.kind !== 'cur') { if (moved.length) chronoAudit.auto.push({ group: g.kind === 'col' ? 'col ' + (cols[g.id]?.name || g.id) : res.worlds[g.id].name, order: r.order.map(k => meta(k).title), moved: moved.map(([k, m]) => `${meta(k).title} ← ${m.w} ${m.ref.map(t => meta(t).title).join(' / ')} [${m.src}]`) }); continue; }
+  if (g.kind !== 'cur') { if (moved.length) chronoAudit.auto.push({ group: g.kind === 'col' ? 'col ' + (cols[g.id] ? cn(cols[g.id]) : g.id) : wn(res.worlds[g.id], g.id), order: r.order.map(metaT), moved: moved.map(([k, m]) => `${metaT(k)} ← ${m.w} ${m.ref.map(metaT).join(' / ')} [${m.src}]`) }); continue; }
   // المراجَع: هل يضع كل جزء حرّكه المحرك قبل ما يسبقه في دليله؟ وأي جزء قدّمته المراجعة ولم يقدّمه المحرك؟
   const pos = new Map(g.keys.map((k, i) => [k, i]));
   const fits = (k, m) => m.w === 'between' && m.ref.length >= 2 ? pos.get(m.ref[0]) < pos.get(k) && pos.get(k) < pos.get(m.ref.at(-1)) : m.ref.every(t => pos.get(k) < pos.get(t));
-  for (const [k, m] of moved) (fits(k, m) ? chronoAudit.agree : chronoKeep[g.id]?.[k] ? chronoAudit.reviewed : chronoAudit.conflict).push({ cur: g.id, view: g.view || null, t: meta(k).title, w: m.w, before: m.ref.map(t => meta(t).title), src: m.src });
-  if (g.view) for (const k of g.keys) { const d = meta(k).date || '9999'; if (g.keys.some(j => pos.get(j) > pos.get(k) && (meta(j).date || '9999') < d) && !r.moved[k]) chronoAudit.missed.push({ cur: g.id, t: meta(k).title }); } }
+  for (const [k, m] of moved) (fits(k, m) ? chronoAudit.agree : chronoKeep[g.id]?.[k] ? chronoAudit.reviewed : chronoAudit.conflict).push({ cur: g.id, view: g.view || null, t: metaT(k), w: m.w, before: m.ref.map(metaT), src: m.src });
+  if (g.view) for (const k of g.keys) { const d = meta(k).date || '9999'; if (g.keys.some(j => pos.get(j) > pos.get(k) && (meta(j).date || '9999') < d) && !r.moved[k]) chronoAudit.missed.push({ cur: g.id, t: metaT(k) }); } }
 const out = { generatedAt: new Date().toISOString(), worlds: res.worlds, works: res.works, info: res.info, cols: outCols };
 fs.writeFileSync(new URL('worlds.json', OUT), JSON.stringify(out) + '\n');
 
@@ -73,23 +78,24 @@ fs.writeFileSync(new URL('worlds.json', OUT), JSON.stringify(out) + '\n');
 const skip = audit.skip || {};
 const curOf = new Map(); for (const [k, g] of Object.entries(fr.items || {})) for (const s of g.order || []) { const id = s.m ? 'm' + s.m : s.t ? 't' + s.t : null; if (id) curOf.set(id, k); }
 const colOf = f => { const c = f.col && cols[f.col]; return c && c.parts.length > 1 ? c : null; };
-const title = k => known[k]?.title || res.info[k]?.title || k;
+const title = k => tt(k, known[k]?.title || res.info[k]?.title || k);
 const released = k => { const d = known[k]?.date || res.info[k]?.date; return d && d <= today; };
 // uncurated: أعمال تُعرض سلسلتها من مجموعة TMDB أو عالم آلي بترتيب الصدور، وترتيب أحداثها لم يُراجَع (قد يكون فيها جزء يسبق القصة)
 const report = { generatedAt: out.generatedAt, counts: {}, missing: [], uncurated: [], chronoAudit, curatedGaps: [], collectionGaps: [], related: [], noItem: [], excludedGroups: res.report.excludedGroups, rejectedFollows: res.report.rejectedFollows };
 const listed = new Set(focus);
 for (const f of films) { const k = keyOf(f), w = res.works[k];
-  if (!w) { report.noItem.push({ k, t: f.title, y: f.year }); continue; }
+  const ft = tt(k, f.title);
+  if (!w) { report.noItem.push({ k, t: ft, y: f.year }); continue; }
   const ws = (w.worlds || []).map(id => res.worlds[id]), cur = curOf.get(k), col = colOf(f);
-  if (ws.length && !cur && !col) report.missing.push({ k, t: f.title, y: f.year, worlds: ws.map(x => ({ name: x.name, kind: x.kind, size: x.size, order: x.order.map(title) })) });
-  if (!cur && (col || ws.length)) report.uncurated.push({ k, t: f.title, y: f.year, via: col ? 'collection' : 'world', name: col ? col.name : ws[0].name });
+  if (ws.length && !cur && !col) report.missing.push({ k, t: ft, y: f.year, worlds: ws.map(x => ({ name: wn(x), kind: x.kind, size: x.size, order: x.order.map(title) })) });
+  if (!cur && (col || ws.length)) report.uncurated.push({ k, t: ft, y: f.year, via: col ? 'collection' : 'world', name: col ? cn(col) : wn(ws[0]) });
   if (cur) { const have = new Set(fr.items[cur].order.map(s => s.m ? 'm' + s.m : s.t ? 't' + s.t : null));
     for (const wd of ws.filter(x => x.size <= 40)) { const gap = wd.order.filter(x => !have.has(x) && released(x) && !(skip[cur] || []).includes(x));
-      if (gap.length && !report.curatedGaps.some(g => g.cur === cur && g.world === wd.name)) report.curatedGaps.push({ cur, k, t: f.title, world: wd.name, kind: wd.kind, gap: gap.map(x => `${x} ${title(x)}`) }); } }
+      if (gap.length && !report.curatedGaps.some(g => g.cur === cur && g.world === wn(wd))) report.curatedGaps.push({ cur, k, t: ft, world: wn(wd), kind: wd.kind, gap: gap.map(x => `${x} ${title(x)}`) }); } }
   else if (col && ws[0]) { const parts = new Set(col.parts.map(p => 'm' + p.tmdb)), wo = new Set(ws[0].order);
     const extra = ws[0].order.filter(x => !parts.has(x)), lack = [...parts].filter(x => !wo.has(x));
-    if (extra.length || lack.length) report.collectionGaps.push({ k, t: f.title, col: col.name, world: ws[0].name, extra: extra.map(x => `${x} ${title(x)}`), lack: lack.map(x => `${x} ${title(x)}`) }); }
-  if (w.rel?.length || w.src?.length) report.related.push({ k, t: f.title, rel: (w.rel || []).map(r => `${r.r}:${title(r.k)}${listed.has(r.k) ? '*' : ''}`), src: (w.src || []).map(s => `${s.kind}:${s.label}`) });
+    if (extra.length || lack.length) report.collectionGaps.push({ k, t: ft, col: cn(col), world: wn(ws[0]), extra: extra.map(x => `${x} ${title(x)}`), lack: lack.map(x => `${x} ${title(x)}`) }); }
+  if (w.rel?.length || w.src?.length) report.related.push({ k, t: ft, rel: (w.rel || []).map(r => `${r.r}:${title(r.k)}${listed.has(r.k) ? '*' : ''}`), src: (w.src || []).map(s => `${s.kind}:${adultK.has(k) ? '+18' : s.label}`) });
 }
 report.counts = { works: focus.length, withEntry: focus.length - report.noItem.length, inWorld: Object.values(res.works).filter(w => w.worlds?.length).length, worlds: Object.keys(res.worlds).length,
   chains: res.report.chains, withRelated: report.related.length, missing: report.missing.length, uncurated: report.uncurated.length, curatedGaps: report.curatedGaps.length, collectionGaps: report.collectionGaps.length,

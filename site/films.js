@@ -222,12 +222,19 @@ const autoOf = f => { const c = colOf(f), parts = c ? c.parts.map(p => 'm' + p.t
   return worldIds(keyOf(f)).find(id => { const o = D.worlds[id].order; return o.length > 1 && parts.every(p => o.includes(p)); }) || null; };
 // العالم الآلي ومجموعة TMDB: إن وجد محرّك الأحداث دليلاً على جزء يسبق القصة صار الترتيب ترتيب الأحداث، والمُوصى به للمشاهدة الأولى الصدور
 const chronoOf = c => c?.order ? { view: 'release', chrono: c } : c?.chk ? { chk: true } : {};
-const worldGroup = id => { const w = D.worlds[id]; return { key: 'w:' + id, auto: true, id, name: w.name, kind: w.kind, by: w.by, wd: w.wd, wiki: w.wiki, order: (w.chrono?.order || w.order).map(stepOf), ...chronoOf(w.chrono || (w.chk && { chk: 1 })) }; };
-const groupOf = f => { const k = D.frOf.get(keyOf(f)); if (k) return { key: k, curated: true, ...D.fr[k] }; const id = autoOf(f); if (id) return worldGroup(id);
+const worldGroup = id => { const w = D.worlds[id]; return { key: 'w:' + id, auto: true, id, name: w.name, kind: w.kind, by: w.by, wd: w.wd, wiki: w.wiki, order: (w.chrono?.order || w.order).map(stepOf).filter(seenStep), ...chronoOf(w.chrono || (w.chk && { chk: 1 })) }; };
+// سلسلة العمل كما تظهر الآن: أعمال +18 فيها (من القائمة أو خارجها) تظهر حين يُرفع الفلتر وحده (E75)
+const groupOf = f => vis(groupRaw(f));
+const groupRaw = f => { const k = D.frOf.get(keyOf(f)); if (k) return { key: k, curated: true, ...D.fr[k] }; const id = autoOf(f); if (id) return worldGroup(id);
   const c = colOf(f); if (!c) return null; const parts = c.parts.map(p => 'm' + p.tmdb), w = worldIds(keyOf(f)).map(id => D.worlds[id]).find(x => x.order.every(k => parts.includes(k)));
   const cc = D.colChrono[c.id]; return { key: 'c' + c.id, name: c.name, order: (cc?.order || parts).map(stepOf), wiki: w?.wiki || null, ...chronoOf(cc) }; };
 const listedOf = s => s.m ? D.byTmdb.get(s.m) : s.t ? D.byId.get('t' + s.t) : null;
 const infoOf = s => listedOf(s) || (s.m ? D.fx['m' + s.m] || D.part.get(s.m) || D.winfo['m' + s.m] : s.t ? D.fx['t' + s.t] || D.winfo['t' + s.t] : s) || {};
+// عمل في ترتيب أو بين الأعمال المرتبطة: هل هو +18؟ ما في القائمة من سجله ولو كان مخفياً، وما خارجها من أجزاء مجموعته ومعلومات العوالم (E75).
+// يُخفى والفلتر قائم، وصورته مغطاة بعين البوابة حتى تُكشف؛ والسلسلة بما يظهر منها وحده
+const poolOf = s => s.m ? D.pool.get('m' + s.m) : s.t ? D.pool.get('t' + s.t) : null;
+const adultStep = s => !!(poolOf(s)?.adult || infoOf(s).adult), seenStep = s => isOpen() || !adultStep(s), veilStep = s => adultStep(s) && covered(keyOfStep(s));
+const vis = g => g && { ...g, order: g.order.filter(seenStep) };
 // عمل خارج القائمة له رقم في TMDB: زره يفتح بطاقة اطلاع مباشرة بدل البحث
 const outRef = s => s.m ? ` data-tmdb="${s.m}" data-kind="movie"` : s.t ? ` data-tmdb="${s.t}" data-kind="tv"` : '';
 // نوع العمل في الترتيب: مسلسل، أنمي، فيلم رسوم، فيلم قصير (٤٠ دقيقة فأقل). الفيلم الحي بلا وصف
@@ -235,15 +242,15 @@ const kindOf = s => { if (s.x) return XKIND[s.x] || ''; const o = infoOf(s), w =
   if (s.t) return anim ? (ja ? 'أنمي' : 'مسلسل رسوم') : 'مسلسل';
   if (run && run <= 40) return 'فيلم قصير';
   return anim ? (ja ? 'فيلم أنمي' : 'فيلم رسوم') : ''; };
-function groups() { const out = new Map(Object.entries(D.fr).map(([key, fr]) => [key, { key, curated: true, ...fr }]));
+function groups() { const out = new Map(Object.entries(D.fr).map(([key, fr]) => [key, vis({ key, curated: true, ...fr })]));
   for (const f of D.films) { if (D.frOf.has(f.id)) continue; const g = groupOf(f); if (g && !out.has(g.key)) out.set(g.key, g); }
-  return [...out.values()].sort((a, b) => a.name.localeCompare(b.name, 'en')); }
+  return [...out.values()].filter(g => g.order.length >= 2).sort((a, b) => a.name.localeCompare(b.name, 'en')); }
 function seriesHTML() { const gs = groups().filter(g => !ui.q || g.name.toLowerCase().includes(ui.q) || g.order.some(s => (infoOf(s).title || '').toLowerCase().includes(ui.q)));
   if (!gs.length) return '<p class="empty">لا سلسلة تطابق البحث.</p>';
   return gs.map(g => { const mine = g.order.map(listedOf).filter(Boolean), seen = mine.filter(f => st(f.id) === 'watched').length;
     return `<section class="fr"><header><h3 dir="ltr">${esc(g.name)}</h3><span>${nWorks(g.order.length)}${seen ? ` · شاهدت ${seen}` : ''}${mine.length < g.order.length ? ` · ${mine.length} في قائمتك` : ''}${g.curated ? ` · بتوصيات الدليل${g.view ? '، بترتيب الأحداث' : ''}` : g.auto ? ` · ${WKIND[g.kind]}، مرتّب آلياً${g.chrono ? ' حسب الأحداث' : ''}` : g.chrono ? ' · مرتّب آلياً حسب الأحداث' : ''}</span></header>${g.note ? `<p class="fr-note">${ar(g.note)}</p>` : ''}<div class="reel">${
-      g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s); return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}"${f ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
-<span class="p"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '118px') || slate(o)}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
+      g.order.map((s, i) => { const f = listedOf(s), o = infoOf(s), k = kindOf(s), v = veilStep(s) && !!o.poster; return `<button class="part${f ? '' : ' out'}${f && st(f.id) === 'watched' ? ' watched' : ''}${s.rec ? ' r-' + s.rec : ''}" data-act="${f ? 'open' : 'add-part'}" data-id="${f ? f.id : ''}"${f ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}"${marks(keyOfStep(s) || '', adultStep(s))}>
+<span class="p${v ? ' x18' : ''}"${o.poster && !v ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '118px', v) || slate(o)}<span class="n">${i + 1}</span>${s.rec && s.rec !== 'watch' ? `<span class="rc ${s.rec}">${REC[s.rec]}</span>` : ''}</span><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), f ? '' : 'خارج قائمتك'].filter(Boolean).join(' · ')}</small></button>`; }).join('')}</div></section>`; }).join(''); }
 function setView(v) { ui.view = v; $$('.tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); $('#grid').hidden = v !== 'grid'; $('#series').hidden = v !== 'series'; $('#chips').hidden = v !== 'grid';
   if (v === 'series') $('#series').innerHTML = seriesHTML(); apply(false); }
 
@@ -270,7 +277,8 @@ const srcLine = src => { const n = src?.length || 0, l = (src || []).map(x => `<
   return !n ? '' : n === 1 ? `مصدر واحد: ${l}` : `مؤكد من ${n === 2 ? 'مصدرين' : (['', '', '', 'ثلاثة', 'أربعة'][n] || n) + ' مصادر'}: ${l}`; };
 const row = (f, s, i, opt, far) => { const l = listedOf(s), o = infoOf(s), w = l && st(l.id) === 'watched', here = isHere(f, s), k0 = kindOf(s), k = k0 && s.note?.includes(k0) ? '' : k0;
   const rec = s.rec || (opt?.auto && (o.date ? o.date > today : !o.year) ? 'soon' : ''), mv = opt?.moved?.[keyOfStep(s)];
-  return `<li data-n="${i + 1}" class="${[here ? 'here' : '', w ? 'watched' : '', rec ? 'r-' + rec : '', far ? 'far' : ''].filter(Boolean).join(' ')}"><span class="th"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${o.poster ? `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k0)}</span>
+  const v = veilStep(s) && !!o.poster;
+  return `<li data-n="${i + 1}" class="${[here ? 'here' : '', w ? 'watched' : '', rec ? 'r-' + rec : '', far ? 'far' : ''].filter(Boolean).join(' ')}"${marks(keyOfStep(s) || '', adultStep(s))}><span class="th${v ? ' x18' : ''}"${o.poster && !v ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${o.poster ? v ? cover(`<img loading="lazy" alt="" src="${IMG}w92${o.poster}">`) : `<img loading="lazy" alt="" src="${IMG}w92${o.poster}">` : esc(k0)}</span>
 <span class="t"><b>${esc(o.title || '')}</b><small>${[k, whenOf(o), o.rating ? `<bdi dir="ltr">${o.rating.toFixed(1)}</bdi>` : '', s.note ? ar(s.note) : '', mv ? movedNote(mv) : ''].filter(Boolean).join(' · ')}</small></span>
 <span class="st">${rec ? `<i class="rc ${rec}">${REC[rec]}</i>` : ''}<small>${here ? 'هذا العمل' : w ? 'شاهدته' : l ? 'في قائمتك' : 'خارج قائمتك'}</small></span>${here ? '' : s.x && !s.url ? '' : s.x ? `<a class="go" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(o.title || '')}"></a>` : `<button class="go" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}" aria-label="${l ? 'افتح' : 'اعرض'} ${esc(o.title || '')}"></button>`}</li>`; };
 // ترتيب طويل (أكثر من ١٤ عملاً) يُختصر إلى نافذة حول هذا العمل، وزر يعرضه كاملاً
@@ -290,8 +298,8 @@ const noteOf = g => g.curated ? `<p class="note">الترتيب والتوصيا
   : g.auto ? autoNote(g) : `<p class="note">الأجزاء من مجموعة <bdi dir="ltr">TMDB</bdi> وتشمل الأفلام فقط${g.wiki ? `، وتفصيل السلسلة في ${ext('Wikipedia', g.wiki)}` : ''}. رتّبها الدليل آلياً حسب تاريخ الصدور${chronoTail(g)}</p>${evidenceHTML(g.chrono)}`;
 // عوالم أوسع يقع فيها العمل (لغير الترتيب المراجَع): كل واحد يضيف أعمالاً لم تظهر، مطويّاً، واثنان على الأكثر
 function widerHTML(f, g) { if (g.curated) return ''; const have = new Set(g.order.map(keyOfStep)); let out = '', n = 0;
-  for (const id of worldIds(keyOf(f))) { const w = D.worlds[id]; if ('w:' + id === g.key || n >= 2 || !w.order.some(x => !have.has(x))) continue; w.order.forEach(x => have.add(x)); n++;
-    out += `<details class="wider"><summary><b>${WKIND[w.kind]} أوسع</b><bdi dir="ltr">${esc(w.name)}</bdi><small>${nWorks(w.order.length)}</small></summary>${rowsHTML(f, worldGroup(id).order, { auto: true, moved: w.chrono?.moved })}${autoNote(worldGroup(id))}</details>`; }
+  for (const id of worldIds(keyOf(f))) { const w = D.worlds[id], wg = worldGroup(id), o = wg.order.map(keyOfStep); if ('w:' + id === g.key || n >= 2 || o.length < 2 || !o.some(x => !have.has(x))) continue; o.forEach(x => have.add(x)); n++;
+    out += `<details class="wider"><summary><b>${WKIND[w.kind]} أوسع</b><bdi dir="ltr">${esc(w.name)}</bdi><small>${nWorks(o.length)}</small></summary>${rowsHTML(f, wg.order, { auto: true, moved: w.chrono?.moved })}${autoNote(wg)}</details>`; }
   return out; }
 // العمل نفسه في دليل DC أو Fate: رابط إلى بطاقته هناك
 const DOORS = { dc: 'DC', fate: 'Fate' };
@@ -316,11 +324,11 @@ function orderHTML(f) { const g = groupOf(f), door = xdoorHTML(D.wworks[keyOf(f)
   if (!g) return `<section class="sec"><h3>السلسلة وترتيب المشاهدة</h3>${door}<p>${aloneText(f)}</p></section>`;
   return `<section class="sec"><h3>ترتيب المشاهدة: <bdi dir="ltr">${esc(g.name)}</bdi>${g.auto ? ` <span class="wk">${WKIND[g.kind]}</span>` : ''}</h3>${door}${g.note ? `<p>${ar(g.note)}</p>` : ''}${viewsHTML(f, g)}${noteOf(g)}${widerHTML(f, g)}</section>`; }
 // أعمال مرتبطة: الأصل وما اقتُبس عنه واقتباسات أخرى للمصدر نفسه، والمصدر نفسه إن كان كتاباً أو لعبة. ما ظهر في الترتيب لا يتكرر هنا
-const relCard = r => { const s = stepOf(r.k), l = listedOf(s), o = infoOf(s);
-  return `<button class="part${l && st(l.id) === 'watched' ? ' watched' : ''}" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${l ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}">
-<span class="p"${o.poster ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '100px') || slate(o)}<span class="rl ${r.r}">${RELN[r.r]}</span></span><b>${esc(o.title || '')}</b><small>${[kindOf(s), o.year, r.r === 'sibling' && r.via ? `عن <bdi dir="ltr">${esc(r.via)}</bdi>` : '', l ? 'في قائمتك' : ''].filter(Boolean).join(' · ')}</small></button>`; };
+const relCard = r => { const s = stepOf(r.k), l = listedOf(s), o = infoOf(s), v = veilStep(s) && !!o.poster;
+  return `<button class="part${l && st(l.id) === 'watched' ? ' watched' : ''}" data-act="${l ? 'open' : 'add-part'}" data-id="${l ? l.id : ''}"${l ? '' : outRef(s)} data-q="${esc(o.title || '')}${o.year ? ' ' + o.year : ''}"${marks(r.k, adultStep(s))}>
+<span class="p${v ? ' x18' : ''}"${o.poster && !v ? ` data-zoom-pinch data-zoom-title="${esc(o.title || '')}"` : ''}>${poster(o.poster, '100px', v) || slate(o)}<span class="rl ${r.r}">${RELN[r.r]}</span></span><b>${esc(o.title || '')}</b><small>${[kindOf(s), o.year, r.r === 'sibling' && r.via ? `عن <bdi dir="ltr">${esc(r.via)}</bdi>` : '', l ? 'في قائمتك' : ''].filter(Boolean).join(' · ')}</small></button>`; };
 function relatedHTML(f) { const w = D.wworks[keyOf(f)]; if (!w) return '';
-  const shown = new Set((groupOf(f)?.order || []).map(keyOfStep)), rel = (w.rel || []).filter(r => !shown.has(r.k) && infoOf(stepOf(r.k)).title);
+  const shown = new Set((groupOf(f)?.order || []).map(keyOfStep)), rel = (w.rel || []).filter(r => !shown.has(r.k) && infoOf(stepOf(r.k)).title && seenStep(stepOf(r.k)));
   const src = (w.src || []).map(x => { const t = `مقتبس عن ${SRCK[x.kind] || 'عمل'} «<bdi dir="ltr">${esc(x.label)}</bdi>»${x.year ? ` <bdi>(${x.year})</bdi>` : ''}`;
     return `<li>${x.wiki ? `<a href="${esc(x.wiki)}" target="_blank" rel="noopener">${t}</a>` : `<span>${t}</span>`}</li>`; }).join('');
   if (!rel.length && !src) return '';
@@ -368,7 +376,7 @@ function chainHTML(f) { const g = groupOf(f), o = g?.order || [], i = o.findInde
     foot = `<button type="button" class="ch-n" data-act="to-order"><span>${i + 1} من ${o.length} في <bdi dir="ltr">${esc(g.name)}</bdi>، ${g.curated ? 'بترتيب المشاهدة الذي يوصي به الدليل' : g.chrono ? 'بترتيب الأحداث' : 'بترتيب الصدور'}</span><b>الترتيب كاملاً</b></button>`; }
   else if (solo) body = `${posMap({ solo: true })}<p class="ch-m"><b class="ch-k">${f.kind === 'tv' ? 'مسلسل منفرد' : 'فيلم منفرد'}</b></p><p class="ch-t">${D.wlive.get(keyOf(f)) === 'wait' ? '<span class="wait">أبحث عن سلسلته وعالمه…</span>'
     : `قائم بذاته: ${f.kind === 'tv' ? 'لا تجمعه سلسلة ولا عالم مشترك بأعمال أخرى' : 'لا أجزاء أخرى له ولا عالم مشترك بأعمال أخرى'}.`}</p>`;
-  const orig = (D.wworks[keyOf(f)]?.rel || []).find(r => r.r === 'original' && infoOf(stepOf(r.k)).title); let from = '';
+  const orig = (D.wworks[keyOf(f)]?.rel || []).find(r => r.r === 'original' && infoOf(stepOf(r.k)).title && seenStep(stepOf(r.k))); let from = '';
   if (orig) { const s = stepOf(orig.k), y = infoOf(s).year, same = (s.t ? 'tv' : 'movie') === f.kind;
     from = `<p class="ch-m ch-o"><b class="ch-k">${same ? 'إعادة صنع' : 'مقتبس'}</b><span>${same ? (f.kind === 'tv' ? 'لمسلسل' : 'لفيلم') : s.t ? 'عن مسلسل' : 'عن فيلم'} ${chainLink(s)}${y ? ` <bdi>(${y})</bdi>` : ''}</span></p>`; }
   return body || from ? `<nav class="chain${inSeries ? '' : solo ? ' solo' : ' bare'}" aria-label="موقعه من سلسلته">${body}${from}${foot}</nav>` : ''; }
@@ -399,15 +407,15 @@ async function sheetHTML(f, pv = null) { await Promise.race([D.worldsReady, new 
   : f.poster ? `<button type="button" class="poster" data-zoom="" data-zoom-title="${esc(f.title)}" aria-label="تكبير بوستر ${esc(f.title)}">${poster(f.poster, '170px')}</button>` : `<div class="poster">${slate(f)}</div>`}<div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
 <p class="facts">${[f.kind === 'tv' ? 'مسلسل' : '', f.year ? `<bdi>${f.year}</bdi>` : '', rt(f.runtime), f.seasons ? count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم']) : '', f.cert ? `<bdi dir="ltr">${esc(f.cert)}</bdi>` : '', LANGS[f.lang] ? 'اللغة ' + LANGS[f.lang] : '', f.rating ? `<span class="rate">تقييم <bdi dir="ltr">TMDB ${f.rating.toFixed(1)}</bdi></span>` : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</p>
 <div class="tags">${f.genres.map(g => GENRES[g] ? `<span>${GENRES[g]}</span>` : '').join('')}</div></div></div>
-<div id="chslot" data-k="${keyOf(f)}">${f.adult ? '' : chainHTML(f)}</div>${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>
+<div id="chslot" data-k="${keyOf(f)}">${chainHTML(f)}</div>${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>
 <section class="sec"><p class="ask">ليس في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">TMDB</bdi>.</p></section>`
   : `<div class="sh-acts"><button class="btn sec" data-act="set" data-v="watched" aria-pressed="${s === 'watched'}">${ic('check')}شاهدته</button><button class="btn sec nx" data-act="set" data-v="next" aria-pressed="${s === 'next'}">${ic('mark')}التالي في المشاهدة</button></div>`}
-${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''}${f.src === 'added' && !f.adult ? '<section class="sec"><p class="ask">أُضيف بزر «أضف فيلماً»: معلوماته آلية من <bdi dir="ltr">TMDB</bdi> ولم تُراجَع يدوياً.</p></section>' : ''}
+${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''}${f.src === 'added' ? '<section class="sec"><p class="ask">أُضيف بزر «أضف فيلماً»: معلوماته آلية من <bdi dir="ltr">TMDB</bdi> ولم تُراجَع يدوياً.</p></section>' : ''}
 <section class="sec"><h3>القصة</h3>${ov}</section>${un ? `<section class="sec"><h3>موعد الصدور</h3>${f.date ? leader(f.date, `يصدر في <bdi>${dateAr(f.date)}</bdi> حسب <bdi dir="ltr">TMDB</bdi>، والموعد قابل للتغيير.`) : leader(null, 'معلن، ولم يُحدَّد موعد صدوره بعد.')}</section>` : ''}${nextEp(f) ? (n => `<section class="sec"><h3>${n.e === 1 ? 'الموسم القادم' : 'الحلقة القادمة'}</h3>${leader(n.date, `${n.e === 1 ? `الموسم ${n.s} يبدأ` : `الموسم ${n.s}، الحلقة ${n.e}: تُعرض`} في <bdi>${dateAr(n.date)}</bdi> حسب <bdi dir="ltr">TMDB</bdi>، والموعد قابل للتغيير.`, n.e === 1 ? 'يبدأ اليوم' : 'تُعرض اليوم')}</section>`)(nextEp(f)) : ''}
-${f.adult ? '' : whereSec(f)}<div id="wslot" data-k="${keyOf(f)}">${f.adult ? '' : worldHTML(f)}</div>
+${whereSec(f)}<div id="wslot" data-k="${keyOf(f)}">${worldHTML(f)}</div>
 ${(m.directors?.length || m.cast?.length) ? `<section class="sec"><h3>الطاقم</h3><p class="people">${m.directors?.length ? `<b>${f.kind === 'tv' ? 'صنّاع المسلسل' : 'الإخراج'}:</b> <bdi dir="ltr">${m.directors.map(esc).join(', ')}</bdi><br>` : ''}${m.cast?.length ? `<b>التمثيل:</b> <bdi dir="ltr">${m.cast.map(esc).join(', ')}</bdi>` : ''}</p></section>` : ''}
 ${linksSec(f)}`; }
-async function openFilm(id, push = true) { const f = D.byId.get(id); if (!f) return; openId = id; markEl($('#sheet-body'), id, f.adult); $('#sheet-body').innerHTML = await sheetHTML(f); $('#sheet-body').scrollTop = 0; if (f.fresh && !f.adult && !D.wworks[id]?.q) liveWorlds(f);
+async function openFilm(id, push = true) { const f = D.byId.get(id); if (!f) return; openId = id; markEl($('#sheet-body'), id, f.adult); $('#sheet-body').innerHTML = await sheetHTML(f); $('#sheet-body').scrollTop = 0; if (f.fresh && !D.wworks[id]?.q) liveWorlds(f);
   if (!sheet.open) { sheet.showModal(); $('#sheet-body').scrollTop = 0;   // بعد العرض: المتصفح يعيد للنافذة موضع تمرير البطاقة السابقة حين تُعرض، وتصفيره وهي مخفية لا يؤثر
     if (!calm) sheet.animate(innerWidth <= 640 ? { transform: ['translateY(6%)', 'none'], opacity: [0, 1] } : { transform: ['scale(.97)', 'none'], opacity: [0, 1] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
     if (push) history.pushState({ film: id }, '', '#' + id); } else if (push) history.replaceState({ film: id }, '', '#' + id); }
@@ -492,7 +500,7 @@ async function openPreview(tmdb, kind, btn) { const id = (kind === 'tv' ? 't' : 
     Object.assign(D.prov, r.providers || {}); if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) if (!D.part.has(p.tmdb)) D.part.set(p.tmdb, p); }
     const [light, heavy] = split(r.film), k = keyOf(light); openId = null;
     D.winfo[k] ||= { title: light.title, date: light.date, year: light.year, poster: light.poster, rating: light.rating, votes: light.votes, genres: light.genres, lang: light.lang, runtime: light.runtime };
-    markEl($('#sheet-body'), id, light.adult); $('#sheet-body').innerHTML = await sheetHTML(light, { more: heavy }); $('#sheet-body').scrollTop = 0; if (!light.adult) liveWorlds(light); pvOpen = { tmdb, kind };
+    markEl($('#sheet-body'), id, light.adult); $('#sheet-body').innerHTML = await sheetHTML(light, { more: heavy }); $('#sheet-body').scrollTop = 0; liveWorlds(light); pvOpen = { tmdb, kind };
     if (!sheet.open) { sheet.showModal(); $('#sheet-body').scrollTop = 0; if (!calm) sheet.animate({ opacity: [0, 1], transform: [innerWidth <= 640 ? 'translateY(6%)' : 'scale(.97)', 'none'] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' }); history.pushState({ film: 'preview' }, '', location.pathname + location.search); }
   } catch (err) { if (addDlg.open) $('#add-msg').textContent = err.message; else toast(err.message); }
   finally { if (btn) { btn.disabled = false; btn.innerHTML = label; } } }

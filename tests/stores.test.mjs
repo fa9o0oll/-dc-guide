@@ -104,6 +104,11 @@ check('أسعار Steam تُسأل دفعة واحدة لا لعبة لعبة، 
 
 console.log('مصدر لا يجيب');
 const prev = new Map([[1, { pc: [{ s: 'steam', u: 'https://store.steampowered.com/app/100', free: 'gift' }, { s: 'epic', u: 'https://store.epicgames.com/p/alpha-quest-ab12cd', free: 'gift', from: iso(-48), until: iso(72) }, { s: 'xbox', u: 'https://x/9AAAAAAAAAA1', pass: 1 }] }], [3, { pc: [{ s: 'steam', u: 'https://store.steampowered.com/app/300' }] }]]);
+// لعبة +18 (E75): تُفحص متاجرها كغيرها وباسمها، والتقرير يذكرها برقمها وحده بلا اسمها ولا مسار صفحتها
+{ const AD = new Set([5, 8, 14, 18, 30]), ag = games.map(g => AD.has(g.id) ? { ...g, adult: 1 } : g), a = await storesFor(ag, { fetch: net, pause: 0, now: NOW, fix }), txt = JSON.stringify(a.report);
+  check('لعبة +18: متاجرها كغيرها، والتقرير يذكرها برقمها وحده (+18 #الرقم) بلا اسمها ولا ما يدل عليه', [...AD].every(id => JSON.stringify(a.rows.get(id)) === JSON.stringify(r.rows.get(id)))
+    && !/Gone Game|Rayman|Old Epic|Wiki Epic(?! Gone)|Wiki Gog(?! Wrong)|wiki-epic(?!-gone)|wiki_gog(?!_wrong)|old-epic/i.test(txt) && '+18 #8' in a.report.games && a.report.none.includes('+18 #5') && a.report.passByTitle.some(x => /9DDDDDDDDDD4 → \+18 #8/.test(x))
+    && a.report.epicGuess.some(x => x.startsWith('+18 #18: ')) && a.report.gogSearch.some(x => /^\+18 → /.test(x)) && /Alpha Quest/.test(txt), [Object.keys(a.report.games).slice(0, 8), a.report.passByTitle, a.report.epicGuess, a.report.gogSearch, a.report.none]); }
 down = new Set(['steam', 'epic', 'ms']); const f = await storesFor(games, { fetch: net, pause: 0, now: NOW, fix, prev }), fb = (id, s) => (f.rows.get(id) || []).find(x => x.s === s);
 check('Steam لا يجيب: يبقى لكل لعبة ما كان لها، وما لا سابق له يبقى متجراً بلا حال', f.meta.failed.includes('steam') && fb(1, 'steam').free === 'gift' && fb(3, 'steam') && !fb(3, 'steam').free && fb(4, 'steam') && !fb(4, 'steam').off, [f.meta, f.rows.get(1), f.rows.get(4)]);
 check('Epic لا يجيب: الهدية السابقة تبقى ما دامت مدتها لم تنتهِ', f.meta.failed.includes('epic') && fb(1, 'epic').free === 'gift' && fb(1, 'epic').until === iso(72), f.rows.get(1));

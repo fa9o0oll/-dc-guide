@@ -1,7 +1,8 @@
 // دالة «أضف فيلماً»: تقترح أثناء الكتابة (suggest)، وتبحث في TMDB عن سطر مكتوب بحرّية (اسم وسنة)، وتجلب بطاقة كاملة لأي نتيجة للاطلاع (preview)، ثم تضيف المختار إلى data/films/added.json في المستودع،
 // فيعاد بناء القائمة ويظهر الفيلم على كل الأجهزة. و worlds: سلسلة العمل وعالمه وأعماله المرتبطة من Wikidata (تطلبها الصفحة بعد فتح البطاقة، فلا تتأخر).
 // adult في الطلب: الفلتر مرفوع في الصفحة (E65، العين). البحث والاقتراح يعودان حينها بنتائجهما المعتادة ومعها ما وسمه TMDB للبالغين (موسوماً adult)، وبدونه
-// لا يعودان بشيء منه؛ والإضافة والاطلاع يُرفضان لعمل +18 والفلتر قائم. والمضاف منها يُوسم adult في الملف، وعنوان إيداعه برقمه بلا اسمه.
+// لا يعودان بشيء منه؛ والإضافة والاطلاع والعالم تُرفض لعمل +18 والفلتر قائم. والمضاف منها يُوسم adult في الملف، وعنوان إيداعه برقمه بلا اسمه،
+// ومعلوماته كاملة كغيره: طاقمه وسلسلته ومنصاته وعالمه (E75).
 // محمية بكلمة سر. المفاتيح تُقرأ من متغيرات Netlify ولا تُكتب في أي ملف:
 //   TMDB_API_KEY  مفتاح TMDB        GH_TOKEN  رمز GitHub بصلاحية الكتابة على هذا المستودع        ADD_FILM_PASSWORD  كلمة السر
 import { createHash, timingSafeEqual } from 'node:crypto';
@@ -60,7 +61,7 @@ export default async req => {
       const usual = s => s.filter(x => !x.c.adult), x18 = s => adult ? s.filter(x => x.c.adult).slice(0, 3) : [], byScore = (a, b) => b.score - a.score;
       const movies = [...usual(mv.scored).slice(0, 5), ...x18(mv.scored)].sort(byScore).map(x => ({ kind: 'movie', c: x.c })), shows = [...usual(tv.scored).filter(x => x.exact).slice(0, 2), ...x18(tv.scored)].sort(byScore).map(x => ({ kind: 'tv', c: x.c }));
       const candidates = await Promise.all([...movies, ...shows].map(async ({ kind, c }, i) => {
-        const col = kind === 'movie' && i < 4 && !c.adult ? (await tmdb('/movie/' + c.id).catch(() => null))?.belongs_to_collection?.name?.replace(/\s+Collection$/i, '') : null;
+        const col = kind === 'movie' && i < 4 ? (await tmdb('/movie/' + c.id).catch(() => null))?.belongs_to_collection?.name?.replace(/\s+Collection$/i, '') : null;
         return { tmdb: c.id, kind, title: c.title || c.name, year: year(c), poster: c.poster_path || null, collection: col || undefined, adult: c.adult ? 1 : undefined }; }));
       return json(200, { parsed, sure: mv.sure, candidates });
     }
@@ -78,10 +79,12 @@ export default async req => {
     if (b.action === 'worlds') {
       const kind = b.kind === 'tv' ? 'tv' : 'movie', id = +b.tmdb; if (!Number.isInteger(id) || id <= 0) return json(400, { error: 'معرّف غير صالح.' });
       const key = (kind === 'tv' ? 't' : 'm') + id, budget = new Promise((_, no) => setTimeout(() => no(new Error('worlds timeout')), 45000));
+      // العمل نفسه أولاً: عمل +18 والفلتر قائم لا يُبحث له عن عالم، وعالم عمل +18 يدخله ما خارج القائمة من +18 (lib-worlds: known.adult)
+      const self = await tmdb(detailPath(kind, id), { language: 'en-US' }).catch(() => null), date = (kind === 'tv' ? self?.first_air_date : self?.release_date) || null;
+      if (self?.adult && !adult) return json(422, { error: 'هذا العمل مصنَّف للبالغين: افتح العين أعلى الصفحة.' });
       const t0 = Date.now(), work = (async () => {
-        const opt = { timeout: 20000, tries: 2 }, r = await worldsFor([key], { tmdb, opt }), cols = {};
+        const opt = { timeout: 20000, tries: 2 }, r = await worldsFor([key], { tmdb, opt, known: self ? { [key]: { title: self.title || self.name, date, ...(self.adult ? { adult: true } : {}) } } : {} }), cols = {};
         // ترتيب الأحداث لعوالم العمل ولمجموعته في TMDB، من أدلة Wikipedia وTMDB وWikidata (scripts/lib-chrono.mjs)
-        const self = await tmdb(detailPath(kind, id), { language: 'en-US' }).catch(() => null), date = (kind === 'tv' ? self?.first_air_date : self?.release_date) || null;
         const groups = (r.works[key]?.worlds || []).map(w => ({ w, keys: r.worlds[w].order, wide: ['universe', 'franchise'].includes(r.worlds[w].kind) })).filter(g => g.keys.length >= 2 && g.keys.length <= 40);
         const col = kind === 'movie' && self?.belongs_to_collection?.id ? await tmdb('/collection/' + self.belongs_to_collection.id, { language: 'en-US' }).then(shapeCollection).catch(() => null) : null;
         if (col?.parts.length > 1) groups.push({ c: col.id, keys: col.parts.map(p => 'm' + p.tmdb) });
