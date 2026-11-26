@@ -125,6 +125,12 @@ const more = worldsOf([
   W(4654, 'Toaru Majutsu no Index', '2008-10-05', [['Sequel', 8937], ['Spin-Off', 6213]]), W(8937, 'Toaru Majutsu no Index II', '2010-10-08', []), W(6213, 'Toaru Kagaku no Railgun', '2009-10-03', [['Sequel', 16049]]), W(16049, 'Toaru Kagaku no Railgun S', '2013-04-12', [['Sequel', 38481]]), W(38481, 'Toaru Kagaku no Railgun T', '2020-01-10', []),
 ]);
 const mOf = n => more.find(w => w.name === n);
+// أعمال +18 (E73): تدخل سلسلة غيرها، ولا يُشتق منها رقم السلسلة ولا اسمها ولا عملها صاحب الاسم ما دام فيها غيرها، فرقم السلسلة كما كان قبل دخولها
+const adw = worldsOf([
+  W(34620, 'Visible Saga', '2017-04-04', [['Prequel', 3883]]), W(3883, 'Visible Saga Night', '2003-01-01', [['Sequel', 34620]], { mine: false, ad: true }),
+  W(70100, 'Only Night', '2010-01-01', [['Sequel', 70101]], { ad: true }), W(70101, 'Only Night 2', '2012-01-01', [], { ad: true })]);
+check('عمل +18 في سلسلة غيره: رقمها واسمها وصاحب اسمها من غيره ولو كان أقدمها وأصغرها رقماً، وسلسلة كلها +18 تُسمّى بها', (() => { const v = adw.find(w => w.ids.includes(34620)), o = adw.find(w => w.ids.includes(70100));
+  return v.id === 34620 && v.name === 'Visible Saga' && v.head === 34620 && same(v.ids, [3883, 34620]) && o.id === 70100 && o.head === 70100 && o.name === 'Only Night'; })(), adw);
 check('علاقتان متناقضتان بين عملين تُحسمان بترتيب الصدور، فلا يتأخر المسلسل الأصلي عن أعمال لا علاقة ترتيب له بها', !('story' in mOf('Code Geass: Hangyaku no Lelouch')) && same(mOf('Code Geass: Hangyaku no Lelouch').ids, [1575, 2904, 12685, 8888]), mOf('Code Geass: Hangyaku no Lelouch'));
 check('سلسلة بدأت بـOVA تأخذ الاسم الذي تبدأ به أعمالها لا اسم أول مسلسلاتها، ومعها رقم العمل صاحب الاسم', !!mOf('Ginga Eiyuu Densetsu') && mOf('Ginga Eiyuu Densetsu').ids.length === 3 && mOf('Ginga Eiyuu Densetsu').head === 820 && wOf('Shingeki no Kyojin').head === 16498 && mOf('Steins;Gate').head === 9253, more.map(w => [w.name, w.head]));
 check('وعالم غلب عليه اسم آخر يأخذه، وما لأقدم مسلسلاته ثلثه يبقى باسمه', !!mOf('Steins;Gate') && mOf('Steins;Gate').ids.includes(4975) && !!mOf('Toaru Majutsu no Index') && mOf('Toaru Majutsu no Index').ids.length === 5, more.map(w => w.name));

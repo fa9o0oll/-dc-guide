@@ -483,8 +483,8 @@ function enroll(a) { if (D.known.has(a.id)) return; D.known.add(a.id); D.all.pus
 const seen = w => w.ids.filter(id => D.by.has(id)).length;
 const worldName = t => String(t || '').replace(/\s*\((?:TV|\d{4})\)\s*$/i, '').replace(/\s*(?::|-)?\s*(?:Season\s*\d+|\d+(?:st|nd|rd|th)\s+Season|Part\s*\d+|First Season|S\d+)\s*$/i, '').trim() || String(t || '');   // كما في lib-anime
 function worldsSync() { D.wby.clear(); D.worlds = [];
-  for (const c of D.cw || []) { if (!c.ids.some(id => D.by.get(id)?.ord != null)) continue; const w = { ...c };
-    if (!isOpen() && (D.adult.has(c.head ?? c.id) || D.adult.has(c.id))) { const f = D.by.get((c.story || c.ids).find(id => D.by.has(id))); w.name = worldName(f.t); w.en = f.en ? worldName(f.en) : undefined; }
+  for (const c of D.cw || []) { if (!c.ids.some(id => D.by.get(id)?.ord != null) || seen(c) < 2) continue; const w = { ...c };   // وما بقي منها عمل واحد ظاهر فعمله منفرد
+    if (!isOpen() && (D.adult.has(c.head ?? c.id) || D.adult.has(c.id))) { const f = D.by.get((c.story || c.ids).find(id => D.by.has(id)) ?? c.ids.find(id => D.by.has(id))); w.name = worldName(f.t); w.en = f.en ? worldName(f.en) : undefined; }
     D.worlds.push(w); D.wby.set(w.id, w); } }
 function relist() { D.list.length = 0; D.by.clear(); for (const a of D.all) if (!hides(a)) { D.list.push(a); D.by.set(a.id, a); } D.prep = D.prepAll = null; worldsSync(); }
 function fillTypes() { const s = $('#type'), types = [...new Set(D.list.filter(a => a.ord != null).map(a => a.type).filter(Boolean))]; s.innerHTML = '<option value="">كل الأنواع</option>' + types.map(t => `<option value="${esc(t)}">${TYPE[t] || esc(t)}</option>`).join(''); s.value = types.includes(ui.type) ? ui.type : ''; ui.type = s.value; }

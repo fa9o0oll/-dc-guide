@@ -125,7 +125,7 @@ if (!door && prevCat?.door) door = prevCat.door;
 if (prevCat && tmdbOk && !tv.size && !movie.size) { tmdbOk = false; Object.assign(providers, prevCat.providers || {}); report.problems.push('TMDB لم يرد بشيء: تبقى صور الكتالوج السابق ومنصاته'); }
 
 // ---------- 3) السلاسل (أعمال +18 فيها كغيرها، والصفحة تخفيها والفلتر قائم)
-const items = all.map(id => { const d = cache.get(id)?.d, b = basics.get(id); return { id, rel: d?.rel || [], from: d?.from || null, type: d?.type || b?.type || '', eps: d ? d.eps : b?.eps || 0, title: d?.title || b?.title || '', en: d?.en || null, mine: inList.has(id) }; });
+const items = all.map(id => { const d = cache.get(id)?.d, b = basics.get(id); return { id, rel: d?.rel || [], from: d?.from || null, type: d?.type || b?.type || '', eps: d ? d.eps : b?.eps || 0, title: d?.title || b?.title || '', en: d?.en || null, mine: inList.has(id), ad: adult.has(id) }; });
 const worlds = worldsOf(items), itemBy = new Map(items.map(x => [x.id, x]));
 // ترتيب القصة المُراجَع (data/anime/orders.json): { "<رقم العمل الذي تحمل السلسلة اسمه>": { order: [أرقام الأعمال], note: "ملاحظة تظهر تحت الترتيب" } }.
 // الترتيب المحسوب من علاقات MyAnimeList يكفي أكثر السلاسل؛ وهذا لما يخالف فيه الترتيبُ الزمني المعروف تلك العلاقات (Dragon Ball GT بعد Super، Hanamonogatari في آخر Monogatari)

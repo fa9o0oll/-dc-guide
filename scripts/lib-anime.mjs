@@ -76,9 +76,11 @@ export function worldsOf(items) {
   const groups = new Map(); for (const x of items) { const k = find(x.id); (groups.get(k) || groups.set(k, []).get(k)).push(x); }
   const byDate = (a, b) => when(a) < when(b) ? -1 : when(a) > when(b) ? 1 : a.id - b.id, out = [];
   for (const g of groups.values()) { if (g.length < 2 || !g.some(x => x.mine)) continue; g.sort(byDate);
-    const head = g.find(x => x.type === 'TV') || g[0], ids = g.map(x => x.id), story = storyOrder(g), stem = stemOf(g, head);
+    // أعمال +18 (ad) تدخل السلسلة كغيرها (E73)، لكن ما دام فيها غيرها فلا يُسمّى بها ولا يُشتق منها رقمها: فرقم السلسلة واسمها كما كانا قبل دخولها
+    const vis = g.some(x => !x.ad) ? g.filter(x => !x.ad) : g;
+    const head = vis.find(x => x.type === 'TV') || vis[0], ids = g.map(x => x.id), story = storyOrder(g), stem = stemOf(vis, head);
     const named = stem || head;   // العمل الذي تحمل السلسلة اسمه: منه نبذتها في نافذتها
-    out.push({ id: Math.min(...ids), name: worldName(named.title), en: named.en ? worldName(named.en) : null, head: named.id, ids, ...(story.join() !== ids.join() ? { story } : {}) }); }
+    out.push({ id: Math.min(...vis.map(x => x.id)), name: worldName(named.title), en: named.en ? worldName(named.en) : null, head: named.id, ids, ...(story.join() !== ids.join() ? { story } : {}) }); }
   return out.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' })); }
 // ترتيب القصة داخل سلسلة (g مرتبة بالصدور): كل عمل يأتي بعد كل ما تقول العلاقات إنه قبله، ومن بين المتاح يُقدَّم الأقدم صدوراً.
 // صفحات MyAnimeList تتناقض أحياناً (العمل «متفرع» من الثاني والثاني «متفرع» منه): بين عملين يغلب «السابق/اللاحق» على غيره، وعند التساوي يغلب ترتيب الصدور.
