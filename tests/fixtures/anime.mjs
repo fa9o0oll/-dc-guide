@@ -22,12 +22,15 @@ export const catalog = () => ({ generatedAt: new Date().toISOString(), imageBase
     { id: 199, t: 'Sen to Chihiro no Kamikakushi', en: 'Spirited Away', an: ['المخطوفة'], type: 'Movie', eps: 1, ord: 10, y: 2001, st: 'finished', from: '2001-07-20', img: '6/79597', sc: 8.77, sv: 1300000, dur: 124, studio: 'Studio Ghibli', tm: { k: 'movie', id: 129 }, bd: '/sab.jpg', pv: P([8]) },
     { id: 60000, t: 'Brand New Show', type: 'TV', eps: 12, ord: 11, pending: 1 },
     { id: 61000, t: 'Upcoming Thing', type: 'TV', eps: 0, ord: 12, y: +month(5).slice(0, 4), st: 'soon', from: month(5), img: '1/1', tm: { k: 'tv', id: 999 }, pv: null },
-    // عملان +18 (ad) بأسماء مختلَقة، كما يكتبهما البناء: بلا TMDB ولا سلسلة. لا يظهران إلا والفلتر مرفوع (العين)
-    { id: 70001, t: 'Midnight Sample', type: 'OVA', eps: 2, ord: 13, ad: 1, y: 2019, st: 'finished', from: '2019-05-01', img: '7/70001', sc: 6.4, sv: 2100, dur: 28, g: [4], studio: 'Studio Night', rating: 'Rx', sk: 990001 },
+    // أعمال +18 (ad) بأسماء مختلَقة، كما يكتبها البناء (E73): معلوماتها كاملة كغيرها، وسلسلتها فيها قريب ليس في القائمة، وعمل جانبي +18 في عالم Hunter x Hunter.
+    // لا تظهر إلا والفلتر مرفوع (العين)
+    { id: 70001, t: 'Midnight Sample', type: 'OVA', eps: 2, ord: 13, ad: 1, y: 2019, st: 'finished', from: '2019-05-01', img: '7/70001', sc: 6.4, sv: 2100, dur: 28, g: [4], studio: 'Studio Night', rating: 'Rx', sk: 990001, w: 70001, tm: { k: 'tv', id: 970001 }, bd: '/ad70001bd.jpg' },
     { id: 70002, t: 'Velvet Sample', en: 'Velvet', type: 'OVA', eps: 1, ord: 14, ad: 1, y: 2022, st: 'finished', from: '2022-02-01', img: '7/70002', sc: 6.9, sv: 800, dur: 30, g: [4], studio: 'Studio Night', rating: 'Rx' },
+    { id: 70003, t: 'Midnight Sample: Afterglow', type: 'OVA', eps: 2, x: 1, ad: 1, y: 2020, st: 'finished', from: '2020-08-01', img: '7/70003', sc: 6.1, dur: 27, g: [4], rating: 'Rx', w: 70001 },
+    { id: 70004, t: 'Hunter Night Special', type: 'Special', eps: 1, x: 1, ad: 1, y: 2014, st: 'finished', from: '2014-06-01', img: '7/70004', dur: 24, g: [4], rating: 'Rx', w: 136 },
   ],
   // خطوط السلسلة كما يكتبها البناء (lib-anime: linesOf): الرئيسي مسلسل 1999 وحلقاته OVA، ومسلسل 2011 وفيلمه خط «نسخة أخرى» من مسلسل 1999
-  worlds: [{ id: 136, name: 'Hunter x Hunter', head: 11061, ids: [136, 137, 11061, 13271], lk: 'ma', li: [0, 0, 1, 1], ri: [-1, 0, 0, 2] }, { id: 356, name: 'Fate/stay night', ids: [356, 22297], story: [22297, 356], sv: 1, sn: 'ترتيب القصة هنا يبدأ بالمسار الأحدث. من يشاهد أول مرة يبدأ بترتيب الصدور.' }] });
+  worlds: [{ id: 136, name: 'Hunter x Hunter', head: 11061, ids: [136, 137, 11061, 13271, 70004], lk: 'ma', li: [0, 0, 1, 1, 1], ri: [-1, 0, 0, 2, 2] }, { id: 70001, name: 'Midnight Sample', head: 70001, ids: [70001, 70003] }, { id: 356, name: 'Fate/stay night', ids: [356, 22297], story: [22297, 356], sv: 1, sn: 'ترتيب القصة هنا يبدأ بالمسار الأحدث. من يشاهد أول مرة يبدأ بترتيب الصدور.' }] });
 export const texts = { 11061: { en: 'Hunters devote themselves to accomplishing hazardous tasks.', ar: 'الصيادون يكرّسون أنفسهم لمهام خطرة، وGon Freecss يخرج ليصير صياداً ويجد أباه.', jp: 'HUNTER×HUNTER', source: 'Manga', anilist: 11061,
     wa: 'مانغا يوشيهيرو توغاشي في عالم الصيادين.\n\nحُوّلت إلى الأنمي مرتين: نسخة 1999 وأوفاتها، ثم نسخة 2011 التي تعيد الحكاية من أولها.',
     rel: [{ r: 'Alternative Version', id: 136, name: 'Hunter x Hunter' }, { r: 'Sequel', id: 13271, name: 'Hunter x Hunter Movie 1: Phantom Rouge' }, { r: 'Other', id: 999999, name: 'Not here' }] },
@@ -60,11 +63,12 @@ export const simklItems = () => ({ anime: [
 // وحلقة بلا ملخص ولا صورة (396). وفي One Piece (عدد لم يُعلن) ثلاث حلقات لم تُعرض بعد، آخرها بلا موعد. وعملان لا يوافق عددُ حلقاتهما في المصدر
 // عددَ MyAnimeList: Fullmetal Alchemist: Brotherhood بفرق حلقتين (fit: odd)، وFate/stay night بعدّ آخر (fit: loose، للقراءة بلا تعليم)
 const wk = (from, i) => new Date(Date.parse(from) + i * 7 * 864e5).toISOString().slice(0, 10);
-export const epIndex = () => ({ 21: 1160, 356: 30, 1735: 500, 5114: 62, 37989: 12, 52701: 24 });
+export const epIndex = () => ({ 21: 1160, 356: 30, 1735: 500, 5114: 62, 37989: 12, 52701: 24, 70001: 2 });
 export function episodes(id) { const mk = (n, from, tv, over = {}) => ({ id, tv, how: 'map', eps: Array.from({ length: n }, (_, i) => ({ n: i + 1, se: Math.floor(i / 25) + 1, ep: i % 25 + 1, t: `Chapter ${i + 1}`, d: wk(from, i), r: 23, ov: `What happens in chapter ${i + 1}.`, st: `/still${i + 1}.jpg`, ...(over[i + 1] || {}) })) });
   if (id === 1735) { const j = mk(500, '2007-02-15', 31910, { 394: { t: 'The New Chunin Exams', ta: 'اختبارات التشونين الجديدة', ov: 'Naruto remembers the exams held while he was away.', oa: 'يتذكر ناروتو الاختبارات التي أقيمت وهو غائب عن القرية.', ra: 8.1 }, 395: { t: 'The Chunin Exams Begin!' } }); j.eps[395] = { n: 396, se: 16, ep: 21, d: wk('2007-02-15', 395) }; return j; }
   if (id === 21) { const j = mk(1160, '1999-10-20', 37854); j.eps[1157].d = day(3); j.eps[1158].d = day(10); delete j.eps[1159].d; for (const e of j.eps.slice(0, 1157)) if (e.d > day(0)) e.d = day(-1); return j; }
   if (id === 37989) return mk(12, '2018-10-08', 76757);
+  if (id === 70001) return mk(2, '2019-05-01', 970001);   // +18: حلقاته كغيره (E73)
   if (id === 52701) return mk(24, '2024-01-04', 207784);
   if (id === 5114) return { ...mk(62, '2009-04-05', 31911), fit: 'odd' };
   if (id === 356) return { ...mk(30, '2006-01-07', 45845), fit: 'loose' };

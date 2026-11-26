@@ -15,7 +15,7 @@ import { describe, noun, model } from './anime-pos.js?v=__BUILD__';
 import { themeOf } from './anime-theme.js?v=__BUILD__';
 import { GENRE } from './anime-genres.js?v=__BUILD__';
 import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead } from './anime-simkl.js?v=__BUILD__';
-import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
+import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover, dockEye } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
 const BUILD = '__BUILD__', KEY = 'animeg.progress', UI = 'anime.ui', ASK = 'animeg.asked', PASS = 'animeg.pass', ADDK = 'animeg.added';
@@ -79,6 +79,8 @@ const srcset = a => a.img ? `${D.mal}${a.img}.webp 225w, ${D.mal}${a.img}l.webp 
 // صورة عمل +18 مغطاة حتى تُكشف: مصغّرته وحدها مموّهة (cover في adult.js)، وحاويتها تأخذ الصنف x18
 const hid = a => !!a.ad && covered(a.id) && !!poster(a), xc = a => hid(a) ? ' x18' : '', tiny = a => a.img ? `${D.mal}${a.img}t.webp` : a.tp ? `${D.base}w92${a.tp}` : a.iu || '';
 const art = (a, sizes, eager, hint) => hid(a) ? cover(`<img ${eager ? '' : 'loading="lazy" '}decoding="async" alt="" src="${esc(tiny(a))}">`, hint) : poster(a) ? `<img ${eager ? '' : 'loading="lazy" '}decoding="async" alt="" src="${esc(poster(a))}" srcset="${esc(srcset(a))}" sizes="${sizes}">` : `<span class="ph">${esc((a.t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase())}</span>`;
+// مصغّرة عمل في شريط سلسلته وخطها الزمني (E73): صورة عمل +18 لم تُكشف مصغّرتها وحدها مغطاة بعين البوابة، كغلاف الشبكة
+const thumb = a => hid(a) ? `<span class="th x18">${cover(`<img loading="lazy" decoding="async" alt="" src="${esc(tiny(a))}">`)}</span>` : poster(a) ? `<img loading="lazy" decoding="async" alt="" src="${esc(poster(a))}">` : `<span class="ph">${esc((a.t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase())}</span>`;
 // صور MyAnimeList كلها بصيغة webp، وإن تعذّرت واحدة فنسختها jpg
 document.addEventListener('error', e => { const i = e.target; if (i.tagName === 'IMG' && /cdn\.myanimelist\.net/.test(i.src) && /\.webp$/.test(i.src) && !i.dataset.jpg) { i.dataset.jpg = 1; i.removeAttribute('srcset'); i.src = i.src.replace(/\.webp$/, '.jpg'); } }, true);
 // في قائمتي: ما له سجل. وقبل الاستيراد على هذا الجهاز تُعرض القائمة العامة كلها بلا سجل
@@ -125,7 +127,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
     <g fill="currentColor"><path d="M297 14h6v70h-6zM282 22h36v3h-36zM286 34h28v3h-28zM597 18h6v62h-6zM584 26h32v3h-32zM897 12h6v72h-6zM880 20h40v3h-40zM886 32h28v3h-28z"/></g></svg></section>
 <nav class="bar" aria-label="البحث والقوائم"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a>
   <label class="search">${ic('search')}<span class="sr">ابحث في أنمياتي</span><input id="q" type="search" placeholder="ابحث: أنمي، استوديو، سنة" autocomplete="off" enterkeyhint="search"></label>
-  <div class="views" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="list" aria-pressed="true">الأعمال</button><button data-act="view" data-v="worlds" aria-pressed="false">السلاسل</button></div></div>
+  <div class="views" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="list" aria-pressed="true">الأعمال</button><button data-act="view" data-v="worlds" aria-pressed="false">السلاسل</button></div>${eyeBtn(true)}</div>
   <div class="lists" id="lists" role="group" aria-label="قوائمي"></div>
   <div class="tools" id="tools"><select id="sort" aria-label="الترتيب"><option value="mal">ترتيب قائمتي</option><option value="score">تقييمي، الأعلى أولاً</option><option value="pub">تقييم MyAnimeList</option><option value="new">الأحدث صدوراً</option><option value="old">الأقدم صدوراً</option><option value="prog">الأقرب إلى الإكمال</option></select>
     <select id="type" aria-label="النوع"><option value="">كل الأنواع</option></select>
@@ -288,9 +290,9 @@ function whereHTML(a) { if (a.pv === undefined || a.st === 'soon') return ''; co
   return `<section class="sec where"><h3>أين تشاهده في السعودية</h3>${rows ? rows + `<p class="lbl">الأزرار تفتح صفحة أماكن العرض على ${ltr('TMDB')}، ومنها إلى المنصة. البيانات من ${ltr('JustWatch')} وتتحدث يومياً${!season ? '' : a.pvs ? '، وهي لهذا الموسم بعينه' : '، وهي للمسلسل كله لا لهذا الموسم وحده'}.</p>`
     : `<p class="lbl">لا تذكر بيانات ${ltr('JustWatch')} منصة تعرض${a.pvs ? ' هذا الموسم' : 'ه'} في السعودية حالياً.</p>${other.length ? `<div class="wrow"><b>مواسم أخرى من المسلسل</b><span class="wl">${other.map(id => chip(id, a.pvo.link || show)).join('')}</span></div>` : ''}`}</section>`; }
 const dot = id => { const s = me(id)?.s; return s ? `<i class="dot" data-l="${s}"></i>` : ''; };
-function worldStrip(a) { const w = D.wby.get(a.w); if (!w) return ''; const order = w.story || w.ids, at = order.indexOf(a.id) + 1;
+function worldStrip(a) { const w = D.wby.get(a.w); if (!w) return ''; const order = (w.story || w.ids).filter(id => D.by.has(id)), at = order.indexOf(a.id) + 1;
   return `<section class="sec"><h3>من سلسلة ${ltr(w.name)}</h3><p class="lbl">العمل ${at} من ${order.length} بترتيب ${w.story ? 'القصة' : 'الصدور'}</p>
-    <div class="strip">${order.map(id => D.by.get(id)).filter(Boolean).map(x => `<button data-act="open" data-id="${x.id}" aria-current="${x.id === a.id}" aria-label="${esc(x.t)}">${dot(x.id)}${poster(x) ? `<img loading="lazy" alt="" src="${esc(poster(x))}">` : `<span class="ph">${esc(x.t[0])}</span>`}<span>${esc(title(x))}</span></button>`).join('')}</div>
+    <div class="strip">${order.map(id => D.by.get(id)).filter(Boolean).map(x => `<button data-act="open" data-id="${x.id}" aria-current="${x.id === a.id}" aria-label="${esc(x.t)}"${marks(x.id, x.ad)}>${dot(x.id)}${thumb(x)}<span>${esc(title(x))}</span></button>`).join('')}</div>
     <div class="acts"><button class="btn ghost" data-act="world" data-w="${w.id}">افتح السلسلة بترتيبها</button></div></section>`; }
 // ---------- «موقعه من سلسلته»: لافتة محطة تحت العنوان تقول بجملة واضحة ما هذا الجزء من سلسلته وما يكمله وما بعده، وفوقها خريطة خطه
 // (الجمل في site/anime-pos.js من خطوط السلسلة في الكتالوج). كل اسم فيها يفتح بطاقته، وما ليس في «أنمياتي» يُذكر باسمه
@@ -315,7 +317,7 @@ function posMap(d) { const { ids, at, branch } = d.map, n = ids.length, MAX = 13
 function soloHTML(a) { if (a.pending || a.pk) return ''; const [n, g] = noun(a);
   return `<section class="pos" data-k="solo" aria-label="موقعه من سلسلته"><svg class="pos-map" height="24" aria-hidden="true"><line class="trk" x1="38%" x2="62%" y1="12" y2="12"/><circle class="ring" cx="50%" cy="12" r="9"/><circle class="here" cx="50%" cy="12" r="5.5"/></svg>
     <p class="pos-h"><b class="pos-b">عمل منفرد</b>${n !== 'عمل' && n !== 'جزء قادم' ? `<span class="pos-s">${n}</span>` : ''}</p><p class="pos-t">${g === 'f' ? 'قائمة بذاتها' : 'قائم بذاته'}: ليس جزءاً من سلسلة، فلا أجزاء قبله ولا بعده حتى الآن.</p></section>`; }
-function posHTML(a) { if (a.ad) return ''; const w = D.wby.get(a.w); if (!w || w.ids.length < 2) return soloHTML(a); const d = pos(w, a.id); if (!d) return '';
+function posHTML(a) { const w = D.wby.get(a.w); if (!w || seen(w) < 2) return soloHTML(a); const d = pos(w, a.id); if (!d) return '';
   const order = (w.story || w.ids).filter(id => D.by.has(id)), at = order.indexOf(a.id) + 1;
   return `<section class="pos" data-k="${d.kind}" aria-label="موقعه من سلسلته">${posMap(d)}
     <p class="pos-h"><b class="pos-b">${d.badge}</b>${d.sub ? `<span class="pos-s">${d.sub}</span>` : ''}</p>
@@ -328,7 +330,7 @@ function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `
     a.se && a.y ? [`${SEASON[a.se]} ${a.y}`] : a.y ? [a.y] : null, a.st === 'airing' ? ['يُعرض الآن'] : null, a.studio ? [ltr(a.studio)] : null, x?.source ? [`المصدر: ${SOURCE[x.source] || ltr(x.source)}`] : null, a.rating ? [/^\+/.test(RATING[a.rating] || a.rating) ? ltr(RATING[a.rating] || a.rating) : RATING[a.rating] || ltr(a.rating)] : null].filter(Boolean);
   const alt = [a.en && a.en !== a.t ? a.en : '', ui.names === 'english' && a.en ? a.t : '', x?.jp || ''].filter(Boolean);
   const links = [['MyAnimeList', `https://myanimelist.net/anime/${a.id}`], a.sk ? ['SIMKL', `https://simkl.com/anime/${a.sk}`] : null, x?.anilist ? ['AniList', `https://anilist.co/anime/${x.anilist}`] : null, a.tm ? ['TMDB', `https://www.themoviedb.org/${a.tm.k}/${a.tm.id}`] : null, x?.yt ? ['YouTube', `https://www.youtube.com/watch?v=${encodeURIComponent(x.yt)}`] : null].filter(Boolean);
-  return `<div class="hero">${a.bd ? `<img decoding="async" alt="" src="${D.base}w1280${a.bd}">` : a.bn && !hid(a) ? `<img decoding="async" alt="" src="${esc(a.bn)}">` : ''}</div>
+  return `<div class="hero">${a.bd && !hid(a) ? `<img decoding="async" alt="" src="${D.base}w1280${a.bd}">` : a.bn && !hid(a) ? `<img decoding="async" alt="" src="${esc(a.bn)}">` : ''}</div>
   <div class="body"><div class="head">${hid(a) ? `<button class="cel-art x18"${a.ac ? ` style="--ac:#${a.ac}"` : ''} data-act="bare" data-id="${a.id}" aria-label="أظهر صورة ${esc(a.t)}">${art(a, '170px', true, 'اضغط لإظهارها')}</button>`
       : `<button class="cel-art"${a.ac ? ` style="--ac:#${a.ac}"` : ''} ${poster(a) ? `data-zoom="${esc(big)}" data-zoom-title="${esc(a.t)}"` : 'disabled'} aria-label="تكبير بوستر ${esc(a.t)}">${art(a, '170px', true)}</button>`}
     <div><h2>${esc(title(a))}</h2>${alt.map(t => `<p class="alt">${esc(t)}</p>`).join('')}
@@ -476,7 +478,15 @@ const localOf = (id, m) => ({ id: +id, t: String(m.t || id), type: m.ty || '', e
 // يُدخل عملاً في بيانات الصفحة: في all وknown دائماً، وفي ما يظهر إن لم يخفه الفلتر
 function enroll(a) { if (D.known.has(a.id)) return; D.known.add(a.id); D.all.push(a); if (a.ad) D.adult.add(a.id); if (!hides(a)) { D.list.push(a); D.by.set(a.id, a); D.prep = D.prepAll = null; } }
 // العين (site/adult.js) ترفع الفلتر أو تعيده في مكانها، بلا إعادة تحميل: list وby يُعاد بناؤهما من all، وكل ما بعدهما يُرسم من جديد
-function relist() { D.list.length = 0; D.by.clear(); for (const a of D.all) if (!hides(a)) { D.list.push(a); D.by.set(a.id, a); } D.prep = D.prepAll = null; }
+// السلاسل كما تُرى الآن (E73): أعمال +18 فيها كغيرها، والفلتر قائمٌ تُخفى هي وحدها، فسلسلة كلها +18 لا تظهر في قائمة ولا عدّاد ولا رابط،
+// وسلسلة فيها بعضها تظهر بغيرها، واسمها من أول ما يُرى منها إن كان يحمله عمل +18. نسخ جديدة عند كل تبديل، فنموذج خطوطها (anime-pos) يُحسب بما يُرى
+const seen = w => w.ids.filter(id => D.by.has(id)).length;
+const worldName = t => String(t || '').replace(/\s*\((?:TV|\d{4})\)\s*$/i, '').replace(/\s*(?::|-)?\s*(?:Season\s*\d+|\d+(?:st|nd|rd|th)\s+Season|Part\s*\d+|First Season|S\d+)\s*$/i, '').trim() || String(t || '');   // كما في lib-anime
+function worldsSync() { D.wby.clear(); D.worlds = [];
+  for (const c of D.cw || []) { if (!c.ids.some(id => D.by.get(id)?.ord != null)) continue; const w = { ...c };
+    if (!isOpen() && (D.adult.has(c.head ?? c.id) || D.adult.has(c.id))) { const f = D.by.get((c.story || c.ids).find(id => D.by.has(id))); w.name = worldName(f.t); w.en = f.en ? worldName(f.en) : undefined; }
+    D.worlds.push(w); D.wby.set(w.id, w); } }
+function relist() { D.list.length = 0; D.by.clear(); for (const a of D.all) if (!hides(a)) { D.list.push(a); D.by.set(a.id, a); } D.prep = D.prepAll = null; worldsSync(); }
 function fillTypes() { const s = $('#type'), types = [...new Set(D.list.filter(a => a.ord != null).map(a => a.type).filter(Boolean))]; s.innerHTML = '<option value="">كل الأنواع</option>' + types.map(t => `<option value="${esc(t)}">${TYPE[t] || esc(t)}</option>`).join(''); s.value = types.includes(ui.type) ? ui.type : ''; ui.type = s.value; }
 function toggleEye() { setOpen(!isOpen()); relist(); drawEye(); fillTypes(); if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';
   renderAll(); toast(isOpen() ? 'رُفع الفلتر: تظهر الأعمال كلها.' : 'عاد الفلتر.'); }
@@ -651,15 +661,15 @@ function tickEp(id, n) { const a = D.by.get(id), p = me(id)?.p || 0; X.ask = 0;
   else { X.ask = n; drawXs(a); } }
 
 // ---------- السلاسل
-const wArt = w => { const a = w.ids.map(id => D.by.get(id)).find(x => x?.bd); return a ? `${D.base}w780${a.bd}` : ''; };
-const wMine = w => w.ids.filter(id => me(id)), wDone = w => w.ids.filter(id => me(id)?.s === 'completed');
+const wArt = w => { const a = w.ids.map(id => D.by.get(id)).find(x => x?.bd && !(x.ad && covered(x.id))); return a ? `${D.base}w780${a.bd}` : ''; };
+const wMine = w => w.ids.filter(id => D.by.has(id) && me(id)), wDone = w => w.ids.filter(id => D.by.has(id) && me(id)?.s === 'completed');
 const isFate = w => /^Fate\//.test(w.name) || w.ids.some(id => /^Fate\//.test(D.by.get(id)?.t || ''));
 // الأكثر حضوراً في قائمتك أولاً (ثم الأكبر، ثم بالاسم): سلاسلك الكبرى في أعلى الصفحة لا ما يبدأ اسمه بالألف
-function worldsHTML() { const q = fold(ui.q || '').trim(), n = new Map(D.worlds.map(w => [w.id, w.ids.filter(id => mine(D.by.get(id))).length]));
-  const l = D.worlds.filter(w => !q || fold(w.name + ' ' + (w.en || '')).includes(q) || w.ids.some(id => hay(D.by.get(id)).includes(q))).sort((a, b) => n.get(b.id) - n.get(a.id) || b.ids.length - a.ids.length || a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
+function worldsHTML() { const q = fold(ui.q || '').trim(), n = new Map(D.worlds.map(w => [w.id, w.ids.filter(id => D.by.has(id) && mine(D.by.get(id))).length]));
+  const l = D.worlds.filter(w => !q || fold(w.name + ' ' + (w.en || '')).includes(q) || w.ids.some(id => D.by.has(id) && hay(D.by.get(id)).includes(q))).sort((a, b) => n.get(b.id) - n.get(a.id) || seen(b) - seen(a) || a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
   const fa = D.list.find(a => /^Fate\/stay night: Unlimited Blade Works/.test(a.t) && a.bd) || D.list.find(a => /^Fate\//.test(a.t) && a.bd);
   const fate = `<a class="wc fate" href="../fate/" data-fate>${fa ? `<img loading="lazy" alt="" src="${D.base}w780${fa.bd}">` : ''}<h3>${ltr('Fate')}</h3><p>دليل ${ltr('Fate')} الكامل: خطوط القصة كلها، ومن أين تبدأ، وبأي ترتيب تشاهد.</p></a>`;
-  return (q && !/fate|فيت/i.test(ui.q) ? '' : fate) + l.map(w => { const n = w.ids.length, m = wMine(w).length, d = wDone(w).length, im = wArt(w);
+  return (q && !/fate|فيت/i.test(ui.q) ? '' : fate) + l.map(w => { const n = seen(w), m = wMine(w).length, d = wDone(w).length, im = wArt(w);
     const th = themeOf(w, D.by, D.genres);
     return `<button class="wc" data-act="world" data-w="${w.id}" style="--wc1:${th.c1};--wbg:${th.bg};--wc2:${th.c2}">${im ? `<img loading="lazy" alt="" src="${im}">` : ''}<h3>${esc(ui.names === 'english' && w.en ? w.en : w.name)}</h3><p>${nWorks(n)} · في قائمتك ${num(m)} · أكملت ${num(d)}</p><i class="wbar" style="--p:${n ? d / n : 0}"></i></button>`; }).join('') || '<p class="none">لا سلسلة تطابق ما كتبت.</p>'; }
 // مدة السلسلة كلها: مجموع حلقات كل عمل في مدة حلقته (والفيلم بطوله)
@@ -667,7 +677,7 @@ const span = min => { const h = Math.round(min / 60); return h >= 48 ? `${nDays(
 // ---------- بوابة العالم (E57): وحدتها وتنسيقها يُحمَّلان حين تُفتح أول بوابة (site/anime-gate.js وanime-gate.css)، ونافذتها نافذة السلسلة (#wsheet) بسجلها
 let GM = null;
 const gateMod = () => GM ? Promise.resolve(GM) : Promise.all([import(`./anime-gate.js?v=${BUILD}`), new Promise(ok => { const l = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: `../anime-gate.css?v=${BUILD}` }); l.onload = l.onerror = ok; document.head.append(l); })])
-  .then(([m]) => { m.init({ D, ui, me, esc, ltr, num, nEps, nWorks, count, span, typeOf, ic, LNAME, poster, title, texts, art: wArt, isFate, calm, pos, air: airTag, model: w => model(w, D.by) }); return GM = m; });
+  .then(([m]) => { m.init({ D, ui, me, esc, ltr, num, nEps, nWorks, count, span, typeOf, ic, LNAME, poster, thumb, hid, marks, title, texts, art: wArt, isFate, calm, pos, air: airTag, model: w => model(w, D.by) }); return GM = m; });
 async function openWorld(wid, push = true, from = null) { const w = D.wby.get(wid); if (!w) return; wopen = wid; const d = $('#wsheet'), fresh = !d.open, g = await gateMod(); if (wopen !== wid) return;
   if (fresh) g.resetView();
   const show = () => { if (wopen !== wid) return; d.className = 'gw'; d.style.cssText = g.themeStyle(w); d.querySelector('.gw-sky')?.remove(); d.insertAdjacentHTML('afterbegin', g.skyHTML(w));
@@ -814,11 +824,11 @@ try {
   // ما أُضيف من MyAnimeList ولم يدخل الكتالوج بعد يبقى ببطاقته المؤقتة، ويُنسى ما دخل الكتالوج أو مضى عليه شهر
   { const m = addedMap(); let ch = 0; for (const k of Object.keys(m)) if (D.known.has(+k) || !(Date.parse(today) - Date.parse(m[k]?.at) < 30 * 864e5)) { delete m[k]; ch = 1; } else enroll(localOf(k, m[k])); if (ch) store.set(ADDK, JSON.stringify(m));
     for (const k of Object.keys(m)) { const a = D.by.get(+k); if (a?.pending && !a.img && !a.iu) liveOf(a.id).then(v => { if (v && fillPending(a, v)) { keepLive(a.id, v); renderAll(true); } }); } }
-  D.worlds = (cat.worlds || []).filter(w => w.ids.some(id => D.by.get(id)?.ord != null)); for (const w of D.worlds) D.wby.set(w.id, w);   // أعمال +18 بلا سلاسل
+  D.cw = cat.worlds || []; worldsSync();
   fillTypes();
   $('#sort').value = ui.sort; $('#names').value = ui.names; if (!LNAME[ui.list] && ui.list !== 'all') ui.list = 'watching'; if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';
   placeChips(); renderAll(); liftVeil();
-  { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }
+  { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); dockEye(on); }).observe($('.top')); }
   initSync(id => { if (id !== 'anime') return; load(); renderAll(true); if (open) { const box = $('#sheet-body .mine'); if (box) box.outerHTML = mineHTML(D.by.get(open)); drawXs(D.by.get(open)); } });
   route();
 } catch (err) { $('#grid').innerHTML = '<p class="load">تعذّر تحميل القائمة. حدّث الصفحة.</p>'; liftVeil(); console.error(err); }

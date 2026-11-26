@@ -13,7 +13,7 @@ import { ar } from './bidi.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
 import { posMap, ord } from './pos.js?v=__BUILD__'; // خريطة «موقعها من سلسلتها» والعدد الترتيبي
-import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
+import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover, dockEye } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
 const BUILD = '__BUILD__', KEY = 'gamesg.progress', PEND = 'gamesg.pending', PASS = 'gamesg.pass', IGN = 'gamesg.ignored', STEAM = 'gamesg.steam', REM = 'gamesg.removed', ASK = 'gamesg.asked';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -114,7 +114,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <section class="soon shut" id="soon" hidden aria-label="قادم في سلاسلك"><h2><button type="button" class="soon-b" id="soon-b" data-act="soon" aria-expanded="false" aria-controls="soon-reel"></button></h2><div class="reel" id="soon-reel" hidden></div></section>
 <nav class="bar" aria-label="البحث والتصفية"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a>
   <label class="search">${ic('search')}<span class="sr">ابحث في ألعابي</span><input id="q" type="search" placeholder="ابحث: لعبة، مطوّر، سلسلة، سنة" autocomplete="off" enterkeyhint="search"></label>
-  <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الألعاب</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
+  <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الألعاب</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div>${eyeBtn(true)}</div>
   <div class="chips" id="chips"></div></nav>
 <div class="dupw at-list" id="dupbar" hidden></div>
 <p class="count" id="count" aria-live="polite"></p>
@@ -833,7 +833,7 @@ try {
     store.set(PEND, JSON.stringify(left)); } catch {}
   const last = store.get('games.list'); ui.list = ORDER.includes(last) ? last : inL('play').length ? 'play' : inL('new').length ? 'new' : 'all';
   renderGrid(); renderMenu(false); soonHTML(); liftVeil();
-  { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }
+  { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); dockEye(on); }).observe($('.top')); }
   initSync(id => { if (id !== 'games') return; load(); renderGrid(); renderMenu(false); soonHTML(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); if (openId) { const sv = $('#sheet-body .save'), g = D.byId.get(openId); if (sv && g) sv.outerHTML = saveHTML(g); } });
   route(); setTimeout(texts, 1200);
 } catch (err) { $('#grid').innerHTML = '<p class="load">تعذّر تحميل القائمة. حدّث الصفحة.</p>'; liftVeil(); console.error(err); }

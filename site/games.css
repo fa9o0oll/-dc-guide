@@ -679,6 +679,20 @@ section.sec{padding:22px clamp(14px,3vw,30px) 0}
 .gate-t{padding-inline-end:12px;border-inline-end:1px solid var(--line)}
 @media (hover:hover){.gate:hover .gate-t{color:var(--ink)}}
 @media (max-width:560px){.gate-t{display:none}.bar.docked .gate{max-width:52px}}
+/* الشريط اللاصق يحمل العين وزر الأغلفة أيضاً (E73). وفي الشاشة الضيقة لا يتسع لحقل بحث معهما: فالبحث فيه زرٌّ بعدسته يتسع حين تلمسه
+   (وتغيب الأزرار حتى تنتهي)، وعليه نقطة ما دام فيه بحث */
+@media (max-width:480px){
+  .bar.docked .tabs button{padding:0 10px}
+  .bar.docked .search:not(:focus-within){flex:0 0 44px}
+  .bar.docked .search:not(:focus-within) input{padding:0;color:transparent;caret-color:transparent;cursor:pointer}
+  .bar.docked .search:not(:focus-within) input::placeholder{color:transparent}
+  .bar.docked .search:not(:focus-within) input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+  .bar.docked .search:not(:focus-within) .ic{inset-inline:0;margin-inline:auto;color:var(--dim)}
+  .bar.docked .search:not(:focus-within):has(input:not(:placeholder-shown))::after{content:"";position:absolute;top:7px;inset-inline-end:7px;width:7px;height:7px;border-radius:50%;background:var(--cy);pointer-events:none}
+  .bar.docked .row:has(.search:focus-within)>:is(.tabs,.r18w){display:none}
+}
+/* وفي أضيق الشاشات (شاشة الفولد الخارجية مكبَّرة): زر البوابات يُخلي مكانه للعين وزر الأغلفة ما دام الفلتر مرفوعاً */
+@media (max-width:359.98px){.bar.docked .row:has(.r18-eye:not([hidden]))>.gate{display:none}}
 @media (prefers-reduced-motion:reduce){.gate{transition:none}}
 
 /* ===== البوابة الصغيرة: زر الرجوع إلى القاعة هو بوابة الألعاب مصغّرة: شاشة ليلية بإطار منقّط، وبكسل صغير يقفز

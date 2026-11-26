@@ -283,6 +283,24 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
     await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open')); check('الأفلام: زر الأغلفة بجانب العين يكشفها كلها', await page.evaluate(() => !document.querySelector('.tk .x18') && document.querySelectorAll('.tk[data-ad] .poster img[srcset]').length === 2));
     await tap('.r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open')); check('الأفلام: ويغطيها كلها ثانية', await page.evaluate(() => document.querySelectorAll('.tk .poster.x18').length === 2));
+    // E74: ما كُشف لا يبقى: إغلاق العين والصور مكشوفة ثم فتحها يبدأ والصور مغطاة
+    await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open')); await eye(false); await eye(true);
+    check('الأفلام: أُغلقت العين والصور مكشوفة ثم فُتحت: الصور مغطاة من جديد (E74)', await page.evaluate(() => !document.documentElement.hasAttribute('data-r18-open') && document.querySelectorAll('.tk .poster.x18').length === 2
+      && document.querySelector('.top .r18-eye').getAttribute('aria-pressed') === 'false' && localStorage.getItem('adult.show') === null));
+    // العين في الشريط اللاصق (E73): تظهر حين يخرج الرأس من الشاشة، ومعها زر الأغلفة، وتعمل كعين الرأس
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight)); await page.waitForFunction(() => document.querySelector('.bar').classList.contains('docked')); await page.waitForTimeout(600);
+    check('الأفلام: نزلت بالصفحة: العين وزر الأغلفة في الشريط أعلى الصفحة، ظاهران', await page.evaluate(() => { const w = document.querySelector('.bar .r18w.dock'), r = w.getBoundingClientRect();
+      return w.getAttribute('aria-hidden') === 'false' && r.width > 80 && r.top >= 0 && r.left >= 0 && r.right <= innerWidth && getComputedStyle(w).opacity === '1' && !w.querySelector('.r18-eye').hidden; }));
+    await fits('الأفلام: العين في الشريط');
+    if (width <= 480) { const qs = () => page.evaluate(() => { const w = s => Math.round(document.querySelector(s).getBoundingClientRect().width); return { s: w('.bar .search'), t: w('.bar .tabs'), d: w('.bar .r18w.dock'), g: w('.bar .gate'), dot: getComputedStyle(document.querySelector('.bar .search'), '::after').content }; });
+      const a = await qs(); await page.locator('.bar #q').tap(); await page.waitForTimeout(150); const b = await qs(); await page.evaluate(() => document.activeElement.blur()); await page.waitForTimeout(150);
+      await page.evaluate(() => { document.querySelector('#q').value = 'saw'; }); const d = await qs(); await page.evaluate(() => { document.querySelector('#q').value = ''; });
+      check('الأفلام: الشاشة الضيقة: البحث في الشريط زرّ بعدسته، يتسع حين يُلمس وتغيب الأزرار حتى ينتهي، وعليه نقطة ما دام فيه بحث، وفي أضيقها يُخلي زر البوابات مكانه', a.s <= 46 && a.t > 100 && a.d > 80 && a.dot === 'none' && b.s > 200 && !b.t && !b.d && d.dot !== 'none' && d.s <= 46 && (width < 360 ? !a.g : a.g >= 40), [a, b, d]); }
+    await tap('.bar .r18w.dock .r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open'));
+    check('الأفلام: زر الأغلفة في الشريط يكشفها، وزر الرأس معه', await page.evaluate(() => document.querySelector('.top .r18-eye').getAttribute('aria-pressed') === 'true' && !document.querySelector('.tk .x18')));
+    await tap('.bar .r18w.dock .r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open'));
+    await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForFunction(() => !document.querySelector('.bar').classList.contains('docked'));
+    check('الأفلام: وعاد الرأس: نسخة الشريط مخفية لا تُضغط', await page.evaluate(() => document.querySelector('.bar .r18w.dock').getAttribute('aria-hidden') === 'true' && document.querySelector('.bar .r18w.dock .r18').tabIndex === -1));
     await tap('.top [data-act=add]'); await page.waitForSelector('#add[open]'); check('الأفلام: نافذة الإضافة هي نفسها والفلتر مرفوع', (await page.textContent('#add-h')).trim() === 'أضف فيلماً' && !/\+\s*18/.test(await page.textContent('#add')));
     await page.fill('#add-q', 'Nothing Here'); await page.press('#add-q', 'Enter'); await page.waitForFunction(() => /لم أجد/.test(document.querySelector('#add-msg')?.textContent || ''));
     check('الأفلام: بحث بلا نتيجة يقول رسالته المعتادة', await page.evaluate(() => { const t = document.querySelector('#add-msg').textContent; return /لم أجد عملاً باسم «Nothing Here»/.test(t) && !/للبالغين/.test(t) && !document.querySelector('.cand'); }), await page.textContent('#add-msg'));

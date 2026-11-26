@@ -32,7 +32,7 @@ export function heroHTML(w) { const { D, me, esc, ltr, num, nEps, nWorks, ic } =
   const nx = nextOf(w), na = nx?.id ? D.by.get(nx.id) : null, d = na ? X.pos(w, na.id) : null;
   const cta = !nx ? '' : nx.how === 'done' ? `<p class="gw-done">${ic('check')}<span>أكملت كل ما عُرض من هذا العالم.</span></p>`
     : `<button class="gw-go" data-act="open" data-id="${na.id}"><small>${HOW[nx.how]}</small><b>${d ? d.badge : ''}</b><span dir="ltr">${esc(X.title(na))}</span>${ic('play')}</button>`;
-  const R = 34, C = 2 * Math.PI * R, M = X.model(w), stack = M.lines[0].ids.map(id => D.by.get(id)).filter(a => X.poster(a)).slice(0, 3);
+  const R = 34, C = 2 * Math.PI * R, M = X.model(w), stack = M.lines[0].ids.map(id => D.by.get(id)).filter(a => X.poster(a) && !X.hid(a)).slice(0, 3);   // ولا غلاف لعمل +18 لم يُكشف
   return `<header class="gw-hero">${stack.length ? `<div class="gw-stack" aria-hidden="true">${stack.map((a, i) => `<img alt="" decoding="async" src="${esc(X.poster(a, true))}" style="--i:${i - (stack.length - 1) / 2}">`).join('')}</div>` : ''}
     <h1 class="gw-name" dir="auto">${esc(worldName(w))}</h1>${w.en && worldName(w) !== w.en ? `<p class="gw-en" dir="ltr">${esc(w.en)}</p>` : ''}
     <p class="gw-span">${ys.length ? (y0 === y1 ? y0 : `${y0} إلى ${y1}`) : ''}${studios.length ? ` · ${studios.map(ltr).join('، ')}` : ''}</p>
@@ -43,10 +43,10 @@ export function heroHTML(w) { const { D, me, esc, ltr, num, nEps, nWorks, ic } =
 
 // ---------- الخط الزمني
 let view = { order: 'story', line: -1 };
-function nodeHTML(w, id, here, rel) { const { D, me, esc, ic, LNAME, poster } = X, a = D.by.get(id), M = X.model(w), L = M.lines[M.lineOf.get(id)], m = me(id), d = X.pos(w, id);
+function nodeHTML(w, id, here, rel) { const { D, me, esc, ic, LNAME } = X, a = D.by.get(id), M = X.model(w), L = M.lines[M.lineOf.get(id)], m = me(id), d = X.pos(w, id);
   const meta = [X.typeOf(a), year(a) || '', a.type !== 'Movie' && a.eps ? X.nEps(a.eps) : '', released(a) || a.st === 'soon' ? '' : 'لم يُعرض بعد'].filter(Boolean).join(' · ');   // موعد ما لم يُعرض: سطره تحته (X.air)
   return `<li class="gn${L.i ? ' side' : ''}${m?.s === 'completed' ? ' done' : ''}${here ? ' here' : ''}" data-k="${L.k}" data-l="${L.i}"${a.ac ? ` style="--ac:#${a.ac}"` : ''}>
-    <button class="gn-b" data-act="open" data-id="${id}">${poster(a) ? `<img loading="lazy" decoding="async" alt="" src="${esc(poster(a))}">` : `<span class="ph">${esc((a.t.match(/[A-Za-z0-9]/) || ['؟'])[0].toUpperCase())}</span>`}
+    <button class="gn-b" data-act="open" data-id="${id}"${X.marks(id, a.ad)}>${X.thumb(a)}
       <span class="gn-t">${d ? `<b class="gn-k">${d.badge}${d.hint ? `<span> · ${d.hint}</span>` : ''}</b>` : ''}<span class="gn-n" dir="ltr">${esc(X.title(a))}</span><small>${meta}</small>${X.air(a)}
         ${rel ? `<small class="gn-w">${ic('warp')}${rel}</small>` : ''}</span>
       ${m ? `<span class="chip" data-l="${m.s}">${LNAME[m.s]}${m.r ? ` · ${m.r}` : ''}</span>` : ''}${here ? `<em class="gn-here">${here === 'gap' ? 'فاتك' : here === 'start' ? 'ابدأ هنا' : 'أنت هنا'}</em>` : ''}</button></li>`; }

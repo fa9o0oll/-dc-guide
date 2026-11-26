@@ -32,7 +32,9 @@ const mal = id => rd(new URL(id + '.json', MAL), null)?.d || null;
 const skip = why => { report.skipped[why] = (report.skipped[why] || 0) + 1; };
 // الأعمال التي تُبنى حلقاتها: ما في القائمة، مطابَق بمسلسل في TMDB، وليس فيلماً ولا ذا حلقة واحدة ولا منتظَراً
 const wanted = [], ownsEpisodes = a => a.type !== 'Movie' && a.eps !== 1 && a.st !== 'soon', inList = a => a.ord != null, tag = a => inList(a) ? '' : '~';
-for (const a of cat.anime) { const why = a.ad ? '+18' : a.type === 'Movie' || a.eps === 1 ? 'فيلم أو حلقة واحدة' : a.st === 'soon' ? 'لم يُعرض بعد' : !a.tm ? 'بلا مطابقة في TMDB' : a.tm.k !== 'tv' ? 'مطابَق بفيلم' : '';
+// أعمال +18 تُبنى حلقاتها كغيرها (E73)، وتُذكر في التقرير والسجل برقمها وحده بلا اسمها
+const nm = a => a.ad ? '+18' : a.t;
+for (const a of cat.anime) { const why = a.type === 'Movie' || a.eps === 1 ? 'فيلم أو حلقة واحدة' : a.st === 'soon' ? 'لم يُعرض بعد' : !a.tm ? 'بلا مطابقة في TMDB' : a.tm.k !== 'tv' ? 'مطابَق بفيلم' : '';
   if (!why) wanted.push(a); else if (inList(a)) skip(why); }
 const shows = new Map(); for (const a of wanted) (shows.get(a.tm.id) || shows.set(a.tm.id, []).get(a.tm.id)).push(a);
 // كل ما في الكتالوج على المسلسل نفسه (ولو من أقرباء السلاسل): به تُعرف حدود كل عمل حين يتشارك عملان موسماً أو مسلسلاً
@@ -52,7 +54,7 @@ async function buildShow(tvId, works) { const seasons = new Map();
   const chain = sib.filter(x => x.tm.s == null && (x.type === 'TV' || x.type === 'ONA')).sort((x, y) => (wantOf(x).from || '9') < (wantOf(y).from || '9') ? -1 : 1), guess = new Map(); let acc = 0;
   for (const x of chain) { guess.set(x.id, x.tm.o || acc); acc = (x.tm.o || acc) + wantOf(x).eps; }
   const emit = (a, how, list, fit) => { report.how[how] = (report.how[how] || 0) + 1;
-    const out = { id: a.id, tv: tvId, how, ...(fit ? { fit } : {}), eps: list.map((e, i) => { const x = tr[epKey(e)], ok = x && x.h === epPrint(sha, e); if (x && !ok) report.staleArabic.push(`${a.id} ${a.t} الحلقة ${i + 1} (${epKey(e)})`); if (ok) report.arabic++;
+    const out = { id: a.id, tv: tvId, how, ...(fit ? { fit } : {}), eps: list.map((e, i) => { const x = tr[epKey(e)], ok = x && x.h === epPrint(sha, e); if (x && !ok) report.staleArabic.push(`${a.id} ${nm(a)} الحلقة ${i + 1} (${epKey(e)})`); if (ok) report.arabic++;
       if (e.t) report.withTitle++; if (e.ov) report.withOverview++; if (e.st) report.withStill++;
       return { n: i + 1, se: e.se, ep: e.ep, ...(e.t ? { t: e.t } : {}), ...(e.d ? { d: e.d } : {}), ...(e.r ? { r: e.r } : {}), ...(e.ov ? { ov: e.ov } : {}), ...(e.st ? { st: e.st } : {}), ...(e.ra ? { ra: e.ra } : {}), ...(ok && x.t ? { ta: x.t } : {}), ...(ok && x.o ? { oa: x.o } : {}) }; }) };
     const file = new URL(a.id + '.json', EPS), text = JSON.stringify(out) + '\n'; let was = null; try { was = fs.readFileSync(file, 'utf8'); } catch {}
@@ -65,9 +67,9 @@ async function buildShow(tvId, works) { const seasons = new Map();
     if (pl) { placed.push({ a, want, ...pl }); continue; }
     if (!mine.has(a.id)) continue;
     const sp = pickSpecials(await season(0), want);   // لا مكان له في المواسم العادية: لعله في الحلقات الخاصة
-    if (sp) { emit(a, 'special', sp, null); report.special.push(`${tag(a)}${a.id} ${a.t}: tv/${tvId} ${sp.map(epKey).join(' ')}`); }
+    if (sp) { emit(a, 'special', sp, null); report.special.push(`${tag(a)}${a.id} ${nm(a)}: tv/${tvId} ${sp.map(epKey).join(' ')}`); }
     else if (a.tm.s === 0) { if (inList(a)) skip('في الحلقات الخاصة (الموسم 0) بلا شاهد من التاريخ والعدد'); }
-    else report.dropped.push(`${tag(a)}${a.id} ${a.t}: tv/${tvId}${a.tm.s != null ? ' الموسم ' + a.tm.s : ''}${a.tm.o ? ' +' + a.tm.o : ''}، ${want.eps || '؟'} حلقة ${want.from || '؟'}…${want.to || '؟'}، وفي TMDB ${shape()}`); }
+    else report.dropped.push(`${tag(a)}${a.id} ${nm(a)}: tv/${tvId}${a.tm.s != null ? ' الموسم ' + a.tm.s : ''}${a.tm.o ? ' +' + a.tm.o : ''}، ${want.eps || '؟'} حلقة ${want.from || '؟'}…${want.to || '؟'}، وفي TMDB ${shape()}`); }
   const firm = placed.filter(p => p.how !== 'map?').map(p => p.at), starts = placed.map(p => p.at);
   // العبور إلى الموسم الذي يبدأ عند j: يُسمح حين عُرضت أولى حلقاته المؤرَّخة قبل نهاية العمل (+أسبوع)؛ وعمل ما زال يُعرض بلا عدد معلن يعبر إلى ما عُرض فعلاً
   const cross = (j, t, open) => { let k = j; while (k < w.length && w[k].se === w[j].se && !w[k].d) k++; const d = k < w.length && w[k].se === w[j].se ? w[k].d : null;
@@ -76,15 +78,15 @@ async function buildShow(tvId, works) { const seasons = new Map();
     // بعدد حلقاته حتى بداية عمل ثبت موضعه؛ وما لم يُعلن عدده: حتى آخر موسمه (أو المسلسل لمن لا موسم له في الخريطة) أو بداية العمل التالي
     const cap = Math.min(w.length, ...(eps > 0 ? [at + eps, ...firm.filter(i => i > at)] : starts.filter(i => i > at)));
     let end = at; while (end < cap && (end === at || w[end].se === w[end - 1].se || (eps > 0 || a.tm.s == null ? cross(end, t, want.airing) : want.airing && cross(end, t, true)))) end++;
-    if (end === at) { report.dropped.push(`${tag(a)}${a.id} ${a.t}: لا حلقات عند الموضع ${at}`); continue; }
+    if (end === at) { report.dropped.push(`${tag(a)}${a.id} ${nm(a)}: لا حلقات عند الموضع ${at}`); continue; }
     // ما بقي في موسمه بعده وعُرض قبل نهايته ولم يأخذه عمل آخر: المصدر يعدّ أكثر من MyAnimeList في المدة نفسها، فتُؤخذ معه (وتُعرض بلا تعليم)
     let over = 0; if (eps > 0 && t && end - at === eps) { const stop = Math.min(w.length, ...firm.filter(i => i >= end)); for (let k = end; k < stop && w[k].se === w[end - 1].se && w[k].d && days(w[k].d, t) <= 3; k++) over++; }
-    const list = w.slice(at, end + over), fit = t && t <= today ? epFit(eps, end - at, over) : null, tell = `${tag(a)}${a.id} ${a.t}: tv/${tvId} ${epKey(list[0])} (${list[0].d || 'بلا تاريخ'})، بدايته ${want.from || '؟'}`;
+    const list = w.slice(at, end + over), fit = t && t <= today ? epFit(eps, end - at, over) : null, tell = `${tag(a)}${a.id} ${nm(a)}: tv/${tvId} ${epKey(list[0])} (${list[0].d || 'بلا تاريخ'})، بدايته ${want.from || '؟'}`;
     if (how === 'date') report.moved.push(`${tell}، والخريطة تقول ${a.tm.s != null ? `الموسم ${a.tm.s}` : 'بلا موسم'}${a.tm.o ? ' +' + a.tm.o : ''}`); else if (how === 'map?') report.unsure.push(tell);
-    if (list.at(-1).se !== list[0].se) report.spans.push(`${tag(a)}${a.id} ${a.t}: ${list.length} حلقة من ${epKey(list[0])} إلى ${epKey(list.at(-1))}`);
-    if (eps > 0 && list.length < eps && fit) report.short.push(`${tag(a)}${a.id} ${a.t}: ${list.length} من ${eps}`);
-    if (over) report.over.push(`${tag(a)}${a.id} ${a.t}: ${eps} حلقة، وبعدها في موسمه ${over} عُرضت قبل نهايته`);
-    if (fit === 'loose') report.loose.push(`${tag(a)}${a.id} ${a.t}: ${list.length} هنا و${eps} في MyAnimeList`);
+    if (list.at(-1).se !== list[0].se) report.spans.push(`${tag(a)}${a.id} ${nm(a)}: ${list.length} حلقة من ${epKey(list[0])} إلى ${epKey(list.at(-1))}`);
+    if (eps > 0 && list.length < eps && fit) report.short.push(`${tag(a)}${a.id} ${nm(a)}: ${list.length} من ${eps}`);
+    if (over) report.over.push(`${tag(a)}${a.id} ${nm(a)}: ${eps} حلقة، وبعدها في موسمه ${over} عُرضت قبل نهايته`);
+    if (fit === 'loose') report.loose.push(`${tag(a)}${a.id} ${nm(a)}: ${list.length} هنا و${eps} في MyAnimeList`);
     emit(a, how, list, fit); } }
 
 const queue = [...shows], gone = []; let failed = 0;   // gone: أعمال حُذف مسلسلها من TMDB (404)، يُبحث لها عن مطابقة جديدة

@@ -3,19 +3,19 @@
 // في البوابة نفسها: قوائمها وبحثها وإضافتها وأعدادها. لا مكتبة ثانية ولا إعادة تحميل، والاقتراحات لا تختار منها أبداً.
 // الحالة لهذه الجلسة وهذه البوابة (sessionStorage: adult.<البوابة>): زيارة جديدة للبوابة (من القاعة أو برابط) تبدأ والفلتر قائم دائماً،
 // وتحديث الصفحة والرجوع إليها يبقيانه كما تُرك.
-// أغلفة أعمال +18 مغطاة حتى تُكشف: زر مرافق بجانب العين (يظهر حين تُفتح) يكشفها كلها أو يغطيها، واختياره يُحفظ في هذا الجهاز (localStorage: adult.show)؛
-// وغلاف العمل في بطاقته يُكشف بلمسه. التغطية بطبقتين: حاوية كل عمل +18 تحمل data-ad (marks ومarkEl)، وكل صورة فيها مموّهة بقاعدة واحدة
+// أغلفة أعمال +18 مغطاة حتى تُكشف: زر مرافق بجانب العين (يظهر حين تُفتح) يكشفها كلها أو يغطيها، وغلاف العمل في بطاقته يُكشف بلمسه.
+// وما كُشف لا يبقى (E74): إغلاق العين يغطي الصور كلها ثانية، وكل رفع للفلتر وكل تحميل للصفحة يبدأ والصور مغطاة، فلا يرى أحد ما لم يُقصد كشفه. التغطية بطبقتين: حاوية كل عمل +18 تحمل data-ad (marks ومarkEl)، وكل صورة فيها مموّهة بقاعدة واحدة
 // (فلا تفلت صورة نُسيت في قالب) إلا إن حملت الحاوية data-r18-bare (عمل كُشف) أو حمل <html> السمة data-r18-open (كُشفت كلها).
 // وفوقها غلاف الشبكة (cover): مصغّرة الصورة وحدها وعليها عين مغمضة، فلا تُحمَّل الصورة الكاملة قبل كشفها. والمكبّر (site/zoom.js) لا يفتح صورة مغطاة.
-const root = document.documentElement, G = root.dataset.guide || 'site', K = 'adult.' + G, KS = 'adult.show';
+const root = document.documentElement, G = root.dataset.guide || 'site', K = 'adult.' + G;
 const box = s => ({ get(k) { try { return s().getItem(k); } catch { return null; } }, set(k, v) { try { if (v == null) s().removeItem(k); else s().setItem(k, v); } catch {} } });
 const ss = box(() => sessionStorage), ls = box(() => localStorage);
 try { if (performance.getEntriesByType('navigation')[0]?.type === 'navigate') ss.set(K, null); } catch {}   // زيارة جديدة (لا تحديث ولا رجوع) تمحو ما حُفظ
-let OPEN = ss.get(K) === '1', SHOW = ls.get(KS) === '1'; const BARE = new Set();
+let OPEN = ss.get(K) === '1', SHOW = false; const BARE = new Set(); ls.set('adult.show', null);   // اختيار «أظهر الصور» كان يُحفظ قبل E74
 root.toggleAttribute('data-r18-open', OPEN && SHOW);
 // الفلتر مرفوع؟ وتبديله: في مكانه، والصفحة تعيد قوائمها بعده
 export const isOpen = () => OPEN;
-export function setOpen(v) { OPEN = !!v; ss.set(K, OPEN ? '1' : null); if (!OPEN) BARE.clear(); root.toggleAttribute('data-r18-open', OPEN && SHOW); }
+export function setOpen(v) { OPEN = !!v; ss.set(K, OPEN ? '1' : null); if (!OPEN) { SHOW = false; BARE.clear(); } root.toggleAttribute('data-r18-open', OPEN && SHOW); }
 // هل يُخفى هذا العمل الآن؟ (عمل +18 والفلتر قائم)
 export const hides = w => !!(w && (w.ad || w.adult)) && !OPEN;
 // هل صورة عمل +18 هذا مغطاة الآن؟ (يُسأل عن أعمال +18 وحدها)
@@ -25,7 +25,7 @@ export const uncover = id => { BARE.add(String(id)); };
 export const marks = (id, adult) => adult ? ` data-ad${covered(id) ? '' : ' data-r18-bare'}` : '';
 export const markEl = (el, id, adult) => { el.toggleAttribute('data-ad', !!adult); el.toggleAttribute('data-r18-bare', !!adult && !covered(id)); };
 export const showing = () => SHOW;
-export function setShowing(v) { SHOW = !!v; ls.set(KS, SHOW ? '1' : null); if (!SHOW) BARE.clear(); root.toggleAttribute('data-r18-open', OPEN && SHOW); }
+export function setShowing(v) { SHOW = !!v && OPEN; if (!SHOW) BARE.clear(); root.toggleAttribute('data-r18-open', OPEN && SHOW); }
 // العين المغمضة لكل بوابة (في زرها، وفوق الصور المغطاة). أنمياتي: قوس برموش. أفلامي: قوس رموشه ثقوب شريط الفيلم. ألعابي: درج من البكسلات برموش ثلاثة
 const LIDS = {
   anime: '<path d="M4 15.5c4 5.2 20 5.2 24 0" stroke-width="2.8"/><path d="M8.6 20.2l-1.5 2.6M16 21.4v3.1M23.4 20.2l1.5 2.6" stroke-width="1.8"/>',
@@ -53,16 +53,25 @@ const PIC = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" w
 const PIC_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.4 5.5h9.6a2.5 2.5 0 0 1 2.5 2.5v8.2M18.5 18.5H6A2.5 2.5 0 0 1 3.5 16V8a2.5 2.5 0 0 1 1.1-2.1M4 4l16 16"/></svg>';
 const say = () => OPEN ? 'أعد الفلتر' : 'ارفع الفلتر', picIn = () => `${SHOW ? PIC : PIC_OFF}<span>${SHOW ? 'غطِّ الصور' : 'أظهر الصور'}</span>`;
 // زرا الرأس: العين (الفلتر)، وبجانبها زر الأغلفة ما دامت مفتوحة. بلا نص ظاهر. وزر الأغلفة يظهر في الجهة الخالية من الرأس (row-reverse)، فتبقى العين في مكانها تحت المؤشر
-export const eyeBtn = () => `<span class="r18w"><button type="button" class="r18" data-act="room" aria-pressed="${OPEN}" aria-label="${say()}" title="${say()}">${EYES[G] || EYES.anime}</button><button type="button" class="r18-eye" data-act="room-show" aria-pressed="${SHOW}" title="${SHOW ? 'غطِّ الصور' : 'أظهر الصور'}"${OPEN ? '' : ' hidden'}>${picIn()}</button></span>`;
-// يعيد رسم الزرين في مكانهما بعد كل تبديل (سمات لا عناصر جديدة، فتتحرك العين وهي تنفتح)
-export function drawEye() { const b = document.querySelector('.r18'), c = document.querySelector('.r18-eye'); if (b) { b.setAttribute('aria-pressed', String(OPEN)); b.setAttribute('aria-label', say()); b.title = say(); }
-  if (c) { c.hidden = !OPEN; c.setAttribute('aria-pressed', String(SHOW)); c.title = SHOW ? 'غطِّ الصور' : 'أظهر الصور'; c.innerHTML = picIn(); } }
+// dock: نسخة ثانية في الشريط اللاصق أعلى الصفحة، تظهر ما دام الرأس خارج الشاشة (E73)، فالعين وزر الأغلفة في متناولك وأنت في أي موضع
+export const eyeBtn = (dock = false) => { const t = dock ? ' tabindex="-1"' : '';
+  return `<span class="r18w${dock ? ' dock' : ''}"${dock ? ' aria-hidden="true"' : ''}><button type="button" class="r18" data-act="room" aria-pressed="${OPEN}" aria-label="${say()}" title="${say()}"${t}>${EYES[G] || EYES.anime}</button><button type="button" class="r18-eye" data-act="room-show" aria-pressed="${SHOW}" title="${SHOW ? 'غطِّ الصور' : 'أظهر الصور'}"${t}${OPEN ? '' : ' hidden'}>${picIn()}</button></span>`; };
+// يعيد رسم الأزرار في أماكنها بعد كل تبديل (سمات لا عناصر جديدة، فتتحرك العين وهي تنفتح)، في الرأس وفي الشريط معاً
+export function drawEye() { for (const b of document.querySelectorAll('.r18')) { b.setAttribute('aria-pressed', String(OPEN)); b.setAttribute('aria-label', say()); b.title = say(); }
+  for (const c of document.querySelectorAll('.r18-eye')) { c.hidden = !OPEN; c.setAttribute('aria-pressed', String(SHOW)); c.title = SHOW ? 'غطِّ الصور' : 'أظهر الصور'; c.innerHTML = picIn(); } }
+// الشريط التصق أعلى الصفحة (on) أو عاد الرأس: نسخة الشريط تُضغط وتُبلغ لقارئ الشاشة ما دامت ظاهرة وحدها
+export function dockEye(on) { const w = document.querySelector('.bar .r18w.dock'); if (!w) return; w.setAttribute('aria-hidden', String(!on)); for (const b of w.querySelectorAll('button')) b.tabIndex = on ? 0 : -1; }
 
 const CSS = `:root{--eye-iris:#7fd4ff;--eye-deep:#12142e;--eye-bg:rgba(255,255,255,.06);--eye-r:12px}
 html[data-guide=anime]{--eye-iris:var(--cel);--eye-deep:var(--bg);--eye-bg:color-mix(in srgb,var(--card) 70%,transparent)}
 html[data-guide=films]{--eye-iris:var(--acc);--eye-deep:var(--bg);--eye-bg:var(--card2);--eye-r:10px}
 html[data-guide=games]{--eye-iris:var(--cy);--eye-deep:var(--bg);--eye-bg:var(--card2);--eye-r:10px}
 .r18w{display:inline-flex;flex-direction:row-reverse;align-items:center;gap:6px}
+.bar .r18w.dock>*{flex:none}
+.bar .r18w.dock{flex:none;max-width:0;margin-inline-start:-8px;opacity:0;overflow:hidden;pointer-events:none;transition:max-width .28s ease,opacity .2s ease,margin .28s ease}
+.bar.docked .r18w.dock{max-width:100px;margin-inline-start:0;opacity:1;overflow:visible;pointer-events:auto}
+@media (max-width:560px){.bar .r18w.dock{gap:4px}.bar .r18w.dock :is(.r18,.r18-eye){width:40px;height:40px}.bar .r18w.dock .r18 .eye{width:25px;height:25px}}
+@media (prefers-reduced-motion:reduce){.bar .r18w.dock{transition:none}}
 .r18,.r18-eye{display:inline-grid;place-items:center;width:44px;height:44px;padding:0;border-radius:var(--eye-r);border:1px solid var(--line,rgba(255,255,255,.2));background:var(--eye-bg);color:var(--dim,#b6bce0);cursor:pointer;transition:color .16s ease,border-color .16s ease}
 .r18:focus-visible,.r18-eye:focus-visible{outline:2px solid var(--eye-iris);outline-offset:2px}
 .r18[aria-pressed=true]{color:var(--ink,#fff);border-color:color-mix(in srgb,var(--eye-iris) 55%,var(--line,transparent))}

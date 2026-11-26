@@ -45,12 +45,12 @@ if (cmd === 'pending') { const n = +(args.find(a => /^\d+$/.test(a)) || 15), ful
   for (const a of [...first, ...rest].slice(0, n)) console.log(full ? `\n### ${a.id}${a.ad ? ' | +18: عنوان الإيداع برقمه وحده' : ''} | ${a.t}${a.en ? ' | ' + a.en : ''}\n${textOf(a.id).en}` : `${a.id}${a.ad ? '\t+18' : ''}\t${a.t}`); }
 else if (cmd === 'asked') { const req = requested(), about = askedFor('about').filter(id => by.has(id) && !tr[id] && textOf(id)?.en), eps = askedFor('eps').map(id => [id, epsTodo(id)]).filter(([, x]) => x && x.left);
   console.log(JSON.stringify({ requests: req.length, about: about.length, eps: eps.length }));
-  if (about.length) console.log(`\nنبذات مطلوبة (${about.length}): ${about.map(id => `${id} ${by.get(id).t}`).join(' ؛ ')}\n  node scripts/anime-care.mjs pending ${about.length} --full`);
-  for (const [id, x] of eps) console.log(`\nحلقات مطلوبة: ${id} ${by.get(id)?.t || ''}: تُرجم ${x.ok.length} من ${x.text.length}\n  node scripts/anime-care.mjs eps ${id}`);
+  if (about.length) console.log(`\nنبذات مطلوبة (${about.length}): ${about.map(id => `${id}${by.get(id).ad ? ' +18' : ''} ${by.get(id).t}`).join(' ؛ ')}\n  node scripts/anime-care.mjs pending ${about.length} --full`);
+  for (const [id, x] of eps) console.log(`\nحلقات مطلوبة: ${id}${by.get(id)?.ad ? ' +18' : ''} ${by.get(id)?.t || ''}: تُرجم ${x.ok.length} من ${x.text.length}\n  node scripts/anime-care.mjs eps ${id}`);
   if (!about.length && !eps.length) console.log(req.length ? 'كل ما طُلب تُرجم.' : 'لا طلبات.'); }
 else if (cmd === 'heads') { const n = +(args.find(a => /^\d+$/.test(a)) || 40), mine = w => w.ids.filter(id => by.get(id)?.ord != null).length;
   const need = (cat.worlds || []).slice().sort((a, b) => mine(b) - mine(a) || b.ids.length - a.ids.length).map(w => by.get(w.head)).filter(a => a && !tr[a.id] && textOf(a.id)?.en).slice(0, n);
-  console.log(need.map(a => a.id).join(',')); for (const a of need) console.error(`${a.id}\t${a.t}`); }
+  console.log(need.map(a => a.id).join(',')); for (const a of need) console.error(`${a.id}${a.ad ? '\t+18' : ''}\t${a.t}`); }
 else if (cmd === 'show') { const id = +args[0], a = by.get(id); if (!a) { console.error('لا عمل بهذا الرقم'); process.exit(1); } console.log(`${a.id} | ${a.t}${a.en ? ' | ' + a.en : ''}\n\n${textOf(id)?.en || '(لا نص إنجليزي بعد)'}\n\n${tr[id] || '(لم يُترجم)'}`); }
 else if (cmd === 'check') { const bad = [], raw = fs.readFileSync(new URL('data/anime/translations.json', root), 'utf8');
   if (!/^\{\n("\d+": ".*",?\n)*\}\n$/.test(raw)) bad.push('الصيغة: سطر لكل عمل بين { و } بلا إزاحة');
@@ -82,7 +82,7 @@ else if (cmd === 'check') { const bad = [], raw = fs.readFileSync(new URL('data/
   console.log(bad.length ? bad.join('\n') : `✅ ${Object.keys(tr).length} ترجمة سليمة${eps ? `، و${eps} حلقة${stale ? ` (${stale} تغيّر نصها الإنجليزي بعد ترجمتها)` : ''}` : ''}${extra ? '، و' + extra : ''}`); process.exit(bad.length ? 1 : 0); }
 else if (cmd === 'eps') { const id = +args[0], j = epsOf(id), a = by.get(id); if (!j) { console.error('لا ملف حلقات لهذا العمل'); process.exit(1); } const T = trOf(j.tv), from = +args[1] || 0, to = +args[2] || 0;
   const todo = j.eps.filter(e => hasText(e) && !done(e, T) && (!from || e.n >= from) && (!to || e.n <= to)), pick = from ? todo : todo.slice(0, 12);
-  console.log(JSON.stringify({ id, title: a?.t, tv: j.tv, episodes: j.eps.length, translated: j.eps.filter(e => done(e, T)).length, noText: j.eps.filter(e => !hasText(e)).length, shown: pick.length }));
+  console.log(JSON.stringify({ id, ...(a?.ad ? { adult: '+18: عنوان الإيداع برقمه وحده' } : {}), title: a?.t, tv: j.tv, episodes: j.eps.length, translated: j.eps.filter(e => done(e, T)).length, noText: j.eps.filter(e => !hasText(e)).length, shown: pick.length }));
   for (const e of pick) console.log(`\n## ${e.n} | ${e.t || '(بلا عنوان)'}\n${e.ov || '(بلا ملخص)'}`); }
 else if (cmd === 'eps-add') { const add = JSON.parse(fs.readFileSync(args[0], 'utf8')); let n = 0, changed = 0; const bad = [];
   for (const [id, eps] of Object.entries(add)) { const j = epsOf(+id); if (!j) { bad.push(`${id}: لا ملف حلقات`); continue; } const T = trOf(j.tv);
@@ -113,6 +113,6 @@ else if (cmd === 'eps-next') { const works = +args[0] || 10, each = +args[1] || 
   console.log(JSON.stringify({ started: rows.length, shown: Math.min(works, rows.length), episodes: rows.slice(0, works).reduce((n, r) => n + r.next.length, 0) }));
   for (const r of rows.slice(0, works)) { const names = [...new Set((tr[r.id] || '').match(/«[^»]+»/g) || [])].join(' ');
     const T = trOf(r.j.tv), changed = r.next.filter(e => T[epKey(e)]).length;
-    console.log(`\n# ${r.id} | ${by.get(r.id)?.t || ''} | تُرجم ${r.ok} من ${r.j.eps.filter(hasText).length}${changed ? ` | ${changed} منها تغيّر نصها الإنجليزي بعد ترجمتها` : ''}${r.asked ? ' | مطلوب بالزر' : ''}${names ? '\n' + names : ''}`);
+    console.log(`\n# ${r.id}${by.get(r.id)?.ad ? ' | +18: عنوان الإيداع برقمه وحده' : ''} | ${by.get(r.id)?.t || ''} | تُرجم ${r.ok} من ${r.j.eps.filter(hasText).length}${changed ? ` | ${changed} منها تغيّر نصها الإنجليزي بعد ترجمتها` : ''}${r.asked ? ' | مطلوب بالزر' : ''}${names ? '\n' + names : ''}`);
     for (const e of r.next) console.log(`${e.n} | ${e.t || '—'} | ${e.ov || '—'}`); } }
 else console.log('الأوامر: pending [عدد] [--full] [--ids 1,2] | asked | heads [عدد] | show <رقم> | check | eps <رقم العمل> [من] [إلى] | eps-add <ملف> | eps-left [رقم…] | eps-next [أعمال] [حلقات]');

@@ -352,7 +352,8 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
 .strip button{flex:none;width:86px;display:grid;gap:4px;text-align:start}
 .strip img,.strip .ph{width:86px;aspect-ratio:2/3;object-fit:cover;border-radius:7px;background:var(--card);display:grid;place-items:center;color:var(--line);font-family:var(--display);font-size:1.6rem}
 .strip span{font-size:.7rem;color:var(--dim);line-height:1.3;direction:ltr;text-align:right;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.strip [aria-current=true] img,.strip [aria-current=true] .ph{box-shadow:0 0 0 2px var(--bg2),0 0 0 4px var(--cel)}
+.strip .th{display:block;width:86px;aspect-ratio:2/3;border-radius:7px;background:var(--card)}
+.strip [aria-current=true] img,.strip [aria-current=true] .ph,.strip [aria-current=true] .th{box-shadow:0 0 0 2px var(--bg2),0 0 0 4px var(--cel)}
 .strip .dot{position:absolute;margin:5px;width:11px;height:11px;border-radius:50%;background:var(--tone,transparent);box-shadow:0 0 0 2px rgba(12,13,36,.8)}
 .order{display:grid;gap:8px;counter-reset:n}
 .orow{display:grid;grid-template-columns:2.2em 58px minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--card);border:1px solid var(--line);text-align:start;width:100%}
@@ -452,6 +453,18 @@ button.aart{padding:0}
   .arow{grid-template-columns:48px minmax(0,1fr)}.aart{width:48px}.aacts{grid-column:1/-1;justify-content:flex-start}
   .xr{grid-template-columns:44px minmax(0,1fr) 54px}.xsheet.ro .xr{grid-template-columns:44px minmax(0,1fr)}.xd{grid-template-columns:minmax(0,1fr)}.xi{display:none}
 }
+/* الشريط اللاصق يحمل العين وزر الأغلفة أيضاً (E73). وفي الشاشة الضيقة لا يتسع لحقل بحث معهما: فالبحث فيه زرٌّ بعدسته يتسع حين تلمسه
+   (وتغيب الأزرار حتى تنتهي)، وعليه نقطة ما دام فيه بحث */
+@media (max-width:480px){
+  .bar.docked .row{gap:8px}
+  .bar.docked .views button{padding:0 9px}
+  .bar.docked .search:not(:focus-within){flex:0 0 44px;position:relative;justify-content:center;padding:0;color:var(--dim)}
+  .bar.docked .search:not(:focus-within) input{position:absolute;inset:0;width:100%;min-height:0;opacity:0;cursor:pointer}
+  .bar.docked .search:not(:focus-within):has(input:not(:placeholder-shown))::after{content:"";position:absolute;top:7px;inset-inline-end:7px;width:7px;height:7px;border-radius:50%;background:var(--cel);pointer-events:none}
+  .bar.docked .row:has(.search:focus-within)>:is(.views,.r18w){display:none}
+}
+/* وفي أضيق الشاشات (شاشة الفولد الخارجية مكبَّرة): زر البوابات يُخلي مكانه للعين وزر الأغلفة ما دام الفلتر مرفوعاً */
+@media (max-width:359.98px){.bar.docked .row:has(.r18-eye:not([hidden]))>.gate{display:none}}
 @media (max-width:340px){.dates{grid-template-columns:minmax(0,1fr)}.rail .cel{width:138px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.sky-art b{display:none}.pdoor i,.sky-art i{animation:none!important}}
 

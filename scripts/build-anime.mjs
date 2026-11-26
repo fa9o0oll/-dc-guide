@@ -47,9 +47,9 @@ const sources = [...(CLIENT ? [source('MAL API', 340, id => `https://api.myanime
 const down = {};
 const inList = new Set(list.map(x => x.mal));
 const isAdult = r => r?.d?.rating === 'Rx' || r?.d?.nsfw === 1 || (r?.d?.genres || []).includes('Hentai');
-// أقرباء السلسلة: ما تشير إليه علاقات القصة من أعمال ليست في القائمة، حتى الإغلاق
+// أقرباء السلسلة: ما تشير إليه علاقات القصة من أعمال ليست في القائمة، حتى الإغلاق. وأعمال +18 كغيرها (E73): تُدخل أقرباءها وتدخل عوالم غيرها
 function relatives() { const seen = new Set(inList), out = [], queue = [...inList];
-  while (queue.length && out.length < RELATIVES_CAP) { const r = cache.get(queue.shift()); if (!r?.d || isAdult(r)) continue;
+  while (queue.length && out.length < RELATIVES_CAP) { const r = cache.get(queue.shift()); if (!r?.d) continue;
     for (const x of r.d.rel || []) if (LINKS.has(x.r) && !seen.has(x.id)) { seen.add(x.id); out.push(x.id); queue.push(x.id); } }
   return out; }
 const stale = id => { const r = cache.get(id); if (!r) return 1e6; if (r.gone) return daysAgo(r.at) > 90 ? 1 : 0;
@@ -67,12 +67,14 @@ await pull(relatives().filter(id => !cache.has(id)), 'قريب في سلسلة')
 await pull([...cache.keys()].map(id => [id, stale(id)]).filter(x => x[1] > 0 && x[1] < 1e6).sort((a, b) => b[1] - a[1]).map(x => x[0]), 'تحديث');
 if (sources.every(([n]) => down[n] >= 3)) report.problems.push(`MyAnimeList: لا مصدر متاح الآن (${sources.map(x => x[0]).join('، ')})، وتبقى البيانات السابقة`);
 
-// ---------- الأعمال الداخلة: القائمة كلها (ولو لم تُسحب معلوماتها بعد) ثم أقرباء السلاسل المسحوبون. +18 يدخل منه ما في القائمة وحده، موسوماً
+// ---------- الأعمال الداخلة: القائمة كلها (ولو لم تُسحب معلوماتها بعد) ثم أقرباء السلاسل المسحوبون، و+18 منها موسوماً (يخفيه فلتر العين)
 const basics = new Map(list.map(x => [x.mal, x]));
-const rel = relatives(), all = [...list.map(x => x.mal), ...rel.filter(id => cache.get(id)?.d && !isAdult(cache.get(id)))].filter(id => !cache.get(id)?.gone);
+const rel = relatives(), all = [...list.map(x => x.mal), ...rel.filter(id => cache.get(id)?.d)].filter(id => !cache.get(id)?.gone);
 // +18: ما يقوله سجله في MyAnimeList، أو ما وُسم في القائمة حين أُضيف من بحث +18 ولم تُسحب معلوماته بعد
-const adult = new Set(all.filter(id => inList.has(id) && (isAdult(cache.get(id)) || basics.get(id)?.ad)));
-report.adult = adult.size; report.adultExcluded = rel.filter(id => isAdult(cache.get(id))).length;
+const adult = new Set(all.filter(id => isAdult(cache.get(id)) || basics.get(id)?.ad));
+report.adult = [...adult].filter(id => inList.has(id)).length; report.adultRelatives = adult.size - report.adult;
+// اسم السلسلة في التقرير والسجل: سلسلة يحمل اسمَها عملُ +18 تُذكر برقمها وحده
+const wname = w => adult.has(w.head ?? w.id) || adult.has(w.id) ? `+18 #${w.id}` : w.name;
 
 // ---------- 2) TMDB عبر خريطة Fribb/anime-lists
 let fribb = null;
@@ -85,7 +87,6 @@ try { const res = await fetch('https://raw.githubusercontent.com/Fribb/anime-lis
 // وبعض ما هو موسم هناك مسلسل مستقل في TMDB (KanColle: Itsuka Ano Umi de)، وبعض الأعمال لا مطابقة لها فيها أصلاً. يُطبَّق على نسخة، فملف الخريطة يبقى كما جاء
 const tmdbFix = rd(new URL('tmdb.json', SRC), {}); report.tmdbFixed = 0; fribb = { ...fribb };
 for (const [id, t] of Object.entries(tmdbFix)) { if (!/^\d+$/.test(id)) continue; const m = { ...(fribb[id] || {}) }; if (t && (t.k === 'tv' || t.k === 'movie') && Number.isInteger(t.id)) m.tm = { k: t.k, id: t.id, ...(Number.isInteger(t.s) ? { s: t.s } : {}), ...(t.o > 0 ? { o: t.o } : {}) }; else if (t === null) delete m.tm; else continue; fribb[id] = m; report.tmdbFixed++; }
-for (const id of adult) if (fribb[id]?.tm) { fribb[id] = { ...fribb[id] }; delete fribb[id].tm; }   // +18: لا شيء من TMDB (لا بوستر ولا منصات ولا حلقات)
 
 const providers = {}, provIds = l => [...new Set((l || []).map(p => { providers[p.provider_id] = { name: p.provider_name, logo: p.logo_path }; return p.provider_id; }))];
 const provOf = wp => wp ? { link: wp.link || undefined, stream: provIds(wp.flatrate), free: provIds([...(wp.free || []), ...(wp.ads || [])]), rent: provIds(wp.rent), buy: provIds(wp.buy) } : null;
@@ -123,15 +124,14 @@ const prevCat = rd(new URL('catalog.json', OUT), null), prevBy = new Map((prevCa
 if (!door && prevCat?.door) door = prevCat.door;
 if (prevCat && tmdbOk && !tv.size && !movie.size) { tmdbOk = false; Object.assign(providers, prevCat.providers || {}); report.problems.push('TMDB لم يرد بشيء: تبقى صور الكتالوج السابق ومنصاته'); }
 
-// ---------- 3) السلاسل
-// أعمال +18 لا تدخل سلسلة ولا تُدخَل فيها: علاقاتها تُترك، وعلاقات غيرها بها تُحذف
-const items = all.map(id => { const d = cache.get(id)?.d, b = basics.get(id); return { id, rel: adult.has(id) ? [] : (d?.rel || []).filter(z => !adult.has(z.id)), from: d?.from || null, type: d?.type || b?.type || '', eps: d ? d.eps : b?.eps || 0, title: d?.title || b?.title || '', en: d?.en || null, mine: inList.has(id) }; });
+// ---------- 3) السلاسل (أعمال +18 فيها كغيرها، والصفحة تخفيها والفلتر قائم)
+const items = all.map(id => { const d = cache.get(id)?.d, b = basics.get(id); return { id, rel: d?.rel || [], from: d?.from || null, type: d?.type || b?.type || '', eps: d ? d.eps : b?.eps || 0, title: d?.title || b?.title || '', en: d?.en || null, mine: inList.has(id) }; });
 const worlds = worldsOf(items), itemBy = new Map(items.map(x => [x.id, x]));
 // ترتيب القصة المُراجَع (data/anime/orders.json): { "<رقم العمل الذي تحمل السلسلة اسمه>": { order: [أرقام الأعمال], note: "ملاحظة تظهر تحت الترتيب" } }.
 // الترتيب المحسوب من علاقات MyAnimeList يكفي أكثر السلاسل؛ وهذا لما يخالف فيه الترتيبُ الزمني المعروف تلك العلاقات (Dragon Ball GT بعد Super، Hanamonogatari في آخر Monogatari)
 const orders = rd(new URL('orders.json', SRC), {}); report.ordersApplied = 0; report.ordersLoose = [];
 for (const w of worlds) { const o = orders[w.head] || orders[w.id]; if (!o) continue; report.ordersApplied++;
-  if (Array.isArray(o.order) && o.order.length) { const c = curatedOrder(w.story || w.ids, o.order); if (c.loose.length) report.ordersLoose.push(`${w.name}: ${c.loose.join(' ')}`);
+  if (Array.isArray(o.order) && o.order.length) { const c = curatedOrder(w.story || w.ids, o.order); if (c.loose.length) report.ordersLoose.push(`${wname(w)}: ${c.loose.join(' ')}`);
     if (c.order.join() !== w.ids.join()) w.story = c.order; else delete w.story; w.sv = 1; }
   if (typeof o.note === 'string' && o.note.trim()) w.sn = o.note.trim(); }
 // خطوط القصة في كل سلسلة وما يُعرَّف به كل عمل (lib-anime: linesOf)، بعد الترتيب المُراجَع لأنها تتبعه. وفي orders.json تصحيحان مُراجَعان لما تخطئ فيه
@@ -141,7 +141,7 @@ report.lines = { worlds: 0, side: 0 };
 for (const w of worlds) { const o = orders[w.head] || orders[w.id], order = w.story || w.ids;
   try { const L = linesOf(w.ids.map(id => itemBy.get(id)), order, { main: Array.isArray(o?.main) ? o.main : [], as: o?.as && typeof o.as === 'object' ? o.as : {} });
     if (L.ln.length > 1 || Object.keys(L.rf).length) { Object.assign(w, packLines(order, L)); report.lines.worlds++; report.lines.side += L.ln.length - 1; } }
-  catch (e) { report.problems.push(`خطوط ${w.name}: ${e.message}`); } }
+  catch (e) { report.problems.push(`خطوط ${wname(w)}: ${e.message}`); } }
 const worldOf = new Map(); for (const w of worlds) for (const id of w.ids) worldOf.set(id, w.id);
 
 // ---------- لون غلاف كل عمل من AniList (متوسط ألوان الغلاف كما يحسبه AniList: coverImage.color)، منه ألوان بوابة عالمه ولمسة بطاقته.
@@ -164,11 +164,11 @@ const COLORS = new URL('colors.json', GEN), colors = rd(COLORS, {}); report.colo
 // ---------- الكتالوج الخفيف (ما تحتاجه القوائم) والنصوص (ما تحتاجه بطاقة العمل)، موزعةً على 32 ملفاً
 const genres = [], gi = name => { let i = genres.indexOf(name); if (i < 0) i = genres.push(name) - 1; return i; };
 const texts = Array.from({ length: 32 }, () => ({}));
-const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(id), ad = adult.has(id), m = fribb[id] || {}, t = ad ? null : m.tm, prev = ad ? null : prevBy.get(id);
+const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(id), ad = adult.has(id), m = fribb[id] || {}, t = m.tm, prev = prevBy.get(id);
   const T = t && tmdbOk ? (t.k === 'tv' ? tv.get(t.id) : movie.get(t.id)) : null, S = T?.seasons?.[t?.s];
   const a = { id, t: r?.title || b?.title || String(id), type: r?.type || b?.type || '', eps: r ? r.eps : b?.eps || 0 };
   if (inList.has(id)) a.ord = ord; else a.x = 1;                 // x: ليس في القائمة، دخل لإكمال سلسلته
-  if (ad) a.ad = 1;                                               // +18: يخفيه فلتر العين. صورته من MyAnimeList، ولا شيء له من TMDB
+  if (ad) a.ad = 1;                                               // +18: يخفيه فلتر العين، ومعلوماته كاملة كغيره (E73)
   if (r) { if (r.en && r.en !== a.t) a.en = r.en; if (r.year) a.y = r.year; if (r.season) a.se = r.season; a.st = r.status; if (r.from) a.from = r.from;
     if (r.img) a.img = r.img; if (r.score) { a.sc = r.score; a.sv = r.votes; } if (r.dur) a.dur = r.dur;
     const g = [...r.genres, ...r.themes, ...r.demo].map(gi); if (g.length) a.g = g; if (r.studios[0]) a.studio = r.studios[0]; if (r.rating) a.rating = r.rating; if (r.day) a.day = r.day; }
@@ -181,11 +181,9 @@ const anime = all.map((id, ord) => { const r = cache.get(id)?.d, b = basics.get(
       if (sp?.here) { a.pv = sp.here; a.pvs = 1; } else if (sp?.away) { a.pvo = T.prov; a.pv = { stream: [], free: [], rent: [], buy: [] }; a.pvs = 1; } }
     if (T?.next && r?.status === 'airing' && (t.s == null || T.next.season === t.s)) a.nx = { ep: T.next.episode - (t.o || 0), date: T.next.date }; }
   else if (prev) for (const k of ['tp', 'bd', 'pv', 'pvs', 'pvo', 'nx', 'an']) if (prev[k] !== undefined) a[k] = prev[k];
-  if (r && ad) { const x = { en: r.synopsis || null }; if (translations[id]) x.ar = translations[id]; if (r.jp) x.jp = r.jp; if (r.syn.length) x.syn = r.syn; if (r.studios.length > 1) x.studios = r.studios; if (r.source) x.source = r.source; if (r.to) x.to = r.to;
-    if (m.simkl) x.simkl = m.simkl; if (m.anilist) x.anilist = m.anilist; texts[id % 32][id] = x; }   // نبذته وترجمتها (E69)، بلا عرض دعائي ولا منصات ولا روابط أقرباء
-  else if (r) { const x = { en: r.synopsis || null }; if (translations[id]) x.ar = translations[id]; if (r.jp) x.jp = r.jp; if (r.syn.length) x.syn = r.syn; if (r.studios.length > 1) x.studios = r.studios; if (r.source) x.source = r.source;
+  if (r) { const x = { en: r.synopsis || null }; if (translations[id]) x.ar = translations[id]; if (r.jp) x.jp = r.jp; if (r.syn.length) x.syn = r.syn; if (r.studios.length > 1) x.studios = r.studios; if (r.source) x.source = r.source;
     if (r.to) x.to = r.to; if (r.rank) x.rank = r.rank; if (r.trailer) x.trailer = r.trailer; if (r.stream.length) x.stream = r.stream; if (r.time) x.time = r.time;
-    const rl = r.rel.filter(z => !isAdult(cache.get(z.id)) && !adult.has(z.id)); if (rl.length) x.rel = rl; if (m.simkl) x.simkl = m.simkl; if (m.anilist) x.anilist = m.anilist; if (m.imdb) x.imdb = m.imdb;
+    if (r.rel.length) x.rel = r.rel; if (m.simkl) x.simkl = m.simkl; if (m.anilist) x.anilist = m.anilist; if (m.imdb) x.imdb = m.imdb;
     texts[id % 32][id] = x; }
   return a; });
 wr(new URL('catalog.json', OUT), { generatedAt: report.generatedAt, imageBase: 'https://image.tmdb.org/t/p/', malImages: 'https://cdn.myanimelist.net/images/anime/', country: COUNTRY, providers, genres, anime,

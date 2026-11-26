@@ -547,22 +547,68 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
         && rest.length === 14 && rest.every(x => !x.classList.contains('x18') && [...x.querySelectorAll('img')].every(i => !/blur/.test(getComputedStyle(i).filter))); }));
     await snap('18-open'); await overflow('الفلتر مرفوع');
     await page.fill('#q', 'velvet'); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 1); check('وبحث القائمة يجدها', (await cells()).join() === '70002'); await page.fill('#q', ''); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 16);
+    // السلاسل (E73): سلسلة +18 تظهر بأقربائها والفلتر مرفوع، وسلسلة فيها عمل +18 تُعدّ به
+    await tap('.views [data-v=worlds]'); await page.waitForSelector('#worlds .wc[data-w="70001"]');
+    check('والفلتر مرفوع: سلسلة أعمال +18 بين السلاسل بأقربائها، وعمل +18 في سلسلة غيره يُعدّ فيها', await page.evaluate(() => { const c = w => document.querySelector(`#worlds .wc[data-w="${w}"]`)?.textContent || '';
+      return /Midnight Sample/.test(c(70001)) && /عملان · في قائمتك 1/.test(c(70001)) && /5 أعمال/.test(c(136)); }), await page.evaluate(() => [...document.querySelectorAll('#worlds .wc')].map(x => x.textContent.trim())));
+    await tap('#worlds .wc[data-w="70001"]'); await page.waitForSelector('#wsheet[open] .gw-tl');
+    check('وتُفتح بترتيبها وفيها قريبها الذي ليس في القائمة', await page.evaluate(() => [...document.querySelectorAll('#wsheet .gw-tl [data-id]')].map(x => +x.dataset.id).filter((v, i, a) => a.indexOf(v) === i).join() === '70001,70003'),
+      await page.evaluate(() => [...document.querySelectorAll('#wsheet .gw-tl [data-id]')].map(x => x.dataset.id)));
+    check('وصور أعمال +18 فيها مغطاة: مصغّرتها وحدها بعين البوابة، ولا غلاف لها في رأس البوابة', await page.evaluate(() => { const n = [...document.querySelectorAll('#wsheet .gn-b')];
+      return n.length >= 2 && n.every(b => b.hasAttribute('data-ad') && !!b.querySelector('.th.x18 .x18-m svg') && [...b.querySelectorAll('img')].every(i => /t\.webp$/.test(i.getAttribute('src')))) && !document.querySelector('#wsheet .gw-stack img'); }),
+      await page.evaluate(() => [...document.querySelectorAll('#wsheet .gn-b')].map(b => b.outerHTML.slice(0, 240))));
+    await page.goBack(); await page.waitForSelector('#wsheet', { state: 'hidden' });
+    check('وبطاقة تلك السلسلة بلا صورة من أعمال +18 ما دامت مغطاة', await page.evaluate(() => !document.querySelector('#worlds .wc[data-w="70001"] img')));
+    await tap('#worlds .wc[data-w="136"]'); await page.waitForSelector('#wsheet[open] .gw-tl');
+    check('وفي سلسلة غيرها: عمل +18 بين أعمالها مغطى وحده', await page.evaluate(() => { const b = id => document.querySelector(`#wsheet .gn-b[data-id="${id}"]`);
+      return !!b(70004)?.querySelector('.th.x18') && b(70004).hasAttribute('data-ad') && !!b(11061) && !b(11061).hasAttribute('data-ad') && !b(11061).querySelector('.x18'); }));
+    await tap('#wsheet .gn-b[data-id="11061"]'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => document.querySelector('#sheet-body').dataset.full === '11061');
+    check('وفي بطاقة عمل منها: عمل +18 في شريط سلسلتها مغطى وحده', await page.evaluate(() => { const b = id => document.querySelector(`#sheet-body .strip button[data-id="${id}"]`);
+      return !!b(70004)?.querySelector('.th.x18') && b(70004).hasAttribute('data-ad') && [...b(70004).querySelectorAll('img')].every(i => /t\.webp$/.test(i.getAttribute('src'))) && !!b(11061)?.querySelector('img') && !b(11061).querySelector('.x18'); }),
+      await page.evaluate(() => [...document.querySelectorAll('#sheet-body .strip button')].map(b => b.outerHTML.slice(0, 200))));
+    await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.goBack(); await page.waitForSelector('#wsheet', { state: 'hidden' });
+    await tap('.views [data-v=list]'); await page.waitForSelector('#grid .cel');
+    // العين في الشريط اللاصق: تظهر مع البحث والقوائم حين يخرج الرأس من الشاشة، ومعها زر الأغلفة، وتعمل كعين الرأس
+    await page.evaluate(() => window.scrollTo(0, document.querySelector('#grid').offsetTop + 400)); await page.waitForFunction(() => document.querySelector('.bar').classList.contains('docked'));
+    await page.waitForTimeout(350);
+    check('نزلت بالصفحة: العين وزر الأغلفة معها في الشريط أعلى الصفحة، ظاهران ويُضغطان', await page.evaluate(() => { const w = document.querySelector('.bar .r18w.dock'), r = w.getBoundingClientRect(), e = w.querySelector('.r18'), c = w.querySelector('.r18-eye');
+      return w.getAttribute('aria-hidden') === 'false' && e.tabIndex === 0 && r.width > 80 && r.top >= 0 && r.bottom <= innerHeight && getComputedStyle(w).opacity === '1' && e.getAttribute('aria-pressed') === 'true' && !c.hidden && r.left >= 0 && r.right <= innerWidth; }));
+    await snap('18-dock'); await overflow('العين في الشريط');
+    if (viewport.width <= 480) {   // الشاشة الضيقة: البحث في الشريط زرّ بعدسته يتسع حين يُلمس وتغيب الأزرار حتى ينتهي، وعليه نقطة ما دام فيه بحث
+      const qs = () => page.evaluate(() => { const w = s => Math.round(document.querySelector(s).getBoundingClientRect().width); return { s: w('.bar .search'), v: w('.bar .views'), d: w('.bar .r18w.dock'), dot: getComputedStyle(document.querySelector('.bar .search'), '::after').content }; });
+      const a = await qs(); await page.locator('.bar #q').tap(); await page.waitForTimeout(150); const b = await qs();
+      await page.evaluate(() => document.activeElement.blur()); await page.waitForTimeout(150); const c = await qs();
+      await page.evaluate(() => { document.querySelector('#q').value = 'velvet'; }); const d = await qs(); await page.evaluate(() => { document.querySelector('#q').value = ''; });
+      check('الشاشة الضيقة: البحث في الشريط زرّ بعدسته، يتسع حين يُلمس وتغيب الأزرار حتى ينتهي، وعليه نقطة ما دام فيه بحث', a.s <= 46 && a.v > 100 && a.d > 80 && a.dot === 'none' && b.s > 200 && !b.v && !b.d && c.s <= 46 && c.d > 80 && d.dot !== 'none' && d.s <= 46, [a, b, c, d]); }
+    await page.evaluate(() => { window.__same = 1; }); await page.locator('.bar .r18w.dock .r18').click(); await page.waitForFunction(() => document.querySelector('.top .r18').getAttribute('aria-pressed') === 'false');
+    check('ضغطها هناك يعيد الفلتر في مكانه، وعين الرأس معها', await same() && await page.evaluate(() => document.querySelector('.bar .r18w.dock .r18').getAttribute('aria-pressed') === 'false' && document.querySelector('.bar .r18w.dock .r18-eye').hidden && !document.querySelector('#grid [data-ad]')));
+    await tap('.views [data-v=worlds]'); await page.waitForSelector('#worlds .wc[data-w="136"]');
+    check('والفلتر قائم: لا سلسلة +18 ولا رابطها، وسلسلة فيها عمل +18 تُعدّ بغيره', await page.evaluate(() => !document.querySelector('#worlds .wc[data-w="70001"]') && /4 أعمال/.test(document.querySelector('#worlds .wc[data-w="136"]').textContent) && !/Midnight|Hunter Night/.test(document.querySelector('#worlds').textContent)));
+    await page.evaluate(() => { location.hash = '#w70001'; }); await page.waitForTimeout(200); check('ورابط سلسلة +18 لا يفتحها', await page.evaluate(() => !document.querySelector('#wsheet').open)); await page.evaluate(() => history.replaceState(null, '', location.pathname));
+    await tap('.views [data-v=list]'); await page.waitForSelector('#grid .cel'); await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForFunction(() => !document.querySelector('.bar').classList.contains('docked'));
+    check('وعاد الرأس: نسخة الشريط مخفية لا تُضغط', await page.evaluate(() => document.querySelector('.bar .r18w.dock').getAttribute('aria-hidden') === 'true' && document.querySelector('.bar .r18w.dock .r18').tabIndex === -1));
+    await eye(true); await tap('#lists [data-l=all]');
     if (await page.locator('#tonight [data-act=treroll]').count()) { const seen = new Set(); for (let i = 0; i < 8; i++) { seen.add(await page.getAttribute('#tonight [data-act=open]', 'data-id')); await tap('#tonight [data-act=treroll]'); await page.waitForTimeout(40); }
       check('والاقتراح لا يختار عمل +18 ولو كان في «سأشاهده»', !seen.has('70002') && !seen.has('70001'), [...seen]); }
     // البطاقة
     await tap('#grid .cel[data-id="70001"] [data-act=open]'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => document.querySelector('#sheet-body').dataset.full === '70001');
-    check('بطاقة عمل +18: سجلّه كغيره، ونبذته بالإنجليزية وطلب ترجمتها كغيره (E69)، بلا موقع من سلسلة ولا حلقات، وصورته مغطاة بزر يكشفها', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.head .cel-art');
-      return p.classList.contains('x18') && p.dataset.act === 'bare' && !p.hasAttribute('data-zoom') && /اضغط لإظهارها/.test(p.textContent) && !b.querySelector('.pos') && !b.querySelector('#xs') && !!b.querySelector('.mine') && !/لا تُعرض هنا/.test(b.textContent)
-        && b.querySelector('.ov.en')?.textContent === 'Two strangers share one long night in a sleepless city.' && !!b.querySelector('.tr [data-act]') && [...b.querySelectorAll('.facts span')].some(x => x.textContent === '+18') && [...b.querySelectorAll('.links a')].map(a => a.textContent.trim()).join() === 'MyAnimeList,SIMKL,AniList'; }), await page.textContent('#sheet-body'));
+    check('بطاقة عمل +18: سجلّه كغيره، ونبذته بالإنجليزية وطلب ترجمتها كغيره (E69)، وموقعه من سلسلته وحلقاته كغيره (E73)، وصورته مغطاة بزر يكشفها', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.head .cel-art');
+      return p.classList.contains('x18') && p.dataset.act === 'bare' && !p.hasAttribute('data-zoom') && /اضغط لإظهارها/.test(p.textContent) && !b.querySelector('.hero img') && !!b.querySelector('.pos') && /Midnight Sample/.test(b.querySelector('.pos')?.textContent || '') && !!b.querySelector('#xs') && !!b.querySelector('.mine') && !/لا تُعرض هنا/.test(b.textContent)
+        && b.querySelector('.ov.en')?.textContent === 'Two strangers share one long night in a sleepless city.' && !!b.querySelector('.tr [data-act]') && [...b.querySelectorAll('.facts span')].some(x => x.textContent === '+18') && [...b.querySelectorAll('.links a')].map(a => a.textContent.trim()).join() === 'MyAnimeList,SIMKL,AniList,TMDB'; }), await page.evaluate(() => ({ pos: !!document.querySelector('#sheet-body .pos'), xs: !!document.querySelector('#sheet-body #xs'), links: [...document.querySelectorAll('#sheet-body .links a')].map(a => a.textContent.trim()) })));
     await snap('18-card'); await overflow('بطاقة +18');
     await tap('#sheet-body .head .cel-art'); await page.waitForFunction(() => !document.querySelector('#sheet-body .head .cel-art.x18'));
     check('لمس الصورة يكشفها وحدها: في بطاقته وفي خانته، والباقي مغطى، ولا يُفتح المكبّر بتلك اللمسة', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.head .cel-art');
-      return b.hasAttribute('data-r18-bare') && p.hasAttribute('data-zoom') && /\/7\/70001\.webp$/.test(p.querySelector('img').getAttribute('src')) && getComputedStyle(p.querySelector('img')).filter === 'none' && !document.querySelector('.pz[open]')
+      return b.hasAttribute('data-r18-bare') && p.hasAttribute('data-zoom') && /\/7\/70001\.webp$/.test(p.querySelector('img').getAttribute('src')) && /ad70001bd\.jpg$/.test(b.querySelector('.hero img')?.getAttribute('src') || '') && getComputedStyle(p.querySelector('img')).filter === 'none' && !document.querySelector('.pz[open]')
         && !document.querySelector('#grid .cel[data-id="70001"] .x18') && document.querySelector('#grid .cel[data-id="70001"]').hasAttribute('data-r18-bare') && !!document.querySelector('#grid .cel[data-id="70002"] .cel-art.x18'); }));
     await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' });
     await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open'));
     check('زر الأغلفة بجانب العين يكشف صور أعمال +18 كلها، ويصير «غطِّ الصور»', await page.evaluate(() => !document.querySelector('#grid .x18') && document.querySelectorAll('#grid .cel[data-ad] .cel-art img[srcset]').length === 2 && /غطِّ الصور/.test(document.querySelector('.r18-eye').textContent) && document.querySelector('.r18-eye').getAttribute('aria-pressed') === 'true'
       && getComputedStyle(document.querySelector('#grid .cel[data-ad] .cel-art img')).filter === 'none'));
+    // E74: إغلاق العين يعيد التغطية، فرفع الفلتر بعده يبدأ والصور مغطاة ولو لم تُغطَّ قبل الإغلاق
+    await eye(false); await eye(true);
+    check('أُغلقت العين والصور مكشوفة ثم فُتحت: الصور مغطاة من جديد وزرها «أظهر الصور» (E74)', await page.evaluate(() => !document.documentElement.hasAttribute('data-r18-open') && document.querySelectorAll('#grid .cel-art.x18').length === 2
+      && document.querySelector('.top .r18-eye').getAttribute('aria-pressed') === 'false' && /أظهر الصور/.test(document.querySelector('.top .r18-eye').textContent) && localStorage.getItem('adult.show') === null));
+    await tap('#lists [data-l=all]'); await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open'));
     await tap('.r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open'));
     check('و«غطِّ الصور» يغطيها كلها ثانية، وما كُشف وحده معها', await page.evaluate(() => document.querySelectorAll('#grid .cel-art.x18').length === 2 && !document.querySelector('#grid [data-r18-bare]')));
     // البحث والإضافة: MyAnimeList بلا قيد حين يُرفع الفلتر، وما تصنيفه Rx منه يُوسم ويُغطى، والإضافة تحمل الوسم
@@ -584,8 +630,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
       check('إضافة عمل +18 تحمل الوسم ad، وتدخل القائمة والسجل فوراً ببطاقة مؤقتة مغطاة', adds.length === 1 && adds[0].ad === 1 && adds[0].mal === 70010 && Object.keys(adds[0]).sort().join() === 'ad,eps,mal,password,title,type' && (await log())[70010]?.s === 'watching'
         && await page.evaluate(() => { const a = JSON.parse(localStorage.getItem('animeg.added'))[70010], c = document.querySelector('.rail .cel[data-id="70010"]'); return a?.ad === 1 && a.im === '9/70010' && !!c && c.querySelector('.cel-art').classList.contains('x18') && /\/9\/70010t\.webp$/.test(c.querySelector('img').getAttribute('src')); }), [adds, await rows()]);
       await tap('#addd [data-act=close]'); await page.waitForSelector('#addd', { state: 'hidden' }); }
+    await tap('.top .r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open'));
     await page.reload(); await page.waitForSelector('#grid .cel'); await tap('#lists [data-l=all]');
-    check('تحديث الصفحة يبقي الفلتر مرفوعاً، وما أُضيف باقٍ في القائمة وأعدادها', await lifted() && (await cells()).includes(70010) && await tallyN() === n0 + 3, [await lifted(), await cells(), await tallyN()]);
+    check('تحديث الصفحة يبقي الفلتر مرفوعاً والصور مغطاة من جديد ولو كُشفت قبله (E74)، وما أُضيف باقٍ في القائمة وأعدادها', await lifted() && (await cells()).includes(70010) && await tallyN() === n0 + 3 && await page.evaluate(() => !document.documentElement.hasAttribute('data-r18-open') && !!document.querySelector('#grid .cel-art.x18')), [await lifted(), await cells(), await tallyN()]);
     // الإعادة
     await eye(false);
     check('العين نفسها تعيد الفلتر في مكانها: القائمة كما كانت، وأعمال +18 وما أُضيف منها لا تظهر', await same() && !(await lifted()) && sorted(await cells()) === sorted(all0) && await tallyN() === n0 && await page.locator('.rail .cel[data-id="70010"]').count() === 0 && /عاد الفلتر/.test(await toastText())

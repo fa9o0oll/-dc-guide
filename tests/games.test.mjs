@@ -584,6 +584,23 @@ for (const [name, w, h, mobile] of [['+18', 1440, 900, false], ['+18 (cover)', 3
   await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(350);
   await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open')); check(`${name}: زر الأغلفة بجانب العين يكشفها كلها`, await page.evaluate(() => !document.querySelector('#grid .x18') && document.querySelectorAll('#grid .gc[data-ad] .cover img[srcset]').length === 2));
   await tap('.r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open')); check(`${name}: ويغطيها كلها ثانية`, await page.evaluate(() => document.querySelectorAll('#grid .gc .cover.x18').length === 2));
+  // E74: ما كُشف لا يبقى: إغلاق العين والصور مكشوفة ثم فتحها يبدأ والصور مغطاة
+  await tap('.r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open')); await eye(false); await eye(true);
+  check(`${name}: أُغلقت العين والصور مكشوفة ثم فُتحت: الصور مغطاة من جديد (E74)`, await page.evaluate(() => !document.documentElement.hasAttribute('data-r18-open') && document.querySelectorAll('#grid .gc .cover.x18').length === 2
+    && document.querySelector('.top .r18-eye').getAttribute('aria-pressed') === 'false' && localStorage.getItem('adult.show') === null));
+  // العين في الشريط اللاصق (E73): تظهر حين يخرج الرأس من الشاشة، ومعها زر الأغلفة، وتعمل كعين الرأس
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight)); await page.waitForFunction(() => document.querySelector('.bar').classList.contains('docked')); await page.waitForTimeout(600);
+  check(`${name}: نزلت بالصفحة: العين وزر الأغلفة في الشريط أعلى الصفحة، ظاهران، بلا تمدد أفقي`, await page.evaluate(() => { const w = document.querySelector('.bar .r18w.dock'), r = w.getBoundingClientRect();
+    return w.getAttribute('aria-hidden') === 'false' && r.width > 80 && r.top >= 0 && r.left >= 0 && r.right <= innerWidth && getComputedStyle(w).opacity === '1' && !w.querySelector('.r18-eye').hidden && document.documentElement.scrollWidth <= innerWidth; }));
+  if (w <= 480) { const qs = () => page.evaluate(() => { const w = s => Math.round(document.querySelector(s).getBoundingClientRect().width); return { s: w('.bar .search'), t: w('.bar .tabs'), d: w('.bar .r18w.dock'), dot: getComputedStyle(document.querySelector('.bar .search'), '::after').content }; });
+    const a = await qs(); await page.locator('.bar #q').tap(); await page.waitForTimeout(150); const b = await qs(); await page.evaluate(() => document.activeElement.blur()); await page.waitForTimeout(150);
+    await page.evaluate(() => { document.querySelector('#q').value = 'elden'; }); const d = await qs(); await page.evaluate(() => { document.querySelector('#q').value = ''; });
+    check(`${name}: الشاشة الضيقة: البحث في الشريط زرّ بعدسته، يتسع حين يُلمس وتغيب الأزرار حتى ينتهي، وعليه نقطة ما دام فيه بحث`, a.s <= 46 && a.t > 100 && a.d > 80 && a.dot === 'none' && b.s > 200 && !b.t && !b.d && d.dot !== 'none' && d.s <= 46, [a, b, d]); }
+  await tap('.bar .r18w.dock .r18-eye'); await page.waitForFunction(() => document.documentElement.hasAttribute('data-r18-open'));
+  check(`${name}: زر الأغلفة في الشريط يكشفها، وزر الرأس معه`, await page.evaluate(() => document.querySelector('.top .r18-eye').getAttribute('aria-pressed') === 'true' && !document.querySelector('#grid .x18')));
+  await tap('.bar .r18w.dock .r18-eye'); await page.waitForFunction(() => !document.documentElement.hasAttribute('data-r18-open'));
+  await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForFunction(() => !document.querySelector('.bar').classList.contains('docked'));
+  check(`${name}: وعاد الرأس: نسخة الشريط مخفية لا تُضغط`, await page.evaluate(() => document.querySelector('.bar .r18w.dock').getAttribute('aria-hidden') === 'true' && document.querySelector('.bar .r18w.dock .r18').tabIndex === -1));
   const a0 = asked.length; await tap('.top [data-act=add]'); await page.waitForSelector('#add[open]'); check(`${name}: نافذة الإضافة هي نفسها والفلتر مرفوع`, (await page.textContent('#add-h')).trim() === 'أضف لعبة' && !/\+\s*18/.test(await page.textContent('#add')));
   await page.fill('#add-q', 'nothing here'); await page.press('#add-q', 'Enter'); await page.waitForFunction(() => /لم أجد/.test(document.querySelector('#add-msg')?.textContent || ''));
   check(`${name}: بحث بلا نتيجة يقول رسالته المعتادة`, await page.evaluate(() => { const t = document.querySelector('#add-msg').textContent; return /لم أجد لعبة باسم «nothing here»/.test(t) && !/للبالغين/.test(t) && !document.querySelector('.cand'); }), await page.textContent('#add-msg'));

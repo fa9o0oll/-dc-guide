@@ -8,7 +8,7 @@ import { prepare, find, fold } from './find.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
 import { posMap, ord } from './pos.js?v=__BUILD__'; // خريطة «موقعه من سلسلته» والعدد الترتيبي
-import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
+import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover, dockEye } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
 const BUILD = '__BUILD__', KEY = 'filmsg.progress', PEND = 'filmsg.pending', PASS = 'filmsg.pass', IMG = 'https://image.tmdb.org/t/p/';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -66,7 +66,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <div class="acts"><button class="btn pri" data-act="open-tonight">افتح بطاقته</button><button class="btn sec" data-act="reroll">${ic('roll')}اقتراح آخر</button></div>
   <div class="mood" role="group" aria-labelledby="mood-l"><span class="mood-l" id="mood-l">مزاج السهرة</span><div class="mood-c" id="mood" data-drag></div></div><p class="mood-hint" id="mood-hint" hidden></p></section>
 <nav class="bar" aria-label="البحث والتصفية"><div class="row"><a class="gate" href="../" aria-label="العودة إلى البوابات" aria-hidden="true" tabindex="-1"><span class="gate-em">${miniDoor}</span><span class="gate-t">البوابات</span></a><label class="search">${ic('search')}<span class="sr">ابحث في القائمة</span><input id="q" type="search" placeholder="ابحث: فيلم، مخرج، سنة" autocomplete="off" enterkeyhint="search"></label>
-  <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الأفلام</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div></div>
+  <div class="tabs" role="group" aria-label="طريقة العرض"><button data-act="view" data-v="grid" aria-pressed="true">الأفلام</button><button data-act="view" data-v="series" aria-pressed="false">السلاسل</button></div>${eyeBtn(true)}</div>
   <div class="chips" id="chips"></div></nav>
 <p class="count" id="count" aria-live="polite"></p>
 <main><div class="grid" id="grid"><p class="load">تُحمَّل القائمة…</p></div><div class="series" id="series" hidden></div></main>
@@ -548,7 +548,7 @@ try {
   try { const pend = JSON.parse(localStorage.getItem(PEND) || '[]'), keep = pend.filter(r => r?.film && !D.known.has(r.film.id)); D.more ||= {}; keep.forEach(r => adopt(r, false)); localStorage.setItem(PEND, JSON.stringify(keep)); } catch {}
   renderGrid(); moodChips(); reroll(true); liftVeil();   // والاقتراح لا يختار عمل +18 (tonightOk)
   // حين تغيب الترويسة ينزل زر البوابات إلى أول الشريط الثابت
-  { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); }).observe($('.top')); }
+  { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); dockEye(on); }).observe($('.top')); }
   // تغيير وصل من جهاز آخر: نعيد قراءة السجل ونرسم
   initSync(id => { if (id !== 'films') return; try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {} renderGrid(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); });
   // ‎#add=اسم وسنة: من بوابة أخرى (ألعابي تقترح إضافة فيلم اقتُبس من لعبة) يفتح «أضف فيلماً» بالبحث عنه
