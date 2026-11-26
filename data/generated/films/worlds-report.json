@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-26T21:29:08.549Z",
+ "generatedAt": "2026-11-26T22:50:08.211Z",
  "counts": {
   "works": 629,
   "withEntry": 375,
@@ -18,7 +18,7 @@
   "chronoAuto": 31,
   "infoEntries": 466,
   "bytes": 203020,
-  "seconds": 61
+  "seconds": 14
  },
  "missing": [
   {
@@ -1689,8 +1689,8 @@
     "sibling:Untitled James Bond Film*"
    ],
    "src": [
-    "novels:James Bond",
-    "story:Quantum of Solace"
+    "story:Quantum of Solace",
+    "novels:James Bond"
    ]
   },
   {
@@ -4626,19 +4626,19 @@
  ],
  "excludedGroups": [
   {
-   "g": "Q26705935",
-   "name": "BBC's 100 Greatest Films of the 21st Century",
+   "g": "Q65120698",
+   "name": "list of Illumination films",
    "why": "list",
-   "size": 102,
+   "size": 15,
    "types": [
     "Wikimedia list article"
    ]
   },
   {
-   "g": "Q65120698",
-   "name": "list of Illumination films",
+   "g": "Q26705935",
+   "name": "BBC's 100 Greatest Films of the 21st Century",
    "why": "list",
-   "size": 15,
+   "size": 102,
    "types": [
     "Wikimedia list article"
    ]
@@ -4653,19 +4653,19 @@
    ]
   },
   {
-   "g": "Q56070713",
-   "name": "Walt Disney Animation Studios feature film",
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
    "why": "catalog",
-   "size": 66,
+   "size": 23,
    "types": [
     "animated film series"
    ]
   },
   {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
+   "g": "Q56070713",
+   "name": "Walt Disney Animation Studios feature film",
    "why": "catalog",
-   "size": 23,
+   "size": 66,
    "types": [
     "animated film series"
    ]
