@@ -47,7 +47,7 @@ const RATING = { G: 'لكل الأعمار', PG: 'للأطفال', 'PG-13': '+13
 const SCORE = ['', 'مروّع', 'فظيع', 'سيئ جداً', 'سيئ', 'متوسط', 'لا بأس به', 'جيد', 'جيد جداً', 'عظيم', 'تحفة'];
 const ic = n => `<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const SPRITE = `<svg hidden aria-hidden="true"><defs>
-<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
 <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" stroke-width="1.6" d="M8.5 6v12l10-6z"/></symbol><symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
 <symbol id="i-drop" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><path d="M6.8 6.8l10.4 10.4"/></symbol><symbol id="i-mark" viewBox="0 0 24 24"><path d="M7 4.5h10v15l-5-3.5-5 3.5z"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol><symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.7 2.5 2.7 13.5 0 16M12 4c-2.7 2.5-2.7 13.5 0 16"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5L20 20"/></symbol>
@@ -69,7 +69,7 @@ load();
 // ---------- البيانات
 // list وby: ما يظهر الآن: أعمالك، ومعها أعمال +18 حين يُرفع الفلتر (isOpen، وrelist تعيد بناءهما عند التبديل). all وknown: كل ما في الكتالوج، للاستيراد والمطابقة. adult: أرقام أعمال +18
 const D = { list: [], by: new Map(), all: [], known: new Set(), adult: new Set(), worlds: [], wby: new Map(), prov: {}, genres: [], base: 'https://image.tmdb.org/t/p/', mal: 'https://cdn.myanimelist.net/images/anime/', texts: new Map(), found: null, eps: {}, epc: new Map() };
-const ui = { list: 'watching', view: 'list', q: '', sort: 'mal', type: '', genre: -1, shown: 60, names: 'romaji' };
+const ui = { list: 'watching', view: 'list', q: '', sort: 'mal', type: '', genres: [], shown: 60, names: 'romaji' };
 try { const u = JSON.parse(store.get(UI) || '{}'); for (const k of ['list', 'sort', 'names']) if (typeof u[k] === 'string') ui[k] = u[k]; } catch {}
 const keep = () => store.set(UI, JSON.stringify({ list: ui.list, sort: ui.sort, names: ui.names }));
 const get = async f => { const r = await fetch(`data/${f}?v=${BUILD}`); if (!r.ok) throw new Error(f + ' ' + r.status); return r.json(); };
@@ -138,7 +138,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <footer class="foot"><p>معلومات الأنمي وصوره وتقييماته من <a href="https://myanimelist.net/" target="_blank" rel="noopener">${ltr('MyAnimeList')}</a>، والبوسترات العالية الدقة والخلفيات من <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">${ltr('TMDB')}</a>، وبيانات أماكن العرض من <a href="https://www.justwatch.com/" target="_blank" rel="noopener">${ltr('JustWatch')}</a>، ومطابقة الأرقام بين المواقع من ${ltr('Fribb/anime-lists')}. ${ltr('This product uses the TMDB API but is not endorsed or certified by TMDB.')}</p>
   <p><button class="syncb" data-sync-open><span data-sync-label></span></button></p></footer>
 <dialog id="addd" aria-labelledby="add-h"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="add-body"></div></dialog>
-<dialog id="sheet" aria-label="بطاقة العمل"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="sheet-body"></div></dialog>
+<dialog id="sheet" aria-label="بطاقة العمل"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><button class="close sback" data-act="back" aria-label="رجوع إلى البطاقة السابقة" hidden>${ic('back')}</button><div class="scroll" id="sheet-body"></div></dialog>
 <dialog id="wsheet" aria-label="السلسلة"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="wsheet-body"></div></dialog>
 <dialog id="imp" aria-labelledby="imp-h"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="imp-body"></div></dialog>
 <div class="toast" id="toast" role="status"></div>`);
@@ -197,11 +197,15 @@ function renderTonight(fresh) { const box = $('#tonight'); if (!box) return; if 
   const chip = (g, name, c) => `<button type="button" data-act="amood" data-g="${g}" aria-pressed="${g < 0 ? !amoods.length : amoods.includes(g)}"${g >= 0 ? ` style="--gh:${ghue(D.genres[g])}"` : ''}>${name}<b>${num(c)}</b></button>`;
   const w = a && D.wby.get(a.w), d = w ? pos(w, a.id) : null, wn = w ? (ui.names === 'english' && w.en ? w.en : w.name) : '', meta = a ? [typeOf(a), a.y || '', a.type !== 'Movie' && a.eps ? nEps(a.eps) : '', a.sc ? `${ltr('MyAnimeList')} ${a.sc.toFixed(2)}` : ''].filter(Boolean).join(' · ') : '';
   const gs = a ? [...(a.g || []).filter(g => amoods.includes(g)), ...(a.g || []).filter(g => !amoods.includes(g))].slice(0, 3).map(g => genreOf(D.genres[g])).join('، ') : '';
-  const hint = amoods.length >= 2 ? (best === amoods.length ? `عمل يجمع ${amoods.map(g => genreOf(D.genres[g])).join(' و')}.` : best ? `لا عمل في «سأشاهده» يجمعها كلها، فهذا أقربها: يجمع ${best} من ${amoods.length}.` : 'لا عمل في «سأشاهده» من هذه التصنيفات.') : '';
+  // أقرب ما وُجد حين لا عمل يجمع المزاج كله: يقال ما فيه منه وما ليس فيه بأسمائها، فلا يُظن أنه أخطأ (E76)
+  const gn = g => genreOf(D.genres[g]), has = a ? amoods.filter(g => (a.g || []).includes(g)) : [], miss = amoods.filter(g => !has.includes(g));
+  const hint = amoods.length >= 2 ? (best === amoods.length ? `عمل يجمع ${amoods.map(gn).join(' و')}.` : best ? `لا عمل في «سأشاهده» يجمعها كلها، فهذا أقربها: يجمع ${best} من ${amoods.length}، فيه ${has.map(gn).join(' و')} وليس فيه ${miss.map(gn).join(' ولا ')}.` : 'لا عمل في «سأشاهده» من هذه التصنيفات.') : '';
+  // المختار من المزاج أولاً، فلا يبقى منه شيء خارج الشريط لا يُرى (E76)، ثم البقية بأعدادها
+  const moodOrder = [...amoods.filter(g => n.has(g)).map(g => [g, n.get(g)]), ...[...n].filter(([g]) => !amoods.includes(g)).sort((x, y) => y[1] - x[1])];
   box.innerHTML = `<section class="tn" aria-label="اقتراح الليلة"${a?.ac ? ` style="--ac:#${a.ac}"` : ''}>${a?.bd ? `<div class="tn-bd"><img alt="" decoding="async" src="${D.base}w780${a.bd}"></div>` : ''}
     <div class="tn-t"><p class="tn-l">اقتراح الليلة من «سأشاهده»</p>${a ? `<h2 dir="ltr"${title(a).length > 34 ? ' class="long"' : ''}>${esc(title(a))}</h2>${d ? `<p class="tn-k">${d.badge}${wn && wn !== title(a) ? ` · ${ltr(wn)}` : ''}</p>` : '<p class="tn-k">عمل منفرد</p>'}<p class="tn-m">${meta}${gs ? ` · ${gs}` : ''}</p>
       <div class="acts"><button class="btn pri" data-act="open" data-id="${a.id}">افتح بطاقته</button><button class="btn ghost" data-act="treroll">${ic('warp')}<span>اقتراح آخر</span></button><button class="btn ghost" data-act="status" data-id="${a.id}" data-s="watching">${ic('play')}<span>سأبدأه الآن</span></button></div>` : '<h2>لا شيء بهذا المزاج</h2>'}
-      <div class="tn-mood"><span>مزاجك الليلة</span><div class="gchips tn-c" data-drag>${chip(-1, 'أي تصنيف', total)}${[...n].sort((x, y) => y[1] - x[1]).map(([g, c]) => chip(g, genreOf(D.genres[g]), c)).join('')}</div></div>${hint ? `<p class="tn-h">${hint}</p>` : ''}</div></section>`; }
+      <div class="tn-mood"><span>مزاجك الليلة<small>الأعداد مما تبدأه الآن من «سأشاهده»</small></span><div class="gchips tn-c" data-drag>${chip(-1, 'أي تصنيف', total)}${moodOrder.map(([g, c]) => chip(g, gn(g), c)).join('')}</div></div>${hint ? `<p class="tn-h">${hint}</p>` : ''}</div></section>`; }
 
 // ---------- القوائم والشبكة
 function renderLists() { const n = l => inList(l).length, log = hasLog();
@@ -215,7 +219,7 @@ const arHit = (a, q) => { if (!a?.an || !isArQ(q)) return ''; const k = arKey(q)
 const hay = a => a.h ||= fold(`${a.t} ${a.en || ''} ${a.studio || ''} ${a.y || ''}`);
 function visible() { const log = hasLog(), list = log ? ui.list : 'all'; let l = D.list.filter(a => list === 'all' ? mine(a) : P.a[a.id]?.s === list);
   if (ui.type) l = l.filter(a => a.type === ui.type);
-  D.pool = l; if (ui.genre >= 0) l = l.filter(a => (a.g || []).includes(ui.genre));   // pool: ما قبل التصنيف، منه أعداد شريط التصنيفات
+  D.pool = l; if (ui.genres.length) l = l.filter(hasAll);   // pool: ما قبل التصنيفات، منه أعداد شريطها. والمختار منها يجتمع كله في العمل (E76)
   D.found = null; const q = fold(ui.q || '').trim();
   if (q) { const hit = l.filter(a => hay(a).includes(q) || arHit(a, ui.q)); if (hit.length) l = hit; else { const r = find(D.prep ||= prepare(D.list.filter(mine), a => [a.t, a.en, ...(a.an || [])]), ui.q, { limit: 12, min: 50 }); const ids = new Set(r.hits.map(h => h.id)); l = l.filter(a => ids.has(a.id)); D.found = r.meant?.name || null; } }
   const sc = a => me(a.id)?.r || 0, ratio = a => { const m = me(a.id); return a.eps && m?.p ? m.p / a.eps : 0; }, ord = (a, b) => (a.ord ?? 1e9) - (b.ord ?? 1e9) || a.id - b.id;
@@ -224,9 +228,9 @@ function visible() { const log = hasLog(), list = log ? ui.list : 'all'; let l =
   return l.sort(S[ui.sort] || ord); }
 let cur = [];
 function renderGrid(keepShown) { cur = visible(); if (!keepShown) ui.shown = 60; const g = $('#grid'), log = hasLog();
-  $('#count').innerHTML = !D.list.length ? '' : ui.view === 'worlds' ? `${count(D.worlds.length, ['سلسلة واحدة', 'سلسلتان', 'سلاسل', 'سلسلة', 'سلسلة'])} فيها أعمال من قائمتك، الأكثر حضوراً فيها أولاً` : `${nWorks(cur.length)}${ui.genre >= 0 ? ` من تصنيف ${genreOf(D.genres[ui.genre])}` : ''}${ui.q ? ` تطابق «${esc(ui.q)}»` : ''}${D.found ? `، هل تقصد ${ltr(D.found)}؟` : ''}${log ? '' : ' · بلا سجل على هذا الجهاز'}`;
+  $('#count').innerHTML = !D.list.length ? '' : ui.view === 'worlds' ? `${count(D.worlds.length, ['سلسلة واحدة', 'سلسلتان', 'سلاسل', 'سلسلة', 'سلسلة'])} فيها أعمال من قائمتك، الأكثر حضوراً فيها أولاً` : `${nWorks(cur.length)}${gsay()}${ui.q ? ` تطابق «${esc(ui.q)}»` : ''}${D.found ? `، هل تقصد ${ltr(D.found)}؟` : ''}${log ? '' : ' · بلا سجل على هذا الجهاز'}`;
   g.innerHTML = cur.length ? cur.slice(0, ui.shown).map((a, i) => celHTML(a, 'grid', i)).join('') + (cur.length > ui.shown ? '<i class="more" id="more"></i>' : '')
-    : `<p class="none">${ui.q ? 'لا عمل في هذه القائمة يطابق ما كتبت.' : log ? 'هذه القائمة فارغة.' : 'تُحمَّل القائمة…'}</p>`;
+    : `<p class="none">${ui.q ? 'لا عمل في هذه القائمة يطابق ما كتبت.' : ui.genres.length > 1 ? 'لا عمل في هذه القائمة يجمع هذه التصنيفات كلها.' : log ? 'هذه القائمة فارغة.' : 'تُحمَّل القائمة…'}</p>`;
   const more = $('#more'); if (more) moreIO.observe(more); renderGenres(); }
 // ---------- شريط التصنيفات: تصنيفات القائمة الظاهرة بأعدادها، الأكثر أولاً، ولكل تصنيف لون ثابت يُعرف به. لمسة تفرز بها الشبكة ولمسة ثانية ترفع الفرز،
 // ويُسحب بالماوس كبقية الشرائط (site/rail.js). الأعداد من القائمة والنوع المختارين قبل التصنيف (D.pool)
@@ -234,11 +238,16 @@ function renderGrid(keepShown) { cur = visible(); if (!keepShown) ui.shown = 60;
 const gmq = matchMedia('(max-width: 700px)'), placeChips = () => { const g = $('#gchips'); if (!g) return; if (gmq.matches) { if (g.nextElementSibling?.id !== 'count') $('#count').before(g); g.classList.add('out'); } else { $('#tools .names').before(g); g.classList.remove('out'); } };
 gmq.addEventListener('change', placeChips);
 const ghue = n => { let h = 7; for (const c of String(n)) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
-function renderGenres() { const box = $('#gchips'); if (!box) return; const n = new Map(); for (const a of D.pool || []) for (const g of a.g || []) n.set(g, (n.get(g) || 0) + 1);
-  const gs = [...n].sort((a, b) => b[1] - a[1] || a[0] - b[0]); if (ui.genre >= 0 && !n.has(ui.genre)) gs.unshift([ui.genre, 0]);
-  const x = box.scrollLeft, chip = (g, name, c) => `<button type="button" data-act="genre" data-g="${g}" aria-pressed="${ui.genre === g}"${g >= 0 ? ` style="--gh:${ghue(D.genres[g])}"` : ''}>${name}${c != null ? `<b>${num(c)}</b>` : ''}</button>`;
-  box.innerHTML = chip(-1, 'كل التصنيفات') + gs.map(([g, c]) => chip(g, genreOf(D.genres[g]), c)).join(''); box.scrollLeft = x;
-  const on = box.querySelector('[aria-pressed=true]'); if (on && ui.genre >= 0) { const r = on.getBoundingClientRect(), b = box.getBoundingClientRect(); if (r.left < b.left || r.right > b.right) on.scrollIntoView({ block: 'nearest', inline: 'center', behavior: calm ? 'auto' : 'smooth' }); } }
+// تختار منه تصنيفاً أو أكثر كمزاج «اقتراح الليلة» (E76): لمسة تضيف ولمسة ترفع، و«كل التصنيفات» يرفعها كلها، والشبكة ما يجمع المختار كله.
+// المختار أولاً بلا عدد (عدده في سطر العدّ)، وعدد كل تصنيف غيره: كم عملاً يبقى إن أضفته، وما لا يجتمع مع المختار لا يظهر. jump: بعد لمسة، يعود الشريط إلى أوله
+const hasAll = a => ui.genres.every(g => (a.g || []).includes(g));
+const gsay = () => { const l = ui.genres.map(g => genreOf(D.genres[g])); return !l.length ? '' : l.length === 1 ? ` من تصنيف ${l[0]}` : ` من تصنيف${l.length === 2 ? 'َي' : 'ات'} ${l.join(' و')} معاً`; };
+function renderGenres(jump) { const box = $('#gchips'); if (!box) return; const sel = ui.genres, n = new Map();
+  for (const a of D.pool || []) if (hasAll(a)) for (const g of a.g || []) if (!sel.includes(g)) n.set(g, (n.get(g) || 0) + 1);
+  const gs = [...n].sort((a, b) => b[1] - a[1] || a[0] - b[0]);
+  const x = box.scrollLeft, chip = (g, name, c) => `<button type="button" data-act="genre" data-g="${g}" aria-pressed="${g < 0 ? !sel.length : sel.includes(g)}"${g >= 0 ? ` style="--gh:${ghue(D.genres[g])}"` : ''}>${name}${c != null ? `<b>${num(c)}</b>` : ''}</button>`;
+  box.innerHTML = chip(-1, 'كل التصنيفات') + sel.map(g => chip(g, genreOf(D.genres[g]))).join('') + gs.map(([g, c]) => chip(g, genreOf(D.genres[g]), c)).join('');
+  if (jump) box.scrollTo({ left: 0, behavior: calm ? 'auto' : 'smooth' }); else box.scrollLeft = x; }
 const moreIO = new IntersectionObserver(es => { if (!es.some(e => e.isIntersecting)) return; moreIO.disconnect(); const from = ui.shown; ui.shown += 60; const more = $('#more'); if (!more) return;
   more.insertAdjacentHTML('beforebegin', cur.slice(from, ui.shown).map((a, i) => celHTML(a, 'grid', i)).join('')); if (cur.length > ui.shown) moreIO.observe(more); else more.remove(); }, { rootMargin: '900px' });
 function setView(v) { ui.view = v; $$('.views button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
@@ -344,14 +353,27 @@ function sheetHTML(a, x) { if (x?.ar) unask(a.id, 'about'); const big = a.tp ? `
 // السجل: كل نافذة يفتحها الموقع خطوة فيه، وحالتها تصف ما هو مفتوح عندها: a العمل، وw السلسلة التي تحته إن فُتح منها، وp أنها خطوة أضافها الموقع فإغلاق نافذتها رجوع.
 // الرابط المباشر والعنوان المكتوب أو الملصوق باليد خطوة بلا حالة: يُقرأ ما يُفتح من الرابط نفسه (at)، وإغلاق نافذتها يغلقها وينظف الرابط (shut).
 // والبطاقة فوق سلسلتها دائماً، ولا تُفتح سلسلة فوق بطاقة: فتح السلسلة من بطاقة يطويها (stash) والرجوع يعيدها كما كانت (reshow)
-async function openWork(id, push = true) { const a = D.by.get(id); if (!a) return; open = id; pkOpen = 0; kept = null; const d = $('#sheet'), body = $('#sheet-body');
+// بطاقة فوق بطاقة (E77): ما يُفتح من بطاقة مفتوحة خطوة جديدة في السجل (c: عدد البطاقات في المكدس، b: التي قبلها)، فالرجوع (زره فوق بجانب ×،
+// أو رجوع المتصفح والجوال، أو Esc) يعيد البطاقة السابقة إلى موضعها كما تُركت، و× يغلقها كلها. back: ما حُفظ من البطاقة حين تُركت (موضعها وحلقاتها)
+const CARD = new Map();
+const leaveCard = () => { const id = open || pkOpen, body = $('#sheet-body'); if (!$('#sheet').open || !id) return 0;
+  CARD.set(depth(), { id, t: body.querySelector('h2')?.textContent || '', y: body.scrollTop, xs: open && X.id === open ? { from: X.from, all: X.all, open: X.open } : null }); return id; };
+const onTop = from => ({ ...(history.state?.p ? history.state : {}), p: 1, n: depth() + 1, c: (history.state?.p ? history.state.c || 1 : 1) + 1, b: from });
+function syncBack() { const btn = $('#sheet .sback'); if (!btn) return; const st = history.state || {}, on = !!($('#sheet').open && st.p && (st.c || 1) > 1), left = CARD.get(depth() - 1);
+  const t = !on ? '' : left?.id === st.b && left.t ? left.t : D.by.has(st.b) ? title(D.by.get(st.b)) : SEED.get(st.b)?.t || '', say = t ? `رجوع إلى «${t}»` : 'رجوع إلى البطاقة السابقة';   // باسمها كما ظهر
+  btn.hidden = !on; btn.setAttribute('aria-label', say); btn.title = say; }
+async function openWork(id, push = true, back = null) { const a = D.by.get(id); if (!a) return; const d = $('#sheet'), body = $('#sheet-body');
+  if (d.open && push && open === id) return;   // البطاقة نفسها
+  const from = d.open && push ? leaveCard() : 0; open = id; pkOpen = 0; kept = null;
   // فوق بوابة عالم تلبس البطاقة ألوانه
   const gw = GM && $('#wsheet').open && D.wby.get(wopen), th = gw && themeOf(gw, D.by, D.genres); d.classList.toggle('themed', !!th); if (th) { d.style.setProperty('--wbg', th.bg); d.style.setProperty('--wc1', th.c1); } delete body.dataset.full; markEl(body, a.id, a.ad); body.innerHTML = sheetHTML(a, null); body.scrollTo(0, 0); showEps(a);
-  if (!d.open) { d.showModal(); body.scrollTo(0, 0); if (push) history.pushState({ a: id, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1, n: depth() + 1 }, '', `#a${id}`); }   // التصفير بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
-  else if (push) history.replaceState(history.state?.p ? { ...history.state, a: id } : null, '', `#a${id}`);
+  if (!d.open) { d.showModal(); body.scrollTo(0, 0); if (push) history.pushState({ a: id, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1, n: depth() + 1, c: 1 }, '', `#a${id}`); }   // التصفير بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
+  else if (push) history.pushState({ ...onTop(from), a: id, pk: 0 }, '', `#a${id}`);
+  syncBack(); if (back) body.scrollTop = back.y;
   if (a.pending) { const v = await liveOf(id); if (open !== id) return; if (v && fillPending(a, v)) { keepLive(id, v); renderAll(true); }
-    const top = body.scrollTop; markEl(body, a.id, a.ad); body.innerHTML = sheetHTML(a, v ? { ...v.x, live: 1 } : { failed: 1 }); body.scrollTop = top; body.dataset.full = id; return; }
-  const x = await texts(id); if (open !== id) return; if (x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; showEps(a); } body.dataset.full = id; }
+    const top = body.scrollTop; markEl(body, a.id, a.ad); body.innerHTML = sheetHTML(a, v ? { ...v.x, live: 1 } : { failed: 1 }); body.scrollTop = back ? back.y : top; body.dataset.full = id; return; }
+  const x = await texts(id); if (open !== id) return; if (x) { const top = body.scrollTop; body.innerHTML = sheetHTML(a, x); body.scrollTop = top; showEps(a); } body.dataset.full = id;
+  if (back) { if (back.xs && X.id === id && X.list) { Object.assign(X, back.xs); drawXs(a); } body.scrollTop = back.y; } }   // الرجوع إليها: حلقاتها كما تُركت، ثم موضعها
 const stash = () => { const d = $('#sheet'); if (!d.open) return; kept = { id: open, y: $('#sheet-body').scrollTop }; d.close(); };
 function reshow() { const a = D.by.get(kept.id), body = $('#sheet-body'), y = kept.y; kept = null; open = a.id; $('#sheet').showModal(); body.scrollTop = y; const box = body.querySelector('.mine'); if (box) box.outerHTML = mineHTML(a); drawXs(a); }
 const at = () => { const st = history.state; if (st && (st.a || st.w || st.imp || st.add)) return st; const h = location.hash.slice(1); let m; return (m = h.match(/^a(\d+)$/)) ? { a: +m[1] } : (m = h.match(/^w(\d+)$/)) ? { w: +m[1] } : {}; };
@@ -362,9 +384,14 @@ function apply(st) { const sh = $('#sheet'), ws = $('#wsheet'), a = D.by.has(+st
   if (sh.open && ((!a && !pk) || (w && !ws.open))) stash();
   if (ws.open && !w) ws.close();
   if (w && (wopen !== w || !ws.open)) openWorld(w, false);
-  if (a && (open !== a || !sh.open)) { if (!sh.open && kept?.id === a && +$('#sheet-body').dataset.full === a) reshow(); else openWork(a, false); }
-  else if (pk && (pkOpen !== pk || !sh.open)) peekWork(pk, false); }
+  const back = CARD.get(depth()), mine = x => back?.id === x ? back : null;
+  if (a && (open !== a || !sh.open)) { if (!sh.open && kept?.id === a && +$('#sheet-body').dataset.full === a) reshow(); else openWork(a, false, mine(a)); }
+  else if (pk && (pkOpen !== pk || !sh.open)) peekWork(pk, false, null, mine(pk));
+  syncBack(); }
 const shut = d => { if (history.state?.p) return history.back(); d.close(); if (/^#[aw]\d+$/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); };
+// × البطاقة يغلق مكدسها كله (E77): يرجع إلى أول بطاقة فيه ثم يغلقها كما تُغلق وحدها، فلا يبقى في السجل ما يعيد فتح شيء منها
+let shutAll = false;
+const shutCards = d => { const c = d.id === 'sheet' && history.state?.p ? history.state.c || 1 : 1; if (c < 2) return shut(d); shutAll = true; history.go(-(c - 1)); };
 
 // ---------- من MyAnimeList مباشرة (E69): عمل ليس في «أنمياتي» تُفتح له بطاقة اطلاع (peek) من نتائج البحث ومن أقرباء ما أُضيف، وعمل أُضيف للتو تمتلئ
 // بطاقته المؤقتة بدل أن تبقى فارغة حتى البناء القادم. يُسأل Jikan وAniList معاً، ولكلٍّ مهلته: Jikan لما في MyAnimeList نفسه (النبذة والتقييم والتصنيفات
@@ -427,17 +454,19 @@ function liveMore(a, x) { const seen = new Set(), rel = (x.rel || []).filter(r =
     + (stream.length ? `<section class="sec where"><h3>منصاته الرسمية</h3><div class="wl">${stream.map(s => `<a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.n)}</a>`).join('')}</div><p class="lbl">كما يذكرها ${MAL}، وقد لا يكون كلها متاحاً في السعودية${a.pending ? '. أماكن عرضه في السعودية تظهر مع البناء القادم' : ''}.</p></section>` : ''); }
 // بطاقة اطلاع: تُفتح فوراً بما يُعرف عن العمل (من نتيجة البحث أو من قريبه) وتمتلئ حين يعود MyAnimeList. فوق نافذة البحث أو فوق البطاقة التي فُتحت منها،
 // وكل منها خطوة في السجل، فالرجوع يعيدك إلى ما كنت فيه. وما دخل «أنمياتي» تُفتح بطاقته هو
-async function peekWork(id, push = true, seed = null) { if (D.by.has(id)) return openWork(id, push); if (!(id > 0) || D.known.has(id)) return;
+async function peekWork(id, push = true, seed = null, back = null) { if (D.by.has(id)) return openWork(id, push, back); if (!(id > 0) || D.known.has(id)) return;
   const d = $('#sheet'), body = $('#sheet-body'), s0 = seed?.id === id ? seed : null; if (s0?.ad && !isOpen()) return;
-  open = 0; kept = null; pkOpen = id; d.classList.remove('themed'); delete body.dataset.full;
+  if (d.open && push && pkOpen === id) return;   // البطاقة نفسها
+  const from = d.open && push ? leaveCard() : 0; open = 0; kept = null; pkOpen = id; d.classList.remove('themed'); delete body.dataset.full;
   const draw = (a, x) => { markEl(body, id, a.ad); body.innerHTML = sheetHTML(a, x); };
   const stub = { id, t: s0?.t || String(id), ...(s0?.en ? { en: s0.en } : {}), type: s0?.type || '', eps: s0?.eps || 0, ...(s0?.y ? { y: +s0.y } : {}), ...(/^\d+\/\d+$/.test(s0?.im || '') ? { img: s0.im } : s0?.iu ? { iu: s0.iu } : {}), ...(s0?.ad ? { ad: 1 } : {}), pk: 1 };
-  draw(stub, null); const step = { ...(history.state?.p ? history.state : {}), a: id, pk: 1, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1, n: depth() + 1 };
+  draw(stub, null); const step = d.open ? { ...onTop(from), a: id, pk: 1 } : { ...(history.state?.p ? history.state : {}), a: id, pk: 1, w: $('#wsheet').open ? wopen : 0, add: $('#addd').open ? 1 : 0, p: 1, n: depth() + 1, c: 1 };
   if (!d.open) { d.showModal(); body.scrollTo(0, 0); if (push) history.pushState(step, '', `#a${id}`); } else { body.scrollTo(0, 0); if (push) history.pushState(step, '', `#a${id}`); }
+  syncBack();
   const v = await liveOf(id); if (pkOpen !== id || !d.open) return;
   if (!v) return draw(stub, { failed: 1 });
   if (v.a.ad && !isOpen()) { pkOpen = 0; shut(d); toast('لا يُعرض هذا العمل الآن.'); return; }
-  const top = body.scrollTop; draw({ ...v.a, pk: 1 }, { ...v.x, live: 1 }); body.scrollTop = top; }
+  const top = body.scrollTop; draw({ ...v.a, pk: 1 }, { ...v.x, live: 1 }); body.scrollTop = back ? back.y : top; }
 
 // ---------- ورقة التوقيت: حلقات العمل. تفتح على الحلقة التالية وما حولها، و«كل الحلقات» تفتح الورقة كلها صفحةً صفحة.
 // fit من البناء: 'odd' عدد الحلقات هنا أقل بقليل من عدد MyAnimeList (تنبيه)، و'loose' المصدر يعدّها عدّاً آخر، فلا يقابل رقمُ الخانة رقمَ الحلقة
@@ -754,14 +783,15 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'ep-page': X.from = +d.from; X.open = 0; drawXs(D.by.get(open)); $('#xs')?.scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' }); break;
     case 'list': ui.list = d.l; keep(); if (ui.view !== 'list') setView('list'); renderLists(); renderGrid(); if (t.closest('.rail')) $('.bar').scrollIntoView({ behavior: calm ? 'auto' : 'smooth' }); break;
     case 'view': setView(d.v); break;
-    case 'genre': ui.genre = +d.g === ui.genre ? -1 : +d.g; renderGrid(); break;
+    case 'genre': { const g = +d.g; ui.genres = g < 0 ? [] : ui.genres.includes(g) ? ui.genres.filter(x => x !== g) : [...ui.genres, g]; renderGrid(); renderGenres(true); break; }
     case 'amood': { const g = +d.g; amoods = g < 0 ? [] : amoods.includes(g) ? amoods.filter(x => x !== g) : [...amoods, g]; store.set('anime.mood', amoods.join()); renderTonight(true); break; }
     case 'treroll': renderTonight(true); break;
     case 'genre-go': showGenre(+d.g); break;
-    case 'world': if ($('#sheet').open && $('#wsheet').open && wopen === +d.w) shut($('#sheet')); else { stash(); openWorld(+d.w, true, t.closest('.wc') || t); } break;   // سلسلته هي المفتوحة تحته: إغلاق البطاقة يكشفها
+    case 'world': if ($('#sheet').open && $('#wsheet').open && wopen === +d.w) shutCards($('#sheet')); else { stash(); openWorld(+d.w, true, t.closest('.wc') || t); } break;   // سلسلته هي المفتوحة تحته: إغلاق البطاقة يكشفها
     case 'gw-order': case 'gw-line': { const w = D.wby.get(wopen), sec = $('#gw-line'); if (!w || !GM || !sec) break; if (d.act === 'gw-order') GM.setView('order', d.o); else GM.setView('line', +d.l);
       const y = $('#wsheet-body').scrollTop; sec.outerHTML = GM.timelineHTML(w); $('#wsheet-body').scrollTop = y; break; }
-    case 'close': shut(t.closest('dialog')); break;
+    case 'close': shutCards(t.closest('dialog')); break;
+    case 'back': history.back(); break;   // البطاقة السابقة (E77)
     case 'import': openImport(); break;
     case 'add': openAdd(); break;
     case 'room': toggleEye(); break;                                             // العين: ترفع الفلتر أو تعيده (site/adult.js)
@@ -801,18 +831,19 @@ let qT = 0; $('#q').addEventListener('input', e => { clearTimeout(qT); qT = setT
 document.addEventListener('dragover', e => { const z = e.target.closest?.('#drop'); if (z) { e.preventDefault(); z.classList.add('over'); } });
 document.addEventListener('dragleave', e => e.target.closest?.('#drop')?.classList.remove('over'));
 document.addEventListener('drop', e => { const z = e.target.closest?.('#drop'); if (z) { e.preventDefault(); z.classList.remove('over'); readFile(e.dataTransfer.files[0]); } });
-// الرجوع (زر المتصفح أو إيماءة الجوال) يغلق النافذة المفتوحة، وEsc مثله
+// الرجوع (زر المتصفح أو إيماءة الجوال) يغلق النافذة المفتوحة، وEsc مثله. والبطاقة المفتوحة من بطاقة يرجع منها إلى التي قبلها (E77)، و× يغلقها كلها
 for (const d of $$('dialog')) { d.addEventListener('cancel', e => { e.preventDefault(); shut(d); });
   d.addEventListener('close', () => { if (d.open) return; if (d.id === 'sheet') { open = 0; pkOpen = 0; } if (d.id === 'wsheet') { wopen = 0; d.classList.remove('in'); } if (d.id === 'imp') IMP.simkl = null; });   // ما أُغلق وأُعيد فتحه في اللحظة نفسها مفتوح
-  d.addEventListener('click', e => { if (e.target === d) shut(d); }); }
-addEventListener('popstate', () => { apply(at()); if (leaving && !history.state?.p) { const f = leaving; leaving = null; f(); } });
+  d.addEventListener('click', e => { if (e.target === d) shutCards(d); }); }
+addEventListener('popstate', () => { if (shutAll) { shutAll = false; return shut($('#sheet')); }   // × من بطاقة فوق بطاقات: وصل إلى أولها، فتُغلق
+  apply(at()); if (leaving && !history.state?.p) { const f = leaving; leaving = null; f(); } });
 // عمق النوافذ في السجل: كل نافذة يفتحها الموقع خطوة عليه (n). والخروج من النوافذ كلها إلى الصفحة يرجع بعددها فلا يبقى في السجل ما يعيد فتحها
 const depth = () => history.state?.n || 0;
 let leaving = null;
 function leaveTo(fn) { const k = depth(); if (k) { leaving = fn; history.go(-k); return; }
   for (const id of ['#sheet', '#wsheet', '#addd', '#imp']) if ($(id).open) $(id).close(); if (location.hash) history.replaceState(null, '', location.pathname + location.search); fn(); }
 // تصنيف من بطاقة عمل: يخرج إلى «أنمياتي» ويفرز قائمتك كلها بذلك التصنيف
-function showGenre(g) { leaveTo(() => { ui.genre = g; ui.list = hasLog() ? 'all' : ui.list; ui.type = ''; $('#type').value = ''; ui.q = ''; $('#q').value = ''; if (ui.view !== 'list') setView('list'); renderLists(); renderGrid();
+function showGenre(g) { leaveTo(() => { ui.genres = [g]; ui.list = hasLog() ? 'all' : ui.list; ui.type = ''; $('#type').value = ''; ui.q = ''; $('#q').value = ''; if (ui.view !== 'list') setView('list'); renderLists(); renderGrid();
   requestAnimationFrame(() => $('#count').scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' })); }); }
 
 // ---------- الإقلاع

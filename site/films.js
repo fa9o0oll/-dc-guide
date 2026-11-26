@@ -177,14 +177,18 @@ const fits = (gs, ms) => ms.filter(m => gs.includes(m)).length;
 function moodChips() { const n = {}; for (const f of D.films) if (tonightOk(f)) for (const g of f.genres) if (GENRES[g]) n[g] = (n[g] || 0) + 1;
   moods = moods.filter(g => n[g]);
   const all = D.films.filter(tonightOk).length, chip = (g, t, c) => `<button type="button" class="chip" data-act="mood" data-g="${g}" aria-pressed="${String(g ? moods.includes(g) : !moods.length)}">${t}<small>${c}</small></button>`;
-  $('#mood').innerHTML = chip('', 'أي نوع', all) + Object.entries(n).sort((a, b) => b[1] - a[1]).map(([g, c]) => chip(g, GENRES[g], c)).join(''); }
+  // المختار أولاً، فلا يبقى منه شيء خارج الشريط لا يُرى (E76)، ثم البقية بأعدادها
+  $('#mood').innerHTML = chip('', 'أي نوع', all) + [...moods.map(g => [g, n[g]]), ...Object.entries(n).filter(([g]) => !moods.includes(g)).sort((a, b) => b[1] - a[1])].map(([g, c]) => chip(g, GENRES[g], c)).join(''); }
 function reroll(first) { const ok = f => tonightOk(f) && f.id !== tonightId, ms = moods.map(Number);
   let pool = D.films.filter(f => ok(f) && match(f)); if (!pool.length) pool = D.films.filter(ok);
   let best = 0; if (ms.length) { for (const f of pool) best = Math.max(best, fits(f.genres, ms)); if (best) pool = pool.filter(f => fits(f.genres, ms) === best); }
-  const hint = $('#mood-hint'); hint.hidden = ms.length < 2; if (ms.length >= 2) hint.textContent = best === ms.length ? `فيلم يجمع ${ms.map(g => GENRES[g]).join(' و')}.` : best ? `لا فيلم في قائمتك يجمعها كلها، فهذا أقربها: يجمع ${best} من ${ms.length}.` : 'لا فيلم في قائمتك من هذه الأنواع.';
-  const box = $('#tonight'); if (!pool.length) { if (first || !tonightId) box.hidden = true; return; }
+  const hint = $('#mood-hint'); hint.hidden = ms.length < 2;
+  const box = $('#tonight'); if (!pool.length) { if (ms.length >= 2) hint.textContent = 'لا فيلم في قائمتك من هذه الأنواع.'; if (first || !tonightId) box.hidden = true; return; }
   const next = pool.filter(f => st(f.id) === 'next'), strong = pool.filter(f => f.rating >= 7 && f.votes >= 500);
   const from = first && next.length ? next : strong.length >= 5 ? strong : pool, f = from[Math.floor(Math.random() * from.length)];
+  // وأقرب ما وُجد حين لا فيلم يجمعها كلها: يقال ما فيه منها وما ليس فيه بأسمائها (E76)
+  if (ms.length >= 2) { const has = ms.filter(g => f.genres.includes(g)), miss = ms.filter(g => !has.includes(g));
+    hint.textContent = best === ms.length ? `فيلم يجمع ${ms.map(g => GENRES[g]).join(' و')}.` : best ? `لا فيلم في قائمتك يجمعها كلها، فهذا أقربها: يجمع ${best} من ${ms.length}، فيه ${has.map(g => GENRES[g]).join(' و')} وليس فيه ${miss.map(g => GENRES[g]).join(' ولا ')}.` : 'لا فيلم في قائمتك من هذه الأنواع.'; }
   tonightId = f.id; box.hidden = false; $('h2', box).textContent = f.title;
   // أنواع المزاج المختارة أولاً (فيظهر ما جمعه الفيلم منها)، ثم غيرها حتى نوعين، وثلاثة إن جمع ثلاثة مما اخترت
   const hit = f.genres.filter(g => moods.includes(String(g))), gs = [...hit, ...f.genres.filter(g => !moods.includes(String(g)))].filter(g => GENRES[g]).slice(0, Math.min(3, Math.max(2, hit.length)));

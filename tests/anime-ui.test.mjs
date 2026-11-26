@@ -91,7 +91,10 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await tap('#tonight [data-g="0"]'); T = await tn();
   check('مزاجان: لمسة تضيف الثاني، والاقتراح ما يجمعهما ويقال ذلك', T.id === '13271' && T.on === '0,1' && /^عمل يجمع /.test(T.hint), T);
   await tap('#tonight [data-g="2"]'); T = await tn();
-  check('ثلاثة لا يجمعها عمل: يُقدَّم أقربها ويقال كم يجمع', ['13271', '22297'].includes(T.id) && T.on === '0,1,2' && /يجمع 2 من 3/.test(T.hint), T);
+  check('ثلاثة لا يجمعها عمل: يُقدَّم أقربها، ويقال كم يجمع وما فيه منها وما ليس فيه بأسمائها (E76)', ['13271', '22297'].includes(T.id) && T.on === '0,1,2' && /يجمع 2 من 3، فيه .+ وليس فيه .+\.$/.test(T.hint)
+    && (T.id === '13271' ? /فيه أكشن ومغامرات وليس فيه كوميديا/ : /فيه أكشن وكوميديا وليس فيه مغامرات/).test(T.hint), T);
+  check('والمختار من المزاج أول الشريط بترتيب اختياره، فلا يبقى منه شيء لا يُرى، وتحت العنوان من أين أعداده', T.chips.split(',').slice(0, 4).map(x => x.split(':')[0]).join() === '-1,1,0,2'
+    && await page.evaluate(() => /مما تبدأه الآن من «سأشاهده»/.test(document.querySelector('#tonight .tn-mood > span small')?.textContent || '')), T.chips);
   await tap('#tonight [data-g="1"]'); T = await tn();
   check('لمسة ثانية على تصنيف ترفعه، والمزاج يُحفظ', T.id === '22297' && T.on === '0,2' && await page.evaluate(() => localStorage.getItem('anime.mood')) === '0,2', T);
   await tap('#tonight [data-g="-1"]'); T = await tn();
@@ -179,6 +182,37 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check('تصنيف من البطاقة يفرز قائمتك كلها به ويغلق البطاقة بلا أثر في السجل', await page.evaluate(g => !location.hash && !history.state?.p && document.querySelector('#lists [data-l=all]').getAttribute('aria-pressed') === 'true'
       && document.querySelector(`#gchips [data-g="${g}"]`)?.getAttribute('aria-pressed') === 'true' && /من تصنيف/.test(document.querySelector('#count').textContent), g)); }
   await tap('#gchips [data-g="-1"]');
+  // شريط التصنيفات (E76): يُختار منه أكثر من تصنيف كمزاج الاقتراح، والشبكة ما يجمعها كلها. المختار أولاً بلا عدد، وعدد غيره كم يبقى إن أضفته، وما لا يجتمع معه لا يظهر
+  { const GX = new Map(FX.anime.map(a => [a.id, a.g || []])), cells = () => page.$$eval('#grid .cel', c => c.map(x => +x.dataset.id));
+    const row = () => page.$$eval('#gchips button[data-g]', b => b.map(x => x.dataset.g + (x.getAttribute('aria-pressed') === 'true' ? '*' : '') + ':' + (x.querySelector('b')?.textContent || '')));
+    const all = await cells(), want = gs => all.filter(id => gs.every(g => GX.get(id).includes(g))).sort((a, b) => a - b).join(), has = (r, g) => r.find(x => x.startsWith(g + ':') || x.startsWith(g + '*:'));
+    await tap('#gchips [data-g="0"]'); let r = await row();
+    check('شريط التصنيفات: تصنيف واحد يفرز به، ويصير أول الشريط بلا عدد، وعدد غيره ما يجمعه معه', (await cells()).sort((a, b) => a - b).join() === want([0]) && r[0] === '-1:' && r[1] === '0*:' && has(r, 1) === `1:${want([0, 1]).split(',').filter(Boolean).length}`, [r, await cells()]);
+    await tap('#gchips [data-g="1"]'); r = await row();
+    check('وتصنيف ثانٍ يضاف إليه كمزاج الاقتراح: الشبكة ما يجمعهما، والعدّ يقول ذلك، وما لا يجتمع معهما يغيب', (await cells()).sort((a, b) => a - b).join() === want([0, 1]) && r.slice(1, 3).join() === '0*:,1*:' && !has(r, 2) && /من تصنيفَي أكشن ومغامرات معاً/.test(await page.textContent('#count')),
+      [r, await cells(), await page.textContent('#count')]);
+    await tap('#gchips [data-g="0"]'); r = await row();
+    check('ولمسة ثانية على المختار ترفعه وحده', (await cells()).sort((a, b) => a - b).join() === want([1]) && r[1] === '1*:' && !r.some(x => x.startsWith('0*')) && /من تصنيف مغامرات/.test(await page.textContent('#count')), [r, await cells()]);
+    await tap('#gchips [data-g="-1"]'); r = await row();
+    check('و«كل التصنيفات» يرفعها كلها', (await cells()).length === all.length && r[0] === '-1*:' && !r.some(x => /\*/.test(x.split(':')[0]) && !x.startsWith('-1')), r); }
+  // بطاقة من بطاقة (E77): ما يُفتح من بطاقة خطوة في السجل، فالرجوع (زره بجانب ×، أو رجوع المتصفح والجوال، أو Esc) يعيد التي قبلها إلى موضعها، و× يغلقها كلها
+  { const strip = id => `#sheet-body .strip button[data-id="${id}"]`, full = id => page.waitForFunction(id => document.querySelector('#sheet-body').dataset.full === id, String(id)), y = () => page.evaluate(() => Math.round(document.querySelector('#sheet-body').scrollTop));
+    await tap('#grid .cel[data-id="11061"] [data-act=open]'); await full(11061); await page.locator(strip(136)).scrollIntoViewIfNeeded(); await page.waitForTimeout(250); const y1 = await y();
+    check('أول بطاقة: لا زر رجوع', await page.evaluate(() => document.querySelector('#sheet .sback').hidden));
+    await tap(strip(136)); await full(136);
+    check('بطاقة من بطاقة: زر رجوع بجانب × باسم التي قبلها، ورابطها رابط الجديدة', await page.evaluate(() => { const b = document.querySelector('#sheet .sback'), r = b.getBoundingClientRect(), x = document.querySelector('#sheet .close:not(.sback)').getBoundingClientRect();
+      return !b.hidden && /^رجوع إلى «Hunter x Hunter \(2011\)»$/.test(b.getAttribute('aria-label')) && location.hash === '#a136' && Math.abs(r.top - x.top) < 2 && r.width >= 40; }));
+    await snap('card-back');
+    await tap('#sheet .sback'); await full(11061); let y2 = await y();
+    check('زر الرجوع يعيد البطاقة السابقة إلى موضعها كما تُركت، ويختفي حين لا بطاقة قبلها', y1 > 100 && Math.abs(y2 - y1) <= 2 && await page.evaluate(() => document.getElementById('sheet').open && document.querySelector('#sheet .sback').hidden && location.hash === '#a11061'), [y1, y2]);
+    await tap(strip(136)); await full(136); await page.goBack(); await full(11061); y2 = await y();
+    check('ورجوع المتصفح والجوال مثله', Math.abs(y2 - y1) <= 2 && await page.evaluate(() => document.getElementById('sheet').open), [y1, y2]);
+    await tap(strip(136)); await full(136); await page.keyboard.press('Escape'); await full(11061);
+    check('وEsc مثله', await page.evaluate(() => document.getElementById('sheet').open && location.hash === '#a11061'));
+    await tap(strip(136)); await full(136); await tap(strip(13271)); await full(13271);
+    check('وثالثة فوقهما: زر الرجوع باسم الثانية', /^رجوع إلى «Hunter x Hunter»$/.test(await page.getAttribute('#sheet .sback', 'aria-label') || ''), await page.getAttribute('#sheet .sback', 'aria-label'));
+    await tap('#sheet .close:not(.sback)'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(250);
+    check('و× يغلقها كلها، ولا يبقى في السجل ما يعيد فتح شيء منها', await page.evaluate(() => !document.getElementById('sheet').open && !location.hash && !history.state?.p)); }
   await page.goto('about:blank'); await page.goto(base + '/anime/#a37989'); await page.waitForSelector('#sheet[open]');
   check('السجل محفوظ بعد إعادة التحميل', (await log())[37989].p === 11 && (await lists())[0] === 'أشاهده الآن 2');
   await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
@@ -262,6 +296,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await tap('#sheet-body .strip.rel button[data-id="56876"]'); await page.waitForFunction(() => location.hash === '#a56876' && /second season/i.test(document.querySelector('#sheet-body .ov.en')?.textContent || ''));
     v = await pk();
     check('وقريب ليس في «أنمياتي» بطاقة اطلاع خطوةً في السجل: ما لا صورة له في MyAnimeList غلافه من AniList، ونبذته من هناك بلا وسومها ولا مصدرها، وموعده سنة بلا شهر: ختم «مستقبلاً» و«العام القادم» (E70)', /s4\.anilist\.co.*cover\/large\/bx182255/.test(v.img) && v.ov === 'The second season of Frieren.' && v.facts.includes(String(NEXT_Y)) && v.air === `مستقبلاً|${NEXT_Y}|العام القادم` && v.rel.join() === 'peek:52991:الجزء السابق', v);
+    check('وزر الرجوع بجانب × باسم البطاقة التي فُتحت منها (E77)', await page.evaluate(() => { const b = document.querySelector('#sheet .sback'); return !b.hidden && b.getAttribute('aria-label') === 'رجوع إلى «Sousou no Frieren»'; }));
     await page.goBack(); await page.waitForFunction(() => location.hash === '#a52991' && document.querySelector('#sheet-body h2')?.textContent === 'Sousou no Frieren');
     await page.goBack(); await page.waitForSelector('#sheet', { state: 'hidden' });
     check('والرجوع يعيد البطاقة التي فُتح منها، ثم يغلقها إلى النافذة', await page.evaluate(() => document.querySelector('#addd').open && location.hash === '#add'));
@@ -448,6 +483,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await tap('#xs .xr[data-n="2"] .xb'); await tap('#xs [data-act=ep-all]');
     check('وتُفتح حلقاتها وتُقرأ كلها', await page.locator('#xs .xr').count() === 30 && await page.locator('#xs .xr[data-n="2"] .xd .ov').count() === 1 && /أول الحلقات فقط/.test(await page.textContent('#xs [data-act=ep-less]')) && (await rec(356)).p === 3, await rec(356));
     await snap('8-episodes-readonly'); await overflow('ورقة التوقيت للقراءة');
+    { const y = () => page.evaluate(() => Math.round(document.querySelector('#sheet-body').scrollTop)), full = id => page.waitForFunction(id => document.querySelector('#sheet-body').dataset.full === id, String(id)), sib = '#sheet-body .strip button[data-id="22297"]';
+      await page.locator(sib).scrollIntoViewIfNeeded(); await page.waitForTimeout(250); const y1 = await y(); await tap(sib); await full(22297); await tap('#sheet .sback'); await full(356); await page.waitForTimeout(150);
+      check('والرجوع إليها من بطاقة فتحتها منها يعيد حلقاتها كما تُركت (كلها، والثانية مفتوحة) وموضعها (E77)', await page.locator('#xs .xr').count() === 30 && await page.locator('#xs .xr[data-n="2"] .xd .ov').count() === 1 && /أول الحلقات فقط/.test(await page.textContent('#xs [data-act=ep-less]')) && Math.abs(await y() - y1) <= 2, [await page.locator('#xs .xr').count(), y1, await y()]); }
     await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
     await tap('#lists [data-l=completed]'); await tap('#grid .cel[data-id="199"] [data-act=open]'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => !!document.querySelector('#sheet-body .where, #sheet-body .links'));
     check('عمل بلا ملف حلقات (فيلم) بلا ورقة توقيت', await page.locator('#xs').count() === 0);

@@ -281,8 +281,10 @@ function menuHTML() { return ORDER.map(k => { const n = k === 'all' ? D.games.le
 function moodHTML() { const n = {}; for (const g of D.games) if (tonightOk(g)) for (const x of g.genres || []) n[x] = (n[x] || 0) + 1; moods = moods.filter(m => n[m]);
   const all = D.games.filter(tonightOk).length, c = (v, t, k) => `<button type="button" class="chip" data-act="mood" data-g="${esc(v)}" aria-pressed="${String(v ? moods.includes(v) : !moods.length)}">${esc(t)}<small>${k}</small></button>`;
   const best = moods.length >= 2 ? fits(D.byId.get(tonightId)?.genres || [], moods) : 0;
-  return all < 2 ? '' : `<div class="mood" role="group" aria-label="مزاجك الليلة"><span class="mood-l">مزاجك الليلة</span><div class="mood-c" data-drag>${c('', 'أي نوع', all)}${Object.entries(n).sort((a, b) => b[1] - a[1]).map(([x, k]) => c(x, x, k)).join('')}</div></div>
-${moods.length >= 2 ? `<p class="mood-hint">${best === moods.length ? `لعبة تجمع ${moods.map(esc).join(' و')}.` : best ? `لا لعبة في قائمتك تجمعها كلها، فهذه أقربها: تجمع ${best} من ${moods.length}.` : 'لا لعبة في قائمتك من هذه الأنواع.'}</p>` : ''}`; }
+  // المختار أولاً، فلا يبقى منه شيء خارج الشريط لا يُرى (E76)؛ وأقرب ما وُجد يقال ما فيه منه وما ليس فيه بأسمائها
+  const gs = D.byId.get(tonightId)?.genres || [], has = moods.filter(m => gs.includes(m)), miss = moods.filter(m => !gs.includes(m));
+  return all < 2 ? '' : `<div class="mood" role="group" aria-label="مزاجك الليلة"><span class="mood-l">مزاجك الليلة</span><div class="mood-c" data-drag>${c('', 'أي نوع', all)}${[...moods.map(m => [m, n[m]]), ...Object.entries(n).filter(([x]) => !moods.includes(x)).sort((a, b) => b[1] - a[1])].map(([x, k]) => c(x, x, k)).join('')}</div></div>
+${moods.length >= 2 ? `<p class="mood-hint">${best === moods.length ? `لعبة تجمع ${moods.map(esc).join(' و')}.` : best ? `لا لعبة في قائمتك تجمعها كلها، فهذه أقربها: تجمع ${best} من ${moods.length}، فيها ${has.map(esc).join(' و')} وليس فيها ${miss.map(esc).join(' ولا ')}.` : 'لا لعبة في قائمتك من هذه الأنواع.'}</p>` : ''}`; }
 function pickTonight(fresh) { const ok = g => tonightOk(g), all = D.games.filter(ok);
   let best = 0; for (const g of all) best = Math.max(best, fits(g.genres || [], moods)); const good = g => ok(g) && (!moods.length || !best || fits(g.genres || [], moods) === best);
   const pool = all.filter(g => good(g) && g.id !== tonightId);

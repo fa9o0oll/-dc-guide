@@ -68,7 +68,7 @@ bdi[dir=ltr]{unicode-bidi:isolate}
 .tn-k{font-size:.86rem;font-weight:600;color:color-mix(in srgb,var(--ac,var(--cel)) 70%,#fff)}
 .tn-m{font-size:.84rem;color:#d7cdea}
 .tn .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.tn-mood{display:grid;gap:6px;margin-top:6px}.tn-mood>span{font-size:.8rem;color:#e7defa}
+.tn-mood{display:grid;gap:6px;margin-top:6px}.tn-mood>span{font-size:.8rem;color:#e7defa}.tn-mood>span small{margin-inline-start:8px;font-size:.72rem;color:#b9aed3}
 .tn-c{flex:none}
 .tn-h{font-size:.82rem;color:#d7cdea}
 @media (max-width:560px){.tn-bd{position:relative;inset:auto;width:100%;height:150px}.tn-bd img{-webkit-mask:linear-gradient(transparent,#000 30%,#000 60%,transparent);mask:linear-gradient(transparent,#000 30%,#000 60%,transparent)}.tn-t{max-width:none;background:none;margin-top:-40px}}
@@ -219,6 +219,8 @@ dialog::backdrop{background:rgba(6,7,22,.8)}
 .scroll{height:100%;max-height:inherit;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 #imp .scroll{max-height:min(92dvh,820px);padding:22px 20px 20px;display:grid;gap:14px}
 .close{position:absolute;z-index:6;inset-block-start:12px;inset-inline-end:12px;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:rgba(12,13,36,.72);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+/* رجوع إلى البطاقة السابقة (E77): بجانب ×، ويظهر حين تُفتح بطاقة من بطاقة */
+.close.sback{inset-inline-end:64px}.close.sback[hidden]{display:none}
 .hero{position:relative;height:clamp(150px,30vw,270px);background:linear-gradient(180deg,#171a48,#4a2f7a 70%,#b3508f)}
 .hero img{width:100%;height:100%;object-fit:cover;display:block}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--bg2) 2%,transparent 60%)}

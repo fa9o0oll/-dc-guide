@@ -113,7 +113,9 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   await page.click('#slot .mood .chip:has-text("أكشن")'); await page.waitForTimeout(300); let M2 = await md();
   check('مزاجان «نجاة» و«أكشن»: الاثنان مضغوطان ومحفوظان، واللعبة تجمعهما ويقال ذلك، ونوعاها أول سطرها', M2.t === 'The Last of Us Part I' && M2.on === ['أكشن', 'نجاة'].sort().join('|') && /^لعبة تجمع نجاة وأكشن\.$/.test(M2.hint) && M2.saved === 'نجاة|أكشن' && /أكشن/.test(M2.meta) && /نجاة/.test(M2.meta), M2);
   await page.click('#slot .mood .chip:has-text("تقمّص أدوار")'); await page.waitForTimeout(300); M2 = await md();
-  check('ثلاثة لا تجمعها لعبة: أقربها (The Last of Us Part I) ويقال كم تجمع', M2.t === 'The Last of Us Part I' && /تجمع 2 من 3/.test(M2.hint), M2);
+  check('ثلاثة لا تجمعها لعبة: أقربها (The Last of Us Part I)، ويقال كم تجمع وما فيها منها وما ليس فيها بأسمائها (E76)', M2.t === 'The Last of Us Part I' && /تجمع 2 من 3، فيها نجاة وأكشن وليس فيها تقمّص أدوار\.$/.test(M2.hint), M2);
+  check('والمختار من المزاج أول الشريط بترتيب اختياره (E76)', await page.evaluate(() => [...document.querySelectorAll('#slot .mood .chip')].slice(0, 4).map(c => c.dataset.g).join('|')) === '|نجاة|أكشن|تقمّص أدوار',
+    await page.evaluate(() => [...document.querySelectorAll('#slot .mood .chip')].map(c => c.dataset.g).join('|')));
   await page.click('#slot .mood .chip:has-text("نجاة")'); await page.waitForTimeout(300); M2 = await md();
   check('لمسة ثانية ترفع النوع، وما بقي لا تجمعه لعبة فيُقدَّم أقربها', M2.on === ['أكشن', 'تقمّص أدوار'].sort().join('|') && ['The Last of Us Part I', 'The Witcher 3: Wild Hunt'].includes(M2.t) && /تجمع 1 من 2/.test(M2.hint), M2);
   await page.click('#slot .mood .chip >> nth=0'); await page.waitForTimeout(200); M2 = await md();

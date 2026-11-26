@@ -51,7 +51,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     await tap('#pick .chip[data-g="Comedy"]'); k = await pk();
     check('Fate: مزاج واحد يأتي بما فيه (Prisma☆Illya أول خطها)', k.on === 'Comedy' && k.id === P.find(x => x.universe === 'illya' && x.position === 1).work && !k.hint, k);
     await tap('#pick .chip[data-g="Mystery"]'); k = await pk();
-    check('Fate: مزاجان لا يجمعهما عمل: يُقدَّم أقربها ويقال كم يجمع، ويُحفظان', k.on === 'Comedy|Mystery' && /يجمع 1 من 2/.test(k.hint) && await page.evaluate(() => localStorage.getItem('fateg.progress.mood')) === 'Comedy|Mystery', k);
+    check('Fate: مزاجان لا يجمعهما عمل: يُقدَّم أقربها ويقال كم يجمع، ويُحفظان', k.on === 'Comedy|Mystery' && /يجمع 1 من 2، فيه .+ وليس فيه .+\.$/.test(k.hint) && await page.evaluate(() => localStorage.getItem('fateg.progress.mood')) === 'Comedy|Mystery', k);
     await tap('#pick .chip[data-g="Comedy"]'); await tap('#pick .chip[data-g="Action"]'); k = await pk();
     check('Fate: لمسة ثانية ترفع التصنيف، ومزاجان يجمعهما عمل يُقال فيه ذلك', k.on === 'Action|Mystery' && k.id === P.find(x => x.universe === 'strangefake' && x.position === 1).work && /^عمل يجمع /.test(k.hint), k);
     await tap('#pick .chip[data-g=""]'); k = await pk(); check('Fate: «أي شيء» يرفعها كلها ويعود إلى الأول', k.on === '' && k.id === P[0].work && !k.hint, k);
@@ -132,6 +132,10 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
       return { on: on.map(x => x.dataset.g).join(), names: on.map(x => x.firstChild.textContent), hint: h.hidden ? '' : h.textContent, meta: document.querySelector('#tonight .meta').textContent, saved: localStorage.getItem('films.mood') || '' }; });
     await tap(`#mood .chip[data-g="${gs[1]}"]`); await tap(`#mood .chip[data-g="${gs[2]}"]`); let m = await mood();
     check('الأفلام: مزاج السهرة بنوعين: الاثنان مضغوطان ومحفوظان، والاقتراح يجمعهما ويقال ذلك ونوعاه أول سطره', m.on === `${gs[1]},${gs[2]}` && /^فيلم يجمع /.test(m.hint) && m.names.every(n => m.meta.includes(n)) && m.saved === m.on, m);
+    await tap(`#mood .chip[data-g="${gs[3]}"]`); m = await mood();
+    check('الأفلام: ثلاثة أنواع: المختار أول الشريط بترتيب اختياره، والسطر إما يجمعها أو يسمّي ما في الفيلم منها وما ليس فيه (E76)', m.on === `${gs[1]},${gs[2]},${gs[3]}` && await page.$$eval('#mood .chip', c => c.slice(1, 4).map(x => x.dataset.g).join()) === m.on
+      && (/^فيلم يجمع /.test(m.hint) || /^لا فيلم في قائمتك يجمعها كلها، فهذا أقربها: يجمع [12] من 3، فيه .+ وليس فيه .+\.$/.test(m.hint)), m);
+    await tap(`#mood .chip[data-g="${gs[3]}"]`);
     await tap(`#mood .chip[data-g="${gs[1]}"]`); m = await mood(); check('الأفلام: لمسة ثانية ترفع النوع', m.on === gs[2] && !m.hint && m.saved === gs[2], m);
     await tap('#mood .chip[data-g=""]'); m = await mood(); check('الأفلام: «أي نوع» يرفعها كلها', m.on === '' && !m.hint && !m.saved, m); }
   check('الأفلام: أجزاء السلسلة متجاورة في «ترتيب قائمتي» بترتيب أحداثها مهما كان ترتيب إضافتها', await page.evaluate(ids => { const all = [...document.querySelectorAll('#grid .tk')].map(e => e.id), at = ids.map(m => all.indexOf('f-m' + m));
