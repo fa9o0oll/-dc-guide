@@ -31,8 +31,8 @@ else {
 const audit = rd(new URL('data/films/worlds-audit.json', root), {}), hide = new Set(audit.hide || []);
 for (const w of Object.values(res.works)) if (w.rel) { w.rel = w.rel.filter(r => !hide.has(r.k)); if (!w.rel.length) delete w.rel; }
 for (const k of hide) if (!Object.values(res.worlds).some(w => w.order.includes(k))) delete res.info[k];
-// ربط البوابات: عمل في القائمة موجود في دليل DC أو Fate (المطابقة برقم IMDb لأنه لا يتكرر بين الأفلام والمسلسلات)
-for (const [door, file] of [['dc', 'site/dc/data/catalog.json'], ['fate', 'site/fate/data/catalog.json']]) {
+// ربط البوابات: عمل في القائمة موجود في دليل DC أو مارفل أو Fate (المطابقة برقم IMDb لأنه لا يتكرر بين الأفلام والمسلسلات)
+for (const [door, file] of [['dc', 'site/dc/data/catalog.json'], ['marvel', 'site/marvel/data/catalog.json'], ['fate', 'site/fate/data/catalog.json']]) {
   const cat = rd(new URL(file, root), { works: [] }), byImdb = new Map((cat.works || []).filter(w => w.imdb).map(w => [w.imdb, w.id]));
   for (const f of films) { const id = f.imdb && byImdb.get(f.imdb); if (id) { const k = keyOf(f); (res.works[k] ||= { worlds: [] }).guide = { door, id }; } } }
 // ---------- ترتيب الأحداث (scripts/lib-chrono.mjs) ----------

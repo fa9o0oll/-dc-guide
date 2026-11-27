@@ -1,0 +1,3154 @@
+[
+ {
+  "id": "eyes-of-wakanda-2025",
+  "title": "Eyes of Wakanda",
+  "year": 2025,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt13968252",
+   "tmdb": 241388
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "captain-america-the-first-avenger-2011",
+  "title": "Captain America: The First Avenger",
+  "year": 2011,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0458339",
+   "tmdb": 1771
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-one-shot-agent-carter-2013",
+  "title": "Marvel One-Shot: Agent Carter",
+  "year": 2013,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3067038",
+   "tmdb": 211387
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "captain-marvel-2019",
+  "title": "Captain Marvel",
+  "year": 2019,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt4154664",
+   "tmdb": 299537
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-2008",
+  "title": "Iron Man",
+  "year": 2008,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0371746",
+   "tmdb": 1726
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-2-2010",
+  "title": "Iron Man 2",
+  "year": 2010,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1228705",
+   "tmdb": 10138
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-incredible-hulk-2008",
+  "title": "The Incredible Hulk",
+  "year": 2008,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0800080",
+   "tmdb": 1724
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-one-shot-a-funny-thing-happened-on-the-way-to-thor-s-hammer-2011",
+  "title": "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer",
+  "year": 2011,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2011109",
+   "tmdb": 76535
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "thor-2011",
+  "title": "Thor",
+  "year": 2011,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0800369",
+   "tmdb": 10195
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-one-shot-the-consultant-2011",
+  "title": "Marvel One-Shot: The Consultant",
+  "year": 2011,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2011118",
+   "tmdb": 76122
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-avengers-2012",
+  "title": "The Avengers",
+  "year": 2012,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0848228",
+   "tmdb": 24428
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-one-shot-item-47-2012",
+  "title": "Marvel One-Shot: Item 47",
+  "year": 2012,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2247732",
+   "tmdb": 119569
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "thor-the-dark-world-2013",
+  "title": "Thor: The Dark World",
+  "year": 2013,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1981115",
+   "tmdb": 76338
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-3-2013",
+  "title": "Iron Man 3",
+  "year": 2013,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1300854",
+   "tmdb": 68721
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-one-shot-all-hail-the-king-2014",
+  "title": "Marvel One-Shot: All Hail the King",
+  "year": 2014,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3438640",
+   "tmdb": 253980
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "captain-america-the-winter-soldier-2014",
+  "title": "Captain America: The Winter Soldier",
+  "year": 2014,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1843866",
+   "tmdb": 100402
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "guardians-of-the-galaxy-2014",
+  "title": "Guardians of the Galaxy",
+  "year": 2014,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2015381",
+   "tmdb": 118340
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "guardians-of-the-galaxy-vol-2-2017",
+  "title": "Guardians of the Galaxy Vol. 2",
+  "year": 2017,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3896198",
+   "tmdb": 283995
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "i-am-groot-2022",
+  "title": "I Am Groot",
+  "year": 2022,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt13623148",
+   "tmdb": 232125
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "avengers-age-of-ultron-2015",
+  "title": "Avengers: Age of Ultron",
+  "year": 2015,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2395427",
+   "tmdb": 99861
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "whih-newsfront-2015",
+  "title": "WHIH Newsfront",
+  "year": 2015,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt5296048",
+   "tmdb": 69069
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ant-man-2015",
+  "title": "Ant-Man",
+  "year": 2015,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0478970",
+   "tmdb": 102899
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "captain-america-civil-war-2016",
+  "title": "Captain America: Civil War",
+  "year": 2016,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3498820",
+   "tmdb": 271110
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "black-widow-2021",
+  "title": "Black Widow",
+  "year": 2021,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3480822",
+   "tmdb": 497698
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "black-panther-2018",
+  "title": "Black Panther",
+  "year": 2018,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1825683",
+   "tmdb": 284054
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-homecoming-2017",
+  "title": "Spider-Man: Homecoming",
+  "year": 2017,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2250912",
+   "tmdb": 315635
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "team-thor-2016",
+  "title": "Team Thor",
+  "year": 2016,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt6016776",
+   "tmdb": 413279
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "doctor-strange-2016",
+  "title": "Doctor Strange",
+  "year": 2016,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1211837",
+   "tmdb": 284052
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "team-thor-part-2-2017",
+  "title": "Team Thor: Part 2",
+  "year": 2017,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt6599818",
+   "tmdb": 441829
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "thor-ragnarok-2017",
+  "title": "Thor: Ragnarok",
+  "year": 2017,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3501632",
+   "tmdb": 284053
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "team-darryl-2018",
+  "title": "Team Darryl",
+  "year": 2018,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt8023090",
+   "tmdb": 505945
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ant-man-and-the-wasp-2018",
+  "title": "Ant-Man and the Wasp",
+  "year": 2018,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt5095030",
+   "tmdb": 363088
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "avengers-infinity-war-2018",
+  "title": "Avengers: Infinity War",
+  "year": 2018,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt4154756",
+   "tmdb": 299536
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "avengers-endgame-2019",
+  "title": "Avengers: Endgame",
+  "year": 2019,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt4154796",
+   "tmdb": 299534
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "loki-2021",
+  "title": "Loki",
+  "year": 2021,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt9140554",
+   "tmdb": 84958
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "what-if-2021",
+  "title": "What If...?",
+  "year": 2021,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt10168312",
+   "tmdb": 91363
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-zombies-2025",
+  "title": "Marvel Zombies",
+  "year": 2025,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt16027014",
+   "tmdb": 138505
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "wandavision-2021",
+  "title": "WandaVision",
+  "year": 2021,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt9140560",
+   "tmdb": 85271
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "shang-chi-and-the-legend-of-the-ten-rings-2021",
+  "title": "Shang-Chi and the Legend of the Ten Rings",
+  "year": 2021,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt9376612",
+   "tmdb": 566525
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-falcon-and-the-winter-soldier-2021",
+  "title": "The Falcon and the Winter Soldier",
+  "year": 2021,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt9208876",
+   "tmdb": 88396
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-far-from-home-2019",
+  "title": "Spider-Man: Far From Home",
+  "year": 2019,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt6320628",
+   "tmdb": 429617
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "peter-s-to-do-list-2019",
+  "title": "Peter's To-Do List",
+  "year": 2019,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt11107678",
+   "tmdb": 758025
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "eternals-2021",
+  "title": "Eternals",
+  "year": 2021,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt9032400",
+   "tmdb": 524434
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-no-way-home-2021",
+  "title": "Spider-Man: No Way Home",
+  "year": 2021,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10872600",
+   "tmdb": 634649
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "doctor-strange-in-the-multiverse-of-madness-2022",
+  "title": "Doctor Strange in the Multiverse of Madness",
+  "year": 2022,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt9419884",
+   "tmdb": 453395
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "hawkeye-2021",
+  "title": "Hawkeye",
+  "year": 2021,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10160804",
+   "tmdb": 88329
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "moon-knight-2022",
+  "title": "Moon Knight",
+  "year": 2022,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10234724",
+   "tmdb": 92749
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "black-panther-wakanda-forever-2022",
+  "title": "Black Panther: Wakanda Forever",
+  "year": 2022,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt9114286",
+   "tmdb": 505642
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "echo-2024",
+  "title": "Echo",
+  "year": 2024,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt13966962",
+   "tmdb": 122226
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "she-hulk-attorney-at-law-2022",
+  "title": "She-Hulk: Attorney at Law",
+  "year": 2022,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10857160",
+   "tmdb": 92783
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ms-marvel-2022",
+  "title": "Ms. Marvel",
+  "year": 2022,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10857164",
+   "tmdb": 92782
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "thor-love-and-thunder-2022",
+  "title": "Thor: Love and Thunder",
+  "year": 2022,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10648342",
+   "tmdb": 616037
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ironheart-2025",
+  "title": "Ironheart",
+  "year": 2025,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt13623126",
+   "tmdb": 114471
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "werewolf-by-night-2022",
+  "title": "Werewolf by Night",
+  "year": 2022,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt15318872",
+   "tmdb": 894205
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-guardians-of-the-galaxy-holiday-special-2022",
+  "title": "The Guardians of the Galaxy Holiday Special",
+  "year": 2022,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt13623136",
+   "tmdb": 774752
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ant-man-and-the-wasp-quantumania-2023",
+  "title": "Ant-Man and the Wasp: Quantumania",
+  "year": 2023,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10954600",
+   "tmdb": 640146
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "guardians-of-the-galaxy-vol-3-2023",
+  "title": "Guardians of the Galaxy Vol. 3",
+  "year": 2023,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt6791350",
+   "tmdb": 447365
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "secret-invasion-2023",
+  "title": "Secret Invasion",
+  "year": 2023,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt13157618",
+   "tmdb": 114472
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-marvels-2023",
+  "title": "The Marvels",
+  "year": 2023,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10676048",
+   "tmdb": 609681
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "deadpool-and-wolverine-2024",
+  "title": "Deadpool & Wolverine",
+  "year": 2024,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt6263850",
+   "tmdb": 533535
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "agatha-all-along-2024",
+  "title": "Agatha All Along",
+  "year": 2024,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt15571732",
+   "tmdb": 138501
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "daredevil-born-again-2025",
+  "title": "Daredevil: Born Again",
+  "year": 2025,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt18923754",
+   "tmdb": 202555
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "captain-america-brave-new-world-2025",
+  "title": "Captain America: Brave New World",
+  "year": 2025,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt14513804",
+   "tmdb": 822119
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "thunderbolts-2025",
+  "title": "Thunderbolts*",
+  "year": 2025,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt20969586",
+   "tmdb": 986056
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-fantastic-4-first-steps-2025",
+  "title": "The Fantastic 4: First Steps",
+  "year": 2025,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10676052",
+   "tmdb": 617126
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "wonder-man-2026",
+  "title": "Wonder Man",
+  "year": 2026,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt21066182",
+   "tmdb": 198178
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-punisher-one-last-kill-2026",
+  "title": "The Punisher: One Last Kill",
+  "year": 2026,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt36042156",
+   "tmdb": 1439930
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-brand-new-day-2026",
+  "title": "Spider-Man: Brand New Day",
+  "year": 2026,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt22084616",
+   "tmdb": 969681
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "visionquest-2026",
+  "title": "VisionQuest",
+  "year": 2026,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt23112594",
+   "tmdb": 213375
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "avengers-doomsday-2026",
+  "title": "Avengers: Doomsday",
+  "year": 2026,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt21357150",
+   "tmdb": 1003596
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "avengers-secret-wars-2027",
+  "title": "Avengers: Secret Wars",
+  "year": 2027,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt21361444",
+   "tmdb": 1003598
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "x-men-2028",
+  "title": "X-Men",
+  "year": 2028,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt29347085",
+   "tmdb": 1293690
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "ghost-rider-2028",
+  "title": "Ghost Rider",
+  "year": 2028,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt43711959",
+   "tmdb": 1738010
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "black-panther-3-2028",
+  "title": "Black Panther 3",
+  "year": 2028,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt37884905",
+   "tmdb": 1386618
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "zodiac-2028",
+  "title": "Zodiac",
+  "year": 2028,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt48452696",
+   "tmdb": 337844
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "your-friendly-neighborhood-spider-man-2025",
+  "title": "Your Friendly Neighborhood Spider-Man",
+  "year": 2025,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt16027074",
+   "tmdb": 138503
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-daredevil-2015",
+  "title": "Marvel's Daredevil",
+  "year": 2015,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3322312",
+   "tmdb": 61889
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-jessica-jones-2015",
+  "title": "Marvel's Jessica Jones",
+  "year": 2015,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2357547",
+   "tmdb": 38472
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-luke-cage-2016",
+  "title": "Marvel's Luke Cage",
+  "year": 2016,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3322314",
+   "tmdb": 62126
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-iron-fist-2017",
+  "title": "Marvel's Iron Fist",
+  "year": 2017,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3322310",
+   "tmdb": 62127
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-the-defenders-2017",
+  "title": "Marvel's The Defenders",
+  "year": 2017,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt4230076",
+   "tmdb": 62285
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-the-punisher-2017",
+  "title": "Marvel's The Punisher",
+  "year": 2017,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt5675620",
+   "tmdb": 67178
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-agent-carter-2015",
+  "title": "Marvel's Agent Carter",
+  "year": 2015,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3475734",
+   "tmdb": 61550
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-agents-of-s-h-i-e-l-d-2013",
+  "title": "Marvel's Agents of S.H.I.E.L.D.",
+  "year": 2013,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2364582",
+   "tmdb": 1403
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-agents-of-s-h-i-e-l-d-slingshot-2016",
+  "title": "Marvel's Agents of S.H.I.E.L.D.: Slingshot",
+  "year": 2016,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt6313900",
+   "tmdb": 69088
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-inhumans-2017",
+  "title": "Marvel's Inhumans",
+  "year": 2017,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt4154858",
+   "tmdb": 68716
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-cloak-and-dagger-2018",
+  "title": "Marvel's Cloak & Dagger",
+  "year": 2018,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt5614844",
+   "tmdb": 66190
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-runaways-2017",
+  "title": "Marvel's Runaways",
+  "year": 2017,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1236246",
+   "tmdb": 67466
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "helstrom-2020",
+  "title": "Helstrom",
+  "year": 2020,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt10266874",
+   "tmdb": 88987
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-2000",
+  "title": "X-Men",
+  "year": 2000,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0120903",
+   "tmdb": 36657
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x2-2003",
+  "title": "X2",
+  "year": 2003,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0290334",
+   "tmdb": 36658
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-the-last-stand-2006",
+  "title": "X-Men: The Last Stand",
+  "year": 2006,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0376994",
+   "tmdb": 36668
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-origins-wolverine-2009",
+  "title": "X-Men Origins: Wolverine",
+  "year": 2009,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0458525",
+   "tmdb": 2080
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-first-class-2011",
+  "title": "X-Men: First Class",
+  "year": 2011,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1270798",
+   "tmdb": 49538
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-wolverine-2013",
+  "title": "The Wolverine",
+  "year": 2013,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1430132",
+   "tmdb": 76170
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-days-of-future-past-2014",
+  "title": "X-Men: Days of Future Past",
+  "year": 2014,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1877832",
+   "tmdb": 127585
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "deadpool-2016",
+  "title": "Deadpool",
+  "year": 2016,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1431045",
+   "tmdb": 293660
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-apocalypse-2016",
+  "title": "X-Men: Apocalypse",
+  "year": 2016,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3385516",
+   "tmdb": 246655
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "logan-2017",
+  "title": "Logan",
+  "year": 2017,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt3315342",
+   "tmdb": 263115
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "deadpool-no-good-deed-2017",
+  "title": "Deadpool: No Good Deed",
+  "year": 2017,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt6612630",
+   "tmdb": 558144
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "deadpool-2-2018",
+  "title": "Deadpool 2",
+  "year": 2018,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt5463162",
+   "tmdb": 383498
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "once-upon-a-deadpool-2018",
+  "title": "Once Upon a Deadpool",
+  "year": 2018,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt31050020",
+   "tmdb": 567604
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "dark-phoenix-2019",
+  "title": "Dark Phoenix",
+  "year": 2019,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt6565702",
+   "tmdb": 320288
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-new-mutants-2020",
+  "title": "The New Mutants",
+  "year": 2020,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt4682266",
+   "tmdb": 340102
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-2002",
+  "title": "Spider-Man",
+  "year": 2002,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0145487",
+   "tmdb": 557
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-2-2004",
+  "title": "Spider-Man 2",
+  "year": 2004,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0316654",
+   "tmdb": 558
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-3-2007",
+  "title": "Spider-Man 3",
+  "year": 2007,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0413300",
+   "tmdb": 559
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-amazing-spider-man-2012",
+  "title": "The Amazing Spider-Man",
+  "year": 2012,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0948470",
+   "tmdb": 1930
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-amazing-spider-man-2-2014",
+  "title": "The Amazing Spider-Man 2",
+  "year": 2014,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1872181",
+   "tmdb": 102382
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "venom-2018",
+  "title": "Venom",
+  "year": 2018,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1270797",
+   "tmdb": 335983
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "venom-let-there-be-carnage-2021",
+  "title": "Venom: Let There Be Carnage",
+  "year": 2021,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt7097896",
+   "tmdb": 580489
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "morbius-2022",
+  "title": "Morbius",
+  "year": 2022,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt5108870",
+   "tmdb": 526896
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "madame-web-2024",
+  "title": "Madame Web",
+  "year": 2024,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt11057302",
+   "tmdb": 634492
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "venom-the-last-dance-2024",
+  "title": "Venom: The Last Dance",
+  "year": 2024,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt16366836",
+   "tmdb": 912649
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "kraven-the-hunter-2024",
+  "title": "Kraven the Hunter",
+  "year": 2024,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt8790086",
+   "tmdb": 539972
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-into-the-spider-verse-2018",
+  "title": "Spider-Man: Into the Spider-Verse",
+  "year": 2018,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt4633694",
+   "tmdb": 324857
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-ham-caught-in-a-ham-2019",
+  "title": "Spider-Ham: Caught in a Ham",
+  "year": 2019,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt9803682",
+   "tmdb": 583055
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-across-the-spider-verse-2023",
+  "title": "Spider-Man: Across the Spider-Verse",
+  "year": 2023,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt9362722",
+   "tmdb": 569094
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-spider-within-a-spider-verse-story-2023",
+  "title": "The Spider Within: A Spider-Verse Story",
+  "year": 2023,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt27369002",
+   "tmdb": 1106299
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-beyond-the-spider-verse-2027",
+  "title": "Spider-Man: Beyond the Spider-Verse",
+  "year": 2027,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt16360004",
+   "tmdb": 911916
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "blade-1998",
+  "title": "Blade",
+  "year": 1998,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0120611",
+   "tmdb": 36647
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "blade-ii-2002",
+  "title": "Blade II",
+  "year": 2002,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0187738",
+   "tmdb": 36586
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "blade-trinity-2004",
+  "title": "Blade: Trinity",
+  "year": 2004,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0359013",
+   "tmdb": 36648
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "blade-the-series-2006",
+  "title": "Blade: The Series",
+  "year": 2006,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0823333",
+   "tmdb": 4619
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fantastic-four-2005",
+  "title": "Fantastic Four",
+  "year": 2005,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0120667",
+   "tmdb": 9738
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fantastic-four-rise-of-the-silver-surfer-2007",
+  "title": "Fantastic Four: Rise of the Silver Surfer",
+  "year": 2007,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0486576",
+   "tmdb": 1979
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-incredible-hulk-1977",
+  "title": "The Incredible Hulk",
+  "year": 1977,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0077031",
+   "tmdb": 648
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-incredible-hulk-returns-1988",
+  "title": "The Incredible Hulk Returns",
+  "year": 1988,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0095368",
+   "tmdb": 26881
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-trial-of-the-incredible-hulk-1989",
+  "title": "The Trial of the Incredible Hulk",
+  "year": 1989,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0098512",
+   "tmdb": 26883
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-death-of-the-incredible-hulk-1990",
+  "title": "The Death of the Incredible Hulk",
+  "year": 1990,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0099387",
+   "tmdb": 19593
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-1992",
+  "title": "X-Men",
+  "year": 1992,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0103584",
+   "tmdb": 4574
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-1994",
+  "title": "Iron Man",
+  "year": 1994,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0115218",
+   "tmdb": 3097
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fantastic-four-1994",
+  "title": "Fantastic Four",
+  "year": 1994,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0187635",
+   "tmdb": 2901
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-1994",
+  "title": "Spider-Man",
+  "year": 1994,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0112175",
+   "tmdb": 888
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-incredible-hulk-1996",
+  "title": "The Incredible Hulk",
+  "year": 1996,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0115215",
+   "tmdb": 6332
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-97-2024",
+  "title": "X-Men '97",
+  "year": 2024,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt16026746",
+   "tmdb": 138502
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-ultimate-spider-man-2012",
+  "title": "Marvel's Ultimate Spider-Man",
+  "year": 2012,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1722512",
+   "tmdb": 34391
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-avengers-assemble-2013",
+  "title": "Marvel's Avengers Assemble",
+  "year": 2013,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt2455546",
+   "tmdb": 59427
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-hulk-and-the-agents-of-s-m-a-s-h-2013",
+  "title": "Marvel's Hulk and the Agents of S.M.A.S.H.",
+  "year": 2013,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt2455514",
+   "tmdb": 40044
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-guardians-of-the-galaxy-2015",
+  "title": "Marvel's Guardians of the Galaxy",
+  "year": 2015,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt4176370",
+   "tmdb": 63181
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-rising-initiation-2018",
+  "title": "Marvel Rising: Initiation",
+  "year": 2018,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt9073722",
+   "tmdb": 83043
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-rising-secret-warriors-2018",
+  "title": "Marvel Rising: Secret Warriors",
+  "year": 2018,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt7728344",
+   "tmdb": 491633
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-rising-chasing-ghosts-2019",
+  "title": "Marvel Rising: Chasing Ghosts",
+  "year": 2019,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt9073748",
+   "tmdb": 576743
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-rising-heart-of-iron-2019",
+  "title": "Marvel Rising: Heart of Iron",
+  "year": 2019,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt9073746",
+   "tmdb": 583209
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-rising-battle-of-the-bands-2019",
+  "title": "Marvel Rising: Battle of the Bands",
+  "year": 2019,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt10863978",
+   "tmdb": 592687
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-rising-operation-shuri-2019",
+  "title": "Marvel Rising: Operation Shuri",
+  "year": 2019,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt11113964",
+   "tmdb": 592688
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-rising-playing-with-fire-2019",
+  "title": "Marvel Rising: Playing with Fire",
+  "year": 2019,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt11483514",
+   "tmdb": 592689
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "captain-america-1944",
+  "title": "Captain America",
+  "year": 1944,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0036697",
+   "tmdb": 106355
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-1977",
+  "title": "Spider-Man",
+  "year": 1977,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0075671",
+   "tmdb": 225914
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-amazing-spider-man-1978",
+  "title": "The Amazing Spider-Man",
+  "year": 1978,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0076975",
+   "tmdb": 4552
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "japanese-spiderman-1978",
+  "title": "Japanese Spiderman",
+  "year": 1978,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0185116",
+   "tmdb": 2640
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "dr-strange-1978",
+  "title": "Dr. Strange",
+  "year": 1978,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0077469",
+   "tmdb": 50468
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "captain-america-1979",
+  "title": "Captain America",
+  "year": 1979,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0078937",
+   "tmdb": 197467
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "battle-fever-j-1979",
+  "title": "Battle Fever J",
+  "year": 1979,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0078567",
+   "tmdb": 99256
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "captain-america-ii-death-too-soon-1979",
+  "title": "Captain America II: Death Too Soon",
+  "year": 1979,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0078938",
+   "tmdb": 197481
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "howard-the-duck-1986",
+  "title": "Howard the Duck",
+  "year": 1986,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0091225",
+   "tmdb": 10658
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-punisher-1989",
+  "title": "The Punisher",
+  "year": 1989,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0098141",
+   "tmdb": 8867
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "captain-america-1990",
+  "title": "Captain America",
+  "year": 1990,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0103923",
+   "tmdb": 13995
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-fantastic-four-1994",
+  "title": "The Fantastic Four",
+  "year": 1994,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0109770",
+   "tmdb": 22059
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "generation-x-1996",
+  "title": "Generation X",
+  "year": 1996,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0116401",
+   "tmdb": 26623
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "nick-fury-agent-of-s-h-i-e-l-d-1998",
+  "title": "Nick Fury: Agent of S.H.I.E.L.D.",
+  "year": 1998,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0119781",
+   "tmdb": 27460
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "daredevil-2003",
+  "title": "Daredevil",
+  "year": 2003,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0287978",
+   "tmdb": 9480
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "hulk-2003",
+  "title": "Hulk",
+  "year": 2003,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0286716",
+   "tmdb": 1927
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-punisher-2004",
+  "title": "The Punisher",
+  "year": 2004,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0330793",
+   "tmdb": 7220
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "elektra-2005",
+  "title": "Elektra",
+  "year": 2005,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0357277",
+   "tmdb": 9947
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "man-thing-2005",
+  "title": "Man-Thing",
+  "year": 2005,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0290747",
+   "tmdb": 18882
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ghost-rider-2007",
+  "title": "Ghost Rider",
+  "year": 2007,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0259324",
+   "tmdb": 1250
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "punisher-war-zone-2008",
+  "title": "Punisher: War Zone",
+  "year": 2008,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0450314",
+   "tmdb": 13056
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ghost-rider-spirit-of-vengeance-2011",
+  "title": "Ghost Rider: Spirit of Vengeance",
+  "year": 2011,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1071875",
+   "tmdb": 71676
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fantastic-four-2015",
+  "title": "Fantastic Four",
+  "year": 2015,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1502712",
+   "tmdb": 166424
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "mutant-x-2001",
+  "title": "Mutant X",
+  "year": 2001,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0283203",
+   "tmdb": 1449
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "legion-2017",
+  "title": "Legion",
+  "year": 2017,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt5114356",
+   "tmdb": 67195
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-gifted-2017",
+  "title": "The Gifted",
+  "year": 2017,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt4396630",
+   "tmdb": 69629
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-noir-2026",
+  "title": "Spider-Noir",
+  "year": 2026,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt30460310",
+   "tmdb": 220102
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-marvel-super-heroes-1966",
+  "title": "The Marvel Super Heroes",
+  "year": 1966,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0206474",
+   "tmdb": 2164
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-fantastic-four-1967",
+  "title": "The Fantastic Four",
+  "year": 1967,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0061250",
+   "tmdb": 1651
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-1967",
+  "title": "Spider-Man",
+  "year": 1967,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0061301",
+   "tmdb": 1482
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-fantastic-four-1978",
+  "title": "The Fantastic Four",
+  "year": 1978,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0241100",
+   "tmdb": 2373
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fred-and-barney-meet-the-thing-1979",
+  "title": "Fred and Barney Meet The Thing",
+  "year": 1979,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0298650",
+   "tmdb": 2271
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-woman-1979",
+  "title": "Spider-Woman",
+  "year": 1979,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0197911",
+   "tmdb": 4784
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-1981",
+  "title": "Spider-Man",
+  "year": 1981,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0081938",
+   "tmdb": 3973
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-and-his-amazing-friends-1981",
+  "title": "Spider-Man and His Amazing Friends",
+  "year": 1981,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0083481",
+   "tmdb": 1269
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-incredible-hulk-1982",
+  "title": "The Incredible Hulk",
+  "year": 1982,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0083430",
+   "tmdb": 11328
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-pryde-of-the-x-men-1989",
+  "title": "X-Men: Pryde of the X-Men",
+  "year": 1989,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0098137",
+   "tmdb": 225656
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "silver-surfer-1998",
+  "title": "Silver Surfer",
+  "year": 1998,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0203268",
+   "tmdb": 1130
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-unlimited-1999",
+  "title": "Spider-Man Unlimited",
+  "year": 1999,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0207120",
+   "tmdb": 10079
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-avengers-united-they-stand-1999",
+  "title": "The Avengers: United They Stand",
+  "year": 1999,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0203247",
+   "tmdb": 1300
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-evolution-2000",
+  "title": "X-Men: Evolution",
+  "year": 2000,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0247827",
+   "tmdb": 668
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-the-new-animated-series-2003",
+  "title": "Spider-Man: The New Animated Series",
+  "year": 2003,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0290983",
+   "tmdb": 1664
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "fantastic-four-world-s-greatest-heroes-2006",
+  "title": "Fantastic Four: World's Greatest Heroes",
+  "year": 2006,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0830298",
+   "tmdb": 132
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-spectacular-spider-man-2008",
+  "title": "The Spectacular Spider-Man",
+  "year": 2008,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0976192",
+   "tmdb": 3854
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "wolverine-and-the-x-men-2009",
+  "title": "Wolverine and the X-Men",
+  "year": 2009,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0772145",
+   "tmdb": 6549
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-armored-adventures-2009",
+  "title": "Iron Man: Armored Adventures",
+  "year": 2009,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0837143",
+   "tmdb": 7330
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-super-hero-squad-show-2009",
+  "title": "The Super Hero Squad Show",
+  "year": 2009,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1388589",
+   "tmdb": 21781
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-avengers-earth-s-mightiest-heroes-2010",
+  "title": "The Avengers: Earth's Mightiest Heroes",
+  "year": 2010,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1626038",
+   "tmdb": 33623
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-spider-man-2017",
+  "title": "Marvel's Spider-Man",
+  "year": 2017,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt6135682",
+   "tmdb": 72705
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "big-hero-6-the-series-2017",
+  "title": "Big Hero 6: The Series",
+  "year": 2017,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt5515212",
+   "tmdb": 68665
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-m-o-d-o-k-2021",
+  "title": "Marvel's M.O.D.O.K.",
+  "year": 2021,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt9811118",
+   "tmdb": 111312
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spidey-and-his-amazing-friends-2021",
+  "title": "Spidey and His Amazing Friends",
+  "year": 2021,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt10862280",
+   "tmdb": 127635
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-hit-monkey-2021",
+  "title": "Marvel's Hit-Monkey",
+  "year": 2021,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt9811316",
+   "tmdb": 133903
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "baymax-2022",
+  "title": "Baymax!",
+  "year": 2022,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt13622958",
+   "tmdb": 114466
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-moon-girl-and-devil-dinosaur-2023",
+  "title": "Marvel's Moon Girl and Devil Dinosaur",
+  "year": 2023,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt8041658",
+   "tmdb": 92788
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-and-his-awesome-friends-2025",
+  "title": "Iron Man and His Awesome Friends",
+  "year": 2025,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt33997565",
+   "tmdb": 274388
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-avengers-mightiest-friends-2027",
+  "title": "Marvel's Avengers: Mightiest Friends",
+  "year": 2027,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": null,
+   "tmdb": 297767
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "ultimate-avengers-the-movie-2006",
+  "title": "Ultimate Avengers: The Movie",
+  "year": 2006,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0491703",
+   "tmdb": 14609
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ultimate-avengers-2-2006",
+  "title": "Ultimate Avengers 2",
+  "year": 2006,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0803093",
+   "tmdb": 14611
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-invincible-iron-man-2007",
+  "title": "The Invincible Iron Man",
+  "year": 2007,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0903135",
+   "tmdb": 13647
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "doctor-strange-2007",
+  "title": "Doctor Strange",
+  "year": 2007,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0910865",
+   "tmdb": 14830
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "next-avengers-heroes-of-tomorrow-2008",
+  "title": "Next Avengers: Heroes of Tomorrow",
+  "year": 2008,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1259998",
+   "tmdb": 14613
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "hulk-vs-2009",
+  "title": "Hulk Vs.",
+  "year": 2009,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1325753",
+   "tmdb": 394355
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "planet-hulk-2010",
+  "title": "Planet Hulk",
+  "year": 2010,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1483025",
+   "tmdb": 30675
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "thor-tales-of-asgard-2011",
+  "title": "Thor: Tales of Asgard",
+  "year": 2011,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1667903",
+   "tmdb": 63686
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "phineas-and-ferb-mission-marvel-2013",
+  "title": "Phineas and Ferb: Mission Marvel",
+  "year": 2013,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt33336639",
+   "tmdb": 284019
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-and-hulk-heroes-united-2013",
+  "title": "Iron Man & Hulk: Heroes United",
+  "year": 2013,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt3221698",
+   "tmdb": 230896
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-and-captain-america-heroes-united-2014",
+  "title": "Iron Man & Captain America: Heroes United",
+  "year": 2014,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt3911200",
+   "tmdb": 284274
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "big-hero-6-2014",
+  "title": "Big Hero 6",
+  "year": 2014,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt2245084",
+   "tmdb": 177572
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-super-hero-adventures-frost-fight-2015",
+  "title": "Marvel Super Hero Adventures: Frost Fight!",
+  "year": 2015,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt5272052",
+   "tmdb": 372631
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "hulk-where-monsters-dwell-2016",
+  "title": "Hulk: Where Monsters Dwell",
+  "year": 2016,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt6173902",
+   "tmdb": 422153
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spidey-and-iron-man-avengers-team-up-2025",
+  "title": "Spidey and Iron Man: Avengers Team Up!",
+  "year": 2025,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt37850663",
+   "tmdb": 1564058
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spidey-and-the-avengers-halloween-team-up-2026",
+  "title": "Spidey and the Avengers: Halloween Team-Up!",
+  "year": 2026,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt37850679",
+   "tmdb": 1750432
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-2010",
+  "title": "Iron Man",
+  "year": 2010,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1707807",
+   "tmdb": 45418
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "wolverine-2011",
+  "title": "Wolverine",
+  "year": 2011,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1847521",
+   "tmdb": 38247
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "x-men-2011",
+  "title": "X-Men",
+  "year": 2011,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt2070571",
+   "tmdb": 43146
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "blade-2011",
+  "title": "Blade",
+  "year": 2011,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1988235",
+   "tmdb": 62798
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-rise-of-technovore-2013",
+  "title": "Iron Man: Rise of Technovore",
+  "year": 2013,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt2654124",
+   "tmdb": 169934
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-disk-wars-the-avengers-2014",
+  "title": "Marvel Disk Wars: The Avengers",
+  "year": 2014,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt3644256",
+   "tmdb": 70801
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "avengers-confidential-black-widow-and-punisher-2014",
+  "title": "Avengers Confidential: Black Widow & Punisher",
+  "year": 2014,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt3482378",
+   "tmdb": 257346
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-future-avengers-2017",
+  "title": "Marvel's Future Avengers",
+  "year": 2017,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt6591446",
+   "tmdb": 91278
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-knights-spider-woman-agent-of-s-w-o-r-d-2009",
+  "title": "Marvel Knights: Spider-Woman, Agent of S.W.O.R.D.",
+  "year": 2009,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1673449",
+   "tmdb": 77269
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "astonishing-x-men-2009",
+  "title": "Astonishing X-Men",
+  "year": 2009,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt2047677",
+   "tmdb": 117657
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "black-panther-2010",
+  "title": "Black Panther",
+  "year": 2010,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1441105",
+   "tmdb": 19757
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "iron-man-extremis-2010",
+  "title": "Iron Man: Extremis",
+  "year": 2010,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt2212455",
+   "tmdb": 77362
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "thor-and-loki-blood-brothers-2011",
+  "title": "Thor & Loki: Blood Brothers",
+  "year": 2011,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1922373",
+   "tmdb": 61753
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-knights-inhumans-2013",
+  "title": "Marvel Knights: Inhumans",
+  "year": 2013,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt2824920",
+   "tmdb": 65364
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "wolverine-origin-2013",
+  "title": "Wolverine: Origin",
+  "year": 2013,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt3077530",
+   "tmdb": 219225
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ultimate-wolverine-vs-hulk-2013",
+  "title": "Ultimate Wolverine vs. Hulk",
+  "year": 2013,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt3152670",
+   "tmdb": 65487
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "wolverine-versus-sabretooth-2014",
+  "title": "Wolverine Versus Sabretooth",
+  "year": 2014,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt3668942",
+   "tmdb": 79936
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "wolverine-weapon-x-tomorrow-dies-today-2014",
+  "title": "Wolverine Weapon X: Tomorrow Dies Today",
+  "year": 2014,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt8076362",
+   "tmdb": 130805
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-knights-eternals-2014",
+  "title": "Marvel Knights: Eternals",
+  "year": 2014,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt4058600",
+   "tmdb": 125540
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "wolverine-versus-sabretooth-reborn-2015",
+  "title": "Wolverine Versus Sabretooth: Reborn",
+  "year": 2015,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt8076312",
+   "tmdb": 93331
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-ultimate-comics-2016",
+  "title": "Marvel's Ultimate Comics",
+  "year": 2016,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt6343290",
+   "tmdb": 112193
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-ultimate-comics-absolute-carnage-2019",
+  "title": "Marvel Ultimate Comics: Absolute Carnage",
+  "year": 2019,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": null,
+   "tmdb": 225735
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-super-heroes-maximum-overload-2013",
+  "title": "LEGO Marvel Super Heroes: Maximum Overload",
+  "year": 2013,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt3331092",
+   "tmdb": 62576
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-super-heroes-avengers-reassembled-2015",
+  "title": "LEGO Marvel Super Heroes: Avengers Reassembled!",
+  "year": 2015,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt5371572",
+   "tmdb": 368304
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-super-heroes-guardians-of-the-galaxy-the-thanos-threat-2017",
+  "title": "LEGO Marvel Super Heroes: Guardians of the Galaxy - The Thanos Threat",
+  "year": 2017,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt7387224",
+   "tmdb": 509080
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-super-heroes-black-panther-trouble-in-wakanda-2018",
+  "title": "LEGO Marvel Super Heroes: Black Panther - Trouble in Wakanda",
+  "year": 2018,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt8205250",
+   "tmdb": 528222
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-spider-man-vexed-by-venom-2019",
+  "title": "LEGO Marvel Spider-Man: Vexed by Venom",
+  "year": 2019,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt10755644",
+   "tmdb": 622230
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-avengers-climate-conundrum-2020",
+  "title": "LEGO Marvel Avengers: Climate Conundrum",
+  "year": 2020,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt13783758",
+   "tmdb": 112851
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-avengers-loki-in-training-2021",
+  "title": "LEGO Marvel Avengers: Loki in Training",
+  "year": 2021,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt21072140",
+   "tmdb": 899249
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-avengers-time-twisted-2022",
+  "title": "LEGO Marvel Avengers: Time Twisted",
+  "year": 2022,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt16531868",
+   "tmdb": 940543
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-avengers-code-red-2023",
+  "title": "LEGO Marvel Avengers: Code Red",
+  "year": 2023,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt28477867",
+   "tmdb": 1154598
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-avengers-mission-demolition-2024",
+  "title": "LEGO Marvel Avengers: Mission Demolition",
+  "year": 2024,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt33653255",
+   "tmdb": 1359227
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "lego-marvel-avengers-strange-tails-2025",
+  "title": "LEGO Marvel Avengers: Strange Tails",
+  "year": 2025,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt38692893",
+   "tmdb": 305165
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-super-heroes-what-the-2009",
+  "title": "Marvel Super Heroes: What the--?!",
+  "year": 2009,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt1754183",
+   "tmdb": 212344
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-funko-shorts-2016",
+  "title": "Marvel Funko Shorts",
+  "year": 2016,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt13802728",
+   "tmdb": 85324
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-rocket-and-groot-2017",
+  "title": "Marvel's Rocket & Groot",
+  "year": 2017,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt6603254",
+   "tmdb": 70784
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-s-ant-man-2017",
+  "title": "Marvel's Ant-Man",
+  "year": 2017,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt7249258",
+   "tmdb": 73919
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-super-hero-adventures-2017",
+  "title": "Marvel Super Hero Adventures",
+  "year": 2017,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt7726152",
+   "tmdb": 93508
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-fury-files-2017",
+  "title": "The Fury Files",
+  "year": 2017,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt12433310",
+   "tmdb": 103396
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-battleworld-mystery-of-the-thanostones-2020",
+  "title": "Marvel Battleworld: Mystery of the Thanostones",
+  "year": 2020,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt12583300",
+   "tmdb": 113903
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "meet-iron-man-and-his-awesome-friends-2025",
+  "title": "Meet Iron Man and His Awesome Friends",
+  "year": 2025,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt37452743",
+   "tmdb": 294895
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "jeff-and-his-super-hero-friends-2026",
+  "title": "Jeff & His Super Hero Friends",
+  "year": 2026,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt45381042",
+   "tmdb": 336977
+  },
+  "idsVerified": true
+ }
+]

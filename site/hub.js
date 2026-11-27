@@ -37,7 +37,7 @@ nav?.addEventListener('click', e => { const b = e.target.closest('button[data-to
 hall.addEventListener('focusin', e => { const s = e.target.closest('.slot'); if (s && narrow.matches) go(s); });
 // تبدأ القاعة بالبوابة التي دخلتها آخر مرة، وإلا بالوسطى فيظهر جاراها على الجانبين
 function start() { measure(); if (narrow.matches) { let last = null; try { last = localStorage.getItem('hub.last'); } catch {}
-  go(slots.find(s => doorOf(s).dataset.guide === last) || slots[1], false); } cur = undefined; mark(); }
+  go(slots.find(s => doorOf(s).dataset.guide === last) || slots[Math.floor((slots.length - 1) / 2)], false); } cur = undefined; mark(); }
 requestAnimationFrame(start); narrow.addEventListener('change', start);
 new ResizeObserver(() => { measure(); cur = undefined; mark(); }).observe(hall);
 

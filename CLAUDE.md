@@ -1,6 +1,6 @@
 # ملاحظات لجلسات Claude في هذا المستودع
 
-موقع شخصي بالعربية: أدلة مشاهدة ومكتبة ألعاب. الصفحات في `site/` (القاعة `/`، و`/dc/` و`/anime/` وبداخلها `/fate/`، و`/films/` و`/games/`) بـJavaScript بلا إطار. يُنشر من `main` على Netlify وGitHub Pages.
+موقع شخصي بالعربية: أدلة مشاهدة ومكتبة ألعاب. الصفحات في `site/` (القاعة `/`، و`/dc/` و`/marvel/` و`/anime/` وبداخلها `/fate/`، و`/films/` و`/games/`) بـJavaScript بلا إطار. يُنشر من `main` على Netlify وGitHub Pages.
 
 ## عبارات يقولها صاحب الموقع
 
@@ -8,7 +8,7 @@
 
 ## النشر
 
-1. `git checkout -- site/films/data site/fate/data site/dc/data site/games/data site/anime/data` (ملفات البناء يملكها روبوت البناء، ولا تُودَع).
+1. `git checkout -- site/films/data site/fate/data site/dc/data site/marvel/data site/games/data site/anime/data` (ملفات البناء يملكها روبوت البناء، ولا تُودَع).
 2. `git pull --no-rebase --no-edit origin main`
 3. الاختبارات: `export NODE_PATH=$(npm root -g)` ثم `node tests/<الاسم>.test.mjs`. ما مسّ ملفاً مشتركاً (`site/sync.js` مثلاً) تُشغَّل له كل المجموعات.
 4. الدفع إلى `main` يشغّل البناء (`.github/workflows/`)، وروبوته يودع البيانات، و**Netlify ينشر إيداع الروبوت وحده** (`ignore` في `netlify.toml`). يُتابَع البناء حتى ينجح، ثم يُفتح الموقع الحي للتأكد.
@@ -30,6 +30,13 @@
 - البناء (`scripts/build-anime.mjs`) يسحب من واجهة MyAnimeList الرسمية بحصة لكل تشغيل؛ السحب الطويل: `gh workflow run data.yml --ref main -f anime_max=3000 -f quiet=1`، ولا يُدفع إلى `main` أثناءه (الدفع يلغي البناء الجاري).
 - بحث «أضف أنمي» عمّا ليس في «أنمياتي» يجري في المتصفح: يسأل Jikan، وإن تعطّل أو لم يُجب في 8 ثوانٍ أو لم يجد شيئاً فـAniList (بأرقام MyAnimeList)، ولكلٍّ مهلته فلا يبقى معلّقاً. ولا يُطلب من Jikan بقيد `rating=rx` (يتأخر حتى ينقطع). واسم العمل أو غلافه في النتائج يفتح بطاقة اطلاع من MyAnimeList مباشرة، ومنها يُضاف (E69).
 - الأسماء العربية (E70): البناء يجلب لكل عمل أسماءه العربية من TMDB (`an` في الكتالوج، للبحث وحده لا للعرض). والاسم العربي لما ليس في «أنمياتي» يمرّ بـ`/api/anime-add` (`action: 'ar'`، بكلمة سرها ومفتاح TMDB في Netlify) ثم AniList بأسمائه الإنجليزية.
+
+
+## مارفل
+
+- كتالوج `data/marvel/` (مثل دليل DC: `universes` و`works` و`placements` و`order`، والنبذات في `translations/works.json`) يتحقق منه `node scripts/validate.mjs marvel`. ومحرك الصفحة هو محرك DC نفسه (`site/app.js`) بإعداده في `site/guides.js` وهويته في `site/themes-marvel.js` و`[data-guide=marvel]` في `site/styles.css`.
+- الأرقام من TMDB وحدها: `scripts/tmdb-lookup.mjs` يقرأ `data/lookup/*.json` على فرع `claude/**` ويطبع في سجل البناء `INV` (جرد شركات مارفل وكلماتها) و`DET` (تفاصيل عمل) و`IMG` (صور بلا كتابة) و`LOOKUP` (بحث بالاسم)، ويُحذف ملف الاستعلام قبل الدمج.
+- المستثنى باتفاق (E81): الوثائقيات والكواليس والبودكاست، وكرتون Marvel Productions لشخصيات غير مارفل، والمجمّع من حلقات مسلسل.
 
 ## فلتر +18
 

@@ -310,7 +310,7 @@ function widerHTML(f, g) { if (g.curated) return ''; const have = new Set(g.orde
     out += `<details class="wider"><summary><b>${WKIND[w.kind]} أوسع</b><bdi dir="ltr">${esc(w.name)}</bdi><small>${nWorks(o.length)}</small></summary>${rowsHTML(f, wg.order, { auto: true, moved: w.chrono?.moved })}${autoNote(wg)}</details>`; }
   return out; }
 // العمل نفسه في دليل DC أو Fate: رابط إلى بطاقته هناك
-const DOORS = { dc: 'DC', fate: 'Fate' };
+const DOORS = { dc: 'DC', marvel: 'Marvel', fate: 'Fate' };
 const xdoorHTML = gd => gd && DOORS[gd.door] ? `<a class="xdoor" href="../${gd.door}/#w=${encodeURIComponent(gd.id)}"><span><b>في دليل <bdi dir="ltr">${DOORS[gd.door]}</bdi> أيضاً</b><small>افتح بطاقته هناك، وترتيبه ضمن عالمه في الدليل</small></span></a>` : '';
 const aloneText = f => { const k = keyOf(f), live = D.wlive.get(k);
   if (live === 'wait') return '<span class="wait">أبحث عن سلسلته وعالمه في <bdi dir="ltr">Wikidata</bdi>…</span>';

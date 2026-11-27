@@ -1,4 +1,4 @@
-/* الواجهة الرئيسية: ثلاثة أبواب، كل باب بهوية دليله (خطه ولونه ونقشه) حتى تعرف ما وراءه قبل أن تدخل. */
+/* الواجهة الرئيسية: خمسة أبواب، كل باب بهوية دليله (خطه ولونه ونقشه) حتى تعرف ما وراءه قبل أن تدخل. */
 @font-face{font-family:Lalezar;src:url(fonts/lalezar-arabic-400-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
 @font-face{font-family:Lalezar;src:url(fonts/lalezar-latin-400-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
 @font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/aref-ruqaa-arabic-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
@@ -9,6 +9,8 @@
 @font-face{font-family:Kufi;font-weight:700;src:url(fonts/reem-kufi-latin-700-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
 @font-face{font-family:Handjet;font-weight:100 900;src:url(fonts/handjet-arabic-full-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
 @font-face{font-family:Handjet;font-weight:100 900;src:url(fonts/handjet-latin-full-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
+@font-face{font-family:Changa;font-weight:200 800;src:url(fonts/changa-arabic-wght-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
+@font-face{font-family:Changa;font-weight:200 800;src:url(fonts/changa-latin-wght-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
 @font-face{font-family:Plex;font-weight:400;src:url(fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
 @font-face{font-family:Plex;font-weight:600;src:url(fonts/ibm-plex-sans-arabic-arabic-600-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
 @font-face{font-family:Plex;font-weight:400;src:url(fonts/ibm-plex-sans-arabic-latin-400-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
@@ -20,7 +22,7 @@ body{min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;background:
    الثلاث كلٌّ فوق بوابته، وعلى الجوال لون البوابة التي أمامك ويتبدل معها. تحته خط عتبة بمعين في وسطه، ثم سطر يقول ما وراء الأبواب */
 @font-face{font-family:Inscribe;src:url(fonts/rakkas-arabic-400-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
 @property --lit{syntax:"<color>";inherits:true;initial-value:#e6b65c}
-body[data-here=dc]{--lit:#ff5a4c}body[data-here=anime]{--lit:#ff8fa3}body[data-here=films]{--lit:#ff9f43}body[data-here=games]{--lit:#35e0ff}
+body[data-here=dc]{--lit:#ff5a4c}body[data-here=marvel]{--lit:#ff3347}body[data-here=anime]{--lit:#ff8fa3}body[data-here=films]{--lit:#ff9f43}body[data-here=games]{--lit:#35e0ff}
 .hub-top{position:relative;display:grid;justify-items:center;text-align:center;padding:20px var(--pad) 12px}
 .hub-top h1{font-family:Inscribe,Plex,serif;font-weight:400;font-size:clamp(2.9rem,11vw,4.8rem);line-height:1.25;padding-inline:.2em;
   background-image:linear-gradient(105deg,transparent 42%,rgba(255,248,232,.75) 50%,transparent 58%),linear-gradient(180deg,rgba(6,7,10,.55),rgba(6,7,10,.08) 55%,transparent),linear-gradient(100deg,color-mix(in srgb,var(--lit) 45%,#f7ecd8),var(--lit) 46%,color-mix(in srgb,var(--lit) 70%,#2a1c14));
@@ -97,6 +99,21 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
 .door.dc .motif{background:radial-gradient(90% 30% at 50% 104%,rgba(150,24,18,.24),transparent 70%)}
 
 /* أنمياتي: سماء الغسق. نجوم تومض في أعلاها، ووهج الأفق يتنفس في أسفلها، وشهاب يعبرها كل حين */
+/* مارفل: الغلاف بطله (المنتقمون مجتمعين)، وفوقه صفحات قصص مصورة شفافة تُقلب من حافتها واحدة بعد أخرى كما في مقدمة أفلامها،
+   ونقاط الطباعة القديمة في زاويتها العليا، ووهج قرمزي على الأرض. الخط Changa العريض المكثف بثقله الأقصى */
+.door.marvel{--bg:#0a0405;--c1:#ff3347;--c2:#f5c044;--ink:#fff3ef;--display:Changa,Plex,sans-serif;--dw:800;--lh:1.12;border-color:rgba(255,51,71,.28)}
+.door.marvel::before{border-color:rgba(255,51,71,.16)}
+.door.marvel .art img{filter:contrast(1.08) saturate(1.05)}
+.door.marvel .fx{perspective:1100px}
+.door.marvel .fx>i{inset:5% 5% 5% 50%;transform-origin:0 50%;opacity:0;border-radius:2px;backface-visibility:visible;
+  background:linear-gradient(90deg,rgba(255,255,255,.5) 2px,transparent 2px) 0 0/50% 100%,linear-gradient(rgba(255,255,255,.5) 2px,transparent 2px) 0 0/100% 34%,rgba(255,244,236,.2);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);animation:mv-flip 10.5s cubic-bezier(.62,0,.3,1) infinite}
+.door.marvel .fx>i:nth-child(2){animation-delay:-3.5s}
+.door.marvel .fx>i:nth-child(3){animation-delay:-7s}
+@keyframes mv-flip{0%,76%{transform:rotateY(0);opacity:0}79%{opacity:.34}96%{transform:rotateY(-180deg);opacity:.26}100%{transform:rotateY(-180deg);opacity:0}}
+.door.marvel .motif{background:radial-gradient(90% 30% at 50% 104%,rgba(200,16,34,.3),transparent 70%)}
+.door.marvel .motif::before{content:"";position:absolute;inset:0 0 50%;background:radial-gradient(circle,rgba(255,80,90,.3) 0 1.3px,transparent 1.9px) 0 0/11px 11px;
+  -webkit-mask:radial-gradient(75% 100% at 100% 0,#000,transparent 72%);mask:radial-gradient(75% 100% at 100% 0,#000,transparent 72%)}
 .door.anime{--bg:#12142e;--c1:#ff8fa3;--c2:#ffc46b;--ink:#f6efe6;--display:Marhey,Plex,sans-serif;--dw:700;--lh:1.3}
 .door.anime::before{border:1px solid color-mix(in srgb,var(--c1) 40%,transparent);border-radius:3px}
 .door.anime .fx::before{content:"";position:absolute;inset:auto 0 0;height:52%;background:radial-gradient(120% 70% at 50% 106%,rgba(255,179,92,.5),rgba(255,127,134,.34) 30%,rgba(179,80,143,.2) 52%,transparent 74%);animation:anime-glow 7s ease-in-out infinite alternate}
@@ -145,7 +162,7 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
 
 /* ----- الشاشات العريضة: البوابات الثلاث في قوس يواجهك، وأسطرها مصطفة (الشبكة الفرعية)، والأرضية تعكسها ----- */
 @media (min-width:1024px){
-  .doors{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:minmax(0,1fr) repeat(4,auto);column-gap:clamp(18px,2.2vw,40px);row-gap:4px;
+  .doors{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:minmax(0,1fr) repeat(4,auto);column-gap:clamp(18px,2.2vw,40px);row-gap:4px;
     height:clamp(520px,calc(100dvh - 290px),860px);margin:4px var(--pad) 120px;perspective:2200px}
   .door{grid-row:1/-1;grid-template-rows:subgrid;align-content:normal;-webkit-box-reflect:below 12px linear-gradient(transparent 70%,rgba(255,255,255,.2));
     transition:transform .55s cubic-bezier(.2,.8,.2,1),translate .45s cubic-bezier(.2,.8,.2,1),scale .2s ease,filter .4s ease,border-color .3s ease}
@@ -154,10 +171,13 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   .door bdi{grid-row:3}
   .door .say{grid-row:4;align-self:start}
   .door .stat{grid-row:5}
-  .door.dc{transform:rotateY(-9deg)}
-  .door.anime{transform:rotateY(-3deg)}
-  .door.films{transform:rotateY(3deg)}
-  .door.games{transform:rotateY(9deg)}
+  .door{padding:26px 20px 24px}
+  .door strong{font-size:clamp(1.8rem,2.6vw,3rem)}
+  .door.dc{transform:rotateY(-10deg)}
+  .door.marvel{transform:rotateY(-5deg)}
+  .door.anime{transform:none}
+  .door.films{transform:rotateY(5deg)}
+  .door.games{transform:rotateY(10deg)}
   /* على الشاشات العريضة (ومنها الأوليد) بُنيت البوابة من جديد: غلاف طولي للفيلم بلا كتابة، باتمان واقفاً بدرعه كاملاً في العتمة
      وخلفه هالة حمراء، فالسواد الحقيقي يملأ أكثر البوابة والأحمر ضوء خلفه لا مساحة فاقعة. بدقته الأصلية (1000×1426، فلا تكبير)
      وبلا مرشحات (الصورة مدرّجة أصلاً)، والعتمة خفيفة من الحواف والقاعدة للنص. الجوال باقٍ على غلافه الأحمر كما هو */
@@ -172,14 +192,15 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
      أنمياتي: غلاف يختاره بناء البيانات (بوستر بلا كتابة لعمل البوابة المسمّى في data-art، وإلا بوستره العادي)، ووهج الأفق من تحته والنجوم فوقه.
      الأفلام: وجه K يرفع عينيه في المطر (Blade Runner 2049)، وشعاع آلة العرض يعبره.
      ألعابي: كازويا وجين في نار الجين الشيطاني، لوحة Tekken 8 الرسمية بدقة 4K، كاملة بارتفاع البوابة إلا قاعدتها، وأرضية الحلبة تحتهما */
-  .door[data-poster]:is(.anime,.films,.games) .art img{filter:none}
-  .door[data-poster]:is(.anime,.films,.games) .art img.in{opacity:1}
+  .door[data-poster]:is(.marvel,.anime,.films,.games) .art img{filter:none}
+  .door[data-poster]:is(.marvel,.anime,.films,.games) .art img.in{opacity:1}
+  .door[data-poster].marvel .art img{object-position:center 24%;transform-origin:50% 20%}
   .door[data-poster].anime .art img{object-position:center 26%;transform-origin:50% 20%}
   .door[data-poster].films .art img{object-position:center 30%;transform-origin:50% 15%}
   .door[data-poster].games .art img{position:absolute;top:0;left:50%;width:auto;max-width:none;height:90%;translate:-28% 0;transform-origin:28% 30%}
-  .door[data-poster]:is(.anime,.films,.games) .art::after{background:radial-gradient(100% 75% at 50% 32%,transparent 55%,color-mix(in srgb,var(--bg) 75%,transparent)),
+  .door[data-poster]:is(.marvel,.anime,.films,.games) .art::after{background:radial-gradient(100% 75% at 50% 32%,transparent 55%,color-mix(in srgb,var(--bg) 75%,transparent)),
     linear-gradient(180deg,color-mix(in srgb,var(--bg) 10%,transparent),transparent 12%,transparent 52%,color-mix(in srgb,var(--bg) 55%,transparent) 66%,var(--bg) 86%)}
-  .door[data-poster]:is(.anime,.films,.games)::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;opacity:.2;mix-blend-mode:overlay;
+  .door[data-poster]:is(.marvel,.anime,.films,.games)::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;opacity:.2;mix-blend-mode:overlay;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px}
   .door[data-poster].games .art::before{opacity:.4}
   .door[data-poster].games .motif>i{height:80cqh}
@@ -200,7 +221,7 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   /* التمرير باتجاه اليسار-لليمين والترتيب معكوس (دي سي يميناً كما في القراءة العربية): خط زمن التمرير يُحسب صحيحاً هكذا */
   .doors{direction:ltr;display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;
     padding:6px calc(50% - var(--dw) / 2) 112px;margin-bottom:-58px}
-  .slot:nth-child(1){order:4}.slot:nth-child(2){order:3}.slot:nth-child(3){order:2}.slot:nth-child(4){order:1}
+  .slot:nth-child(1){order:5}.slot:nth-child(2){order:4}.slot:nth-child(3){order:3}.slot:nth-child(4){order:2}.slot:nth-child(5){order:1}
   .doors::-webkit-scrollbar{display:none}
   .slot{direction:rtl;display:block;position:relative;flex:0 0 var(--dw);scroll-snap-align:center;perspective:1000px;view-timeline:--slot inline}
   .door{height:var(--dh)}
@@ -210,7 +231,7 @@ a.door:focus-visible{outline:3px solid var(--c1);outline-offset:4px}
   /* الأرضية المصقولة: ضوء كل عالم ينسكب تحت بوابته (أخف على الجوال من عكس البوابة كاملة وهي تدور) */
   .slot::after{content:"";position:absolute;inset-inline:-6%;top:calc(100% + 6px);height:clamp(70px,14dvh,120px);pointer-events:none;
     background:radial-gradient(48% 100% at 50% 0,color-mix(in srgb,var(--glow) 24%,transparent),color-mix(in srgb,var(--glow) 6%,transparent) 45%,transparent 72%)}
-  .s-dc{--glow:#ff5a4c}.s-anime{--glow:#ff8fa3}.s-films{--glow:#ff9f43}.s-games{--glow:#35e0ff}
+  .s-dc{--glow:#ff5a4c}.s-marvel{--glow:#ff3347}.s-anime{--glow:#ff8fa3}.s-films{--glow:#ff9f43}.s-games{--glow:#35e0ff}
   /* عتمة الجارين طبقة شقيقة للبوابة تميل معها بالحركة نفسها (لا ابنة تحت قصّها)، وشفافة إن لم تتحرك القاعة (تقليل الحركة) */
   @supports (animation-timeline:--slot){.door{animation:hall linear both;animation-timeline:--slot}.slot::after{animation:hall-floor linear both;animation-timeline:--slot}
     .slot::before{content:"";position:absolute;z-index:1;inset:0 0 auto;height:var(--dh);border-radius:20px;background:#050508;opacity:0;pointer-events:none;

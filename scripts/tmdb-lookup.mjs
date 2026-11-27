@@ -6,8 +6,46 @@ if (!hasKey()) { console.error('missing TMDB_API_KEY'); process.exit(0); }
 const dir = new URL('../data/lookup/', import.meta.url);
 const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.json')) : [];
 const brief = c => ({ id: c.id, name: c.title || c.name, orig: c.original_title || c.original_name, date: c.release_date || c.first_air_date || null, rating: c.vote_average, votes: c.vote_count, lang: c.original_language });
+// جرد (inventory): كل ما في TMDB من أفلام ومسلسلات لشركات يطابق اسمها نمطاً (مثل ^Marvel) أو بكلمات مفتاحية، بتفاصيل تكفي للفرز
+// (النوع والتاريخ والمدة والحلقات والشركات وIMDb). يُطبع سطر INV لكل عمل، فيُقرأ من سجل البناء. يُستخدم عند بناء دليل جديد كاملاً
+async function inventory({ companies: pat, search = [], keywords = [], kwPattern }) {
+  const re = new RegExp(pat, 'i'), cos = new Map(), kws = new Map(), seen = new Map();
+  for (const q of search) for (let page = 1; page <= 5; page++) { const d = await tmdb('/search/company', { query: q, page }).catch(() => ({}));
+    for (const c of d.results || []) if (re.test(c.name)) cos.set(c.id, c.name); if (page >= (d.total_pages || 1)) break; }
+  for (const q of keywords) { const d = await tmdb('/search/keyword', { query: q }).catch(() => ({})); for (const k of d.results || []) if (new RegExp(kwPattern || q, 'i').test(k.name)) kws.set(k.id, k.name); }
+  console.log('INVCO ' + JSON.stringify([...cos])); console.log('INVKW ' + JSON.stringify([...kws]));
+  const sweep = async (kind, params, via) => { for (let page = 1; page <= 60; page++) { const d = await tmdb('/discover/' + kind, { ...params, include_adult: false, sort_by: 'popularity.desc', page }).catch(() => null); if (!d) break;
+    for (const r of d.results || []) { const k = kind + ':' + r.id; if (!seen.has(k)) seen.set(k, { kind, id: r.id, via: new Set() }); seen.get(k).via.add(via); } if (page >= (d.total_pages || 1)) break; } };
+  const coIds = [...cos.keys()]; for (let i = 0; i < coIds.length; i += 8) for (const kind of ['movie', 'tv']) await sweep(kind, { with_companies: coIds.slice(i, i + 8).join('|') }, 'co');
+  for (const kind of ['movie', 'tv']) for (const id of kws.keys()) await sweep(kind, { with_keywords: id }, 'kw:' + id);
+  const rows = await Promise.all([...seen.values()].map(async c => { const d = await tmdb(`/${c.kind}/${c.id}`, { language: 'en-US', append_to_response: 'external_ids' }).catch(() => null); if (!d) return null;
+    const tv = c.kind === 'tv', g = (d.genres || []).map(x => x.name);
+    return { k: tv ? 'tv' : 'mv', id: d.id, t: d.title || d.name, o: (d.original_title || d.original_name) !== (d.title || d.name) ? d.original_title || d.original_name : undefined, d: (tv ? d.first_air_date : d.release_date) || null,
+      end: tv ? d.last_air_date || null : undefined, st: d.status, rt: tv ? undefined : d.runtime, s: tv ? d.number_of_seasons : undefined, e: tv ? d.number_of_episodes : undefined, ty: tv ? d.type : undefined,
+      g: g.join('/'), l: d.original_language, imdb: d.imdb_id || d.external_ids?.imdb_id || null, v: d.vote_count, pop: Math.round(d.popularity || 0),
+      co: (d.production_companies || []).map(x => x.name).join('|'), net: tv ? (d.networks || []).map(x => x.name).join('|') : undefined, via: [...c.via].join(',') }; }));
+  for (const r of rows.filter(Boolean).sort((a, b) => (a.d || '9999').localeCompare(b.d || '9999'))) console.log('INV ' + JSON.stringify(r));
+  console.log(`INVSUM ${seen.size} titles from ${cos.size} companies and ${kws.size} keywords`);
+}
+// تفاصيل (details): لكل [tv|mv، رقم TMDB] نبذته بالإنجليزية وبالعربية إن وُجدت، ومواسمه وحلقاتها، ليُكتب الكتالوج والترجمة منها. يُطبع سطر DET لكل عمل
+async function details(list) {
+  const rows = await Promise.all(list.map(async ([k, id]) => { const tv = k === 'tv', d = await tmdb(`/${tv ? 'tv' : 'movie'}/${id}`, { language: 'en-US', append_to_response: 'translations,external_ids' }).catch(e => ({ err: e.message })); if (d.err) return { k, id, err: d.err };
+    const ar = (d.translations?.translations || []).filter(t => t.iso_639_1 === 'ar').map(t => (t.data?.overview || '').trim()).find(Boolean) || null;
+    return { k, id, t: d.title || d.name, d: (tv ? d.first_air_date : d.release_date) || null, st: d.status, ov: d.overview || '', ar, tag: d.tagline || undefined, rt: tv ? undefined : d.runtime,
+      ss: tv ? (d.seasons || []).map(s => `${s.season_number}:${s.episode_count}:${s.air_date || ''}`).join(' ') : undefined, imdb: d.imdb_id || d.external_ids?.imdb_id || null }; }));
+  for (const r of rows) console.log('DET ' + JSON.stringify(r));
+}
+// صور الأعمال المختارة: البوسترات بلا كتابة (لغة فارغة) والخلفيات، الأعلى تصويتاً أولاً (لاختيار صورة بوابة)
+async function images(list) {
+  for (const [k, id] of list) { const d = await tmdb(`/${k === 'tv' ? 'tv' : 'movie'}/${id}/images`, { include_image_language: 'null,en' }).catch(e => ({ err: e.message }));
+    const top = (a = [], n) => a.sort((x, y) => (y.vote_average - x.vote_average) || (y.width - x.width)).slice(0, n).map(i => ({ p: i.file_path, w: i.width, h: i.height, l: i.iso_639_1, v: +i.vote_average.toFixed(1) }));
+    console.log('IMG ' + JSON.stringify({ k, id, err: d.err, posters: top((d.posters || []).filter(i => !i.iso_639_1), 6), backdrops: top((d.backdrops || []).filter(i => !i.iso_639_1), 4) })); }
+}
 for (const f of files) {
-  const { queries = [], top = 6 } = JSON.parse(fs.readFileSync(new URL(f, dir)));
+  const { queries = [], top = 6, inventory: inv, details: det, images: imgs } = JSON.parse(fs.readFileSync(new URL(f, dir)));
+  if (inv) await inventory(inv);
+  if (det) await details(det);
+  if (imgs) await images(imgs);
   for (const q of queries) {
     const out = { file: f, q: q.q, year: q.year, tv: [], movie: [] };
     for (const kind of q.kind ? [q.kind] : ['tv', 'movie']) {
