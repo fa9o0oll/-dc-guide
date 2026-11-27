@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-27T17:36:45.697Z",
+ "generatedAt": "2026-11-27T18:13:58.254Z",
  "counts": {
   "works": 629,
   "withEntry": 375,
@@ -11,14 +11,14 @@
   "uncurated": 4,
   "curatedGaps": 0,
   "collectionGaps": 1,
-  "chronoAgree": 27,
+  "chronoAgree": 28,
   "chronoConflict": 0,
   "chronoReviewed": 2,
-  "chronoMissed": 28,
-  "chronoAuto": 31,
+  "chronoMissed": 27,
+  "chronoAuto": 33,
   "infoEntries": 466,
-  "bytes": 203238,
-  "seconds": 210
+  "bytes": 205280,
+  "seconds": 97
  },
  "missing": [
   {
@@ -337,6 +337,37 @@
     ]
    },
    {
+    "cur": "transformers",
+    "view": "release",
+    "t": "Bumblebee",
+    "w": "before",
+    "before": [
+     "Transformers: Rise of the Beasts"
+    ],
+    "src": [
+     "wikipedia",
+     "tmdb",
+     "wikidata"
+    ]
+   },
+   {
+    "cur": "transformers",
+    "view": "release",
+    "t": "Transformers: Rise of the Beasts",
+    "w": "prequel",
+    "before": [
+     "Transformers",
+     "Transformers: Revenge of the Fallen",
+     "Transformers: Dark of the Moon",
+     "Transformers: Age of Extinction"
+    ],
+    "src": [
+     "wikipedia",
+     "wikidata",
+     "tmdb"
+    ]
+   },
+   {
     "cur": "omen",
     "view": "either",
     "t": "The First Omen",
@@ -382,19 +413,6 @@
     "w": "prequel",
     "before": [
      "Carlito's Way"
-    ],
-    "src": [
-     "wikipedia",
-     "tmdb"
-    ]
-   },
-   {
-    "cur": "wonka",
-    "view": "either",
-    "t": "Wonka",
-    "w": "prequel",
-    "before": [
-     "Willy Wonka & the Chocolate Factory"
     ],
     "src": [
      "wikipedia",
@@ -573,14 +591,6 @@
     "t": "Transformers One"
    },
    {
-    "cur": "transformers",
-    "t": "Bumblebee"
-   },
-   {
-    "cur": "transformers",
-    "t": "Transformers: Rise of the Beasts"
-   },
-   {
     "cur": "lion-king",
     "t": "The Lion King"
    },
@@ -603,6 +613,10 @@
    {
     "cur": "oceans",
     "t": "Ocean's Eight"
+   },
+   {
+    "cur": "wonka",
+    "t": "Wonka"
    },
    {
     "cur": "wonka",
@@ -784,6 +798,40 @@
     ],
     "moved": [
      "Mufasa: The Lion King ← prequel The Lion King [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "Transformers Bayverse",
+    "order": [
+     "Bumblebee",
+     "Transformers",
+     "Transformers: Revenge of the Fallen",
+     "Transformers: Dark of the Moon",
+     "Transformers: Age of Extinction",
+     "Transformers: The Last Knight"
+    ],
+    "moved": [
+     "Bumblebee ← year Transformers / Transformers: Revenge of the Fallen / Transformers: Dark of the Moon / Transformers: Age of Extinction [wikipedia,wikidata,tmdb]"
+    ]
+   },
+   {
+    "group": "Transformers",
+    "order": [
+     "Transformers: The Headmasters",
+     "Transformers: Robots in Disguise",
+     "Bumblebee",
+     "Transformers: Rise of the Beasts",
+     "Transformers: Cybertron",
+     "Transformers",
+     "Transformers: Revenge of the Fallen",
+     "Transformers: Dark of the Moon",
+     "Transformers: Age of Extinction",
+     "Transformers: Robots In Disguise",
+     "Transformers: The Last Knight"
+    ],
+    "moved": [
+     "Bumblebee ← before Transformers: Rise of the Beasts [wikipedia,tmdb,wikidata]",
+     "Transformers: Rise of the Beasts ← prequel Transformers: Cybertron / Transformers / Transformers: Revenge of the Fallen / Transformers: Dark of the Moon [wikipedia,wikidata,tmdb]"
     ]
    },
    {
