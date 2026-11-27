@@ -125,7 +125,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await q('hentai');
     check('والعين مغلقة: تصنيف +18 لا يُعرف بالبحث، ويقال لا تصنيف بهذا الاسم', await vis() === '' && await note() === 'لا تصنيف بهذا الاسم', [await vis(), await note()]);
     await q('شونين'); await snap('e83-note');
-    check('وتصنيف ليس فيما تبدأه الآن من «سأشاهده» يقال ذلك باسمه، في سطر تحت الشريط يُقرأ كله', await vis() === '' && await note() === 'لا عمل من «شونين» تبدأه الآن من «سأشاهده»' && await page.evaluate(() => { const n = document.querySelector('#tonight .tn-mood > .gnote'), r = n.getBoundingClientRect(), c = document.querySelector('#tonight .tn-c').getBoundingClientRect(); return r.top >= c.bottom - 1 && r.left >= 0 && r.right <= innerWidth && n.scrollWidth <= n.clientWidth + 1; }), await note());
+    check('وتصنيف ليس فيما تبدأه الآن من «سأشاهده» يقال ذلك باسمه، في سطر تحت الشريط يُقرأ كله', await vis() === '' && await note() === 'لا عمل من «شونين» في «سأشاهده»' && await page.evaluate(() => { const n = document.querySelector('#tonight .tn-mood > .gnote'), r = n.getBoundingClientRect(), c = document.querySelector('#tonight .tn-c').getBoundingClientRect(); return r.top >= c.bottom - 1 && r.left >= 0 && r.right <= innerWidth && n.scrollWidth <= n.clientWidth + 1; }), await note());
     await page.keyboard.press('Escape'); await page.waitForTimeout(60);
     check('وEsc يطوي الحقل ويعيد الشريط كله، والتركيز على زر البحث', !await page.$(R + ' input[data-gq]') && await vis() === '-1,0,1,2' && await page.evaluate(() => document.activeElement?.matches('#tonight .gfind')), await vis());
     await q('مغا'); await tap(R + ' .gx'); await page.waitForTimeout(60);

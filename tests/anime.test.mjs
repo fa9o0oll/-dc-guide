@@ -5,6 +5,7 @@ import { parseMal, readMalFile, malDate, STATUSES } from '../site/anime-mal.js';
 import { shapeSimkl, bulkDays, simklAhead } from '../site/anime-simkl.js';
 import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, pickSpecials, epFit, epKey, epPrint, curatedOrder, linesOf, packLines, arNames } from '../scripts/lib-anime.mjs';
 import { describe, ord } from '../site/anime-pos.js';
+import { moodNote } from '../site/anime-why.js';
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -243,6 +244,13 @@ check('ما صدر بعد ما يسبقه أحداثاً يقال فيه ذلك 
 check('ترقيم مسلسل يخالف فيه اسمٌ رقمَ موسمه في TMDB يُترك (Monogatari Series: Second Season هو الثالث هناك)', (() => { const b3 = new Map([[1, { id: 1, t: 'Bake', type: 'TV', y: 2009, tm: { k: 'tv', id: 5, s: 1 } }], [2, { id: 2, t: 'Nise', type: 'TV', y: 2012, tm: { k: 'tv', id: 5, s: 2 } }], [3, { id: 3, t: 'Monogatari Series: Second Season', type: 'TV', y: 2013, tm: { k: 'tv', id: 5, s: 3 } }]]);
   const w3 = { id: 1, name: 'Monogatari', ids: [1, 2, 3], lk: 'm', li: [0, 0, 0], ri: [-1, 0, 1] }; return describe(w3, 3, { ...ctx, by: b3, link: id => b3.get(id).t }).badge === 'الجزء الثالث من القصة'; })());
 }
+
+// ---------- لماذا لا يظهر تصنيف في مزاج الاقتراح (E85)
+{ console.log('\n== سبب غياب تصنيف عن المزاج');
+  const nW = n => n === 1 ? 'عمل واحد' : n === 2 ? 'عملان' : `${n} أعمال`, w = (id, r) => ({ id, r }), why = a => a.r;
+  check('لا عمل منه في «سأشاهده»: يقال ذلك', moodNote('هنتاي', [], why, nW) === 'لا عمل من «هنتاي» في «سأشاهده»');
+  check('عمل واحد قبله جزء لم تكمله', moodNote('هنتاي', [w(1, 'before')], why, nW) === 'في «سأشاهده» عمل واحد من «هنتاي»، ولا يصلح منه بداية الآن: قبله جزء لم تكمله.', moodNote('هنتاي', [w(1, 'before')], why, nW));
+  check('أعمال بأسباب مختلفة: كل سبب مرة', moodNote('إيتشي', [w(1, 'before'), w(2, 'soon'), w(3, 'before')], why, nW) === 'في «سأشاهده» 3 أعمال من «إيتشي»، ولا يصلح منها بداية الآن: قبل بعضها جزء لم تكمله، وبعضها لم يُعرض بعد.', moodNote('إيتشي', [w(1, 'before'), w(2, 'soon'), w(3, 'before')], why, nW)); }
 
 console.log(fail ? `\n❌ فشل ${fail}` : '\n✅ كل فحوص أنمياتي نجحت');
 process.exit(fail ? 1 : 0);

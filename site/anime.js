@@ -14,6 +14,7 @@ import { readMalFile } from './anime-mal.js?v=__BUILD__';
 import { describe, noun, model } from './anime-pos.js?v=__BUILD__';
 import { themeOf } from './anime-theme.js?v=__BUILD__';
 import { GENRE } from './anime-genres.js?v=__BUILD__';
+import { moodNote } from './anime-why.js?v=__BUILD__';
 import { accInit, accMark, accSync, accLink, accPoll, accUnlink, accLinks, accState, accSetPass, accPass } from './accounts.js?v=__BUILD__';
 import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover, dockEye } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
 import './zoom.js?v=__BUILD__';
@@ -198,7 +199,10 @@ function applyGq(k) { const box = grail(k); if (!box) return; const q = gfold(GQ
   if (GQ[k] != null) { box.scrollLeft = 0; box.dispatchEvent(new Event('scroll')); }
   if (!note) return; if (!q || seen) { note.hidden = true; return; }
   const known = D.genres.map((n, g) => g).filter(g => gmatch(g, q) && (isOpen() || !adOnly(g))).map(g => `«${genreOf(D.genres[g])}»`);
-  note.innerHTML = known.length ? `لا عمل من ${known.slice(0, 3).join(' أو ')} ${k === 'mood' ? 'تبدأه الآن من «سأشاهده»' : 'هنا'}` : 'لا تصنيف بهذا الاسم'; note.hidden = false; }
+  // مزاج الاقتراح: ما في «سأشاهده» من التصنيف ولا يصلح بداية الآن يقال عدده وسببه (E85)، وفي الفرز «لا عمل منه هنا»
+  if (k === 'mood' && known.length) { const g = D.genres.findIndex((n, i) => gmatch(i, q) && (isOpen() || !adOnly(i))), works = D.list.filter(a => me(a.id)?.s === 'plan' && (a.g || []).includes(g));
+    note.innerHTML = esc(moodNote(genreOf(D.genres[g]), works, a => !startable(a) ? 'before' : a.st === 'soon' ? 'soon' : a.pending || !(a.img || a.tp) ? 'info' : '', nWorks)); note.hidden = false; return; }
+  note.innerHTML = known.length ? `لا عمل من ${known.slice(0, 3).join(' أو ')} هنا` : 'لا تصنيف بهذا الاسم'; note.hidden = false; }
 // اختيار تصنيف من البحث أو بلمسة أثناءه: يُطوى الحقل ويعود الشريط كله والمختار أوله
 function gpick(k, g) { GQ[k] = null; if (k === 'mood') { amoods = g < 0 ? [] : amoods.includes(g) ? amoods.filter(x => x !== g) : [...amoods, g]; store.set('anime.mood', amoods.join()); renderTonight(true); }
   else { ui.genres = g < 0 ? [] : ui.genres.includes(g) ? ui.genres.filter(x => x !== g) : [...ui.genres, g]; renderGrid(); renderGenres(true); } }
