@@ -3,6 +3,6 @@
 import { blobStore, syncAnime } from '../../scripts/lib-accounts.mjs';
 
 export default async () => { const S = await blobStore(); if (!await S.lock()) return;
-  try { await syncAnime(S, { pull: true }); }
+  try { await syncAnime(S, { pull: true, budget: 60, deadline: Date.now() + 22000 }); }
   finally { await S.unlock(); } };
 export const config = { schedule: '*/30 * * * *' };

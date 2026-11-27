@@ -35,7 +35,7 @@ export default async req => {
     if (path === 'unlink') { await unlink(S, svc); return json(200, { links: await linksOf(S) }); }
     if (path === 'sync') { if (!await S.lock()) return json(202, { busy: true });
       // السحب يسبق الدفع دائماً، فلا يغلب تعديلٌ قديم من جهاز كان بلا اتصال تعديلاً أحدث منه في حسابك
-      try { const r = await syncAnime(S, { edits: Array.isArray(body.edits) ? body.edits.slice(0, 500) : [], full: body.full || null, eps: body.eps || null, build: body.build || '', since: +body.since || 0, pull: true });
+      try { const r = await syncAnime(S, { edits: Array.isArray(body.edits) ? body.edits.slice(0, 500) : [], full: body.full || null, eps: body.eps || null, build: body.build || '', since: +body.since || 0, pull: true, budget: 15, deadline: Date.now() + 6500 });
         return json(200, { ...r, links: await linksOf(S) }); }
       finally { await S.unlock(); } }
     return json(404, { error: 'غير موجود.' });

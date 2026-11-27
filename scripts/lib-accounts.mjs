@@ -63,8 +63,8 @@ export const SVC = {
         url = j.paging?.next || null; }
       return { items, complete: !url }; },
     // كل عمل طلب واحد بقيمه كلها (لا فرق يُحسب): الحالة والحلقات والتقييم، أو حذفه من القائمة
-    async push(t, list) { const done = [];
-      for (const { id, to } of list) { const u = `https://api.myanimelist.net/v2/anime/${id}/my_list_status`, h = { Authorization: 'Bearer ' + t.access };
+    async push(t, list, deadline) { const done = [];
+      for (const { id, to } of list) { if (deadline && Date.now() > deadline) break; const u = `https://api.myanimelist.net/v2/anime/${id}/my_list_status`, h = { Authorization: 'Bearer ' + t.access };
         const { ok, status, j } = to ? await req(u, { method: 'PATCH', headers: { ...h, 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ status: MAL_OUT[to.s], num_watched_episodes: String(to.p || 0), score: String(to.r || 0) }) })
           : await req(u, { method: 'DELETE', headers: h });
         if (status === 401) throw Object.assign(fail('auth', 'انتهى الربط'), { done });
@@ -138,15 +138,16 @@ function merge(st, k, R) { const sh = st.shadow[k], items = R.items;
   for (const id of ids) { const r = val(items[id]), was = sh[id] || null; if (same(r, was)) continue;
     if (!r) { if (dropOk) { put(st, id, null, now(), k); delete sh[id]; } continue; }
     put(st, id, r, items[id].t || now(), k); sh[id] = r; } }
-async function pushTo(S, st, k, t, budget) { const sh = st.shadow[k] ||= {}, list = [];
+async function pushTo(S, st, k, t, budget, deadline) { const sh = st.shadow[k] ||= {}, list = [];
   for (const [id, h] of Object.entries(st.items)) { const v = val(h), was = sh[id] || null; if (same(v, was)) continue; if (!v && !was) continue;
     list.push({ id: +id, from: was, to: v, movie: st.eps[id] < 0 }); if (list.length >= budget) break; }
   if (!list.length) return 0; let done = [];
-  try { done = await SVC[k].push(t, list); } catch (e) { done = e.done || []; for (const id of done) { const x = list.find(y => y.id === id); if (x.to) sh[id] = x.to; else delete sh[id]; } throw e; }
+  try { done = await SVC[k].push(t, list, deadline); } catch (e) { done = e.done || []; for (const id of done) { const x = list.find(y => y.id === id); if (x.to) sh[id] = x.to; else delete sh[id]; } throw e; }
   for (const id of done) { const x = list.find(y => y.id === +id); if (x.to) sh[id] = x.to; else delete sh[id]; }
   return done.length; }
 
-export async function syncAnime(S, { edits = [], full = null, eps = null, build = '', since = 0, pull = true, budget = 40 } = {}) {
+// budget: أكثر ما يُرسل إلى خدمة في المرة، وdeadline: وقت يتوقف عنده الإرسال ويُحفظ ما تم (والباقي في المرة القادمة)، فلا تتجاوز الدالة مهلتها
+export async function syncAnime(S, { edits = [], full = null, eps = null, build = '', since = 0, pull = true, budget = 40, deadline = 0 } = {}) {
   const st = Object.assign(blank(), await S.get('anime') || {});
   // المحور يبدأ من سجلّ الصفحة كله، ولا يبدأ من سجلّ فارغ (جهاز بلا سجلّ لا يمحو بحضوره شيئاً)
   if (!st.boot && !(full && Object.keys(full).length)) return { needFull: true, rev: st.rev, changes: [] };
@@ -157,7 +158,7 @@ export async function syncAnime(S, { edits = [], full = null, eps = null, build 
   const live = {}, oops = async (k, t, e) => { st.err[k] = e.code === 'auth' ? 'auth' : e.code === 'net' ? 'net' : String(e.message || 'خطأ').slice(0, 120); delete live[k]; if (e.code === 'auth') { t.dead = 1; await S.set('tok/' + k, t); } };
   for (const k of Object.keys(SVC)) { const t = await token(S, k); if (!t) continue; if (t.dead) { st.err[k] = 'auth'; continue; } live[k] = t;
     try { if (pull || !st.shadow[k]) { const R = await SVC[k].pull(t, st.mark[k], st.eps); if (!R.same) { merge(st, k, R); if (R.mark) st.mark[k] = R.mark; } } } catch (e) { await oops(k, t, e); } }
-  for (const [k, t] of Object.entries(live)) { try { await pushTo(S, st, k, t, budget); st.err[k] = ''; st.at[k] = now(); } catch (e) { await oops(k, t, e); } }
+  for (const [k, t] of Object.entries(live)) { if (deadline && Date.now() > deadline) break; try { await pushTo(S, st, k, t, budget, deadline); st.err[k] = ''; st.at[k] = now(); } catch (e) { await oops(k, t, e); } }
   await S.set('anime', st);
   const changes = Object.entries(st.items).filter(([, h]) => h.rev > since && h.src !== 'site').map(([id, h]) => ({ id: +id, ...(val(h) || { s: null }), src: h.src }));
   return { rev: st.rev, changes, needEps: !!build && st.build !== build }; }

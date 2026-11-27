@@ -173,7 +173,7 @@ function tallyHTML() { const all = Object.entries(P.a).filter(([id]) => isOpen()
 function nowList() { const l = inList('watching'), k = a => { const m = me(a.id), p = m.p || 0; return p ? 2 + (a.eps ? p / a.eps : .5) : a.nx ? 1 : 0; };
   return l.sort((a, b) => k(b) - k(a) || (a.ord ?? 1e9) - (b.ord ?? 1e9)); }
 function nowHTML() { if (!hasLog()) return D.list.length ? `<div class="invite"><h2>هذه قائمتك: ${nWorks(D.list.filter(a => a.ord != null).length)}</h2>
-    <p>سجلّك (ما شاهدته وما أكملته وتقييماتك وتواريخك) لا يُحفظ في الموقع العام. استورده من ملف تصدير ${ltr('MyAnimeList')} مرة واحدة على أي جهاز، ثم اربط ${ltr('SIMKL')} ليكمله بما عنده، وتنقله المزامنة إلى بقية أجهزتك.</p>
+    <p>سجلّك (ما شاهدته وما أكملته وتقييماتك وتواريخك) لا يُحفظ في الموقع العام. استورده من ملف تصدير ${ltr('MyAnimeList')} مرة واحدة على أي جهاز، وتنقله المزامنة إلى بقية أجهزتك. ومن «قائمتي وحساباتي» تربط ${ltr('MyAnimeList')} و${ltr('SIMKL')} فيتزامنان معه وحدهما.</p>
     <button class="btn pri" data-act="import">${ic('in')}<span>استورد سجلّي</span></button></div>` : '';
   const l = nowList(); if (!l.length) return '';
   return `<div class="now"><h2>أكمل المشاهدة<small>${nWorks(l.length)}</small></h2><div class="rail" id="rail">${l.slice(0, 14).map((a, i) => celHTML(a, 'rail', i)).join('')}${l.length > 14 ? `<button class="rail-more" data-act="list" data-l="watching">كل ما أشاهده (${l.length})</button>` : ''}</div></div>`; }

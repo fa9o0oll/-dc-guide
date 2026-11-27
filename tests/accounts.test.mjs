@@ -107,6 +107,15 @@ r = await call('/sync', { body: { since: r.j.rev } }); MAL.delete(2); sent.lengt
 r = await call('/sync', { body: { since: r.j.rev } }); ch = byId(r.j.changes);
 check('وإزالة عمل واحد في MAL تصل SIMKL والصفحة', ch[2]?.s === null && !SK.has(2), [r.j.changes, [...SK.keys()]]);
 
+console.log('\n== مهلة الدالة');
+{ const { syncAnime } = await import('../scripts/lib-accounts.mjs'); for (const id of [21, 22, 23]) await call('/sync', { body: { since: 0, edits: [{ id, s: 'plan', p: 0, r: 0, t: Date.now() }] } }).catch(() => {});
+  for (const id of [31, 32, 33]) { const st0 = await S.get('anime'); st0.items[id] = { s: 'plan', p: 0, r: 0, t: Date.now(), src: 'site', rev: ++st0.rev }; await S.set('anime', st0); }
+  sent.length = 0; await syncAnime(S, { pull: false, deadline: Date.now() - 1 });
+  check('مهلة انقضت: لا يُرسل شيء ويُحفظ الحال كما هو', !sent.some(x => x[0] === 'mal') && !!(await S.get('anime')).items[31]);
+  sent.length = 0; await syncAnime(S, { pull: false, budget: 2 });
+  check('وحصة الإرسال: عملان في المرة، والباقي في المرة القادمة', sent.filter(x => x[0] === 'mal').length === 2, sent.filter(x => x[0] === 'mal'));
+  sent.length = 0; await syncAnime(S, { pull: false }); check('ثم يكمل الباقي', sent.filter(x => x[0] === 'mal').length === 1 && [31, 32, 33].every(id => MAL.has(id)), sent.filter(x => x[0] === 'mal')); }
+
 console.log('\n== الفصل وانتهاء الربط');
 await call('/unlink', { body: { svc: 'simkl' } }); skRow(1, 'hold', 12); sent.length = 0; r = await call('/sync', { body: { since: r.j.rev } });
 check('بعد فصل SIMKL لا يُسحب منه ولا يُرسل إليه', !sent.some(x => x[0] === 'sk') && !r.j.changes.some(c => c.id === 1 && c.s === 'hold') && !(await S.get('tok/simkl')), sent);
