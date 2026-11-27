@@ -77,6 +77,11 @@ img{max-width:100%;display:block}
 .m-diamonds .motif::before{background:linear-gradient(45deg,color-mix(in srgb,var(--c1) 17%,transparent) 25%,transparent 25% 75%,color-mix(in srgb,var(--c1) 17%,transparent) 75%) 0 0/72px 72px,linear-gradient(45deg,color-mix(in srgb,var(--c1) 17%,transparent) 25%,transparent 25% 75%,color-mix(in srgb,var(--c1) 17%,transparent) 75%) 36px 36px/72px 72px;-webkit-mask:linear-gradient(120deg,#000,transparent 65%);mask:linear-gradient(120deg,#000,transparent 65%)}
 .m-halftone .motif::before{background:radial-gradient(circle,color-mix(in srgb,var(--c1) 60%,transparent) 0 2.2px,transparent 2.8px) 0 0/13px 13px;-webkit-mask:radial-gradient(90% 90% at 6% 0%,#000,transparent 72%);mask:radial-gradient(90% 90% at 6% 0%,#000,transparent 72%)}
 .m-halftone .motif::after{background:radial-gradient(circle,color-mix(in srgb,var(--c2) 50%,transparent) 0 1.6px,transparent 2.2px) 6px 6px/13px 13px;-webkit-mask:radial-gradient(60% 60% at 100% 100%,#000,transparent 75%);mask:radial-gradient(60% 60% at 100% 100%,#000,transparent 75%)}
+/* شبكة العنكبوت (عالم ريمي في دليل مارفل): خيوط تخرج من زاوية البداية ودوائرها، وتخفت بعيداً عنها */
+.m-web .motif::before{background:repeating-conic-gradient(from 180deg at 97% -2%,color-mix(in srgb,var(--c1) 30%,transparent) 0 .45deg,transparent .45deg 9deg),
+  repeating-radial-gradient(circle at 97% -2%,transparent 0 40px,color-mix(in srgb,var(--c1) 20%,transparent) 40px 41.5px);
+  -webkit-mask:radial-gradient(85% 95% at 97% -2%,#000,transparent 72%);mask:radial-gradient(85% 95% at 97% -2%,#000,transparent 72%)}
+.m-web .motif::after{background:radial-gradient(52% 46% at 10% 100%,color-mix(in srgb,var(--c2) 22%,transparent),transparent 70%)}
 .m-spiral .motif::before{background:repeating-radial-gradient(circle at 16% 26%,color-mix(in srgb,var(--c1) 20%,transparent) 0 2px,transparent 2px 24px);-webkit-mask:radial-gradient(90% 100% at 16% 26%,#000,transparent 78%);mask:radial-gradient(90% 100% at 16% 26%,#000,transparent 78%)}
 .m-scan .motif::before{background:repeating-linear-gradient(0deg,rgba(255,255,255,.06) 0 1px,transparent 1px 4px)}
 .m-scan .motif::after{background:radial-gradient(70% 50% at 20% 0%,color-mix(in srgb,var(--c1) 22%,transparent),transparent 70%)}
@@ -624,11 +629,25 @@ img.in{opacity:1}
 @keyframes spin{to{transform:rotate(360deg)}}
 .opener.m-circle .motif::before{inset:auto auto -60% -18%;width:min(86vw,720px);height:min(86vw,720px)}
 
+/* مارفل: خط Changa العريض المكثّف، وشعار طوبة حمراء بحرف الميم، وبطاقات يعلوها شريط بلون العالم كشريط أغلفة مجلاتها،
+   والدخول إليها صفحة تُقلب كما في مقدمة أفلامها (app.js). */
+@font-face{font-family:Changa;font-weight:200 800;src:url(fonts/changa-arabic-wght-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC,U+200C-200E}
+@font-face{font-family:Changa;font-weight:200 800;src:url(fonts/changa-latin-wght-normal.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2010-2027}
+[data-guide=marvel]{--display:Changa,"Plex",Tahoma,sans-serif}
+[data-guide=marvel] :is(.brand h1,.opener h2,.av-intro h2,.dock-index,.gauge,.tile-name,.veil strong){font-weight:800}
+[data-guide=marvel] .opener h2{line-height:1.12;letter-spacing:-.005em}
+[data-guide=marvel] .logo{width:auto;min-width:46px;padding:0 10px;border-radius:2px;background:#e62429;color:#fff;font-weight:800;font-size:1.6rem;box-shadow:-4px 4px 0 #6e0a0e}
+[data-guide=marvel] .card{border-radius:5px;box-shadow:inset 0 3px 0 var(--c1)}
+[data-guide=marvel] .node{border-radius:5px;box-shadow:inset -3px 0 0 var(--c1)}
+[data-guide=marvel] .tag{border-radius:3px}
+
 /* ===== ستار الدخول من الواجهة الرئيسية: يستقبل القادم بلون الدليل واسمه (نفس آخر مشهد في الواجهة) ثم ينكشف بطريقة كل دليل ===== */
 .veil{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:0 6vw;text-align:center;background:#07183a;color:#fff;animation:veil-out .5s 7s forwards}
 .veil strong{font-family:var(--display);font-weight:400;font-size:clamp(2.2rem,7vw,4.6rem);line-height:1.3}
 /* دي سي: نفس سواد بوابته في القاعة، ويُسحب جانباً بخطين أحمرين كوهج غلافها */
 [data-guide=dc] .veil{background:#050304;color:#f6f0ef;box-shadow:44px 0 0 #b8221b,88px 0 0 #3a0605}
+/* مارفل: صفحة حمراء بنقاط الطباعة القديمة واسم الدليل بالأبيض، تُقلب من حافتها كصفحة مجلة (app.js) */
+[data-guide=marvel] .veil{background:radial-gradient(circle,rgba(255,255,255,.12) 0 1.1px,transparent 1.6px) 0 0/9px 9px,#e62429;color:#fff;transform-origin:0 50%;box-shadow:inset -18px 0 30px -14px rgba(0,0,0,.45)}
 [data-guide=fate] .veil{background:#12060a;color:#f7efe0}
 [data-guide=fate] .veil strong{font-weight:700}
 [data-guide=fate] .veil::before{content:"";position:absolute;inset:0;margin:auto;width:38vmin;height:38vmin;border-radius:50%;border:2px solid #e6b65c;box-shadow:0 0 0 10px rgba(230,182,92,.12),inset 0 0 0 14px rgba(230,182,92,.1);opacity:0}
@@ -673,6 +692,13 @@ img.in{opacity:1}
 @keyframes pd-pillar{from{opacity:.35;transform:scaleY(.68)}to{opacity:1;transform:none}}
 [data-guide=fate] .pdoor i:nth-child(3){inset:auto;left:46%;top:70%;width:2px;height:2px;border-radius:50%;background:#ffdca6;box-shadow:0 0 3px 1px rgba(255,170,90,.85);animation:pd-ember 2.6s ease-out infinite}
 @keyframes pd-ember{0%{transform:translate(0,0);opacity:0}20%{opacity:1}100%{transform:translate(3px,-20px);opacity:0}}
+[data-guide=marvel] .pdoor{--pd-glow:rgba(230,36,41,.62);border-radius:2px;border:1px solid rgba(255,140,140,.6);background:radial-gradient(circle,rgba(255,255,255,.2) 0 .6px,transparent 1px) 0 0/4px 4px,#b5121b}
+[data-guide=marvel] .pdoor::before{display:none}
+[data-guide=marvel] .pdoor i:nth-child(1){inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.35));animation:none}
+[data-guide=marvel] .pdoor i:nth-child(2){inset:2px 2px 2px 50%;transform-origin:0 50%;background:linear-gradient(90deg,#d9d1c2,#f6f1e7);animation:pd-page 3.4s cubic-bezier(.6,0,.35,1) infinite}
+[data-guide=marvel] .pdoor i:nth-child(2)::before{display:none}
+@keyframes pd-page{0%,52%{transform:perspective(40px) rotateY(0);opacity:0}58%{opacity:1}84%{transform:perspective(40px) rotateY(-180deg);opacity:1}100%{transform:perspective(40px) rotateY(-180deg);opacity:0}}
+[data-guide=marvel] .pdoor i:nth-child(3){display:none}
 @media (hover:hover){a:hover>.pdoor,.gate:hover .pdoor{transform:scale(1.1);box-shadow:0 0 18px -2px var(--pd-glow)}}
 /* الرجوع: البوابة الصغيرة تتسع حتى تملأ الشاشة (portal.js) */
 .pexit{position:fixed;inset:0;z-index:500;transform-origin:0 0;pointer-events:none;will-change:transform}

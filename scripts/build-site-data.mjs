@@ -66,7 +66,7 @@ async function buildWork(w) {
 
 const rows = await Promise.all(works.map(w => buildWork(w).catch(e => { problems.push(`${w.id}: ${e.message}`); return { id: w.id, error: true }; })));
 // روابط صفحات التقييم الدقيقة (روتن توميتوز/ميتاكريتيك) من ويكي‌داتا عبر معرّف IMDb
-if (guide === 'dc') try {
+if (guide === 'dc' || guide === 'marvel') try {
   const ids = rows.map(r => r.imdb).filter(Boolean);
   const q = `SELECT ?imdb ?rt ?mc WHERE { VALUES ?imdb { ${ids.map(i => `"${i}"`).join(' ')} } ?item wdt:P345 ?imdb. OPTIONAL { ?item wdt:P1258 ?rt } OPTIONAL { ?item wdt:P1712 ?mc } }`;
   const res = await fetch('https://query.wikidata.org/sparql', { method: 'POST',

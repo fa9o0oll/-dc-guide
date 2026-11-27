@@ -1,0 +1,620 @@
+{
+ "intro": "أشهر سؤال في مارفل: بأي ترتيب أشاهد؟ هذه أربع إجابات، وكل واحدة معها سببها ومصدرها.",
+ "outro": "بقية العوالم (فوكس وسوني والكرتون) ترتيب كل منها مكتوب على بطاقاته في صفحة البطاقات.",
+ "paths": [
+  {
+   "id": "timeline",
+   "name": "ترتيب أحداث القصة",
+   "why": "كما رتبته مارفل في Disney+: من أقدم الأحداث زمنياً إلى أحدثها. الأفلام القصيرة اختيارية.",
+   "source": "https://marvelwatchorder.com/chronological-order/",
+   "sourceName": "Marvel Watch Order (عن ترتيب Disney+)",
+   "steps": [
+    {
+     "work": "eyes-of-wakanda-2025"
+    },
+    {
+     "work": "captain-america-the-first-avenger-2011"
+    },
+    {
+     "work": "marvel-one-shot-agent-carter-2013"
+    },
+    {
+     "work": "captain-marvel-2019"
+    },
+    {
+     "work": "iron-man-2008"
+    },
+    {
+     "work": "iron-man-2-2010"
+    },
+    {
+     "work": "the-incredible-hulk-2008"
+    },
+    {
+     "work": "marvel-one-shot-a-funny-thing-happened-on-the-way-to-thor-s-hammer-2011",
+     "optional": true
+    },
+    {
+     "work": "thor-2011"
+    },
+    {
+     "work": "marvel-one-shot-the-consultant-2011",
+     "optional": true
+    },
+    {
+     "work": "the-avengers-2012"
+    },
+    {
+     "work": "marvel-one-shot-item-47-2012",
+     "optional": true
+    },
+    {
+     "work": "thor-the-dark-world-2013"
+    },
+    {
+     "work": "iron-man-3-2013"
+    },
+    {
+     "work": "marvel-one-shot-all-hail-the-king-2014",
+     "optional": true
+    },
+    {
+     "work": "captain-america-the-winter-soldier-2014"
+    },
+    {
+     "work": "guardians-of-the-galaxy-2014"
+    },
+    {
+     "work": "guardians-of-the-galaxy-vol-2-2017"
+    },
+    {
+     "work": "i-am-groot-2022"
+    },
+    {
+     "work": "avengers-age-of-ultron-2015"
+    },
+    {
+     "work": "whih-newsfront-2015",
+     "season": 1,
+     "optional": true
+    },
+    {
+     "work": "ant-man-2015"
+    },
+    {
+     "work": "captain-america-civil-war-2016"
+    },
+    {
+     "work": "black-widow-2021"
+    },
+    {
+     "work": "black-panther-2018"
+    },
+    {
+     "work": "spider-man-homecoming-2017"
+    },
+    {
+     "work": "whih-newsfront-2015",
+     "season": 2,
+     "optional": true
+    },
+    {
+     "work": "team-thor-2016",
+     "optional": true
+    },
+    {
+     "work": "doctor-strange-2016"
+    },
+    {
+     "work": "team-thor-part-2-2017",
+     "optional": true
+    },
+    {
+     "work": "thor-ragnarok-2017"
+    },
+    {
+     "work": "team-darryl-2018",
+     "optional": true
+    },
+    {
+     "work": "ant-man-and-the-wasp-2018"
+    },
+    {
+     "work": "avengers-infinity-war-2018"
+    },
+    {
+     "work": "avengers-endgame-2019"
+    },
+    {
+     "work": "loki-2021",
+     "season": 1
+    },
+    {
+     "work": "what-if-2021",
+     "season": 1
+    },
+    {
+     "work": "marvel-zombies-2025"
+    },
+    {
+     "work": "wandavision-2021"
+    },
+    {
+     "work": "shang-chi-and-the-legend-of-the-ten-rings-2021"
+    },
+    {
+     "work": "the-falcon-and-the-winter-soldier-2021"
+    },
+    {
+     "work": "spider-man-far-from-home-2019"
+    },
+    {
+     "work": "peter-s-to-do-list-2019",
+     "optional": true
+    },
+    {
+     "work": "eternals-2021"
+    },
+    {
+     "work": "spider-man-no-way-home-2021"
+    },
+    {
+     "work": "doctor-strange-in-the-multiverse-of-madness-2022"
+    },
+    {
+     "work": "hawkeye-2021"
+    },
+    {
+     "work": "moon-knight-2022"
+    },
+    {
+     "work": "black-panther-wakanda-forever-2022"
+    },
+    {
+     "work": "echo-2024"
+    },
+    {
+     "work": "she-hulk-attorney-at-law-2022"
+    },
+    {
+     "work": "ms-marvel-2022"
+    },
+    {
+     "work": "thor-love-and-thunder-2022"
+    },
+    {
+     "work": "ironheart-2025"
+    },
+    {
+     "work": "werewolf-by-night-2022"
+    },
+    {
+     "work": "the-guardians-of-the-galaxy-holiday-special-2022"
+    },
+    {
+     "work": "ant-man-and-the-wasp-quantumania-2023"
+    },
+    {
+     "work": "guardians-of-the-galaxy-vol-3-2023"
+    },
+    {
+     "work": "secret-invasion-2023"
+    },
+    {
+     "work": "the-marvels-2023"
+    },
+    {
+     "work": "loki-2021",
+     "season": 2
+    },
+    {
+     "work": "what-if-2021",
+     "season": 2
+    },
+    {
+     "work": "deadpool-and-wolverine-2024"
+    },
+    {
+     "work": "agatha-all-along-2024"
+    },
+    {
+     "work": "what-if-2021",
+     "season": 3
+    },
+    {
+     "work": "daredevil-born-again-2025",
+     "season": 1
+    },
+    {
+     "work": "captain-america-brave-new-world-2025"
+    },
+    {
+     "work": "thunderbolts-2025"
+    },
+    {
+     "work": "the-fantastic-4-first-steps-2025"
+    },
+    {
+     "work": "wonder-man-2026"
+    },
+    {
+     "work": "daredevil-born-again-2025",
+     "season": 2
+    },
+    {
+     "work": "the-punisher-one-last-kill-2026"
+    },
+    {
+     "work": "spider-man-brand-new-day-2026"
+    },
+    {
+     "work": "visionquest-2026"
+    }
+   ]
+  },
+  {
+   "id": "release",
+   "name": "ترتيب الصدور",
+   "why": "كما شاهده الجمهور أول مرة، وفيه تنكشف المفاجآت بالترتيب الذي أراده صنّاعها.",
+   "source": "https://en.wikipedia.org/wiki/Marvel_Cinematic_Universe",
+   "sourceName": "ويكيبيديا",
+   "steps": [
+    {
+     "work": "iron-man-2008"
+    },
+    {
+     "work": "the-incredible-hulk-2008"
+    },
+    {
+     "work": "iron-man-2-2010"
+    },
+    {
+     "work": "thor-2011"
+    },
+    {
+     "work": "captain-america-the-first-avenger-2011"
+    },
+    {
+     "work": "marvel-one-shot-the-consultant-2011",
+     "optional": true
+    },
+    {
+     "work": "marvel-one-shot-a-funny-thing-happened-on-the-way-to-thor-s-hammer-2011",
+     "optional": true
+    },
+    {
+     "work": "the-avengers-2012"
+    },
+    {
+     "work": "marvel-one-shot-item-47-2012",
+     "optional": true
+    },
+    {
+     "work": "iron-man-3-2013"
+    },
+    {
+     "work": "marvel-one-shot-agent-carter-2013"
+    },
+    {
+     "work": "thor-the-dark-world-2013"
+    },
+    {
+     "work": "marvel-one-shot-all-hail-the-king-2014",
+     "optional": true
+    },
+    {
+     "work": "captain-america-the-winter-soldier-2014"
+    },
+    {
+     "work": "guardians-of-the-galaxy-2014"
+    },
+    {
+     "work": "avengers-age-of-ultron-2015"
+    },
+    {
+     "work": "whih-newsfront-2015",
+     "season": 1,
+     "optional": true
+    },
+    {
+     "work": "ant-man-2015"
+    },
+    {
+     "work": "whih-newsfront-2015",
+     "season": 2,
+     "optional": true
+    },
+    {
+     "work": "captain-america-civil-war-2016"
+    },
+    {
+     "work": "team-thor-2016",
+     "optional": true
+    },
+    {
+     "work": "doctor-strange-2016"
+    },
+    {
+     "work": "team-thor-part-2-2017",
+     "optional": true
+    },
+    {
+     "work": "guardians-of-the-galaxy-vol-2-2017"
+    },
+    {
+     "work": "spider-man-homecoming-2017"
+    },
+    {
+     "work": "thor-ragnarok-2017"
+    },
+    {
+     "work": "black-panther-2018"
+    },
+    {
+     "work": "team-darryl-2018",
+     "optional": true
+    },
+    {
+     "work": "avengers-infinity-war-2018"
+    },
+    {
+     "work": "ant-man-and-the-wasp-2018"
+    },
+    {
+     "work": "captain-marvel-2019"
+    },
+    {
+     "work": "avengers-endgame-2019"
+    },
+    {
+     "work": "spider-man-far-from-home-2019"
+    },
+    {
+     "work": "peter-s-to-do-list-2019",
+     "optional": true
+    },
+    {
+     "work": "wandavision-2021"
+    },
+    {
+     "work": "the-falcon-and-the-winter-soldier-2021"
+    },
+    {
+     "work": "loki-2021",
+     "season": 1
+    },
+    {
+     "work": "black-widow-2021"
+    },
+    {
+     "work": "what-if-2021",
+     "season": 1
+    },
+    {
+     "work": "shang-chi-and-the-legend-of-the-ten-rings-2021"
+    },
+    {
+     "work": "eternals-2021"
+    },
+    {
+     "work": "hawkeye-2021"
+    },
+    {
+     "work": "spider-man-no-way-home-2021"
+    },
+    {
+     "work": "moon-knight-2022"
+    },
+    {
+     "work": "doctor-strange-in-the-multiverse-of-madness-2022"
+    },
+    {
+     "work": "ms-marvel-2022"
+    },
+    {
+     "work": "thor-love-and-thunder-2022"
+    },
+    {
+     "work": "i-am-groot-2022"
+    },
+    {
+     "work": "she-hulk-attorney-at-law-2022"
+    },
+    {
+     "work": "werewolf-by-night-2022"
+    },
+    {
+     "work": "black-panther-wakanda-forever-2022"
+    },
+    {
+     "work": "the-guardians-of-the-galaxy-holiday-special-2022"
+    },
+    {
+     "work": "ant-man-and-the-wasp-quantumania-2023"
+    },
+    {
+     "work": "guardians-of-the-galaxy-vol-3-2023"
+    },
+    {
+     "work": "secret-invasion-2023"
+    },
+    {
+     "work": "loki-2021",
+     "season": 2
+    },
+    {
+     "work": "the-marvels-2023"
+    },
+    {
+     "work": "what-if-2021",
+     "season": 2
+    },
+    {
+     "work": "echo-2024"
+    },
+    {
+     "work": "deadpool-and-wolverine-2024"
+    },
+    {
+     "work": "agatha-all-along-2024"
+    },
+    {
+     "work": "what-if-2021",
+     "season": 3
+    },
+    {
+     "work": "captain-america-brave-new-world-2025"
+    },
+    {
+     "work": "daredevil-born-again-2025",
+     "season": 1
+    },
+    {
+     "work": "thunderbolts-2025"
+    },
+    {
+     "work": "ironheart-2025"
+    },
+    {
+     "work": "the-fantastic-4-first-steps-2025"
+    },
+    {
+     "work": "eyes-of-wakanda-2025"
+    },
+    {
+     "work": "marvel-zombies-2025"
+    },
+    {
+     "work": "wonder-man-2026"
+    },
+    {
+     "work": "daredevil-born-again-2025",
+     "season": 2
+    },
+    {
+     "work": "the-punisher-one-last-kill-2026"
+    },
+    {
+     "work": "spider-man-brand-new-day-2026"
+    },
+    {
+     "work": "visionquest-2026"
+    }
+   ]
+  },
+  {
+   "id": "infinity",
+   "name": "ملحمة اللانهاية",
+   "why": "الأفلام الثلاثة والعشرون من Iron Man إلى Far From Home بترتيب صدورها، وهي القصة المكتملة الأولى لهذا العالم.",
+   "source": "https://en.wikipedia.org/wiki/Marvel_Cinematic_Universe",
+   "sourceName": "ويكيبيديا",
+   "steps": [
+    {
+     "work": "iron-man-2008"
+    },
+    {
+     "work": "the-incredible-hulk-2008"
+    },
+    {
+     "work": "iron-man-2-2010"
+    },
+    {
+     "work": "thor-2011"
+    },
+    {
+     "work": "captain-america-the-first-avenger-2011"
+    },
+    {
+     "work": "the-avengers-2012"
+    },
+    {
+     "work": "iron-man-3-2013"
+    },
+    {
+     "work": "thor-the-dark-world-2013"
+    },
+    {
+     "work": "captain-america-the-winter-soldier-2014"
+    },
+    {
+     "work": "guardians-of-the-galaxy-2014"
+    },
+    {
+     "work": "avengers-age-of-ultron-2015"
+    },
+    {
+     "work": "ant-man-2015"
+    },
+    {
+     "work": "captain-america-civil-war-2016"
+    },
+    {
+     "work": "doctor-strange-2016"
+    },
+    {
+     "work": "guardians-of-the-galaxy-vol-2-2017"
+    },
+    {
+     "work": "spider-man-homecoming-2017"
+    },
+    {
+     "work": "thor-ragnarok-2017"
+    },
+    {
+     "work": "black-panther-2018"
+    },
+    {
+     "work": "avengers-infinity-war-2018"
+    },
+    {
+     "work": "ant-man-and-the-wasp-2018"
+    },
+    {
+     "work": "captain-marvel-2019"
+    },
+    {
+     "work": "avengers-endgame-2019"
+    },
+    {
+     "work": "spider-man-far-from-home-2019"
+    }
+   ]
+  },
+  {
+   "id": "spider",
+   "name": "سبايدرمان الواقعي كاملاً",
+   "why": "أفلام سبايدرمان الثلاثة بأبطالها الثلاثة بترتيب صدورها، حتى يلتقوا في No Way Home.",
+   "source": "https://en.wikipedia.org/wiki/Spider-Man_in_film",
+   "sourceName": "ويكيبيديا",
+   "steps": [
+    {
+     "work": "spider-man-2002"
+    },
+    {
+     "work": "spider-man-2-2004"
+    },
+    {
+     "work": "spider-man-3-2007"
+    },
+    {
+     "work": "the-amazing-spider-man-2012"
+    },
+    {
+     "work": "the-amazing-spider-man-2-2014"
+    },
+    {
+     "work": "spider-man-homecoming-2017"
+    },
+    {
+     "work": "spider-man-far-from-home-2019"
+    },
+    {
+     "work": "spider-man-no-way-home-2021"
+    },
+    {
+     "work": "spider-man-brand-new-day-2026"
+    }
+   ]
+  }
+ ]
+}

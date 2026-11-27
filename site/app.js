@@ -68,12 +68,13 @@ async function boot() {
   initSync(id => { if (id !== G.id) return; try { const raw = JSON.parse(localStorage.getItem(KEY)); if (raw?.v === 1) store = { ...blank(), ...raw }; } catch {}
     render(true); stats(); const tab = $('#seasonTabs .on'); if (tab) showSeason(tab.dataset.id, +tab.dataset.season); });
 }
-// كشف ستار الدخول: دي سي يُسحب جانباً كلوحة قصة مصورة، وFate يتلاشى مع حلقة استدعاء تتسع
+// كشف ستار الدخول: دي سي يُسحب جانباً كلوحة قصة مصورة، وFate يتلاشى مع حلقة استدعاء تتسع، ومارفل صفحة تُقلب من حافتها
 function liftVeil() {
   const v = $('#veil'); if (!v || v.hidden) return; const done = () => v.remove();
   if (reduce.matches) return done();
   v.classList.add('lift');
   const a = G.id === 'fate' ? v.animate({ opacity: [1, 1, 0] }, { duration: 850, easing: 'ease-in', fill: 'forwards' })
+    : G.id === 'marvel' ? v.animate({ transform: ['perspective(1800px) rotateY(0deg)', 'perspective(1800px) rotateY(-108deg)'], opacity: [1, 1, 0] }, { duration: 720, delay: 120, easing: 'cubic-bezier(.62,0,.32,1)', fill: 'forwards' })
     : v.animate({ transform: ['none', 'translateX(-125%)'] }, { duration: 640, delay: 140, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' });
   a.finished.then(done, done); setTimeout(done, 1500);
 }

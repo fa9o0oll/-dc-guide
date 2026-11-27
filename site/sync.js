@@ -11,7 +11,7 @@
 //   ومعها علامة k لكل تنبيه «لعبتان مكررتان» أسكته صاحبه (مفتاحها أرقام ألعاب المجموعة مرتبة)، فلا يعود التنبيه على جهاز آخر.
 // - أنمياتي: لكل عمل خمس علامات مستقلة: قائمته a، وما شوهد من حلقاته p، وتقييمه r، وتاريخ بدايته b، وتاريخ نهايته z.
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-', CFG = 'guides.fb', META = 'guides.sync', LEGACY = 'guides';
-const GUIDES = { dc: 'dcg.progress', fate: 'fateg.progress', films: 'filmsg.progress', games: 'gamesg.progress', anime: 'animeg.progress' };
+const GUIDES = { dc: 'dcg.progress', marvel: 'marvelg.progress', fate: 'fateg.progress', films: 'filmsg.progress', games: 'gamesg.progress', anime: 'animeg.progress' };
 const OK = { w: ['watched', 'watching', 'list', 'skip'], f: ['watched', 'next'], g: ['play', 'new', 'done', 'seen'], a: ['watching', 'completed', 'hold', 'dropped', 'plan'] };
 // قيم الألعاب غير القائمة: رمز منصة، وتاريخ، وعدد ساعات. وكل علامة لعبة تقابل حقلاً في سجلها
 // وقيم الأنمي غير القائمة: عدد حلقات، وتقييم من 1 إلى 10، وتاريخ قد يكون سنة فقط أو سنة وشهراً (كما في MyAnimeList)

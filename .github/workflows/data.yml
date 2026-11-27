@@ -30,12 +30,12 @@ jobs:
         with:
           node-version: 22
       - name: Validate catalog
-        run: node scripts/validate.mjs && node scripts/validate.mjs fate
+        run: node scripts/validate.mjs && node scripts/validate.mjs fate && node scripts/validate.mjs marvel
       - name: Pull live data from TMDB
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           MAL_CLIENT_ID: ${{ secrets.MAL_CLIENT_ID }}   # اختياري: مفتاح واجهة MyAnimeList الرسمية لتقييمات الأنمي
-        run: node scripts/build-site-data.mjs && node scripts/build-site-data.mjs fate
+        run: node scripts/build-site-data.mjs && node scripts/build-site-data.mjs fate && node scripts/build-site-data.mjs marvel
       - name: Build «أنمياتي» (MyAnimeList API, then Jikan; TMDB for posters and where to watch; keeps the previous data when a source is unreachable)
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
@@ -109,7 +109,7 @@ jobs:
         run: node scripts/tmdb-lookup.mjs
         continue-on-error: true
       - name: Build base + Arrowverse order + apply our Arabic translations (fails on any gap)
-        run: node scripts/build-base.mjs && node scripts/build-arrowverse.mjs && node scripts/apply-translations.mjs && node scripts/build-base.mjs fate && node scripts/apply-translations.mjs fate
+        run: node scripts/build-base.mjs && node scripts/build-arrowverse.mjs && node scripts/apply-translations.mjs && node scripts/build-base.mjs fate && node scripts/apply-translations.mjs fate && node scripts/build-base.mjs marvel && node scripts/apply-translations.mjs marvel
       - name: Commit generated data
         if: github.ref == 'refs/heads/main'   # فروع العمل تُبنى للتحقق فقط ولا يُكتب عليها
         run: |
@@ -118,7 +118,7 @@ jobs:
           # ختم آخر إيداع ليس من الروبوت: به يتغيّر شيء مع كل تغيير في الكود ولو لم تتغيّر البيانات، فيتبعه إيداع الروبوت الذي ينشره Netlify.
           # التحديث اليومي المجدول لا يغيّره، فلا نشر في يوم لم يتغيّر فيه شيء
           if [ "$(git log -1 --pretty=%an)" != "dc-guide-bot" ]; then printf '{"commit":"%s"}\n' "$GITHUB_SHA" > site/build.json; fi
-          git add data/generated site/dc/data site/fate/data site/films/data site/games/data site/anime/data site/build.json
+          git add data/generated site/dc/data site/marvel/data site/fate/data site/films/data site/games/data site/anime/data site/build.json
           git diff --cached --quiet || git commit -m "data: daily refresh${{ inputs.quiet == '1' && ' [skip netlify]' || '' }}"
           # إن وصل إلى الفرع إيداع جديد أثناء البناء (ملف توثيق مثلاً) يُدمج قبل الدفع بدل أن يُرفض
           git pull --rebase origin "${GITHUB_REF_NAME}"

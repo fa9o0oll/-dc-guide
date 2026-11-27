@@ -1,0 +1,27 @@
+// هوية كل عالم في دليل مارفل: لون الأرضية، لونان مميّزان، نقش الجو، والعمل الذي تؤخذ منه صورة العالم.
+// هذه قرارات تصميم لا بيانات؛ الصور نفسها تأتي من كتالوج TMDB. نقش «web» (شبكة العنكبوت) خاص بعالم ريمي.
+export const THEMES = {
+  mcu:         { bg: '#12070a', c1: '#ff4141', c2: '#f5c044', motif: 'rays',     key: 'avengers-endgame-2019' },
+  defenders:   { bg: '#0d0608', c1: '#ec3346', c2: '#f2b544', motif: 'rain',     key: 'marvel-s-daredevil-2015' },
+  mtv:         { bg: '#06101b', c1: '#5aa2ff', c2: '#d7e3f2', motif: 'scan',     key: 'marvel-s-agents-of-s-h-i-e-l-d-2013' },
+  xmen:        { bg: '#0a0d16', c1: '#ffc83d', c2: '#4f86ff', motif: 'slash',    key: 'x-men-days-of-future-past-2014' },
+  raimi:       { bg: '#110609', c1: '#ff3346', c2: '#5b95ff', motif: 'web',      key: 'spider-man-2-2004' },
+  webb:        { bg: '#080b16', c1: '#ff5050', c2: '#7fd3ff', motif: 'bolts',    key: 'the-amazing-spider-man-2012' },
+  ssu:         { bg: '#07070b', c1: '#dfe3ec', c2: '#a36bff', motif: 'steel',    key: 'venom-2018' },
+  spiderverse: { bg: '#0e0716', c1: '#ff4fae', c2: '#45d8ff', motif: 'halftone', key: 'spider-man-into-the-spider-verse-2018' },
+  blade:       { bg: '#0f0505', c1: '#ea2e36', c2: '#aab3bd', motif: 'gothic',   key: 'blade-1998' },
+  ff:          { bg: '#06101f', c1: '#58a2ff', c2: '#f4f6fb', motif: 'crystal',  key: 'fantastic-four-2005' },
+  hulk:        { bg: '#07130a', c1: '#6bdc72', c2: '#bb8fff', motif: 'beam',     key: 'the-incredible-hulk-1977' },
+  mau:         { bg: '#140b04', c1: '#ffb52b', c2: '#4a95ff', motif: 'deco',     key: 'x-men-1992' },
+  xd:          { bg: '#04121b', c1: '#36d3ff', c2: '#ff6262', motif: 'diamonds', key: 'marvel-s-ultimate-spider-man-2012' },
+  rising:      { bg: '#13071a', c1: '#ff78c8', c2: '#ffd84a', motif: 'stars',    key: 'marvel-rising-secret-warriors-2018' },
+  early_st:    { bg: '#161108', c1: '#e9b85f', c2: '#d15a45', motif: 'halftone', key: 'howard-the-duck-1986' },
+  movie_st:    { bg: '#140806', c1: '#ff6a3d', c2: '#ffc14a', motif: 'embers',   key: 'ghost-rider-2007' },
+  tv_st:       { bg: '#060f19', c1: '#57abff', c2: '#a8d8ff', motif: 'scan',     key: 'legion-2017' },
+  anim_tv_st:  { bg: '#05140b', c1: '#5fe272', c2: '#c2ff96', motif: 'horizon',  key: 'the-spectacular-spider-man-2008' },
+  anim_mv_st:  { bg: '#150606', c1: '#ff4a4a', c2: '#ffa24a', motif: 'circle',   key: 'big-hero-6-2014' },
+  anime:       { bg: '#10050f', c1: '#ff6593', c2: '#8fd3ff', motif: 'sand',     key: 'iron-man-rise-of-technovore-2013' },
+  motion:      { bg: '#0e0e10', c1: '#f2f2f2', c2: '#ff4141', motif: 'halftone', key: 'astonishing-x-men-2009' },
+  lego:        { bg: '#170c02', c1: '#ffd21a', c2: '#ff4a3d', motif: 'diamonds', key: 'lego-marvel-avengers-code-red-2023' },
+  shorts:      { bg: '#0a1020', c1: '#86b8ff', c2: '#ffd24a', motif: 'spiral',   key: 'marvel-s-rocket-and-groot-2017' },
+};
