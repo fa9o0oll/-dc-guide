@@ -1,0 +1,439 @@
+{
+ "top": 4,
+ "inventory": {
+  "companies": "^Marvel\\b",
+  "search": [
+   "Marvel",
+   "Marvel Studios",
+   "Marvel Entertainment",
+   "Marvel Television",
+   "Marvel Animation",
+   "Marvel Productions",
+   "Marvel Enterprises",
+   "Marvel Knights",
+   "Marvel Comics"
+  ],
+  "keywords": [
+   "marvel"
+  ],
+  "kwPattern": "marvel"
+ },
+ "queries": [
+  {
+   "q": "Captain America",
+   "year": 1944
+  },
+  {
+   "q": "The Marvel Super Heroes",
+   "year": 1966,
+   "kind": "tv"
+  },
+  {
+   "q": "Spider-Man",
+   "year": 1967,
+   "kind": "tv"
+  },
+  {
+   "q": "Fantastic Four",
+   "year": 1967,
+   "kind": "tv"
+  },
+  {
+   "q": "The Amazing Spider-Man",
+   "year": 1977,
+   "kind": "tv"
+  },
+  {
+   "q": "Spider-Man",
+   "year": 1977,
+   "kind": "movie"
+  },
+  {
+   "q": "Spider-Man Strikes Back",
+   "year": 1978,
+   "kind": "movie"
+  },
+  {
+   "q": "Spider-Man: The Dragon's Challenge",
+   "year": 1981,
+   "kind": "movie"
+  },
+  {
+   "q": "The Incredible Hulk",
+   "year": 1977,
+   "kind": "tv"
+  },
+  {
+   "q": "The Incredible Hulk",
+   "year": 1977,
+   "kind": "movie"
+  },
+  {
+   "q": "The Return of the Incredible Hulk",
+   "year": 1977,
+   "kind": "movie"
+  },
+  {
+   "q": "The Incredible Hulk Returns",
+   "year": 1988,
+   "kind": "movie"
+  },
+  {
+   "q": "The Trial of the Incredible Hulk",
+   "year": 1989,
+   "kind": "movie"
+  },
+  {
+   "q": "The Death of the Incredible Hulk",
+   "year": 1990,
+   "kind": "movie"
+  },
+  {
+   "q": "Dr. Strange",
+   "year": 1978,
+   "kind": "movie"
+  },
+  {
+   "q": "Captain America",
+   "year": 1979,
+   "kind": "movie"
+  },
+  {
+   "q": "Captain America II: Death Too Soon",
+   "year": 1979,
+   "kind": "movie"
+  },
+  {
+   "q": "Spider-Man",
+   "year": 1978,
+   "kind": "tv"
+  },
+  {
+   "q": "The New Fantastic Four",
+   "year": 1978,
+   "kind": "tv"
+  },
+  {
+   "q": "Spider-Woman",
+   "year": 1979,
+   "kind": "tv"
+  },
+  {
+   "q": "Spider-Man",
+   "year": 1981,
+   "kind": "tv"
+  },
+  {
+   "q": "Spider-Man and His Amazing Friends",
+   "year": 1981,
+   "kind": "tv"
+  },
+  {
+   "q": "The Incredible Hulk",
+   "year": 1982,
+   "kind": "tv"
+  },
+  {
+   "q": "Howard the Duck",
+   "year": 1986,
+   "kind": "movie"
+  },
+  {
+   "q": "The Punisher",
+   "year": 1989,
+   "kind": "movie"
+  },
+  {
+   "q": "Captain America",
+   "year": 1990,
+   "kind": "movie"
+  },
+  {
+   "q": "The Fantastic Four",
+   "year": 1994,
+   "kind": "movie"
+  },
+  {
+   "q": "Generation X",
+   "year": 1996,
+   "kind": "movie"
+  },
+  {
+   "q": "Nick Fury: Agent of S.H.I.E.L.D.",
+   "year": 1998,
+   "kind": "movie"
+  },
+  {
+   "q": "Blade",
+   "year": 1998,
+   "kind": "movie"
+  },
+  {
+   "q": "Blade: The Series",
+   "year": 2006,
+   "kind": "tv"
+  },
+  {
+   "q": "Man-Thing",
+   "year": 2005,
+   "kind": "movie"
+  },
+  {
+   "q": "Mutant X",
+   "year": 2001,
+   "kind": "tv"
+  },
+  {
+   "q": "X-Men",
+   "year": 1992,
+   "kind": "tv"
+  },
+  {
+   "q": "Iron Man",
+   "year": 1994,
+   "kind": "tv"
+  },
+  {
+   "q": "Fantastic Four",
+   "year": 1994,
+   "kind": "tv"
+  },
+  {
+   "q": "Spider-Man",
+   "year": 1994,
+   "kind": "tv"
+  },
+  {
+   "q": "The Incredible Hulk",
+   "year": 1996,
+   "kind": "tv"
+  },
+  {
+   "q": "Silver Surfer",
+   "year": 1998,
+   "kind": "tv"
+  },
+  {
+   "q": "Spider-Man Unlimited",
+   "year": 1999,
+   "kind": "tv"
+  },
+  {
+   "q": "The Avengers: United They Stand",
+   "year": 1999,
+   "kind": "tv"
+  },
+  {
+   "q": "X-Men: Evolution",
+   "year": 2000,
+   "kind": "tv"
+  },
+  {
+   "q": "Spider-Man: The New Animated Series",
+   "year": 2003,
+   "kind": "tv"
+  },
+  {
+   "q": "Fantastic Four: World's Greatest Heroes",
+   "year": 2006,
+   "kind": "tv"
+  },
+  {
+   "q": "The Spectacular Spider-Man",
+   "year": 2008,
+   "kind": "tv"
+  },
+  {
+   "q": "Iron Man: Armored Adventures",
+   "year": 2009,
+   "kind": "tv"
+  },
+  {
+   "q": "Wolverine and the X-Men",
+   "year": 2009,
+   "kind": "tv"
+  },
+  {
+   "q": "The Super Hero Squad Show",
+   "year": 2009,
+   "kind": "tv"
+  },
+  {
+   "q": "The Avengers: Earth's Mightiest Heroes",
+   "year": 2010,
+   "kind": "tv"
+  },
+  {
+   "q": "Iron Man",
+   "year": 2010,
+   "kind": "tv"
+  },
+  {
+   "q": "Wolverine",
+   "year": 2011,
+   "kind": "tv"
+  },
+  {
+   "q": "X-Men",
+   "year": 2011,
+   "kind": "tv"
+  },
+  {
+   "q": "Blade",
+   "year": 2011,
+   "kind": "tv"
+  },
+  {
+   "q": "Spider-Noir",
+   "year": 2026,
+   "kind": "tv"
+  },
+  {
+   "q": "Wonder Man",
+   "year": 2026,
+   "kind": "tv"
+  },
+  {
+   "q": "VisionQuest",
+   "kind": "tv"
+  },
+  {
+   "q": "Avengers: Doomsday",
+   "year": 2026,
+   "kind": "movie"
+  },
+  {
+   "q": "Avengers: Secret Wars",
+   "year": 2027,
+   "kind": "movie"
+  },
+  {
+   "q": "Spider-Man: Brand New Day",
+   "year": 2026,
+   "kind": "movie"
+  },
+  {
+   "q": "Spider-Man: Beyond the Spider-Verse",
+   "year": 2027,
+   "kind": "movie"
+  },
+  {
+   "q": "The Punisher: One Last Kill"
+  },
+  {
+   "q": "X-Men '97",
+   "year": 2024,
+   "kind": "tv"
+  },
+  {
+   "q": "Marvel Zombies",
+   "year": 2025,
+   "kind": "tv"
+  },
+  {
+   "q": "Eyes of Wakanda",
+   "year": 2025,
+   "kind": "tv"
+  },
+  {
+   "q": "Your Friendly Neighborhood Spider-Man",
+   "year": 2025,
+   "kind": "tv"
+  },
+  {
+   "q": "Ironheart",
+   "year": 2025,
+   "kind": "tv"
+  },
+  {
+   "q": "Daredevil: Born Again",
+   "year": 2025,
+   "kind": "tv"
+  },
+  {
+   "q": "Big Hero 6",
+   "year": 2014,
+   "kind": "movie"
+  },
+  {
+   "q": "Big Hero 6: The Series",
+   "year": 2017,
+   "kind": "tv"
+  },
+  {
+   "q": "Ultimate Avengers",
+   "year": 2006,
+   "kind": "movie"
+  },
+  {
+   "q": "The Invincible Iron Man",
+   "year": 2007,
+   "kind": "movie"
+  },
+  {
+   "q": "Doctor Strange",
+   "year": 2007,
+   "kind": "movie"
+  },
+  {
+   "q": "Next Avengers: Heroes of Tomorrow",
+   "year": 2008,
+   "kind": "movie"
+  },
+  {
+   "q": "Hulk Vs.",
+   "year": 2009,
+   "kind": "movie"
+  },
+  {
+   "q": "Planet Hulk",
+   "year": 2010,
+   "kind": "movie"
+  },
+  {
+   "q": "Thor: Tales of Asgard",
+   "year": 2011,
+   "kind": "movie"
+  },
+  {
+   "q": "Iron Man: Rise of Technovore",
+   "year": 2013,
+   "kind": "movie"
+  },
+  {
+   "q": "Avengers Confidential: Black Widow & Punisher",
+   "year": 2014,
+   "kind": "movie"
+  },
+  {
+   "q": "Iron Man & Hulk: Heroes United",
+   "year": 2013,
+   "kind": "movie"
+  },
+  {
+   "q": "Iron Man & Captain America: Heroes United",
+   "year": 2014,
+   "kind": "movie"
+  },
+  {
+   "q": "Hulk: Where Monsters Dwell",
+   "year": 2016,
+   "kind": "movie"
+  },
+  {
+   "q": "Marvel Rising: Secret Warriors",
+   "year": 2018,
+   "kind": "movie"
+  },
+  {
+   "q": "Spider-Man: Into the Spider-Verse",
+   "year": 2018,
+   "kind": "movie"
+  },
+  {
+   "q": "Spider-Man: Across the Spider-Verse",
+   "year": 2023,
+   "kind": "movie"
+  }
+ ]
+}
