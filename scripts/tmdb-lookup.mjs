@@ -27,9 +27,18 @@ async function inventory({ companies: pat, search = [], keywords = [], kwPattern
   for (const r of rows.filter(Boolean).sort((a, b) => (a.d || '9999').localeCompare(b.d || '9999'))) console.log('INV ' + JSON.stringify(r));
   console.log(`INVSUM ${seen.size} titles from ${cos.size} companies and ${kws.size} keywords`);
 }
+// تفاصيل (details): لكل [tv|mv، رقم TMDB] نبذته بالإنجليزية وبالعربية إن وُجدت، ومواسمه وحلقاتها، ليُكتب الكتالوج والترجمة منها. يُطبع سطر DET لكل عمل
+async function details(list) {
+  const rows = await Promise.all(list.map(async ([k, id]) => { const tv = k === 'tv', d = await tmdb(`/${tv ? 'tv' : 'movie'}/${id}`, { language: 'en-US', append_to_response: 'translations,external_ids' }).catch(e => ({ err: e.message })); if (d.err) return { k, id, err: d.err };
+    const ar = (d.translations?.translations || []).filter(t => t.iso_639_1 === 'ar').map(t => (t.data?.overview || '').trim()).find(Boolean) || null;
+    return { k, id, t: d.title || d.name, d: (tv ? d.first_air_date : d.release_date) || null, st: d.status, ov: d.overview || '', ar, tag: d.tagline || undefined, rt: tv ? undefined : d.runtime,
+      ss: tv ? (d.seasons || []).map(s => `${s.season_number}:${s.episode_count}:${s.air_date || ''}`).join(' ') : undefined, imdb: d.imdb_id || d.external_ids?.imdb_id || null }; }));
+  for (const r of rows) console.log('DET ' + JSON.stringify(r));
+}
 for (const f of files) {
-  const { queries = [], top = 6, inventory: inv } = JSON.parse(fs.readFileSync(new URL(f, dir)));
+  const { queries = [], top = 6, inventory: inv, details: det } = JSON.parse(fs.readFileSync(new URL(f, dir)));
   if (inv) await inventory(inv);
+  if (det) await details(det);
   for (const q of queries) {
     const out = { file: f, q: q.q, year: q.year, tv: [], movie: [] };
     for (const kind of q.kind ? [q.kind] : ['tv', 'movie']) {
