@@ -1,8 +1,6 @@
 {
- "at": "2026-11-26T22:51:06.390Z",
- "failed": [
-  "psplus"
- ],
+ "at": "2026-11-27T12:21:03.863Z",
+ "failed": [],
  "lists": {
   "gp.console": "All Console Games (582)",
   "gp.pc": "All PC Games (502)",
@@ -14,10 +12,10 @@
   "gp.leavingPc": "Leaving soon (8)",
   "gp.coming": "Coming to Game Pass (8)",
   "gp.comingPc": "Coming to Game Pass (9)",
-  "ps.extra": "FAILED",
-  "ps.ubi": "FAILED",
-  "ps.deluxe": "FAILED",
-  "ps.month": "FAILED"
+  "ps.extra": "411",
+  "ps.ubi": "64",
+  "ps.deluxe": "161",
+  "ps.month": "3"
  },
  "games": {
   "Limbo": "gp:xbox+pc",
@@ -81,7 +79,7 @@
   "Borderlands": "—",
   "Grand Theft Auto V": "—",
   "Alice: Madness Returns": "gp:pc:ea",
-  "Assassin's Creed III": "gp:xbox+pc~title(Assassin's Creed® III Remastered) ps:extra:ps4(Assassin's Creed III Remastered)",
+  "Assassin's Creed III": "gp:xbox+pc~title(Assassin's Creed® III Remastered) ps:extra:ps4~title(Assassin's Creed III Remastered)",
   "Sleeping Dogs": "—",
   "Crysis 3": "gp:xbox+pc:ea",
   "Bayonetta": "—",
@@ -177,7 +175,7 @@
   "Darksiders: Warmastered Edition": "—",
   "Mitsurugi Kamui Hikae": "—",
   "Hyper Void": "—",
-  "Marvel's Spider-Man": "ps:extra:ps5+ps4(Marvel's Spider-Man Remastered)",
+  "Marvel's Spider-Man": "ps:extra:ps5+ps4~title(Marvel's Spider-Man Remastered)",
   "Injustice 2": "—",
   "Street Fighter V": "—",
   "Teslagrad": "—",
@@ -227,7 +225,138 @@
  },
  "byTitle": [
   "gp BPMJ413V6BB2,9NKD0MLJ3Z3X \"Assassin's Creed® III Remastered\" → Assassin's Creed III",
-  "gp 9N2HB4MWG7HM,9N04NS8TP202 \"Killer Instinct: Anniversary Edition\" → Killer Instinct"
+  "ps 231856,231856 \"Assassin's Creed® III Remastered\" → Assassin's Creed III",
+  "gp 9N2HB4MWG7HM,9N04NS8TP202 \"Killer Instinct: Anniversary Edition\" → Killer Instinct",
+  "ps 10000762,10000762 \"Marvel's Spider-Man Remastered\" → Marvel's Spider-Man"
  ],
- "sample": {}
+ "sample": {
+  "extra": {
+   "conceptId": 228903,
+   "name": "A Hat in Time",
+   "nameEn": "A Hat in Time",
+   "conceptUrl": "https://store.playstation.com/en-sa/concept/228903",
+   "imageUrl": "https://image.api.playstation.com/cdn/EP3717/CUSA10028_00/W5zEdEr6WbWrhcZKurNdeDo7qUXDyo4I.png",
+   "genre": [
+    "ADVENTURE",
+    "ACTION",
+    "ACTION"
+   ],
+   "ageRating": {
+    "authority": "PEGI",
+    "description": "PEGI 7",
+    "name": "PEGI_7",
+    "url": "https://image.api.playstation.com/grc/images/ratings/hd/pegi/7.png",
+    "url4k": "https://image.api.playstation.com/grc/images/ratings/4k/pegi/7.png",
+    "descriptors": [
+     {
+      "description": "Fear",
+      "name": "PEGI_FEAR",
+      "url": "https://image.api.playstation.com/grc/images/descriptors/hd/pegi/fear.png",
+      "url4k": "https://image.api.playstation.com/grc/images/descriptors/4k/pegi/fear.png"
+     },
+     {
+      "description": "Violence",
+      "name": "PEGI_VIOLENCE",
+      "url": "https://image.api.playstation.com/grc/images/descriptors/hd/pegi/violence.png",
+      "url4k": "https://image.api.playstation.com/grc/images/descriptors/4k/pegi/violence.png"
+     }
+    ],
+    "interactiveElements": []
+   },
+   "device": [
+    "PS4"
+   ],
+   "releaseDate": "2017-12-05T21:00:00Z",
+   "productId": "EP3717-CUSA10028_00-AHATINTIMEPS4000",
+   "streamingSupported": false
+  },
+  "ubi": {
+   "conceptId": 10003143,
+   "name": "Anno 1800",
+   "nameEn": "Anno 1800",
+   "conceptUrl": "https://store.playstation.com/en-sa/concept/10003143",
+   "imageUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202212/1519/4VflW4eIDaJxRKQjgoQn7NhX.png",
+   "genre": [
+    "STRATEGY",
+    "SIMULATION"
+   ],
+   "ageRating": {
+    "authority": "GCAM",
+    "description": "GMEDIA 16",
+    "name": "GCAM_16",
+    "url": "https://image.api.playstation.com/grc/images/ratings/hd/gmedia/16.png",
+    "url4k": "https://image.api.playstation.com/grc/images/ratings/4k/gmedia/16.png",
+    "descriptors": [],
+    "interactiveElements": []
+   },
+   "device": [
+    "PS5"
+   ],
+   "releaseDate": "2023-03-15T21:00:00Z",
+   "productId": "EP0001-PPSA04719_00-ANNO1800PS000000",
+   "streamingSupported": false
+  },
+  "deluxe": {
+   "conceptId": 10011762,
+   "name": "Alone in the Dark 2 (1996)",
+   "nameEn": "Alone in the Dark 2 (1996)",
+   "conceptUrl": "https://store.playstation.com/en-sa/concept/10011762",
+   "imageUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202410/3019/f2c5ed132e1c7c0fdba7c822b97d5885ceaf95c8de3c1bc1.png",
+   "genre": [
+    "ACTION"
+   ],
+   "ageRating": {
+    "authority": "Generic",
+    "description": "IARC 7+",
+    "name": "GENERIC_7",
+    "url": "https://image.api.playstation.com/grc/images/ratings/hd/generic/iarc_7.png",
+    "url4k": "https://image.api.playstation.com/grc/images/ratings/4k/generic/iarc_7.png",
+    "descriptors": [
+     {
+      "description": "Fear",
+      "name": "GENERIC_FEAR"
+     },
+     {
+      "description": "Mild Violence",
+      "name": "GENERIC_MILD_VIOLENCE"
+     }
+    ],
+    "interactiveElements": []
+   },
+   "device": [
+    "PS4",
+    "PS5"
+   ],
+   "releaseDate": "2025-04-15T08:00:00Z",
+   "productId": "EP4389-PPSA24515_00-EMUPS1ALONEDARK2",
+   "streamingSupported": false
+  },
+  "month": {
+   "conceptId": 201061,
+   "name": "Dead Island 2",
+   "nameEn": "Dead Island 2",
+   "conceptUrl": "https://store.playstation.com/en-sa/concept/201061",
+   "imageUrl": "https://image.api.playstation.com/vulcan/ap/rnd/202208/1012/V6WJkRhfNIQ3ePfAmrLSfGng.png",
+   "genre": [
+    "ACTION",
+    "ACTION"
+   ],
+   "ageRating": {
+    "authority": "GCAM",
+    "description": "GMEDIA 18",
+    "name": "GCAM_18",
+    "url": "https://image.api.playstation.com/grc/images/ratings/hd/gmedia/18.png",
+    "url4k": "https://image.api.playstation.com/grc/images/ratings/4k/gmedia/18.png",
+    "descriptors": [],
+    "interactiveElements": []
+   },
+   "device": [
+    "PS5",
+    "PS4"
+   ],
+   "releaseDate": "2023-04-20T21:00:00Z",
+   "productId": "EP4062-PPSA03099_00-DI2MAINSIEEPS500",
+   "streamingSupported": false
+  }
+ }
 }

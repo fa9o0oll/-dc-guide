@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-26T22:50:08.211Z",
+ "generatedAt": "2026-11-27T12:20:02.821Z",
  "counts": {
   "works": 629,
   "withEntry": 375,
@@ -18,7 +18,7 @@
   "chronoAuto": 31,
   "infoEntries": 466,
   "bytes": 203020,
-  "seconds": 14
+  "seconds": 13
  },
  "missing": [
   {
@@ -4653,19 +4653,19 @@
    ]
   },
   {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
+   "g": "Q56070713",
+   "name": "Walt Disney Animation Studios feature film",
    "why": "catalog",
-   "size": 23,
+   "size": 66,
    "types": [
     "animated film series"
    ]
   },
   {
-   "g": "Q56070713",
-   "name": "Walt Disney Animation Studios feature film",
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
    "why": "catalog",
-   "size": 66,
+   "size": 23,
    "types": [
     "animated film series"
    ]
