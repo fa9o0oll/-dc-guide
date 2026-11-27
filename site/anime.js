@@ -14,8 +14,7 @@ import { readMalFile } from './anime-mal.js?v=__BUILD__';
 import { describe, noun, model } from './anime-pos.js?v=__BUILD__';
 import { themeOf } from './anime-theme.js?v=__BUILD__';
 import { GENRE } from './anime-genres.js?v=__BUILD__';
-import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead, simklCanWrite } from './anime-simkl.js?v=__BUILD__';
-import { outInit, outMark, outState, outRelink, outForget, outFlush } from './anime-out.js?v=__BUILD__';
+import { accInit, accMark, accSync, accLink, accPoll, accUnlink, accLinks, accState, accSetPass, accPass } from './accounts.js?v=__BUILD__';
 import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover, dockEye } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
@@ -278,10 +277,10 @@ function setView(v) { ui.view = v; $$('.views button').forEach(b => b.setAttribu
 function renderAll(keepShown) { renderSky(); renderLists(); if (ui.view === 'worlds') $('#worlds').innerHTML = worldsHTML(); renderGrid(keepShown); if ($('#addd')?.open) drawAddRes(); }
 
 // ---------- تعديل السجل. كل تعديل يُحفظ ويُزامَن فوراً، ومعه «تراجع»
-// وكل تعديل وتراجع عنه يدخل صندوق الصادر إلى حساباتك المربوطة (anime-out.js، E84)
+// وكل تعديل وتراجع عنه يصل حساباتك المربوطة عبر الخادم (accounts.js، E84)
 function commit(id, before, say) { const m = P.a[id]; if (m) { if (!m.p) delete m.p; if (!m.r) delete m.r; if (!m.b) delete m.b; if (!m.e) delete m.e; if (!m.s) delete P.a[id]; }
-  save(); outMark(id, before); const moved = (before?.s || '') !== (P.a[id]?.s || ''); redraw(id, moved);
-  if (say) toast(say, () => { const cur = P.a[id] ? { ...P.a[id] } : null; if (before) P.a[id] = before; else delete P.a[id]; save(); outMark(id, cur); redraw(id, true); }); }
+  save(); accMark(id, P.a[id]); const moved = (before?.s || '') !== (P.a[id]?.s || ''); redraw(id, moved);
+  if (say) toast(say, () => { const cur = P.a[id] ? { ...P.a[id] } : null; if (before) P.a[id] = before; else delete P.a[id]; save(); accMark(id, P.a[id]); redraw(id, true); }); }
 // ما تغيّر مكانه (دخل قائمة أو خرج منها) يُعاد رسم الصفحة له، وما تغيّر تقدّمه فقط يُحدَّث سِله في مكانه
 function redraw(id, moved) { const a = D.by.get(id); if (moved) renderAll(true); else { renderLists(); $('#tally').innerHTML = tallyHTML();
     for (const c of $$(`.cel[data-id="${id}"]`)) { const rail = !!c.closest('.rail'), t = document.createElement('template'); t.innerHTML = celHTML(a, rail ? 'rail' : 'grid', +c.style.getPropertyValue('--i') || 0); const n = t.content.firstElementChild; n.style.animation = 'none'; c.replaceWith(n); } }
@@ -645,7 +644,7 @@ async function sendAdd(id, s, info, pw) {
   if (!r.ok) throw new Error(j.error ? esc(j.error) : 'تعذّرت الإضافة الآن. حاول بعد قليل.');
   store.set(PASS, pw); const m = addedMap(); m[id] = { t: info.t, s, at: today, ty: info.type, n: info.eps, y: info.y, im: info.im, ...(!info.im && info.iu ? { iu: info.iu } : {}), ...(info.ad ? { ad: 1 } : {}) }; store.set(ADDK, JSON.stringify(m));
   enroll(localOf(id, m[id])); const v = LIVE.has(id) ? await LIVE.get(id) : null, a = D.by.get(id); if (v && a) fillPending(a, v);
-  if (!P.a[id]) { P.a[id] = { s }; save(); outMark(id, null); } renderAll(true); drawAddRes(); toast(`${ltr(info.t)} في «${LNAME[s]}». تكتمل حلقاته وأماكن عرضه مع البناء القادم.`); }
+  if (!P.a[id]) { P.a[id] = { s }; save(); accMark(id, P.a[id]); } renderAll(true); drawAddRes(); toast(`${ltr(info.t)} في «${LNAME[s]}». تكتمل حلقاته وأماكن عرضه مع البناء القادم.`); }
 const addFail = e => e instanceof TypeError ? 'تعذّر الاتصال. تحقق من الشبكة ثم حاول.' : e.message;
 async function addMal(btn) { const row = btn.closest('.arow'), id = +row.dataset.mal, s = btn.dataset.s, x = ADD.mal?.find(m => m.id === id); if (!x || !LNAME[s]) return;
   const field = row.querySelector('.add-pass'), pw = field?.value || pass();
@@ -752,40 +751,54 @@ async function openWorld(wid, push = true, from = null) { const w = D.wby.get(wi
 function redrawGate() { const w = D.wby.get(wopen); if (!w || !GM || !$('#wsheet').open) return; const h = $('#wsheet-body .gw-hero'), tl = $('#wsheet-body .gw-tl'); if (h) h.outerHTML = GM.heroHTML(w); if (tl) tl.innerHTML = GM.lineHTML(w); }
 
 // ---------- «قائمتي وحساباتي»: الاستيراد من ملف MyAnimeList، والربط بـSIMKL، ونسخة احتياطية
-const IMP = { mal: null, msg: '', ok: false, simkl: null, sk: null };
+const IMP = { mal: null, msg: '', ok: false, acc: null };
 const sumHTML = t => `<div class="sum">${[['الكل', t.all], ...LISTS.map(([k, n]) => [n, t[k]]), ['حلقة', t.episodes], ['تقييماً', t.scored]].map(([n, v]) => `<div><b>${num(v || 0)}</b><span>${n}</span></div>`).join('')}</div>`;
 const sameCore = (m, o) => m.s === o.s && (m.p || 0) === (o.p || 0) && (!o.r || o.r === m.r);
 function diff(entries, core) { let add = 0, change = 0, same = 0, unknown = 0; for (const e of entries) { const m = P.a[e.id], o = toMine(e); if (!o) continue; if (!D.known.has(e.id)) unknown++;
     if (!m) add++; else if (core ? sameCore(m, o) : JSON.stringify(sane(m)) === JSON.stringify(o)) same++; else change++; } return { add, change, same, unknown }; }
 const toMine = e => sane({ s: e.status, p: e.watched, r: e.score, b: e.start, e: e.finish });
-function impHTML() { const m = IMP.mal, log = hasLog(), n = Object.keys(P.a).length, tok = simklToken();
+function impHTML() { const m = IMP.mal, log = hasLog(), n = Object.keys(P.a).length;
   const malBox = m ? (() => { const d = diff(m.entries), gone = log ? Object.keys(P.a).filter(id => !m.entries.some(e => e.id === +id)).length : 0;
       return `<p class="lbl">ملف ${ltr(m.user.name || 'MyAnimeList')}</p>${sumHTML(m.totals)}
       <p class="lbl">${log ? `مقارنةً بسجلّك هنا: ${num(d.add)} جديد، ${num(d.change)} تغيّر، ${num(d.same)} كما هو${gone ? `، و${num(gone)} في سجلّك وليس في الملف (يبقى)` : ''}.` : 'لا سجل على هذا الجهاز بعد: يدخل الملف كله.'}${d.unknown ? ` ${nWorks(d.unknown)} ليست في كتالوج الموقع بعد: تُحفظ في سجلّك، وتظهر بعد أن تُضاف إلى الكتالوج.` : ''}${m.skipped.length ? ` ${num(m.skipped.length)} سطراً بلا رقم أو حالة لم يُقرأ.` : ''}</p>
       <div class="acts"><button class="btn pri" data-act="imp-apply">${log ? 'حدّث سجلّي من الملف' : 'استورد سجلّي'}</button><button class="btn ghost" data-act="imp-clear">اختر ملفاً آخر</button></div>`; })()
     : `<ol><li>في ${ltr('MyAnimeList')}: القائمة ← ${ltr('Export')} ← ${ltr('Anime List')}. <a href="https://myanimelist.net/panel.php?go=export" target="_blank" rel="noopener">افتح صفحة التصدير</a></li><li>ينزل ملف اسمه ${ltr('animelist_….xml.gz')}. اختره هنا كما هو.</li></ol>
       <label class="drop" id="drop"><input class="sr" id="imp-file" type="file" accept=".gz,.xml,application/gzip,text/xml,application/xml"><b>اختر ملف التصدير</b><span>أو اسحبه إلى هنا. يُقرأ في متصفحك ولا يُرفع إلى أي مكان.</span></label>`;
-  const sk = IMP.simkl ? `<p class="lbl">افتح صفحة ${ltr('SIMKL')} ووافق على الرمز، وهذه النافذة تكمل وحدها.</p><div class="sum"><div><b dir="ltr">${esc(IMP.simkl.user_code)}</b><span>رمز الربط</span></div></div>
-      <div class="acts"><a class="btn pri" href="${esc(IMP.simkl.verification_uri_complete || IMP.simkl.verification_uri || 'https://simkl.com/pin')}" target="_blank" rel="noopener">افتح ${ltr('SIMKL')} للموافقة</a><button class="btn ghost" data-act="sk-cancel">ألغِ</button></div>`
-    : IMP.sk ? (() => { const d = IMP.sk; return `${sumHTML(d.totals)}<p class="lbl">طوبق ${nWorks(d.matched)} من ${ltr('SIMKL')} بأعمال الموقع${d.unmatched ? `، وبقي ${nWorks(d.unmatched)} بلا رقم في ${ltr('MyAnimeList')} فلم يُطابَق` : ''}. مقارنةً بسجلّك هنا: ${num(d.diff.add)} جديد، ${num(d.diff.change)} يختلف، ${num(d.diff.same)} مطابق.${d.diff.unknown ? ` ${nWorks(d.diff.unknown)} ليست في كتالوج الموقع بعد: تُحفظ في سجلّك، وتظهر بعد أن تُضاف إلى الكتالوج.` : ''}</p>
-      <div class="acts"><button class="btn pri" data-act="sk-apply" data-how="ahead">ادمج: الأبعد تقدّماً يغلب</button><button class="btn ghost" data-act="sk-apply" data-how="simkl">اعتمد ${ltr('SIMKL')} عند الاختلاف</button><button class="btn ghost" data-act="sk-apply" data-how="new">أضف الجديد فقط</button></div>
-      <p class="lbl">«الأبعد تقدّماً»: لكل عمل يختلف تؤخذ الحالة والحلقات ممن شاهد أكثر، ويبقى تقييمك وتاريخاك إن وُجدت، وما تركته يبقى متروكاً ما لم تزد حلقاته. قبل أي دمج تُحفظ نسخة من سجلّك للتراجع.</p>
-      <p class="lbl">عدد الحلقات لا يتجاوز حلقات العمل هنا (${ltr('SIMKL')} يجمع أحياناً أجزاء في مدخل واحد).${d.bulk ? ` وأيام نقل القائمة إلى ${ltr('SIMKL')} (${count(d.bulk, ['يوم واحد', 'يومان', 'أيام', 'يوماً', 'يوم'])}: أعمال كثيرة عُلّمت دفعة واحدة) لا تُحسب تواريخ مشاهدة.` : ''}</p>
-      <div class="acts"><button class="btn quiet" data-act="sk-raw">نزّل ما أرسله ${ltr('SIMKL')} كاملاً (فيه تاريخ كل حلقة)</button></div>`; })()
-    : tok ? (() => { const w = simklCanWrite(), o = outState('simkl'), n = o.pending;
-        const st = !w ? '' : o.err === 'auth' ? ` <b class="warn">لم يقبل ${ltr('SIMKL')} الكتابة بهذا الربط: اربطه من جديد ووافق على الكتابة${n ? `، وتنتظر ${nWorks(n)}` : ''}.</b>`
-          : o.err === 'net' ? ` تعذّر الاتصال، ويُعاد الإرسال وحده حين يعود${n ? ` (تنتظر ${nWorks(n)})` : ''}.` : o.err ? ` <b class="warn">لم يقبل ${ltr('SIMKL')} آخر إرسال: ${esc(o.err)}</b>`
-          : n ? ` ينتظر الإرسال ${nWorks(n)}.` : o.at ? ' كل تعديلاتك وصلته ✓' : '';
-        return `<p class="lbl" id="sk-st">${w ? `حسابك في ${ltr('SIMKL')} مربوط على هذا الجهاز، وما تعدّله هنا يصله أولاً بأول: حالة كل عمل وحلقاته وتقييمك.${st}`
-          : `حسابك في ${ltr('SIMKL')} مربوط على هذا الجهاز للقراءة فقط. اسمح بالكتابة ليصله ما تعدّله هنا أولاً بأول: حالة كل عمل وحلقاته وتقييمك. تضغط الزر، يظهر رمز، توافق عليه في صفحة ${ltr('SIMKL')}.`}</p>
-        <div class="acts">${!w || o.err === 'auth' ? `<button class="btn pri" data-act="sk-start">اسمح بالكتابة</button>` : ''}<button class="btn ${w && o.err !== 'auth' ? 'pri' : 'ghost'}" data-act="sk-pull">اسحب سجلّي من ${ltr('SIMKL')}</button>${w && n && o.err !== 'auth' ? '<button class="btn ghost" data-act="sk-push">أرسل الآن</button>' : ''}<button class="btn quiet" data-act="sk-forget">افصل الحساب</button></div>`; })()
-    : `<p class="lbl">يسحب حالة كل عمل وحلقاته وتقييمه من حسابك، ويرسل إليه ما تعدّله هنا أولاً بأول. تضغط الزر، يظهر رمز، توافق عليه في صفحة ${ltr('SIMKL')}. رمز الدخول يبقى في هذا المتصفح فقط.${outState('simkl').pending ? ` وتنتظر ${nWorks(outState('simkl').pending)} حتى تربطه.` : ''}</p><div class="acts"><button class="btn pri" data-act="sk-start">اربط ${ltr('SIMKL')}</button></div>`;
   return `<h2 id="imp-h">قائمتي وحساباتي</h2>
-    <section class="sec"><h3>${ltr('MyAnimeList')}</h3>${malBox}</section>
-    <section class="sec"><h3>${ltr('SIMKL')}</h3>${sk}</section>
+    ${accHTML()}
+    <section class="sec"><h3>استيراد ملف ${ltr('MyAnimeList')}</h3>${malBox}</section>
     ${IMP.msg ? `<p class="msg${IMP.ok ? ' ok' : ''}" role="alert">${IMP.msg}</p>` : ''}
     <section class="sec"><h3>نسخة من سجلّي</h3><p class="lbl">${log ? `في سجلّك ${nWorks(n)}.` : 'سجلّك فارغ على هذا الجهاز.'} النسخة ملف ${ltr('JSON')} فيه حالاتك وحلقاتك وتقييماتك وتواريخك.</p>
       <div class="acts"><button class="btn ghost" data-act="backup" ${log ? '' : 'disabled'}>نزّل نسخة</button>${store.get(KEY + '.bak') ? '<button class="btn quiet" data-act="restore">تراجع عن آخر استيراد</button>' : ''}</div></section>`; }
+// ---------- حساباتك (E84): ربط مرة واحدة على الخادم، ثم مزامنة تلقائية بالاتجاهين من كل أجهزتك (site/accounts.js)
+const ACC = { mal: 'MyAnimeList', simkl: 'SIMKL' };
+const ago = t => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? 'الآن' : m < 60 ? `قبل ${count(m, ['دقيقة', 'دقيقتين', 'دقائق', 'دقيقة', 'دقيقة'])}` : m < 1440 ? `قبل ${count(Math.round(m / 60), ['ساعة', 'ساعتين', 'ساعات', 'ساعة', 'ساعة'])}` : `قبل ${count(Math.round(m / 1440), ['يوم', 'يومين', 'أيام', 'يوماً', 'يوم'])}`; };
+function accHTML() { const st = accState(), L = st.links || {}, w = IMP.acc;
+  const row = k => { const l = L[k] || {}, on = l.on, err = on && l.err ? (l.err === 'net' ? 'تعذّر الاتصال به في آخر مزامنة، ويُعاد وحده.' : l.err === 'auth' ? 'انتهى الربط: اربطه من جديد.' : `لم يقبل آخر تحديث: ${esc(l.err)}`) : '';
+    return `<div class="acc-row${on ? ' on' : ''}" data-svc="${k}"><b dir="ltr">${ACC[k]}</b><span>${l.dead ? '<em class="warn">انتهى الربط: اربطه من جديد.</em>' : on ? `مربوط ✓${l.at ? ` · آخر مزامنة ${ago(l.at)}` : ''}${err ? ` <em class="warn">${err}</em>` : ''}` : l.ready === false ? 'يُجهَّز قريباً' : 'غير مربوط'}</span>
+      ${on && !l.dead ? `<button class="btn quiet" data-act="acc-unlink" data-svc="${k}">افصل</button>` : l.ready === false ? '' : `<button class="btn pri" data-act="acc-link" data-svc="${k}">اربط</button>`}</div>`; };
+  // بلا كلمة سر في هذا المتصفح لا يُعرف حال الحسابات: تُطلب أولاً بدل صفوف قد توهم أنها غير مربوطة
+  const pass = st.pass || !accPass() ? `<form class="acc-pass" data-act="acc-pass"><label>كلمة سر الموقع مرة واحدة في هذا المتصفح (نفسها في «أضف أنمي»)<input type="password" autocomplete="current-password" required></label><button class="btn pri" type="submit">تم</button></form>` : '';
+  const wait = w ? `<p class="lbl">افتح صفحة ${ltr(ACC[w.svc])} ووافق على الرمز، وهذه النافذة تكمل وحدها.</p><div class="sum"><div><b dir="ltr">${esc(w.code)}</b><span>رمز الربط</span></div></div>
+      <div class="acts"><a class="btn pri" href="${esc(w.url)}" target="_blank" rel="noopener">افتح ${ltr(ACC[w.svc])} للموافقة</a><button class="btn ghost" data-act="acc-cancel">ألغِ</button></div>` : '';
+  const any = Object.values(L).some(l => l.on);
+  return `<section class="sec" id="accounts"><h3>حساباتك</h3><p class="lbl">اربط كل حساب مرة واحدة من أي جهاز، وبعدها يتزامن وحده بالاتجاهين: ما تعدّله هنا يصله، وما تعدّله هناك يصل هنا وإلى الحساب الآخر، ولو كانت الصفحة مغلقة.</p>
+    ${pass}${wait}${pass ? '' : `<div class="acc">${Object.keys(ACC).map(row).join('')}</div>`}
+    ${any ? `<div class="acts"><button class="btn ghost" data-act="acc-sync"${st.busy ? ' disabled' : ''}>${st.busy ? 'يزامن…' : 'زامن الآن'}</button></div>` : ''}${st.err ? `<p class="lbl"><em class="warn">${esc(st.err)}</em></p>` : ''}</section>`; }
+async function accGo(svc) { IMP.msg = ''; try { const r = await accLink(svc); if (r.away) return; IMP.acc = { svc, code: r.code, url: r.url, until: r.until || Date.now() + 9e5 }; drawImp();
+    const w = IMP.acc; while (IMP.acc === w && Date.now() < w.until) { await new Promise(res => setTimeout(res, (r.every || 5) * 1000)); if (IMP.acc !== w) return;
+      const p = await accPoll(svc); if (p.done) { IMP.acc = null; IMP.ok = true; IMP.msg = `رُبط ${ltr(ACC[svc])}، والمزامنة تبدأ الآن.`; drawImp(); return; } if (p.gone) break; }
+    if (IMP.acc === w) { IMP.acc = null; IMP.ok = false; IMP.msg = 'انتهت مهلة الرمز قبل الموافقة. اضغط «اربط» من جديد.'; drawImp(); } }
+  catch (e) { IMP.acc = null; IMP.ok = false; IMP.msg = e.pass ? '' : esc(e.message || 'تعذّر الربط.'); drawImp(); } }
+// ما وصل من حساباتك: يُطبَّق على السجل ولا يُعاد إرساله، ويحفظ تاريخيك ويكملهما إن بدأ العمل أو اكتمل هناك
+function applyRemote(changes) { let n = 0;
+  for (const c of changes) { const id = c.id, m = P.a[id], a = D.all.find(x => x.id === id);
+    if (!c.s) { if (m) { delete P.a[id]; n++; } continue; }
+    const p = a?.eps ? Math.min(a.eps, c.p || 0) : c.p || 0, o = { ...(m || {}), s: c.s, p, r: c.r || 0 };
+    if (m && m.s === o.s && (m.p || 0) === p && (m.r || 0) === o.r) continue;
+    if (!o.b && p > 0) o.b = today; if (o.s === 'completed' && !o.e) o.e = today; for (const k of ['p', 'r', 'b', 'e']) if (!o[k]) delete o[k];
+    P.a[id] = o; n++; }
+  if (!n) return; save(); renderAll(true); toast(`وصل من حساباتك تحديث ${nWorks(n)}`); }
 function drawImp() { $('#imp-body').innerHTML = impHTML(); }
 function openImport() { IMP.msg = ''; drawImp(); const d = $('#imp'); if (!d.open) { d.showModal(); history.pushState({ imp: 1, p: 1, n: depth() + 1 }, '', '#import'); } }
 async function readFile(f) { if (!f) return; IMP.msg = ''; try { IMP.mal = await readMalFile(f); if (!IMP.mal.entries.length) { IMP.mal = null; IMP.msg = 'الملف سليم لكنه بلا أعمال.'; } }
@@ -794,8 +807,7 @@ async function readFile(f) { if (!f) return; IMP.msg = ''; try { IMP.mal = await
 function applyEntries(list, how) { store.set(KEY + '.bak', JSON.stringify(P)); const r = { n: 0, added: 0, moved: 0, filled: 0 };
   for (const e of list) { const o = toMine(e), m = P.a[e.id]; if (!o) continue; r.n++;
     if (!m) { P.a[e.id] = o; r.added++; continue; } if (how === 'new') continue;
-    if (how === 'ahead') { const go = simklAhead(m, o); if (go) { m.s = o.s; if (o.p) m.p = o.p; r.moved++; } let got = 0; for (const k of ['r', 'b', 'e']) if (!m[k] && o[k]) { m[k] = o[k]; got = 1; } if (got && !go) r.filled++; continue; }
-    const was = JSON.stringify(m); P.a[e.id] = how === 'simkl' ? { ...o, ...(o.r ? {} : m.r ? { r: m.r } : {}), ...(o.b ? {} : m.b ? { b: m.b } : {}), ...(o.e ? {} : m.e ? { e: m.e } : {}) } : o; if (JSON.stringify(P.a[e.id]) !== was) r.moved++; }
+    const was = JSON.stringify(m); P.a[e.id] = o; if (JSON.stringify(P.a[e.id]) !== was) r.moved++; }
   save(); renderAll(); return r; }
 
 // ---------- الأحداث
@@ -845,22 +857,14 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'imp-apply': { const { n } = applyEntries(IMP.mal.entries, 'file'); IMP.ok = true; IMP.msg = `دخل سجلّك: ${nWorks(n)}. المزامنة تنقله إلى بقية أجهزتك.`; IMP.mal = null; ui.list = inList('watching').length ? 'watching' : 'all'; renderAll(); drawImp(); break; }
     case 'backup': { const u = URL.createObjectURL(new Blob([JSON.stringify({ exported: new Date().toISOString(), source: 'أنمياتي', ...P }, null, 1)], { type: 'application/json' })); Object.assign(document.createElement('a'), { href: u, download: `anime-log-${today}.json` }).click(); setTimeout(() => URL.revokeObjectURL(u), 4000); break; }
     case 'restore': { const b = store.get(KEY + '.bak'); if (!b) break; const now = JSON.stringify(P); store.set(KEY, b); store.set(KEY + '.bak', now); load(); save(); renderAll(); IMP.ok = true; IMP.msg = 'رجع سجلّك كما كان قبل آخر استيراد.'; drawImp(); break; }
-    case 'sk-start': await skStart(); break;
-    case 'sk-cancel': IMP.simkl = null; IMP.msg = ''; drawImp(); break;
-    case 'sk-pull': await skPull(); break;
-    case 'sk-raw': { const u = URL.createObjectURL(new Blob([JSON.stringify(IMP.sk.raw, null, 1)], { type: 'application/json' })); Object.assign(document.createElement('a'), { href: u, download: `simkl-anime-${today}.json` }).click(); setTimeout(() => URL.revokeObjectURL(u), 4000); break; }
-    case 'sk-push': outFlush(); break;
-    case 'sk-forget': simklForget(); outForget('simkl'); IMP.sk = null; IMP.ok = true; IMP.msg = 'فُصل الحساب عن هذا الجهاز.'; drawImp(); break;
-    case 'sk-apply': { const r = applyEntries(IMP.sk.entries, d.how), inWorks = n => count(n, ['عمل واحد', 'عملين', 'أعمال', 'عملاً', 'عمل']);
-      const did = [r.added && `أُضيف ${nWorks(r.added)}`, r.moved && `${d.how === 'ahead' ? 'تقدّم' : 'تغيّر'} ${nWorks(r.moved)}`, r.filled && `استُكمل تاريخ أو تقييم في ${inWorks(r.filled)}`].filter(Boolean);
-      IMP.ok = true; IMP.msg = did.length ? `دُمج سجل ${ltr('SIMKL')}: ${did.join('، و')}. الباقي كما هو.` : `سجلّك يطابق ما في ${ltr('SIMKL')}: لم يتغير شيء.`; IMP.sk = null; drawImp(); break; }
+    case 'acc-link': await accGo(t.dataset.svc); break;
+    case 'acc-cancel': IMP.acc = null; IMP.msg = ''; drawImp(); break;
+    case 'acc-unlink': try { await accUnlink(t.dataset.svc); IMP.ok = true; IMP.msg = `فُصل ${ltr(ACC[t.dataset.svc])}: لا يُرسل إليه شيء ولا يُسحب منه.`; } catch (e) { IMP.ok = false; IMP.msg = esc(e.message); } drawImp(); break;
+    case 'acc-sync': await accSync({ force: true }); drawImp(); break;
   } });
-// ---------- SIMKL: الربط بالرمز ثم السحب. كل طلب من المتصفح مباشرة (site/anime-simkl.js)
-async function skStart() { IMP.msg = ''; try { const s = IMP.simkl = await simklStart(); drawImp();
-    const ok = await simklPoll(s, () => IMP.simkl === s); if (IMP.simkl !== s) return; IMP.simkl = null; if (!ok) { IMP.ok = false; IMP.msg = 'انتهت مهلة الرمز قبل الموافقة. اضغط «اربط» من جديد.'; drawImp(); return; } if (simklCanWrite()) outRelink('simkl'); await skPull(); }
-  catch (e) { IMP.simkl = null; IMP.ok = false; IMP.msg = esc(e.message || 'تعذّر الاتصال بـSIMKL.'); drawImp(); } }
-async function skPull() { IMP.ok = false; IMP.msg = `يُسحب سجلّك من ${ltr('SIMKL')}…`; drawImp();
-  try { const r = await simklPull(D.all); IMP.sk = { ...r, diff: diff(r.entries, true) }; IMP.msg = ''; } catch (e) { IMP.msg = esc(e.message || 'تعذّر السحب من SIMKL.'); } drawImp(); }
+// كلمة سر الموقع لربط الحسابات، مرة واحدة في كل متصفح (تحفظها «أضف أنمي» أيضاً)
+document.addEventListener('submit', async e => { if (!e.target.matches?.('.acc-pass')) return; e.preventDefault(); const v = e.target.querySelector('input').value; if (!v) return;
+  accSetPass(v); await accLinks(); drawImp(); accSync(); });
 document.addEventListener('change', e => { const t = e.target;
   if (t.id === 'sort') { ui.sort = t.value; keep(); renderGrid(); } else if (t.id === 'type') { ui.type = t.value; renderGrid(); }
   else if (t.id === 'names') { ui.names = t.value; keep(); renderAll(); if (open) openWork(open, false); else if (pkOpen) peekWork(pkOpen, false); }
@@ -873,7 +877,7 @@ document.addEventListener('dragleave', e => e.target.closest?.('#drop')?.classLi
 document.addEventListener('drop', e => { const z = e.target.closest?.('#drop'); if (z) { e.preventDefault(); z.classList.remove('over'); readFile(e.dataTransfer.files[0]); } });
 // الرجوع (زر المتصفح أو إيماءة الجوال) يغلق النافذة المفتوحة، وEsc مثله. والبطاقة المفتوحة من بطاقة يرجع منها إلى التي قبلها (E77)، و× يغلقها كلها
 for (const d of $$('dialog')) { d.addEventListener('cancel', e => { e.preventDefault(); shut(d); });
-  d.addEventListener('close', () => { if (d.open) return; if (d.id === 'sheet') { open = 0; pkOpen = 0; } if (d.id === 'wsheet') { wopen = 0; d.classList.remove('in'); } if (d.id === 'imp') IMP.simkl = null; });   // ما أُغلق وأُعيد فتحه في اللحظة نفسها مفتوح
+  d.addEventListener('close', () => { if (d.open) return; if (d.id === 'sheet') { open = 0; pkOpen = 0; } if (d.id === 'wsheet') { wopen = 0; d.classList.remove('in'); } if (d.id === 'imp') IMP.acc = null; });   // ما أُغلق وأُعيد فتحه في اللحظة نفسها مفتوح
   d.addEventListener('click', e => { if (e.target === d) shutCards(d); }); }
 addEventListener('popstate', () => { if (shutAll) { shutAll = false; return shut($('#sheet')); }   // × من بطاقة فوق بطاقات: وصل إلى أولها، فتُغلق
   apply(at()); if (leaving && !history.state?.p) { const f = leaving; leaving = null; f(); } });
@@ -900,8 +904,10 @@ try {
   $('#sort').value = ui.sort; $('#names').value = ui.names; if (!LNAME[ui.list] && ui.list !== 'all') ui.list = 'watching'; if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';
   placeChips(); renderAll(); liftVeil();
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); dockEye(on); }).observe($('.top')); }
-  { const all = () => { if (all.n !== D.all.length) { all.m = new Map(D.all.map(a => [a.id, a])); all.n = D.all.length; } return all.m; };
-    outInit({ get: id => P.a[id], info: id => all().get(id), onChange: () => { if ($('#imp').open && !IMP.simkl && !IMP.sk) drawImp(); } }); }
+  accInit({ guide: 'anime', build: BUILD, apply: applyRemote, onState: () => { if ($('#imp').open && !IMP.mal) drawImp(); },
+    full: () => Object.fromEntries(Object.entries(P.a).filter(([, m]) => m?.s).map(([id, m]) => [id, { s: m.s, p: m.p || 0, r: m.r || 0 }])),
+    eps: () => Object.fromEntries(D.all.filter(a => a.eps || a.type === 'Movie').map(a => [a.id, a.type === 'Movie' ? -1 : a.eps])),
+    onLinked: (svc, fail) => { openImport(); IMP.ok = !fail; IMP.msg = fail ? (fail === 'denied' ? `لم توافق على الربط في ${ltr(ACC[svc] || svc)}.` : `تعذّر ربط ${ltr(ACC[svc] || svc)}. حاول مرة أخرى.`) : `رُبط ${ltr(ACC[svc] || svc)}، والمزامنة تبدأ الآن.`; drawImp(); } });
   initSync(id => { if (id !== 'anime') return; load(); renderAll(true); if (open) { const box = $('#sheet-body .mine'); if (box) box.outerHTML = mineHTML(D.by.get(open)); drawXs(D.by.get(open)); } });
   route();
 } catch (err) { $('#grid').innerHTML = '<p class="load">تعذّر تحميل القائمة. حدّث الصفحة.</p>'; liftVeil(); console.error(err); }

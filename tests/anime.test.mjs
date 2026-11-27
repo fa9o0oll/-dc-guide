@@ -5,7 +5,6 @@ import { parseMal, readMalFile, malDate, STATUSES } from '../site/anime-mal.js';
 import { shapeSimkl, bulkDays, simklAhead } from '../site/anime-simkl.js';
 import { shapeMal, shapeMalApi, MAL_FIELDS, pickTmdb, worldsOf, worldName, minutes, malImage, LINKS, shapeEpisode, placeEpisodes, pickSpecials, epFit, epKey, epPrint, curatedOrder, linesOf, packLines, arNames } from '../scripts/lib-anime.mjs';
 import { describe, ord } from '../site/anime-pos.js';
-import { simklOps } from '../site/anime-out.js';
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -244,23 +243,6 @@ check('ما صدر بعد ما يسبقه أحداثاً يقال فيه ذلك 
 check('ترقيم مسلسل يخالف فيه اسمٌ رقمَ موسمه في TMDB يُترك (Monogatari Series: Second Season هو الثالث هناك)', (() => { const b3 = new Map([[1, { id: 1, t: 'Bake', type: 'TV', y: 2009, tm: { k: 'tv', id: 5, s: 1 } }], [2, { id: 2, t: 'Nise', type: 'TV', y: 2012, tm: { k: 'tv', id: 5, s: 2 } }], [3, { id: 3, t: 'Monogatari Series: Second Season', type: 'TV', y: 2013, tm: { k: 'tv', id: 5, s: 3 } }]]);
   const w3 = { id: 1, name: 'Monogatari', ids: [1, 2, 3], lk: 'm', li: [0, 0, 0], ri: [-1, 0, 1] }; return describe(w3, 3, { ...ctx, by: b3, link: id => b3.get(id).t }).badge === 'الجزء الثالث من القصة'; })());
 }
-
-// ---------- صندوق الصادر إلى SIMKL (E84): يُرسل تعديلك نفسه، الفرق بين حال العمل قبله وحاله الآن
-{ console.log('\n== صندوق الصادر إلى SIMKL');
-  const A = { sk: 77, type: 'TV' }, J = x => JSON.stringify(x), eps = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => ({ number: a + i }));
-  let ops = simklOps([{ id: 5, was: { s: 'watching', p: 3, r: 0 }, now: { s: 'watching', p: 5, r: 0 }, a: A }]);
-  check('«+» مرتين: تُعلَّم الحلقتان المضافتان وحدهما، برقمي MyAnimeList وSIMKL، ولا شيء غيرهما', J(ops) === J([['/sync/history', { shows: [{ ids: { mal: 5, simkl: 77 }, seasons: [{ number: 1, episodes: eps(4, 5) }] }] }]]), ops);
-  ops = simklOps([{ id: 5, was: { s: 'watching', p: 5, r: 0 }, now: { s: 'watching', p: 3, r: 0 }, a: A }]);
-  check('وإنقاصها يزيل علامتي الحلقتين وحدهما (والعمل يبقى في قائمته هناك)', J(ops) === J([['/sync/history/remove', { shows: [{ ids: { mal: 5, simkl: 77 }, seasons: [{ number: 1, episodes: eps(4, 5) }] }] }]]), ops);
-  ops = simklOps([{ id: 5, was: { s: 'watching', p: 10, r: 0 }, now: { s: 'completed', p: 12, r: 9 }, a: A }]);
-  check('الإكمال: الحلقات الباقية، ثم الحالة، ثم التقييم، بهذا الترتيب', J(ops.map(o => o[0])) === J(['/sync/history', '/sync/add-to-list', '/sync/ratings']) && ops[1][1].to === 'completed' && ops[2][1].shows[0].rating === 9, ops);
-  ops = simklOps([{ id: 6, was: null, now: { s: 'plan', p: 0, r: 0 }, a: { type: 'TV' } }, { id: 7, was: null, now: { s: 'plan', p: 0, r: 0 } }]);
-  check('عملان أضيفا إلى «سأشاهده»: طلب واحد لهما، برقم MyAnimeList وحده حين لا رقم في SIMKL', J(ops) === J([['/sync/add-to-list', { to: 'plantowatch', shows: [{ ids: { mal: 6 } }, { ids: { mal: 7 } }] }]]), ops);
-  ops = simklOps([{ id: 8, was: { s: 'completed', p: 1, r: 7 }, now: null, a: { type: 'Movie' } }, { id: 9, was: { s: 'hold', p: 2, r: 6 }, now: { s: 'hold', p: 2, r: 0 }, a: A }]);
-  check('إزالة عمل من قائمتك تزيله هناك كله، وإزالة تقييمك تمحوه', J(ops) === J([['/sync/history/remove', { shows: [{ ids: { mal: 8 } }] }], ['/sync/ratings/remove', { shows: [{ ids: { mal: 9, simkl: 77 } }] }]]), ops);
-  ops = simklOps([{ id: 10, was: { s: 'plan', p: 0, r: 0 }, now: { s: 'completed', p: 1, r: 0 }, a: { type: 'Movie' } }]);
-  check('الفيلم بلا حلقات: إكماله حالة وحدها', J(ops) === J([['/sync/add-to-list', { to: 'completed', shows: [{ ids: { mal: 10 } }] }]]), ops);
-  check('ولا طلب لعمل لم يتغير ما يُرسل منه', simklOps([{ id: 11, was: { s: 'watching', p: 2, r: 8 }, now: { s: 'watching', p: 2, r: 8 }, a: A }]).length === 0); }
 
 console.log(fail ? `\n❌ فشل ${fail}` : '\n✅ كل فحوص أنمياتي نجحت');
 process.exit(fail ? 1 : 0);

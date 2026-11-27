@@ -7,6 +7,7 @@
     "resolve": "node scripts/tmdb-resolve.mjs"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.12",
     "psn-api": "2.18.1"
   }
 }

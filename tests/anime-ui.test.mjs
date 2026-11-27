@@ -48,6 +48,18 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
       wrote.push([u.pathname, JSON.parse(q.postData() || '{}'), q.headers().authorization || '']); return J({ added: {} }); }
     return J({ error: 'not_found' }, 404); });
   await page.route(u => !u.href.startsWith(base) && !/cdn\.myanimelist\.net|image\.tmdb\.org|api\.simkl\.com/.test(u.href), r => r.abort());
+  // خادم ربط الحسابات (E84) مُحاكى: حال الخدمتين، والربط، والمزامنة. ACCT.calls ما وصله بكلمة سره، وACCT.next ما يعيده في المزامنة القادمة
+  const ACCT = { links: { mal: { on: false, ready: true }, simkl: { on: false, ready: true } }, calls: [], boot: false, polls: 0, next: [] };
+  await page.route(base + '/api/accounts**', r => { const q = r.request(), u = new URL(q.url()), path = u.pathname.replace('/api/accounts', ''), b = JSON.parse(q.postData() || 'null'), pass = q.headers()['x-pass'] || '';
+    const J = (o, status = 200) => r.fulfill({ status, contentType: 'application/json', body: JSON.stringify(o) }); ACCT.calls.push([path || '/', b, pass]);
+    if (pass !== 'pw-test') return J({ error: 'كلمة السر غير صحيحة.', pass: true }, 401);
+    if (!path) return J({ links: ACCT.links });
+    if (path === '/link') return b.svc === 'mal' ? J({ url: base + '/anime/?linked=mal' }) : J({ code: 'WXYZ-9876', url: 'https://simkl.com/pin/WXYZ-9876', every: 1, until: Date.now() + 9e5 });
+    if (path === '/poll') { if (++ACCT.polls < 2) return J({ wait: 1 }); ACCT.links.simkl = { on: true, ready: true, at: Date.now() }; return J({ done: true }); }
+    if (path === '/unlink') { ACCT.links[b.svc] = { on: false, ready: true }; return J({ links: ACCT.links }); }
+    if (path === '/sync') { if (!ACCT.boot && !b.full) return J({ needFull: true, rev: 0, changes: [] }); if (b.full) ACCT.boot = true;
+      const changes = ACCT.next; ACCT.next = []; return J({ rev: (b.since || 0) + changes.length, changes, links: ACCT.links }); }
+    return J({ error: 'not_found' }, 404); });
   const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); return mobile ? l.tap() : l.click(); };
   const log = () => page.evaluate(() => JSON.parse(localStorage.getItem('animeg.progress') || '{"a":{}}').a);
   const lists = () => page.$$eval('#lists button', b => b.map(x => x.textContent.replace(/\s+/g, ' ').trim()));
@@ -524,45 +536,40 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await tap('#lists [data-l=watching]');
     check('السجل بعد ورقة التوقيت كما كان قبلها', JSON.stringify(await log()) === before); }
 
-  // ---------- SIMKL (على الكمبيوتر فقط: ينتظر ثواني الاستعلام)
+  // ---------- حساباتك (E84، على الكمبيوتر فقط): ربط مرة واحدة على الخادم، ثم مزامنة تلقائية بالاتجاهين
   if (name === 'desktop') {
-    await tap('.top [data-act=import]'); await page.waitForSelector('#imp[open]'); await tap('[data-act=sk-start]'); await page.waitForSelector('#imp .sum b[dir=ltr]');
-    check('ربط SIMKL: يظهر الرمز ورابط الموافقة', await page.textContent('#imp .sum b[dir=ltr]') === 'ABCD-1234' && await page.getAttribute('#imp a.btn.pri', 'href') === 'https://simkl.com/pin/ABCD-1234');
-    await page.waitForSelector('[data-act=sk-apply]', { timeout: 20000 });
-    check('بعد الموافقة يُسحب السجل مرة واحدة، وكل طلب معرَّف، والرمز في المتصفح فقط', asked.join(' | ') === 'POST /oauth2/device | POST /oauth2/token | POST /oauth2/token | GET /sync/activities +auth | GET /sync/all-items/anime +auth'
-      && await page.evaluate(() => JSON.parse(localStorage.getItem('animeg.simkl')).access === 'test-access' && !/test-access/.test(localStorage.getItem('animeg.progress')) && !/test-access/.test(localStorage.getItem('guides.sync') || '')), asked);
-    check('المطابقة برقم MyAnimeList أو برقم SIMKL، وما لا رقم له يُذكر', (await page.$$eval('#imp .sum b', b => b.map(x => x.textContent))).slice(0, 3).join(',') === '5,2,3' && /طوبق 5 أعمال/.test(await page.textContent('#imp-body')) && /بقي عمل واحد بلا رقم/.test(await page.textContent('#imp-body')) && /0 جديد، 3 يختلف، 2 مطابق/.test(await page.textContent('#imp-body')), await page.textContent('#imp-body'));
-    check('مدخل يجمع أجزاء لا يزيد حلقات العمل، ويوم النقل الجماعي يُذكر ولا يُحسب', /لا يتجاوز حلقات العمل هنا/.test(await page.textContent('#imp-body')) && /أيام نقل القائمة إلى SIMKL \(يوم واحد: أعمال كثيرة عُلّمت دفعة واحدة\) لا تُحسب تواريخ مشاهدة/.test(await page.textContent('#imp-body')) && (await page.$$eval('#imp .sum b', b => b.map(x => x.textContent)))[6] === '170', await page.$$eval('#imp .sum b', b => b.map(x => x.textContent)));
-    await snap('7-simkl'); const before = await log(); await tap('[data-act=sk-apply][data-how=ahead]'); const L = await log();
-    check('«الأبعد تقدّماً يغلب»: حلقات SIMKL الأبعد وحالته، وتقييمك وتواريخك تبقى، وما سبق أبعد لا يتراجع', JSON.stringify(L[37989]) === '{"s":"completed","p":12,"r":8,"b":"2025-06-10","e":"2026-10-02"}' && JSON.stringify(L[22297]) === '{"s":"watching","p":4}' && L[52701].s === 'hold' && L[52701].p === 10 && L[52701].r === 9
-      && JSON.stringify(L[11061]) === JSON.stringify(before[11061]) && JSON.stringify(L[1735]) === JSON.stringify(before[1735]) && JSON.stringify(L[199]) === JSON.stringify(before[199]) && L[199].p === 1, [L[37989], L[22297], L[52701], L[199]]);
-    check('رسالة الدمج تقول ما تغيّر فعلاً لا عدد ما قُرئ', /دُمج سجل SIMKL: تقدّم عملان، واستُكمل تاريخ أو تقييم في عمل واحد\. الباقي كما هو\./.test(await page.textContent('#imp .msg.ok')), await page.textContent('#imp .msg'));
-    await tap('[data-act=restore]');
-    check('«تراجع عن آخر استيراد» يعيد السجل كما كان', JSON.stringify(await log()) === JSON.stringify(before));
-    // صندوق الصادر (E84): الربط يطلب الكتابة، وكل تعديل منك يصل SIMKL وحده بعد ثوانٍ: الحلقة التي أضفتها، والتراجع عنها، والحالة
-    check('الربط يطلب القراءة والكتابة، ويُحفظ ما منحه SIMKL مع الرمز', scope === 'media:read media:write' && await page.evaluate(() => /media:write/.test(JSON.parse(localStorage.getItem('animeg.simkl')).scope)), scope);
-    { const got = async n => { for (let i = 0; i < 80 && wrote.length < n; i++) await page.waitForTimeout(100); return wrote.length >= n; }, J = x => JSON.stringify(x);
-      await page.keyboard.press('Escape'); await page.waitForSelector('#imp', { state: 'hidden' });
-      const L0 = await log(), W = (await page.$$eval('.rail .cel', c => c.map(x => +x.dataset.id))).find(id => { const a = FX.anime.find(x => x.id === id); return a && (!a.eps || a.eps - (L0[id]?.p || 0) > 1); });
-      const WA = FX.anime.find(a => a.id === W), I = { mal: W, ...(WA.sk ? { simkl: WA.sk } : {}) }, p0 = L0[W]?.p || 0;
-      await tap(`.rail .cel[data-id="${W}"] [data-act=plus]`);
-      check('«+» يرسل إلى SIMKL الحلقة التي أضفتها وحدها، بعد ثوانٍ، برقمي العمل وبالرمز', await got(1) && J(wrote[0].slice(0, 2)) === J(['/sync/history', { shows: [{ ids: I, seasons: [{ number: 1, episodes: [{ number: p0 + 1 }] }] }] }]) && wrote[0][2] === 'Bearer test-access', wrote);
-      await tap('#toast [data-act=undo]');
-      check('والتراجع يزيل علامتها هناك وحدها', await got(2) && J(wrote[1].slice(0, 2)) === J(['/sync/history/remove', { shows: [{ ids: I, seasons: [{ number: 1, episodes: [{ number: p0 + 1 }] }] }] }]), wrote[1]);
-      await tap(`.rail .cel[data-id="${W}"] [data-act=plus]`); await tap('#toast [data-act=undo]'); await page.waitForTimeout(3200);
-      check('وتعديل يُتراجع عنه قبل الإرسال لا يُرسل شيئاً', wrote.length === 2 && await page.evaluate(() => !Object.keys(JSON.parse(localStorage.getItem('animeg.out')).simkl.q).length), wrote.slice(2));
-      fails.n = 1; await tap('#tonight [data-act=status][data-s=watching]'); const tid = +(await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('animeg.out')).simkl.q)[0]));
-      await page.waitForFunction(() => JSON.parse(localStorage.getItem('animeg.out')).simkl.err === 'net', null, { timeout: 8000 });
-      await tap('.top [data-act=import]'); await page.waitForSelector('#imp[open]');
-      check('وما انقطع يبقى في الصندوق، ويقال ذلك في «قائمتي وحساباتي» مع زر «أرسل الآن»', /تعذّر الاتصال، ويُعاد الإرسال وحده حين يعود \(تنتظر عمل واحد\)/.test(await page.textContent('#sk-st')) && await page.locator('[data-act=sk-push]').count() === 1, await page.textContent('#sk-st'));
-      await tap('[data-act=sk-push]');
-      check('و«أرسل الآن» يرسله: «سأبدأه الآن» حالةٌ هناك', await got(3) && J(wrote[2].slice(0, 2)) === J(['/sync/add-to-list', { to: 'watching', shows: [{ ids: { mal: tid } }] }]), wrote[2]);
-      await page.waitForFunction(() => /كل تعديلاتك وصلته ✓/.test(document.querySelector('#sk-st')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
-      check('ثم يقال إن كل تعديلاتك وصلته', /كل تعديلاتك وصلته ✓/.test(await page.textContent('#sk-st')), await page.textContent('#sk-st'));
-      await page.keyboard.press('Escape'); await page.waitForSelector('#imp', { state: 'hidden' }); await tap('#toast [data-act=undo]');
-      check('والتراجع عن «سأبدأه الآن» يعيده إلى «سأشاهده» هناك', await got(4) && J(wrote[3].slice(0, 2)) === J(['/sync/add-to-list', { to: 'plantowatch', shows: [{ ids: { mal: tid } }] }]), wrote[3]);
-      await tap('.top [data-act=import]'); await page.waitForSelector('#imp[open]'); }
-    await tap('[data-act=sk-forget]'); check('فصل الحساب يمحو رمزه من المتصفح', await page.evaluate(() => localStorage.getItem('animeg.simkl') === null));
+    const sync = () => ACCT.calls.filter(c => c[0] === '/sync'), waitFor = async (f, n = 80) => { for (let i = 0; i < n && !f(); i++) await page.waitForTimeout(100); return !!f(); };
+    await page.evaluate(() => ['animeg.pass', 'filmsg.pass', 'gamesg.pass'].forEach(k => localStorage.removeItem(k)));
+    await tap('.top [data-act=import]'); await page.waitForSelector('#imp[open] #accounts');
+    check('«قائمتي وحساباتي»: قسم «حساباتك» أولها، وبلا كلمة سر في المتصفح تُطلب أولاً بدل صفوف قد توهم أنها غير مربوطة', await page.evaluate(() => document.querySelector('#imp-body .sec').id === 'accounts' && !!document.querySelector('#accounts .acc-pass input[type=password]') && !document.querySelector('#accounts .acc-row') && !document.querySelector('[data-act=sk-start]')));
+    await page.fill('#accounts .acc-pass input', 'pw-test'); await page.press('#accounts .acc-pass input', 'Enter'); await page.waitForSelector('#accounts .acc-pass', { state: 'detached' });
+    check('وبعدها صف لكل حساب: MyAnimeList وSIMKL، وزر «اربط» لكل منهما', await page.evaluate(() => { const rows = [...document.querySelectorAll('#accounts .acc-row')]; return rows.map(r => r.dataset.svc).join() === 'mal,simkl' && rows.every(r => r.querySelector('[data-act=acc-link]')); }));
+    await tap('#accounts [data-act=acc-link][data-svc=simkl]'); await page.waitForSelector('#accounts .sum b[dir=ltr]');
+    check('ربط SIMKL: رمز ورابط موافقة، والطلب بكلمة السر وحدها', await page.textContent('#accounts .sum b[dir=ltr]') === 'WXYZ-9876' && await page.getAttribute('#accounts a.btn.pri', 'href') === 'https://simkl.com/pin/WXYZ-9876'
+      && ACCT.calls.filter(c => c[0] === '/link').every(c => c[2] === 'pw-test'));
+    await page.waitForSelector('#accounts .acc-row.on[data-svc=simkl]', { timeout: 8000 });
+    check('وبعد الموافقة: «مربوط ✓» وزر «افصل»، ويُطلب من الخادم سجلّك كله مرة واحدة ليبدأ منه', /مربوط ✓/.test(await page.textContent('#accounts .acc-row[data-svc=simkl]')) && await page.locator('#accounts [data-act=acc-unlink][data-svc=simkl]').count() === 1
+      && await waitFor(() => sync().some(c => c[1].full)) && Object.keys(sync().find(c => c[1].full)[1].full).length === Object.keys(await log()).length && sync().find(c => c[1].full)[1].eps[13271] === -1, sync().map(c => Object.keys(c[1])));
+    // ما وصل من الحساب يدخل سجلّك ويقال ذلك، ولا يُعاد إرساله
+    ACCT.next = [{ id: 5114, s: 'completed', p: 64, r: 9, src: 'mal' }]; const before5114 = (await log())[5114]; await page.click('#accounts [data-act=acc-sync]');
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('animeg.progress')).a[5114]?.r === 9, null, { timeout: 6000 }).catch(() => {});
+    const L1 = await log(), n1 = sync().length;
+    check('تعديل جاء من حسابك (تقييمك في MAL) يدخل سجلّك بتواريخه كما هي، ويقال «وصل من حساباتك»', L1[5114].r === 9 && L1[5114].s === 'completed' && L1[5114].e === before5114.e && /وصل من حساباتك تحديث عمل واحد/.test(await page.textContent('#toast')), [before5114, L1[5114]]);
+    await page.keyboard.press('Escape'); await page.waitForSelector('#imp', { state: 'hidden' });
+    const L0 = await log(), W = (await page.$$eval('.rail .cel', c => c.map(x => +x.dataset.id))).find(id => { const a = FX.anime.find(x => x.id === id); return a && (!a.eps || a.eps - (L0[id]?.p || 0) > 1); }), p0 = L0[W]?.p || 0;
+    await tap(`.rail .cel[data-id="${W}"] [data-act=plus]`);
+    check('«+» يصل الخادم بعد ثوانٍ: حال العمل بعد التعديل ووقته، والتقييم الذي وصل لا يُعاد', await waitFor(() => sync().length > n1) && (() => { const e = sync().at(-1)[1].edits; return e.length === 1 && e[0].id === W && e[0].p === p0 + 1 && e[0].s === L0[W].s && e[0].t > 0; })(), sync().at(-1)?.[1]);
+    const n2 = sync().length; await tap('#toast [data-act=undo]');
+    check('والتراجع يصل كذلك', await waitFor(() => sync().length > n2) && sync().at(-1)[1].edits.some(e => e.id === W && e.p === p0));
+    // ربط MyAnimeList: ينتقل إلى صفحة موافقته ثم يعود إلى «أنمياتي» وتُفتح «حساباتك» برسالة
+    await tap('.top [data-act=import]'); await page.waitForSelector('#imp[open] #accounts'); ACCT.links.mal = { on: true, ready: true, at: Date.now() };
+    await Promise.all([page.waitForURL(/linked=mal|#import/), tap('#accounts [data-act=acc-link][data-svc=mal]')]); await page.waitForSelector('#imp[open] #accounts');
+    await page.waitForSelector('#accounts .acc-row.on[data-svc=mal]', { timeout: 6000 }).catch(() => {}); await page.waitForSelector('#accounts [data-act=acc-sync]:not([disabled])', { timeout: 6000 }).catch(() => {}); await page.waitForTimeout(300);
+    check('ربط MyAnimeList: صفحة موافقته ثم عودة إلى «حساباتك» برسالة «رُبط»، ورابط نظيف', /رُبط MyAnimeList/.test(await page.textContent('#imp .msg')) && !/linked=/.test(page.url()) && /مربوط ✓/.test(await page.textContent('#accounts .acc-row[data-svc=mal]')), [page.url(), await page.textContent('#imp .msg').catch(() => '')]);
+    await tap('#accounts [data-act=acc-unlink][data-svc=simkl]'); await page.waitForSelector('#accounts .acc-row[data-svc=simkl]:not(.on)');
+    check('«افصل» يفصل الخدمة: يعود زر «اربط»', await page.locator('#accounts [data-act=acc-link][data-svc=simkl]').count() === 1);
+    await overflow('حساباتك'); await snap('7-accounts');
+    ACCT.links.mal = { on: false, ready: true }; await page.evaluate(() => { localStorage.removeItem('accounts.on'); });
     await page.keyboard.press('Escape'); await page.waitForSelector('#imp', { state: 'hidden' });
   }
   // ---------- السجل والنوافذ: الرجوع يغلق ما فُتح آخراً، والبطاقة فوق سلسلتها دائماً، والرابط المباشر والعنوان المكتوب باليد يفتحان ويُغلقان بلا خروج من البوابة
