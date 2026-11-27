@@ -246,6 +246,34 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   check('الأفلام: ما شاهدته يختفي من القائمة ويُذكر عدده', await page.evaluate(id => document.getElementById('f-' + id).hidden && document.querySelector('#count').textContent.includes('مخفي') && document.querySelector('#tally').textContent.includes('بقي'), inCol.id));
   await tap('[data-act=show-all]'); await page.waitForTimeout(250);
   check('الأفلام: «أظهر الكل» يعيده مختوماً', await page.evaluate(id => { const el = document.getElementById('f-' + id); return !el.hidden && el.classList.contains('watched') && document.querySelector('[data-v=all]').getAttribute('aria-pressed') === 'true'; }, inCol.id));
+  // Letterboxd (E86، على الكمبيوتر): يومياتك تصل وحدها، وما تعلّمه هنا في ملف استيراد بصيغته ترفعه أنت. الخادم مُحاكى
+  if (!mobile) { const calls = [], LBS = { on: false, boot: false, told: false }, KNOWN = new Set(), log0 = await page.evaluate(() => JSON.parse(localStorage.getItem('filmsg.progress') || '{"films":{}}').films);
+    const NEWW = FL.find(f => f.kind === 'movie' && !log0[f.id]), seen0 = Object.entries(log0).filter(([k, v]) => v === 'watched' && /^m\d+$/.test(k)).map(([k]) => +k.slice(1));
+    await page.route(base + '/api/accounts**', r => { const q = r.request(), path = new URL(q.url()).pathname.replace('/api/accounts', ''), b = JSON.parse(q.postData() || 'null'), pw = q.headers()['x-pass'];
+      const J = o => r.fulfill({ contentType: 'application/json', body: JSON.stringify(o) }), links = { letterboxd: LBS.on ? { on: true, user: 'fa9o0oll', at: Date.now() } : { on: false, ready: true } }; calls.push([path || '/', b]);
+      if (pw !== 'pw-lb') return r.fulfill({ status: 401, contentType: 'application/json', body: '{"pass":true,"error":"كلمة السر غير صحيحة."}' });
+      const lb = { user: 'fa9o0oll', known: [...KNOWN], wl: [] };
+      if (!path) return J({ links }); if (path === '/link') { LBS.on = true; return J({ done: true, user: 'fa9o0oll' }); }
+      if (path === '/sync') { if (b.guide !== 'films') return J({ rev: 0, changes: [], links }); if (!LBS.boot && !b.full) return J({ needFull: true, rev: 0, changes: [], links, lb }); LBS.boot = true;
+        const ch = LBS.told ? [] : [{ id: NEWW.id, s: 'watched', src: 'letterboxd' }]; LBS.told = true; KNOWN.add(NEWW.tmdb); return J({ rev: 1, changes: ch, links, lb: { ...lb, known: [...KNOWN] } }); }
+      if (path === '/films/sent') { for (const id of b.ids) KNOWN.add(id); return J({ known: KNOWN.size, wl: 0 }); } return J({}); });
+    await tap('.top [data-act=lbx]'); await page.waitForSelector('#lbx[open] .lbx-pass');
+    check('الأفلام: زر Letterboxd في الرأس يفتح نافذته، وبلا كلمة سر في المتصفح تُطلب أولاً', await page.locator('#lbx .lbx-pass input[type=password]').count() === 1);
+    await page.fill('#lbx .lbx-pass input', 'pw-lb'); await page.press('#lbx .lbx-pass input', 'Enter'); await page.waitForSelector('#lbx .lbx-link');
+    await page.fill('#lbx .lbx-link input', 'https://letterboxd.com/fa9o0oll/'); await page.press('#lbx .lbx-link input', 'Enter'); await page.waitForSelector('#lbx .lbx-on');
+    await page.waitForFunction(id => JSON.parse(localStorage.getItem('filmsg.progress') || '{"films":{}}').films[id] === 'watched', NEWW.id, { timeout: 8000 }).catch(() => {});
+    const full = calls.find(c => c[0] === '/sync' && c[1]?.full)?.[1].full || {};
+    check('ربط Letterboxd باسم صفحتك، ويبدأ من سجلّ الأفلام كله (الأفلام وحدها، بلا المسلسلات)', calls.some(c => c[0] === '/link' && c[1].svc === 'letterboxd' && c[1].user === 'https://letterboxd.com/fa9o0oll/')
+      && /letterboxd\.com\/fa9o0oll/.test(await page.textContent('#lbx .lbx-on')) && Object.keys(full).length === Object.keys(log0).filter(k => /^m\d+$/.test(k)).length && Object.keys(full).every(k => /^m\d+$/.test(k)), Object.keys(full));
+    check('ما سجّلته في يومياتك يصير هنا «شاهدته» ويقال ذلك', await page.evaluate(id => JSON.parse(localStorage.getItem('filmsg.progress')).films[id] === 'watched', NEWW.id) && /وصل من يومياتك في Letterboxd: فيلم واحد/.test(await page.textContent('#toast')));
+    await page.waitForSelector('#lbx [data-act=lbx-file][data-k=watched]');
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#lbx [data-act=lbx-file][data-k=watched]')]), csv = fs.readFileSync(await dl.path(), 'utf8').trim().split('\n');
+    check('ملف الاستيراد بصيغة Letterboxd: رقم TMDB والاسم والسنة لما شاهدته هنا ولم يصله، بلا ما جاء منه', csv[0] === 'tmdbID,Title,Year' && csv.length - 1 === seen0.length && seen0.every(id => csv.some(l => l.startsWith(id + ',"'))) && !csv.some(l => l.startsWith(NEWW.tmdb + ',')) && /^letterboxd-watched-\d{4}-\d\d-\d\d\.csv$/.test(dl.suggestedFilename()), [csv.slice(0, 3), seen0.length, dl.suggestedFilename()]);
+    await page.waitForFunction(() => /لا شيء/.test(document.querySelector('#lbx .lbx-row p')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
+    check('وبعد تنزيله صار معروفاً له: لا ينتظر شيء، ويقال أين يُرفع', calls.some(c => c[0] === '/films/sent' && c[1].kind === 'watched' && c[1].ids.length === seen0.length) && /لا شيء/.test(await page.textContent('#lbx .lbx-row p')) && /ارفعه من صفحة الاستيراد/.test(await page.textContent('#lbx .msg')));
+    await fits('الأفلام: نافذة Letterboxd'); await page.keyboard.press('Escape'); await page.waitForSelector('#lbx', { state: 'hidden' });
+    await page.unroute(base + '/api/accounts**'); await page.evaluate(id => { const p = JSON.parse(localStorage.getItem('filmsg.progress')); delete p.films[id]; localStorage.setItem('filmsg.progress', JSON.stringify(p)); ['accounts.on', 'accounts.q', 'accounts.rev', 'animeg.pass'].forEach(k => localStorage.removeItem(k)); }, NEWW.id);
+    await page.reload(); await page.waitForSelector('.tk:not([hidden])'); if (await page.$('[data-act=show-all]')) { await tap('[data-act=show-all]'); await page.waitForTimeout(300); } }
   await tap('[data-act=reset]'); await page.waitForTimeout(250);
   const other = FL.find(f => f.id !== inCol.id && f.kind === 'movie' && f.poster); await tap(`#f-${other.id} .seen`); await page.waitForTimeout(1300);
   check('الأفلام: التعليم من القائمة يُخرج التذكرة منها مع زر تراجع', await page.evaluate(id => document.getElementById('f-' + id).hidden && !!document.querySelector('#toast.act button'), other.id));

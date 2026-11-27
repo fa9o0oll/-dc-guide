@@ -908,7 +908,7 @@ try {
   $('#sort').value = ui.sort; $('#names').value = ui.names; if (!LNAME[ui.list] && ui.list !== 'all') ui.list = 'watching'; if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';
   placeChips(); renderAll(); liftVeil();
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); dockEye(on); }).observe($('.top')); }
-  accInit({ guide: 'anime', build: BUILD, apply: applyRemote, onState: () => { if ($('#imp').open && !IMP.mal) drawImp(); },
+  accInit({ guide: 'anime', svcs: ['mal', 'simkl'], build: BUILD, apply: applyRemote, onState: () => { if ($('#imp').open && !IMP.mal) drawImp(); },
     full: () => Object.fromEntries(Object.entries(P.a).filter(([, m]) => m?.s).map(([id, m]) => [id, { s: m.s, p: m.p || 0, r: m.r || 0 }])),
     eps: () => Object.fromEntries(D.all.filter(a => a.eps || a.type === 'Movie').map(a => [a.id, a.type === 'Movie' ? -1 : a.eps])),
     onLinked: (svc, fail) => { openImport(); IMP.ok = !fail; IMP.msg = fail ? (fail === 'denied' ? `لم توافق على الربط في ${ltr(ACC[svc] || svc)}.` : `تعذّر ربط ${ltr(ACC[svc] || svc)}. حاول مرة أخرى.`) : `رُبط ${ltr(ACC[svc] || svc)}، والمزامنة تبدأ الآن.`; drawImp(); } });

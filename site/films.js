@@ -1,6 +1,7 @@
 // قائمة أفلامي: شبكة تذاكر، بحث وتصفية، نافذة لكل فيلم (معلوماته، أين يُعرض في السعودية، ترتيب سلسلته أو عالمه، وأعماله المرتبطة)، وزر «أضف فيلماً».
 // البيانات تُبنى في scripts/build-films.mjs، وخريطة العوالم في scripts/build-worlds.mjs (Wikidata). سجل المشاهدة يُحفظ في المتصفح بالمفتاح filmsg.progress.
 import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
+import { accInit, accMark, accSync, accLink, accUnlink, accLinks, accState, accSetPass, accPass, accSent } from './accounts.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { clock, spoken, left } from './count.js?v=__BUILD__';
 import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
@@ -61,7 +62,7 @@ const ui = { q: '', status: 'todo', genre: '', decade: '', prov: '', sort: 'list
 
 document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <header class="top"><a class="home" href="../" aria-label="العودة إلى البوابات">${miniDoor}<span>البوابات</span></a><h1>قائمة أفلامي</h1>
-  ${eyeBtn()}<button class="btn pri add" data-act="add">${ic('plus')}<span>أضف فيلماً</span><span class="sr">أضف فيلماً</span></button><p class="tally" id="tally"></p></header>
+  ${eyeBtn()}<button class="btn sec lbx-b" data-act="lbx" aria-label="حسابي في Letterboxd"><bdi dir="ltr">Letterboxd</bdi></button><button class="btn pri add" data-act="add">${ic('plus')}<span>أضف فيلماً</span><span class="sr">أضف فيلماً</span></button><p class="tally" id="tally"></p></header>
 <section class="tonight" id="tonight" hidden><div class="bd"></div><p class="lbl">اقتراح الليلة</p><h2 dir="ltr"></h2><p class="meta"></p>
   <div class="acts"><button class="btn pri" data-act="open-tonight">افتح بطاقته</button><button class="btn sec" data-act="reroll">${ic('roll')}اقتراح آخر</button></div>
   <div class="mood" role="group" aria-labelledby="mood-l"><span class="mood-l" id="mood-l">مزاج السهرة</span><div class="mood-c" id="mood" data-drag></div></div><p class="mood-hint" id="mood-hint" hidden></p></section>
@@ -81,6 +82,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <label id="add-pass-wrap">كلمة السر (تُطلب مرة واحدة على هذا الجهاز)<input id="add-pass" type="password" autocomplete="current-password"></label>
   <button class="btn pri" type="submit">ابحث عنه</button><p class="msg" id="add-msg" aria-live="polite"></p><div class="cands" id="cands"></div>
   <p class="hint">الفيلم يظهر هنا فوراً، ويصل إلى بقية أجهزتك خلال دقائق. سلسلته وعالمه وأعماله المرتبطة تُجلب آلياً من <bdi dir="ltr">TMDB</bdi> و<bdi dir="ltr">Wikidata</bdi>.</p></form></dialog>
+<dialog id="lbx" aria-labelledby="lbx-h"><button class="close" data-act="close-lbx" aria-label="إغلاق">${ic('x')}</button><div class="lbx-in" id="lbx-body"></div></dialog>
 <div class="toast" id="toast" role="status"></div>`);
 portalBack('films');
 
@@ -436,11 +438,49 @@ sheet.addEventListener('cancel', e => { e.preventDefault(); closeFilm(); });
 sheet.addEventListener('click', e => { if (e.target === sheet) closeFilm(); });
 addDlg.addEventListener('click', e => { if (e.target === addDlg) addDlg.close(); });
 
-function setStatus(id, v) { const cur = st(id); if (cur === v) delete P.films[id]; else P.films[id] = v; save(); moodChips();
+function setStatus(id, v) { const cur = st(id); if (cur === v) delete P.films[id]; else P.films[id] = v; save(); accMark(id, { s: st(id) || null }); moodChips();
   const el = document.getElementById('f-' + id); if (el) { el.classList.add('stamping'); el.classList.toggle('watched', st(id) === 'watched'); el.classList.toggle('next', st(id) === 'next'); $('.seen', el).setAttribute('aria-pressed', st(id) === 'watched'); setTimeout(() => el.classList.remove('stamping'), 400); }
   if (openId === id) $$('.sh-acts [data-act=set]').forEach(b => b.setAttribute('aria-pressed', st(id) === b.dataset.v));
   if (ui.view === 'series') $('#series').innerHTML = seriesHTML();
   const f = D.byId.get(id); if (el && !el.hidden && f && !match(f) && !calm) { el.classList.add('leaving'); setTimeout(() => { el.classList.remove('leaving'); apply(false); }, 850); } else apply(false); }
+
+// ---------- Letterboxd (E86): يومياتك فيه تصل هنا وحدها، وما تعلّمه هنا يُجهَّز لك في ملف استيراد ترفعه إليه بنفسك
+// (Letterboxd لا يسمح لأي موقع أن يكتب في حسابك). الخادم (/api/accounts) يقرأ يومياتك العامة ويحفظ ما يعرفه Letterboxd، فلا يُعاد في ملف
+const LB = { msg: '' };
+// أعمال +18 (موسومة للبالغين في TMDB) لا تدخل الملف ولا عدّه في أي حال: Letterboxd يرفض استيرادها («marked as adult content and was not imported»)،
+// فلا فائدة من ظهور أسمائها في ملفك وصفحة الاستيراد، والفلتر قائم لا تظهر في عدّاد
+const lbPending = () => { const lb = accState().lb, known = new Set(lb?.known || []), wl = new Set(lb?.wl || []), o = { watched: [], next: [] };
+  for (const [k, v] of Object.entries(P.films)) { const m = /^m(\d+)$/.exec(k); if (!m || D.pool.get(k)?.adult) continue; if (v === 'watched' && !known.has(+m[1])) o.watched.push(+m[1]); if (v === 'next' && !wl.has(+m[1]) && !known.has(+m[1])) o.next.push(+m[1]); }
+  return o; };
+function lbxHTML() { const st = accState(), l = st.links?.letterboxd, on = !!l?.on, pend = on ? lbPending() : null, user = l?.user || '';
+  const passF = st.pass || !accPass() ? `<form class="lbx-pass"><label>كلمة سر الموقع مرة واحدة في هذا المتصفح (نفسها في «أضف فيلماً»)<input type="password" autocomplete="current-password" required></label><button class="btn pri" type="submit">تم</button></form>` : '';
+  const ago = t => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? 'الآن' : m < 60 ? `قبل ${m} دقيقة` : m < 1440 ? `قبل ${Math.round(m / 60)} ساعة` : `قبل ${Math.round(m / 1440)} يوم`; };
+  const err = on && l.err ? `<p class="msg">${l.err === 'gone' ? 'لم تعد صفحتك في Letterboxd بهذا الاسم: افصله واربطه باسمك الجديد.' : 'تعذّر الوصول إلى يومياتك في آخر قراءة، ويُعاد وحده.'}</p>` : '';
+  const file = (k, n, label, open, href) => `<div class="lbx-row"><p><b>${n ? nFilms(n) : 'لا شيء'}</b> ${label}</p>${n ? `<button class="btn pri" data-act="lbx-file" data-k="${k}">نزّل الملف</button>` : ''}<a class="btn sec" href="${href}" target="_blank" rel="noopener">${open}</a></div>`;
+  return `<h2 id="lbx-h"><bdi dir="ltr">Letterboxd</bdi></h2>
+    <p class="hint">ما تسجّله في يومياتك هناك يصير هنا «شاهدته» وحده. وLetterboxd لا يسمح لأي موقع أن يكتب في حسابك، فما تعلّمه هنا يُجهَّز لك في ملف ترفعه إليه بضغطتين.</p>
+    ${passF || (on ? `<p class="lbx-on">مربوط بصفحتك <bdi dir="ltr">letterboxd.com/${esc(user)}</bdi> ✓${l.at ? ` · آخر قراءة ${ago(l.at)}` : ''}</p>${err}
+      ${file('watched', pend.watched.length, 'مما شاهدته هنا ولم يصل Letterboxd', 'افتح صفحة الاستيراد', 'https://letterboxd.com/import/')}
+      ${file('next', pend.next.length, 'مما في «سأشاهده» هنا وليس في قائمة المشاهدة هناك', 'افتح قائمة المشاهدة', `https://letterboxd.com/${encodeURIComponent(user)}/watchlist/`)}
+      <p class="hint">بعد أن تنزّل الملف: افتح الصفحة، اختر الملف، ثم «Import». وما في الملف لا يعود في الملف التالي.</p>
+      <div class="acts"><button class="btn sec" data-act="lbx-sync"${st.busy ? ' disabled' : ''}>${st.busy ? 'يقرأ…' : 'اقرأ يومياتي الآن'}</button><button class="btn sec" data-act="lbx-unlink">افصل</button></div>`
+    : `<form class="lbx-link"><label>اسمك في Letterboxd، أو رابط صفحتك<input dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="letterboxd.com/…" required></label><button class="btn pri" type="submit">اربط</button></form>`)}
+    ${LB.msg ? `<p class="msg" role="alert">${LB.msg}</p>` : ''}${st.err ? `<p class="msg">${esc(st.err)}</p>` : ''}`; }
+function drawLbx() { const b = $('#lbx-body'); if (b) b.innerHTML = lbxHTML(); }
+function openLbx() { LB.msg = ''; drawLbx(); const d = $('#lbx'); if (!d.open) d.showModal(); if (accPass()) accLinks().then(drawLbx); }
+// ملف الاستيراد بصيغة Letterboxd: رقم الفيلم في TMDB يطابقه تماماً، والاسم والسنة للقراءة (letterboxd.com/about/importing-data)
+function lbxFile(k) { const ids = lbPending()[k], q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const rows = ids.map(id => { const f = D.byId.get('m' + id) || D.pool?.get('m' + id); return [id, q(f?.title || ''), f?.year || ''].join(','); });
+  const u = URL.createObjectURL(new Blob(['tmdbID,Title,Year\n' + rows.join('\n') + '\n'], { type: 'text/csv;charset=utf-8' }));
+  Object.assign(document.createElement('a'), { href: u, download: `letterboxd-${k === 'next' ? 'watchlist' : 'watched'}-${new Date().toISOString().slice(0, 10)}.csv` }).click(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+  accSent(k, ids).then(() => { LB.msg = `نزل ملف فيه ${nFilms(ids.length)}. ارفعه من صفحة ${k === 'next' ? 'قائمة المشاهدة' : 'الاستيراد'} في Letterboxd.`; drawLbx(); }, e => { LB.msg = esc(e.message); drawLbx(); }); }
+// ما وصل من يومياتك: يصير «شاهدته» هنا ولا يُعاد إرساله
+function lbApply(changes) { let n = 0; for (const c of changes) { const cur = st(c.id); if (c.s ? cur === c.s : !cur) continue; if (c.s) P.films[c.id] = c.s; else delete P.films[c.id]; n++; }
+  if (!n) return; save(); renderGrid(); moodChips(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); toast(`وصل من يومياتك في Letterboxd: ${nFilms(n)}`); }
+document.addEventListener('submit', async e => { const f = e.target;
+  if (f.matches?.('.lbx-pass')) { e.preventDefault(); accSetPass(f.querySelector('input').value); await accLinks(); drawLbx(); return; }
+  if (f.matches?.('.lbx-link')) { e.preventDefault(); const v = f.querySelector('input').value, b = f.querySelector('button'); b.disabled = true; LB.msg = '';
+    try { await accLink('letterboxd', { user: v }); LB.msg = 'رُبط Letterboxd، وتُقرأ يومياتك الآن.'; } catch (err) { LB.msg = esc(err.message); } drawLbx(); } });
 
 // ---------- أضف فيلماً ----------
 const pass = () => { try { return localStorage.getItem(PASS) || ''; } catch { return ''; } };
@@ -524,6 +564,11 @@ document.addEventListener('click', e => { const t = e.target.closest('[data-act]
   else if (act === 'set') setStatus(openId, t.dataset.v);
   else if (act === 'close') closeFilm();
   else if (act === 'close-add') addDlg.close();
+  else if (act === 'lbx') openLbx();
+  else if (act === 'close-lbx') $('#lbx').close();
+  else if (act === 'lbx-file') lbxFile(t.dataset.k);
+  else if (act === 'lbx-unlink') accUnlink('letterboxd').then(() => { LB.msg = 'فُصل Letterboxd: لا تُقرأ يومياتك بعد الآن.'; drawLbx(); }, e => { LB.msg = esc(e.message); drawLbx(); });
+  else if (act === 'lbx-sync') accSync({ force: true });
   else if (act === 'status') { ui.status = t.dataset.v; $$('[data-act=status]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === ui.status)); apply(false); }
   else if (act === 'only-series') { ui.series = !ui.series; t.setAttribute('aria-pressed', ui.series); apply(false); }
   else if (act === 'show-all') { ui.status = 'all'; $('#chips').innerHTML = chipsHTML(); apply(false); }
@@ -566,6 +611,8 @@ try {
   // حين تغيب الترويسة ينزل زر البوابات إلى أول الشريط الثابت
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); dockEye(on); }).observe($('.top')); }
   // تغيير وصل من جهاز آخر: نعيد قراءة السجل ونرسم
+  accInit({ guide: 'films', svcs: ['letterboxd'], build: BUILD, apply: lbApply, onState: () => { if ($('#lbx').open) drawLbx(); },
+    full: () => Object.fromEntries(Object.entries(P.films).filter(([k, v]) => /^m\d+$/.test(k) && (v === 'watched' || v === 'next'))) });
   initSync(id => { if (id !== 'films') return; try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {} renderGrid(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); });
   // ‎#add=اسم وسنة: من بوابة أخرى (ألعابي تقترح إضافة فيلم اقتُبس من لعبة) يفتح «أضف فيلماً» بالبحث عنه
   const h = location.hash.slice(1); if (h && D.byId.has(h)) openFilm(h, false);

@@ -31,11 +31,15 @@ globalThis.fetch = async (u, init = {}) => { const url = new URL(u), m = init.me
     for (const it of b.shows || []) { const id = it.ids.mal, cur = SK.get(id) || { status: 'watching', watched_episodes_count: 0, user_rating: null }, eps = (it.seasons?.[0]?.episodes || []).map(e => e.number);
       if (url.pathname === '/sync/history') cur.watched_episodes_count = Math.max(cur.watched_episodes_count, ...eps);
       if (url.pathname === '/sync/history/remove') { if (!eps.length) { SK.delete(id); skAct++; continue; } cur.watched_episodes_count = Math.min(cur.watched_episodes_count, Math.min(...eps) - 1); }
-      if (url.pathname === '/sync/add-to-list') cur.status = b.to;
+      if (url.pathname === '/sync/add-to-list') { if (!it.to) return res({ error: 'Missed "to" parameter' }, 400); cur.status = it.to; }
       if (url.pathname === '/sync/ratings') cur.user_rating = it.rating; if (url.pathname === '/sync/ratings/remove') cur.user_rating = null;
       SK.set(id, cur); skAct++; }
     return res({}); }
+  if (url.host === 'letterboxd.com') { const user = url.pathname.split('/')[1]; sent.push(['lb', user]); if (user !== 'faisal_test') return new Response('not found', { status: 404 });
+    return new Response(`<?xml version='1.0' encoding='utf-8'?><rss version="2.0" xmlns:letterboxd="https://letterboxd.com" xmlns:tmdb="https://themoviedb.org"><channel><title>Letterboxd - Faisal</title>${LBX.map(([id, d, r]) =>
+      `<item><title>Film ${id}</title><guid isPermaLink="false">letterboxd-review-${id}</guid><pubDate>${new Date(d).toUTCString()}</pubDate><letterboxd:watchedDate>${d}</letterboxd:watchedDate><letterboxd:rewatch>No</letterboxd:rewatch>${r ? `<letterboxd:memberRating>${r}</letterboxd:memberRating>` : ''}<tmdb:movieId>${id}</tmdb:movieId></item>`).join('')}<item><title>A list</title><guid>letterboxd-list-9</guid></item></channel></rss>`, { status: 200, headers: { 'content-type': 'application/rss+xml' } }); }
   throw new Error('unexpected fetch ' + u); };
+const LBX = [];
 
 const S = memStore(); fn._useStore(S);
 const call = async (path, { method = 'POST', body, pass = 'pw' } = {}) => { const r = await fn.default(new Request('https://watch.example/api/accounts' + path, { method, headers: { 'x-pass': pass, 'content-type': 'application/json' }, body: body ? J(body) : undefined }));
@@ -116,12 +120,37 @@ console.log('\n== مهلة الدالة');
   check('وحصة الإرسال: عملان في المرة، والباقي في المرة القادمة', sent.filter(x => x[0] === 'mal').length === 2, sent.filter(x => x[0] === 'mal'));
   sent.length = 0; await syncAnime(S, { pull: false }); check('ثم يكمل الباقي', sent.filter(x => x[0] === 'mal').length === 1 && [31, 32, 33].every(id => MAL.has(id)), sent.filter(x => x[0] === 'mal')); }
 
+console.log('\n== الأفلام ↔ Letterboxd (E86)');
+{ const { parseLb } = await import('../scripts/lib-accounts.mjs');
+  check('قراءة يوميات Letterboxd: رقم TMDB وتاريخ المشاهدة والتقييم، وما ليس فيلماً (قائمة) يُترك', J(parseLb(`<item><tmdb:movieId>27205</tmdb:movieId><letterboxd:watchedDate>2026-11-20</letterboxd:watchedDate><letterboxd:memberRating>4.5</letterboxd:memberRating><pubDate>Fri, 20 Nov 2026 20:00:00 +0000</pubDate></item><item><guid>letterboxd-list-1</guid></item>`).map(i => [i.tmdb, i.date, i.rating]))
+    === J([[27205, '2026-11-20', 4.5]]));
+  let l = await call('/link', { body: { svc: 'letterboxd', user: 'nobody_here' } });
+  check('ربط Letterboxd باسم لا صفحة له: يقال ذلك ولا يُحفظ', l.status === 400 && /لا حساب/.test(l.j.error) && !(await S.get('tok/letterboxd')), l.j);
+  l = await call('/link', { body: { svc: 'letterboxd', user: 'https://letterboxd.com/Faisal_Test/' } });
+  check('وبرابط صفحته أو اسمه يُربط (بلا كلمة سر ولا رمز: يومياته عامة)', l.j.done === true && l.j.user === 'faisal_test' && (await S.get('tok/letterboxd')).user === 'faisal_test', l.j);
+  let f = await call('/sync', { body: { guide: 'films', since: 0 } });
+  check('الأفلام: قبل سجلّ الصفحة يُطلب كله', f.j.needFull === true && f.j.lb?.user === 'faisal_test', f.j);
+  LBX.push([27205, '2026-11-20', 4.5], [603, '2026-11-22', 0]);
+  f = await call('/sync', { body: { guide: 'films', since: 0, full: { m550: 'watched', m27205: 'next', m13: 'next', t1399: 'watched' } } });
+  const fc = Object.fromEntries(f.j.changes.map(c => [c.id, c.s]));
+  check('ما سجّلته في Letterboxd يصير هنا «شاهدته» (ولو كان في «سأشاهده»)، وما شاهدته هنا وحده يبقى', fc.m27205 === 'watched' && fc.m603 === 'watched' && !fc.m550 && !fc.m13 && !fc.t1399, f.j.changes);
+  check('وما يعرفه Letterboxd: ما في يومياته (فلا يُعاد في ملف الاستيراد)', J(f.j.lb.known.sort((a, b) => a - b)) === J([603, 27205]) && J(f.j.lb.wl) === '[]', f.j.lb);
+  const s1 = await call('/films/sent', { body: { kind: 'watched', ids: [550] } }), s2 = await call('/films/sent', { body: { kind: 'next', ids: [13] } });
+  f = await call('/sync', { body: { guide: 'films', since: f.j.rev, edits: [{ id: 'm680', s: 'watched', t: Date.now() }] } });
+  check('ملف نزّلته صار معروفاً له، وتعديلك الجديد ينتظر الملف التالي', s1.j.known === 3 && s2.j.wl === 1 && f.j.lb.known.includes(550) && f.j.lb.wl.includes(13) && !f.j.lb.known.includes(680) && !f.j.changes.length, [s1.j, s2.j, f.j.lb]);
+  f = await call('/sync', { body: { guide: 'films', since: 0, edits: [{ id: 'm603', s: null, t: Date.now() }] } });
+  check('وفيلم أزلت علامته هنا بعد تسجيله هناك لا تعيده اليوميات', !f.j.changes.some(c => c.id === 'm603' && c.s === 'watched'), f.j.changes);
+  const links = (await call('', { method: 'GET' })).j.links;
+  check('حال Letterboxd: مربوط باسمه وآخر قراءة', links.letterboxd.on && links.letterboxd.user === 'faisal_test' && links.letterboxd.at > 0, links.letterboxd);
+  await call('/unlink', { body: { svc: 'letterboxd' } });
+  check('وفصله يمحو اسمه وما يعرفه', !(await S.get('tok/letterboxd')) && J((await S.get('films')).lb) === J({ known: {}, wl: {} })); }
+
 console.log('\n== الفصل وانتهاء الربط');
 await call('/unlink', { body: { svc: 'simkl' } }); skRow(1, 'hold', 12); sent.length = 0; r = await call('/sync', { body: { since: r.j.rev } });
 check('بعد فصل SIMKL لا يُسحب منه ولا يُرسل إليه', !sent.some(x => x[0] === 'sk') && !r.j.changes.some(c => c.id === 1 && c.s === 'hold') && !(await S.get('tok/simkl')), sent);
 await S.set('tok/mal', { ...(await S.get('tok/mal')), access: 'expired-token', exp: Date.now() + 3600e3 }); r = await call('/sync', { body: { since: r.j.rev } });
 check('رمز رُفض: يقال «أعد الربط» ولا يتوقف الباقي', r.status === 200 && r.j.links.mal.dead && r.j.links.mal.err === 'auth', r.j.links);
-check('simklOps: الفيلم بلا حلقات، والإنقاص يزيل علامات حلقاته وحدها', J(simklOps([{ id: 9, from: { s: 'plan', p: 0 }, to: { s: 'completed', p: 1 }, movie: true }])) === J([['/sync/add-to-list', { to: 'completed', shows: [{ ids: { mal: 9 } }] }]])
+check('simklOps: الفيلم بلا حلقات، والحالة لكل عمل في مدخله، والإنقاص يزيل علامات حلقاته وحدها', J(simklOps([{ id: 9, from: { s: 'plan', p: 0 }, to: { s: 'completed', p: 1 }, movie: true }, { id: 7, from: null, to: { s: 'plan', p: 0 } }])) === J([['/sync/add-to-list', { shows: [{ to: 'completed', ids: { mal: 9 } }, { to: 'plantowatch', ids: { mal: 7 } }] }]])
   && J(simklOps([{ id: 8, from: { s: 'watching', p: 5 }, to: { s: 'watching', p: 3 } }])) === J([['/sync/history/remove', { shows: [{ ids: { mal: 8 }, seasons: [{ number: 1, episodes: [{ number: 4 }, { number: 5 }] }] }] }]]));
 check('ولا رمز ولا سر في حال المزامنة المحفوظة', noTok(await S.get('anime')));
 

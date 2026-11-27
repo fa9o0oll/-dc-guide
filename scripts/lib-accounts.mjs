@@ -37,16 +37,17 @@ const SK_IN = { watching: 'watching', plantowatch: 'plan', hold: 'hold', complet
 const SK_OUT = { plan: 'plantowatch', watching: 'watching', completed: 'completed', hold: 'hold', dropped: 'dropped' };
 const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => ({ number: a + i }));
 // الأنمي بصيغة المسلسلات في SIMKL، والحلقات في الموسم 1 بترقيم AniDB. الترتيب: الإزالة، ثم الحلقات، ثم الحالة، ثم التقييم
-export function simklOps(list) { const gone = [], add = [], unmark = [], to = {}, rate = [], unrate = [];
+// والحالة في /sync/add-to-list لكل عمل في مدخله (to مع ids)، لا للطلب كله: SIMKL رفض to في رأس الطلب («Missed "to" parameter»)
+export function simklOps(list) { const gone = [], add = [], unmark = [], move = [], rate = [], unrate = [];
   for (const { id, from, to: now_, movie } of list) { const ids = { mal: +id };
     if (!now_) { if (from) gone.push({ ids }); continue; }
     const p0 = from?.p || 0, p1 = now_.p || 0;
     if (!movie && p1 > p0) add.push({ ids, seasons: [{ number: 1, episodes: range(p0 + 1, p1) }] });
     if (!movie && p1 < p0) unmark.push({ ids, seasons: [{ number: 1, episodes: range(p1 + 1, p0) }] });
-    if (now_.s !== from?.s && SK_OUT[now_.s]) (to[SK_OUT[now_.s]] ||= []).push({ ids });
+    if (now_.s !== from?.s && SK_OUT[now_.s]) move.push({ to: SK_OUT[now_.s], ids });
     if ((now_.r || 0) !== (from?.r || 0)) (now_.r ? rate : unrate).push(now_.r ? { ids, rating: now_.r } : { ids }); }
   return [gone.length && ['/sync/history/remove', { shows: gone }], unmark.length && ['/sync/history/remove', { shows: unmark }], add.length && ['/sync/history', { shows: add }],
-    ...Object.entries(to).map(([t, shows]) => ['/sync/add-to-list', { to: t, shows }]), rate.length && ['/sync/ratings', { shows: rate }], unrate.length && ['/sync/ratings/remove', { shows: unrate }]].filter(Boolean); }
+    move.length && ['/sync/add-to-list', { shows: move }], rate.length && ['/sync/ratings', { shows: rate }], unrate.length && ['/sync/ratings/remove', { shows: unrate }]].filter(Boolean); }
 
 export const SVC = {
   mal: { name: 'MyAnimeList', kind: 'code',
@@ -113,11 +114,12 @@ export async function linkCallback(S, k, code, state, redirect) { const p = awai
   const t = await SVC[k].exchange(code, p, redirect); await S.set('tok/' + k, t); await S.del('pend/' + k); return true; }
 export async function linkPoll(S, k) { const p = await S.get('pend/' + k); if (!p || p.until < now()) return { gone: true };
   const t = await SVC[k].poll(p); if (!t) return { wait: p.every }; await S.set('tok/' + k, t); await S.del('pend/' + k); return { done: true }; }
-export async function unlink(S, k) { await S.del('tok/' + k); await S.del('pend/' + k); const st = await S.get('anime'); if (st) { delete st.shadow?.[k]; delete st.mark?.[k]; delete st.err?.[k]; await S.set('anime', st); } }
+export async function unlink(S, k) { await S.del('tok/' + k); await S.del('pend/' + k); if (k === 'letterboxd') { const fl = await S.get('films'); if (fl) { fl.lb = { known: {}, wl: {} }; delete fl.err?.letterboxd; await S.set('films', fl); } return; } const st = await S.get('anime'); if (st) { delete st.shadow?.[k]; delete st.mark?.[k]; delete st.err?.[k]; await S.set('anime', st); } }
 async function token(S, k) { let t = await S.get('tok/' + k); if (!t) return null;
   if (t.refresh && t.exp - now() < 10 * 60e3) { try { t = await SVC[k].refresh(t); await S.set('tok/' + k, t); } catch (e) { if (e.code === 'auth') { t.dead = 1; await S.set('tok/' + k, t); } } }
   return t.dead ? { dead: 1 } : t; }
-export async function linksOf(S) { const st = await S.get('anime') || {}, o = {};
+export async function linksOf(S) { const st = await S.get('anime') || {}, o = {}, fl = await S.get('films') || {}, lb = await S.get('tok/letterboxd');
+  o.letterboxd = { on: !!lb, user: lb?.user || '', since: lb?.at || 0, ready: true, err: fl.err?.letterboxd || '', at: fl.at?.letterboxd || 0 };
   for (const k of Object.keys(SVC)) { const t = await S.get('tok/' + k), p = await S.get('pend/' + k);
     o[k] = { on: !!t && !t.dead, dead: !!t?.dead, since: t?.at || 0, ready: SVC[k].ready(), waiting: !!p && p.until > now(), err: st.err?.[k] || '', at: st.at?.[k] || 0 }; }
   return o; }
@@ -162,3 +164,40 @@ export async function syncAnime(S, { edits = [], full = null, eps = null, build 
   await S.set('anime', st);
   const changes = Object.entries(st.items).filter(([, h]) => h.rev > since && h.src !== 'site').map(([id, h]) => ({ id: +id, ...(val(h) || { s: null }), src: h.src }));
   return { rev: st.rev, changes, needEps: !!build && st.build !== build }; }
+
+// ---------- الأفلام ↔ Letterboxd (E86). Letterboxd لا يسمح لأي موقع أن يكتب في حسابك (لا واجهة مفتوحة)، فالمزامنة نصفان:
+// - منه إلى الموقع تلقائياً: يومياتك العامة (letterboxd.com/<اسمك>/rss/) فيها كل فيلم تسجله برقمه في TMDB، فيصير هنا «شاهدته».
+// - ومن الموقع إليه: الصفحة تجهّز ملف استيراد بصيغته (tmdbID) لما شاهدته أو أضفته إلى «سأشاهده» ولم يصله، وترفعه أنت.
+//   والخادم يحفظ ما يعرفه Letterboxd (ما ظهر في يومياتك وما نزّلته في ملف)، فلا يُعاد في الملف التالي.
+// المحور هنا: لكل فيلم (رقمه في TMDB) حالته في الموقع s: watched أو next، ومتى تغيّرت ومن أين، كمحور الأنمي.
+const LB_UA = 'Mozilla/5.0 (compatible; watch-guide/1.0)';
+export const lbName = s => String(s || '').trim().replace(/^https?:\/\/(www\.)?letterboxd\.com\//i, '').replace(/^@/, '').replace(/\/.*$/, '').toLowerCase();
+export function parseLb(xml) { return [...String(xml).matchAll(/<item>([\s\S]*?)<\/item>/g)].map(m => { const x = m[1], g = re => (x.match(re) || [])[1] || '';
+    return { tmdb: +g(/<tmdb:movieId>(\d+)<\/tmdb:movieId>/), date: g(/<letterboxd:watchedDate>([\d-]+)</), rating: +g(/<letterboxd:memberRating>([\d.]+)</) || 0, at: Date.parse(g(/<pubDate>([^<]+)</)) || 0 }; })
+  .filter(i => i.tmdb); }
+async function lbFetch(user) { let r; try { r = await fetch(`https://letterboxd.com/${encodeURIComponent(user)}/rss/`, { headers: { 'user-agent': LB_UA, accept: 'application/rss+xml, application/xml' }, signal: AbortSignal.timeout(T) }); }
+  catch { throw fail('net', 'تعذّر الوصول إلى Letterboxd'); }
+  if (r.status === 404) throw fail('gone', 'لا حساب في Letterboxd بهذا الاسم'); const text = await r.text();
+  if (!r.ok || !/<rss[\s>]/.test(text)) throw fail('net', 'Letterboxd لم يعطِ يومياتك الآن'); return parseLb(text); }
+export async function linkLetterboxd(S, name) { const user = lbName(name); if (!/^[a-z0-9_]{2,30}$/.test(user)) throw fail('user', 'اكتب اسمك في Letterboxd كما في رابط صفحتك');
+  await lbFetch(user); await S.set('tok/letterboxd', { user, at: now() }); return { done: true, user }; }
+const FILM = new Set(['watched', 'next']), fval = x => x && FILM.has(x.s) ? { s: x.s } : null;
+const filmsBlank = () => ({ rev: 0, items: {}, lb: { known: {}, wl: {} }, err: {}, at: {} });
+// edits/full بمفاتيح الصفحة (m رقم الفيلم في TMDB، والمسلسل t لا يدخل هنا: مكانه Trakt). يعيد ما تغيّر من Letterboxd بعد since، وما يعرفه Letterboxd
+export async function syncFilms(S, { edits = [], full = null, since = 0, pull = true } = {}) {
+  const st = Object.assign(filmsBlank(), await S.get('films') || {}), t = await S.get('tok/letterboxd');
+  const lbOut = () => t ? { user: t.user, known: Object.keys(st.lb.known).map(Number), wl: Object.keys(st.lb.wl).map(Number), err: st.err.letterboxd || '', at: st.at.letterboxd || 0 } : null;
+  if (!st.boot && !(full && Object.keys(full).some(k => /^m\d+$/.test(k)))) return { needFull: true, rev: st.rev, changes: [], lb: lbOut() };
+  const put = (id, v, when, src) => { const cur = st.items[id]; if (cur && cur.t > when) return; if (cur && J(fval(cur)) === J(v)) { cur.t = Math.max(cur.t, when); return; }
+    if (!cur && !v) return; st.items[id] = { ...(v || { s: null }), t: when, src, rev: ++st.rev }; };
+  if (full && !st.boot) { for (const [k, s] of Object.entries(full)) if (/^m\d+$/.test(k)) put(k.slice(1), fval({ s }), 0, 'site'); st.boot = now(); }
+  for (const e of edits) { const k = String(e.id || ''); if (/^m\d+$/.test(k)) put(k.slice(1), fval(e), +e.t || now(), 'site'); }
+  if (t && pull) { try { for (const i of await lbFetch(t.user)) { st.lb.known[i.tmdb] = 1; if (st.items[i.tmdb]?.s !== 'watched') put(String(i.tmdb), { s: 'watched' }, i.at || now(), 'letterboxd'); }
+      st.err.letterboxd = ''; st.at.letterboxd = now(); }
+    catch (e) { st.err.letterboxd = e.code === 'gone' ? 'gone' : 'net'; } }
+  await S.set('films', st);
+  const changes = Object.entries(st.items).filter(([, h]) => h.rev > since && h.src !== 'site').map(([id, h]) => ({ id: 'm' + id, s: h.s || null, src: h.src }));
+  return { rev: st.rev, changes, lb: lbOut() }; }
+// نزّلتَ ملف الاستيراد: ما فيه صار معروفاً لـLetterboxd (kind: watched أو next)، فلا يعود في الملف التالي
+export async function filmsSent(S, kind, ids) { const st = Object.assign(filmsBlank(), await S.get('films') || {}), m = kind === 'next' ? st.lb.wl : st.lb.known;
+  for (const id of ids || []) if (/^\d+$/.test(String(id))) m[id] = 1; await S.set('films', st); return { known: Object.keys(st.lb.known).length, wl: Object.keys(st.lb.wl).length }; }

@@ -6,9 +6,11 @@
 //   POST /api/accounts/poll   {svc}    هل وافقت على رمز SIMKL؟
 //   GET  /api/accounts/callback/mal    رجوع MyAnimeList بعد الموافقة، ثم إلى «أنمياتي»
 //   POST /api/accounts/unlink {svc}    يفصل الخدمة ويمحو رموزها
-//   POST /api/accounts/sync   {edits, full, eps, build, since}   تعديلات الصفحة إلى المحور، وما تغيّر من الخدمات إليها
+//   POST /api/accounts/sync   {guide, edits, full, eps, build, since}   تعديلات الصفحة إلى المحور، وما تغيّر من الخدمات إليها (guide: anime أو films)
+//   POST /api/accounts/link   {svc: 'letterboxd', user}   Letterboxd باسم صفحتك العامة وحده (E86)
+//   POST /api/accounts/films/sent {kind, ids}   ما نزّلته في ملف استيراد Letterboxd صار معروفاً له
 import { createHash, timingSafeEqual } from 'node:crypto';
-import { blobStore, linkStart, linkPoll, linkCallback, unlink, linksOf, syncAnime, SVC } from '../../scripts/lib-accounts.mjs';
+import { blobStore, linkStart, linkPoll, linkCallback, unlink, linksOf, syncAnime, syncFilms, filmsSent, linkLetterboxd, SVC } from '../../scripts/lib-accounts.mjs';
 
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
 const digest = x => createHash('sha256').update(String(x)).digest(), same = (a, b) => timingSafeEqual(digest(a), digest(b));
@@ -27,18 +29,22 @@ export default async req => {
   if (!password()) return json(500, { error: 'إعدادات الخادم ناقصة: كلمة السر (ADD_GAME_PASSWORD أو ADD_FILM_PASSWORD) غير موجودة في Netlify.' });
   const pass = req.headers.get('x-pass') || ''; if (!pass || !same(pass, password())) return json(401, { error: 'كلمة السر غير صحيحة.', pass: true });
   let body = {}; if (req.method === 'POST') { try { body = await req.json(); } catch { return json(400, { error: 'طلب غير مفهوم.' }); } }
-  const svc = body.svc; if (['link', 'poll', 'unlink'].includes(path) && !SVC[svc]) return json(400, { error: 'خدمة غير معروفة.' });
+  const svc = body.svc; if (['link', 'poll', 'unlink'].includes(path) && !SVC[svc] && !(svc === 'letterboxd' && path !== 'poll')) return json(400, { error: 'خدمة غير معروفة.' });
   try {
     if (req.method === 'GET' && !path) return json(200, { links: await linksOf(S) });
+    if (path === 'link' && svc === 'letterboxd') return json(200, await linkLetterboxd(S, body.user));
     if (path === 'link') return json(200, await linkStart(S, svc, redirect));
+    if (path === 'films/sent') { if (!await S.lock()) return json(202, { busy: true }); try { return json(200, await filmsSent(S, body.kind === 'next' ? 'next' : 'watched', Array.isArray(body.ids) ? body.ids.slice(0, 5000) : [])); } finally { await S.unlock(); } }
     if (path === 'poll') return json(200, await linkPoll(S, svc));
     if (path === 'unlink') { await unlink(S, svc); return json(200, { links: await linksOf(S) }); }
     if (path === 'sync') { if (!await S.lock()) return json(202, { busy: true });
       // السحب يسبق الدفع دائماً، فلا يغلب تعديلٌ قديم من جهاز كان بلا اتصال تعديلاً أحدث منه في حسابك
-      try { const r = await syncAnime(S, { edits: Array.isArray(body.edits) ? body.edits.slice(0, 500) : [], full: body.full || null, eps: body.eps || null, build: body.build || '', since: +body.since || 0, pull: true, budget: 15, deadline: Date.now() + 6500 });
+      try { const edits = Array.isArray(body.edits) ? body.edits.slice(0, 500) : [];
+        const r = body.guide === 'films' ? await syncFilms(S, { edits, full: body.full || null, since: +body.since || 0, pull: true })
+          : await syncAnime(S, { edits, full: body.full || null, eps: body.eps || null, build: body.build || '', since: +body.since || 0, pull: true, budget: 15, deadline: Date.now() + 6500 });
         return json(200, { ...r, links: await linksOf(S) }); }
       finally { await S.unlock(); } }
     return json(404, { error: 'غير موجود.' });
-  } catch (e) { return json(e.code === 'setup' || e.code === 'state' ? 400 : 502, { error: e.message || 'تعذّر الطلب.', code: e.code || '' }); }
+  } catch (e) { return json(['setup', 'state', 'user', 'gone'].includes(e.code) ? 400 : 502, { error: e.message || 'تعذّر الطلب.', code: e.code || '' }); }
 };
 export const config = { path: ['/api/accounts', '/api/accounts/*'] };
