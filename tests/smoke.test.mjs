@@ -25,7 +25,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await page.goto(base + '/'); await page.waitForSelector('.door');
   check('الواجهة: خمسة أبواب بروابطها', await page.locator('a.door').count() === 5 && await page.getAttribute('.door.dc', 'href') === 'dc/' && await page.getAttribute('.door.marvel', 'href') === 'marvel/' && (await page.getAttribute('.door.anime', 'href')) === 'anime/' && (await page.getAttribute('.door.films', 'href')) === 'films/' && (await page.getAttribute('.door.games', 'href')) === 'games/');
   await page.waitForFunction(() => /\d/.test(document.querySelector('.door.dc [data-stat]').textContent)); check('الواجهة: عدد أعمال كل دليل ظاهر', /196/.test(await page.textContent('.door.dc [data-stat]')));
-  await page.waitForFunction(() => /\d/.test(document.querySelector('.door.marvel [data-stat]').textContent)); check('الواجهة: عدد أعمال مارفل ظاهر', /262 عملاً/.test(await page.textContent('.door.marvel [data-stat]')));
+  await page.waitForFunction(() => /\d/.test(document.querySelector('.door.marvel [data-stat]').textContent)); check('الواجهة: عدد أعمال مارفل ظاهر', (await page.textContent('.door.marvel [data-stat]')).includes(JSON.parse(fs.readFileSync(new URL('../data/marvel/works.json', import.meta.url))).length + ' عملاً'));
   await page.waitForFunction(() => /\d/.test(document.querySelector('.door.anime [data-stat]').textContent)); check('الواجهة: عدد أعمال «أنمياتي» ظاهر', /\d{3,} عمل/.test(await page.textContent('.door.anime [data-stat]')), await page.textContent('.door.anime [data-stat]'));
   await fits('الواجهة');
   // أنمياتي ببياناتها المبنية فعلاً: القائمة تُحمَّل، وقبل الاستيراد دعوته، والسلاسل فيها مدخل Fate

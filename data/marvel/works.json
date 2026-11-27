@@ -906,6 +906,58 @@
   "announced": true
  },
  {
+  "id": "shang-chi-2-tba",
+  "title": "Shang-Chi 2",
+  "year": null,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt16357306",
+   "tmdb": 1737233
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "armor-wars-tba",
+  "title": "Armor Wars",
+  "year": null,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt13623128",
+   "tmdb": 1827939
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "nova-tba",
+  "title": "Nova",
+  "year": null,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt19037048",
+   "tmdb": 1731190
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
+  "id": "deadpool-and-x-men-team-up-tba",
+  "title": "Deadpool & X-Men Team-Up",
+  "year": null,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": null,
+   "tmdb": 1474568
+  },
+  "idsVerified": true,
+  "announced": true
+ },
+ {
   "id": "your-friendly-neighborhood-spider-man-2025",
   "title": "Your Friendly Neighborhood Spider-Man",
   "year": 2025,
@@ -1519,6 +1571,30 @@
   "idsVerified": true
  },
  {
+  "id": "the-incredible-hulk-pilot-1977",
+  "title": "The Incredible Hulk",
+  "year": 1977,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0076190",
+   "tmdb": 65294
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-return-of-the-incredible-hulk-1977",
+  "title": "The Return of the Incredible Hulk",
+  "year": 1977,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0177457",
+   "tmdb": 166890
+  },
+  "idsVerified": true
+ },
+ {
   "id": "the-incredible-hulk-1977",
   "title": "The Incredible Hulk",
   "year": 1977,
@@ -1831,6 +1907,18 @@
   "idsVerified": true
  },
  {
+  "id": "spider-man-strikes-back-1978",
+  "title": "Spider-Man Strikes Back",
+  "year": 1978,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0078308",
+   "tmdb": 225925
+  },
+  "idsVerified": true
+ },
+ {
   "id": "captain-america-1979",
   "title": "Captain America",
   "year": 1979,
@@ -1863,6 +1951,18 @@
   "ids": {
    "imdb": "tt0078938",
    "tmdb": 197481
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "spider-man-the-dragon-s-challenge-1980",
+  "title": "Spider-Man: The Dragon's Challenge",
+  "year": 1980,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0077328",
+   "tmdb": 225938
   },
   "idsVerified": true
  },
@@ -1935,6 +2035,30 @@
   "ids": {
    "imdb": "tt0119781",
    "tmdb": 27460
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "men-in-black-1997",
+  "title": "Men in Black",
+  "year": 1997,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0119654",
+   "tmdb": 607
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "men-in-black-ii-2002",
+  "title": "Men in Black II",
+  "year": 2002,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0120912",
+   "tmdb": 608
   },
   "idsVerified": true
  },
@@ -2023,6 +2147,18 @@
   "idsVerified": true
  },
  {
+  "id": "kick-ass-2010",
+  "title": "Kick-Ass",
+  "year": 2010,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1250777",
+   "tmdb": 23483
+  },
+  "idsVerified": true
+ },
+ {
   "id": "ghost-rider-spirit-of-vengeance-2011",
   "title": "Ghost Rider: Spirit of Vengeance",
   "year": 2011,
@@ -2031,6 +2167,42 @@
   "ids": {
    "imdb": "tt1071875",
    "tmdb": 71676
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "men-in-black-3-2012",
+  "title": "Men in Black 3",
+  "year": 2012,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1409024",
+   "tmdb": 41154
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "kick-ass-2-2013",
+  "title": "Kick-Ass 2",
+  "year": 2013,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1650554",
+   "tmdb": 59859
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "kingsman-the-secret-service-2015",
+  "title": "Kingsman: The Secret Service",
+  "year": 2015,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2802144",
+   "tmdb": 207703
   },
   "idsVerified": true
  },
@@ -2047,6 +2219,54 @@
   "idsVerified": true
  },
  {
+  "id": "kingsman-the-golden-circle-2017",
+  "title": "Kingsman: The Golden Circle",
+  "year": 2017,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt4649466",
+   "tmdb": 343668
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "men-in-black-international-2019",
+  "title": "Men in Black: International",
+  "year": 2019,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt2283336",
+   "tmdb": 479455
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "the-king-s-man-2021",
+  "title": "The King's Man",
+  "year": 2021,
+  "kind": "film",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt6856242",
+   "tmdb": 476669
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "night-man-1997",
+  "title": "Night Man",
+  "year": 1997,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt0128886",
+   "tmdb": 13084
+  },
+  "idsVerified": true
+ },
+ {
   "id": "mutant-x-2001",
   "title": "Mutant X",
   "year": 2001,
@@ -2055,6 +2275,18 @@
   "ids": {
    "imdb": "tt0283203",
    "tmdb": 1449
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "powers-2015",
+  "title": "Powers",
+  "year": 2015,
+  "kind": "series",
+  "medium": "live",
+  "ids": {
+   "imdb": "tt1851040",
+   "tmdb": 42531
   },
   "idsVerified": true
  },
@@ -2211,6 +2443,30 @@
   "ids": {
    "imdb": "tt0098137",
    "tmdb": 225656
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "ultraforce-1995",
+  "title": "UltraForce",
+  "year": 1995,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0484812",
+   "tmdb": 29807
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "men-in-black-the-series-1997",
+  "title": "Men in Black: The Series",
+  "year": 1997,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt0127385",
+   "tmdb": 1153
   },
   "idsVerified": true
  },
@@ -2454,6 +2710,18 @@
   },
   "idsVerified": true,
   "announced": true
+ },
+ {
+  "id": "the-origin-of-the-silver-surfer-1999",
+  "title": "The Origin of the Silver Surfer",
+  "year": 1999,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": null,
+   "tmdb": 1730724
+  },
+  "idsVerified": true
  },
  {
   "id": "ultimate-avengers-the-movie-2006",
@@ -2740,6 +3008,30 @@
   "ids": {
    "imdb": "tt6591446",
    "tmdb": 91278
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "super-crooks-2021",
+  "title": "Super Crooks",
+  "year": 2021,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt14272628",
+   "tmdb": 127599
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "stephen-king-s-n-2008",
+  "title": "Stephen King's N.",
+  "year": 2008,
+  "kind": "film",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt6316676",
+   "tmdb": 1810734
   },
   "idsVerified": true
  },
@@ -3052,6 +3344,18 @@
   "ids": {
    "imdb": "tt1754183",
    "tmdb": 212344
+  },
+  "idsVerified": true
+ },
+ {
+  "id": "marvel-mash-up-2012",
+  "title": "Marvel Mash-Up",
+  "year": 2012,
+  "kind": "series",
+  "medium": "animation",
+  "ids": {
+   "imdb": "tt2702928",
+   "tmdb": 57083
   },
   "idsVerified": true
  },
