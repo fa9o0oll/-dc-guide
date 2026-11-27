@@ -100,6 +100,26 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await tap('#tonight [data-g="-1"]'); T = await tn();
   check('«أي تصنيف» يرفعها كلها', T.on === '-1' && !T.hint && !(await page.evaluate(() => localStorage.getItem('anime.mood'))), T);
   { const was = T.id; await tap('#tonight [data-act=treroll]'); T = await tn(); check('«اقتراح آخر» يأتي بغيره', T.id !== was && ['13271', '22297'].includes(T.id), [was, T.id]); }
+  // البحث عن تصنيف بالكتابة (E83): زر بعدسة أول شريط المزاج يصير حقلاً، يُبقي ما يوافق ما كُتب بالعربي أو الإنجليزي، وEnter يختار أوله، وEsc يطويه
+  { const R = '#tonight .tn-c', q = async text => { if (!await page.$(R + ' input[data-gq]')) await tap(R + ' .gfind'); await page.fill(R + ' input[data-gq]', text); await page.waitForTimeout(60); };
+    const vis = () => page.$$eval(R + ' button[data-g]', b => b.filter(x => !x.hidden).map(x => x.dataset.g).join()), note = () => page.evaluate(() => { const n = document.querySelector('#tonight .tn-mood > .gnote'); return n && !n.hidden ? n.textContent : ''; });
+    await q('الاكشن'); await snap('e83-search');
+    check('بحث المزاج بالكتابة (E83): «الاكشن» بلا «ال» ولا همزة يُبقي أكشن وحده، وسهما التمرير يغيبان إن لم يبق ما يُمرَّر إليه', await vis() === '0' && !await note() && await page.evaluate(() => [...document.querySelectorAll('#tonight .tn-c > .rl-a')].every(a => a.classList.contains('off'))), [await vis(), await note()]);
+    await q('ADV');
+    check('وبالإنجليزي كذلك', await vis() === '1', await vis());
+    await q('hentai');
+    check('والعين مغلقة: تصنيف +18 لا يُعرف بالبحث، ويقال لا تصنيف بهذا الاسم', await vis() === '' && await note() === 'لا تصنيف بهذا الاسم', [await vis(), await note()]);
+    await q('شونين'); await snap('e83-note');
+    check('وتصنيف ليس فيما تبدأه الآن من «سأشاهده» يقال ذلك باسمه، في سطر تحت الشريط يُقرأ كله', await vis() === '' && await note() === 'لا عمل من «شونين» تبدأه الآن من «سأشاهده»' && await page.evaluate(() => { const n = document.querySelector('#tonight .tn-mood > .gnote'), r = n.getBoundingClientRect(), c = document.querySelector('#tonight .tn-c').getBoundingClientRect(); return r.top >= c.bottom - 1 && r.left >= 0 && r.right <= innerWidth && n.scrollWidth <= n.clientWidth + 1; }), await note());
+    await page.keyboard.press('Escape'); await page.waitForTimeout(60);
+    check('وEsc يطوي الحقل ويعيد الشريط كله، والتركيز على زر البحث', !await page.$(R + ' input[data-gq]') && await vis() === '-1,0,1,2' && await page.evaluate(() => document.activeElement?.matches('#tonight .gfind')), await vis());
+    await q('مغا'); await tap(R + ' .gx'); await page.waitForTimeout(60);
+    check('وزر × في الحقل يطويه (للمس، بلا Esc)', !await page.$(R + ' input[data-gq]') && await vis() === '-1,0,1,2', await vis());
+    await tap(R + ' .gfind'); await tap('#tonight .tn-l'); await page.waitForTimeout(260);
+    check('وحقل فارغ يُطوى حين يخرج منه التركيز', !await page.$(R + ' input[data-gq]'));
+    await q('كوميد'); await page.keyboard.press('Enter'); await page.waitForTimeout(80); T = await tn();
+    check('وEnter يختار أول ما بقي مزاجاً، فيأتي الاقتراح منه', T.on === '2' && T.id === '22297' && !await page.$(R + ' input[data-gq]'), T);
+    await tap('#tonight [data-g="-1"]'); }
   await overflow('بعد الاستيراد'); await snap('3-home');
   const small = await page.evaluate(() => [...document.querySelectorAll('button,a,select,input')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 40 || r.width < 40) && !e.closest('.foot,[hidden]') && e.type !== 'file'; }).map(e => (e.textContent || e.id).trim().slice(0, 24)));
   check('أهداف اللمس ≥ 40px', small.length === 0, small.slice(0, 6));
@@ -194,7 +214,16 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await tap('#gchips [data-g="0"]'); r = await row();
     check('ولمسة ثانية على المختار ترفعه وحده', (await cells()).sort((a, b) => a - b).join() === want([1]) && r[1] === '1*:' && !r.some(x => x.startsWith('0*')) && /من تصنيف مغامرات/.test(await page.textContent('#count')), [r, await cells()]);
     await tap('#gchips [data-g="-1"]'); r = await row();
-    check('و«كل التصنيفات» يرفعها كلها', (await cells()).length === all.length && r[0] === '-1*:' && !r.some(x => /\*/.test(x.split(':')[0]) && !x.startsWith('-1')), r); }
+    check('و«كل التصنيفات» يرفعها كلها', (await cells()).length === all.length && r[0] === '-1*:' && !r.some(x => /\*/.test(x.split(':')[0]) && !x.startsWith('-1')), r);
+    // والبحث بالكتابة فيه كشريط المزاج (E83)
+    await tap('#gchips .gfind'); await page.fill('#gchips input[data-gq]', 'كوميد'); await page.waitForTimeout(60);
+    const gv = await page.$$eval('#gchips button[data-g]', b => b.filter(x => !x.hidden).map(x => x.dataset.g).join());
+    check('وفي شريط الفرز بحث بالكتابة كذلك (E83)', gv === '2', gv);
+    await page.keyboard.press('Enter'); await page.waitForTimeout(80);
+    check('وEnter فيه يفرز بما بقي ويطوي الحقل', (await cells()).sort((a, b) => a - b).join() === want([2]) && !await page.$('#gchips input[data-gq]'), await cells());
+    await tap('#gchips .gfind'); await page.fill('#gchips input[data-gq]', 'هنتاي'); await page.waitForTimeout(60);
+    check('وتصنيف +18 لا يُعرف فيه والعين مغلقة', await page.evaluate(() => { const n = document.querySelector('#gnote'); return !n.hidden && n.textContent === 'لا تصنيف بهذا الاسم' && ![...document.querySelectorAll('#gchips button[data-g]')].some(b => !b.hidden && !['-1', '2'].includes(b.dataset.g)); }));
+    await page.keyboard.press('Escape'); await tap('#gchips [data-g="-1"]'); }
   // بطاقة من بطاقة (E77): ما يُفتح من بطاقة خطوة في السجل، فالرجوع (زره بجانب ×، أو رجوع المتصفح والجوال، أو Esc) يعيد التي قبلها إلى موضعها، و× يغلقها كلها
   { const strip = id => `#sheet-body .strip button[data-id="${id}"]`, full = id => page.waitForFunction(id => document.querySelector('#sheet-body').dataset.full === id, String(id)), y = () => page.evaluate(() => Math.round(document.querySelector('#sheet-body').scrollTop));
     await tap('#grid .cel[data-id="11061"] [data-act=open]'); await full(11061); await page.locator(strip(136)).scrollIntoViewIfNeeded(); await page.waitForTimeout(250); const y1 = await y();
@@ -634,6 +663,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
       await eye(false); await page.waitForTimeout(100); const shut1 = await anyN();
       check('وإغلاق العين يخرجه من الاقتراح ومن عدّه', shut1 === open1 - 1 && await pid() !== '70002' && !await page.evaluate(() => document.querySelector('#tonight [data-ad]')), [open1, shut1, await pid()]);
       await eye(true); }
+    // البحث عن تصنيف بالكتابة والعين مفتوحة (E83): تصنيف +18 يُعرف بالبحث حين يكون في «سأشاهده»، وEnter يختاره مزاجاً ويطوي الحقل
+    { await tap('#tonight .tn-c .gfind'); await page.fill('#tonight input[data-gq]', 'هنتاي'); await page.waitForTimeout(60);
+      const vis = await page.$$eval('#tonight .tn-c button[data-g]', b => b.filter(x => !x.hidden).map(x => x.dataset.g).join());
+      check('بحث المزاج بالكتابة والعين مفتوحة: «هنتاي» يُبقي تصنيفه وحده بعدده (E83)', vis === '4' && await page.evaluate(() => document.querySelector('#tonight .tn-mood > .gnote').hidden), vis);
+      await page.keyboard.press('Enter'); await page.waitForTimeout(80);
+      check('وEnter يختاره مزاجاً ويطوي الحقل، والتركيز على زر البحث', await page.evaluate(() => localStorage.getItem('anime.mood') === '4' && !document.querySelector('#tonight input[data-gq]') && document.activeElement?.matches('#tonight .gfind')));
+      await tap('#tonight [data-g="-1"]'); }
     // البطاقة
     await tap('#grid .cel[data-id="70001"] [data-act=open]'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => document.querySelector('#sheet-body').dataset.full === '70001');
     check('بطاقة عمل +18: سجلّه كغيره، ونبذته بالإنجليزية وطلب ترجمتها كغيره (E69)، وموقعه من سلسلته وحلقاته كغيره (E73)، وصورته مغطاة بزر يكشفها', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.head .cel-art');

@@ -118,6 +118,19 @@ bdi[dir=ltr]{unicode-bidi:isolate}
 .gchips button[aria-pressed=true] b{color:rgba(11,13,38,.7)}
 .gchips button[data-g="-1"][aria-pressed=true]{background:var(--ink);color:var(--bg);box-shadow:none}
 @media (hover:hover){.gchips button:not([aria-pressed=true]):hover{border-color:hsl(var(--gh,220) 82% 68%);color:var(--ink)}}
+/* البحث عن تصنيف (E83): عدسة بحجم الرقاقة أول الشريط، تتسع حقلاً حين تُلمس، وسطر هادئ حين لا يبقى ما يطابق */
+.gchips .gfind{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:40px;padding:0;border-radius:999px;border:0;box-shadow:inset 0 0 0 1px var(--line);background:color-mix(in srgb,var(--bg2) 85%,transparent);color:var(--dim);cursor:pointer}
+.gchips .gfind .ic{width:18px;height:18px}
+.gchips .gfind.on{--gfl:color-mix(in srgb,var(--acc,#7fd4ff) 55%,var(--line));padding-inline:12px 0;flex:0 1 min(250px,64vw);min-width:150px;color:var(--ink);box-shadow:inset 0 0 0 1px var(--gfl);cursor:text}
+.gchips .gfind input{flex:1;min-width:0;height:40px;border:0;outline:0;background:none;color:var(--ink);font:inherit;font-size:.86rem}
+.gchips .gfind input::placeholder{color:var(--mute)}
+.gchips .gfind input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.gchips .gfind .gx{flex:none;justify-content:center;width:40px;min-width:40px;min-height:40px;padding:0;border:0;border-radius:999px;background:none;box-shadow:none;color:var(--mute)}.gchips .gfind .gx .ic{width:16px;height:16px}
+@media (hover:hover){.gchips .gfind .gx:hover{color:var(--ink)}}
+.gchips .gfind:focus-within{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--acc,#7fd4ff) 75%,var(--line))}
+@media (hover:hover){.gchips button.gfind:hover{box-shadow:inset 0 0 0 1px var(--ink);color:var(--ink)}}
+.gnote{font-size:.8rem;line-height:1.5;color:#b9aed3}.tools .gnote{flex:1 0 100%;order:9;padding-inline:4px;color:var(--mute)}
+
 .count{padding:12px var(--pad) 0;color:var(--mute);font-size:.88rem}
 main{padding:12px var(--pad) 56px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cw),1fr));gap:22px 16px}
