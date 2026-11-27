@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-27T16:44:58.259Z",
+ "generatedAt": "2026-11-27T17:36:45.697Z",
  "counts": {
   "works": 629,
   "withEntry": 375,
@@ -17,8 +17,8 @@
   "chronoMissed": 28,
   "chronoAuto": 31,
   "infoEntries": 466,
-  "bytes": 195030,
-  "seconds": 15
+  "bytes": 203238,
+  "seconds": 210
  },
  "missing": [
   {
