@@ -605,8 +605,52 @@
  },
  {
   "universe": "mcu",
-  "work": "your-friendly-neighborhood-spider-man-2025",
+  "work": "shang-chi-2-tba",
   "position": 81,
+  "label": "قيد التطوير",
+  "note": "تكملة Shang-Chi بإخراج ديستن دانيال كريتون، وأكد في يوليو 2026 أنها في طور التطوير، بلا موعد بعد.",
+  "upcoming": {
+   "stage": "development",
+   "source": "https://nme.com/news/film/every-marvel-film-after-avengers-doomsday-3959489"
+  }
+ },
+ {
+  "universe": "mcu",
+  "work": "armor-wars-tba",
+  "position": 82,
+  "label": "قيد التطوير",
+  "note": "جيمس رودز (وور ماشين) في فيلم بعد أن تحوّل المشروع من مسلسل إلى فيلم؛ مصيره لم يُحسم بعد.",
+  "upcoming": {
+   "stage": "development",
+   "source": "https://nme.com/news/film/every-marvel-film-after-avengers-doomsday-3959489"
+  }
+ },
+ {
+  "universe": "mcu",
+  "work": "nova-tba",
+  "position": 83,
+  "label": "قيد التطوير",
+  "note": "ريتشارد رايدر (نوفا) في مشروع بدأ مسلسلاً ثم صار فيلماً، بلا موعد بعد.",
+  "upcoming": {
+   "stage": "development",
+   "source": "https://www.comicbasics.com/upcoming-marvel-movies-shows/"
+  }
+ },
+ {
+  "universe": "mcu",
+  "work": "deadpool-and-x-men-team-up-tba",
+  "position": 84,
+  "label": "قيد التطوير",
+  "note": "فيلم يجمع ديدبول بثلاثة أو أربعة من فريق الإكس، يكتبه رايان رينولدز؛ أكد في 2026 أن العمل عليه جارٍ، ولا موعد له بعد.",
+  "upcoming": {
+   "stage": "development",
+   "source": "https://www.comingsoon.net/?p=2164355"
+  }
+ },
+ {
+  "universe": "mcu",
+  "work": "your-friendly-neighborhood-spider-man-2025",
+  "position": 85,
   "label": "خارج الخط الزمني",
   "note": "قصة أصل أخرى لبيتر باركر يرعاه فيها نورمان أوزبورن بدل توني ستارك؛ عالم مستقل لا يلتزم بأحداث الأفلام."
  },
@@ -885,28 +929,28 @@
   "universe": "xmen",
   "work": "once-upon-a-deadpool-2018",
   "position": 13,
-  "label": "13 (نسخة بديلة، اختياري)",
+  "label": "12-بديل (نسخة عائلية، اختياري)",
   "note": "نسخة عائلية من Deadpool 2 يرويها ديدبول لفريد سافاج، بمشاهد جديدة."
  },
  {
   "universe": "xmen",
   "work": "dark-phoenix-2019",
   "position": 14,
-  "label": "14 (زمن القصة: 1992)",
+  "label": "13 (زمن القصة: 1992)",
   "note": "جين غراي تمتص قوة كونية تخرج عن سيطرتها؛ ختام الجيل الشاب."
  },
  {
   "universe": "xmen",
   "work": "the-new-mutants-2020",
   "position": 15,
-  "label": "15",
+  "label": "14",
   "note": "خمسة متحولين شبان محتجزون في مستشفى غامض؛ رعب جانبي في هذا العالم."
  },
  {
   "universe": "xmen",
   "work": "deadpool-and-wolverine-2024",
   "position": 16,
-  "label": "16 (الختام)",
+  "label": "15 (الختام)",
   "note": "ديدبول ووولفرين معاً في وداع عالم فوكس.",
   "canon": {
    "status": "canon",
@@ -1078,30 +1122,44 @@
  },
  {
   "universe": "hulk",
-  "work": "the-incredible-hulk-1977",
+  "work": "the-incredible-hulk-pilot-1977",
   "position": 1,
-  "label": "1 (المسلسل)",
-  "note": "العالم ديفيد بانر يتحول إلى هالك عند الغضب، ويطارده صحفي؛ أول حلقتين هما الفيلمان التجريبيان (1977)."
+  "label": "1 (الفيلم التجريبي الأول)",
+  "note": "التجربة التي حوّلت ديفيد بانر إلى هالك، وبداية هروبه. وهو نفسه الحلقة الأولى من المسلسل."
+ },
+ {
+  "universe": "hulk",
+  "work": "the-return-of-the-incredible-hulk-1977",
+  "position": 2,
+  "label": "2 (الفيلم التجريبي الثاني)",
+  "note": "بانر هارباً يحمي وريثة شابة من مؤامرة على حياتها، والصحفي جاك ماكغي في أثره. وهو نفسه الحلقة الثانية من المسلسل."
+ },
+ {
+  "universe": "hulk",
+  "work": "the-incredible-hulk-1977",
+  "position": 3,
+  "label": "3 (المسلسل)",
+  "note": "العالم ديفيد بانر يتحول إلى هالك عند الغضب، ويطارده صحفي؛ إن شاهدت الفيلمين التجريبيين فابدأ من الحلقة الثالثة."
  },
  {
   "universe": "hulk",
   "work": "the-incredible-hulk-returns-1988",
-  "position": 2,
-  "label": "2 (فيلم تلفزيوني)",
+  "position": 4,
+  "label": "4 (فيلم تلفزيوني)",
   "note": "بانر يقترب من العلاج، وأول ظهور لثور على الشاشة."
  },
  {
   "universe": "hulk",
   "work": "the-trial-of-the-incredible-hulk-1989",
-  "position": 3,
-  "label": "3 (فيلم تلفزيوني)",
+  "position": 5,
+  "label": "5 (فيلم تلفزيوني)",
   "note": "بانر متهم أمام المحكمة، ومحاميه مات موردوك (ديرديفل)."
  },
  {
   "universe": "hulk",
   "work": "the-death-of-the-incredible-hulk-1990",
-  "position": 4,
-  "label": "4 (الختام)",
+  "position": 6,
+  "label": "6 (الختام)",
   "note": "الفيلم الأخير لبيل بيكسبي ولو فيرينو في الدورين."
  },
  {
@@ -1260,155 +1318,246 @@
  },
  {
   "universe": "early_st",
-  "work": "captain-america-1979",
+  "work": "spider-man-strikes-back-1978",
   "position": 6,
+  "label": "منفرد",
+  "note": "نسخة سينمائية من حلقتين في مسلسل The Amazing Spider-Man، عُرضت في دور السينما خارج أمريكا."
+ },
+ {
+  "universe": "early_st",
+  "work": "captain-america-1979",
+  "position": 7,
   "label": "منفرد",
   "note": "فيلم تلفزيوني: ستيف روجرز جندي سابق يرث مصل أبيه."
  },
  {
   "universe": "early_st",
   "work": "battle-fever-j-1979",
-  "position": 7,
+  "position": 8,
   "label": "منفرد",
   "note": "مسلسل Toei بالشراكة مع مارفل، وفيه أول روبوت عملاق في سلسلة Super Sentai، وشخصية ميس أمريكا."
  },
  {
   "universe": "early_st",
   "work": "captain-america-ii-death-too-soon-1979",
-  "position": 8,
+  "position": 9,
   "label": "منفرد",
   "note": "تكملة الفيلم التلفزيوني: البطل نفسه أمام إرهابي يملك سلاحاً يسرّع الشيخوخة."
  },
  {
   "universe": "early_st",
+  "work": "spider-man-the-dragon-s-challenge-1980",
+  "position": 10,
+  "label": "منفرد",
+  "note": "نسخة سينمائية من حلقتين في المسلسل نفسه، يسافر فيهما سبايدرمان إلى الصين."
+ },
+ {
+  "universe": "early_st",
   "work": "howard-the-duck-1986",
-  "position": 9,
+  "position": 11,
   "label": "منفرد",
   "note": "بطة من كوكب آخر تُسحب إلى الأرض؛ أول فيلم سينمائي طويل لشخصية من مارفل، من إنتاج جورج لوكاس."
  },
  {
   "universe": "early_st",
   "work": "the-punisher-1989",
-  "position": 10,
+  "position": 12,
   "label": "منفرد",
   "note": "دولف لوندغرين في دور فرانك كاسل ضد المافيا (للكبار)."
  },
  {
   "universe": "early_st",
   "work": "captain-america-1990",
-  "position": 11,
+  "position": 13,
   "label": "منفرد",
   "note": "ستيف روجرز يُجمَّد في الحرب ثم يستيقظ لمواجهة الجمجمة الحمراء."
  },
  {
   "universe": "early_st",
   "work": "the-fantastic-four-1994",
-  "position": 12,
+  "position": 14,
   "label": "منفرد",
   "note": "فيلم منخفض التكلفة لم يُعرض رسمياً قط، وصار من أشهر الأفلام المفقودة."
  },
  {
   "universe": "early_st",
   "work": "generation-x-1996",
-  "position": 13,
+  "position": 15,
   "label": "منفرد",
   "note": "فيلم تلفزيوني عن طلاب مدرسة للمتحولين بقيادة إيما فروست."
  },
  {
   "universe": "early_st",
   "work": "nick-fury-agent-of-s-h-i-e-l-d-1998",
-  "position": 14,
+  "position": 16,
   "label": "منفرد",
   "note": "ديفيد هاسلهوف في دور نيك فيوري أمام منظمة هايدرا."
  },
  {
   "universe": "movie_st",
-  "work": "daredevil-2003",
+  "work": "men-in-black-1997",
   "position": 1,
+  "label": "منفرد",
+  "note": "شرطي من نيويورك يُجنَّد في وكالة سرية تراقب الكائنات الفضائية على الأرض. مقتبس من قصص مصورة صارت ملك مارفل حين اشترت ناشرها Malibu Comics عام 1994."
+ },
+ {
+  "universe": "movie_st",
+  "work": "men-in-black-ii-2002",
+  "position": 2,
+  "label": "منفرد",
+  "note": "الجزء الثاني: K وJ معاً من جديد في مواجهة فضائية فاتنة شريرة."
+ },
+ {
+  "universe": "movie_st",
+  "work": "daredevil-2003",
+  "position": 3,
   "label": "منفرد",
   "note": "بن أفليك في دور المحامي الأعمى مات موردوك، أمام كينغبين وبولزآي."
  },
  {
   "universe": "movie_st",
   "work": "hulk-2003",
-  "position": 2,
+  "position": 4,
   "label": "منفرد",
   "note": "فيلم آنغ لي عن بروس بانر وعلاقته المعقدة بأبيه."
  },
  {
   "universe": "movie_st",
   "work": "the-punisher-2004",
-  "position": 3,
+  "position": 5,
   "label": "منفرد",
   "note": "توماس جاين في دور فرانك كاسل ينتقم من رجل عصابات قتل عائلته (للكبار)."
  },
  {
   "universe": "movie_st",
   "work": "elektra-2005",
-  "position": 4,
+  "position": 6,
   "label": "منفرد",
   "note": "جينيفر غارنر في دور القاتلة المأجورة؛ امتداد لفيلم Daredevil (2003)."
  },
  {
   "universe": "movie_st",
   "work": "man-thing-2005",
-  "position": 5,
+  "position": 7,
   "label": "منفرد",
   "note": "كائن مستنقع يحرس أرضاً مقدسة في لويزيانا (رعب)."
  },
  {
   "universe": "movie_st",
   "work": "ghost-rider-2007",
-  "position": 6,
+  "position": 8,
   "label": "منفرد",
   "note": "نيكولاس كيج في دور جوني بليز، سائق الدراجة الذي باع روحه."
  },
  {
   "universe": "movie_st",
   "work": "punisher-war-zone-2008",
-  "position": 7,
+  "position": 9,
   "label": "منفرد",
   "note": "راي ستيفنسون في دور فرانك كاسل أمام جيغسو (للكبار)."
  },
  {
   "universe": "movie_st",
+  "work": "kick-ass-2010",
+  "position": 10,
+  "label": "منفرد",
+  "note": "مراهق بلا قوى ولا تدريب يقرر أن يصبح بطلاً خارقاً. مقتبس من قصة لمارك ميلار وجون روميتا الابن نشرتها مارفل تحت شعارها لأعمال المؤلفين (Icon)، للكبار."
+ },
+ {
+  "universe": "movie_st",
   "work": "ghost-rider-spirit-of-vengeance-2011",
-  "position": 8,
+  "position": 11,
   "label": "منفرد",
   "note": "تكملة Ghost Rider: نيكولاس كيج في أوروبا الشرقية يحمي فتى من الشيطان."
  },
  {
   "universe": "movie_st",
+  "work": "men-in-black-3-2012",
+  "position": 12,
+  "label": "منفرد",
+  "note": "الجزء الثالث: J يعود بالزمن إلى عام 1969 لينقذ شريكه K في شبابه."
+ },
+ {
+  "universe": "movie_st",
+  "work": "kick-ass-2-2013",
+  "position": 13,
+  "label": "منفرد",
+  "note": "الجزء الثاني: كيك آس ينضم إلى فريق من الأبطال الهواة (للكبار)."
+ },
+ {
+  "universe": "movie_st",
+  "work": "kingsman-the-secret-service-2015",
+  "position": 14,
+  "label": "منفرد",
+  "note": "شاب من حي فقير يُجنَّد في وكالة تجسس بريطانية سرية. مقتبس من قصة The Secret Service التي نشرتها مارفل تحت شعارها لأعمال المؤلفين (Icon)، للكبار."
+ },
+ {
+  "universe": "movie_st",
   "work": "fantastic-four-2015",
-  "position": 9,
+  "position": 15,
   "label": "منفرد",
   "note": "إعادة تقديم الفريق بنبرة جادة، بعيداً عن ثنائية 2005."
  },
  {
+  "universe": "movie_st",
+  "work": "kingsman-the-golden-circle-2017",
+  "position": 16,
+  "label": "منفرد",
+  "note": "الجزء الثاني: الوكالة تتعاون مع نظيرتها الأمريكية بعد هجوم على مقرها (للكبار)."
+ },
+ {
+  "universe": "movie_st",
+  "work": "men-in-black-international-2019",
+  "position": 17,
+  "label": "منفرد",
+  "note": "فرع لندن من الوكالة وعميلان جديدان أمام أكبر أخطارها."
+ },
+ {
+  "universe": "movie_st",
+  "work": "the-king-s-man-2021",
+  "position": 18,
+  "label": "منفرد",
+  "note": "قصة تأسيس الوكالة في الحرب العالمية الأولى، تجري قبل الجزأين."
+ },
+ {
+  "universe": "tv_st",
+  "work": "night-man-1997",
+  "position": 1,
+  "label": "منفرد",
+  "note": "جوني دومينو، عازف ساكسفون في سان فرانسيسكو، بطل خارق باسم نايت مان. مقتبس بتصرف من قصص Malibu Comics التي اشترتها مارفل (موسمان)."
+ },
+ {
   "universe": "tv_st",
   "work": "mutant-x-2001",
-  "position": 1,
+  "position": 2,
   "label": "منفرد",
   "note": "متحولون صنعهم مختبر حكومي يبحثون عن أمثالهم؛ أنتجته مارفل (ثلاثة مواسم)."
  },
  {
   "universe": "tv_st",
+  "work": "powers-2015",
+  "position": 3,
+  "label": "منفرد",
+  "note": "محققان في قسم يتولى جرائم أصحاب القوى. مقتبس من قصص براين مايكل بنديس ومايكل أفون أومينغ التي انتقل نشرها إلى مارفل تحت شعار Icon (موسمان)."
+ },
+ {
+  "universe": "tv_st",
   "work": "legion-2017",
-  "position": 2,
+  "position": 4,
   "label": "منفرد",
   "note": "ديفيد هالر، ابن البروفيسور إكس، يكتشف أن ما ظنه مرضاً نفسياً قوة هائلة (ثلاثة مواسم)."
  },
  {
   "universe": "tv_st",
   "work": "the-gifted-2017",
-  "position": 3,
+  "position": 5,
   "label": "منفرد",
   "note": "عائلة تهرب مع ابنيها المتحولين وتنضم إلى شبكة سرية (موسمان)."
  },
  {
   "universe": "tv_st",
   "work": "spider-noir-2026",
-  "position": 4,
+  "position": 6,
   "label": "منفرد",
   "note": "نيكولاس كيج محقق خاص في نيويورك الثلاثينيات، بنسخة بالأبيض والأسود وأخرى ملونة؛ من سوني."
  },
@@ -1484,141 +1633,155 @@
  },
  {
   "universe": "anim_tv_st",
-  "work": "silver-surfer-1998",
+  "work": "ultraforce-1995",
   "position": 11,
+  "label": "منفرد",
+  "note": "فريق من أبطال عالم Ultraverse في مسلسل كرتون. مقتبس من قصص Malibu Comics بعد أن اشترتها مارفل (13 حلقة)."
+ },
+ {
+  "universe": "anim_tv_st",
+  "work": "men-in-black-the-series-1997",
+  "position": 12,
+  "label": "منفرد",
+  "note": "مسلسل كرتون يكمل مغامرات العميلين J وK بعد فيلم Men in Black الأول (4 مواسم)."
+ },
+ {
+  "universe": "anim_tv_st",
+  "work": "silver-surfer-1998",
+  "position": 13,
   "label": "منفرد",
   "note": "ساعي غالاكتوس في رحلة فضائية بأسلوب رسم جاك كيربي (13 حلقة)."
  },
  {
   "universe": "anim_tv_st",
   "work": "spider-man-unlimited-1999",
-  "position": 12,
+  "position": 14,
   "label": "منفرد",
   "note": "سبايدرمان على أرض مضادة يحكمها الهاي إيفولوشنري."
  },
  {
   "universe": "anim_tv_st",
   "work": "the-avengers-united-they-stand-1999",
-  "position": 13,
+  "position": 15,
   "label": "منفرد",
   "note": "المنتقمون بقيادة الرجل النملة (13 حلقة)."
  },
  {
   "universe": "anim_tv_st",
   "work": "x-men-evolution-2000",
-  "position": 14,
+  "position": 16,
   "label": "منفرد",
   "note": "فريق الإكس مراهقين في المدرسة الثانوية (أربعة مواسم)."
  },
  {
   "universe": "anim_tv_st",
   "work": "spider-man-the-new-animated-series-2003",
-  "position": 15,
+  "position": 17,
   "label": "منفرد",
   "note": "سبايدرمان بالرسوم الحاسوبية، تكملة غير رسمية لفيلم Spider-Man (2002)."
  },
  {
   "universe": "anim_tv_st",
   "work": "fantastic-four-world-s-greatest-heroes-2006",
-  "position": 16,
+  "position": 18,
   "label": "منفرد",
   "note": "مغامرات الفريق بأسلوب رسم متأثر بالأنمي (26 حلقة)."
  },
  {
   "universe": "anim_tv_st",
   "work": "the-spectacular-spider-man-2008",
-  "position": 17,
+  "position": 19,
   "label": "منفرد",
   "note": "من أحب مسلسلات سبايدرمان لدى الجمهور: بيتر في سنته الثانوية (موسمان)."
  },
  {
   "universe": "anim_tv_st",
   "work": "wolverine-and-the-x-men-2009",
-  "position": 18,
+  "position": 20,
   "label": "منفرد",
   "note": "وولفرين يقود الفريق بعد اختفاء البروفيسور إكس (26 حلقة)."
  },
  {
   "universe": "anim_tv_st",
   "work": "iron-man-armored-adventures-2009",
-  "position": 19,
+  "position": 21,
   "label": "منفرد",
   "note": "توني ستارك مراهقاً يبني بدلته (موسمان)."
  },
  {
   "universe": "anim_tv_st",
   "work": "the-super-hero-squad-show-2009",
-  "position": 20,
+  "position": 22,
   "label": "منفرد",
   "note": "كوميديا للصغار بنسخ مصغّرة من أبطال مارفل (موسمان)."
  },
  {
   "universe": "anim_tv_st",
   "work": "the-avengers-earth-s-mightiest-heroes-2010",
-  "position": 21,
+  "position": 23,
   "label": "منفرد",
   "note": "من أفضل مسلسلات المنتقمين: قصص متصلة مقتبسة من الكوميكس (موسمان)."
  },
  {
   "universe": "anim_tv_st",
   "work": "marvel-s-spider-man-2017",
-  "position": 22,
+  "position": 24,
   "label": "منفرد",
   "note": "قصة أصل جديدة لبيتر باركر في مدرسة هورايزن، وثلاثة مواسم حتى Maximum Venom."
  },
  {
   "universe": "anim_tv_st",
   "work": "big-hero-6-the-series-2017",
-  "position": 23,
+  "position": 25,
   "label": "منفرد",
   "note": "تكملة فيلم Big Hero 6: هيرو وبايماكس والفريق في سان فرانسوكيو (ثلاثة مواسم)."
  },
  {
   "universe": "anim_tv_st",
   "work": "marvel-s-m-o-d-o-k-2021",
-  "position": 24,
+  "position": 26,
   "label": "منفرد",
   "note": "كوميديا للكبار بأسلوب تحريك الدمى عن الشرير موودوك وأزمة منتصف العمر."
  },
  {
   "universe": "anim_tv_st",
   "work": "spidey-and-his-amazing-friends-2021",
-  "position": 25,
+  "position": 27,
   "label": "منفرد",
   "note": "للأطفال الصغار: بيتر ومايلز وغوين فريق عناكب صغير."
  },
  {
   "universe": "anim_tv_st",
   "work": "marvel-s-hit-monkey-2021",
-  "position": 26,
+  "position": 28,
   "label": "منفرد",
   "note": "قرد ياباني يصير قاتلاً مأجوراً بصحبة شبح قاتل (للكبار، موسمان)."
  },
  {
   "universe": "anim_tv_st",
   "work": "baymax-2022",
-  "position": 27,
+  "position": 29,
   "label": "منفرد",
   "note": "حلقات قصيرة لبايماكس يعتني بسكان سان فرانسوكيو."
  },
  {
   "universe": "anim_tv_st",
   "work": "marvel-s-moon-girl-and-devil-dinosaur-2023",
-  "position": 28,
+  "position": 30,
   "label": "منفرد",
   "note": "لونيلا لافاييت، عبقرية في الثالثة عشرة، وديناصور عملاق في نيويورك (موسمان)."
  },
  {
   "universe": "anim_tv_st",
   "work": "iron-man-and-his-awesome-friends-2025",
-  "position": 29,
+  "position": 31,
   "label": "منفرد",
   "note": "للأطفال الصغار: توني ستارك وأصدقاؤه أبطال صغار في بدلات."
  },
  {
   "universe": "anim_tv_st",
   "work": "marvel-s-avengers-mightiest-friends-2027",
-  "position": 30,
+  "position": 32,
   "label": "قادم",
   "note": "أول مسلسل للمنتقمين موجّه لأطفال ما قبل المدرسة، على Disney Jr. ثم Disney+.",
   "upcoming": {
@@ -1628,113 +1791,120 @@
  },
  {
   "universe": "anim_mv_st",
-  "work": "ultimate-avengers-the-movie-2006",
+  "work": "the-origin-of-the-silver-surfer-1999",
   "position": 1,
+  "label": "منفرد",
+  "note": "نسخة مجمّعة من حلقات مسلسل Silver Surfer الأولى، صدرت على الفيديو بقصة أصل الساعي الفضي."
+ },
+ {
+  "universe": "anim_mv_st",
+  "work": "ultimate-avengers-the-movie-2006",
+  "position": 2,
   "label": "منفرد",
   "note": "أول أفلام مارفل الكرتونية للفيديو: تشكيل المنتقمين بروح سلسلة The Ultimates."
  },
  {
   "universe": "anim_mv_st",
   "work": "ultimate-avengers-2-2006",
-  "position": 2,
+  "position": 3,
   "label": "منفرد",
   "note": "تكملة مباشرة: المنتقمون في واكاندا أمام غزو فضائي."
  },
  {
   "universe": "anim_mv_st",
   "work": "the-invincible-iron-man-2007",
-  "position": 3,
+  "position": 4,
   "label": "منفرد",
   "note": "قصة أصل آيرون مان في الصين أمام الماندارين."
  },
  {
   "universe": "anim_mv_st",
   "work": "doctor-strange-2007",
-  "position": 4,
+  "position": 5,
   "label": "منفرد",
   "note": "ستيفن سترينج من جراح إلى ساحر أعلى، أمام دورمامو."
  },
  {
   "universe": "anim_mv_st",
   "work": "next-avengers-heroes-of-tomorrow-2008",
-  "position": 5,
+  "position": 6,
   "label": "منفرد",
   "note": "أبناء المنتقمين في مستقبل يحكمه ألترون."
  },
  {
   "universe": "anim_mv_st",
   "work": "hulk-vs-2009",
-  "position": 6,
+  "position": 7,
   "label": "منفرد",
   "note": "فيلمان قصيران: هالك ضد وولفرين، وهالك ضد ثور (للكبار)."
  },
  {
   "universe": "anim_mv_st",
   "work": "planet-hulk-2010",
-  "position": 7,
+  "position": 8,
   "label": "منفرد",
   "note": "هالك منفي إلى كوكب ساكار يصير مصارعاً ثم ثائراً؛ القصة التي ألهمت Thor: Ragnarok."
  },
  {
   "universe": "anim_mv_st",
   "work": "thor-tales-of-asgard-2011",
-  "position": 8,
+  "position": 9,
   "label": "منفرد",
   "note": "ثور ولوكي في شبابهما في رحلة بحثاً عن سيف أسطوري."
  },
  {
   "universe": "anim_mv_st",
   "work": "phineas-and-ferb-mission-marvel-2013",
-  "position": 9,
+  "position": 10,
   "label": "منفرد",
   "note": "فينياس وفيرب مع المنتقمين ضد دكتور دوفنشميرتز وعصابة من أشرار مارفل."
  },
  {
   "universe": "anim_mv_st",
   "work": "iron-man-and-hulk-heroes-united-2013",
-  "position": 10,
+  "position": 11,
   "label": "منفرد",
   "note": "آيرون مان وهالك أمام كائن من الطاقة."
  },
  {
   "universe": "anim_mv_st",
   "work": "iron-man-and-captain-america-heroes-united-2014",
-  "position": 11,
+  "position": 12,
   "label": "منفرد",
   "note": "آيرون مان وكابتن أمريكا أمام الجمجمة الحمراء."
  },
  {
   "universe": "anim_mv_st",
   "work": "big-hero-6-2014",
-  "position": 12,
+  "position": 13,
   "label": "منفرد",
   "note": "فيلم ديزني المقتبس من فريق مارفل: الفتى هيرو وروبوته بايماكس؛ فاز بأوسكار أفضل فيلم رسوم متحركة."
  },
  {
   "universe": "anim_mv_st",
   "work": "marvel-super-hero-adventures-frost-fight-2015",
-  "position": 13,
+  "position": 14,
   "label": "منفرد",
   "note": "لوكي وعملاق الجليد يمير يخططان لغزو العالم في موسم الأعياد، والأبطال في مواجهتهما."
  },
  {
   "universe": "anim_mv_st",
   "work": "hulk-where-monsters-dwell-2016",
-  "position": 14,
+  "position": 15,
   "label": "منفرد",
   "note": "هالك ودكتور سترينج في عالم الكوابيس ليلة الهالوين."
  },
  {
   "universe": "anim_mv_st",
   "work": "spidey-and-iron-man-avengers-team-up-2025",
-  "position": 15,
+  "position": 16,
   "label": "منفرد",
   "note": "عرض خاص للصغار: سبايدي وآيرون مان مع المنتقمين ضد ألترون والغرين غوبلن."
  },
  {
   "universe": "anim_mv_st",
   "work": "spidey-and-the-avengers-halloween-team-up-2026",
-  "position": 16,
+  "position": 17,
   "label": "منفرد",
   "note": "عرض الهالوين الخاص للصغار مع سبايدي والمنتقمين."
  },
@@ -1795,100 +1965,114 @@
   "note": "ثلاثة أطفال يتدربون ليصبحوا أبطالاً بصحبة المنتقمين (موسمان)."
  },
  {
+  "universe": "anime",
+  "work": "super-crooks-2021",
+  "position": 9,
+  "label": "منفرد",
+  "note": "أنمي من استوديو Bones عن عصابة لصوص بقوى خارقة في عملية سطو كبرى. مقتبس من قصة لمارك ميلار نشرتها مارفل تحت شعارها لأعمال المؤلفين (Icon)."
+ },
+ {
+  "universe": "motion",
+  "work": "stephen-king-s-n-2008",
+  "position": 1,
+  "label": "منفرد",
+  "note": "قصة رعب قصيرة لستيفن كينغ قدّمتها مارفل قصةً مصورة متحركة على الإنترنت قبل نشرها مطبوعة."
+ },
+ {
   "universe": "motion",
   "work": "marvel-knights-spider-woman-agent-of-s-w-o-r-d-2009",
-  "position": 1,
+  "position": 2,
   "label": "منفرد",
   "note": "جيسيكا درو بعد الغزو السري تطارد السكرول."
  },
  {
   "universe": "motion",
   "work": "astonishing-x-men-2009",
-  "position": 2,
+  "position": 3,
   "label": "منفرد",
   "note": "قصص جوس ويدون وجون كاساداي في الكوميكس: Gifted وDangerous وTorn وUnstoppable."
  },
  {
   "universe": "motion",
   "work": "black-panther-2010",
-  "position": 3,
+  "position": 4,
   "label": "منفرد",
   "note": "واكاندا والأمير تشالا، من كتابة ريجينالد هودلين (6 حلقات)."
  },
  {
   "universe": "motion",
   "work": "iron-man-extremis-2010",
-  "position": 4,
+  "position": 5,
   "label": "منفرد",
   "note": "سرقة مصل إكستريمس، القصة التي ألهمت Iron Man 3."
  },
  {
   "universe": "motion",
   "work": "thor-and-loki-blood-brothers-2011",
-  "position": 5,
+  "position": 6,
   "label": "منفرد",
   "note": "لوكي حاكماً لأسغارد، برسوم إيساد ريبيتش."
  },
  {
   "universe": "motion",
   "work": "marvel-knights-inhumans-2013",
-  "position": 6,
+  "position": 7,
   "label": "منفرد",
   "note": "العائلة الملكية للإنهيومنز، من رواية بول جنكينز وجاي لي."
  },
  {
   "universe": "motion",
   "work": "wolverine-origin-2013",
-  "position": 7,
+  "position": 8,
   "label": "منفرد",
   "note": "طفولة جيمس هاولت في القرن التاسع عشر قبل أن يصبح لوغان."
  },
  {
   "universe": "motion",
   "work": "ultimate-wolverine-vs-hulk-2013",
-  "position": 8,
+  "position": 9,
   "label": "منفرد",
   "note": "وولفرين يطارد هالك في عالم Ultimate."
  },
  {
   "universe": "motion",
   "work": "wolverine-versus-sabretooth-2014",
-  "position": 9,
+  "position": 10,
   "label": "منفرد",
   "note": "لوغان أمام خصمه الأزلي سابرتوث."
  },
  {
   "universe": "motion",
   "work": "wolverine-weapon-x-tomorrow-dies-today-2014",
-  "position": 10,
+  "position": 11,
   "label": "منفرد",
   "note": "روبوتات قاتلة من المستقبل وديثلوك جديد."
  },
  {
   "universe": "motion",
   "work": "marvel-knights-eternals-2014",
-  "position": 11,
+  "position": 12,
   "label": "منفرد",
   "note": "طالب طب يكتشف الخالدين، من رواية نيل غايمان وجون روميتا الابن."
  },
  {
   "universe": "motion",
   "work": "wolverine-versus-sabretooth-reborn-2015",
-  "position": 12,
+  "position": 13,
   "label": "منفرد",
   "note": "جولة أخرى بين لوغان وسابرتوث (4 حلقات)."
  },
  {
   "universe": "motion",
   "work": "marvel-s-ultimate-comics-2016",
-  "position": 13,
+  "position": 14,
   "label": "منفرد",
   "note": "سبايدرمان وآيرون مان وفريق من عالم Ultimate."
  },
  {
   "universe": "motion",
   "work": "marvel-ultimate-comics-absolute-carnage-2019",
-  "position": 14,
+  "position": 15,
   "label": "منفرد",
   "note": "نورمان أوزبورن يتحد مع كارنج ضد سبايدرمان."
  },
@@ -1978,57 +2162,64 @@
  },
  {
   "universe": "shorts",
-  "work": "marvel-funko-shorts-2016",
+  "work": "marvel-mash-up-2012",
   "position": 2,
+  "label": "منفرد",
+  "note": "مقاطع ساخرة من كرتون مارفل القديم بحوار جديد مضحك، عُرضت بين برامج Disney XD."
+ },
+ {
+  "universe": "shorts",
+  "work": "marvel-funko-shorts-2016",
+  "position": 3,
   "label": "منفرد",
   "note": "أول أفلام Funko المتحركة: أبطال مارفل بأشكال الدمى الشهيرة."
  },
  {
   "universe": "shorts",
   "work": "marvel-s-rocket-and-groot-2017",
-  "position": 3,
+  "position": 4,
   "label": "منفرد",
   "note": "روكيت وغروت صائدا جوائز قبل الحراس (12 حلقة قصيرة)."
  },
  {
   "universe": "shorts",
   "work": "marvel-s-ant-man-2017",
-  "position": 4,
+  "position": 5,
   "label": "منفرد",
   "note": "سكوت لانغ الرجل النملة بين الأشرار وواجبات ابنته المدرسية."
  },
  {
   "universe": "shorts",
   "work": "marvel-super-hero-adventures-2017",
-  "position": 5,
+  "position": 6,
   "label": "منفرد",
   "note": "حلقات قصيرة للصغار عن سبايدرمان وأصدقائه."
  },
  {
   "universe": "shorts",
   "work": "the-fury-files-2017",
-  "position": 6,
+  "position": 7,
   "label": "منفرد",
   "note": "نيك فيوري يكشف ملفات S.H.I.E.L.D. السرية عن الأبطال والأشرار."
  },
  {
   "universe": "shorts",
   "work": "marvel-battleworld-mystery-of-the-thanostones-2020",
-  "position": 7,
+  "position": 8,
   "label": "منفرد",
   "note": "آيرون مان وفريق غريب الأطوار في عالم جديد يبحثون عن أحجار ثانوس (6 حلقات)."
  },
  {
   "universe": "shorts",
   "work": "meet-iron-man-and-his-awesome-friends-2025",
-  "position": 8,
+  "position": 9,
   "label": "منفرد",
   "note": "حلقات قصيرة تعرّف الصغار بأبطال Iron Man and His Awesome Friends."
  },
  {
   "universe": "shorts",
   "work": "jeff-and-his-super-hero-friends-2026",
-  "position": 9,
+  "position": 10,
   "label": "منفرد",
   "note": "حلقات قصيرة لجيف، القرش البري الصغير، مع أبطال مارفل (6 حلقات)."
  }
