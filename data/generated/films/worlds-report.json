@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-27T13:18:35.573Z",
+ "generatedAt": "2026-11-27T16:44:58.259Z",
  "counts": {
   "works": 629,
   "withEntry": 375,
@@ -17,8 +17,8 @@
   "chronoMissed": 28,
   "chronoAuto": 31,
   "infoEntries": 466,
-  "bytes": 202713,
-  "seconds": 49
+  "bytes": 195030,
+  "seconds": 15
  },
  "missing": [
   {
@@ -1202,8 +1202,8 @@
     "sibling:Mortal Kombat Legends: Scorpion's Revenge",
     "sibling:Mortal Kombat: Annihilation",
     "sibling:Mortal Kombat: Conquest",
-    "sibling:Mortal Kombat: Defenders of the Realm",
     "sibling:Mortal Kombat: Legacy",
+    "sibling:Mortal Kombat: Defenders of the Realm",
     "sibling:Mortal Kombat: The Journey Begins"
    ],
    "src": [
@@ -1845,7 +1845,7 @@
     "sibling:Snow White",
     "sibling:Snow White",
     "sibling:The Death of Snow White",
-    "sibling:Snow White and the Evil Queen"
+    "sibling:Snow White"
    ],
    "src": [
     "story:Snow White"
@@ -2536,8 +2536,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "musical:Wicked",
     "novel:The Wonderful Wizard of Oz",
+    "musical:Wicked",
     "novel:Wicked"
    ]
   },
@@ -4644,6 +4644,15 @@
    ]
   },
   {
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
+   "why": "catalog",
+   "size": 23,
+   "types": [
+    "animated film series"
+   ]
+  },
+  {
    "g": "Q56070713",
    "name": "Walt Disney Animation Studios feature film",
    "why": "catalog",
@@ -4659,15 +4668,6 @@
    "size": 28,
    "types": [
     "Wikimedia list article"
-   ]
-  },
-  {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
-   "why": "catalog",
-   "size": 23,
-   "types": [
-    "animated film series"
    ]
   }
  ],
