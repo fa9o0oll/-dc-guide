@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-27T19:56:37.084Z",
+ "generatedAt": "2026-11-27T20:33:55.721Z",
  "counts": {
   "works": 629,
   "withEntry": 375,
@@ -17,8 +17,8 @@
   "chronoMissed": 27,
   "chronoAuto": 33,
   "infoEntries": 466,
-  "bytes": 204929,
-  "seconds": 19
+  "bytes": 205271,
+  "seconds": 18
  },
  "missing": [
   {
@@ -1250,8 +1250,8 @@
     "sibling:Mortal Kombat Legends: Scorpion's Revenge",
     "sibling:Mortal Kombat: Annihilation",
     "sibling:Mortal Kombat: Conquest",
-    "sibling:Mortal Kombat: Defenders of the Realm",
     "sibling:Mortal Kombat: Legacy",
+    "sibling:Mortal Kombat: Defenders of the Realm",
     "sibling:Mortal Kombat: The Journey Begins"
    ],
    "src": [
