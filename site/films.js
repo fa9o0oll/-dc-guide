@@ -94,6 +94,7 @@ function register(f, heavy) { D.known.add(f.id); if (heavy) (D.more ||= {})[f.id
 function relist() { D.films.length = 0; D.byId.clear(); D.byTmdb.clear(); for (const f of D.pool.values()) admit(f); stale(); }
 // العين (site/adult.js) ترفع الفلتر أو تعيده في مكانها، بلا إعادة تحميل: الشبكة والسلاسل والأعداد تُرسم من جديد
 function toggleEye() { setOpen(!isOpen()); relist(); drawEye(); if (sheet.open && openId && !D.byId.has(openId)) sheet.close(); renderGrid(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML();
+  moodChips(); if (!D.byId.has(tonightId)) { tonightId = null; reroll(false); }   // الاقتراح بما يظهر الآن (E78)
   toast(isOpen() ? 'رُفع الفلتر: تظهر الأعمال كلها.' : 'عاد الفلتر.'); }
 const HEAVY = ['overviewEn', 'overviewAr', 'cast', 'countries', 'arSource', 'titleAr', 'directors'];
 const split = full => { const light = {}, heavy = {}; for (const [k, v] of Object.entries(full)) (HEAVY.includes(k) ? heavy : light)[k] = v; return [light, heavy]; };
@@ -172,13 +173,17 @@ function renderGrid() { $('#grid').innerHTML = [...D.films].sort(SORTS[ui.sort][
 // الأنواع المعروضة هي ما في قائمتك فعلاً من أفلام لم تشاهدها، مرتبة بعددها، وبجانب كل نوع كم فيلماً ينتظرك فيه.
 let tonightId = null, moods = [];
 try { moods = (localStorage.getItem('films.mood') || '').split(',').filter(Boolean); } catch {}
-const tonightOk = f => !f.adult && f.backdrop && f.kind === 'movie' && !unreleased(f) && st(f.id) !== 'watched';
+// أفلام +18 تدخل الاقتراح والعين مفتوحة، وتخرج منه حين تُغلق (E78)، وخلفيتها لا تظهر حتى تُكشف (tonightBd)
+const tonightOk = f => (!f.adult || isOpen()) && f.backdrop && f.kind === 'movie' && !unreleased(f) && st(f.id) !== 'watched';
 const fits = (gs, ms) => ms.filter(m => gs.includes(m)).length;
 function moodChips() { const n = {}; for (const f of D.films) if (tonightOk(f)) for (const g of f.genres) if (GENRES[g]) n[g] = (n[g] || 0) + 1;
   moods = moods.filter(g => n[g]);
   const all = D.films.filter(tonightOk).length, chip = (g, t, c) => `<button type="button" class="chip" data-act="mood" data-g="${g}" aria-pressed="${String(g ? moods.includes(g) : !moods.length)}">${t}<small>${c}</small></button>`;
   // المختار أولاً، فلا يبقى منه شيء خارج الشريط لا يُرى (E76)، ثم البقية بأعدادها
   $('#mood').innerHTML = chip('', 'أي نوع', all) + [...moods.map(g => [g, n[g]]), ...Object.entries(n).filter(([g]) => !moods.includes(g)).sort((a, b) => b[1] - a[1])].map(([g, c]) => chip(g, GENRES[g], c)).join(''); }
+function tonightBd() { const f = D.byId.get(tonightId), bd = $('#tonight .bd'); if (!f || !bd) return; if (f.adult && covered(f.id)) { bd.replaceChildren(); return; }
+  const src = IMG + (innerWidth * devicePixelRatio > 1000 ? 'w1280' : 'w780') + f.backdrop; if (bd.querySelector('img')?.src === src) return;
+  const img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = src; img.onload = () => { if (D.byId.get(tonightId) !== f) return; bd.replaceChildren(img); requestAnimationFrame(() => img.classList.add('in')); }; }
 function reroll(first) { const ok = f => tonightOk(f) && f.id !== tonightId, ms = moods.map(Number);
   let pool = D.films.filter(f => ok(f) && match(f)); if (!pool.length) pool = D.films.filter(ok);
   let best = 0; if (ms.length) { for (const f of pool) best = Math.max(best, fits(f.genres, ms)); if (best) pool = pool.filter(f => fits(f.genres, ms) === best); }
@@ -193,8 +198,7 @@ function reroll(first) { const ok = f => tonightOk(f) && f.id !== tonightId, ms 
   // أنواع المزاج المختارة أولاً (فيظهر ما جمعه الفيلم منها)، ثم غيرها حتى نوعين، وثلاثة إن جمع ثلاثة مما اخترت
   const hit = f.genres.filter(g => moods.includes(String(g))), gs = [...hit, ...f.genres.filter(g => !moods.includes(String(g)))].filter(g => GENRES[g]).slice(0, Math.min(3, Math.max(2, hit.length)));
   $('.meta', box).textContent = [f.year, rt(f.runtime), gs.map(g => GENRES[g]).join('، '), f.rating ? `التقييم ${f.rating.toFixed(1)}` : ''].filter(Boolean).join(' · ');
-  const img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = IMG + (innerWidth * devicePixelRatio > 1000 ? 'w1280' : 'w780') + f.backdrop;
-  img.onload = () => { $('.bd', box).replaceChildren(img); requestAnimationFrame(() => img.classList.add('in')); };
+  tonightBd();
   if (!first) { box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap'); } }
 
 // ---------- السلاسل والعوالم ----------
@@ -533,8 +537,8 @@ document.addEventListener('click', e => { const t = e.target.closest('[data-act]
   else if (act === 'open-tonight') openFilm(tonightId);
   else if (act === 'add') openAdd();
   else if (act === 'room') toggleEye();   // العين: ترفع الفلتر أو تعيده (site/adult.js)
-  else if (act === 'room-show') { setShowing(!showing()); drawEye(); renderGrid(); redrawSheet(); }                                 // أغلفة أعمال +18 كلها: تُكشف أو تُغطى
-  else if (act === 'bare') { uncover(t.dataset.id); const el = document.getElementById('f-' + t.dataset.id), f = D.byId.get(t.dataset.id); if (el && f) { el.outerHTML = card(f); apply(false); } redrawSheet(); }   // صورة هذا العمل وحده (والتذكرة الجديدة تأخذ ظهورها من التصفية)
+  else if (act === 'room-show') { setShowing(!showing()); drawEye(); renderGrid(); redrawSheet(); tonightBd(); }                                 // أغلفة أعمال +18 كلها: تُكشف أو تُغطى
+  else if (act === 'bare') { uncover(t.dataset.id); const el = document.getElementById('f-' + t.dataset.id), f = D.byId.get(t.dataset.id); if (el && f) { el.outerHTML = card(f); apply(false); } redrawSheet(); tonightBd(); }   // صورة هذا العمل وحده (والتذكرة الجديدة تأخذ ظهورها من التصفية)
   else if (act === 'add-part') { if (t.dataset.tmdb && pass()) openPreview(+t.dataset.tmdb, t.dataset.kind, t); else { if (sheet.open) closeFilm(); openAdd(t.dataset.q); } }
   else if (act === 'preview') openPreview(+t.dataset.tmdb, t.dataset.kind, t);
   else if (act === 'preview-add') addFilm(+t.dataset.tmdb, t.dataset.kind, t, t.innerHTML);

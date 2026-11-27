@@ -270,6 +270,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     const eye = async on => { await page.evaluate(() => { window.__same = 1; }); await tap('.top .r18'); await page.waitForFunction(on => document.querySelector('.top .r18').getAttribute('aria-pressed') === String(on), on); await page.waitForTimeout(200); };
     const same = () => page.evaluate(() => window.__same === 1), toastNow = () => page.evaluate(() => document.querySelector('#toast').textContent);
     const n0 = await page.locator('.tk').count(), tn0 = await page.evaluate(() => document.querySelector('#tonight').hidden);
+    const anyN = () => page.evaluate(() => +(document.querySelector('#mood .chip[data-g=""] small')?.textContent || 0)), an0 = await anyN();
     check('الأفلام: الفلتر قائم: عين مغمضة في الرأس بلا نص ولا رقم، وأعمال +18 ليست في القائمة', await page.evaluate(() => { const b = document.querySelector('.top .r18'); return !!b && b.getAttribute('aria-pressed') === 'false' && b.textContent.trim() === '' && !!b.querySelector('svg.eye') && !/\d/.test(b.getAttribute('aria-label') + b.title)
       && document.querySelector('.top .r18-eye').hidden && !/\+\s*18/.test(document.querySelector('.top').textContent) && !document.getElementById('f-m9900001') && !document.querySelector('.r18-bar'); }) && n0 === FL.length + 1, String(n0));
     await eye(true);
@@ -279,8 +280,9 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
       return ad.length === 2 && ad.every(p => p.classList.contains('x18') && /\/w92\/ad\d\.jpg$/.test(p.querySelector('.x18-i img').getAttribute('src')) && p.querySelector('.x18-m').textContent === '' && !!p.querySelector('.x18-m svg') && !p.hasAttribute('data-zoom-pinch') && /blur/.test(getComputedStyle(p.querySelector('img')).filter))
         && rest.length > 0 && rest.every(p => !p.classList.contains('x18') && [...p.querySelectorAll('img')].every(i => !/blur/.test(getComputedStyle(i).filter))); }));
     await fits('الأفلام: الفلتر مرفوع');
-    if (!tn0) { const seen = new Set(); for (let i = 0; i < 8; i++) { seen.add((await page.textContent('#tonight h2')).trim()); await tap('#tonight [data-act=reroll]'); await page.waitForTimeout(60); }
-      check('الأفلام: والاقتراح لا يختار عمل +18', ![...seen].some(t => AD.some(a => a.title === t)), [...seen]); }
+    // والعين مفتوحة يدخل الاقتراح ما في القائمة من +18 وعدّه (E78)، وخلفيته لا تظهر فيه حتى تُكشف
+    if (!tn0) { const an1 = await anyN(), bds = []; for (let i = 0; i < 12; i++) { const t = (await page.textContent('#tonight h2')).trim(); bds.push([AD.some(a => a.title === t), await page.evaluate(() => document.querySelector('#tonight .bd img')?.getAttribute('src') || '')]); await tap('#tonight [data-act=reroll]'); await page.waitForTimeout(80); }
+      check('الأفلام: والعين مفتوحة يدخل الاقتراح ما في القائمة من +18 ويُعدّ، وخلفيته لا تظهر فيه قبل كشفها', an1 === an0 + 2 && bds.every(([ad, src]) => !/\/ad\db\.jpg/.test(src) && (!ad || !src)), [an0, an1, bds.filter(b => b[0])]); }
     await tap('#f-m9900001 .poster'); await page.waitForSelector('#sheet[open] .sh-head .poster.x18');
     check('الأفلام: بطاقة عمل +18 كغيره (E69، E75): نبذته، وموقعه من مجموعته وترتيبها وجزؤها الآخر مغطى الصورة، وأين تشاهده؛ وبوستره بزر يكشفه ولا خلفية قبل كشفه', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.sh-head .poster'), rows = [...b.querySelectorAll('#wslot .order li')];
       return p.dataset.act === 'bare' && !p.hasAttribute('data-zoom') && !b.querySelector('.sh-hero img') && !!b.querySelector('#chslot .chain') && /Sample Night Collection/.test(b.querySelector('#wslot').textContent) && rows.length === 2 && !!rows[1].matches('[data-ad]') && !!rows[1].querySelector('.th.x18 .x18-m svg') && !rows[1].querySelector('.th[data-zoom-pinch]')
@@ -325,6 +327,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
     await page.reload(); await page.waitForSelector('.tk'); check('الأفلام: تحديث الصفحة يبقي الفلتر مرفوعاً وما أُضيف باقٍ', await page.evaluate(() => document.querySelector('.top .r18').getAttribute('aria-pressed') === 'true' && !!document.getElementById('f-m9900009') && !!document.getElementById('f-m9900001')));
     await eye(false);
+    if (!tn0) check('الأفلام: وإغلاق العين يخرجه من الاقتراح وعدّه', await anyN() === an0 && !AD.map(a => a.title).includes((await page.textContent('#tonight h2')).trim()), [await anyN(), an0]);
     check('الأفلام: العين نفسها تعيد الفلتر في مكانها، والقائمة كما كانت بلا أعمال +18 وما أُضيف منها', await same() && /عاد الفلتر/.test(await toastNow()) && await page.evaluate(tn0 => document.querySelector('.top .r18').getAttribute('aria-pressed') === 'false' && document.querySelector('.top .r18-eye').hidden
       && !document.getElementById('f-m9900009') && !document.getElementById('f-m9900001') && !document.querySelector('.tk[data-ad]') && document.querySelector('#tonight').hidden === tn0, tn0) && await page.locator('.tk').count() === n0, String(await page.locator('.tk').count()));
     await page.evaluate(() => sessionStorage.setItem('adult.films', '1')); await page.goto('about:blank'); await page.goto(base + '/films/'); await page.waitForSelector('.tk');

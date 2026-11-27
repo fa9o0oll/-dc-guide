@@ -185,13 +185,14 @@ let tonightId = 0, amoods = []; try { amoods = (store.get('anime.mood') || '').s
 // يصلح بدايةً: ما قبله في خطه أكملته (أو هو أوله)، وما كان فرعاً (جانبياً، نسخة أخرى، ملخصاً…) فأصله أكملته أيضاً
 const startable = a => { const w = D.wby.get(a.w); if (!w) return true; const M = model(w, D.by), L = M.lines[M.lineOf.get(a.id)]; if (!L) return true; const i = L.ids.indexOf(a.id), done = id => me(id)?.s === 'completed';
   if (i > 0 && !done(L.ids[i - 1])) return false; const root = M.refOf.get(L.ids[0]); return L.i === 0 || !root || done(root); };
-const tonightOk = a => !a.ad && me(a.id)?.s === 'plan' && a.st !== 'soon' && !a.pending && (a.img || a.tp) && startable(a);
+// أعمال +18 تدخل الاقتراح والعين مفتوحة، وتخرج منه حين تُغلق (E78)، وصورتها لا تظهر فيه حتى تُكشف
+const tonightOk = a => (!a.ad || isOpen()) && me(a.id)?.s === 'plan' && a.st !== 'soon' && !a.pending && (a.img || a.tp) && startable(a);
 const gfits = a => amoods.filter(g => (a.g || []).includes(g)).length;
 function pickTonight(fresh) { const all = D.list.filter(tonightOk); let best = 0; for (const a of all) best = Math.max(best, gfits(a)); const good = a => !amoods.length || !best || gfits(a) === best;
   const cur = D.by.get(tonightId); if (!fresh && cur && tonightOk(cur) && good(cur)) return { a: cur, best };
   const pool = all.filter(a => good(a) && a.id !== tonightId), from0 = pool.length ? pool : all.filter(good); if (!from0.length) return { a: null, best };
   const strong = from0.filter(a => (a.sc || 0) >= 7.8), from = strong.length >= 4 ? strong : from0, a = from[Math.floor(Math.random() * from.length)]; tonightId = a.id; return { a, best }; }
-function renderTonight(fresh) { const box = $('#tonight'); if (!box) return; if (!hasLog()) { box.innerHTML = ''; return; }   // والاقتراح لا يختار عمل +18 (tonightOk)
+function renderTonight(fresh) { const box = $('#tonight'); if (!box) return; if (!hasLog()) { box.innerHTML = ''; return; }   // وأعمال +18 فيه والعين مفتوحة وحدها (tonightOk، E78)
   const n = new Map(); for (const a of D.list) if (tonightOk(a)) for (const g of a.g || []) n.set(g, (n.get(g) || 0) + 1); amoods = amoods.filter(g => n.has(g));
   const { a, best } = pickTonight(fresh), total = D.list.filter(tonightOk).length; if (!total) { box.innerHTML = ''; return; }
   const chip = (g, name, c) => `<button type="button" data-act="amood" data-g="${g}" aria-pressed="${g < 0 ? !amoods.length : amoods.includes(g)}"${g >= 0 ? ` style="--gh:${ghue(D.genres[g])}"` : ''}>${name}<b>${num(c)}</b></button>`;
@@ -202,7 +203,7 @@ function renderTonight(fresh) { const box = $('#tonight'); if (!box) return; if 
   const hint = amoods.length >= 2 ? (best === amoods.length ? `عمل يجمع ${amoods.map(gn).join(' و')}.` : best ? `لا عمل في «سأشاهده» يجمعها كلها، فهذا أقربها: يجمع ${best} من ${amoods.length}، فيه ${has.map(gn).join(' و')} وليس فيه ${miss.map(gn).join(' ولا ')}.` : 'لا عمل في «سأشاهده» من هذه التصنيفات.') : '';
   // المختار من المزاج أولاً، فلا يبقى منه شيء خارج الشريط لا يُرى (E76)، ثم البقية بأعدادها
   const moodOrder = [...amoods.filter(g => n.has(g)).map(g => [g, n.get(g)]), ...[...n].filter(([g]) => !amoods.includes(g)).sort((x, y) => y[1] - x[1])];
-  box.innerHTML = `<section class="tn" aria-label="اقتراح الليلة"${a?.ac ? ` style="--ac:#${a.ac}"` : ''}>${a?.bd ? `<div class="tn-bd"><img alt="" decoding="async" src="${D.base}w780${a.bd}"></div>` : ''}
+  box.innerHTML = `<section class="tn" aria-label="اقتراح الليلة"${a ? marks(a.id, a.ad) : ''}${a?.ac ? ` style="--ac:#${a.ac}"` : ''}>${a?.bd && !(a.ad && covered(a.id)) ? `<div class="tn-bd"><img alt="" decoding="async" src="${D.base}w780${a.bd}"></div>` : ''}
     <div class="tn-t"><p class="tn-l">اقتراح الليلة من «سأشاهده»</p>${a ? `<h2 dir="ltr"${title(a).length > 34 ? ' class="long"' : ''}>${esc(title(a))}</h2>${d ? `<p class="tn-k">${d.badge}${wn && wn !== title(a) ? ` · ${ltr(wn)}` : ''}</p>` : '<p class="tn-k">عمل منفرد</p>'}<p class="tn-m">${meta}${gs ? ` · ${gs}` : ''}</p>
       <div class="acts"><button class="btn pri" data-act="open" data-id="${a.id}">افتح بطاقته</button><button class="btn ghost" data-act="treroll">${ic('warp')}<span>اقتراح آخر</span></button><button class="btn ghost" data-act="status" data-id="${a.id}" data-s="watching">${ic('play')}<span>سأبدأه الآن</span></button></div>` : '<h2>لا شيء بهذا المزاج</h2>'}
       <div class="tn-mood"><span>مزاجك الليلة<small>الأعداد مما تبدأه الآن من «سأشاهده»</small></span><div class="gchips tn-c" data-drag>${chip(-1, 'أي تصنيف', total)}${moodOrder.map(([g, c]) => chip(g, gn(g), c)).join('')}</div></div>${hint ? `<p class="tn-h">${hint}</p>` : ''}</div></section>`; }

@@ -577,17 +577,17 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     const pick0 = await page.evaluate(() => document.querySelector('#tonight [data-act=open]')?.dataset.id || '');
     // الرفع
     await eye(true);
-    check('العين ترفع الفلتر في مكانها بلا تحميل: أعمال +18 تندمج في القائمة نفسها وأعدادها، والقوائم والسلاسل والاقتراح كما هي، ورسالة تقول ما جرى', await same() && sorted(await cells()) === sorted([...all0, 70001, 70002]) && await tallyN() === n0 + 2
+    check('العين ترفع الفلتر في مكانها بلا تحميل: أعمال +18 تندمج في القائمة نفسها وأعدادها، والقوائم والسلاسل كما هي، والاقتراح يأخذ عمل +18 الذي في «سأشاهده» وكان فارغاً (E78)، ورسالة تقول ما جرى', await same() && sorted(await cells()) === sorted([...all0, 70001, 70002]) && await tallyN() === n0 + 2
       && /رُفع الفلتر/.test(await toastText()) && await page.evaluate(pick0 => { const b = document.querySelector('.top .r18'), c = document.querySelector('.top .r18-eye');
         return b.getAttribute('aria-pressed') === 'true' && b.textContent.trim() === '' && !c.hidden && !document.querySelector('.r18-bar') && !document.querySelector('.views').hidden && !/\+\s*18/.test(document.querySelector('.top').textContent)
-          && (document.querySelector('#tonight [data-act=open]')?.dataset.id || '') === pick0 && document.querySelector('#lists [data-l=all]').getAttribute('aria-pressed') === 'true'; }, pick0), [await cells(), await tallyN(), await toastText()]);
+          && !pick0 && (document.querySelector('#tonight [data-act=open]')?.dataset.id || '') === '70002' && document.querySelector('#lists [data-l=all]').getAttribute('aria-pressed') === 'true'; }, pick0), [await cells(), await tallyN(), await toastText()]);
     check('صور أعمال +18 مغطاة: مصغّرتها وحدها مموّهة وعليها عين مغمضة بلا نص، ولا تُحمَّل الصورة الكاملة، وصور غيرها كما هي', await page.evaluate(() => { const ad = [...document.querySelectorAll('#grid .cel[data-ad] .cel-art')], rest = [...document.querySelectorAll('#grid .cel:not([data-ad]) .cel-art')];
       return ad.length === 2 && ad.every(x => x.classList.contains('x18') && /\/7\/7000[12]t\.webp$/.test(x.querySelector('.x18-i img').getAttribute('src')) && !x.querySelector('img[srcset]') && x.querySelector('.x18-m').textContent === '' && !!x.querySelector('.x18-m svg') && /blur/.test(getComputedStyle(x.querySelector('img')).filter))
         && rest.length === 14 && rest.every(x => !x.classList.contains('x18') && [...x.querySelectorAll('img')].every(i => !/blur/.test(getComputedStyle(i).filter))); }));
     await snap('18-open'); await overflow('الفلتر مرفوع');
     await page.fill('#q', 'velvet'); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 1); check('وبحث القائمة يجدها', (await cells()).join() === '70002'); await page.fill('#q', ''); await page.waitForFunction(() => document.querySelectorAll('#grid .cel').length === 16);
     // السلاسل (E73): سلسلة +18 تظهر بأقربائها والفلتر مرفوع، وسلسلة فيها عمل +18 تُعدّ به
-    await tap('.views [data-v=worlds]'); await page.waitForSelector('#worlds .wc[data-w="70001"]');
+    await page.evaluate(() => { window.scrollTo(0, 0); document.querySelector('.views [data-v=worlds]').click(); }); await page.waitForSelector('#worlds .wc[data-w="70001"]');   // والاقتراح فوق الشبكة الآن (E78)، فلمسها يمرّر الصفحة حتى يلتصق الشريط
     check('والفلتر مرفوع: سلسلة أعمال +18 بين السلاسل بأقربائها، وعمل +18 في سلسلة غيره يُعدّ فيها', await page.evaluate(() => { const c = w => document.querySelector(`#worlds .wc[data-w="${w}"]`)?.textContent || '';
       return /Midnight Sample/.test(c(70001)) && /عملان · في قائمتك 1/.test(c(70001)) && /5 أعمال/.test(c(136)) && /عملان · في قائمتك 1/.test(c(52701)); }), await page.evaluate(() => [...document.querySelectorAll('#worlds .wc')].map(x => x.textContent.trim())));
     await tap('#worlds .wc[data-w="70001"]'); await page.waitForSelector('#wsheet[open] .gw-tl');
@@ -627,8 +627,13 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await tap('.views [data-v=list]'); await page.waitForSelector('#grid .cel'); await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForFunction(() => !document.querySelector('.bar').classList.contains('docked'));
     check('وعاد الرأس: نسخة الشريط مخفية لا تُضغط', await page.evaluate(() => document.querySelector('.bar .r18w.dock').getAttribute('aria-hidden') === 'true' && document.querySelector('.bar .r18w.dock .r18').tabIndex === -1));
     await eye(true); await tap('#lists [data-l=all]');
-    if (await page.locator('#tonight [data-act=treroll]').count()) { const seen = new Set(); for (let i = 0; i < 8; i++) { seen.add(await page.getAttribute('#tonight [data-act=open]', 'data-id')); await tap('#tonight [data-act=treroll]'); await page.waitForTimeout(40); }
-      check('والاقتراح لا يختار عمل +18 ولو كان في «سأشاهده»', !seen.has('70002') && !seen.has('70001'), [...seen]); }
+    // الاقتراح والعين مفتوحة (E78): عمل +18 في «سأشاهده» يدخله وعدّه، ومغطى فيه؛ وإغلاق العين يخرجه منه ومن عدّه
+    { const anyN = () => page.evaluate(() => +(document.querySelector('#tonight [data-act=amood][data-g="-1"] b')?.textContent.replace(/\D/g, '') || 0)), pid = () => page.evaluate(() => document.querySelector('#tonight [data-act=open]')?.dataset.id || '');
+      const open1 = await anyN(); let hit = false; for (let i = 0; i < 80 && !hit; i++) { if (await pid() === '70002') hit = true; else { await tap('#tonight [data-act=treroll]'); await page.waitForTimeout(20); } }
+      check('والعين مفتوحة: عمل +18 في «سأشاهده» يدخل الاقتراح وعدّه، وقسمه موسوم مغطى', hit && await page.evaluate(() => { const t = document.querySelector('#tonight .tn'); return t.hasAttribute('data-ad') && !t.hasAttribute('data-r18-bare') && /Velvet Sample/.test(t.querySelector('h2').textContent); }), [hit, open1]);
+      await eye(false); await page.waitForTimeout(100); const shut1 = await anyN();
+      check('وإغلاق العين يخرجه من الاقتراح ومن عدّه', shut1 === open1 - 1 && await pid() !== '70002' && !await page.evaluate(() => document.querySelector('#tonight [data-ad]')), [open1, shut1, await pid()]);
+      await eye(true); }
     // البطاقة
     await tap('#grid .cel[data-id="70001"] [data-act=open]'); await page.waitForSelector('#sheet[open]'); await page.waitForFunction(() => document.querySelector('#sheet-body').dataset.full === '70001');
     check('بطاقة عمل +18: سجلّه كغيره، ونبذته بالإنجليزية وطلب ترجمتها كغيره (E69)، وموقعه من سلسلته وحلقاته كغيره (E73)، وصورته مغطاة بزر يكشفها', await page.evaluate(() => { const b = document.querySelector('#sheet-body'), p = b.querySelector('.head .cel-art');

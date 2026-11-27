@@ -582,7 +582,13 @@ for (const [name, w, h, mobile] of [['+18', 1440, 900, false], ['+18 (cover)', 3
   // صورة القائمة الرئيسية لا تكون للعبة +18 في أي قائمة، واقتراح «ماذا ألعب الليلة؟» لا يختارها
   { const seen = []; for (const k of ['play', 'new', 'done', 'seen', 'all']) { await page.evaluate(k => document.querySelector(`#mm-menu .mi[data-v="${k}"]`).click(), k); await page.waitForTimeout(160);
       seen.push(await page.evaluate(() => [...document.querySelectorAll('#mm-art img')].map(i => i.src).join(' ') + ' | ' + (document.querySelector('#slot h2')?.textContent || ''))); }
-    check(`${name}: صورة القائمة الرئيسية واقتراحها لا يكونان للعبة +18`, !seen.some(s => /c98\d|ar981|sh981/.test(s)) && !/Sample (Night Novel|Velvet Academy)/.test(seen[1]), seen); }
+    check(`${name}: صورة القائمة الرئيسية لا تكون للعبة +18 لم تُكشف`, !seen.some(s => /c98\d|ar981|sh981/.test(s)), seen);
+    // والعين مفتوحة تدخل ألعاب +18 اقتراح «ماذا ألعب الليلة؟» وعدّه (E78)، وصورتها لا تظهر فيه حتى تُكشف
+    await page.evaluate(() => document.querySelector('#mm-menu .mi[data-v="new"]').click()); await page.waitForTimeout(160); const picks = [];
+    for (let i = 0; i < 30; i++) { picks.push(await page.evaluate(() => [document.querySelector('#slot h2')?.textContent || '', [...document.querySelectorAll('#mm-art img:not(.out)')].map(i => i.src).join(' ')])); await page.evaluate(() => document.querySelector('#slot [data-act=reroll]')?.click()); await page.waitForTimeout(40); }
+    const ad = picks.filter(([t]) => /Sample (Night Novel|Velvet Academy)/.test(t));
+    check(`${name}: والعين مفتوحة تدخل ألعاب +18 الاقتراح، وصورتها لا تظهر فيه قبل كشفها`, ad.length > 0 && picks.every(([, src]) => !/c98\d|ar981|sh981/.test(src)), [ad.length, picks.length]);
+    await page.evaluate(() => document.querySelector('#mm-menu .mi[data-v="all"]').click()); await page.waitForTimeout(160); }
   await tap('#g-9800001 .cover'); await page.waitForSelector('#sheet[open] .sh-head .cover.x18');
   check(`${name}: بطاقة لعبة +18 كغيرها (E69، E75): نبذتها وطلب ترجمتها، وموقعها من سلسلتها وترتيبها، وملف حفظها؛ وغلافها بزر يكشفه، ولقطاتها مغطاة لا تُكبَّر، ولا خلفية قبل كشفها`, await page.evaluate(() => { const b = document.querySelector('#sheet-body'), c = b.querySelector('.sh-head .cover'), tr = b.querySelector('.about .tr'), sh = [...b.querySelectorAll('.shots .shot')];
     return c.dataset.act === 'bare' && !c.hasAttribute('data-zoom') && /اضغط لإظهاره/.test(c.textContent) && !!b.querySelector('.chain') && !b.querySelector('.sh-hero img') && b.querySelector('.about p.en')?.textContent === 'A quiet visual novel about one long night.' && !/لا تُعرض هنا/.test(b.textContent)

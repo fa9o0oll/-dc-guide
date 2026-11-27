@@ -275,7 +275,7 @@ const fits = (gs, ms) => ms.filter(m => gs.includes(m)).length;
 const moodFirst = gs => { const hit = gs.filter(x => moods.includes(x)); return [...hit, ...gs.filter(x => !moods.includes(x))].slice(0, Math.min(3, Math.max(2, hit.length))); };
 const inL = s => D.games.filter(g => lst(g.id) === s);
 const byAt = list => [...list].sort((a, b) => (rec(b.id).at || '').localeCompare(rec(a.id).at || '') || (b.ord ?? 0) - (a.ord ?? 0));
-const tonightOk = g => !g.adult && lst(g.id) === 'new' && !soon(g) && g.status !== 'cancelled';   // والاقتراح لا يختار لعبة +18
+const tonightOk = g => (!g.adult || isOpen()) && lst(g.id) === 'new' && !soon(g) && g.status !== 'cancelled';   // وألعاب +18 تدخل الاقتراح والعين مفتوحة وتخرج منه حين تُغلق (E78)، وصورتها لا تظهر حتى تُكشف
 function menuHTML() { return ORDER.map(k => { const n = k === 'all' ? D.games.length : inL(k).length, L = LISTS[k];
   return `<button type="button" class="mi m-${k}" data-act="list" data-v="${k}" aria-pressed="${ui.list === k}"><span class="cur" aria-hidden="true">${ic('play')}</span><span class="mt"><b>${k === 'all' ? 'كل الألعاب' : L.t}</b><small>${k === 'all' ? 'قائمتك كاملة' : L.s}</small></span><i class="n">${n}</i></button>`; }).join(''); }
 function moodHTML() { const n = {}; for (const g of D.games) if (tonightOk(g)) for (const x of g.genres || []) n[x] = (n[x] || 0) + 1; moods = moods.filter(m => n[m]);
@@ -288,7 +288,7 @@ ${moods.length >= 2 ? `<p class="mood-hint">${best === moods.length ? `لعبة 
 function pickTonight(fresh) { const ok = g => tonightOk(g), all = D.games.filter(ok);
   let best = 0; for (const g of all) best = Math.max(best, fits(g.genres || [], moods)); const good = g => ok(g) && (!moods.length || !best || fits(g.genres || [], moods) === best);
   const pool = all.filter(g => good(g) && g.id !== tonightId);
-  if (!fresh && tonightId && good(D.byId.get(tonightId) || {})) return D.byId.get(tonightId);
+  if (!fresh && tonightId && tonightOk(D.byId.get(tonightId) || {}) && good(D.byId.get(tonightId) || {})) return D.byId.get(tonightId);
   const from = pool.length ? pool : all.filter(good); if (!from.length) return null;
   const strong = from.filter(g => (g.critic || g.users || 0) >= 80), list = strong.length >= 4 ? strong : from, g = list[Math.floor(Math.random() * list.length)]; tonightId = g.id; return g; }
 function featured() { const k = ui.list; if (!D.games.length) return null;
@@ -311,7 +311,7 @@ let artFor = null;
 function renderMenu(swap) { $('#mm-menu').innerHTML = menuHTML(); const g = featured(); slotId = g?.id ?? null; const slot = $('#slot'); slot.innerHTML = slotHTML(g);
   $('#mm').dataset.list = ui.list;
   if (swap && !calm) { slot.classList.remove('swap'); void slot.offsetWidth; slot.classList.add('swap'); }
-  const src = g && !g.adult ? (g.art ? img(g.art, innerWidth * devicePixelRatio > 1400 ? '1080p' : '720p') : g.shots?.[0] ? img(g.shots[0], '720p') : g.cover ? img(g.cover, 'cover_big_2x') : null) : null;
+  const src = g && !(g.adult && covered(g.id)) ? (g.art ? img(g.art, innerWidth * devicePixelRatio > 1400 ? '1080p' : '720p') : g.shots?.[0] ? img(g.shots[0], '720p') : g.cover ? img(g.cover, 'cover_big_2x') : null) : null;
   if (src === artFor) return; artFor = src; const box = $('#mm-art'), old = box.querySelector('img:not(.out)');
   if (!src) { old?.classList.add('out'); setTimeout(() => old?.remove(), 600); return; }
   const im = new Image(); im.alt = ''; im.decoding = 'async'; im.className = g.art || g.shots?.[0] ? '' : 'soft'; im.src = src;
@@ -791,8 +791,8 @@ document.addEventListener('click', e => { if (!qm.hidden && !e.target.closest('#
   else if (act === 'reset') { Object.assign(ui, { q: '', plat: '', genre: '', sub: false }); $('#q').value = ''; $('#chips').innerHTML = chipsHTML(); apply(false); }
   else if (act === 'add') { if (accDlg.open) accDlg.close(); openAdd(); }
   else if (act === 'room') toggleEye();                                                                             // العين: ترفع الفلتر أو تعيده (site/adult.js)
-  else if (act === 'room-show') { setShowing(!showing()); drawEye(); renderGrid(); soonHTML(); redrawSheet(); }   // أغلفة ألعاب +18 كلها: تُكشف أو تُغطى
-  else if (act === 'bare') { uncover(+t.dataset.id); const el = document.getElementById('g-' + t.dataset.id), g = D.byId.get(+t.dataset.id); if (el && g) { el.outerHTML = card(g); apply(false); } redrawSheet(); }   // غلاف هذه اللعبة وحدها (والعلبة الجديدة تأخذ ظهورها من التصفية)
+  else if (act === 'room-show') { setShowing(!showing()); drawEye(); renderGrid(); soonHTML(); redrawSheet(); renderMenu(false); }   // أغلفة ألعاب +18 كلها: تُكشف أو تُغطى
+  else if (act === 'bare') { uncover(+t.dataset.id); const el = document.getElementById('g-' + t.dataset.id), g = D.byId.get(+t.dataset.id); if (el && g) { el.outerHTML = card(g); apply(false); } redrawSheet(); if (slotId === g?.id) renderMenu(false); }   // غلاف هذه اللعبة وحدها (والعلبة الجديدة تأخذ ظهورها من التصفية)
   else if (act === 'accounts') openAccounts();
   else if (act === 'add-pick') askList(t);
   else if (act === 'add-to') addGame(+t.dataset.igdb, t.dataset.v, t);
