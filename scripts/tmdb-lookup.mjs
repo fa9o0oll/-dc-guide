@@ -35,10 +35,17 @@ async function details(list) {
       ss: tv ? (d.seasons || []).map(s => `${s.season_number}:${s.episode_count}:${s.air_date || ''}`).join(' ') : undefined, imdb: d.imdb_id || d.external_ids?.imdb_id || null }; }));
   for (const r of rows) console.log('DET ' + JSON.stringify(r));
 }
+// صور الأعمال المختارة: البوسترات بلا كتابة (لغة فارغة) والخلفيات، الأعلى تصويتاً أولاً (لاختيار صورة بوابة)
+async function images(list) {
+  for (const [k, id] of list) { const d = await tmdb(`/${k === 'tv' ? 'tv' : 'movie'}/${id}/images`, { include_image_language: 'null,en' }).catch(e => ({ err: e.message }));
+    const top = (a = [], n) => a.sort((x, y) => (y.vote_average - x.vote_average) || (y.width - x.width)).slice(0, n).map(i => ({ p: i.file_path, w: i.width, h: i.height, l: i.iso_639_1, v: +i.vote_average.toFixed(1) }));
+    console.log('IMG ' + JSON.stringify({ k, id, err: d.err, posters: top((d.posters || []).filter(i => !i.iso_639_1), 6), backdrops: top((d.backdrops || []).filter(i => !i.iso_639_1), 4) })); }
+}
 for (const f of files) {
-  const { queries = [], top = 6, inventory: inv, details: det } = JSON.parse(fs.readFileSync(new URL(f, dir)));
+  const { queries = [], top = 6, inventory: inv, details: det, images: imgs } = JSON.parse(fs.readFileSync(new URL(f, dir)));
   if (inv) await inventory(inv);
   if (det) await details(det);
+  if (imgs) await images(imgs);
   for (const q of queries) {
     const out = { file: f, q: q.q, year: q.year, tv: [], movie: [] };
     for (const kind of q.kind ? [q.kind] : ['tv', 'movie']) {
