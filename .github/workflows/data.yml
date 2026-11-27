@@ -29,6 +29,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Probe Letterboxd RSS from a datacenter (temporary)
+        run: |
+          for ua in "Mozilla/5.0 (compatible; watch-guide/1.0; +https://soft-gingersnap-fb1f77.netlify.app)" "curl/8"; do
+            curl -s -o /tmp/lb.xml -w "LBPROBE ua=[$ua] code=%{http_code} bytes=%{size_download}\n" -A "$ua" https://letterboxd.com/dave/rss/ || true
+            head -c 300 /tmp/lb.xml | tr '\n' ' ' | sed 's/^/LBHEAD /'; echo; grep -o '<tmdb:movieId>[0-9]*' /tmp/lb.xml | head -3 | sed 's/^/LBTMDB /'
+          done
+          exit 1
       - name: Validate catalog
         run: node scripts/validate.mjs && node scripts/validate.mjs fate && node scripts/validate.mjs marvel
       - name: Pull live data from TMDB
