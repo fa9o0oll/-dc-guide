@@ -1,4 +1,4 @@
-// فحص سريع للواجهة الرئيسية ودليل Fate على مقاسات الكمبيوتر والجوال وشاشتي الفولد: تحميل بلا أخطاء، بلا تمدد أفقي، والعناصر الأساسية تعمل.
+// فحص سريع للواجهة الرئيسية ودليلَي Fate ومارفل على مقاسات الكمبيوتر والجوال وشاشتي الفولد: تحميل بلا أخطاء، بلا تمدد أفقي، والعناصر الأساسية تعمل.
 // node tests/smoke.test.mjs   (دليل دي سي له اختباره المفصّل في ui.test.mjs)
 import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright');
@@ -23,8 +23,9 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     check(`${label}: بلا تمدد أفقي`, o.sw <= o.iw, `${o.sw}/${o.iw}`); if (mobile) check(`${label}: أهداف اللمس 40px فأكثر`, o.small.length === 0, o.small.join(' ')); };
   // الواجهة الرئيسية
   await page.goto(base + '/'); await page.waitForSelector('.door');
-  check('الواجهة: أربعة أبواب بروابطها', await page.locator('a.door').count() === 4 && await page.getAttribute('.door.dc', 'href') === 'dc/' && (await page.getAttribute('.door.anime', 'href')) === 'anime/' && (await page.getAttribute('.door.films', 'href')) === 'films/' && (await page.getAttribute('.door.games', 'href')) === 'games/');
+  check('الواجهة: خمسة أبواب بروابطها', await page.locator('a.door').count() === 5 && await page.getAttribute('.door.dc', 'href') === 'dc/' && await page.getAttribute('.door.marvel', 'href') === 'marvel/' && (await page.getAttribute('.door.anime', 'href')) === 'anime/' && (await page.getAttribute('.door.films', 'href')) === 'films/' && (await page.getAttribute('.door.games', 'href')) === 'games/');
   await page.waitForFunction(() => /\d/.test(document.querySelector('.door.dc [data-stat]').textContent)); check('الواجهة: عدد أعمال كل دليل ظاهر', /196/.test(await page.textContent('.door.dc [data-stat]')));
+  await page.waitForFunction(() => /\d/.test(document.querySelector('.door.marvel [data-stat]').textContent)); check('الواجهة: عدد أعمال مارفل ظاهر', /262 عملاً/.test(await page.textContent('.door.marvel [data-stat]')));
   await page.waitForFunction(() => /\d/.test(document.querySelector('.door.anime [data-stat]').textContent)); check('الواجهة: عدد أعمال «أنمياتي» ظاهر', /\d{3,} عمل/.test(await page.textContent('.door.anime [data-stat]')), await page.textContent('.door.anime [data-stat]'));
   await fits('الواجهة');
   // أنمياتي ببياناتها المبنية فعلاً: القائمة تُحمَّل، وقبل الاستيراد دعوته، والسلاسل فيها مدخل Fate
@@ -85,6 +86,25 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   check('Fate: تبديل المسار يغيّر الخطوات', await page.getAttribute('.paths .on', 'data-path') === 'release' && (await page.textContent('.tl .node .t')).includes('Fate/stay night') && n1 > 5);
   await fits('Fate ترتيب المشاهدة');
   await tap('.views [data-view=timeline]'); await page.waitForSelector('.tl .node'); await fits('Fate الخط الزمني');
+  // دليل مارفل (E81): محرك دليل DC نفسه بكتالوجه وهويته، وسجله في مفتاحه
+  { const MP = JSON.parse(fs.readFileSync(new URL('../data/marvel/placements.json', import.meta.url))), MU = JSON.parse(fs.readFileSync(new URL('../data/marvel/universes.json', import.meta.url))), MO = JSON.parse(fs.readFileSync(new URL('../data/marvel/order.json', import.meta.url)));
+    await page.goto(base + '/marvel/'); await page.waitForSelector('.card'); await page.evaluate(() => { try { localStorage.removeItem('marvelg.progress'); } catch {} }); await page.reload(); await page.waitForSelector('.card');
+    check(`مارفل: ${MP.length} بطاقة في ${MU.length} عالماً`, await page.locator('.card').count() === MP.length && await page.locator('section.uni').count() === MU.length);
+    const id = await page.evaluate(() => ({ logo: document.querySelector('.top .logo').textContent.trim(), font: getComputedStyle(document.querySelector('.brand h1')).fontFamily, fontOk: document.fonts.check('800 30px Changa', 'مارفل'),
+      stripe: getComputedStyle(document.querySelector('.card')).boxShadow, home: document.querySelector('.top .home').getAttribute('href') }));
+    check('مارفل: هويته (خط Changa، وشعار الميم، وشريط العالم أعلى البطاقة)، والعودة إلى القاعة', id.logo === 'م' && /Changa/.test(id.font) && id.fontOk && /inset/.test(id.stripe) && id.home === '../', id);
+    const two = '#' + (await page.locator('.card', { hasText: 'Daredevil: Born Again' }).first().getAttribute('id'));
+    check('مارفل: ما يكمل عالماً من عالم آخر يظهر في العالمين ومعه مصدره', await page.locator('.card', { hasText: 'Daredevil: Born Again' }).count() >= 4 && /يظهر في عالمين/.test(await page.evaluate(() => [...document.querySelectorAll('.canon')].map(x => x.textContent).join(' '))), two);
+    check('مارفل: القادم في آخر عالمه بوسم «قادم» أو «معلن»', await page.locator('section.uni[data-uni=mcu] .card .tag.soon').count() >= 5);
+    const first = '#' + await page.locator('.card').first().getAttribute('id');
+    await tap(first + ' [data-s=watched]'); check('مارفل: تغيير الحالة يُحفظ في مفتاحه وحده', await page.evaluate(() => Object.values(JSON.parse(localStorage.getItem('marvelg.progress')).works).includes('watched') && !(localStorage.getItem('dcg.progress') || '').includes('eyes-of-wakanda')));
+    await fits('مارفل');
+    await tap('.views [data-view=arrow]'); await page.waitForSelector('.paths');
+    check(`مارفل: ترتيب المشاهدة بـ${MO.paths.length} مسارات ومصدر`, await page.locator('.paths button').count() === MO.paths.length && /^https:/.test(await page.getAttribute('.av-intro .why a', 'href')));
+    await tap('.paths [data-path=spider]'); await page.waitForTimeout(250);
+    check('مارفل: مسار سبايدرمان يبدأ بثلاثية ريمي', await page.getAttribute('.paths .on', 'data-path') === 'spider' && (await page.textContent('.tl .node .t')).includes('Spider-Man'));
+    await fits('مارفل ترتيب المشاهدة');
+    await tap('.views [data-view=timeline]'); await page.waitForSelector('.tl .node'); await fits('مارفل الخط الزمني'); }
   // قائمة الأفلام
   let previewCalls = 0, worldsCalls = 0; const FL = JSON.parse(fs.readFileSync(path.join(siteDir, 'films/data/films.json'))).films.filter(f => !f.adult), inCol = FL.find(f => f.col && f.kind === 'movie' && f.prov);
   // خريطة عوالم للاختبار: فيلم من القائمة بلا ترتيب مراجَع ولا مجموعة TMDB، في عالم صغير (مع أنمي خارج القائمة) وسلسلة أوسع طويلة، وله أصل ورواية ورابط في دليل DC

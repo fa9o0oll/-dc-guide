@@ -140,13 +140,13 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
   await page.waitForTimeout(900);
   const art = await page.evaluate(() => [...document.querySelectorAll('.door')].map(x => { const i = x.querySelector('.art img'); return { g: x.dataset.guide, poster: x.hasAttribute('data-poster'), src: i?.src || '', op: i ? getComputedStyle(i).opacity : '', filter: i ? getComputedStyle(i).filter : '' }; }));
   if (w >= 1024) check(`${name}: كل بوابة بغلافها الطولي بدقته الأصلية (دي سي وFate وأفلامي من TMDB، وألعابي لوحة Tekken 8 بدقة 4K)، والثلاث بحضورها كاملاً بلا تعتيم ولا مرشحات`,
-    art.every(a => a.poster) && /original\/mhOo2k/.test(art[0].src) && /\/t\/p\/original\//.test(art[1].src) && /original\/xWRahw/.test(art[2].src) && /store-images\.s-microsoft\.com\/.*w=2880/.test(art[3].src)
+    art.every(a => a.poster) && /original\/mhOo2k/.test(art[0].src) && /original\/3YBoaK/.test(art[1].src) && /\/t\/p\/original\//.test(art[2].src) && /original\/xWRahw/.test(art[3].src) && /store-images\.s-microsoft\.com\/.*w=2880/.test(art[4].src)
     && art.slice(1).every(a => a.op === '1' && a.filter === 'none'), art);
-  else check(`${name}: على الأضيق كل بوابة بصورتها العادية، لا غلاف الشاشات العريضة`, art.every(a => !a.poster) && /images\.igdb\.com\/.*ar5zhb/.test(art[3].src) && !/pgsHTHQ|xWRahw|mhOo2k|s-microsoft/.test(art.map(a => a.src).join()), art);
+  else check(`${name}: على الأضيق كل بوابة بصورتها العادية، لا غلاف الشاشات العريضة`, art.every(a => !a.poster) && /images\.igdb\.com\/.*ar5zhb/.test(art[4].src) && !/pgsHTHQ|xWRahw|mhOo2k|3YBoaK|s-microsoft/.test(art.map(a => a.src).join()), art);
   // الجاران مائلان قليلاً في القوس فيُسقَط موضع أسطرهما بفارق بكسلات قليلة
-  if (w >= 1024) check(`${name}: البوابات الأربع ظاهرة في قوس يواجهك (الطرفان أكثر ميلاً من الوسطيين)، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, d.flat.length === 4 && [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 4) && (a => a[0] < a[1] && a[1] < 0 && 0 < a[2] && a[2] < a[3])(d.flat.map(rotY)) && !d.nav.length, { ...d, angles: d.flat.map(rotY) });
+  if (w >= 1024) check(`${name}: البوابات الخمس ظاهرة في قوس يواجهك (الوسطى تواجهك والطرفان أكثر ميلاً من جاريهما)، وأسطرها مصطفة (العنوان، اسمه الإنجليزي، الوصف، العدد)`, d.flat.length === 5 && [0, 1, 2, 3].every(i => Math.max(...d.rows.map(r => r[i])) - Math.min(...d.rows.map(r => r[i])) <= 4) && (a => a[0] < a[1] && a[1] < 0 && Math.abs(a[2]) < .5 && 0 < a[3] && a[3] < a[4])(d.flat.map(rotY)) && !d.nav.length, { ...d, angles: d.flat.map(rotY) });
   else {
-    check(`${name}: القاعة تبدأ بالبوابة الوسطى كبيرة تواجهك وجاراها مائلان على الجانبين`, d.here.join() === 'anime' && Math.abs(d.off[1]) <= 2 && d.off[0] > 0 && d.off[2] < 0 && d.off[3] < d.off[2] && facing(d.flat[1]) && !facing(d.flat[0]) && !facing(d.flat[2]) && d.nav.join() === 'false,true,false,false', d);
+    check(`${name}: القاعة تبدأ بالبوابة الوسطى كبيرة تواجهك وجاراها مائلان على الجانبين`, d.here.join() === 'anime' && Math.abs(d.off[2]) <= 2 && d.off[0] > d.off[1] && d.off[1] > 0 && d.off[3] < 0 && d.off[4] < d.off[3] && facing(d.flat[2]) && !facing(d.flat[1]) && !facing(d.flat[3]) && d.nav.join() === 'false,false,true,false,false', d);
     // ما يتحرك في القاعة: transform وopacity فقط (يحرّكه كرت الشاشة دون إعادة رسم)، بلا تمويه، وحركة الجارين ساكنة حتى يصلا الوسط
     const fx = await page.evaluate(() => { const ok = new Set(['offset', 'computedOffset', 'easing', 'composite', 'transform', 'opacity', 'translate', 'rotate', 'scale']);
       const anims = document.getAnimations().filter(a => a.effect?.target?.closest?.('.doors'));
@@ -171,7 +171,13 @@ for (const [name, w, h, mobile] of [['desktop', 1440, 900, false], ['fold-main',
     const lit = () => page.evaluate(() => [document.body.dataset.here, getComputedStyle(document.body).getPropertyValue('--lit').trim()]);
     await page.waitForTimeout(900); const l0 = await lit();
     check(`${name}: لون النقش من البوابة التي أمامك`, l0[0] === 'anime' && /255, 143, 163|#ff8fa3/i.test(l0[1]), l0);
-    const tapDoor = async g => { const b = await page.locator(`.door.${g}`).boundingBox(); const x = g === 'dc' ? Math.min(w - 6, b.x + b.width * .5) : b.x + b.width * .5; if (mobile) await page.touchscreen.tap(x, b.y + b.height * .5); else await page.mouse.click(x, b.y + b.height * .5); };
+    // الجارة قد يخرج أكثرها عن الشاشة الضيقة، فيُضغط على ما يظهر منها
+    const tapDoor = async g => { const b = await page.locator(`.door.${g}`).boundingBox(); const x = Math.min(w - 6, Math.max(6, b.x + b.width * .5)); if (mobile) await page.touchscreen.tap(x, b.y + b.height * .5); else await page.mouse.click(x, b.y + b.height * .5); };
+    await tapDoor('marvel'); await page.waitForTimeout(1100);
+    const mv = await page.evaluate(() => ({ url: location.pathname, here: document.querySelector('.door[data-here]')?.dataset.guide, t: getComputedStyle(document.querySelector('.door.marvel')).transform,
+      pages: [...document.querySelectorAll('.door.marvel .fx>i')].map(i => i.getAnimations()[0]?.playState) }));
+    const lm = await lit();
+    check(`${name}: الضغط على مارفل (الجارة) يأتي بها إلى الوسط، فتُقلب صفحاتها ويحمرّ النقش بلونها`, mv.url === '/' && mv.here === 'marvel' && facing(mv.t) && mv.pages.length === 3 && mv.pages.every(x => x === 'running') && lm[0] === 'marvel' && /255, 51, 71|#ff3347/i.test(lm[1]), { mv, lm });
     await tapDoor('dc'); await page.waitForTimeout(1100);
     const after = await page.evaluate(() => ({ url: location.pathname, here: document.querySelector('.door[data-here]')?.dataset.guide, t: getComputedStyle(document.querySelector('.door.dc')).transform }));
     check(`${name}: الضغط على البوابة الجانبية يأتي بها إلى الوسط ولا يدخلها`, after.url === '/' && after.here === 'dc' && facing(after.t), after);
