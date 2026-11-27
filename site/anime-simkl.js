@@ -16,10 +16,12 @@ async function call(u, init) { let r; try { r = await fetch(u, init); } catch { 
 export const simklToken = () => { const t = ls.get(TOK); return t?.access ? t : null; };
 export const simklForget = () => { ls.del(TOK); ls.del(ACT); };
 // رمز التجديد لا يتبدل عند التجديد (api.simkl.org/api-reference/oauth2-tokens)، فإن لم يُعده الرد يبقى الذي عندنا
-const keepToken = (j, old) => { const t = { access: j.access_token, refresh: j.refresh_token || old?.refresh || null, exp: Date.now() + (+j.expires_in || 7 * 86400) * 1000 }; ls.set(TOK, t); return t; };
+const keepToken = (j, old) => { const t = { access: j.access_token, refresh: j.refresh_token || old?.refresh || null, exp: Date.now() + (+j.expires_in || 7 * 86400) * 1000, scope: j.scope || old?.scope || 'media:read' }; ls.set(TOK, t); return t; };
+// الكتابة في الحساب (E84) لا تكون إلا بصلاحية media:write يمنحها صاحب الحساب عند الربط، ويُقرأ ما مُنح من رد SIMKL نفسه لا مما طُلب
+export const simklCanWrite = () => /(^|\s)media:write(\s|$)/.test(simklToken()?.scope || '');
 
 // 1) طلب رمز الربط: يعيد { device_code, user_code, verification_uri, verification_uri_complete, expires_in, interval }
-export async function simklStart() { const { ok, j } = await call(url('/oauth2/device'), form({ client_id: CLIENT }));
+export async function simklStart() { const { ok, j } = await call(url('/oauth2/device'), form({ client_id: CLIENT, scope: 'media:read media:write' }));
   if (!ok || !j.device_code || !j.user_code) throw fail(j.error === 'invalid_client' ? 'SIMKL لم يتعرف على تطبيق الموقع.' : 'SIMKL لم يعطِ رمز ربط الآن. حاول بعد قليل.', j.error);
   return { ...j, until: Date.now() + (+j.expires_in || 900) * 1000 }; }
 // 2) انتظار الموافقة: يسأل كل «interval» ثانية حتى يوافق صاحب الحساب أو تنتهي مهلة الرمز. alive: دالة تقول إن الانتظار ما زال مطلوباً
@@ -31,7 +33,7 @@ export async function simklPoll(s, alive = () => true) { let every = Math.max(2,
     else if (j.error && j.error !== 'authorization_pending') throw fail('SIMKL رفض الطلب: ' + j.error, j.error); }
   return false; }
 // رمز الدخول يعيش أسبوعاً، ورمز التجديد (180 يوماً تتجدد مع كل استعمال) يمدّه. إن تعذّر التجديد يُطلب الربط من جديد.
-// الربط يطلب صلاحية القراءة وحدها (media:read، وهي ما يعطيه SIMKL حين لا يُطلب غيرها): الموقع يسحب ولا يكتب في الحساب
+// الربط يطلب القراءة والكتابة (media:read media:write): يُسحب السجل منه، وتُرسل إليه تعديلاتك هنا (anime-out.js). والربط القديم للقراءة وحدها يبقى يعمل للسحب
 async function access() { let t = simklToken(); if (!t) throw fail('اربط حسابك في SIMKL أولاً.', 'no_token');
   if (t.exp - Date.now() < 3600e3 && t.refresh) { const { ok, j } = await call(url('/oauth2/token'), form({ grant_type: 'refresh_token', client_id: CLIENT, refresh_token: t.refresh })); if (ok && j.access_token) t = keepToken(j, t); }
   return t.access; }
@@ -70,3 +72,10 @@ export async function simklPull(catalog) { const by = new Map(catalog.map(a => [
   for (const it of items) { const e = shapeSimkl(it, cx); if (!e) { unmatched++; continue; } const was = seen.get(e.id); if (!was || e.watched > was.watched) seen.set(e.id, e); }
   const entries = [...seen.values()], n = s => entries.filter(e => e.status === s).length; ls.set(ACT, act);
   return { entries, matched: entries.length, unmatched, bulk: cx.bulk.size, raw, totals: { all: entries.length, watching: n('watching'), completed: n('completed'), hold: n('hold'), dropped: n('dropped'), plan: n('plan'), episodes: entries.reduce((s, e) => s + e.watched, 0), scored: entries.filter(e => e.score).length } }; }
+
+// ---------- الكتابة في الحساب (E84). صندوق الصادر الذي يقرر ما يُرسل في anime-out.js
+// طلب كتابة واحد. 401: الربط انتهى أو سُحبت صلاحيته، فيُنسى الرمز ويُطلب الربط من جديد (والصندوق يبقى ينتظر)
+export async function simklSend(path, body) { const tok = await access(), { ok, status, j } = await call(url(path), { method: 'POST', headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (status === 401) { ls.del(TOK); throw fail('انتهى ربط SIMKL على هذا الجهاز. اربطه من جديد.', 'unauthorized'); }
+  if (status === 403) throw fail('SIMKL لم يسمح بالكتابة في حسابك. اربطه من جديد ووافق على الكتابة.', 'unauthorized');
+  if (!ok) throw fail(j.message || j.error_description || j.error || `SIMKL ${status}`, j.error || status); return j; }

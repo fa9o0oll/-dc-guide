@@ -14,7 +14,8 @@ import { readMalFile } from './anime-mal.js?v=__BUILD__';
 import { describe, noun, model } from './anime-pos.js?v=__BUILD__';
 import { themeOf } from './anime-theme.js?v=__BUILD__';
 import { GENRE } from './anime-genres.js?v=__BUILD__';
-import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead } from './anime-simkl.js?v=__BUILD__';
+import { simklStart, simklPoll, simklPull, simklToken, simklForget, simklAhead, simklCanWrite } from './anime-simkl.js?v=__BUILD__';
+import { outInit, outMark, outState, outRelink, outForget, outFlush } from './anime-out.js?v=__BUILD__';
 import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover, dockEye } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
@@ -277,9 +278,10 @@ function setView(v) { ui.view = v; $$('.views button').forEach(b => b.setAttribu
 function renderAll(keepShown) { renderSky(); renderLists(); if (ui.view === 'worlds') $('#worlds').innerHTML = worldsHTML(); renderGrid(keepShown); if ($('#addd')?.open) drawAddRes(); }
 
 // ---------- تعديل السجل. كل تعديل يُحفظ ويُزامَن فوراً، ومعه «تراجع»
+// وكل تعديل وتراجع عنه يدخل صندوق الصادر إلى حساباتك المربوطة (anime-out.js، E84)
 function commit(id, before, say) { const m = P.a[id]; if (m) { if (!m.p) delete m.p; if (!m.r) delete m.r; if (!m.b) delete m.b; if (!m.e) delete m.e; if (!m.s) delete P.a[id]; }
-  save(); const moved = (before?.s || '') !== (P.a[id]?.s || ''); redraw(id, moved);
-  if (say) toast(say, () => { if (before) P.a[id] = before; else delete P.a[id]; save(); redraw(id, true); }); }
+  save(); outMark(id, before); const moved = (before?.s || '') !== (P.a[id]?.s || ''); redraw(id, moved);
+  if (say) toast(say, () => { const cur = P.a[id] ? { ...P.a[id] } : null; if (before) P.a[id] = before; else delete P.a[id]; save(); outMark(id, cur); redraw(id, true); }); }
 // ما تغيّر مكانه (دخل قائمة أو خرج منها) يُعاد رسم الصفحة له، وما تغيّر تقدّمه فقط يُحدَّث سِله في مكانه
 function redraw(id, moved) { const a = D.by.get(id); if (moved) renderAll(true); else { renderLists(); $('#tally').innerHTML = tallyHTML();
     for (const c of $$(`.cel[data-id="${id}"]`)) { const rail = !!c.closest('.rail'), t = document.createElement('template'); t.innerHTML = celHTML(a, rail ? 'rail' : 'grid', +c.style.getPropertyValue('--i') || 0); const n = t.content.firstElementChild; n.style.animation = 'none'; c.replaceWith(n); } }
@@ -643,7 +645,7 @@ async function sendAdd(id, s, info, pw) {
   if (!r.ok) throw new Error(j.error ? esc(j.error) : 'تعذّرت الإضافة الآن. حاول بعد قليل.');
   store.set(PASS, pw); const m = addedMap(); m[id] = { t: info.t, s, at: today, ty: info.type, n: info.eps, y: info.y, im: info.im, ...(!info.im && info.iu ? { iu: info.iu } : {}), ...(info.ad ? { ad: 1 } : {}) }; store.set(ADDK, JSON.stringify(m));
   enroll(localOf(id, m[id])); const v = LIVE.has(id) ? await LIVE.get(id) : null, a = D.by.get(id); if (v && a) fillPending(a, v);
-  if (!P.a[id]) { P.a[id] = { s }; save(); } renderAll(true); drawAddRes(); toast(`${ltr(info.t)} في «${LNAME[s]}». تكتمل حلقاته وأماكن عرضه مع البناء القادم.`); }
+  if (!P.a[id]) { P.a[id] = { s }; save(); outMark(id, null); } renderAll(true); drawAddRes(); toast(`${ltr(info.t)} في «${LNAME[s]}». تكتمل حلقاته وأماكن عرضه مع البناء القادم.`); }
 const addFail = e => e instanceof TypeError ? 'تعذّر الاتصال. تحقق من الشبكة ثم حاول.' : e.message;
 async function addMal(btn) { const row = btn.closest('.arow'), id = +row.dataset.mal, s = btn.dataset.s, x = ADD.mal?.find(m => m.id === id); if (!x || !LNAME[s]) return;
   const field = row.querySelector('.add-pass'), pw = field?.value || pass();
@@ -770,8 +772,14 @@ function impHTML() { const m = IMP.mal, log = hasLog(), n = Object.keys(P.a).len
       <p class="lbl">«الأبعد تقدّماً»: لكل عمل يختلف تؤخذ الحالة والحلقات ممن شاهد أكثر، ويبقى تقييمك وتاريخاك إن وُجدت، وما تركته يبقى متروكاً ما لم تزد حلقاته. قبل أي دمج تُحفظ نسخة من سجلّك للتراجع.</p>
       <p class="lbl">عدد الحلقات لا يتجاوز حلقات العمل هنا (${ltr('SIMKL')} يجمع أحياناً أجزاء في مدخل واحد).${d.bulk ? ` وأيام نقل القائمة إلى ${ltr('SIMKL')} (${count(d.bulk, ['يوم واحد', 'يومان', 'أيام', 'يوماً', 'يوم'])}: أعمال كثيرة عُلّمت دفعة واحدة) لا تُحسب تواريخ مشاهدة.` : ''}</p>
       <div class="acts"><button class="btn quiet" data-act="sk-raw">نزّل ما أرسله ${ltr('SIMKL')} كاملاً (فيه تاريخ كل حلقة)</button></div>`; })()
-    : tok ? `<p class="lbl">حسابك في ${ltr('SIMKL')} مربوط على هذا الجهاز.</p><div class="acts"><button class="btn pri" data-act="sk-pull">اسحب سجلّي من ${ltr('SIMKL')}</button><button class="btn quiet" data-act="sk-forget">افصل الحساب</button></div>`
-    : `<p class="lbl">يسحب حالة كل عمل وحلقاته وتقييمه من حسابك، للقراءة فقط: الموقع لا يغيّر شيئاً في حسابك هناك. تضغط الزر، يظهر رمز، توافق عليه في صفحة ${ltr('SIMKL')}. رمز الدخول يبقى في هذا المتصفح فقط.</p><div class="acts"><button class="btn pri" data-act="sk-start">اربط ${ltr('SIMKL')}</button></div>`;
+    : tok ? (() => { const w = simklCanWrite(), o = outState('simkl'), n = o.pending;
+        const st = !w ? '' : o.err === 'auth' ? ` <b class="warn">لم يقبل ${ltr('SIMKL')} الكتابة بهذا الربط: اربطه من جديد ووافق على الكتابة${n ? `، وتنتظر ${nWorks(n)}` : ''}.</b>`
+          : o.err === 'net' ? ` تعذّر الاتصال، ويُعاد الإرسال وحده حين يعود${n ? ` (تنتظر ${nWorks(n)})` : ''}.` : o.err ? ` <b class="warn">لم يقبل ${ltr('SIMKL')} آخر إرسال: ${esc(o.err)}</b>`
+          : n ? ` ينتظر الإرسال ${nWorks(n)}.` : o.at ? ' كل تعديلاتك وصلته ✓' : '';
+        return `<p class="lbl" id="sk-st">${w ? `حسابك في ${ltr('SIMKL')} مربوط على هذا الجهاز، وما تعدّله هنا يصله أولاً بأول: حالة كل عمل وحلقاته وتقييمك.${st}`
+          : `حسابك في ${ltr('SIMKL')} مربوط على هذا الجهاز للقراءة فقط. اسمح بالكتابة ليصله ما تعدّله هنا أولاً بأول: حالة كل عمل وحلقاته وتقييمك. تضغط الزر، يظهر رمز، توافق عليه في صفحة ${ltr('SIMKL')}.`}</p>
+        <div class="acts">${!w || o.err === 'auth' ? `<button class="btn pri" data-act="sk-start">اسمح بالكتابة</button>` : ''}<button class="btn ${w && o.err !== 'auth' ? 'pri' : 'ghost'}" data-act="sk-pull">اسحب سجلّي من ${ltr('SIMKL')}</button>${w && n && o.err !== 'auth' ? '<button class="btn ghost" data-act="sk-push">أرسل الآن</button>' : ''}<button class="btn quiet" data-act="sk-forget">افصل الحساب</button></div>`; })()
+    : `<p class="lbl">يسحب حالة كل عمل وحلقاته وتقييمه من حسابك، ويرسل إليه ما تعدّله هنا أولاً بأول. تضغط الزر، يظهر رمز، توافق عليه في صفحة ${ltr('SIMKL')}. رمز الدخول يبقى في هذا المتصفح فقط.${outState('simkl').pending ? ` وتنتظر ${nWorks(outState('simkl').pending)} حتى تربطه.` : ''}</p><div class="acts"><button class="btn pri" data-act="sk-start">اربط ${ltr('SIMKL')}</button></div>`;
   return `<h2 id="imp-h">قائمتي وحساباتي</h2>
     <section class="sec"><h3>${ltr('MyAnimeList')}</h3>${malBox}</section>
     <section class="sec"><h3>${ltr('SIMKL')}</h3>${sk}</section>
@@ -841,14 +849,15 @@ document.addEventListener('click', async e => { const t = e.target.closest('[dat
     case 'sk-cancel': IMP.simkl = null; IMP.msg = ''; drawImp(); break;
     case 'sk-pull': await skPull(); break;
     case 'sk-raw': { const u = URL.createObjectURL(new Blob([JSON.stringify(IMP.sk.raw, null, 1)], { type: 'application/json' })); Object.assign(document.createElement('a'), { href: u, download: `simkl-anime-${today}.json` }).click(); setTimeout(() => URL.revokeObjectURL(u), 4000); break; }
-    case 'sk-forget': simklForget(); IMP.sk = null; IMP.ok = true; IMP.msg = 'فُصل الحساب عن هذا الجهاز.'; drawImp(); break;
+    case 'sk-push': outFlush(); break;
+    case 'sk-forget': simklForget(); outForget('simkl'); IMP.sk = null; IMP.ok = true; IMP.msg = 'فُصل الحساب عن هذا الجهاز.'; drawImp(); break;
     case 'sk-apply': { const r = applyEntries(IMP.sk.entries, d.how), inWorks = n => count(n, ['عمل واحد', 'عملين', 'أعمال', 'عملاً', 'عمل']);
       const did = [r.added && `أُضيف ${nWorks(r.added)}`, r.moved && `${d.how === 'ahead' ? 'تقدّم' : 'تغيّر'} ${nWorks(r.moved)}`, r.filled && `استُكمل تاريخ أو تقييم في ${inWorks(r.filled)}`].filter(Boolean);
       IMP.ok = true; IMP.msg = did.length ? `دُمج سجل ${ltr('SIMKL')}: ${did.join('، و')}. الباقي كما هو.` : `سجلّك يطابق ما في ${ltr('SIMKL')}: لم يتغير شيء.`; IMP.sk = null; drawImp(); break; }
   } });
 // ---------- SIMKL: الربط بالرمز ثم السحب. كل طلب من المتصفح مباشرة (site/anime-simkl.js)
 async function skStart() { IMP.msg = ''; try { const s = IMP.simkl = await simklStart(); drawImp();
-    const ok = await simklPoll(s, () => IMP.simkl === s); if (IMP.simkl !== s) return; IMP.simkl = null; if (!ok) { IMP.ok = false; IMP.msg = 'انتهت مهلة الرمز قبل الموافقة. اضغط «اربط» من جديد.'; drawImp(); return; } await skPull(); }
+    const ok = await simklPoll(s, () => IMP.simkl === s); if (IMP.simkl !== s) return; IMP.simkl = null; if (!ok) { IMP.ok = false; IMP.msg = 'انتهت مهلة الرمز قبل الموافقة. اضغط «اربط» من جديد.'; drawImp(); return; } if (simklCanWrite()) outRelink('simkl'); await skPull(); }
   catch (e) { IMP.simkl = null; IMP.ok = false; IMP.msg = esc(e.message || 'تعذّر الاتصال بـSIMKL.'); drawImp(); } }
 async function skPull() { IMP.ok = false; IMP.msg = `يُسحب سجلّك من ${ltr('SIMKL')}…`; drawImp();
   try { const r = await simklPull(D.all); IMP.sk = { ...r, diff: diff(r.entries, true) }; IMP.msg = ''; } catch (e) { IMP.msg = esc(e.message || 'تعذّر السحب من SIMKL.'); } drawImp(); }
@@ -891,6 +900,8 @@ try {
   $('#sort').value = ui.sort; $('#names').value = ui.names; if (!LNAME[ui.list] && ui.list !== 'all') ui.list = 'watching'; if (hasLog() && ui.list !== 'all' && !inList(ui.list).length) ui.list = inList('watching').length ? 'watching' : 'all';
   placeChips(); renderAll(); liftVeil();
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); dockEye(on); }).observe($('.top')); }
+  { const all = () => { if (all.n !== D.all.length) { all.m = new Map(D.all.map(a => [a.id, a])); all.n = D.all.length; } return all.m; };
+    outInit({ get: id => P.a[id], info: id => all().get(id), onChange: () => { if ($('#imp').open && !IMP.simkl && !IMP.sk) drawImp(); } }); }
   initSync(id => { if (id !== 'anime') return; load(); renderAll(true); if (open) { const box = $('#sheet-body .mine'); if (box) box.outerHTML = mineHTML(D.by.get(open)); drawXs(D.by.get(open)); } });
   route();
 } catch (err) { $('#grid').innerHTML = '<p class="load">تعذّر تحميل القائمة. حدّث الصفحة.</p>'; liftVeil(); console.error(err); }

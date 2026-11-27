@@ -487,3 +487,5 @@ button.aart{padding:0}
 .cel-art .x18-i{border-radius:10px;-webkit-mask:var(--holes);mask:var(--holes)}
 .cel-art .x18-i img{-webkit-mask:none;mask:none;border-radius:0}
 .aart.x18 .x18-m{font-size:.68rem;padding:0}
+/* حال الإرسال إلى SIMKL في «قائمتي وحساباتي» (E84) */
+#imp .lbl .warn{color:#ffc2b8;font-weight:600}

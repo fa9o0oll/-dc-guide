@@ -35,14 +35,17 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource/.test(m.text())) errs.push(m.text()); });
   await page.route(/cdn\.myanimelist\.net|image\.tmdb\.org/, r => r.fulfill({ contentType: 'image/svg+xml', body: /w780|w1280/.test(r.request().url()) ? svg(640, 360, '#5a3d8a') : svg(300, 440, '#2f6f9f') }));
   // SIMKL المُحاكى: الرمز، ثم «لم يوافق بعد» مرة، ثم رمز الدخول، ثم النشاط والقائمة. كل طلب يجب أن يحمل معرّف التطبيق واسمه ونسخته
-  let polls = 0; const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
+  let polls = 0, scope = ''; const wrote = [], fails = { n: 0 }; const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
   await page.route('https://api.simkl.com/**', r => { const q = r.request(), u = new URL(q.url()), J = (o, status = 200) => r.fulfill({ status, headers: cors, contentType: 'application/json', body: JSON.stringify(o) });
     if (q.method() === 'OPTIONS') return r.fulfill({ status: 204, headers: cors });
     asked.push(`${q.method()} ${u.pathname}${u.searchParams.get('client_id') && u.searchParams.get('app-name') && u.searchParams.get('app-version') ? '' : ' (بلا تعريف)'}${q.headers().authorization ? ' +auth' : ''}`);
-    if (u.pathname === '/oauth2/device') return J({ device_code: 'dc-1', user_code: 'ABCD-1234', verification_uri: 'https://simkl.com/pin', verification_uri_complete: 'https://simkl.com/pin/ABCD-1234', expires_in: 900, interval: 1 });
-    if (u.pathname === '/oauth2/token') return ++polls < 2 ? J({ error: 'authorization_pending' }, 400) : J({ access_token: 'test-access', refresh_token: 'test-refresh', expires_in: 604800 });
+    if (u.pathname === '/oauth2/device') { scope = new URLSearchParams(q.postData() || '').get('scope') || ''; } if (u.pathname === '/oauth2/device') return J({ device_code: 'dc-1', user_code: 'ABCD-1234', verification_uri: 'https://simkl.com/pin', verification_uri_complete: 'https://simkl.com/pin/ABCD-1234', expires_in: 900, interval: 1 });
+    if (u.pathname === '/oauth2/token') return ++polls < 2 ? J({ error: 'authorization_pending' }, 400) : J({ access_token: 'test-access', refresh_token: 'test-refresh', expires_in: 604800, ...(scope ? { scope } : {}) });
     if (u.pathname === '/sync/activities') return J({ all: '2026-11-20T10:00:00Z', anime: { all: '2026-11-20T10:00:00Z' } });
     if (u.pathname === '/sync/all-items/anime') return q.headers().authorization === 'Bearer test-access' ? J(simklItems()) : J({ error: 'user_token_failed' }, 401);
+    // الكتابة (E84): يُسجَّل كل طلب بجسمه، وfails.n يفشل ما بعده بانقطاع مصطنع
+    if (/^\/sync\/(history(\/remove)?|add-to-list|ratings(\/remove)?)$/.test(u.pathname) && q.method() === 'POST') { if (fails.n > 0) { fails.n--; return r.abort('internetdisconnected'); }
+      wrote.push([u.pathname, JSON.parse(q.postData() || '{}'), q.headers().authorization || '']); return J({ added: {} }); }
     return J({ error: 'not_found' }, 404); });
   await page.route(u => !u.href.startsWith(base) && !/cdn\.myanimelist\.net|image\.tmdb\.org|api\.simkl\.com/.test(u.href), r => r.abort());
   const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); return mobile ? l.tap() : l.click(); };
@@ -104,7 +107,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   { const R = '#tonight .tn-c', q = async text => { if (!await page.$(R + ' input[data-gq]')) await tap(R + ' .gfind'); await page.fill(R + ' input[data-gq]', text); await page.waitForTimeout(60); };
     const vis = () => page.$$eval(R + ' button[data-g]', b => b.filter(x => !x.hidden).map(x => x.dataset.g).join()), note = () => page.evaluate(() => { const n = document.querySelector('#tonight .tn-mood > .gnote'); return n && !n.hidden ? n.textContent : ''; });
     await q('الاكشن'); await snap('e83-search');
-    check('بحث المزاج بالكتابة (E83): «الاكشن» بلا «ال» ولا همزة يُبقي أكشن وحده، وسهما التمرير يغيبان إن لم يبق ما يُمرَّر إليه', await vis() === '0' && !await note() && await page.evaluate(() => [...document.querySelectorAll('#tonight .tn-c > .rl-a')].every(a => a.classList.contains('off'))), [await vis(), await note()]);
+    check('بحث المزاج بالكتابة (E83): «الاكشن» بلا «ال» ولا همزة يُبقي أكشن وحده، وسهما التمرير يغيبان إن لم يبق ما يُمرَّر إليه', await vis() === '0' && !await note() && await page.waitForFunction(() => [...document.querySelectorAll('#tonight .tn-c > .rl-a')].every(a => a.classList.contains('off')), null, { timeout: 1500 }).then(() => true, () => false), [await vis(), await note()]);
     await q('ADV');
     check('وبالإنجليزي كذلك', await vis() === '1', await vis());
     await q('hentai');
@@ -536,6 +539,29 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check('رسالة الدمج تقول ما تغيّر فعلاً لا عدد ما قُرئ', /دُمج سجل SIMKL: تقدّم عملان، واستُكمل تاريخ أو تقييم في عمل واحد\. الباقي كما هو\./.test(await page.textContent('#imp .msg.ok')), await page.textContent('#imp .msg'));
     await tap('[data-act=restore]');
     check('«تراجع عن آخر استيراد» يعيد السجل كما كان', JSON.stringify(await log()) === JSON.stringify(before));
+    // صندوق الصادر (E84): الربط يطلب الكتابة، وكل تعديل منك يصل SIMKL وحده بعد ثوانٍ: الحلقة التي أضفتها، والتراجع عنها، والحالة
+    check('الربط يطلب القراءة والكتابة، ويُحفظ ما منحه SIMKL مع الرمز', scope === 'media:read media:write' && await page.evaluate(() => /media:write/.test(JSON.parse(localStorage.getItem('animeg.simkl')).scope)), scope);
+    { const got = async n => { for (let i = 0; i < 80 && wrote.length < n; i++) await page.waitForTimeout(100); return wrote.length >= n; }, J = x => JSON.stringify(x);
+      await page.keyboard.press('Escape'); await page.waitForSelector('#imp', { state: 'hidden' });
+      const L0 = await log(), W = (await page.$$eval('.rail .cel', c => c.map(x => +x.dataset.id))).find(id => { const a = FX.anime.find(x => x.id === id); return a && (!a.eps || a.eps - (L0[id]?.p || 0) > 1); });
+      const WA = FX.anime.find(a => a.id === W), I = { mal: W, ...(WA.sk ? { simkl: WA.sk } : {}) }, p0 = L0[W]?.p || 0;
+      await tap(`.rail .cel[data-id="${W}"] [data-act=plus]`);
+      check('«+» يرسل إلى SIMKL الحلقة التي أضفتها وحدها، بعد ثوانٍ، برقمي العمل وبالرمز', await got(1) && J(wrote[0].slice(0, 2)) === J(['/sync/history', { shows: [{ ids: I, seasons: [{ number: 1, episodes: [{ number: p0 + 1 }] }] }] }]) && wrote[0][2] === 'Bearer test-access', wrote);
+      await tap('#toast [data-act=undo]');
+      check('والتراجع يزيل علامتها هناك وحدها', await got(2) && J(wrote[1].slice(0, 2)) === J(['/sync/history/remove', { shows: [{ ids: I, seasons: [{ number: 1, episodes: [{ number: p0 + 1 }] }] }] }]), wrote[1]);
+      await tap(`.rail .cel[data-id="${W}"] [data-act=plus]`); await tap('#toast [data-act=undo]'); await page.waitForTimeout(3200);
+      check('وتعديل يُتراجع عنه قبل الإرسال لا يُرسل شيئاً', wrote.length === 2 && await page.evaluate(() => !Object.keys(JSON.parse(localStorage.getItem('animeg.out')).simkl.q).length), wrote.slice(2));
+      fails.n = 1; await tap('#tonight [data-act=status][data-s=watching]'); const tid = +(await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('animeg.out')).simkl.q)[0]));
+      await page.waitForFunction(() => JSON.parse(localStorage.getItem('animeg.out')).simkl.err === 'net', null, { timeout: 8000 });
+      await tap('.top [data-act=import]'); await page.waitForSelector('#imp[open]');
+      check('وما انقطع يبقى في الصندوق، ويقال ذلك في «قائمتي وحساباتي» مع زر «أرسل الآن»', /تعذّر الاتصال، ويُعاد الإرسال وحده حين يعود \(تنتظر عمل واحد\)/.test(await page.textContent('#sk-st')) && await page.locator('[data-act=sk-push]').count() === 1, await page.textContent('#sk-st'));
+      await tap('[data-act=sk-push]');
+      check('و«أرسل الآن» يرسله: «سأبدأه الآن» حالةٌ هناك', await got(3) && J(wrote[2].slice(0, 2)) === J(['/sync/add-to-list', { to: 'watching', shows: [{ ids: { mal: tid } }] }]), wrote[2]);
+      await page.waitForFunction(() => /كل تعديلاتك وصلته ✓/.test(document.querySelector('#sk-st')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
+      check('ثم يقال إن كل تعديلاتك وصلته', /كل تعديلاتك وصلته ✓/.test(await page.textContent('#sk-st')), await page.textContent('#sk-st'));
+      await page.keyboard.press('Escape'); await page.waitForSelector('#imp', { state: 'hidden' }); await tap('#toast [data-act=undo]');
+      check('والتراجع عن «سأبدأه الآن» يعيده إلى «سأشاهده» هناك', await got(4) && J(wrote[3].slice(0, 2)) === J(['/sync/add-to-list', { to: 'plantowatch', shows: [{ ids: { mal: tid } }] }]), wrote[3]);
+      await tap('.top [data-act=import]'); await page.waitForSelector('#imp[open]'); }
     await tap('[data-act=sk-forget]'); check('فصل الحساب يمحو رمزه من المتصفح', await page.evaluate(() => localStorage.getItem('animeg.simkl') === null));
     await page.keyboard.press('Escape'); await page.waitForSelector('#imp', { state: 'hidden' });
   }
