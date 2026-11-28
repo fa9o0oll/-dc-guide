@@ -1,0 +1,8 @@
+{
+ "inventory": {
+  "companies": "^(DC( Comics| Entertainment| Films| Studios| Universe| Black Label)?|Detective Comics|Vertigo|WildStorm( Productions)?|Milestone Media|Paradox Press)\\b",
+  "search": ["DC Comics", "DC Entertainment", "DC Films", "DC Studios", "DC Universe", "DC Black Label", "Detective Comics", "Vertigo", "WildStorm", "Milestone Media", "Paradox Press"],
+  "keywords": ["dc comics", "dc extended universe", "dc universe", "dc animated", "tomorrowverse", "arrowverse", "based on dc comics"],
+  "kwPattern": "\\bdc\\b|arrowverse|tomorrowverse|dceu"
+ }
+}
