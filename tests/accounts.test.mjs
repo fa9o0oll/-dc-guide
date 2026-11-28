@@ -1,14 +1,14 @@
 // يفحص خادم ربط الحسابات (E84): الربط، والمزامنة بالاتجاهين بين «أنمياتي» وMyAnimeList وSIMKL، بخدمتين مُحاكاتين ومخزن في الذاكرة.
 // node tests/accounts.test.mjs
 process.env.URL = 'https://watch.example'; process.env.ADD_FILM_PASSWORD = 'pw'; process.env.MAL_CLIENT_ID_SYNC = 'mal-client'; process.env.TRAKT_GAP_MS = '20';
-const { memStore, simklOps, syncSeries } = await import('../scripts/lib-accounts.mjs');
+const { memStore, simklOps, syncSeries, val } = await import('../scripts/lib-accounts.mjs');
 const { createHash } = await import('node:crypto');
 const fn = await import('../netlify/functions/accounts.mjs');
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const J = x => JSON.stringify(x);
 
 // ---------- الخدمتان المحاكاتان
-const MAL = new Map(), SK = new Map(), sent = []; let skAct = 1, skPolls = 0, malTok = 0;
+const MAL = new Map(), SK = new Map(), sent = []; let skAct = 1, skPolls = 0, malTok = 0, malPulls = 0;
 const malRow = (id, status, n, score = 0, at = '2026-01-01T00:00:00Z') => MAL.set(id, { status, num_episodes_watched: n, score, updated_at: at });
 const skRow = (id, status, n, rating = null) => { SK.set(id, { status, watched_episodes_count: n, user_rating: rating }); skAct++; };
 const res = (o, status = 200) => new Response(J(o), { status, headers: { 'content-type': 'application/json' } });
@@ -17,7 +17,7 @@ globalThis.fetch = async (u, init = {}) => { const url = new URL(u), m = init.me
   if (url.host === 'myanimelist.net' && url.pathname === '/v1/oauth2/token') { const f = new URLSearchParams(body); sent.push(['mal-token', f.get('grant_type'), f.get('code_verifier') ? 'verifier' : '', f.get('client_secret') ? 'SECRET' : '']);
     return res({ access_token: 'tok-mal-' + (++malTok), refresh_token: 'ref-mal', expires_in: 2678400 }); }
   if (url.host === 'api.myanimelist.net') { if (!/^Bearer tok-mal-/.test(auth)) return res({ error: 'invalid_token' }, 401);
-    if (url.pathname === '/v2/users/@me/animelist') { check('سحب MyAnimeList يطلب أعمال +18 أيضاً وحالة القائمة', url.searchParams.get('nsfw') === 'true' && url.searchParams.get('fields') === 'list_status');
+    if (url.pathname === '/v2/users/@me/animelist') { malPulls++; check('سحب MyAnimeList يطلب أعمال +18 أيضاً وحالة القائمة', url.searchParams.get('nsfw') === 'true' && url.searchParams.get('fields') === 'list_status');
       return res({ data: [...MAL].map(([id, L]) => ({ node: { id, title: 'w' + id }, list_status: L })), paging: {} }); }
     const id = +url.pathname.split('/')[3];
     if (m === 'PATCH') { const f = new URLSearchParams(body); sent.push(['mal', id, f.get('status'), +f.get('num_watched_episodes'), +f.get('score')]); malRow(id, f.get('status'), +f.get('num_watched_episodes'), +f.get('score'), new Date().toISOString()); return res({}); }
@@ -147,6 +147,24 @@ console.log('\n== مهلة الدالة');
   sent.length = 0; await syncAnime(S, { pull: false, budget: 2 });
   check('وحصة الإرسال: عملان في المرة، والباقي في المرة القادمة', sent.filter(x => x[0] === 'mal').length === 2, sent.filter(x => x[0] === 'mal'));
   sent.length = 0; await syncAnime(S, { pull: false }); check('ثم يكمل الباقي', sent.filter(x => x[0] === 'mal').length === 1 && [31, 32, 33].every(id => MAL.has(id)), sent.filter(x => x[0] === 'mal')); }
+
+console.log('\n== دليل Fate ↔ MyAnimeList وSIMKL (E92)');
+{ const byId = a => Object.fromEntries(a.map(x => [x.id, x])); const a0 = await call('/sync', { body: { since: 0 } }); sent.length = 0;
+  let f = await call('/sync', { body: { guide: 'fate', since: 0, full: { 1: { s: 'watching', p: 3 }, 2: { s: 'watching', p: 30 }, 4: { s: 'completed', p: 0 }, 50: { s: 'plan', p: 0 }, 51: { s: 'watching', p: 30 } } } });
+  let hub = (await S.get('anime')).items;
+  check('سجل الدليل يُجمع إلى المحور إلى الأمام وحده: لا ينزل «ختمته» (1) ولا يمسّ تقييمك، ولا يعود ما أزلته من حسابك (2)، ويُختم الفيلم (4)، ويُضاف الجديد (50 و51)',
+    hub[1].s === 'completed' && hub[1].p === 12 && hub[1].r === 9 && !val(hub[2]) && hub[4].s === 'completed' && hub[4].p === 1 && hub[50]?.s === 'plan' && hub[50].src === 'fate' && hub[51]?.s === 'watching' && hub[51].p === 30, [hub[1], hub[2], hub[4], hub[50], hub[51]]);
+  check('وما تقدّم يصل الحسابين: MAL بالفيلم المختوم وبالجديد', sent.some(x => x[0] === 'mal' && x[1] === 4 && x[2] === 'completed') && MAL.get(50)?.status === 'plan_to_watch' && MAL.get(51)?.status === 'watching', sent.filter(x => x[0] === 'mal'));
+  check('ويصل الدليلَ ما في المحور من غيره (1 من MAL)، ولا يعود إليه ما جاء منه (4 و50)', byId(f.j.changes)[1]?.s === 'completed' && byId(f.j.changes)[1].src === 'mal' && !byId(f.j.changes)[50] && !byId(f.j.changes)[4], f.j.changes);
+  const a1 = await call('/sync', { body: { since: a0.j.rev } }), ac = byId(a1.j.changes);
+  check('و«أنمياتي» يصلها ما جاء من الدليل بمصدره', ac[4]?.s === 'completed' && ac[4].src === 'fate' && ac[50]?.s === 'plan' && ac[50].src === 'fate', a1.j.changes);
+  const p0 = malPulls; f = await call('/sync', { body: { guide: 'fate', since: f.j.rev, edits: [{ id: 50, s: 'watching', p: 0, t: Date.now() }, { id: 1, s: 'watching', p: 4, t: Date.now() }, { id: 21, s: null, t: Date.now() }, { id: 2, s: 'watching', p: 2, t: Date.now() }] } });
+  hub = (await S.get('anime')).items;
+  check('وتعديل الدليل: «أشاهده» بعد «سأشاهده» يُقبل (50)، ولا ينزل المختوم بحلقة (1)، ولا يزيل عملاً (21)، وما علّمته الآن يعيد ما أُزيل (2)',
+    hub[50].s === 'watching' && hub[1].s === 'completed' && hub[1].p === 12 && hub[21]?.s === 'plan' && hub[2]?.s === 'watching' && hub[2].p === 2 && hub[2].src === 'fate', [hub[50], hub[1], hub[21], hub[2]]);
+  check('ولا تُسحب الحسابات من الدليل أكثر من مرة كل دقيقتين', malPulls === p0, [p0, malPulls]);
+  check('والدليل بلا محور (لم تبدأ «أنمياتي») لا يبدأ منه شيء', await (async () => { const S2 = await import('../scripts/lib-accounts.mjs');
+    const r2 = await S2.syncAnime(memStore(), { guide: 'fate', full: { 9: { s: 'plan', p: 0 } } }); return r2.needBoot === true && !r2.needFull && !r2.changes.length; })()); }
 
 console.log('\n== الأفلام ↔ Letterboxd (E86)');
 { const { parseLb } = await import('../scripts/lib-accounts.mjs');

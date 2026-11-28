@@ -158,21 +158,29 @@ async function pushTo(S, st, k, t, budget, deadline) { const sh = st.shadow[k] |
   return done.length; }
 
 // budget: أكثر ما يُرسل إلى خدمة في المرة، وdeadline: وقت يتوقف عنده الإرسال ويُحفظ ما تم (والباقي في المرة القادمة)، فلا تتجاوز الدالة مهلتها
-export async function syncAnime(S, { edits = [], full = null, eps = null, build = '', since = 0, pull = true, budget = 40, deadline = 0 } = {}) {
-  const st = Object.assign(blank(), await S.get('anime') || {});
+// guide (E92): «أنمياتي» (anime، ومصدر تعديلاتها site) أو دليل Fate (fate). الدليل يتقدّم وحده: ما يرسله يُقبل إن كان أمام ما في المحور
+// (عدد حلقات أكثر، أو ختمٌ، أو بدءٌ بعد «سأشاهده»)، ولا يزيل ولا يُنزل ولا يمسّ التقييم، و«ختمته» كامل حلقات العمل في MyAnimeList.
+// والمحور لا يبدأ من سجلّه (يبدأ من «أنمياتي»). fresh: لا تُسحب الخدمات إن سُحبت قبل أقل من ذلك
+const fwd = (v, cur) => !cur || ahead(v, cur) || (cur.s === 'plan' && v.s === 'watching');
+export async function syncAnime(S, { guide = 'anime', edits = [], full = null, eps = null, build = '', since = 0, pull = true, budget = 40, deadline = 0, fresh = 0 } = {}) {
+  const st = Object.assign(blank(), await S.get('anime') || {}), g = guide === 'fate' ? 'fate' : 'site';
   // المحور يبدأ من سجلّ الصفحة كله، ولا يبدأ من سجلّ فارغ (جهاز بلا سجلّ لا يمحو بحضوره شيئاً)
-  if (!st.boot && !(full && Object.keys(full).length)) return { needFull: true, rev: st.rev, changes: [] };
+  if (!st.boot && !(g === 'site' && full && Object.keys(full).length)) return { needFull: g === 'site', needBoot: g !== 'site', rev: st.rev, changes: [] };
   if (full && !st.boot) { for (const [id, m] of Object.entries(full)) put(st, id, val(m), 0, 'site'); st.boot = now(); }
   if (eps) { st.eps = eps; st.build = build; }
-  for (const e of edits) if (/^\d+$/.test(String(e.id))) put(st, String(e.id), val(e), +e.t || now(), 'site');
+  const fv = (id, e) => { const v = val({ ...e, r: st.items[id]?.r || 0 }), n = st.eps[id]; if (!v) return null; if (n > 0) v.p = v.s === 'completed' ? n : Math.min(v.p, n); else if (n < 0) v.p = v.s === 'completed' ? 1 : 0; return v; };
+  const fput = (id, e, t) => { const v = fv(id, e), cur = val(st.items[id]); if (v && !same(cur, v) && fwd(v, cur)) put(st, id, v, Math.max(t, (st.items[id]?.t || 0) + 1), 'fate', true); };
+  // وسجله كله (من كل جهاز مرة لكل ربط) لا يعيد عملاً أُزيل من حسابك صراحة، أما تعديله الجديد فيعيده (علّمته الآن)
+  if (full && g === 'fate') for (const [id, m] of Object.entries(full)) if (/^\d+$/.test(id) && !(st.items[id] && !val(st.items[id]))) fput(id, m, 1);
+  for (const e of edits) if (/^\d+$/.test(String(e.id))) { if (g === 'fate') fput(String(e.id), e, +e.t || now()); else put(st, String(e.id), val(e), +e.t || now(), 'site'); }
   // السحب من كل الخدمات أولاً ثم الدفع إليها كلها، فتعديل في إحداها يصل الأخرى في المزامنة نفسها
   const live = {}, oops = async (k, t, e) => { st.err[k] = e.code === 'auth' ? 'auth' : e.code === 'net' ? 'net' : String(e.message || 'خطأ').slice(0, 120); delete live[k]; if (e.code === 'auth') { t.dead = 1; await S.set('tok/' + k, t); } };
   for (const k of ANIME) { const t = await token(S, k); if (!t) continue; if (t.dead) { st.err[k] = 'auth'; continue; } live[k] = t;
-    try { if (pull || !st.shadow[k]) { const R = await SVC[k].pull(t, st.mark[k], st.eps); if (!R.same) { merge(st, k, R); if (R.mark) st.mark[k] = R.mark; } } } catch (e) { await oops(k, t, e); } }
+    try { if ((pull && !(fresh && now() - (st.at[k] || 0) < fresh)) || !st.shadow[k]) { const R = await SVC[k].pull(t, st.mark[k], st.eps); if (!R.same) { merge(st, k, R); if (R.mark) st.mark[k] = R.mark; } } } catch (e) { await oops(k, t, e); } }
   for (const [k, t] of Object.entries(live)) { if (deadline && Date.now() > deadline) break; try { await pushTo(S, st, k, t, budget, deadline); st.err[k] = ''; st.at[k] = now(); } catch (e) { await oops(k, t, e); } }
   await S.set('anime', st);
-  const changes = Object.entries(st.items).filter(([, h]) => h.rev > since && h.src !== 'site').map(([id, h]) => ({ id: +id, ...(val(h) || { s: null }), src: h.src }));
-  return { rev: st.rev, changes, needEps: !!build && st.build !== build }; }
+  const changes = Object.entries(st.items).filter(([, h]) => h.rev > since && h.src !== g).map(([id, h]) => ({ id: +id, ...(val(h) || { s: null }), src: h.src }));
+  return { rev: st.rev, changes, needEps: g === 'site' && !!build && st.build !== build }; }
 
 // ---------- المسلسلات ↔ Trakt (E87، التفاصيل في scripts/lib-trakt.mjs): الرمز يُجدَّد هنا كغيره، وانتهاء الربط يُحفظ
 export const syncSeries = (S, o) => seriesCore(S, { get: () => token(S, 'trakt'), kill: async t => { t.dead = 1; await S.set('tok/trakt', t); } }, o);

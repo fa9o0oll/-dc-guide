@@ -49,7 +49,9 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check(`${label}: لا عناصر متراكبة`, lap === 0, String(lap)); };
 
   await page.goto(url); await page.waitForSelector('.card');
-  check('تحميل البطاقات: 200 بطاقة في 19 عالماً', await page.locator('.card').count() === 200 && await page.locator('section.uni').count() === 19);
+  // الأعداد من البيانات المبنية نفسها (تتغير بإضافة الأعمال، E91)
+  const DCB = JSON.parse(fs.readFileSync(path.join(siteDir, 'dc/data/base.json'))), NP = DCB.placements.length, NU = DCB.universes.length;
+  check(`تحميل البطاقات: ${NP} بطاقة في ${NU} عالماً`, await page.locator('.card').count() === NP && await page.locator('section.uni').count() === NU);
   { const g = () => page.evaluate(() => { const x = document.querySelector('#stick .gate'), r = x.getBoundingClientRect(), h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
       return { shown: getComputedStyle(x).opacity === '1' && r.width >= 40, hit: !!h?.closest('.gate'), tab: x.tabIndex, href: x.getAttribute('href') }; });
     const g0 = await g(); await page.evaluate(() => scrollTo(0, 1600)); await page.waitForTimeout(800); const g1 = await g(); await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(700); const g2 = await g();
@@ -143,7 +145,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.evaluate(() => scrollTo(0, 6000)); await page.waitForTimeout(200);
   check('زر الفهرس وطرق العرض والأدوات ظاهرة بعد النزول في الصفحة', await page.evaluate(m => ['.dock-index', '.views [data-view=timeline]', '#shieldBtn'].every(s => { const r = document.querySelector(s).getBoundingClientRect(); return r.top >= 0 && r.bottom <= 125 && r.width > 40 && (r.left >= 0 || (m && s === '#shieldBtn')); }), mobile), await page.evaluate(() => 'ارتفاع الشريط ' + Math.round(document.querySelector('.stick').getBoundingClientRect().height)));
   await tap('.dock-index'); await page.waitForSelector('.tile');
-  check('الفهرس يعرض 19 عالماً في مجموعتين', await page.locator('.tile').count() === 19 && await page.locator('.idx h3').count() === 2);
+  check(`الفهرس يعرض ${NU} عالماً في مجموعتين`, await page.locator('.tile').count() === NU && await page.locator('.idx h3').count() === 2);
   await page.waitForTimeout(600);
   if (!phone) check('البطاقة المنبثقة في وسط الشاشة', await page.evaluate(() => { const r = document.querySelector('#sheet').getBoundingClientRect(); return Math.abs((r.left + r.right) / 2 - innerWidth / 2) < 4 && Math.abs((r.top + r.bottom) / 2 - innerHeight / 2) < 4; }));
   await overflow('الفهرس'); await snap('8-index');
@@ -214,6 +216,19 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.goto(url + '#w=the-dark-knight-rises-2012'); await page.waitForSelector('#sheet:not([hidden])'); await page.waitForTimeout(300);
   check('عمل بلا منصات في السعودية: يُقال ذلك صراحة', /لا تذكر بيانات JustWatch منصة تعرضه في السعودية حالياً/.test(await page.textContent('#sheet .where')) && await page.locator('#sheet .where a').count() === 0);
   check('رابط #w= يفتح بطاقة العمل ثم يُزال من العنوان', (await page.textContent('#sheetTitle')).includes('The Dark Knight Rises') && (await page.evaluate(() => location.hash)) === '');
+  // التقييمات الحية (E93، على الكمبيوتر): الدائرة تقييم الجمهور في IMDb من ملفاتها اليومية، وبجانبها آراء النقاد؛ وما ليس له في IMDb أصوات كافية يبقى على TMDB
+  if (name === 'desktop') { const RR = /\/dc\/data\/ratings\.json/; if (await page.isVisible('#sheet')) { await page.keyboard.press('Escape'); await page.waitForTimeout(300); }
+    await page.route(RR, r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ at: '2026-11-28', r: { tt0468569: [9.0, 3012345, 94, 84], tt1877830: [7.8, 15, null, null] } }) }));
+    await page.reload(); await page.waitForSelector('#c-nolan-the-dark-knight-2008 .gauge');
+    const card = await page.evaluate(() => { const c = document.querySelector('#c-nolan-the-dark-knight-2008 .rates'); return { g: c?.querySelector('.gauge')?.textContent, src: c?.querySelector('.src b')?.textContent, crit: [...(c?.querySelectorAll('.crit') || [])].map(x => x.textContent.trim()) }; });
+    const bt = await page.evaluate(() => document.querySelector('[data-k="the-batman-2022"] .rates .src b')?.textContent || '');
+    await tap('#c-nolan-the-dark-knight-2008 [data-act=open]'); await page.waitForSelector('#sheet:not([hidden]) .rates .gauge');
+    const sh = await page.evaluate(() => { const r = document.querySelector('#sheet .rates'); return { g: r.querySelector('.gauge').textContent, src: r.querySelector('.src b').textContent, crit: [...r.querySelectorAll('.crit')].map(c => c.textContent.trim()),
+      rt: !!r.querySelector('a.crit[href="https://www.rottentomatoes.com/m/the_dark_knight"]'), mc: !!r.querySelector('a.crit[href*="metacritic.com/movie/"]') }; });
+    check('التقييم الحي: الدائرة تقييم IMDb (9) بأصواتها، وبجانبها النقاد Rotten Tomatoes 94% وMetacritic 84 برابطَي صفحتيهما، وفي البطاقة نسبة النقاد وحدها (E93)',
+      card.g === '9' && /IMDb/.test(card.src) && card.crit.length === 1 && /94%/.test(card.crit[0]) && sh.g === '9' && /IMDb/.test(sh.src) && sh.crit.length === 2 && /94%/.test(sh.crit[0]) && /84/.test(sh.crit[1]) && sh.rt && sh.mc, [card, sh]);
+    check('وما له في IMDb أقل من 20 صوتاً يبقى على TMDB', /TMDB/.test(bt), bt);
+    await page.keyboard.press('Escape'); await page.unroute(RR); await page.reload(); await page.waitForSelector('#c-nolan-the-dark-knight-2008'); }
   // ستاك البطاقات (E89، على الكمبيوتر): عمل يُفتح من سطر «موقعه من عالمه» في بطاقة عمل خطوة فوقها، والرجوع يعيد الأولى إلى موضع القراءة فيها، و× يغلقهما معاً
   if (name === 'desktop') { if (await page.isVisible('#sheet')) { await page.keyboard.press('Escape'); await page.waitForTimeout(400); }
     await tap('#c-dcu-peacemaker-2022-s1 [data-act=open]'); await page.waitForSelector('#sheet:not([hidden]) .chain .ch-l'); await page.waitForTimeout(450);

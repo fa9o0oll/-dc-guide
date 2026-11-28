@@ -712,3 +712,9 @@ img.in{opacity:1}
 .pexit{position:fixed;inset:0;z-index:500;transform-origin:0 0;pointer-events:none;will-change:transform}
 /* شعار TMDB المعتمد بجانب إشعاره، كما تشترط شروط واجهته: أصغر من هوية الموقع، بلا تغيير في لونه ولا نسبته */
 .tmdb-logo{display:inline-block;vertical-align:middle;margin-inline-end:4px;line-height:0}.tmdb-logo img{height:11px;width:auto;display:block}
+.guide .trk-list{margin:6px 0 4px;padding-inline-start:18px;line-height:1.9}
+/* آراء النقاد بجانب تقييم الجمهور (E93): Rotten Tomatoes بنسبته وMetacritic من 100 */
+.rates .crit{display:grid;justify-items:start;gap:1px;text-decoration:none;color:var(--ink);line-height:1.2;padding-inline-start:10px;border-inline-start:1px solid var(--hair)}
+.rates .crit b{font-family:var(--display);font-size:1.05rem}
+.rates .crit small{font-size:.72rem;color:var(--dim)}
+.rates a.crit:hover b,.rates a.crit:focus-visible b{text-decoration:underline}

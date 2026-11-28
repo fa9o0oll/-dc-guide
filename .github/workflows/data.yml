@@ -65,6 +65,11 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: WORLDS_DUMP=${{ github.ref != 'refs/heads/main' && '1' || '' }} node scripts/build-worlds.mjs
         continue-on-error: true
+      - name: Build live ratings (IMDb daily dataset; critics from Rotten Tomatoes and Metacritic via OMDb when OMDB_API_KEY is set; keeps the previous values when a source is unreachable)
+        env:
+          OMDB_API_KEY: ${{ secrets.OMDB_API_KEY }}
+        run: node scripts/build-ratings.mjs
+        continue-on-error: true
       - name: Build «ألعابي» (IGDB + Wikidata; keeps the previous file if IGDB is unreachable)
         env:
           IGDB_CLIENT_ID: ${{ secrets.IGDB_CLIENT_ID }}

@@ -44,7 +44,7 @@ const KEY = G.key;
 const blank = () => ({ v: 1, works: {}, eps: {}, shield: true });
 let store = blank();
 try { const raw = JSON.parse(localStorage.getItem(KEY) || 'null'); if (raw && raw.v === 1) store = { ...blank(), ...raw }; } catch {}
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch { toast('تعذّر الحفظ في هذا المتصفح'); } syncTouch(G.id); };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch { toast('تعذّر الحفظ في هذا المتصفح'); } syncTouch(G.id); aniDiff(); };
 
 // ---------- البيانات
 const D = { universes: [], works: new Map(), placements: [], bridges: [], legacyMap: {}, base: '', arrow: null, order: null, mal: {}, prov: {}, episodes: new Map() };
@@ -53,10 +53,10 @@ const getJSON = async u => { const r = await fetch(u + '?v=' + BUILD); if (!r.ok
 
 async function boot() {
   try {
-    const [base, cat, arrow, mal] = await Promise.all([getJSON('data/base.json'), getJSON('data/catalog.json'), G.order?.kind === 'arrow' ? getJSON(G.order.file) : null, G.malScore ? getJSON('data/mal.json').catch(() => ({})) : {}]);
+    const [base, cat, arrow, mal, rate] = await Promise.all([getJSON('data/base.json'), getJSON('data/catalog.json'), G.order?.kind === 'arrow' ? getJSON(G.order.file) : null, G.malScore ? getJSON('data/mal.json').catch(() => ({})) : {}, getJSON('data/ratings.json').catch(() => ({}))]);
     const extra = new Map(cat.works.map(w => [w.id, w]));
     for (const w of base.works) D.works.set(w.id, { ...w, ...(extra.get(w.id) || {}) });
-    Object.assign(D, { universes: base.universes, placements: base.placements, bridges: base.bridges || [], legacyMap: base.legacyMap || {}, base: cat.imageBase, arrow, order: base.order, mal: mal.anime || {}, prov: cat.providers || {} });
+    Object.assign(D, { universes: base.universes, placements: base.placements, bridges: base.bridges || [], legacyMap: base.legacyMap || {}, base: cat.imageBase, arrow, order: base.order, mal: mal.anime || {}, prov: cat.providers || {}, rate: rate.r || {} });
     $('#builtAt').textContent = 'آخر تحديث للبيانات: ' + fmtDate(cat.generatedAt.slice(0, 10));
   } catch (e) {
     $('#veil')?.remove();
@@ -70,6 +70,10 @@ async function boot() {
     full: () => { const o = {}; for (const id of D.works.keys()) { const f = fmOf(id), fs = f && fState(store.works[id]); if (fs) o['m' + f] = fs;
       const t = tvOf(id); if (!t) continue; const e = Object.keys(store.eps[id] || {}), l = store.works[id] === 'list' ? 1 : 0; if (e.length || l) o['tv' + t] = { e, l }; } return o; },
     known: () => [...D.works.keys()].map(tvOf).filter(Boolean) });
+  // دليل Fate مع MyAnimeList وSIMKL (E92): حال كل موضع وعدد حلقاته برقمه في MyAnimeList، إلى محور الأنمي ومنه
+  if (G.id === 'fate') { accInit({ guide: 'fate', svcs: ['mal', 'simkl'], build: BUILD, emptyOk: true, pack: m => ({ s: m.s, p: m.p || 0 }), apply: aniApply, onState: drawTrk,
+      full: () => Object.fromEntries(MALP().map(p => [p.mal, aniState(p)]).filter(([, v]) => v)), known: () => [...new Set(MALP().map(p => p.mal))] });
+    ANS = Object.fromEntries(MALP().map(p => [p.mal, aniKey(aniState(p))])); }
   // رابط مباشر لعمل (#w=المعرّف)، تستعمله قائمة الأفلام للانتقال إلى بطاقته في هذا الدليل، عند الفتح أو بتغيير العنوان والصفحة مفتوحة
   { const deep = () => { const w = new URLSearchParams(location.hash.slice(1)).get('w'); if (w && D.works.has(w)) { history.replaceState(history.state, '', location.pathname + location.search); openWork(w); } };
     deep(); addEventListener('hashchange', deep); }
@@ -124,8 +128,15 @@ const tmdbUrl = w => `https://www.themoviedb.org/${w.seasons || w.kind === 'seri
 const themeVars = id => { const t = THEMES[id]; return `--bg:${t.bg};--c1:${t.c1};--c2:${t.c2}`; };
 // التقييم معلومة فمكانه مع العنوان؛ والروابط الخارجية أفعال فمكانها مع الأزرار، وكلٌّ منها يقول ما ستجده هناك.
 // في دليل الأنمي التقييم من MyAnimeList للإدراج نفسه (العمل أو الموسم)، وإن غاب فمن TMDB.
+// وتقييم الجمهور (E93) من IMDb حيّاً (ملفاتها الرسمية اليومية) إن كان له 20 صوتاً فأكثر، وإلا TMDB؛ وفي دليل الأنمي MyAnimeList أولاً.
+const imdbOf = w => { const x = w.imdb && D.rate?.[w.imdb]; return x && x[0] != null && x[1] >= 20 ? { v: x[0], votes: x[1], name: 'IMDb', href: `https://www.imdb.com/title/${w.imdb}/` } : null; };
 const rating = (w, p) => { const m = G.malScore && p?.mal ? D.mal[p.mal] : null;
-  return m?.score != null ? { v: m.score, votes: m.votes, name: 'MAL', href: `https://myanimelist.net/anime/${p.mal}` } : w.tmdbRating != null ? { v: w.tmdbRating, votes: w.tmdbVotes || 0, name: 'TMDB', href: tmdbUrl(w) } : null; };
+  return m?.score != null ? { v: m.score, votes: m.votes, name: 'MAL', href: `https://myanimelist.net/anime/${p.mal}` } : imdbOf(w) || (w.tmdbRating != null ? { v: w.tmdbRating, votes: w.tmdbVotes || 0, name: 'TMDB', href: tmdbUrl(w) } : null); };
+// آراء النقاد (E93): Rotten Tomatoes بنسبته وMetacritic من 100 (عبر OMDb)، وما لا رقم له لا يُكتب. mini: سطر صغير في البطاقة
+const critics = (w, mini) => { const x = w.imdb && D.rate?.[w.imdb]; if (!x || (x[2] == null && x[3] == null)) return '';
+  const one = (v, unit, name, href) => { const t = `<b>${v}${unit}</b><small>نقاد ${ltr(name)}</small>`; return href ? `<a class="crit" href="${href}" target="_blank" rel="noopener" aria-label="${name}: ${v}${unit}">${t}</a>` : `<span class="crit">${t}</span>`; };
+  const rt = x[2] != null ? one(x[2], '%', 'Rotten Tomatoes', w.rt && `https://www.rottentomatoes.com/${w.rt}`) : '', mc = x[3] != null ? one(x[3], '', 'Metacritic', w.mc && `https://www.metacritic.com/${w.mc}`) : '';
+  return mini ? (rt || mc) : rt + mc; };
 const gaugeRow = (w, p) => { const r = rating(w, p); return r ? `<a class="gauge ${String(r.v).length > 3 ? 'fine' : ''}" style="--v:${Math.round(r.v * 10)}" href="${r.href}" target="_blank" rel="noopener" aria-label="تقييم ${r.name} ${r.v} من 10">${r.v}</a><span class="src"><b>تقييم ${ltr(r.name)}</b>${cnt(r.votes, 'vote')}</span>` : ''; };
 // Letterboxd للأفلام فقط (لا يستورد المسلسلات) ويُفتح برقم TMDB. Trakt يُفتح برقم IMDb لأن رابط البحث برقم TMDB يعطي 404 في تطبيقه الجديد.
 // MyAnimeList وSimkl يُفتحان برقم الإدراج نفسه (لكل موسم صفحته هناك).
@@ -140,7 +151,7 @@ const LINKS = {
 };
 const xlinks = (w, p) => { const list = G.links.map(k => LINKS[k](w, p)).filter(Boolean).map(([href, what, name]) => `<a href="${href}" target="_blank" rel="noopener"><small>${what}</small>${ic('ext')}<b>${ltr(name)}</b></a>`);
   return list.length ? `<div class="xlinks">${list.join('')}</div>` : ''; };
-const rateBlock = (w, p) => { const r = rating(w, p), v = isSoon(w) ? null : verdict(r?.v); return `<div class="rates wide">${gaugeRow(w, p)}${v && r ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${xlinks(w, p)}</div>`; };
+const rateBlock = (w, p) => { const r = rating(w, p), v = isSoon(w) ? null : verdict(r?.v); return `<div class="rates wide">${gaugeRow(w, p)}${isSoon(w) ? '' : critics(w)}${v && r ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${xlinks(w, p)}</div>`; };
 const daysTo = d => Math.ceil((new Date(d) - new Date(TODAY)) / 864e5);
 // ---------- أين يُشاهد العمل رسمياً في السعودية: منصات TMDB (بياناتها من JustWatch) كما في بوابة الأفلام، مجموعةً بطريقة الإتاحة.
 // كل زر يفتح صفحة أماكن العرض على TMDB ومنها إلى المنصة. prov غير معرَّف: بيانات بُنيت قبل الميزة فلا يُقال شيء؛ null: لا بيانات للسعودية.
@@ -276,7 +287,7 @@ function card(p) {
       <h3>${ltr(titleOf(p))}</h3>
       ${meta}
       <div class="tags">${soon ? (p.upcoming?.stage === 'development' ? '<span class="tag soon">معلن</span>' : '<span class="tag soon">قادم</span>') : v ? `<span class="tag" style="color:${v[1]}">${v[0]}</span>` : ''}${nextTag(w)}</div>
-      ${rating(w, p) ? `<div class="rates">${gaugeRow(w, p)}</div>` : ''}
+      ${rating(w, p) ? `<div class="rates">${gaugeRow(w, p)}${soon ? '' : critics(w, true)}</div>` : ''}
     </div></div>
     <div class="cbody"><p class="note">${ar(p.note)}</p>
     ${soon ? soonBlock(w, p.universe, p.upcoming, 'wide') : ''}
@@ -645,7 +656,40 @@ function trkHTML() { const st = accState(), l = st.links?.trakt || {}, msg = TK.
 // وأفلامه مع Letterboxd (E90): الربط وملف الاستيراد في نافذة Letterboxd في قائمة أفلامي، وهنا حاله ورابط إليها
 function lbnHTML() { const l = accState().links?.letterboxd;
   return `${l?.on ? `<p class="trk-on">مربوط بصفحتك <bdi dir="ltr">letterboxd.com/${esc(l.user || '')}</bdi> ✓</p>` : ''}<div class="actions"><button data-act="lbn-go">${l?.on ? 'افتح نافذته في قائمة أفلامي' : 'اربطه من قائمة أفلامي'}</button></div>`; }
-const drawTrk = () => { const el = $('#trk'); if (el) el.innerHTML = trkHTML(); const ln = $('#lbn'); if (ln) ln.innerHTML = lbnHTML(); };
+const drawTrk = () => { const el = $('#trk'); if (el) el.innerHTML = trkHTML(); const ln = $('#lbn'); if (ln) ln.innerHTML = lbnHTML(); const an = $('#anis'); if (an) an.innerHTML = aniHTML(); };
+// ---------- دليل Fate ↔ MyAnimeList وSIMKL (E92): لكل موضع في الدليل (عمل أو موسم) رقمه في MyAnimeList. حاله وعدد حلقاته يصلان محور الأنمي على الخادم
+// (مصدرها fate) فيصلان الحسابين و«أنمياتي»، ويصل منه ما تغيّر هناك. إلى الأمام وحده: الدليل لا يرسل إزالة ولا نزولاً، ولا ينزل بما يصله، ولا تنتقل إليه
+// إزالة أكثر من ثلاثة أعمال دفعة واحدة؛ والتقييم لا يمسّه (يبقى ما في حسابك). و«تجاوز» لا يُرسل
+var ANS = null;   // آخر ما عرفه المحور من الدليل لكل رقم: ما تغيّر عنه وحده يُرسل
+const MALP = () => G.id === 'fate' ? D.placements.filter(p => p.mal) : [];
+const plEps = p => D.works.get(p.work)?.kind === 'series' ? (p.season ? seasonDone(p.work, p.season) : seasonDone(p.work)) : 0;
+const plTot = p => (D.works.get(p.work)?.seasons || []).filter(x => x.n && (!p.season || x.n === p.season)).reduce((a, x) => a + (x.episodes || 0), 0);   // بلا الخاصة
+const aniState = p => { const w = D.works.get(p.work), st = statusOf(p), film = w?.kind !== 'series', n = film ? (st === 'watched' ? 1 : 0) : plEps(p);
+  const s = st === 'watched' ? 'completed' : st === 'watching' || (n && st !== 'skip') ? 'watching' : st === 'list' ? 'plan' : null;
+  return s ? { s, p: s === 'completed' && !film ? Math.max(n, plTot(p)) : n } : null; };
+const aniKey = v => v ? v.s + ':' + v.p : '';
+function aniDiff() { if (G.id !== 'fate' || !ANS) return; for (const p of MALP()) { const v = aniState(p), k = aniKey(v); if (k === ANS[p.mal]) continue; ANS[p.mal] = k; if (v) accMark(String(p.mal), v); } }
+// يعلّم الحلقات من أول الموضع حتى العدد المطلوب (مواسمه بترتيبها، بلا الخاصة)
+function tickTo(p, want) { const w = D.works.get(p.work), ss = (w.seasons || []).filter(x => x.n && (!p.season || x.n === p.season)).sort((a, b) => a.n - b.n); let n = 0, ch = 0;
+  for (const x of ss) for (let e = 1; e <= (x.episodes || 0) && n < want; e++, n++) if (!epDone(p.work, x.n, e)) { setEp(p.work, x.n, e, true, true); ch = 1; }
+  return ch; }
+const ASRC = { mal: 'MyAnimeList', simkl: 'SIMKL', site: 'أنمياتي' };
+function aniApply(changes) { if (!ANS) return; const by = new Map(), gone = [], from = new Set(); let n = 0;
+  for (const p of MALP()) { if (!by.has(p.mal)) by.set(p.mal, []); by.get(p.mal).push(p); }
+  for (const c of changes) for (const p of by.get(+c.id) || []) { const k = sKey(p), w = D.works.get(p.work), cur = store.works[k] || ''; let ch = 0;
+    if (!c.s) { if (cur === 'list' || cur === 'watching' || cur === 'watched') gone.push([k, c.src]); continue; }
+    if (c.s === 'completed' && cur !== 'watched') { store.works[k] = 'watched'; ch = 1; }
+    else if ((c.s === 'watching' || c.s === 'hold') && (!cur || cur === 'list')) { store.works[k] = 'watching'; ch = 1; }
+    else if (c.s === 'plan' && !cur) { store.works[k] = 'list'; ch = 1; }
+    if (w?.kind === 'series') { const tot = plTot(p), want = c.s === 'completed' ? tot : Math.min(c.p || 0, tot); if (want > plEps(p)) ch |= tickTo(p, want); }
+    if (ch) { n++; from.add(ASRC[c.src] || 'حساباتك'); } }
+  if (gone.length <= 3) for (const [k, src] of gone) { delete store.works[k]; n++; from.add(ASRC[src] || 'حساباتك'); }
+  for (const p of MALP()) ANS[p.mal] = aniKey(aniState(p));   // ما وصل لا يعود إلى المحور
+  if (!n) return; save(); render(true); stats(); toast(`وصل من ${[...from].join(' و')} تحديث ${cnt(n, 'work')}`); }
+function aniHTML() { const st = accState(), L = st.links || {}, on = ['mal', 'simkl'].some(k => L[k]?.on);
+  if (st.pass || !accPass()) return `<form class="trk-pass"><label>كلمة سر الموقع مرة واحدة في هذا المتصفح (نفسها في «أضف فيلماً»)<input type="password" autocomplete="current-password" required></label><div class="actions"><button type="submit">تم</button></div></form>`;
+  const row = (k, name) => { const l = L[k]; return `<li><bdi dir="ltr">${name}</bdi>: ${!l?.on ? 'غير مربوط' : l.err === 'auth' || l.dead ? 'انتهى الربط، أعد ربطه من «أنمياتي»' : `مربوط ✓${l.at ? ` · آخر مزامنة ${ago(l.at)}` : ''}`}</li>`; };
+  return `<ul class="trk-list">${row('mal', 'MyAnimeList')}${row('simkl', 'SIMKL')}</ul><div class="actions">${on ? `<button data-act="trk-sync"${st.busy ? ' disabled' : ''}>${st.busy ? 'يزامن…' : 'زامن الآن'}</button>` : ''}<button data-act="ani-go">${on ? 'حساباتك في «أنمياتي»' : 'اربطها من «أنمياتي»'}</button></div>${st.err ? `<p class="trk-msg">${esc(st.err)}</p>` : ''}`; }
 // «اربط»: إلى صفحة موافقة Trakt، ثم يعود إلى هذا الدليل (?linked=trakt) وتُفتح «سجلّي» برسالة
 async function trkGo() { TK.msg = ''; try { await accLink('trakt', { from: G.id }); } catch (e) { TK.msg = e.pass ? '' : esc(e.message || 'تعذّر الربط.'); drawTrk(); } }
 const trkBack = (svc, fail) => { if (svc !== 'trakt') return; TK.msg = !fail ? 'رُبط Trakt، والمزامنة تبدأ الآن.' : fail === 'denied' ? 'لم تكتمل الموافقة في Trakt، فلم يُربط.' : 'تعذّر الربط. اضغط «اربط» من جديد.'; openBackup(); };
@@ -674,7 +718,7 @@ function openJump() {
 }
 const encode = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 function openBackup() {
-  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px">${TRK ? `<section class="trk"><h4><bdi dir="ltr">Trakt</bdi></h4><p>حلقات المسلسلات و«سأشاهده» تتزامن بالاتجاهين مع حسابك في Trakt، ولو كانت الصفحة مغلقة.</p><div id="trk">${trkHTML()}</div></section><section class="trk"><h4><bdi dir="ltr">Letterboxd</bdi></h4><p>أفلام هذا الدليل مع قائمة أفلامي و<bdi dir="ltr">Letterboxd</bdi>: ما تسجّله في يومياتك هناك أو تعلّمه في قائمة أفلامي يصل هنا، وما تعلّمه هنا يصل قائمة أفلامي ويدخل ملف الاستيراد إلى <bdi dir="ltr">Letterboxd</bdi>.</p><div id="lbn">${lbnHTML()}</div></section><h4>أجهزتك</h4>` : ''}<p>فعّل المزامنة ليصل سجلك إلى كل أجهزتك تلقائياً، في لحظته.</p>
+  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px">${TRK ? `<section class="trk"><h4><bdi dir="ltr">Trakt</bdi></h4><p>حلقات المسلسلات و«سأشاهده» تتزامن بالاتجاهين مع حسابك في Trakt، ولو كانت الصفحة مغلقة.</p><div id="trk">${trkHTML()}</div></section><section class="trk"><h4><bdi dir="ltr">Letterboxd</bdi></h4><p>أفلام هذا الدليل مع قائمة أفلامي و<bdi dir="ltr">Letterboxd</bdi>: ما تسجّله في يومياتك هناك أو تعلّمه في قائمة أفلامي يصل هنا، وما تعلّمه هنا يصل قائمة أفلامي ويدخل ملف الاستيراد إلى <bdi dir="ltr">Letterboxd</bdi>.</p><div id="lbn">${lbnHTML()}</div></section><h4>أجهزتك</h4>` : ''}${G.id === 'fate' ? `<section class="trk"><h4>حساباتك في الأنمي</h4><p>حال أعمال هذا الدليل وحلقاتها مع <bdi dir="ltr">MyAnimeList</bdi> و<bdi dir="ltr">SIMKL</bdi> و«أنمياتي»: ما تعلّمه هنا يصلها، وما يتغيّر هناك يصل هنا. والدليل يتقدّم ولا يرجع: لا يزيل عملاً من حسابك ولا يمسّ تقييمك.</p><div id="anis">${aniHTML()}</div></section><h4>أجهزتك</h4>` : ''}<p>فعّل المزامنة ليصل سجلك إلى كل أجهزتك تلقائياً، في لحظته.</p>
     <div class="actions"><button data-sync-open><span data-sync-label>${syncLabel()}</span></button></div>
     <h4>نسخة يدوية</h4><p>الكود التالي هو سجلك كاملاً. احتفظ به نسخةً احتياطية، أو الصقه في جهاز آخر لاسترجاع السجل.</p>
     <textarea id="bk" aria-label="كود السجل">${encode(store)}</textarea>
@@ -789,6 +833,7 @@ document.addEventListener('click', ev => {
     case 'trk-link': trkGo(); break;
     case 'trk-sync': accSync({ force: true }); break;
     case 'lbn-go': location.href = '../films/#letterboxd'; break;
+    case 'ani-go': location.href = '../anime/#import'; break;
     case 'trk-unlink': accUnlink('trakt').then(() => { TK.msg = 'فُصل Trakt: لا تتزامن المسلسلات معه بعد الآن.'; drawTrk(); }, e => { TK.msg = esc(e.message); drawTrk(); }); break;
     case 'guide': openGuide(); break;
     case 'tonight': if (ui.sheet) closeSheet(); setTimeout(SG ? pickGo : tonight, 60); break;

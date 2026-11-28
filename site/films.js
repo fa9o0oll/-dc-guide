@@ -17,6 +17,12 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const GENRES = { 28: 'أكشن', 12: 'مغامرة', 16: 'رسوم متحركة', 35: 'كوميديا', 80: 'جريمة', 99: 'وثائقي', 18: 'دراما', 10751: 'عائلي', 14: 'فانتازيا', 36: 'تاريخي', 27: 'رعب', 10402: 'موسيقي', 9648: 'غموض', 10749: 'رومانسي', 878: 'خيال علمي', 10770: 'فيلم تلفزيوني', 53: 'إثارة', 10752: 'حربي', 37: 'ويسترن', 10759: 'أكشن ومغامرة', 10765: 'خيال علمي وفانتازيا', 10768: 'حرب وسياسة', 10762: 'أطفال', 10764: 'واقع' };
 const LANGS = { en: 'الإنجليزية', ko: 'الكورية', ja: 'اليابانية', fr: 'الفرنسية', es: 'الإسبانية', it: 'الإيطالية', de: 'الألمانية', hi: 'الهندية', da: 'الدنماركية', pt: 'البرتغالية', zh: 'الصينية', cn: 'الكانتونية', sv: 'السويدية', ar: 'العربية', te: 'التيلوغو', id: 'الإندونيسية', ru: 'الروسية', tr: 'التركية', fa: 'الفارسية', no: 'النرويجية', nl: 'الهولندية', pl: 'البولندية', th: 'التايلندية' };
+// تقييم الجمهور (E93): IMDb حيّاً من ملفاتها الرسمية اليومية إن كان له 20 صوتاً فأكثر، وإلا TMDB. وآراء النقاد من Rotten Tomatoes (بنسبته)
+// وMetacritic (من 100) عبر OMDb، وما لا رقم له لا يُكتب. D.rate من ratings.json: { رقم IMDb: [تقييم IMDb, أصواته, Rotten Tomatoes, Metacritic] }
+const RX = f => f?.imdb && D.rate?.[f.imdb];
+const aud = f => { const x = RX(f); return x && x[0] != null && x[1] >= 20 ? { v: x[0], n: x[1], name: 'IMDb' } : f?.rating ? { v: f.rating, n: f.votes || 0, name: 'TMDB' } : null; };
+const audSort = f => { const r = aud(f); return r && r.n >= 50 ? r.v : 0; };
+const critF = f => { const x = RX(f); return x ? [x[2] != null ? `<span class="rate">نقاد <bdi dir="ltr">Rotten Tomatoes ${x[2]}%</bdi></span>` : '', x[3] != null ? `<span class="rate">نقاد <bdi dir="ltr">Metacritic ${x[3]}</bdi></span>` : ''] : []; };
 const XKIND = { tv: 'مسلسل', anime: 'أنمي', game: 'لعبة', short: 'فيلم قصير', book: 'كتاب', film: 'فيلم', comic: 'قصص مصورة' };
 const ic = n => `<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -72,7 +78,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <div class="chips" id="chips"></div></nav>
 <p class="count" id="count" aria-live="polite"></p>
 <main><div class="grid" id="grid"><p class="load">تُحمَّل القائمة…</p></div><div class="series" id="series" hidden></div></main>
-<footer class="foot"><p>البوسترات وبيانات الأفلام من <a href="https://www.themoviedb.org/" target="_blank" rel="noopener"><bdi dir="ltr">TMDB</bdi></a>، وبيانات أماكن العرض من <a href="https://www.justwatch.com/" target="_blank" rel="noopener"><bdi dir="ltr">JustWatch</bdi></a>. <a class="tmdb-logo" href="https://www.themoviedb.org/" target="_blank" rel="noopener" aria-label="TMDB"><img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg" alt="TMDB" loading="lazy" decoding="async"></a> <bdi dir="ltr">This product uses the TMDB API but is not endorsed or certified by TMDB.</bdi></p>
+<footer class="foot"><p>البوسترات وبيانات الأفلام من <a href="https://www.themoviedb.org/" target="_blank" rel="noopener"><bdi dir="ltr">TMDB</bdi></a>، وبيانات أماكن العرض من <a href="https://www.justwatch.com/" target="_blank" rel="noopener"><bdi dir="ltr">JustWatch</bdi></a>. <a class="tmdb-logo" href="https://www.themoviedb.org/" target="_blank" rel="noopener" aria-label="TMDB"><img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg" alt="TMDB" loading="lazy" decoding="async"></a> <bdi dir="ltr">This product uses the TMDB API but is not endorsed or certified by TMDB.</bdi> تقييمات الجمهور من <a href="https://www.imdb.com/" target="_blank" rel="noopener"><bdi dir="ltr">IMDb</bdi></a> (<bdi dir="ltr">Information courtesy of IMDb (https://www.imdb.com). Used with permission.</bdi>)، وآراء النقاد من <bdi dir="ltr">Rotten Tomatoes</bdi> و<bdi dir="ltr">Metacritic</bdi> عبر <a href="https://www.omdbapi.com/" target="_blank" rel="noopener"><bdi dir="ltr">OMDb</bdi></a>.</p>
   <p><button class="syncb" data-sync-open><span data-sync-label></span></button></p></footer>
 <dialog id="sheet" aria-label="بطاقة الفيلم"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><button class="close sback" data-act="sback" aria-label="رجوع إلى البطاقة السابقة" hidden>${ic('back')}</button><div class="scroll" id="sheet-body"></div></dialog>
 <dialog id="add" aria-labelledby="add-h"><button class="close" data-act="close-add" aria-label="إغلاق">${ic('x')}</button>
@@ -119,7 +125,7 @@ function retag() { for (const f of D.films) { const el = document.querySelector(
 function card(f) { const s = st(f.id);
   return `<article class="tk${s ? ' ' + s : ''}" id="f-${f.id}" data-id="${f.id}"${marks(f.id, f.adult)}>
 <button class="poster${hid(f) ? ' x18' : ''}" data-act="open" ${f.poster && !hid(f) ? `data-zoom-pinch data-zoom-title="${esc(f.title)}" ` : ''}aria-label="افتح بطاقة ${esc(f.title)}">${poster(f.poster, '(max-width:520px) 45vw, 180px', hid(f)) || slate(f)}${tagOf(f)}${marquee(f)}<span class="stamp" aria-hidden="true">شوهد</span></button>
-<div class="stub"><h3>${esc(f.title)}</h3><p class="meta">${f.year ? `<bdi>${f.year}</bdi>` : '<span>بلا موعد</span>'}${f.rating ? `<span class="rate"><bdi dir="ltr">${f.rating.toFixed(1)}</bdi></span>` : ''}${f.runtime ? `<span>${rt(f.runtime)}</span>` : f.seasons ? `<span>${count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم'])}</span>` : ''}</p>
+<div class="stub"><h3>${esc(f.title)}</h3><p class="meta">${f.year ? `<bdi>${f.year}</bdi>` : '<span>بلا موعد</span>'}${aud(f) ? `<span class="rate"><bdi dir="ltr">${aud(f).v.toFixed(1)}</bdi></span>` : ''}${f.runtime ? `<span>${rt(f.runtime)}</span>` : f.seasons ? `<span>${count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم'])}</span>` : ''}</p>
 <button class="seen" data-act="seen" aria-pressed="${s === 'watched'}" aria-label="شاهدته: ${esc(f.title)}">${ic('check')}</button><div class="where">${whereHTML(f)}</div></div></article>`; }
 
 // ---------- التصفية والترتيب ----------
@@ -127,7 +133,7 @@ function card(f) { const s = st(f.id);
 const listKey = f => f._lk ??= (() => { const g = groupOf(f), i = g ? g.order.findIndex(s => isHere(f, s)) : -1; if (i < 0 || g.order.length < 2) return [f.ord, 0];
   return [Math.min(...g.order.map(listedOf).filter(Boolean).map(m => m.ord)), i]; })();
 const SORTS = { list: ['ترتيب قائمتي', (a, b) => { const x = listKey(a), y = listKey(b); return x[0] - y[0] || x[1] - y[1] || a.ord - b.ord; }], new: ['الأحدث صدوراً', (a, b) => (b.date || '0').localeCompare(a.date || '0')], old: ['الأقدم صدوراً', (a, b) => (a.date || '9').localeCompare(b.date || '9')],
-  rate: ['الأعلى تقييماً', (a, b) => (b.votes >= 50 ? b.rating || 0 : 0) - (a.votes >= 50 ? a.rating || 0 : 0)], short: ['الأقصر مدة', (a, b) => (a.runtime || 9999) - (b.runtime || 9999)], az: ['أبجدياً', (a, b) => a.title.localeCompare(b.title, 'en')] };
+  rate: ['الأعلى تقييماً', (a, b) => audSort(b) - audSort(a)], short: ['الأقصر مدة', (a, b) => (a.runtime || 9999) - (b.runtime || 9999)], az: ['أبجدياً', (a, b) => a.title.localeCompare(b.title, 'en')] };
 const hay = f => f._h ??= ' ' + fold([f.title, f.orig, f.year, ...(D.more?.[f.id]?.directors || []), D.more?.[f.id]?.titleAr, f.col && D.cols[f.col]?.name, D.fr[D.frOf.get(f.id)]?.name, ...worldIds(f.id).map(id => D.worlds[id].name)].filter(Boolean).join(' '));
 // البحث في القائمة: كل كلمة مكتوبة جزء من بيانات الفيلم (بعد توحيد الهمزات والتاء المربوطة وعلامات الترقيم)، وإن لم يطابق
 // المكتوب أي فيلم حرفياً تظهر الأقرب إليه بالصوت أو الإملاء (site/find.js) ومعها «هل تقصد…؟»
@@ -192,7 +198,7 @@ function reroll(first) { const ok = f => tonightOk(f) && f.id !== tonightId, ms 
   let best = 0; if (ms.length) { for (const f of pool) best = Math.max(best, fits(f.genres, ms)); if (best) pool = pool.filter(f => fits(f.genres, ms) === best); }
   const hint = $('#mood-hint'); hint.hidden = ms.length < 2;
   const box = $('#tonight'); if (!pool.length) { if (ms.length >= 2) hint.textContent = 'لا فيلم في قائمتك من هذه الأنواع.'; if (first || !tonightId) box.hidden = true; return; }
-  const next = pool.filter(f => st(f.id) === 'next'), strong = pool.filter(f => f.rating >= 7 && f.votes >= 500);
+  const next = pool.filter(f => st(f.id) === 'next'), strong = pool.filter(f => (aud(f)?.v || 0) >= 7 && (aud(f)?.n || 0) >= 500);
   const from = first && next.length ? next : strong.length >= 5 ? strong : pool, f = from[Math.floor(Math.random() * from.length)];
   // وأقرب ما وُجد حين لا فيلم يجمعها كلها: يقال ما فيه منها وما ليس فيه بأسمائها (E76)
   if (ms.length >= 2) { const has = ms.filter(g => f.genres.includes(g)), miss = ms.filter(g => !has.includes(g));
@@ -200,7 +206,7 @@ function reroll(first) { const ok = f => tonightOk(f) && f.id !== tonightId, ms 
   tonightId = f.id; box.hidden = false; $('h2', box).textContent = f.title;
   // أنواع المزاج المختارة أولاً (فيظهر ما جمعه الفيلم منها)، ثم غيرها حتى نوعين، وثلاثة إن جمع ثلاثة مما اخترت
   const hit = f.genres.filter(g => moods.includes(String(g))), gs = [...hit, ...f.genres.filter(g => !moods.includes(String(g)))].filter(g => GENRES[g]).slice(0, Math.min(3, Math.max(2, hit.length)));
-  $('.meta', box).textContent = [f.year, rt(f.runtime), gs.map(g => GENRES[g]).join('، '), f.rating ? `التقييم ${f.rating.toFixed(1)}` : ''].filter(Boolean).join(' · ');
+  $('.meta', box).textContent = [f.year, rt(f.runtime), gs.map(g => GENRES[g]).join('، '), aud(f) ? `تقييم ${aud(f).name} ${aud(f).v.toFixed(1)}` : ''].filter(Boolean).join(' · ');
   tonightBd();
   if (!first) { box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap'); } }
 
@@ -416,7 +422,7 @@ async function sheetHTML(f, pv = null) { await Promise.race([D.worldsReady, new 
   return `<div class="sh-hero">${f.backdrop && !(f.adult && covered(f.id)) ? `<img alt="" src="${IMG}w780${f.backdrop}" srcset="${IMG}w780${f.backdrop} 780w, ${IMG}w1280${f.backdrop} 1280w" sizes="(max-width:880px) 100vw, 880px">` : ''}</div>
 <div class="sh-head">${hid(f) ? `<button type="button" class="poster x18" data-act="bare" data-id="${f.id}" aria-label="أظهر صورة ${esc(f.title)}">${poster(f.poster, '170px', true, 'اضغط لإظهارها')}</button>`
   : f.poster ? `<button type="button" class="poster" data-zoom="" data-zoom-title="${esc(f.title)}" aria-label="تكبير بوستر ${esc(f.title)}">${poster(f.poster, '170px')}</button>` : `<div class="poster">${slate(f)}</div>`}<div class="txt"><h2>${esc(f.title)}</h2>${f.orig ? `<p class="orig">${esc(f.orig)}</p>` : ''}
-<p class="facts">${[f.kind === 'tv' ? 'مسلسل' : '', f.year ? `<bdi>${f.year}</bdi>` : '', rt(f.runtime), f.seasons ? count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم']) : '', f.cert ? `<bdi dir="ltr">${esc(f.cert)}</bdi>` : '', LANGS[f.lang] ? 'اللغة ' + LANGS[f.lang] : '', f.rating ? `<span class="rate">تقييم <bdi dir="ltr">TMDB ${f.rating.toFixed(1)}</bdi></span>` : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</p>
+<p class="facts">${[f.kind === 'tv' ? 'مسلسل' : '', f.year ? `<bdi>${f.year}</bdi>` : '', rt(f.runtime), f.seasons ? count(f.seasons, ['موسم واحد', 'موسمان', 'مواسم', 'موسماً', 'موسم']) : '', f.cert ? `<bdi dir="ltr">${esc(f.cert)}</bdi>` : '', LANGS[f.lang] ? 'اللغة ' + LANGS[f.lang] : '', aud(f) ? `<span class="rate">تقييم <bdi dir="ltr">${aud(f).name} ${aud(f).v.toFixed(1)}</bdi></span>` : '', ...critF(f)].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</p>
 <div class="tags">${f.genres.map(g => GENRES[g] ? `<span>${GENRES[g]}</span>` : '').join('')}</div></div></div>
 <div id="chslot" data-k="${keyOf(f)}">${chainHTML(f)}</div>${pv ? `<div class="sh-acts"><button class="btn pri" data-act="preview-add" data-tmdb="${f.tmdb}" data-kind="${f.kind}">${ic('plus')}أضفه إلى قائمتي</button></div>
 <section class="sec"><p class="ask">ليس في قائمتك. هذه بطاقة للاطلاع، ومعلوماتها آلية من <bdi dir="ltr">TMDB</bdi>.</p></section>`
@@ -673,8 +679,8 @@ let qt; $('#q').addEventListener('input', e => { clearTimeout(qt); qt = setTimeo
 // ---------- الإقلاع ----------
 const liftVeil = () => { const v = $('#veil'); if (!v || v.hidden) return; requestAnimationFrame(() => requestAnimationFrame(() => { v.classList.add('lift'); setTimeout(() => v.remove(), calm ? 0 : 900); })); };
 try {
-  const [films, prov, cols, fr] = await Promise.all([get('films.json'), get('providers.json'), get('collections.json'), get('franchises.json').catch(() => ({}))]);
-  D.prov = prov; D.cols = cols; D.fr = fr.items || {}; D.fx = fr.extras || {}; for (const f of films.films) register(f);
+  const [films, prov, cols, fr, rate] = await Promise.all([get('films.json'), get('providers.json'), get('collections.json'), get('franchises.json').catch(() => ({})), get('ratings.json').catch(() => ({}))]);
+  D.prov = prov; D.cols = cols; D.fr = fr.items || {}; D.fx = fr.extras || {}; D.rate = rate.r || {}; for (const f of films.films) register(f);
   for (const c of Object.values(cols)) for (const p of c.parts) D.part.set(p.tmdb, p);
   for (const [k, g] of Object.entries(D.fr)) for (const st of g.order) { const id = st.m ? 'm' + st.m : st.t ? 't' + st.t : null; if (id) { D.frOf.set(id, k); D.recOf.set(id, st.rec); } }
   D.moreReady = get('more.json').then(m => { D.more = { ...m, ...(D.more || {}) }; for (const f of D.films) delete f._h; return D.more; }).catch(() => (D.more ||= {}));

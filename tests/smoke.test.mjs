@@ -33,7 +33,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   // الواجهة الرئيسية
   await page.goto(base + '/'); await page.waitForSelector('.door');
   check('الواجهة: خمسة أبواب بروابطها', await page.locator('a.door').count() === 5 && await page.getAttribute('.door.dc', 'href') === 'dc/' && await page.getAttribute('.door.marvel', 'href') === 'marvel/' && (await page.getAttribute('.door.anime', 'href')) === 'anime/' && (await page.getAttribute('.door.films', 'href')) === 'films/' && (await page.getAttribute('.door.games', 'href')) === 'games/');
-  await page.waitForFunction(() => /\d/.test(document.querySelector('.door.dc [data-stat]').textContent)); check('الواجهة: عدد أعمال كل دليل ظاهر', /196/.test(await page.textContent('.door.dc [data-stat]')));
+  await page.waitForFunction(() => /\d/.test(document.querySelector('.door.dc [data-stat]').textContent)); check('الواجهة: عدد أعمال كل دليل ظاهر', new RegExp(String(JSON.parse(fs.readFileSync(path.join(siteDir, 'dc/data/base.json'))).works.length)).test(await page.textContent('.door.dc [data-stat]')));
   await page.waitForFunction(() => /\d/.test(document.querySelector('.door.marvel [data-stat]').textContent)); check('الواجهة: عدد أعمال مارفل ظاهر', (await page.textContent('.door.marvel [data-stat]')).includes(JSON.parse(fs.readFileSync(new URL('../data/marvel/works.json', import.meta.url))).length + ' عملاً'));
   await page.waitForFunction(() => /\d/.test(document.querySelector('.door.anime [data-stat]').textContent)); check('الواجهة: عدد أعمال «أنمياتي» ظاهر', /\d{3,} عمل/.test(await page.textContent('.door.anime [data-stat]')), await page.textContent('.door.anime [data-stat]'));
   await fits('الواجهة');
@@ -153,9 +153,38 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
       info: { m999002: { title: 'Test Film 2', year: 2003, date: '2003-01-01' }, m999004: { title: 'Test Film 4', year: null, date: null } } }) });
     return r.fulfill({ contentType: 'application/json', body: JSON.stringify({ ...(b.action === 'add' ? { state: 'added' } : {}), providers: {}, collection: { id: 999, name: 'Test Saga', parts: [{ tmdb: 999001, title: 'Test Film', year: 1999 }, { tmdb: 999002, title: 'Test Film 2', year: 2003 }] },
       film: { id: 'm999001', tmdb: 999001, kind: 'movie', title: 'Test Film', year: 1999, date: '1999-01-01', genres: [18], rating: 7.1, votes: 10, poster: null, col: 999, prov: null, src: 'added', overviewEn: 'A test.', directors: ['Someone'] } }) }); });
+  // دليل Fate مع MyAnimeList وSIMKL (E92، على الكمبيوتر): ما وصل من حسابك يُعلَّم هنا إلى الأمام، وما تعلّمه هنا يصل الخادم برقمه في MyAnimeList. الخادم مُحاكى
+  if (!mobile) { const FC = [], FZ = P.find(x => x.mal === 10087), UBW = P.find(x => x.mal === 28701), HF = P.find(x => x.mal === 25537); let told = false;
+    const until = async f => { for (let i = 0; i < 80 && !f(); i++) await page.waitForTimeout(100); return !!f(); };
+    await page.route(base + '/api/accounts**', r => { const q = r.request(), path = new URL(q.url()).pathname.replace('/api/accounts', ''), b = JSON.parse(q.postData() || 'null');
+      const J = o => r.fulfill({ contentType: 'application/json', body: JSON.stringify(o) }), links = { mal: { on: true, at: Date.now() }, simkl: { on: true, at: Date.now() } }; FC.push([path || '/', b]);
+      if (!path) return J({ links }); if (path !== '/sync') return J({});
+      const ch = told ? [] : [{ id: FZ.mal, s: 'completed', p: 13, r: 9, src: 'mal' }, { id: UBW.mal, s: 'watching', p: 4, r: 0, src: 'simkl' }, { id: HF.mal, s: null, src: 'site' }]; told = true; return J({ rev: 7, changes: ch, links }); });
+    await page.goto(base + '/fate/'); await page.evaluate(() => { localStorage.setItem('animeg.pass', 'pw-fate'); ['fateg.progress', 'accounts.rev', 'accounts.full', 'accounts.q', 'accounts.on'].forEach(k => localStorage.removeItem(k)); });
+    await page.reload(); await page.waitForSelector('.card');
+    await page.waitForFunction(k => JSON.parse(localStorage.getItem('fateg.progress') || '{"works":{}}').works?.[k] === 'watched', FZ.work + '#1', { timeout: 8000 }).catch(() => {});
+    const st = await page.evaluate(() => JSON.parse(localStorage.getItem('fateg.progress') || '{}')), eps = (w, s) => Object.keys(st.eps?.[w] || {}).filter(k => k.startsWith(s + '-')).length;
+    check('Fate: ما ختمته في حسابك يصير «شاهدته» بحلقاته كلها، وما بدأته «أشاهده» بأول حلقاته، وإزالة من حسابك لعمل بلا حال هنا لا تفعل شيئاً (E92)',
+      st.works?.[FZ.work + '#1'] === 'watched' && eps(FZ.work, 1) === 13 && st.works?.[UBW.work + '#2'] === 'watching' && eps(UBW.work, 2) === 4 && !st.works?.[HF.work], st);
+    const boot = FC.find(c => c[0] === '/sync' && c[1]?.full);
+    check('Fate: والدليل يرسل سجلّه أول مرة، ولا يعيد إلى الخادم ما وصله منه', !!boot && boot[1].guide === 'fate' && !FC.some(c => c[1]?.edits?.some(e => e.id === FZ.mal || e.id === UBW.mal)), FC.map(c => [c[0], c[1]?.guide, c[1]?.edits]));
+    await page.evaluate(k => document.querySelector(`.card[data-k="${k}"] [data-act=status][data-s=watched]`).click(), HF.work);
+    check('Fate: «شاهدته» على فيلم يصل الخادم بعد ثوانٍ برقمه في MyAnimeList مختوماً', await until(() => FC.some(c => c[0] === '/sync' && c[1]?.edits?.some(e => e.id === HF.mal && e.s === 'completed' && e.p === 1))), FC.map(c => c[1]?.edits).filter(Boolean));
+    await tap('[data-act=backup]'); await page.waitForSelector('#anis');
+    check('Fate: و«سجلّي» فيه حساباتك في الأنمي: الحسابان مربوطان، وزر إلى «أنمياتي»', /MyAnimeList: مربوط ✓/.test(await page.textContent('#anis')) && await page.locator('#anis [data-act=ani-go]').count() === 1, await page.textContent('#anis'));
+    await page.keyboard.press('Escape'); await page.unroute(base + '/api/accounts**');
+    await page.evaluate(() => ['animeg.pass', 'fateg.progress', 'accounts.rev', 'accounts.full', 'accounts.q', 'accounts.on'].forEach(k => localStorage.removeItem(k))); }
   await page.goto(base + '/films/'); await page.waitForSelector('.tk'); await page.evaluate(() => { try { ['filmsg.progress', 'filmsg.pending', 'filmsg.pass'].forEach(k => localStorage.removeItem(k)); } catch {} }); await page.reload(); await page.waitForSelector('.tk');
   check(`الأفلام: ${FL.length} تذكرة والعنوان صحيح`, await page.locator('.tk').count() === FL.length && await page.title() === 'قائمة أفلامي' && await page.getAttribute('.top .home', 'href') === '../');
   await fits('الأفلام: الشبكة');
+  // التقييمات الحية (E93، على الكمبيوتر): تذكرة الفيلم بتقييم IMDb من ملفاتها اليومية، وبطاقته به وبآراء النقاد؛ وما لا رقم له في IMDb على TMDB
+  if (!mobile) { const RR = /\/films\/data\/ratings\.json/, F1 = FL.find(f => f.imdb && f.rating && f.kind === 'movie'), F2 = FL.find(f => f.imdb && f.rating && f !== F1 && f.kind === 'movie');
+    await page.route(RR, r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ at: '2026-11-28', r: { [F1.imdb]: [8.7, 123456, 91, 77] } }) })); await page.reload(); await page.waitForSelector('.tk');
+    const tk = id => page.evaluate(i => document.querySelector(`#f-${i} .rate bdi`)?.textContent || '', id), t1 = await tk(F1.id), t2 = await tk(F2.id);
+    await tap(`#f-${F1.id} .poster`); await page.waitForSelector('#sheet[open] .sh-head'); const facts = await page.evaluate(() => [...document.querySelectorAll('#sheet .facts .rate')].map(x => x.textContent.trim()));
+    check('الأفلام: التذكرة بتقييم IMDb (8.7)، وبطاقته به وبآراء النقاد Rotten Tomatoes 91% وMetacritic 77، وما لا رقم له في IMDb على TMDB (E93)',
+      t1 === '8.7' && t2 === F2.rating.toFixed(1) && facts.length === 3 && /IMDb 8\.7/.test(facts[0]) && /Rotten Tomatoes 91%/.test(facts[1]) && /Metacritic 77/.test(facts[2]), [t1, t2, F2.rating, facts]);
+    await page.keyboard.press('Escape'); await page.waitForTimeout(300); await page.unroute(RR); await page.reload(); await page.waitForSelector('.tk'); }
   // «مزاج السهرة» بأكثر من نوع (E62): لمسة تضيف ولمسة ترفع، ويُقدَّم ما يجمعها ويقال ذلك، ويُحفظ الاختيار
   { const gs = await page.$$eval('#mood .chip', c => c.map(x => x.dataset.g)), mood = () => page.evaluate(() => { const on = [...document.querySelectorAll('#mood .chip[aria-pressed=true]')], h = document.querySelector('#mood-hint');
       return { on: on.map(x => x.dataset.g).join(), names: on.map(x => x.firstChild.textContent), hint: h.hidden ? '' : h.textContent, meta: document.querySelector('#tonight .meta').textContent, saved: localStorage.getItem('films.mood') || '' }; });

@@ -54,6 +54,8 @@ export default async req => {
         if (g === 'dc' || g === 'marvel') { const sv = body.since && typeof body.since === 'object' ? body.since : { s: +body.since || 0, f: 0 };
           const R = await syncSeries(S, { guide: g, edits, full, known, build, since: +sv.s || 0, deadline: dl }), F = await syncFilms(S, { guide: g, edits, full, since: +sv.f || 0, pull: true, fresh: 120e3 });
           return json(200, { rev: { s: R.rev, f: F.rev }, changes: [...R.changes, ...F.changes], needAll: !!R.needAll, needKnown: !!R.needKnown, links: await linksOf(S) }); }
+        // دليل Fate (E92): مع محور الأنمي نفسه، يتقدّم ولا يزيل، ولا تُسحب الحسابات منه أكثر من مرة كل دقيقتين
+        if (g === 'fate') return json(200, { ...await syncAnime(S, { guide: 'fate', edits, full, since: +body.since || 0, pull: true, fresh: 120e3, budget: 15, deadline: dl }), links: await linksOf(S) });
         const r = await syncAnime(S, { edits, full, eps: body.eps || null, build, since: +body.since || 0, pull: true, budget: 15, deadline: dl });
         return json(200, { ...r, links: await linksOf(S) }); }
       finally { await S.unlock(); } }
