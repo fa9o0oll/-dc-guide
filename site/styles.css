@@ -265,6 +265,7 @@ main:focus{outline:none}
 .sheet-head{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--hair)}
 .sheet-head h2{flex:1;font-size:1.05rem;font-weight:600;min-width:0}
 .close{flex:none;width:44px;height:44px;padding:0;border-radius:50%}
+.sheet-head .sback{display:inline-grid;place-items:center;order:1}.sheet-head .sback[hidden]{display:none}.sheet-head [data-act=close]{order:2}   /* زر الرجوع إلى البطاقة السابقة بجانب × (E89)، وفي الصفحة بعده فيبقى × أول .close */
 .sheet-body{overflow-y:auto;overflow-x:hidden;padding:0 0 calc(24px + env(safe-area-inset-bottom));flex:1;overscroll-behavior:contain}
 .hero{position:relative;aspect-ratio:16/9;background:#161c2a;max-height:min(320px,36dvh);width:100%;overflow:hidden}
 .hero img{width:100%;height:100%;object-fit:cover}
@@ -709,3 +710,5 @@ img.in{opacity:1}
 @media (hover:hover){a:hover>.pdoor,.gate:hover .pdoor{transform:scale(1.1);box-shadow:0 0 18px -2px var(--pd-glow)}}
 /* الرجوع: البوابة الصغيرة تتسع حتى تملأ الشاشة (portal.js) */
 .pexit{position:fixed;inset:0;z-index:500;transform-origin:0 0;pointer-events:none;will-change:transform}
+/* شعار TMDB المعتمد بجانب إشعاره، كما تشترط شروط واجهته: أصغر من هوية الموقع، بلا تغيير في لونه ولا نسبته */
+.tmdb-logo{display:inline-block;vertical-align:middle;margin-inline-end:4px;line-height:0}.tmdb-logo img{height:11px;width:auto;display:block}

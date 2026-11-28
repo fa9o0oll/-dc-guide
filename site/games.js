@@ -13,6 +13,7 @@ import { ar } from './bidi.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__';
 import './rail.js?v=__BUILD__'; // الشرائط الأفقية: السحب بالماوس والسهمان على طرفيها
 import { posMap, ord } from './pos.js?v=__BUILD__'; // خريطة «موقعها من سلسلتها» والعدد الترتيبي
+import { cardStack } from './stack.js?v=__BUILD__'; // البطاقة المفتوحة من بطاقة خطوة فوقها، والرجوع إلى التي قبلها (E89)
 import { isOpen, setOpen, hides, covered, uncover, marks, markEl, showing, setShowing, drawEye, eyeBtn, cover, dockEye } from './adult.js?v=__BUILD__'; // فلتر +18 (E65)
 const BUILD = '__BUILD__', KEY = 'gamesg.progress', PEND = 'gamesg.pending', PASS = 'gamesg.pass', IGN = 'gamesg.ignored', STEAM = 'gamesg.steam', REM = 'gamesg.removed', ASK = 'gamesg.asked';
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -70,7 +71,7 @@ const ic = n => `<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`
 const listBtn = k => `${ic(LISTS[k].ic)}<span><b>${LISTS[k].act}</b><small>في «${LISTS[k].t}»</small></span>`;
 const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
-<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
 <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" stroke-width="1.4" d="M8 5.5v13l10.5-6.5z"/></symbol>
 <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 4l2.4 5 5.4.6-4 3.7 1.1 5.4L12 16l-4.9 2.7 1.1-5.4-4-3.7 5.4-.6z"/></symbol>
 <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7.5 4h9v5a4.5 4.5 0 01-9 0zM7.5 6H5v1.5a3 3 0 003 3M16.5 6H19v1.5a3 3 0 01-3 3M12 13.5v4M8.5 20h7"/></symbol>
@@ -125,7 +126,7 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
 <main><div class="grid" id="grid"><p class="load">تُحمَّل القائمة…</p></div><div class="series" id="series" hidden></div></main>
 <footer class="foot"><p>معلومات الألعاب وأغلفتها من <a href="https://www.igdb.com/" target="_blank" rel="noopener"><bdi dir="ltr">IGDB.com</bdi></a>، والعوالم والاقتباسات والأسماء العربية من <a href="https://www.wikidata.org/" target="_blank" rel="noopener"><bdi dir="ltr">Wikidata</bdi></a>.</p>
   <p><button class="syncb" data-sync-open><span data-sync-label></span></button></p></footer>
-<dialog id="sheet" aria-label="بطاقة اللعبة"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="sheet-body"></div></dialog>
+<dialog id="sheet" aria-label="بطاقة اللعبة"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><button class="close sback" data-act="sback" aria-label="رجوع إلى البطاقة السابقة" hidden>${ic('back')}</button><div class="scroll" id="sheet-body"></div></dialog>
 <dialog id="add" aria-labelledby="add-h"><button class="close" data-act="close-add" aria-label="إغلاق">${ic('x')}</button>
   <form id="add-form"><h2 id="add-h">أضف لعبة</h2>
   <label for="add-q">اسم اللعبة، بالعربي أو بالإنجليزي (والسنة إن أردت)</label>
@@ -541,17 +542,27 @@ function placeSec(g) { const p = g.place; if (!p || !PK[p.k]) return '';
   const src = p.src === 'igdb' ? `<p class="note">عن وصفها الرسمي في <bdi dir="ltr">IGDB</bdi>.</p>` : Array.isArray(p.src) ? `<p class="note">المصدر: ${p.src.map(x => ext(x.name, x.url)).join('، ')}.</p>` : '';
   return `<section class="sec place k-${p.k}"><h3>موقعها من أحداث عالمها</h3><div class="pl-card"><p class="pl-k"><i aria-hidden="true"></i>${PK[p.k]}</p><p class="pl-line">${ar(p.line)}</p>${track}${facts ? `<p class="pl-facts">${facts}</p>` : ''}${src}</div></section>`; }
 const filmsReady = () => D.filmsReady ??= fetch(`../films/data/films.json?v=${BUILD}`).then(r => r.ok ? r.json() : { films: [] }).then(j => { D.films = new Set((j.films || []).map(f => f.id)); }).catch(() => { D.films = new Set(); });
-async function openGame(id, push = true) { const g = D.byId.get(+id); if (!g) return; openId = g.id; pvOpen = 0; markEl($('#sheet-body'), g.id, g.adult); $('#sheet-body').innerHTML = await sheetHTML(g); $('#sheet-body').scrollTop = 0; showSheet(push ? { game: g.id } : null, '#g' + g.id); }
-function showSheet(state, hash) { if (!sheet.open) { showM(sheet); $('#sheet-body').scrollTop = 0;   // بعد العرض: المتصفح يعيد للنافذة موضع تمرير البطاقة السابقة حين تُعرض، وتصفيره وهي مخفية لا يؤثر
+async function openGame(id, push = true) { const g = D.byId.get(+id); if (!g) return; const from = push && sheet.open ? GS.leave() : null; if (push && sheet.open && openId === g.id) return;   // البطاقة نفسها
+  openId = g.id; pvOpen = 0; markEl($('#sheet-body'), g.id, g.adult); $('#sheet-body').innerHTML = await sheetHTML(g); $('#sheet-body').scrollTop = 0; showSheet(push ? { game: g.id } : null, '#g' + g.id, from);
+  if (!push && !GS.depth()) GS.swap({ game: g.id }, '#g' + g.id); }   // من رابط مباشر: أول بطاقة في الستاك
+// إغلاق جارٍ تلغيه بطاقة تُفتح قبل أن ينتهي (وإلا أغلقها مؤقّته الاحتياطي بعد أن فُتحت)
+let closeTok = 0, closeAnim = null;
+function showSheet(state, hash, from) { closeTok++; if (closeAnim) { closeAnim.cancel(); closeAnim = null; } delete sheet.dataset.out;
+  if (!sheet.open) { showM(sheet); $('#sheet-body').scrollTop = 0;   // بعد العرض: المتصفح يعيد للنافذة موضع تمرير البطاقة السابقة حين تُعرض، وتصفيره وهي مخفية لا يؤثر
     if (!calm) sheet.animate(innerWidth <= 640 ? { transform: ['translateY(6%)', 'none'], opacity: [0, 1] } : { transform: ['scale(.97)', 'none'], opacity: [0, 1] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
     setTimeout(host, calm ? 0 : 260);   // تنبيه عابر سبق فتح البطاقة (كـ«أُضيفت…») يصعد إليها بعد أن تستقر حركتها
-    if (state) history.pushState(state, '', hash || location.pathname + location.search); } else if (state) history.replaceState(state, '', hash || location.pathname + location.search); }
-const redrawSheet = () => { if (!sheet.open) return; if (openId) openGame(openId, false); else if (pvOpen) peek(pvOpen); };
-function closeGame(fromPop) { if (!sheet.open) return; openId = null; pvOpen = 0; sheet.dataset.out = '1'; const done = () => sheet.close();   // out: تُغلق الآن، فلا يسكنها تنبيه عابر
-  if (calm) done(); else { const a = sheet.animate({ opacity: [1, 0], transform: ['none', innerWidth <= 640 ? 'translateY(5%)' : 'scale(.98)'] }, { duration: 160, easing: 'ease-in' }); a.onfinish = done; setTimeout(done, 300); }
-  if (!fromPop && history.state?.game) history.back(); else if (!fromPop && location.hash) history.replaceState(null, '', location.pathname + location.search); }
-addEventListener('popstate', () => { if (/^#steam/.test(location.hash)) return route(); const m = location.hash.match(/^#g(\d+)$/); if (m && D.byId.has(+m[1])) openGame(+m[1], false); else closeGame(true); });
-sheet.addEventListener('cancel', e => { e.preventDefault(); closeGame(); });
+  } if (state) GS.open(state, hash || location.pathname + location.search, from); else GS.sync(); }
+const redrawSheet = () => { if (!sheet.open) return; if (openId) openGame(openId, false); else if (pvOpen) peek(pvOpen, null, false); };
+// × يغلق البطاقات كلها (الستاك كله)، وfromPop: السجل رجع إلى ما قبلها فتُغلق وحدها
+function closeGame(fromPop) { if (!sheet.open) return; if (!fromPop) return GS.closeAll(); openId = null; pvOpen = 0; sheet.dataset.out = '1'; const tok = ++closeTok, done = () => { if (tok === closeTok && sheet.open) { closeAnim = null; sheet.close(); } };   // out: تُغلق الآن، فلا يسكنها تنبيه عابر
+  if (calm) done(); else { const a = closeAnim = sheet.animate({ opacity: [1, 0], transform: ['none', innerWidth <= 640 ? 'translateY(5%)' : 'scale(.98)'] }, { duration: 160, easing: 'ease-in' }); a.onfinish = done; setTimeout(done, 300); }
+  if (location.hash && /^#g\d+$/.test(location.hash) && !history.state?.game) history.replaceState(null, '', location.pathname + location.search); }
+const GS = cardStack({ key: 'game', body: $('#sheet-body'), btn: $('#sheet .sback'), isOpen: () => sheet.open, close: () => closeGame(true),
+  title: () => $('#sheet-body h2')?.textContent.trim() || '',
+  show: async (s, y) => { if (s.game === 'preview') await peek(s.pv, null, false); else if (D.byId.has(+s.game)) await openGame(+s.game, false); else return closeGame(true); $('#sheet-body').scrollTop = y; } });
+// الرجوع (زر المتصفح وإيماءة الجوال) يعيد البطاقة التي قبلها، وEsc مثله خطوةً خطوة، و× والنقر خارج البطاقة يغلقانها كلها
+addEventListener('popstate', () => { if (/^#steam/.test(location.hash)) return route(); const m = location.hash.match(/^#g(\d+)$/); if (m && !history.state?.game && D.byId.has(+m[1])) return openGame(+m[1], false); GS.pop(); });
+sheet.addEventListener('cancel', e => { e.preventDefault(); GS.back(); });
 sheet.addEventListener('click', e => { if (e.target === sheet) closeGame(); });
 for (const d of [addDlg, accDlg]) d.addEventListener('click', e => { if (e.target === d) d.close(); });
 for (const d of [sheet, addDlg, accDlg, ibDlg]) d.addEventListener('close', () => { delete d.dataset.out; host(); });
@@ -607,7 +618,7 @@ function askList(btn) { const row = btn.closest('.cand'); $$('.cand .pickl').for
   row.querySelector('.pickl [data-v=new]').focus(); }
 async function addGame(igdb, list, btn) { const msg = $('#add-msg'), label = btn?.innerHTML; if (btn) { btn.disabled = true; btn.textContent = 'تُضاف…'; }
   try { const r = await api('/api/add-game', { action: 'add', igdb }); adopt(r.game, r, true); renew(r.game.id); setRec(r.game.id, { s: list, at: today }); keep(r);
-    if (addDlg.open) addDlg.close(); toast(`أُضيفت «${r.game.title}» إلى «${LISTS[list].t}»`); refresh(r.game.id); openGame(r.game.id, !sheet.open);
+    if (addDlg.open) addDlg.close(); toast(`أُضيفت «${r.game.title}» إلى «${LISTS[list].t}»`); refresh(r.game.id); const inPlace = sheet.open; await openGame(r.game.id, !inPlace); if (inPlace) GS.swap({ game: r.game.id, pv: undefined }, '#g' + r.game.id);
   } catch (err) { if (addDlg.open) msg.textContent = err.message; else toast(err.message); if (btn) { btn.disabled = false; btn.innerHTML = label; } } }
 const twinOf = t => { const k = fold(t); return k ? D.games.find(g => ft(g) === k) : null; };
 const twinNote = g => `في مكتبتك لعبة بهذا الاسم${g.year ? ` (<bdi>${g.year}</bdi>)` : ''}`;
@@ -637,11 +648,11 @@ function adopt(g, r, draw) { if (!g || D.pool.has(g.id)) return false; merge(r |
   if (draw && D.byId.has(g.id)) { $('#grid').insertAdjacentHTML('afterbegin', card(g)); $('#chips').innerHTML = chipsHTML(); } return true; }
 // بطاقة اطلاع: اللعبة كاملة من IGDB عبر الخادم دون إضافتها، مرة واحدة لكل لعبة
 const previews = new Map(); let pvOpen = 0;   // بطاقة الاطلاع المفتوحة، ليُعاد رسمها حين يُكشف غلافها
-async function peek(id, btn) { if (D.byId.has(id)) { if (addDlg.open) addDlg.close(); return openGame(id); }
+async function peek(id, btn, push = true) { if (D.byId.has(id)) { if (addDlg.open) addDlg.close(); return openGame(id, push); }
   if (!pass()) return openAdd(btn?.dataset.q || '');
   const label = btn?.innerHTML, busy = btn && btn.matches('.btn'); if (busy) { btn.disabled = true; btn.textContent = 'يجهّز…'; }
-  try { let r = previews.get(id); if (!r) { r = await api('/api/add-game', { action: 'preview', igdb: id }); previews.set(id, r); } merge(r); openId = null;
-    markEl($('#sheet-body'), id, r.game.adult); $('#sheet-body').innerHTML = await sheetHTML(r.game, true); $('#sheet-body').scrollTop = 0; pvOpen = id; showSheet({ game: 'preview' });
+  try { let r = previews.get(id); if (!r) { r = await api('/api/add-game', { action: 'preview', igdb: id }); previews.set(id, r); } merge(r); const from = push && sheet.open ? GS.leave() : null; openId = null;
+    markEl($('#sheet-body'), id, r.game.adult); $('#sheet-body').innerHTML = await sheetHTML(r.game, true); $('#sheet-body').scrollTop = 0; pvOpen = id; showSheet(push ? { game: 'preview', pv: id } : null, location.pathname + location.search, from);
   } catch (err) { if (addDlg.open) $('#add-msg').textContent = err.message; else if (err.pw) openAdd(btn?.dataset.q || ''); else toast(err.message); }
   finally { if (busy) { btn.disabled = false; btn.innerHTML = label; } } }
 
@@ -781,6 +792,7 @@ document.addEventListener('click', e => { if (!qm.hidden && !e.target.closest('#
   else if (act === 'shuffle') { const pool = D.games.filter(g => g.id !== slotId && !g.adult && (g.art || g.cover)); slotId = pool[Math.floor(Math.random() * pool.length)]?.id ?? slotId; renderMenu(true); }
   else if (act === 'mood') { const g = t.dataset.g; moods = !g ? [] : moods.includes(g) ? moods.filter(x => x !== g) : [...moods, g]; store.set('games.mood', moods.join('|')); tonightId = null; pickTonight(true); renderMenu(true); }
   else if (act === 'close') closeGame();
+  else if (act === 'sback') GS.back();   // البطاقة السابقة (E89)
   else if (act === 'close-add') addDlg.close();
   else if (act === 'close-acc') accDlg.close();
   else if (act === 'view') { ui.dup = null; setView(t.dataset.v); }

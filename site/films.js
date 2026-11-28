@@ -2,6 +2,7 @@
 // البيانات تُبنى في scripts/build-films.mjs، وخريطة العوالم في scripts/build-worlds.mjs (Wikidata). سجل المشاهدة يُحفظ في المتصفح بالمفتاح filmsg.progress.
 import { initSync, touch as syncTouch } from './sync.js?v=__BUILD__';
 import { accInit, accMark, accSync, accLink, accUnlink, accLinks, accState, accSetPass, accPass, accSent } from './accounts.js?v=__BUILD__';
+import { cardStack } from './stack.js?v=__BUILD__'; // البطاقة المفتوحة من بطاقة خطوة فوقها، والرجوع إلى التي قبلها (E89)
 import { ar } from './bidi.js?v=__BUILD__';
 import { clock, spoken, left } from './count.js?v=__BUILD__';
 import { miniDoor, portalBack } from './portal.js?v=__BUILD__';
@@ -20,7 +21,7 @@ const XKIND = { tv: 'مسلسل', anime: 'أنمي', game: 'لعبة', short: '�
 const ic = n => `<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-mark" viewBox="0 0 24 24"><path d="M7 4.5h10v15l-5-3.5-5 3.5z"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-mark" viewBox="0 0 24 24"><path d="M7 4.5h10v15l-5-3.5-5 3.5z"/></symbol>
 <symbol id="i-roll" viewBox="0 0 24 24"><path d="M4 7.5h3c2 0 3.2 1.2 4.5 4.5s2.5 4.5 4.5 4.5h4M4 16.5h3c1.1 0 1.9-.4 2.7-1.3M20 7.5h-4c-1.1 0-1.9.4-2.7 1.3M17.5 5L20 7.5 17.5 10M17.5 14l2.5 2.5-2.5 2.5"/></symbol></defs></svg>`;
 
 // عدّ عربي: 1 فيلم واحد، 2 فيلمان، 3 إلى 10 أفلام، 11 فأكثر فيلماً
@@ -71,9 +72,9 @@ document.body.insertAdjacentHTML('beforeend', `${SPRITE}
   <div class="chips" id="chips"></div></nav>
 <p class="count" id="count" aria-live="polite"></p>
 <main><div class="grid" id="grid"><p class="load">تُحمَّل القائمة…</p></div><div class="series" id="series" hidden></div></main>
-<footer class="foot"><p>البوسترات وبيانات الأفلام من <a href="https://www.themoviedb.org/" target="_blank" rel="noopener"><bdi dir="ltr">TMDB</bdi></a>، وبيانات أماكن العرض من <a href="https://www.justwatch.com/" target="_blank" rel="noopener"><bdi dir="ltr">JustWatch</bdi></a>. <bdi dir="ltr">This product uses the TMDB API but is not endorsed or certified by TMDB.</bdi></p>
+<footer class="foot"><p>البوسترات وبيانات الأفلام من <a href="https://www.themoviedb.org/" target="_blank" rel="noopener"><bdi dir="ltr">TMDB</bdi></a>، وبيانات أماكن العرض من <a href="https://www.justwatch.com/" target="_blank" rel="noopener"><bdi dir="ltr">JustWatch</bdi></a>. <a class="tmdb-logo" href="https://www.themoviedb.org/" target="_blank" rel="noopener" aria-label="TMDB"><img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg" alt="TMDB" loading="lazy" decoding="async"></a> <bdi dir="ltr">This product uses the TMDB API but is not endorsed or certified by TMDB.</bdi></p>
   <p><button class="syncb" data-sync-open><span data-sync-label></span></button></p></footer>
-<dialog id="sheet" aria-label="بطاقة الفيلم"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><div class="scroll" id="sheet-body"></div></dialog>
+<dialog id="sheet" aria-label="بطاقة الفيلم"><button class="close" data-act="close" aria-label="إغلاق">${ic('x')}</button><button class="close sback" data-act="sback" aria-label="رجوع إلى البطاقة السابقة" hidden>${ic('back')}</button><div class="scroll" id="sheet-body"></div></dialog>
 <dialog id="add" aria-labelledby="add-h"><button class="close" data-act="close-add" aria-label="إغلاق">${ic('x')}</button>
   <form id="add-form"><h2 id="add-h">أضف فيلماً</h2>
   <label for="add-q">اسم الفيلم أو المسلسل، بالعربي أو بالإنجليزي (والسنة إن أردت)</label>
@@ -425,16 +426,24 @@ ${f.ask ? `<section class="sec"><p class="ask">${esc(f.ask)}</p></section>` : ''
 ${whereSec(f)}<div id="wslot" data-k="${keyOf(f)}">${worldHTML(f)}</div>
 ${(m.directors?.length || m.cast?.length) ? `<section class="sec"><h3>الطاقم</h3><p class="people">${m.directors?.length ? `<b>${f.kind === 'tv' ? 'صنّاع المسلسل' : 'الإخراج'}:</b> <bdi dir="ltr">${m.directors.map(esc).join(', ')}</bdi><br>` : ''}${m.cast?.length ? `<b>التمثيل:</b> <bdi dir="ltr">${m.cast.map(esc).join(', ')}</bdi>` : ''}</p></section>` : ''}
 ${linksSec(f)}`; }
-async function openFilm(id, push = true) { const f = D.byId.get(id); if (!f) return; openId = id; markEl($('#sheet-body'), id, f.adult); $('#sheet-body').innerHTML = await sheetHTML(f); $('#sheet-body').scrollTop = 0; if (f.fresh && !D.wworks[id]?.q) liveWorlds(f);
+async function openFilm(id, push = true) { const f = D.byId.get(id); if (!f) return; if (push && sheet.open && openId === id) return;   // البطاقة نفسها
+  const from = push && sheet.open ? FS.leave() : null; reopen(); openId = id; markEl($('#sheet-body'), id, f.adult); $('#sheet-body').innerHTML = await sheetHTML(f); $('#sheet-body').scrollTop = 0; if (f.fresh && !D.wworks[id]?.q) liveWorlds(f);
   if (!sheet.open) { sheet.showModal(); $('#sheet-body').scrollTop = 0;   // بعد العرض: المتصفح يعيد للنافذة موضع تمرير البطاقة السابقة حين تُعرض، وتصفيره وهي مخفية لا يؤثر
     if (!calm) sheet.animate(innerWidth <= 640 ? { transform: ['translateY(6%)', 'none'], opacity: [0, 1] } : { transform: ['scale(.97)', 'none'], opacity: [0, 1] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
-    if (push) history.pushState({ film: id }, '', '#' + id); } else if (push) history.replaceState({ film: id }, '', '#' + id); }
-const redrawSheet = () => { if (!sheet.open) return; if (openId) openFilm(openId, false); else if (pvOpen) openPreview(pvOpen.tmdb, pvOpen.kind); };
-function closeFilm(fromPop) { if (!sheet.open) return; openId = null; pvOpen = null; const done = () => sheet.close();
-  if (calm) done(); else { const a = sheet.animate({ opacity: [1, 0], transform: ['none', innerWidth <= 640 ? 'translateY(5%)' : 'scale(.98)'] }, { duration: 160, easing: 'ease-in' }); a.onfinish = done; setTimeout(done, 300); }
-  if (!fromPop && history.state?.film) history.back(); else if (!fromPop && location.hash) history.replaceState(null, '', location.pathname + location.search); }
-addEventListener('popstate', () => { const id = location.hash.slice(1); if (id && D.byId.has(id)) openFilm(id, false); else closeFilm(true); });
-sheet.addEventListener('cancel', e => { e.preventDefault(); closeFilm(); });
+  } if (push) FS.open({ film: id }, '#' + id, from); else if (!FS.depth()) FS.swap({ film: id }, '#' + id); else FS.sync(); }   // من رابط مباشر: أول بطاقة في الستاك
+const redrawSheet = () => { if (!sheet.open) return; if (openId) openFilm(openId, false); else if (pvOpen) openPreview(pvOpen.tmdb, pvOpen.kind, null, false); };
+// × يغلق البطاقات كلها (الستاك كله)، وfromPop: السجل رجع إلى ما قبلها فتُغلق وحدها
+// إغلاق جارٍ تلغيه بطاقة تُفتح قبل أن ينتهي (وإلا أغلقها مؤقّته الاحتياطي بعد أن فُتحت)
+let closeTok = 0, closeAnim = null; const reopen = () => { closeTok++; if (closeAnim) { closeAnim.cancel(); closeAnim = null; } };
+function closeFilm(fromPop) { if (!sheet.open) return; if (!fromPop) return FS.closeAll(); openId = null; pvOpen = null; const tok = ++closeTok, done = () => { if (tok === closeTok && sheet.open) { closeAnim = null; sheet.close(); } };
+  if (calm) done(); else { const a = closeAnim = sheet.animate({ opacity: [1, 0], transform: ['none', innerWidth <= 640 ? 'translateY(5%)' : 'scale(.98)'] }, { duration: 160, easing: 'ease-in' }); a.onfinish = done; setTimeout(done, 300); }
+  if (location.hash && D.byId.has(location.hash.slice(1)) && !history.state?.film) history.replaceState(null, '', location.pathname + location.search); }
+const FS = cardStack({ key: 'film', body: $('#sheet-body'), btn: $('#sheet .sback'), isOpen: () => sheet.open, close: () => closeFilm(true),
+  title: () => $('#sheet-body h2')?.textContent.trim() || '',
+  show: async (s, y) => { if (s.film === 'preview') await openPreview(s.pv.tmdb, s.pv.kind, null, false); else if (D.byId.has(s.film)) await openFilm(s.film, false); else return closeFilm(true); $('#sheet-body').scrollTop = y; } });
+// الرجوع (زر المتصفح وإيماءة الجوال) يعيد البطاقة التي قبلها، وEsc مثله خطوةً خطوة، و× والنقر خارج البطاقة يغلقانها كلها
+addEventListener('popstate', () => { const id = location.hash.slice(1); if (id && !history.state?.film && D.byId.has(id)) return openFilm(id, false); FS.pop(); });
+sheet.addEventListener('cancel', e => { e.preventDefault(); FS.back(); });
 sheet.addEventListener('click', e => { if (e.target === sheet) closeFilm(); });
 addDlg.addEventListener('click', e => { if (e.target === addDlg) addDlg.close(); });
 
@@ -464,7 +473,7 @@ function lbxHTML() { const st = accState(), l = st.links?.letterboxd, on = !!l?.
         <a class="btn sec" href="https://letterboxd.com/settings/data/" target="_blank" rel="noopener">افتح صفحة التصدير</a>${LB.imp ? `<p class="lbx-imp" role="status">${esc(LB.imp)}</p>` : '<label class="btn pri lbx-pick">اختر الملف<input type="file" class="lbx-file-in" accept=".zip,.csv,application/zip,text/csv"></label>'}</div>
       ${file('watched', pend.watched.length, 'مما شاهدته هنا ولم يصل Letterboxd', 'افتح صفحة الاستيراد', 'https://letterboxd.com/import/')}
       ${file('next', pend.next.length, 'مما في «سأشاهده» هنا وليس في قائمة المشاهدة هناك', 'افتح قائمة المشاهدة', `https://letterboxd.com/${encodeURIComponent(user)}/watchlist/`)}
-      <p class="hint">بعد أن تنزّل الملف: افتح الصفحة، اختر الملف، ثم «Import». وما في الملف لا يعود في الملف التالي.</p>
+      <p class="hint">بعد أن تنزّل الملف: افتح الصفحة، اختر الملف، ثم «Import». وما في الملف لا يعود في الملف التالي. وأفلام دليلَي <bdi dir="ltr">DC</bdi> ومارفل تدخله أيضاً، وما تعلّمه منها هنا أو في يومياتك يظهر فيهما.</p>
       <div class="acts"><button class="btn sec" data-act="lbx-sync"${st.busy ? ' disabled' : ''}>${st.busy ? 'يقرأ…' : 'اقرأ يومياتي الآن'}</button><button class="btn sec" data-act="lbx-unlink">افصل</button></div>`
     : `<form class="lbx-link"><label>اسمك في Letterboxd، أو رابط صفحتك<input dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="letterboxd.com/…" required></label><button class="btn pri" type="submit">اربط</button></form>`)}
     ${LB.msg ? `<p class="msg" role="alert">${LB.msg}</p>` : ''}${st.err ? `<p class="msg">${esc(st.err)}</p>` : ''}`; }
@@ -478,12 +487,17 @@ function lbxFile(k) { const ids = lbPending()[k], q = v => `"${String(v ?? '').r
   accSent(k, ids).then(() => { LB.msg = `نزل ملف فيه ${nFilms(ids.length)}. ارفعه من صفحة ${k === 'next' ? 'قائمة المشاهدة' : 'الاستيراد'} في Letterboxd.`; drawLbx(); }, e => { LB.msg = esc(e.message); drawLbx(); }); }
 // ما وصل من يومياتك في Letterboxd: يصير «شاهدته» هنا ولا يُعاد إرساله. ومن Trakt (E87) للمسلسلات (tرقم): ما اكتمل هناك «شاهدته»،
 // وقائمة المشاهدة «سأشاهده» (لا تنزل بمسلسل شاهدته)، والخروج منها يخرجه من «سأشاهده» وحدها
-function accApply(changes) { let n = 0, tv = 0;
+// ومن دليلَي DC ومارفل (E90) أفلامهما بحالها: «سأشاهده» لا ينزل بـ«شاهدته»، ولا تنتقل منهما إزالة أكثر من ثلاثة أفلام دفعة واحدة
+function accApply(changes) { let n = 0, tv = 0; const gs = [], gone = [];
   for (const c of changes) { const cur = st(c.id);
     if (/^t\d+$/.test(c.id)) { const to = c.done ? 'watched' : c.l === 1 && cur !== 'watched' ? 'next' : c.l === 0 && cur === 'next' ? null : cur; if (to === cur) continue; if (to) P.films[c.id] = to; else delete P.films[c.id]; tv++; continue; }
-    if (c.s ? cur === c.s : !cur) continue; if (c.s) P.films[c.id] = c.s; else delete P.films[c.id]; n++; }
-  if (!n && !tv) return; save(); renderGrid(); moodChips(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML();
-  toast([n ? `وصل من يومياتك في Letterboxd: ${nFilms(n)}` : '', tv ? `وصل من Trakt تحديث ${tv === 1 ? 'مسلسل واحد' : tv === 2 ? 'مسلسلين' : tv <= 10 ? tv + ' مسلسلات' : tv + ' مسلسلاً'}` : ''].filter(Boolean).join('، و')); }
+    if (c.s ? cur === c.s : !cur) continue;
+    if (c.src === 'dc' || c.src === 'marvel') { if (c.s === 'next' && cur === 'watched') continue; (c.s ? gs : gone).push(c); continue; }
+    if (c.s) P.films[c.id] = c.s; else delete P.films[c.id]; n++; }
+  for (const c of [...gs, ...(gone.length <= 3 ? gone : [])]) if (c.s) P.films[c.id] = c.s; else delete P.films[c.id];
+  const g = gs.length + (gone.length <= 3 ? gone.length : 0), from = [...new Set([...gs, ...gone].map(c => c.src === 'dc' ? 'دليل DC' : 'دليل مارفل'))].join(' و');
+  if (!n && !tv && !g) return; save(); renderGrid(); moodChips(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML();
+  toast([n ? `وصل من يومياتك في Letterboxd: ${nFilms(n)}` : '', g ? `وصل من ${from}: ${nFilms(g)}` : '', tv ? `وصل من Trakt تحديث ${tv === 1 ? 'مسلسل واحد' : tv === 2 ? 'مسلسلين' : tv <= 10 ? tv + ' مسلسلات' : tv + ' مسلسلاً'}` : ''].filter(Boolean).join('، و')); }
 // ---------- سجلّك كله في Letterboxd (E88): صفحة Watched وقائمة المشاهدة لا يعطيهما Letterboxd لأي موقع إلا في ملف «تصدير بياناتك»
 // (letterboxd.com/settings/data). يُختار هنا كما نزل (ZIP، أو watched.csv وحده) مرة واحدة: كل فيلم شاهدته هناك يصير «شاهدته» هنا، وما ليس في
 // القائمة يُضاف إليها (بإيداع واحد في /api/add-film، ويظهر بعد تحديث الموقع بدقائق)، وقائمة المشاهدة «سأشاهده». المطابقة بالاسم والسنة:
@@ -594,21 +608,22 @@ addDlg.addEventListener('cancel', e => { if (!sugEl.hidden) { e.preventDefault()
 async function addFilm(tmdb, kind, btn, label) { const msg = $('#add-msg'); btn.disabled = true; btn.textContent = 'يُضاف…';
   try { const r = await api({ action: 'add', tmdb, kind }, pass()); adopt(r, true);
     try { const p = JSON.parse(localStorage.getItem(PEND) || '[]'); p.push(r); localStorage.setItem(PEND, JSON.stringify(p)); } catch {}
-    keepPending(r.film.id); if (addDlg.open) addDlg.close(); toast(`أُضيف «${r.film.title}»`); openFilm(r.film.id, !sheet.open);
+    keepPending(r.film.id); if (addDlg.open) addDlg.close(); toast(`أُضيف «${r.film.title}»`); const inPlace = sheet.open; await openFilm(r.film.id, !inPlace); if (inPlace) FS.swap({ film: r.film.id, pv: undefined }, '#' + r.film.id);   // بطاقة الاطلاع صارت بطاقته في مكانها
   } catch (err) { if (addDlg.open) msg.textContent = err.message; else toast(err.message); btn.disabled = false; btn.innerHTML = label; } }
 const addPick = btn => addFilm(+btn.dataset.tmdb, btn.dataset.kind, btn, 'أضفه');
 // بطاقة اطلاع: يجلب العمل كاملاً من TMDB عبر الخادم دون إضافته. تُحفظ في الذاكرة فلا يتكرر الطلب.
 // تُفتح فوق نافذة البحث (فإغلاقها يعيدك إلى النتائج) أو مكان البطاقة المفتوحة، وزر الرجوع في الجوال يغلقها.
 const previews = new Map(); let pvOpen = null;   // بطاقة الاطلاع المفتوحة، ليُعاد رسمها حين تُكشف صورتها
-async function openPreview(tmdb, kind, btn) { const id = (kind === 'tv' ? 't' : 'm') + tmdb; if (D.byId.has(id)) { if (addDlg.open) addDlg.close(); return openFilm(id); }
+async function openPreview(tmdb, kind, btn, push = true) { const id = (kind === 'tv' ? 't' : 'm') + tmdb; if (D.byId.has(id)) { if (addDlg.open) addDlg.close(); return openFilm(id, push); }
   if (!pass()) return openAdd(btn?.dataset.q || '');
   const label = btn?.innerHTML; if (btn) { btn.disabled = true; btn.textContent = 'يجهّز…'; }
   try { let r = previews.get(id); if (!r) { r = await api({ action: 'preview', tmdb, kind }, pass()); previews.set(id, r); }
     Object.assign(D.prov, r.providers || {}); if (r.collection && !D.cols[r.collection.id]) { D.cols[r.collection.id] = r.collection; for (const p of r.collection.parts) if (!D.part.has(p.tmdb)) D.part.set(p.tmdb, p); }
-    const [light, heavy] = split(r.film), k = keyOf(light); openId = null;
+    const [light, heavy] = split(r.film), k = keyOf(light), from = push && sheet.open ? FS.leave() : null; reopen(); openId = null;
     D.winfo[k] ||= { title: light.title, date: light.date, year: light.year, poster: light.poster, rating: light.rating, votes: light.votes, genres: light.genres, lang: light.lang, runtime: light.runtime };
     markEl($('#sheet-body'), id, light.adult); $('#sheet-body').innerHTML = await sheetHTML(light, { more: heavy }); $('#sheet-body').scrollTop = 0; liveWorlds(light); pvOpen = { tmdb, kind };
-    if (!sheet.open) { sheet.showModal(); $('#sheet-body').scrollTop = 0; if (!calm) sheet.animate({ opacity: [0, 1], transform: [innerWidth <= 640 ? 'translateY(6%)' : 'scale(.97)', 'none'] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' }); history.pushState({ film: 'preview' }, '', location.pathname + location.search); }
+    if (!sheet.open) { sheet.showModal(); $('#sheet-body').scrollTop = 0; if (!calm) sheet.animate({ opacity: [0, 1], transform: [innerWidth <= 640 ? 'translateY(6%)' : 'scale(.97)', 'none'] }, { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' }); }
+    if (push) FS.open({ film: 'preview', pv: { tmdb, kind } }, location.pathname + location.search, from); else FS.sync();
   } catch (err) { if (addDlg.open) $('#add-msg').textContent = err.message; else toast(err.message); }
   finally { if (btn) { btn.disabled = false; btn.innerHTML = label; } } }
 // يُدخل فيلماً عاد من الخادم (أو محفوظاً بانتظار وصوله في البناء القادم) في القائمة المعروضة
@@ -622,6 +637,7 @@ document.addEventListener('click', e => { const t = e.target.closest('[data-act]
   else if (act === 'seen') { setStatus(id, 'watched'); if (st(id) === 'watched') toast(ui.status === 'todo' && !ui.q ? 'شوهد، وانتقل إلى «شاهدته»' : 'خُتمت التذكرة: شوهد', () => setStatus(id, 'watched')); }
   else if (act === 'set') setStatus(openId, t.dataset.v);
   else if (act === 'close') closeFilm();
+  else if (act === 'sback') FS.back();   // البطاقة السابقة (E89)
   else if (act === 'close-add') addDlg.close();
   else if (act === 'lbx') openLbx();
   else if (act === 'close-lbx') $('#lbx').close();
@@ -676,5 +692,6 @@ try {
   initSync(id => { if (id !== 'films') return; try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {} renderGrid(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); });
   // ‎#add=اسم وسنة: من بوابة أخرى (ألعابي تقترح إضافة فيلم اقتُبس من لعبة) يفتح «أضف فيلماً» بالبحث عنه
   const h = location.hash.slice(1); if (h && D.byId.has(h)) openFilm(h, false);
+  else if (h === 'letterboxd') { history.replaceState(null, '', location.pathname + location.search); openLbx(); }   // من «سجلّي» في دليلَي DC ومارفل (E90)
   else if (h.startsWith('add=')) { history.replaceState(null, '', location.pathname + location.search); openAdd(decodeURIComponent(h.slice(4)).slice(0, 120)); }
 } catch (err) { $('#grid').innerHTML = '<p class="load">تعذّر تحميل القائمة. حدّث الصفحة.</p>'; liftVeil(); console.error(err); }

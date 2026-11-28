@@ -22,7 +22,7 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   const ctx = await browser.newContext({ viewport, isMobile: mobile, hasTouch: mobile, deviceScaleFactor: shots ? 2 : 1, locale: 'ar-SA' });
   const page = await ctx.newPage(); const errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource/.test(m.text())) errs.push(m.text()); });
-  await page.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com/, r => { const u = r.request().url(), seed = [...u].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7);
+  await page.route(/image\.tmdb\.org|www\.themoviedb\.org\/assets|images\.igdb\.com|store-images\.s-microsoft\.com/, r => { const u = r.request().url(), seed = [...u].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7);
     const wide = /\/(w300|w1280)\//.test(u) || (/\/w780\//.test(u) && r.request().resourceType() !== 'image');
     return r.fulfill({ contentType: 'image/svg+xml', body: wide ? ph(640, 360, seed) : ph(342, 513, seed) }); });
   // بيانات مُعدَّلة للاختبار فقط: مسلسل له حلقة قادمة بعد 5 أيام
@@ -214,6 +214,17 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.goto(url + '#w=the-dark-knight-rises-2012'); await page.waitForSelector('#sheet:not([hidden])'); await page.waitForTimeout(300);
   check('عمل بلا منصات في السعودية: يُقال ذلك صراحة', /لا تذكر بيانات JustWatch منصة تعرضه في السعودية حالياً/.test(await page.textContent('#sheet .where')) && await page.locator('#sheet .where a').count() === 0);
   check('رابط #w= يفتح بطاقة العمل ثم يُزال من العنوان', (await page.textContent('#sheetTitle')).includes('The Dark Knight Rises') && (await page.evaluate(() => location.hash)) === '');
+  // ستاك البطاقات (E89، على الكمبيوتر): عمل يُفتح من سطر «موقعه من عالمه» في بطاقة عمل خطوة فوقها، والرجوع يعيد الأولى إلى موضع القراءة فيها، و× يغلقهما معاً
+  if (name === 'desktop') { if (await page.isVisible('#sheet')) { await page.keyboard.press('Escape'); await page.waitForTimeout(400); }
+    await tap('#c-dcu-peacemaker-2022-s1 [data-act=open]'); await page.waitForSelector('#sheet:not([hidden]) .chain .ch-l'); await page.waitForTimeout(450);
+    const t0 = await page.evaluate(() => document.querySelector('#sheetTitle').textContent.trim()), y0 = await page.evaluate(() => { const b = document.getElementById('sheetBody'); b.scrollTop = 120; return b.scrollTop; });
+    await page.evaluate(() => document.querySelector('#sheet .chain .ch-l').click()); await page.waitForTimeout(500);
+    const top = await page.evaluate(() => ({ t: document.querySelector('#sheetTitle').textContent.trim(), sb: !document.querySelector('#sheet .sback').hidden, say: document.querySelector('#sheet .sback').getAttribute('aria-label'), k: history.state?.k }));
+    await page.click('#sheet [data-act=sback]'); await page.waitForTimeout(500);
+    const back = await page.evaluate(() => ({ t: document.querySelector('#sheetTitle').textContent.trim(), y: document.getElementById('sheetBody').scrollTop, open: !document.getElementById('sheet').hidden, sb: document.querySelector('#sheet .sback').hidden }));
+    check('بطاقة عمل تُفتح من بطاقة عمل خطوة فوقها بزر «رجوع» باسم التي تحتها، والرجوع يعيدها إلى موضع القراءة فيها (E89)', top.t !== t0 && top.sb && top.say === `رجوع إلى «${t0}»` && top.k === 2 && back.open && back.t === t0 && Math.abs(back.y - y0) < 4 && back.sb, [t0, top, back, y0]);
+    await page.evaluate(() => document.querySelector('#sheet .chain .ch-l').click()); await page.waitForTimeout(500); await page.click('#sheet [data-act=close]'); await page.waitForTimeout(500);
+    check('و× يغلق البطاقتين معاً ولا يبقى في السجل ما يعيد فتحهما', await page.evaluate(() => document.getElementById('sheet').hidden && !history.state?.sheet)); }
   // Trakt (E87، على الكمبيوتر): ربط مرة واحدة من «سجلّي»، ثم حلقات المسلسلات و«سأشاهده» بالاتجاهين. الخادم مُحاكى
   if (name === 'desktop') { const calls = [], T = { on: false, authUrl: '', boot: false, next: [] }, until = async f => { for (let i = 0; i < 100 && !f(); i++) await page.waitForTimeout(100); return !!f(); };
     const CAT = JSON.parse(fs.readFileSync(path.join(siteDir, 'dc/data/catalog.json'))), tm = id => CAT.works.find(w => w.id === id).tmdb, PM = tm('peacemaker-2022'), FL = tm('the-flash-2014');
@@ -237,7 +248,8 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     check('ربط Trakt: صفحة موافقته، ثم عودة إلى الدليل و«سجلّي» مفتوحة برسالة «رُبط»، ورابط نظيف', /^https:\/\/auth\.trakt\.tv\/oauth\/authorize/.test(T.authUrl || '') && calls.some(c => c[0] === '/link' && c[1]?.svc === 'trakt' && c[1]?.from === 'dc')
       && /رُبط Trakt، والمزامنة تبدأ الآن/.test(await page.textContent('#trk')) && !/linked=/.test(page.url()), [T.authUrl, page.url()]);
     check('وبعد الموافقة: «مربوط ✓»، ويُرسل سجلّ الدليل وأرقام مسلسلاته مرة واحدة', /مربوط ✓/.test(await page.textContent('#trk')) && await until(boot) && boot()[1].known.length === CAT.works.filter(w => w.seasons?.length).length
-      && boot()[1].full['tv' + PM]?.e?.length > 0 && boot()[1].full['tv' + FL]?.l === 1 && Object.keys(boot()[1].full).every(k => /^tv\d+$/.test(k)), JSON.stringify(boot()?.[1]?.full || {}).slice(0, 160));
+      && boot()[1].full['tv' + PM]?.e?.length > 0 && boot()[1].full['tv' + FL]?.l === 1 && Object.keys(boot()[1].full).every(k => /^(tv|m)\d+$/.test(k)), JSON.stringify(boot()?.[1]?.full || {}).slice(0, 160));
+    check('ومعه أفلامه بحالها برقمها في TMDB (E90): «شاهدته» شاهدته، ولا فيلم بلا حال', boot()[1].full['m' + tm('the-dark-knight-2008')] === 'watched' && Object.entries(boot()[1].full).filter(([k]) => k[0] === 'm').every(([, v]) => v === 'watched' || v === 'next'), JSON.stringify(Object.entries(boot()?.[1]?.full || {}).filter(([k]) => k[0] === 'm')));
     await overflow('سجلّي مع Trakt'); await snap('8-trakt');
     await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
     await tap('#c-dcu-peacemaker-2022-s1 [data-act=open]'); await page.waitForSelector('.ep:not(.skel)');
@@ -251,6 +263,16 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
     await page.waitForFunction(id => { const e = JSON.parse(localStorage.getItem('dcg.progress')).eps[id] || {}; return e['1-8'] === 1; }, 'peacemaker-2022', { timeout: 6000 }).catch(() => {});
     const E = await page.evaluate(() => JSON.parse(localStorage.getItem('dcg.progress')).eps['peacemaker-2022'] || {}); await page.waitForTimeout(3200);
     check('ما وصل من Trakt (حلقة شاهدتها هناك وأخرى أزلتها) يدخل سجلّك ويقال ذلك، ولا يُعاد إرساله', E['1-8'] === 1 && !E[k] && /وصل من Trakt تحديث مسلسل واحد/.test(await page.textContent('#toast')) && !edits().slice(n0).some(e => e.id.startsWith(`tv${PM}|`)), [E, edits().slice(n0)]);
+    // أفلام الدليل مع قائمة أفلامي وLetterboxd (E90): «شاهدته» على فيلم يصل الخادم برقمه في TMDB، وما سُجّل في يومياتك يصل الدليل
+    const BT = tm('the-batman-2022'), JK = tm('joker-2019'); await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    await page.evaluate(id => document.querySelector(`[data-k="${id}"] [data-act=status][data-s=watched]`).click(), 'the-batman-2022');
+    check('«شاهدته» على فيلم في الدليل يصل الخادم بعد ثوانٍ برقمه في TMDB، لقائمة أفلامي وLetterboxd (E90)', await until(() => edits().some(e => e.id === 'm' + BT && e.s === 'watched')), JSON.stringify(edits()).slice(-200));
+    T.next = [{ id: 'm' + JK, s: 'watched', src: 'letterboxd' }]; await tap('[data-act=backup]'); await page.waitForSelector('#trk [data-act=trk-sync]');
+    check('و«سجلّي» فيه قسم Letterboxd بعد Trakt: أفلام الدليل معه، وربطه من قائمة أفلامي', /Letterboxd/.test(await page.textContent('#sheetBody .trk + .trk h4')) && await page.locator('#lbn [data-act=lbn-go]').count() === 1);
+    await tap('#trk [data-act=trk-sync]'); await page.waitForFunction(id => JSON.parse(localStorage.getItem('dcg.progress')).works[id] === 'watched', 'joker-2019', { timeout: 6000 }).catch(() => {});
+    check('وما سجّلته في يومياتك في Letterboxd يصير «شاهدته» على الفيلم هنا ويقال ذلك', await page.evaluate(id => JSON.parse(localStorage.getItem('dcg.progress')).works[id], 'joker-2019') === 'watched'
+      && /وصل من يومياتك في Letterboxd تحديث فيلم واحد/.test(await page.textContent('#toast')), await page.textContent('#toast'));
+    await page.waitForFunction(() => { const b = document.querySelector('#trk [data-act=trk-sync]'); return b && !b.disabled; }, null, { timeout: 6000 }).catch(() => {}); await page.waitForTimeout(400);
     await tap('#trk [data-act=trk-unlink]'); await page.waitForFunction(() => /فُصل Trakt/.test(document.querySelector('#trk')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
     check('«افصل» يفصله: يعود زر «اربط»', /فُصل Trakt/.test(await page.textContent('#trk')) && await page.locator('#trk [data-act=trk-link]').count() === 1);
     await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.unroute('**/api/accounts**'); await page.unroute('https://auth.trakt.tv/**');

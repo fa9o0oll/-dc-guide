@@ -25,7 +25,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   // مقاس واحد بتفضيل «تقليل الحركة» في النظام، ليُختبر طريقه (تلاشٍ بلا طيران)
   const ctx = await browser.newContext({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, locale: 'ar-SA', reducedMotion: name === 'fold-cover-zoom' ? 'reduce' : 'no-preference' }), page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message)); page.on('console', m => m.type() === 'error' && !/favicon|404|401/.test(m.text()) && errs.push(m.text()));
-  await page.route(/image\.tmdb\.org|images\.igdb\.com|store-images\.s-microsoft\.com|cdn\.myanimelist\.net/, r => r.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#345"/></svg>' }));
+  await page.route(/image\.tmdb\.org|www\.themoviedb\.org\/assets|images\.igdb\.com|store-images\.s-microsoft\.com|cdn\.myanimelist\.net/, r => r.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#345"/></svg>' }));
   const tap = async sel => { const l = page.locator(sel).first(); await l.scrollIntoViewIfNeeded(); await page.waitForTimeout(550); return mobile ? l.tap() : l.click(); };
   const fits = async label => { await page.waitForTimeout(500); const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
       small: [...document.querySelectorAll('button,a[href],summary,select,input')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight && r.bottom > 0 && (r.width < 40 || r.height < 40) && !e.closest('.foot,.hub-foot,.canon,.why,.note,[hidden]'); }).map(e => (e.className || e.tagName) + ':' + (e.textContent || '').trim().slice(0, 24)).slice(0, 3) }));
@@ -212,6 +212,20 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     check('الأفلام: السحب القصير يعيد البوستر مكانه', await page.evaluate(() => document.querySelector('dialog.pz').open && !document.querySelector('.pz-fly').style.transform));
     await page.mouse.move(cx, cy); await page.mouse.down(); await page.mouse.move(cx, cy + 240, { steps: 10 }); await page.mouse.up(); await page.waitForSelector('dialog.pz', { state: 'hidden' }); await page.waitForTimeout(350);
     check('الأفلام: سحب البوستر لأسفل يغلقه وحده', await page.evaluate(id => document.querySelector('#sheet').open && location.hash === '#' + id && !document.querySelector('.pz-lifted'), inCol.id)); }
+  // ستاك البطاقات (E89): فيلم من سلسلة الفيلم المفتوح خطوة فوقه، والرجوع يعيد الأول إلى موضع القراءة فيه، و× يغلقهما معاً
+  if (!mobile) { const other = await page.evaluate(id => [...document.querySelectorAll('#sheet [data-act=open][data-id]')].map(b => b.dataset.id).find(x => x !== id) || null, inCol.id);
+    check('الأفلام: في بطاقة فيلم من سلسلة فيلمٌ آخر منها يُفتح من البطاقة', !!other);
+    if (other) { const t0 = await page.evaluate(() => document.querySelector('#sheet-body h2').textContent), btn = id => `#sheet [data-act=open][data-id="${id}"]`;
+      await page.evaluate(sel => document.querySelector(sel).scrollIntoView({ block: 'center' }), btn(other)); await page.waitForTimeout(150); const y0 = await page.evaluate(() => document.getElementById('sheet-body').scrollTop);
+      await page.evaluate(sel => document.querySelector(sel).click(), btn(other)); await page.waitForFunction(id => location.hash === '#' + id, other, { timeout: 4000 }).catch(() => {}); await page.waitForTimeout(300);
+      const top = await page.evaluate(() => ({ sb: !document.querySelector('#sheet .sback').hidden, say: document.querySelector('#sheet .sback').getAttribute('aria-label'), k: history.state?.k }));
+      await page.goBack(); await page.waitForFunction(id => location.hash === '#' + id, inCol.id, { timeout: 4000 }).catch(() => {}); await page.waitForTimeout(500);
+      const back = await page.evaluate(() => ({ t: document.querySelector('#sheet-body h2').textContent, y: document.getElementById('sheet-body').scrollTop, open: document.getElementById('sheet').open, sb: document.querySelector('#sheet .sback').hidden }));
+      check('الأفلام: فيلم من سلسلة الفيلم المفتوح خطوة فوقه بزر «رجوع» باسمه، والرجوع يعيد الأول إلى موضع القراءة فيه (E89)', top.sb && top.say === `رجوع إلى «${t0}»` && top.k === 2 && back.open && back.t === t0 && Math.abs(back.y - y0) < 30 && back.sb, [top, back, y0]);
+      await page.evaluate(sel => document.querySelector(sel).click(), btn(other)); await page.waitForTimeout(400);
+      await tap('#sheet [data-act=close]'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.waitForTimeout(300);
+      check('الأفلام: و× يغلق البطاقتين معاً ولا يبقى في السجل ما يعيد فتحهما', await page.evaluate(() => !location.hash && !history.state?.film));
+      await tap(`#f-${inCol.id} .poster`); await page.waitForSelector('#sheet[open] .sh-head'); await page.waitForTimeout(350); } }
   await fits('الأفلام: النافذة'); await tap('#sheet .close'); await page.waitForSelector('#sheet', { state: 'hidden' });
   await page.waitForTimeout(400); await page.evaluate(() => { location.hash = '#m218'; }); await page.waitForSelector('#sheet[open] .order .rc'); await page.waitForTimeout(300);
   check('الأفلام: سلسلة مراجَعة تعرض التوصيات والمسلسل المرتبط بتقييمه', await page.evaluate(() => { const o = document.querySelector('#sheet .order'), t = o.textContent; return o.querySelectorAll('.rc.watch').length >= 2 && o.querySelectorAll('.rc.skip').length >= 1 && t.includes('Sarah Connor') && t.includes('مسلسل') && /\d\.\d/.test(t) && document.querySelector('#wslot .sec > .note').textContent.includes('توصيات'); }));

@@ -196,20 +196,28 @@ export async function linkLetterboxd(S, name) { const user = lbName(name); if (!
 const FILM = new Set(['watched', 'next']), fval = x => x && FILM.has(x.s) ? { s: x.s } : null;
 const filmsBlank = () => ({ rev: 0, items: {}, lb: { known: {}, wl: {} }, err: {}, at: {} });
 // edits/full بمفاتيح الصفحة (m رقم الفيلم في TMDB، والمسلسل t لا يدخل هنا: مكانه Trakt). يعيد ما تغيّر من Letterboxd بعد since، وما يعرفه Letterboxd
-export async function syncFilms(S, { edits = [], full = null, since = 0, pull = true } = {}) {
-  const st = Object.assign(filmsBlank(), await S.get('films') || {}), t = await S.get('tok/letterboxd');
+// guide (E90): قائمة أفلامي (films، ومصدر تعديلاتها site) أو دليل DC أو مارفل (أفلامهما). المحور واحد للبوابات الثلاث، فما تعلّمه في بوابة يصل
+// الأخريين، وملف الاستيراد إلى Letterboxd (في قائمة أفلامي) يحمل أفلام الدليلين أيضاً. ولكل تعديل مصدره، فلا يعود إلى البوابة التي جاء منها
+// fresh: لا تُقرأ اليوميات إن قُرئت قبل أقل من ذلك (الدليلان: دقيقتان، فلا يُطلب Letterboxd مع كل تعديل فيهما)
+export async function syncFilms(S, { guide = 'films', edits = [], full = null, since = 0, pull = true, fresh = 0 } = {}) {
+  const st = Object.assign(filmsBlank(), await S.get('films') || {}), t = await S.get('tok/letterboxd'), g = guide === 'films' ? 'site' : String(guide);
   const lbOut = () => t ? { user: t.user, known: Object.keys(st.lb.known).map(Number), wl: Object.keys(st.lb.wl).map(Number), err: st.err.letterboxd || '', at: st.at.letterboxd || 0 } : null;
   // يبدأ ولو من سجلّ فارغ: محور الأفلام لا يُرسل إلى Letterboxd شيئاً (الكتابة إليه ملف تنزّله)، فما يصل من يومياتك يُضاف ولا يمحو
-  if (!st.boot && !full) return { needFull: true, rev: st.rev, changes: [], lb: lbOut() };
+  // والدليلان لا ينتظران سجلّهما: كل جهاز يرسله مرة لكل ربط (accounts.full) فيُجمع حين يصل
+  if (g === 'site' && !st.boot && !full) return { needFull: true, rev: st.rev, changes: [], lb: lbOut() };
   const put = (id, v, when, src) => { const cur = st.items[id]; if (cur && cur.t > when) return; if (cur && J(fval(cur)) === J(v)) { cur.t = Math.max(cur.t, when); return; }
     if (!cur && !v) return; st.items[id] = { ...(v || { s: null }), t: when, src, rev: ++st.rev }; };
-  if (full && !st.boot) { for (const [k, s] of Object.entries(full)) if (/^m\d+$/.test(k)) put(k.slice(1), fval({ s }), 0, 'site'); st.boot = now(); }
-  for (const e of edits) { const k = String(e.id || ''); if (/^m\d+$/.test(k)) put(k.slice(1), fval(e), +e.t || now(), 'site'); }
-  if (t && pull) { try { for (const i of await lbFetch(t.user)) { st.lb.known[i.tmdb] = 1; if (st.items[i.tmdb]?.s !== 'watched') put(String(i.tmdb), { s: 'watched' }, i.at || now(), 'letterboxd'); }
+  if (full && g === 'site' && !st.boot) { for (const [k, s] of Object.entries(full)) if (/^m\d+$/.test(k)) put(k.slice(1), fval({ s }), 0, 'site'); st.boot = now(); }
+  // سجل الدليل يُجمع إلى المحور (من كل جهاز مرة لكل ربط): يُضاف ما ليس فيه، و«شاهدته» يغلب «سأشاهده»، ولا يعود فيلمٌ أُزيلت علامته صراحة
+  else if (full && g !== 'site') { for (const [k, s] of Object.entries(full)) { if (!/^m\d+$/.test(k) || !FILM.has(s)) continue; const id = k.slice(1), cur = st.items[id];
+      if (!cur) st.items[id] = { s, t: 0, src: g, rev: ++st.rev }; else if (s === 'watched' && cur.s === 'next') Object.assign(cur, { s, src: g, rev: ++st.rev }); }
+    (st.gb ||= {})[g] ||= now(); }
+  for (const e of edits) { const k = String(e.id || ''); if (/^m\d+$/.test(k)) put(k.slice(1), fval(e), +e.t || now(), g); }
+  if (t && pull && !(fresh && now() - (st.at.letterboxd || 0) < fresh)) { try { for (const i of await lbFetch(t.user)) { st.lb.known[i.tmdb] = 1; if (st.items[i.tmdb]?.s !== 'watched') put(String(i.tmdb), { s: 'watched' }, i.at || now(), 'letterboxd'); }
       st.err.letterboxd = ''; st.at.letterboxd = now(); }
     catch (e) { st.err.letterboxd = e.code === 'gone' ? 'gone' : 'net'; } }
   await S.set('films', st);
-  const changes = Object.entries(st.items).filter(([, h]) => h.rev > since && h.src !== 'site').map(([id, h]) => ({ id: 'm' + id, s: h.s || null, src: h.src }));
+  const changes = Object.entries(st.items).filter(([, h]) => h.rev > since && h.src !== g).map(([id, h]) => ({ id: 'm' + id, s: h.s || null, src: h.src }));
   return { rev: st.rev, changes, lb: lbOut() }; }
 // نزّلتَ ملف الاستيراد: ما فيه صار معروفاً لـLetterboxd (kind: watched أو next)، فلا يعود في الملف التالي
 export async function filmsSent(S, kind, ids) { const st = Object.assign(filmsBlank(), await S.get('films') || {}), m = kind === 'next' ? st.lb.wl : st.lb.known;

@@ -13,7 +13,7 @@ export const shell = (G, H = G.home || { href: '../', label: 'البوابات',
 <symbol id="i-lock" viewBox="0 0 24 24"><path d="M8 11V8a4 4 0 018 0v3M6 11h12v9H6z"/></symbol>
 <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5l7 2.8v5.2c0 4.3-2.9 7.3-7 9-4.1-1.7-7-4.7-7-9V6.3z"/></symbol>
 <symbol id="i-pick" viewBox="0 0 24 24"><path d="M4 7.5h3c2 0 3.2 1.2 4.5 4.5s2.5 4.5 4.5 4.5h4M4 16.5h3c1.1 0 1.9-.4 2.7-1.3M20 7.5h-4c-1.1 0-1.9.4-2.7 1.3M17.5 5L20 7.5 17.5 10M17.5 14l2.5 2.5-2.5 2.5"/></symbol>
-<symbol id="i-log" viewBox="0 0 24 24"><path d="M6.5 4h11v16h-11zM9.5 8.5h5M9.5 12h5M9.5 15.5h3"/></symbol>
+<symbol id="i-log" viewBox="0 0 24 24"><path d="M6.5 4h11v16h-11zM9.5 8.5h5M9.5 12h5M9.5 15.5h3"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
 <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 6c2.8-1.1 5.4-.9 8 .7 2.6-1.6 5.2-1.8 8-.7v12.5c-2.8-1.1-5.4-.9-8 .7-2.6-1.6-5.2-1.8-8-.7zM12 6.7v12.5"/></symbol>
 </defs></svg>
 <div class="atmo" aria-hidden="true"><div class="scene"><div class="scene-img"></div><div class="motif"></div></div><div class="scene"><div class="scene-img"></div><div class="motif"></div></div></div>
@@ -57,7 +57,7 @@ export const shell = (G, H = G.home || { href: '../', label: 'البوابات',
 </footer>
 <div class="sheet-backdrop" id="backdrop" hidden></div>
 <aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
-  <div class="sheet-head"><h2 id="sheetTitle"></h2><button class="close" data-act="close" aria-label="إغلاق">✕</button></div>
+  <div class="sheet-head"><h2 id="sheetTitle"></h2><button class="close" data-act="close" aria-label="إغلاق">✕</button><button class="close sback" data-act="sback" aria-label="رجوع إلى البطاقة السابقة" hidden><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg></button></div>
   <div class="sheet-body" id="sheetBody"></div>
 </aside>
 <div class="toast" id="toast" role="status" hidden></div>`;

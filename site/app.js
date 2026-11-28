@@ -5,6 +5,7 @@ import { ar } from './bidi.js?v=__BUILD__';
 import { clock, spoken } from './count.js?v=__BUILD__';
 import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
 import { accInit, accMark, accSync, accLink, accUnlink, accLinks, accState, accSetPass, accPass } from './accounts.js?v=__BUILD__'; // Trakt للمسلسلات (E87)
+import { cardStack } from './stack.js?v=__BUILD__'; // البطاقة المفتوحة من بطاقة خطوة فوقها، والرجوع إلى التي قبلها (E89)
 import { portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
@@ -63,8 +64,11 @@ async function boot() {
   }
   renderUnibar(); syncShield(); render(); liftVeil();
   // Trakt (E87): ما وصل منه يُطبَّق على السجل، والصفحة ترسل إليه سجلّها أول مرة وأرقام مسلسلاتها
-  if (TRK) accInit({ guide: G.id, svcs: ['trakt'], build: BUILD, pack: m => ({ on: m?.on ? 1 : 0 }), apply: traktApply, onState: drawTrk, onLinked: trkBack,
-    full: () => { const o = {}; for (const id of D.works.keys()) { const t = tvOf(id); if (!t) continue; const e = Object.keys(store.eps[id] || {}), l = store.works[id] === 'list' ? 1 : 0; if (e.length || l) o['tv' + t] = { e, l }; } return o; },
+  // وأفلامه مع قائمة أفلامي وLetterboxd (E90): mرقم الفيلم في TMDB بحاله { s }، والحلقات و«سأشاهده» على المسلسل { on }
+  if (TRK) accInit({ guide: G.id, svcs: ['trakt', 'letterboxd'], build: BUILD, emptyOk: true, pack: m => m && 's' in m ? { s: m.s || null } : { on: m?.on ? 1 : 0 }, onState: drawTrk, onLinked: trkBack,
+    apply: ch => { const fm = ch.filter(c => /^m\d+$/.test(String(c.id))); traktApply(ch.filter(c => !fm.includes(c))); if (fm.length) filmApply(fm); },
+    full: () => { const o = {}; for (const id of D.works.keys()) { const f = fmOf(id), fs = f && fState(store.works[id]); if (fs) o['m' + f] = fs;
+      const t = tvOf(id); if (!t) continue; const e = Object.keys(store.eps[id] || {}), l = store.works[id] === 'list' ? 1 : 0; if (e.length || l) o['tv' + t] = { e, l }; } return o; },
     known: () => [...D.works.keys()].map(tvOf).filter(Boolean) });
   // رابط مباشر لعمل (#w=المعرّف)، تستعمله قائمة الأفلام للانتقال إلى بطاقته في هذا الدليل، عند الفتح أو بتغيير العنوان والصفحة مفتوحة
   { const deep = () => { const w = new URLSearchParams(location.hash.slice(1)).get('w'); if (w && D.works.has(w)) { history.replaceState(history.state, '', location.pathname + location.search); openWork(w); } };
@@ -92,7 +96,7 @@ const isSoon = w => !w.date || w.date > TODAY;
 // [مفرد، مثنى مرفوع، مثنى منصوب أو مجرور، جمع، مفرد منصوب، واحد/واحدة]
 const NOUN = { ep: ['حلقة', 'حلقتان', 'حلقتين', 'حلقات', 'حلقة', 'واحدة'], season: ['موسم', 'موسمان', 'موسمين', 'مواسم', 'موسماً', 'واحد'], day: ['يوم', 'يومان', 'يومين', 'أيام', 'يوماً', 'واحد'],
   min: ['دقيقة', 'دقيقتان', 'دقيقتين', 'دقائق', 'دقيقة', 'واحدة'], vote: ['صوت', 'صوتان', 'صوتين', 'أصوات', 'صوتاً', 'واحد'], work: ['عمل', 'عملان', 'عملين', 'أعمال', 'عملاً', 'واحد'],
-  part: ['جزء', 'جزءان', 'جزءين', 'أجزاء', 'جزءاً', 'واحد'], step: ['خطوة', 'خطوتان', 'خطوتين', 'خطوات', 'خطوة', 'واحدة'], show: ['مسلسل', 'مسلسلان', 'مسلسلين', 'مسلسلات', 'مسلسلاً', 'واحد'] };
+  part: ['جزء', 'جزءان', 'جزءين', 'أجزاء', 'جزءاً', 'واحد'], step: ['خطوة', 'خطوتان', 'خطوتين', 'خطوات', 'خطوة', 'واحدة'], film: ['فيلم', 'فيلمان', 'فيلمين', 'أفلام', 'فيلماً', 'واحد'], show: ['مسلسل', 'مسلسلان', 'مسلسلين', 'مسلسلات', 'مسلسلاً', 'واحد'] };
 const unit = (n, k) => { const f = NOUN[k], m = n % 100; return n === 0 || (m >= 3 && m <= 10) ? f[3] : m >= 11 ? f[4] : f[0]; };
 const cnt = (n, k, obl) => { const f = NOUN[k]; return n === 1 ? `${f[0]} ${f[5]}` : n === 2 ? f[obl ? 2 : 1] : `${n.toLocaleString('en')} ${unit(n, k)}`; };
 const bits = a => a.filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('');
@@ -438,14 +442,16 @@ function goTo(view, uni, targetId) {
 // ---------- البطاقة المنبثقة. الحركة كلها transform/opacity على طبقتها الخاصة: لا لقطة للصفحة ولا إعادة رسم لما خلفها.
 let closing = null;
 const EASE = 'cubic-bezier(.2,.85,.25,1)';
+// o.state: ما تصفه خطوة السجل (بطاقة العمل: w وs وu)، وo.push === false: رسم من السجل نفسه (رجوع أو تقدّم) فلا خطوة جديدة.
+// بطاقة عمل تُفتح من بطاقة عمل مفتوحة خطوة فوقها (E89)، وغيرها (الفهرس، سجلّي، الدليل) خطوة واحدة
 function openSheet(title, html, tag, o = {}) {
-  const sh = $('#sheet'), bd = $('#backdrop'), was = ui.sheet;
+  const sh = $('#sheet'), bd = $('#backdrop'), was = ui.sheet, from = was && o.push !== false && tag === 'work' && was === 'work' ? S.leave() : null;
   if (closing) { closing.forEach(a => a.cancel()); closing = null; }
   $('#sheetTitle').innerHTML = title; $('#sheetBody').innerHTML = html; $('#sheetBody').scrollTop = 0;
   sh.className = 'sheet' + (o.wide ? ' wide' : '') + (o.tall ? ' tall' : ''); sh.style.cssText = o.uni && THEMES[o.uni] ? themeVars(o.uni) : '';
   sh.hidden = false; bd.hidden = false; root.classList.add('sheet-open'); $('#sheetBody').scrollTop = 0;   // بعد العرض: المتصفح يعيد للنافذة موضع تمريرها السابق حين تُعرض، وتصفيره وهي مخفية لا يؤثر
-  if (!was) history.pushState({ sheet: 1 }, '');
   ui.sheet = tag || 'x';
+  if (o.push === false) S.sync(); else if (!was || from) S.open({ sheet: ui.sheet, ...(o.state || {}) }, undefined, from); else S.sync();
   if (!was && !reduce.matches) {
     // موضعا البوستر يُقاسان قبل بدء الحركة، ثم يطير البوستر من البطاقة إلى مكانه في النافذة
     const src = o.from, dst = src && $('.dw-top .poster', sh), a = src?.getBoundingClientRect(), b = dst?.getBoundingClientRect();
@@ -462,8 +468,10 @@ function openSheet(title, html, tag, o = {}) {
   }
   $('#sheet .close').focus({ preventScroll: true });
 }
+// × وسحب الرأس والنقر خارجها يغلقها كلها (الستاك كله)، وfromPop: السجل رجع إلى ما قبلها فتُغلق وحدها
 function closeSheet(fromPop) {
   if (!ui.sheet) return;
+  if (!fromPop) return S.closeAll();
   ui.sheet = null;
   const sh = $('#sheet'), bd = $('#backdrop'), cur = sh.style.transform || 'none';
   const done = () => { sh.hidden = true; bd.hidden = true; sh.style.transform = ''; root.classList.remove('sheet-open'); $$('.ghost').forEach(g => g.remove());
@@ -473,9 +481,11 @@ function closeSheet(fromPop) {
       sh.animate(phone.matches ? { transform: [cur, 'translateY(100%)'] } : { transform: ['none', 'translateY(14px) scale(.97)'], opacity: [1, 0] }, { duration: 190, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' })];
     const fin = () => { if (closing !== mine) return; closing = null; done(); mine.forEach(a => a.cancel()); };
     mine[1].finished.then(fin, () => {}); setTimeout(fin, 400); } // المؤقت يضمن الإغلاق حتى لو توقفت الإطارات
-  if (!fromPop && history.state?.sheet) { ui.skipPop = true; history.back(); }
 }
-addEventListener('popstate', () => { if (ui.skipPop) { ui.skipPop = false; return; } closeSheet(true); });
+const S = cardStack({ key: 'sheet', body: $('#sheetBody'), btn: $('#sheet .sback'), isOpen: () => !!ui.sheet, close: () => closeSheet(true), title: () => $('#sheetTitle').textContent.trim(),
+  show: (s, y) => { if (s.w && D.works.has(s.w)) { openWork(s.w, s.s ?? undefined, null, s.u, { push: false }); $('#sheetBody').scrollTop = y; } else closeSheet(true); } });
+// الرجوع (زر المتصفح وإيماءة الجوال) يعيد البطاقة التي قبلها، وEsc مثله خطوةً خطوة
+addEventListener('popstate', () => S.pop());
 // الجوال: سحب رأس النافذة للأسفل يغلقها، والنافذة تتبع الإصبع
 { const sh = $('#sheet'), head = $('.sheet-head'); let drag = null;
   head.addEventListener('pointerdown', e => { if (!phone.matches || e.target.closest('button') || closing) return; drag = { y: e.clientY, t: e.timeStamp, dy: 0 }; head.setPointerCapture(e.pointerId); });
@@ -506,7 +516,7 @@ function chainHTML(pl) { const u = uniOf(pl.universe); if (!u) return '';
     : sameShow ? `يكمل الموسم ${nth(pl.season - 1)}${b ? `، ويليه ${b}` : `، وهو آخر ما في هذا ${where} حتى الآن`}.`
     : i === 0 ? `منه تبدأ مشاهدة هذا ${where}${b ? `، ويليه ${b}` : ''}.` : `يأتي بعد ${a}${b ? ` وقبل ${b}` : `، وهو آخر ما في هذا ${where} حتى الآن`}.`;
   return `<nav class="chain" aria-label="موقعه من عالمه">${head(badge, sub, all.length > 1 ? posMap({ n: all.length, at: i, done: k => statusOf(all[k]) === 'watched' }) : '')}<p class="ch-t">${say}</p><p class="ch-n">${i + 1} من ${all.length} في ${esc(u.name)}، ${u.id === 'arrow' ? 'بترتيب سنة البداية' : 'بترتيب المشاهدة'}</p></nav>`; }
-function openWork(id, season, from, uniHint) {
+function openWork(id, season, from, uniHint, o = {}) {
   const w = D.works.get(id), soon = isSoon(w);
   const places = D.placements.filter(p => p.work === id);
   const uni = (uniHint && places.some(p => p.universe === uniHint) && uniHint) || from?.closest('section.uni')?.dataset.uni || (places.find(p => p.universe === ui.uni) || places[0]).universe;
@@ -523,7 +533,7 @@ function openWork(id, season, from, uniHint) {
     ${rateBlock(w, pl)}
     ${whereBlock(w, season)}
     ${nextBlock(w, '', uni)}
-    ${series ? `<div class="seasons" id="seasonTabs">${tabs.map(s => `<button data-act="season" data-id="${id}" data-season="${s.n}">${s.n ? 'الموسم ' + s.n : 'خاصة'}</button>`).join('')}</div><div id="eps" class="dw" style="padding:0" aria-busy="true">${'<div class="ep skel"><span class="epthumb"><span class="ph"></span></span><div><i></i><i></i></div></div>'.repeat(4)}</div>` : ''}</div>`, 'work', { uni, tall: series, from: from?.querySelector('img') });
+    ${series ? `<div class="seasons" id="seasonTabs">${tabs.map(s => `<button data-act="season" data-id="${id}" data-season="${s.n}">${s.n ? 'الموسم ' + s.n : 'خاصة'}</button>`).join('')}</div><div id="eps" class="dw" style="padding:0" aria-busy="true">${'<div class="ep skel"><span class="epthumb"><span class="ph"></span></span><div><i></i><i></i></div></div>'.repeat(4)}</div>` : ''}</div>`, 'work', { uni, tall: series, from: from?.querySelector('img'), push: o.push, state: { w: id, s: season ?? null, u: uni } });
   if (series) showSeason(id, tabs.some(s => s.n === season) ? season : w.seasons[0].n);
 }
 async function showSeason(id, n) { prevClose();
@@ -600,6 +610,21 @@ function setEp(id, s, e, on, quiet) { const o = store.eps[id] ||= {}; if (on) o[
 const TRK = G.id === 'dc' || G.id === 'marvel';
 const tvOf = id => { const w = TRK && D.works.get(id); return w?.seasons?.length && w.tmdb ? w.tmdb : 0; };
 const listMark = (k, was) => { const t = !k.includes('#') && tvOf(k), on = store.works[k] === 'list'; if (t && (was === 'list') !== on) accMark(`tv${t}|l`, { on }); };
+// ---------- أفلام الدليلين ↔ قائمة أفلامي وLetterboxd (E90): محور الأفلام على الخادم (syncFilms) يجمع أفلام البوابات الثلاث برقمها في TMDB.
+// «شاهدته» على فيلم هنا يصير «شاهدته» في قائمة أفلامي (ومنها ملف الاستيراد إلى Letterboxd)، و«قائمتي» و«أشاهده» «سأشاهده» هناك. وما تسجّله في
+// يومياتك في Letterboxd أو تعلّمه في قائمة أفلامي يصل هنا: لا ينزل «شاهدته» بما يصل، ولا يُغيَّر «أشاهده» و«تجاوز»، ولا تنتقل إزالة أكثر من ثلاثة أفلام دفعة واحدة
+const fmOf = id => { const w = TRK && D.works.get(id); return w?.kind === 'film' && w.tmdb ? w.tmdb : 0; };
+const fState = s => s === 'watched' ? 'watched' : s === 'list' || s === 'watching' ? 'next' : null;
+const filmMark = (k, was) => { const f = !k.includes('#') && fmOf(k), to = fState(store.works[k]); if (f && to !== fState(was)) accMark('m' + f, { s: to }); };
+const FSRC = { letterboxd: 'يومياتك في Letterboxd', site: 'قائمة أفلامي', dc: 'دليل DC', marvel: 'دليل مارفل' };
+function filmApply(changes) { const by = new Map([...D.works.keys()].map(id => [fmOf(id), id]).filter(([f]) => f)), set = [], gone = [];
+  for (const c of changes) { const id = by.get(+String(c.id).slice(1)), cur = id && (store.works[id] || ''); if (!id) continue;
+    if (c.s === 'watched' && cur !== 'watched') set.push([id, 'watched', c.src]); else if (c.s === 'next' && !cur) set.push([id, 'list', c.src]);
+    else if (!c.s && (cur === 'watched' || cur === 'list')) gone.push([id, null, c.src]); }
+  const all = [...set, ...(gone.length <= 3 ? gone : [])]; if (!all.length) return;
+  for (const [id, v] of all) if (v) store.works[id] = v; else delete store.works[id];
+  save(); render(true); stats(); const from = [...new Set(all.map(x => FSRC[x[2]]).filter(Boolean))];
+  toast(`وصل من ${from.length ? from.join(' و') : 'قائمة أفلامي'} تحديث ${cnt(all.length, 'film')}`); }
 function traktApply(changes) { const by = new Map([...D.works.keys()].map(id => [tvOf(id), id]).filter(([t]) => t)), got = new Set();
   for (const c of changes) { const id = by.get(+c.id); if (!id) continue; let n = 0;
     for (const k of c.e || []) { const [s, e] = k.split('-').map(Number); if (!epDone(id, s, e)) { setEp(id, s, e, true, true); n++; } }
@@ -617,7 +642,10 @@ function trkHTML() { const st = accState(), l = st.links?.trakt || {}, msg = TK.
   if (l.dead) return `<p class="trk-msg">انتهى الربط: افصله واربطه من جديد.</p><div class="actions"><button data-act="trk-unlink">افصل</button></div>${msg}`;
   return (l.on ? `<p class="trk-on">مربوط ✓${l.at ? ` · آخر مزامنة ${ago(l.at)}` : ''}</p>${err}<div class="actions"><button data-act="trk-sync"${st.busy ? ' disabled' : ''}>${st.busy ? 'يزامن…' : 'زامن الآن'}</button><button data-act="trk-unlink">افصل</button></div>`
     : l.ready === false ? '<p>يُجهَّز قريباً.</p>' : '<div class="actions"><button class="cta" data-act="trk-link">اربط حسابك في Trakt</button></div>') + msg + (st.err ? `<p class="trk-msg">${esc(st.err)}</p>` : ''); }
-const drawTrk = () => { const el = $('#trk'); if (el) el.innerHTML = trkHTML(); };
+// وأفلامه مع Letterboxd (E90): الربط وملف الاستيراد في نافذة Letterboxd في قائمة أفلامي، وهنا حاله ورابط إليها
+function lbnHTML() { const l = accState().links?.letterboxd;
+  return `${l?.on ? `<p class="trk-on">مربوط بصفحتك <bdi dir="ltr">letterboxd.com/${esc(l.user || '')}</bdi> ✓</p>` : ''}<div class="actions"><button data-act="lbn-go">${l?.on ? 'افتح نافذته في قائمة أفلامي' : 'اربطه من قائمة أفلامي'}</button></div>`; }
+const drawTrk = () => { const el = $('#trk'); if (el) el.innerHTML = trkHTML(); const ln = $('#lbn'); if (ln) ln.innerHTML = lbnHTML(); };
 // «اربط»: إلى صفحة موافقة Trakt، ثم يعود إلى هذا الدليل (?linked=trakt) وتُفتح «سجلّي» برسالة
 async function trkGo() { TK.msg = ''; try { await accLink('trakt', { from: G.id }); } catch (e) { TK.msg = e.pass ? '' : esc(e.message || 'تعذّر الربط.'); drawTrk(); } }
 const trkBack = (svc, fail) => { if (svc !== 'trakt') return; TK.msg = !fail ? 'رُبط Trakt، والمزامنة تبدأ الآن.' : fail === 'denied' ? 'لم تكتمل الموافقة في Trakt، فلم يُربط.' : 'تعذّر الربط. اضغط «اربط» من جديد.'; openBackup(); };
@@ -646,7 +674,7 @@ function openJump() {
 }
 const encode = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 function openBackup() {
-  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px">${TRK ? `<section class="trk"><h4><bdi dir="ltr">Trakt</bdi></h4><p>حلقات المسلسلات و«سأشاهده» تتزامن بالاتجاهين مع حسابك في Trakt، ولو كانت الصفحة مغلقة.</p><div id="trk">${trkHTML()}</div></section><h4>أجهزتك</h4>` : ''}<p>فعّل المزامنة ليصل سجلك إلى كل أجهزتك تلقائياً، في لحظته.</p>
+  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px">${TRK ? `<section class="trk"><h4><bdi dir="ltr">Trakt</bdi></h4><p>حلقات المسلسلات و«سأشاهده» تتزامن بالاتجاهين مع حسابك في Trakt، ولو كانت الصفحة مغلقة.</p><div id="trk">${trkHTML()}</div></section><section class="trk"><h4><bdi dir="ltr">Letterboxd</bdi></h4><p>أفلام هذا الدليل مع قائمة أفلامي و<bdi dir="ltr">Letterboxd</bdi>: ما تسجّله في يومياتك هناك أو تعلّمه في قائمة أفلامي يصل هنا، وما تعلّمه هنا يصل قائمة أفلامي ويدخل ملف الاستيراد إلى <bdi dir="ltr">Letterboxd</bdi>.</p><div id="lbn">${lbnHTML()}</div></section><h4>أجهزتك</h4>` : ''}<p>فعّل المزامنة ليصل سجلك إلى كل أجهزتك تلقائياً، في لحظته.</p>
     <div class="actions"><button data-sync-open><span data-sync-label>${syncLabel()}</span></button></div>
     <h4>نسخة يدوية</h4><p>الكود التالي هو سجلك كاملاً. احتفظ به نسخةً احتياطية، أو الصقه في جهاز آخر لاسترجاع السجل.</p>
     <textarea id="bk" aria-label="كود السجل">${encode(store)}</textarea>
@@ -734,8 +762,9 @@ document.addEventListener('click', ev => {
     case 'season': showSeason(id, season); break;
     case 'path': ui.path = d.path; render(true); break;
     case 'close': closeSheet(); break;
+    case 'sback': S.back(); break;   // البطاقة السابقة (E89)
     case 'shield': if (ui.sheet) closeSheet(); store.shield = !store.shield; save(); syncShield(); render(true); toast(store.shield ? 'درع الحرق مفعّل' : 'درع الحرق متوقف'); break;
-    case 'status': { const k = b.closest('[data-k]').dataset.k, was = store.works[k]; if (store.works[k] === d.s) delete store.works[k]; else store.works[k] = d.s; save(); listMark(k, was);
+    case 'status': { const k = b.closest('[data-k]').dataset.k, was = store.works[k]; if (store.works[k] === d.s) delete store.works[k]; else store.works[k] = d.s; save(); listMark(k, was); filmMark(k, was);
       if (store.works[k] === 'watched') offerEps(k); else if (ask.fn) { ask.fn = null; $('#toast').hidden = true; }
       if ($('#fStatus').value) { render(true); break; } // مع تصفية الحالة قد يخرج العمل من القائمة نفسها
       syncStatus(k); stats(); refreshProgress(); refreshPick(); break; }
@@ -759,15 +788,16 @@ document.addEventListener('click', ev => {
     case 'bkimport': importCode(); break;
     case 'trk-link': trkGo(); break;
     case 'trk-sync': accSync({ force: true }); break;
+    case 'lbn-go': location.href = '../films/#letterboxd'; break;
     case 'trk-unlink': accUnlink('trakt').then(() => { TK.msg = 'فُصل Trakt: لا تتزامن المسلسلات معه بعد الآن.'; drawTrk(); }, e => { TK.msg = esc(e.message); drawTrk(); }); break;
     case 'guide': openGuide(); break;
     case 'tonight': if (ui.sheet) closeSheet(); setTimeout(SG ? pickGo : tonight, 60); break;
     case 'pick-next': refreshPick(1); break;
     case 'pick-mood': { const g = d.g; SG.moods = !g ? [] : SG.moods.includes(g) ? SG.moods.filter(x => x !== g) : [...SG.moods, g]; try { localStorage.setItem(KEY + '.mood', SG.moods.join('|')); } catch {} SG.id = ''; refreshPick(); break; }
-    case 'pick-start': { const k = d.k, was = store.works[k]; store.works[k] = 'watching'; save(); listMark(k, was); syncStatus(k); stats(); refreshProgress(); refreshPick(); toast('بدأته: صار في «أشاهده»'); break; }
+    case 'pick-start': { const k = d.k, was = store.works[k]; store.works[k] = 'watching'; save(); listMark(k, was); filmMark(k, was); syncStatus(k); stats(); refreshProgress(); refreshPick(); toast('بدأته: صار في «أشاهده»'); break; }
   }
 });
-addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && ui.sheet) S.back(); });
 let qt; ['input', 'change'].forEach(t => $('#filters').addEventListener(t, () => { clearTimeout(qt); qt = setTimeout(() => render(), 150); }));
 document.addEventListener('load', e => { if (e.target.tagName === 'IMG') e.target.classList.add('in'); }, true);
 document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && !t.dataset.failed) { t.dataset.failed = 1; t.style.visibility = 'hidden'; } }, true);

@@ -204,11 +204,21 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   { const pvPc = () => page.evaluate(() => ({ tiles: [...document.querySelectorAll('#sheet .pcsec .pcs a')].map(a => a.dataset.s + ':' + a.querySelector('small').textContent), f: !!document.querySelector('#sheet .pcsec .pcf'), note: document.querySelector('#sheet .pcsec .note')?.textContent || '', subs: !!document.querySelector('#sheet .subsec') }));
     let x = await pvPc();
     check('بطاقة الاطلاع لا تَعِد بفحص لا يقع: ليست في المكتبة فمتاجرها لا تُفحص إلا إن أُضيفت، ولا قسم للاشتراكات', !x.tiles.length && !x.f && !x.subs && x.note === 'ليست في مكتبتك، فمتاجرها لا تُفحص، وليس لها في IGDB رابط متجر. إن أضفتها فُحصت في البناء القادم.', x);
-    await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+    // البطاقة المفتوحة من بطاقة خطوة فوقها (E89): زر «رجوع» باسم التي تحتها، وEsc يرجع إليها ولا يغلق الكل
+    { const sb = await page.evaluate(() => { const b = document.querySelector('#sheet .sback'); return { on: !b.hidden, say: b.getAttribute('aria-label'), k: history.state?.k }; });
+      await page.keyboard.press('Escape'); await page.waitForSelector('#sheet[open] .save:not(.pv)', { timeout: 5000 }).catch(() => {});
+      const bk = await page.evaluate(() => ({ open: document.getElementById('sheet').open, t: document.querySelector('#sheet-body h2')?.textContent, hash: location.hash, sb: document.querySelector('#sheet .sback').hidden }));
+      check('بطاقة فُتحت من بطاقة خطوة فوقها: زر «رجوع» باسم التي تحتها، وEsc يرجع إليها لا يغلق الكل (E89)', sb.on && sb.say === 'رجوع إلى «God of War Ragnarök»' && sb.k === 2 && bk.open && bk.t === 'God of War Ragnarök' && bk.hash === '#g112875' && bk.sb, [sb, bk]); }
     await hashOpen(page, '#g112875', '#sheet[open] .order:not([hidden])'); await page.click('#sheet [data-act=ordv][data-v=release]'); await page.waitForSelector('#sheet .order[data-ov=release]:not([hidden]) li:nth-child(3) .go[data-act=peek]'); await page.waitForTimeout(200);
     await page.click('#sheet .order[data-ov=release] li:nth-child(3) .go'); await page.waitForSelector('#sheet [data-act=pv-add]');
     x = await pvPc(); check('وبروابط متاجرها في IGDB: بلاطاتها كما هي بلا حكم على المجانية، والملاحظة تقول إنها لا تُفحص', asked.includes('preview:551') && x.tiles.join() === 'steam:المتجر' && !x.f && x.note === 'ليست في مكتبتك، فهذه روابط متاجرها في IGDB كما هي، بلا فحص لمجانيتها. إن أضفتها فُحصت في البناء القادم.', x); }
-  await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  // وزر «رجوع» بجانب × مثل Esc، وما فُتح من رابط مباشر لا يخرج الرجوع منه من الموقع، و× يغلقها كلها ولا يبقى في السجل ما يعيد فتحها
+  { await page.click('#sheet [data-act=sback]'); await page.waitForSelector('#sheet[open] .save:not(.pv)', { timeout: 5000 }).catch(() => {});
+    const t1 = await page.evaluate(() => document.querySelector('#sheet-body h2')?.textContent);
+    await page.click('#sheet .order[data-ov=release] li:nth-child(3) .go').catch(() => {}); await page.waitForSelector('#sheet [data-act=pv-add]', { timeout: 5000 }).catch(() => {});
+    await page.click('#sheet [data-act=close]'); await page.waitForTimeout(400);
+    const c = await page.evaluate(() => ({ open: document.getElementById('sheet').open, hash: location.hash, st: history.state, url: location.pathname }));
+    check('زر «رجوع» يعيد التي تحتها، و× يغلق البطاقات كلها مرة واحدة ويبقى في الصفحة بلا رابط بطاقة', t1 === 'God of War Ragnarök' && !c.open && !c.hash && !c.st?.game && c.url === '/games/', [t1, c]); }
   // السلاسل
   await page.click('[data-act=view][data-v=series]'); await page.waitForTimeout(300);
   const sr = await page.evaluate(() => [...document.querySelectorAll('#series .fr')].map(f => [f.querySelector('h3').textContent, f.querySelectorAll('.part').length, f.querySelectorAll('.part.out').length]));
@@ -540,7 +550,7 @@ const shown = page => page.evaluate(() => [...document.querySelectorAll('#grid .
   await page.goto(`${base}/games/#g112875`); await page.waitForSelector('#sheet[open] .order:not([hidden])'); await page.click('#sheet .order[data-ov=release] li:nth-child(2) .go'); await page.waitForSelector('#sheet .save.pv');
   const pv = await twin();
   check('بطاقة الاطلاع للعبة ليست في القائمة: «في مكتبتك لعبتان بهذا الاسم» بصفّيهما، وبلا زر إسكات', pv?.pv && pv.head === 'في مكتبتك لعبتان بهذا الاسم' && pv.rows.map(r => r[0]).join() === '549,19560' && !pv.no && pv.first, pv);
-  await page.keyboard.press('Escape'); await page.waitForTimeout(350);
+  await page.click('#sheet [data-act=close]'); await page.waitForTimeout(350);   // × يغلق البطاقتين معاً (E89)
   await page.evaluate(() => localStorage.setItem('gamesg.steam', '76561198000000001')); await page.click('.top [data-act=accounts]'); await page.waitForSelector('#acc[open] [data-act=pull][data-src=steam]'); await page.click('#acc [data-act=pull][data-src=steam]'); await page.waitForSelector('#inbox[open] .ib-card.top');
   const ibh = await page.evaluate(() => ({ t: document.querySelector('.ib-card.top h3').textContent, tw: document.querySelector('.ib-card.top .hints .tw')?.textContent || '' }));
   check('صندوق الأسئلة: لعبة مسحوبة وفي المكتبة لعبة باسمها تُعلَّم بذلك قبل أن تُضاف', ibh.t === 'Minecraft' && ibh.tw === 'في مكتبتك لعبة بهذا الاسم (2011)', ibh);

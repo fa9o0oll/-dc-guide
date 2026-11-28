@@ -240,6 +240,30 @@ console.log('\n== المسلسلات ↔ Trakt (E87)');
   check('فصل Trakt يمحو رمزه وينسى ظله، ويبقي المحور', !su.sh && !su.shOk && Object.keys(su.items).length > 0 && !(await S.get('tok/trakt')) && (await call('', { method: 'GET' })).j.links.trakt.on === false, su.shOk);
   check('ولا رمز في حال المسلسلات المحفوظة', noTok(su)); }
 
+console.log('\n== أفلام دليلَي DC ومارفل ↔ قائمة أفلامي وLetterboxd (E90)');
+{ await call('/link', { body: { svc: 'letterboxd', user: 'faisal_test' } });
+  const fm = r => Object.fromEntries(r.j.changes.filter(c => /^m\d+$/.test(c.id)).map(c => [c.id, c]));
+  let f0 = await call('/sync', { body: { guide: 'films', since: { f: 0, s: 0 } } }); const hub0 = (await S.get('films')).items;
+  check('قبل الدليلين: في المحور ما شاهدته في القائمة (550)، وما في «سأشاهده» (13)، وما أزلت علامته (603)', hub0[550]?.s === 'watched' && hub0[13]?.s === 'next' && hub0[603]?.s === null, [hub0[550], hub0[13], hub0[603]]);
+  let d = await call('/sync', { body: { guide: 'dc', build: 'b1', since: 0, full: { m414906: 'watched', m550: 'next', m13: 'watched', m603: 'watched', tv1: { e: [], l: 0 } } } }); let dc = fm(d), hub = (await S.get('films')).items;
+  check('سجل دليل DC يُجمع إلى المحور: فيلم جديد يُضاف، و«شاهدته» يغلب «سأشاهده»، ولا ينزل «شاهدته» بـ«سأشاهده»، ولا يعود فيلم أُزيلت علامته صراحة',
+    hub[414906]?.s === 'watched' && hub[414906].src === 'dc' && hub[13]?.s === 'watched' && hub[550]?.s === 'watched' && hub[603]?.s === null, [hub[414906], hub[13], hub[550], hub[603]]);
+  check('ويصل الدليلَ ما في المحور من غيره (يومياتك وقائمة أفلامي)، ولا يعود إليه ما جاء منه، ورقم المراجعة للمسلسلات والأفلام معاً',
+    dc.m27205?.s === 'watched' && dc.m27205.src === 'letterboxd' && dc.m550?.s === 'watched' && !dc.m414906 && !dc.m13 && typeof d.j.rev === 'object' && d.j.rev.f > 0 && d.j.rev.s >= 0, [d.j.rev, Object.keys(dc)]);
+  let f = await call('/sync', { body: { guide: 'films', since: f0.j.rev } }); let fc = fm(f);
+  check('وقائمة أفلامي يصلها ما جاء من الدليل بمصدره (414906 و13 من DC)', fc.m414906?.s === 'watched' && fc.m414906.src === 'dc' && fc.m13?.s === 'watched' && fc.m13.src === 'dc', f.j.changes);
+  d = await call('/sync', { body: { guide: 'dc', build: 'b1', since: d.j.rev, edits: [{ id: 'm414906', s: null, t: Date.now() }, { id: 'm268', s: 'next', t: Date.now() }] } });
+  f = await call('/sync', { body: { guide: 'films', since: f.j.rev, edits: [{ id: 'm299534', s: 'watched', t: Date.now() }] } }); fc = fm(f);
+  check('وتعديل في الدليل يصل قائمة أفلامي: إزالة «شاهدته» (414906) و«قائمتي» «سأشاهده» (268)', fc.m414906?.s === null && fc.m268?.s === 'next' && fc.m268.src === 'dc', f.j.changes);
+  let mv = await call('/sync', { body: { guide: 'marvel', build: 'b1', since: 5 } }); const mc = fm(mv);
+  check('ودليل مارفل يصله ما في قائمة أفلامي (299534) وما في دليل DC، وصفحة قديمة ترسل رقماً واحداً فيُقرأ رقم المسلسلات', mc.m299534?.s === 'watched' && mc.m299534.src === 'site' && mc.m268?.src === 'dc' && mv.status === 200 && typeof mv.j.rev === 'object', [mv.j.rev, Object.keys(mc).length]);
+  LBX.push([299534, '2026-11-27', 5], [24428, '2026-11-27', 4]); sent.length = 0; mv = await call('/sync', { body: { guide: 'marvel', build: 'b1', since: mv.j.rev } });
+  check('والدليلان لا يطلبان يومياتك مع كل تعديل: قُرئت قبل أقل من دقيقتين فلا تُقرأ', !sent.some(x => x[0] === 'lb') && !fm(mv).m24428, sent.filter(x => x[0] === 'lb'));
+  { const fs0 = await S.get('films'); fs0.at.letterboxd = Date.now() - 180e3; await S.set('films', fs0); } mv = await call('/sync', { body: { guide: 'marvel', build: 'b1', since: mv.j.rev } });
+  check('وبعدهما تُقرأ، فما سجّلته فيها يصل الدليل (24428)، ولا يتكرر ما وصله', fm(mv).m24428?.s === 'watched' && fm(mv).m24428.src === 'letterboxd' && !fm(mv).m299534, mv.j.changes);
+  check('والمسلسلات في الرد نفسه كما كانت (لا مفتاح فيلم فيها، ولا شيء يُطلب)', mv.j.changes.every(c => /^m\d+$/.test(c.id) || typeof c.id === 'number') && !mv.j.needFull, mv.j);
+  await call('/unlink', { body: { svc: 'letterboxd' } }); }
+
 console.log('\n== الفصل وانتهاء الربط');
 await call('/unlink', { body: { svc: 'simkl' } }); skRow(1, 'hold', 12); sent.length = 0; r = await call('/sync', { body: { since: r.j.rev } });
 check('بعد فصل SIMKL لا يُسحب منه ولا يُرسل إليه', !sent.some(x => x[0] === 'sk') && !r.j.changes.some(c => c.id === 1 && c.s === 'hold') && !(await S.get('tok/simkl')), sent);
