@@ -84,4 +84,12 @@ check('تعطّل Wikidata يعيد خطأً واضحاً ولا يكتب شيئ
   const na = await call({ action: 'add', tmdb: 949, kind: 'movie', adult: true, ...P });
   check('وعمل عادي يُضاف والفلتر مرفوع كما يُضاف دائماً، بلا وسم', na.status === 200 && !na.body.film.adult && !JSON.parse(stored).find(e => e.tmdb === 949)?.adult && !/\+18/.test(puts.at(-1).message.replace('films: add +18 (m700)', '')), [na.status, na.body.state, puts.at(-1)?.message]); }
 check('عمل غير موجود في TMDB برسالة واضحة', (await call({ action: 'add', tmdb: 123456, password: 'open-sesame-42' })).status === 422);
+// استيراد سجل Letterboxd (E88): مطابقة الاسم والسنة، ثم إضافة ما ليس في القائمة بإيداع واحد
+{ const P = { password: 'open-sesame-42' }, n0 = puts.length;
+  const m = await call({ action: 'match', items: [{ name: 'Heat', year: 1995 }, { name: 'Velvet', year: 2020 }, { name: 'Nothing Like This', year: 2001 }], ...P }), by = n => m.body.items.find(x => x.name === n);
+  check('مطابقة سجل Letterboxd: الاسم والسنة بفيلم TMDB، وما لم يُعرف بثقة يقال، ولا عمل +18', m.status === 200 && by('Heat')?.tmdb === 949 && by('Heat')?.y === 1995 && by('Velvet')?.tmdb !== 700 && by('Nothing Like This')?.miss === 1, m.body);
+  const im = await call({ action: 'import', items: [{ tmdb: 949, title: 'Heat', year: 1995 }, { tmdb: 4242, title: 'New One', year: 2026 }, { tmdb: 4243, title: 'Newer', year: 2026 }, { tmdb: 4242, title: 'New One', year: 2026 }], ...P }), L = JSON.parse(stored);
+  check('واستيراده يضيف إلى القائمة ما ليس فيها بإيداع واحد، ولا يكرر ما فيها ولا ما تكرر في الطلب', im.status === 200 && im.body.added === 2 && puts.length === n0 + 1 && puts.at(-1).message === 'films: import 2 from Letterboxd'
+    && L.filter(e => e.tmdb === 949).length === 1 && L.filter(e => e.tmdb === 4242).length === 1 && L.some(e => e.tmdb === 4243 && e.from === 'letterboxd' && e.kind === 'movie'), [im.body, puts.at(-1)?.message]);
+  check('وبلا كلمة السر لا مطابقة ولا استيراد', (await call({ action: 'import', items: [{ tmdb: 5 }] })).status === 401 && (await call({ action: 'match', items: [{ name: 'Heat' }] })).status === 401); }
 console.log(fails.length ? `\n❌ فشل ${fails.length}` : '\n✅ كل الفحوص نجحت'); process.exit(fails.length ? 1 : 0);

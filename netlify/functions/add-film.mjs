@@ -35,6 +35,24 @@ async function record(entry) {
   }
   throw new Error('GitHub conflict');
 }
+// استيراد سجل Letterboxd (E88): كل ما ليس في الملف يُضاف بإيداع واحد (لا إيداع لكل فيلم)، ويُبنى مع التحديث الذي يشغّله الإيداع
+async function recordMany(entries) {
+  const api = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
+  const headers = { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'watch-guide-add-film' };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const cur = await fetch(`${api}?ref=${BRANCH}`, { headers }); let list = [], sha;
+    if (cur.status === 200) { const j = await cur.json(); sha = j.sha; list = JSON.parse(Buffer.from(j.content, 'base64').toString('utf8')); }
+    else if (cur.status !== 404) throw Object.assign(new Error('GitHub read ' + cur.status), { gh: cur.status });
+    const have = new Set(list.map(x => (x.kind || 'movie') + x.tmdb)), fresh = entries.filter(e => !have.has(e.kind + e.tmdb) && have.add(e.kind + e.tmdb));
+    if (!fresh.length) return 0;
+    const put = await fetch(api, { method: 'PUT', headers, body: JSON.stringify({ message: `films: import ${fresh.length} from Letterboxd`, branch: BRANCH, ...(sha ? { sha } : {}),
+      content: Buffer.from(JSON.stringify([...list, ...fresh], null, 1) + '\n').toString('base64') }) });
+    if (put.ok) return fresh.length;
+    if (put.status !== 409 && put.status !== 422) throw Object.assign(new Error('GitHub write ' + put.status), { gh: put.status });
+    await wait(400);
+  }
+  throw new Error('GitHub conflict');
+}
 
 export default async req => {
   if (req.method !== 'POST') return json(405, { error: 'POST only' });
@@ -64,6 +82,21 @@ export default async req => {
         const col = kind === 'movie' && i < 4 ? (await tmdb('/movie/' + c.id).catch(() => null))?.belongs_to_collection?.name?.replace(/\s+Collection$/i, '') : null;
         return { tmdb: c.id, kind, title: c.title || c.name, year: year(c), poster: c.poster_path || null, collection: col || undefined, adult: c.adult ? 1 : undefined }; }));
       return json(200, { parsed, sure: mv.sure, candidates });
+    }
+    // سجل Letterboxd (E88، من ملف «تصدير بياناتك»): match يطابق اسماً وسنة بفيلم في TMDB (30 في المرة، والمطابقة الواثقة وحدها: الاسم نفسه
+    // والسنة نفسها أو التي تليها)، وimport يضيف إلى القائمة ما ليس فيها بإيداع واحد. ولا يُستورد عمل +18 (Letterboxd لا يحمله أصلاً)
+    if (b.action === 'match') {
+      const items = (Array.isArray(b.items) ? b.items : []).slice(0, 30);
+      const out = await Promise.all(items.map(async it => { const name = String(it?.name || '').trim().slice(0, 200), y = +it?.year || null; if (!name) return null;
+        const r = await search(tmdb, 'movie', name, y).catch(() => null), c = r?.top;
+        return c && r.sure && !c.adult ? { name, year: y, tmdb: c.id, title: c.title, y: year(c) } : { name, year: y, miss: 1 }; }));
+      return json(200, { items: out.filter(Boolean) });
+    }
+    if (b.action === 'import') {
+      const at = new Date().toISOString(), items = (Array.isArray(b.items) ? b.items : []).filter(x => Number.isInteger(+x?.tmdb) && +x.tmdb > 0).slice(0, 3000)
+        .map(x => ({ tmdb: +x.tmdb, kind: 'movie', title: String(x.title || '').slice(0, 200), year: +x.year || null, at, from: 'letterboxd' }));
+      if (!items.length) return json(400, { error: 'لا أفلام للإضافة.' });
+      return json(200, { added: await recordMany(items) });
     }
     // preview: بطاقة كاملة لعمل ليس في القائمة، دون إضافته. add: البطاقة نفسها ثم الحفظ في المستودع
     if (b.action === 'add' || b.action === 'preview') {

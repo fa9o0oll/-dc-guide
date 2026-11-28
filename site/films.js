@@ -446,7 +446,7 @@ function setStatus(id, v) { const cur = st(id); if (cur === v) delete P.films[id
 
 // ---------- Letterboxd (E86): يومياتك فيه تصل هنا وحدها، وما تعلّمه هنا يُجهَّز لك في ملف استيراد ترفعه إليه بنفسك
 // (Letterboxd لا يسمح لأي موقع أن يكتب في حسابك). الخادم (/api/accounts) يقرأ يومياتك العامة ويحفظ ما يعرفه Letterboxd، فلا يُعاد في ملف
-const LB = { msg: '' };
+const LB = { msg: '', imp: null };
 // أعمال +18 (موسومة للبالغين في TMDB) لا تدخل الملف ولا عدّه في أي حال: Letterboxd يرفض استيرادها («marked as adult content and was not imported»)،
 // فلا فائدة من ظهور أسمائها في ملفك وصفحة الاستيراد، والفلتر قائم لا تظهر في عدّاد
 const lbPending = () => { const lb = accState().lb, known = new Set(lb?.known || []), wl = new Set(lb?.wl || []), o = { watched: [], next: [] };
@@ -456,10 +456,12 @@ function lbxHTML() { const st = accState(), l = st.links?.letterboxd, on = !!l?.
   const passF = st.pass || !accPass() ? `<form class="lbx-pass"><label>كلمة سر الموقع مرة واحدة في هذا المتصفح (نفسها في «أضف فيلماً»)<input type="password" autocomplete="current-password" required></label><button class="btn pri" type="submit">تم</button></form>` : '';
   const ago = t => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? 'الآن' : m < 60 ? `قبل ${m} دقيقة` : m < 1440 ? `قبل ${Math.round(m / 60)} ساعة` : `قبل ${Math.round(m / 1440)} يوم`; };
   const err = on && l.err ? `<p class="msg">${l.err === 'gone' ? 'لم تعد صفحتك في Letterboxd بهذا الاسم: افصله واربطه باسمك الجديد.' : 'تعذّر الوصول إلى يومياتك في آخر قراءة، ويُعاد وحده.'}</p>` : '';
-  const file = (k, n, label, open, href) => `<div class="lbx-row"><p><b>${n ? nFilms(n) : 'لا شيء'}</b> ${label}</p>${n ? `<button class="btn pri" data-act="lbx-file" data-k="${k}">نزّل الملف</button>` : ''}<a class="btn sec" href="${href}" target="_blank" rel="noopener">${open}</a></div>`;
+  const file = (k, n, label, open, href) => `<div class="lbx-row lbx-due"><p><b>${n ? nFilms(n) : 'لا شيء'}</b> ${label}</p>${n ? `<button class="btn pri" data-act="lbx-file" data-k="${k}">نزّل الملف</button>` : ''}<a class="btn sec" href="${href}" target="_blank" rel="noopener">${open}</a></div>`;
   return `<h2 id="lbx-h"><bdi dir="ltr">Letterboxd</bdi></h2>
-    <p class="hint">ما تسجّله في يومياتك هناك يصير هنا «شاهدته» وحده. وLetterboxd لا يسمح لأي موقع أن يكتب في حسابك، فما تعلّمه هنا يُجهَّز لك في ملف ترفعه إليه بضغطتين.</p>
+    <p class="hint">ما تسجّله في يومياتك هناك (Log بتاريخ مشاهدة) يصير هنا «شاهدته» وحده، أما علامة «شاهدته» بلا تسجيل فلا يعطيها Letterboxd لأي موقع. ولا يسمح لأي موقع أن يكتب في حسابك، فما تعلّمه هنا يُجهَّز لك في ملف ترفعه إليه بضغطتين.</p>
     ${passF || (on ? `<p class="lbx-on">مربوط بصفحتك <bdi dir="ltr">letterboxd.com/${esc(user)}</bdi> ✓${l.at ? ` · آخر قراءة ${ago(l.at)}` : ''}</p>${err}
+      <div class="lbx-row lbx-old"><p><b>سجلّك كله هناك</b>: صفحة Watched وقائمة المشاهدة لا يعطيهما Letterboxd لأي موقع إلا في ملف «تصدير بياناتك». نزّله من إعداداته، ثم اختره هنا كما نزل، مرة واحدة.</p>
+        <a class="btn sec" href="https://letterboxd.com/settings/data/" target="_blank" rel="noopener">افتح صفحة التصدير</a>${LB.imp ? `<p class="lbx-imp" role="status">${esc(LB.imp)}</p>` : '<label class="btn pri lbx-pick">اختر الملف<input type="file" class="lbx-file-in" accept=".zip,.csv,application/zip,text/csv"></label>'}</div>
       ${file('watched', pend.watched.length, 'مما شاهدته هنا ولم يصل Letterboxd', 'افتح صفحة الاستيراد', 'https://letterboxd.com/import/')}
       ${file('next', pend.next.length, 'مما في «سأشاهده» هنا وليس في قائمة المشاهدة هناك', 'افتح قائمة المشاهدة', `https://letterboxd.com/${encodeURIComponent(user)}/watchlist/`)}
       <p class="hint">بعد أن تنزّل الملف: افتح الصفحة، اختر الملف، ثم «Import». وما في الملف لا يعود في الملف التالي.</p>
@@ -482,6 +484,58 @@ function accApply(changes) { let n = 0, tv = 0;
     if (c.s ? cur === c.s : !cur) continue; if (c.s) P.films[c.id] = c.s; else delete P.films[c.id]; n++; }
   if (!n && !tv) return; save(); renderGrid(); moodChips(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML();
   toast([n ? `وصل من يومياتك في Letterboxd: ${nFilms(n)}` : '', tv ? `وصل من Trakt تحديث ${tv === 1 ? 'مسلسل واحد' : tv === 2 ? 'مسلسلين' : tv <= 10 ? tv + ' مسلسلات' : tv + ' مسلسلاً'}` : ''].filter(Boolean).join('، و')); }
+// ---------- سجلّك كله في Letterboxd (E88): صفحة Watched وقائمة المشاهدة لا يعطيهما Letterboxd لأي موقع إلا في ملف «تصدير بياناتك»
+// (letterboxd.com/settings/data). يُختار هنا كما نزل (ZIP، أو watched.csv وحده) مرة واحدة: كل فيلم شاهدته هناك يصير «شاهدته» هنا، وما ليس في
+// القائمة يُضاف إليها (بإيداع واحد في /api/add-film، ويظهر بعد تحديث الموقع بدقائق)، وقائمة المشاهدة «سأشاهده». المطابقة بالاسم والسنة:
+// في القائمة أولاً، ثم TMDB (مطابقة واثقة وحدها). وما جاء منه معروف له، فلا يعود في ملف الاستيراد إليه
+const lbNorm = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, ' and ').replace(/[^a-z0-9؀-ۿ]+/g, ' ').replace(/\b(the|a|an)\b/g, ' ').replace(/\s+/g, ' ').trim();
+// ملف ZIP بلا مكتبة: الفهرس المركزي في آخره، وكل ملف مخزَّن أو مضغوط بـdeflate (DecompressionStream في المتصفح)
+async function zipTexts(buf, want) { const u8 = new Uint8Array(buf), dv = new DataView(buf), dec = new TextDecoder(), out = {};
+  let e = u8.length - 22; while (e >= 0 && dv.getUint32(e, true) !== 0x06054b50) e--; if (e < 0) throw new Error('الملف ليس ZIP سليماً.');
+  let p = dv.getUint32(e + 16, true); const n = dv.getUint16(e + 10, true);
+  for (let i = 0; i < n && dv.getUint32(p, true) === 0x02014b50; i++) { const method = dv.getUint16(p + 10, true), size = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true), off = dv.getUint32(p + 42, true);
+    const name = dec.decode(u8.subarray(p + 46, p + 46 + nl)); p += 46 + nl + dv.getUint16(p + 30, true) + dv.getUint16(p + 32, true); if (!want(name)) continue;
+    const at = off + 30 + dv.getUint16(off + 26, true) + dv.getUint16(off + 28, true), raw = u8.subarray(at, at + size);
+    out[name] = method === 0 ? dec.decode(raw) : method === 8 ? await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text() : ''; }
+  return out; }
+// CSV بصيغة Letterboxd (Date,Name,Year,Letterboxd URI): الحقول بين علامتي تنصيص، والفاصلة داخلها
+function lbCsv(text) { const rows = []; let row = [], f = '', q = false; text = String(text || '').replace(/^﻿/, '');
+  for (let i = 0; i < text.length; i++) { const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true; else if (c === ',') { row.push(f); f = ''; } else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(f); rows.push(row); row = []; f = ''; } else f += c; }
+  if (f || row.length) { row.push(f); rows.push(row); }
+  const [h, ...rest] = rows.filter(r => r.some(x => x.trim())); if (!h) return []; const ix = k => h.findIndex(x => x.trim().toLowerCase() === k), N = ix('name'), Y = ix('year'); if (N < 0) return [];
+  return rest.map(r => ({ name: (r[N] || '').trim(), year: +(r[Y] || '') || null })).filter(r => r.name); }
+async function lbxFiles(file) { const name = file.name.toLowerCase(), buf = await file.arrayBuffer();
+  if (!name.endsWith('.zip')) { const t = new TextDecoder().decode(buf); return /watchlist/.test(name) ? { watchlist: t } : { watched: t }; }
+  // في الملف مجلد deleted/ لما حذفته، ولا يُؤخذ منه شيء
+  const all = await zipTexts(buf, n => /(^|\/)(watched|watchlist)\.csv$/i.test(n) && !/(^|\/)deleted\//i.test(n)), pick = k => Object.entries(all).filter(([n]) => new RegExp(`(^|/)${k}\\.csv$`, 'i').test(n)).sort((a, b) => a[0].length - b[0].length)[0]?.[1] || '';
+  return { watched: pick('watched'), watchlist: pick('watchlist') }; }
+async function lbxImport(file) { const pw = accPass(), step = t => { LB.imp = t; LB.msg = ''; drawLbx(); }; if (!pw) { LB.msg = 'اكتب كلمة سر الموقع أولاً.'; return drawLbx(); }
+  try { step('يقرأ الملف…'); const f = await lbxFiles(file), W = lbCsv(f.watched), WL = lbCsv(f.watchlist);
+    if (!W.length && !WL.length) throw new Error('لم أجد في الملف أفلاماً. اختر ملف «تصدير بياناتك» من Letterboxd كما نزل (ZIP)، أو watched.csv منه.');
+    // في القائمة أولاً: الاسم والسنة، أو السنة التي قبلها أو بعدها (كما يطابق البناء)
+    const idx = new Map(); for (const x of D.pool.values()) if (x.kind === 'movie' && x.year) { const k = lbNorm(x.title); for (const y of [x.year, x.year - 1, x.year + 1]) if (!idx.has(k + '|' + y)) idx.set(k + '|' + y, x); }
+    const rows = [...W.map(r => ({ ...r, s: 'watched' })), ...WL.map(r => ({ ...r, s: 'next' }))], hit = new Map(), miss = [], ask = [];
+    for (const r of rows) { const x = r.year && idx.get(lbNorm(r.name) + '|' + r.year); if (x) hit.set(r, { id: x.id, tmdb: x.tmdb, have: true }); else ask.push(r); }
+    // والباقي من TMDB، ثلاثون في الطلب
+    for (let i = 0; i < ask.length; i += 30) { step(`يطابق مع TMDB: ${Math.min(i + 30, ask.length)} من ${ask.length}…`);
+      const part = ask.slice(i, i + 30), j = await api({ action: 'match', items: part.map(r => ({ name: r.name, year: r.year })) }, pw), by = new Map((j.items || []).map(m => [m.name + '|' + (m.year || ''), m]));
+      for (const r of part) { const m = by.get(r.name.slice(0, 200) + '|' + (r.year || '')); if (m?.tmdb) hit.set(r, { id: 'm' + m.tmdb, tmdb: m.tmdb, title: m.title, year: m.y, have: D.pool.has('m' + m.tmdb) }); else miss.push(r); } }
+    const add = [...new Map([...hit.values()].filter(h => !h.have).map(h => [h.tmdb, { tmdb: h.tmdb, title: h.title, year: h.year }])).values()];
+    let added = 0; if (add.length) { step(`يضيف إلى قائمتك ${nFilms(add.length)}…`); added = (await api({ action: 'import', items: add }, pw)).added || 0; }
+    // «شاهدته» يغلب «سأشاهده»، ولا ينزل فيلم شاهدته إلى «سأشاهده»
+    let nw = 0, nn = 0; const sw = new Set(), sn = new Set();
+    for (const [r, h] of hit) if (r.s === 'watched') { sw.add(h.tmdb); if (P.films[h.id] !== 'watched') { P.films[h.id] = 'watched'; nw++; } }
+    for (const [r, h] of hit) if (r.s === 'next' && !sw.has(h.tmdb)) { sn.add(h.tmdb); if (!P.films[h.id]) { P.films[h.id] = 'next'; nn++; } }
+    save(); renderGrid(); moodChips(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML();
+    if (sw.size) await accSent('watched', [...sw]).catch(() => {}); if (sn.size) await accSent('next', [...sn]).catch(() => {});
+    const onN = n => n === 2 ? 'فيلمين' : nFilms(n), parts = [nw ? `عُلّم «شاهدته» على ${onN(nw)}` : '', nn ? `و«سأشاهده» على ${onN(nn)}` : ''].filter(Boolean);   // بعد «على» المثنى مجرور
+    LB.imp = null; LB.msg = (parts.length ? parts.join('، ') + '.' : 'كل ما في الملف معلَّم هنا من قبل.') + (added ? ` وأُضيف منها إلى قائمتك ${nFilms(added)}، وتظهر بعد تحديث الموقع بدقائق.` : '')
+      + (miss.length ? ` ولم أتعرّف بثقة على ${onN(miss.length)}: ${miss.slice(0, 8).map(r => `<bdi dir="ltr">${esc(r.name)}${r.year ? ' (' + r.year + ')' : ''}</bdi>`).join('، ')}${miss.length > 8 ? '…' : ''}، وتُضاف بزر «أضف فيلماً».` : '');
+    drawLbx(); }
+  catch (err) { LB.imp = null; LB.msg = esc(err.message || 'تعذّر الاستيراد.'); drawLbx(); } }
+document.addEventListener('change', e => { const t = e.target; if (t.matches?.('.lbx-file-in') && t.files?.[0]) lbxImport(t.files[0]); });
 document.addEventListener('submit', async e => { const f = e.target;
   if (f.matches?.('.lbx-pass')) { e.preventDefault(); accSetPass(f.querySelector('input').value); await accLinks(); drawLbx(); return; }
   if (f.matches?.('.lbx-link')) { e.preventDefault(); const v = f.querySelector('input').value, b = f.querySelector('button'); b.disabled = true; LB.msg = '';
@@ -617,7 +671,7 @@ try {
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); dockEye(on); }).observe($('.top')); }
   // تغيير وصل من جهاز آخر: نعيد قراءة السجل ونرسم
   // الأفلام مع Letterboxd، والمسلسلات (tرقم) مع Trakt (E87): سجلّها كله أول مرة، وأرقام مسلسلاتها في TMDB
-  accInit({ guide: 'films', svcs: ['letterboxd', 'trakt'], build: BUILD, apply: accApply, onState: () => { if ($('#lbx').open) drawLbx(); },
+  accInit({ guide: 'films', svcs: ['letterboxd', 'trakt'], build: BUILD, apply: accApply, emptyOk: true, onState: () => { if ($('#lbx').open) drawLbx(); },
     full: () => Object.fromEntries(Object.entries(P.films).filter(([k, v]) => /^[mt]\d+$/.test(k) && (v === 'watched' || v === 'next'))), known: () => [...D.pool.values()].filter(f => f.kind === 'tv').map(f => f.tmdb) });
   initSync(id => { if (id !== 'films') return; try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {} renderGrid(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); });
   // ‎#add=اسم وسنة: من بوابة أخرى (ألعابي تقترح إضافة فيلم اقتُبس من لعبة) يفتح «أضف فيلماً» بالبحث عنه

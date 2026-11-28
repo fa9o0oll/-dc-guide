@@ -199,7 +199,8 @@ const filmsBlank = () => ({ rev: 0, items: {}, lb: { known: {}, wl: {} }, err: {
 export async function syncFilms(S, { edits = [], full = null, since = 0, pull = true } = {}) {
   const st = Object.assign(filmsBlank(), await S.get('films') || {}), t = await S.get('tok/letterboxd');
   const lbOut = () => t ? { user: t.user, known: Object.keys(st.lb.known).map(Number), wl: Object.keys(st.lb.wl).map(Number), err: st.err.letterboxd || '', at: st.at.letterboxd || 0 } : null;
-  if (!st.boot && !(full && Object.keys(full).some(k => /^m\d+$/.test(k)))) return { needFull: true, rev: st.rev, changes: [], lb: lbOut() };
+  // يبدأ ولو من سجلّ فارغ: محور الأفلام لا يُرسل إلى Letterboxd شيئاً (الكتابة إليه ملف تنزّله)، فما يصل من يومياتك يُضاف ولا يمحو
+  if (!st.boot && !full) return { needFull: true, rev: st.rev, changes: [], lb: lbOut() };
   const put = (id, v, when, src) => { const cur = st.items[id]; if (cur && cur.t > when) return; if (cur && J(fval(cur)) === J(v)) { cur.t = Math.max(cur.t, when); return; }
     if (!cur && !v) return; st.items[id] = { ...(v || { s: null }), t: when, src, rev: ++st.rev }; };
   if (full && !st.boot) { for (const [k, s] of Object.entries(full)) if (/^m\d+$/.test(k)) put(k.slice(1), fval({ s }), 0, 'site'); st.boot = now(); }

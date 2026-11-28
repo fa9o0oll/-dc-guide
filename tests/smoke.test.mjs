@@ -2,13 +2,22 @@
 // node tests/smoke.test.mjs   (دليل دي سي له اختباره المفصّل في ui.test.mjs)
 import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright');
-import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
+import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { deflateRawSync, crc32 } from 'node:zlib';
 const siteDir = path.resolve(new URL('../site', import.meta.url).pathname);
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2' };
 const server = http.createServer((q, r) => { let f = path.join(siteDir, decodeURIComponent(q.url.split('?')[0])); if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
   fs.readFile(f, (e, b) => e ? (r.writeHead(404), r.end()) : (r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'text/plain' }), r.end(b))); }).listen(0);
 const base = `http://127.0.0.1:${server.address().port}`, fails = [];
 const check = (n, ok, d = '') => { console.log(`${ok ? '  ✓' : '  ✗'} ${n}${ok ? '' : ' — ' + d}`); if (!ok) fails.push(n); };
+// ملف ZIP كالذي ينزّله Letterboxd من «تصدير بياناتك» (ملفات مضغوطة بـdeflate)، لفحص الاستيراد (E88)
+const mkZip = files => { const parts = [], cen = []; let off = 0;
+  for (const [name, text] of Object.entries(files)) { const raw = Buffer.from(text), data = deflateRawSync(raw), nm = Buffer.from(name), crc = crc32(raw), lh = Buffer.alloc(30), ch = Buffer.alloc(46);
+    lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(20, 4); lh.writeUInt16LE(8, 8); lh.writeUInt32LE(crc, 14); lh.writeUInt32LE(data.length, 18); lh.writeUInt32LE(raw.length, 22); lh.writeUInt16LE(nm.length, 26);
+    ch.writeUInt32LE(0x02014b50, 0); ch.writeUInt16LE(20, 4); ch.writeUInt16LE(20, 6); ch.writeUInt16LE(8, 10); ch.writeUInt32LE(crc, 16); ch.writeUInt32LE(data.length, 20); ch.writeUInt32LE(raw.length, 24); ch.writeUInt16LE(nm.length, 28); ch.writeUInt32LE(off, 42);
+    parts.push(lh, nm, data); cen.push(ch, nm); off += 30 + nm.length + data.length; }
+  const cd = Buffer.concat(cen), end = Buffer.alloc(22), n = Object.keys(files).length; end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(n, 8); end.writeUInt16LE(n, 10); end.writeUInt32LE(cd.length, 12); end.writeUInt32LE(off, 16);
+  return Buffer.concat([...parts, cd, end]); };
+const csvOf = rows => 'Date,Name,Year,Letterboxd URI\n' + rows.map(([n, y]) => `2026-01-01,"${String(n).replace(/"/g, '""')}",${y},https://boxd.it/x`).join('\n') + '\n';
 const P = JSON.parse(fs.readFileSync(new URL('../data/fate/placements.json', import.meta.url))), U = JSON.parse(fs.readFileSync(new URL('../data/fate/universes.json', import.meta.url)));
 const browser = await chromium.launch();
 for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fold-cover', 369, 905, true], ['fold-cover-zoom', 323, 792, true], ['fold-main', 707, 823, true], ['fold-main-landscape', 823, 707, true]]) {
@@ -247,7 +256,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
   await tap('[data-act=show-all]'); await page.waitForTimeout(250);
   check('الأفلام: «أظهر الكل» يعيده مختوماً', await page.evaluate(id => { const el = document.getElementById('f-' + id); return !el.hidden && el.classList.contains('watched') && document.querySelector('[data-v=all]').getAttribute('aria-pressed') === 'true'; }, inCol.id));
   // Letterboxd (E86، على الكمبيوتر): يومياتك تصل وحدها، وما تعلّمه هنا في ملف استيراد بصيغته ترفعه أنت. الخادم مُحاكى
-  if (!mobile) { const calls = [], LBS = { on: false, boot: false, told: false }, KNOWN = new Set(), log0 = await page.evaluate(() => JSON.parse(localStorage.getItem('filmsg.progress') || '{"films":{}}').films);
+  if (!mobile) { const calls = [], IMP = [], LBS = { on: false, boot: false, told: false }, KNOWN = new Set(), log0 = await page.evaluate(() => JSON.parse(localStorage.getItem('filmsg.progress') || '{"films":{}}').films);
     const NEWW = FL.find(f => f.kind === 'movie' && !log0[f.id]), seen0 = Object.entries(log0).filter(([k, v]) => v === 'watched' && /^m\d+$/.test(k)).map(([k]) => +k.slice(1));
     await page.route(base + '/api/accounts**', r => { const q = r.request(), path = new URL(q.url()).pathname.replace('/api/accounts', ''), b = JSON.parse(q.postData() || 'null'), pw = q.headers()['x-pass'];
       const J = o => r.fulfill({ contentType: 'application/json', body: JSON.stringify(o) }), links = { letterboxd: LBS.on ? { on: true, user: 'fa9o0oll', at: Date.now() } : { on: false, ready: true } }; calls.push([path || '/', b]);
@@ -269,8 +278,24 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     await page.waitForSelector('#lbx [data-act=lbx-file][data-k=watched]');
     const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#lbx [data-act=lbx-file][data-k=watched]')]), csv = fs.readFileSync(await dl.path(), 'utf8').trim().split('\n');
     check('ملف الاستيراد بصيغة Letterboxd: رقم TMDB والاسم والسنة لما شاهدته هنا ولم يصله، بلا ما جاء منه', csv[0] === 'tmdbID,Title,Year' && csv.length - 1 === seen0.length && seen0.every(id => csv.some(l => l.startsWith(id + ',"'))) && !csv.some(l => l.startsWith(NEWW.tmdb + ',')) && /^letterboxd-watched-\d{4}-\d\d-\d\d\.csv$/.test(dl.suggestedFilename()), [csv.slice(0, 3), seen0.length, dl.suggestedFilename()]);
-    await page.waitForFunction(() => /لا شيء/.test(document.querySelector('#lbx .lbx-row p')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
-    check('وبعد تنزيله صار معروفاً له: لا ينتظر شيء، ويقال أين يُرفع', calls.some(c => c[0] === '/films/sent' && c[1].kind === 'watched' && c[1].ids.length === seen0.length) && /لا شيء/.test(await page.textContent('#lbx .lbx-row p')) && /ارفعه من صفحة الاستيراد/.test(await page.textContent('#lbx .msg')));
+    await page.waitForFunction(() => /لا شيء/.test(document.querySelector('#lbx .lbx-due p')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
+    check('وبعد تنزيله صار معروفاً له: لا ينتظر شيء، ويقال أين يُرفع', calls.some(c => c[0] === '/films/sent' && c[1].kind === 'watched' && c[1].ids.length === seen0.length) && /لا شيء/.test(await page.textContent('#lbx .lbx-due p')) && /ارفعه من صفحة الاستيراد/.test(await page.textContent('#lbx .msg')));
+    // سجلّك كله في Letterboxd من ملف «تصدير بياناتك» (E88): ما في القائمة يُطابَق هنا، والباقي من TMDB، وما ليس في القائمة يُضاف إليها بطلب واحد
+    { const free = FL.filter(f => f.kind === 'movie' && f.year && !log0[f.id] && f.id !== NEWW.id && f.id !== inCol.id), LW = free.at(-1), LN = free.at(-2), AF = [], cmp = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+      await page.route(base + '/api/add-film', r => { const b = JSON.parse(r.request().postData() || '{}'); AF.push(b); const J = o => r.fulfill({ contentType: 'application/json', body: JSON.stringify(o) });
+        if (b.password !== 'pw-lb') return r.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"password"}' });
+        if (b.action === 'match') return J({ items: b.items.map(it => it.name === 'Imported Film' ? { ...it, tmdb: 990001, title: 'Imported Film', y: 2026 } : { ...it, miss: 1 }) });
+        if (b.action === 'import') return J({ added: b.items.length }); return J({}); });
+      const zip = mkZip({ 'profile.csv': 'Username\nfa9o0oll\n', 'watched.csv': csvOf([[LW.title, LW.year], ['Imported Film', 2026], ['Mystery Reel', 1999]]), 'watchlist.csv': csvOf([[LN.title, LN.year], [LW.title, LW.year]]), 'deleted/watched.csv': csvOf([['Deleted One', 2001]]) });
+      await page.setInputFiles('#lbx .lbx-file-in', { name: 'letterboxd-fa9o0oll-2026-11-28-02-00-utc.zip', mimeType: 'application/zip', buffer: zip });
+      await page.waitForFunction(() => /عُلّم «شاهدته»/.test(document.querySelector('#lbx .msg')?.textContent || ''), null, { timeout: 8000 }).catch(() => {});
+      const L1 = await page.evaluate(() => JSON.parse(localStorage.getItem('filmsg.progress')).films), msg = await page.textContent('#lbx .msg').catch(() => ''), m = AF.find(x => x.action === 'match'), im = AF.find(x => x.action === 'import');
+      check('سجلّك كله في Letterboxd من ملف تصديره كما نزل (ZIP): ما شاهدته هناك «شاهدته» هنا، وقائمة المشاهدة «سأشاهده» (ولا ينزل فيلم شاهدته إليها)', L1[LW.id] === 'watched' && L1.m990001 === 'watched' && L1[LN.id] === 'next', [L1[LW.id], L1.m990001, L1[LN.id]]);
+      check('ما في القائمة يُطابَق هنا بالاسم والسنة، والباقي من TMDB، وما حذفته هناك (deleted) لا يُؤخذ', !!m && cmp(m.items.map(x => x.name).sort(), ['Imported Film', 'Mystery Reel']) && !AF.some(x => JSON.stringify(x).includes('Deleted One')), JSON.stringify(m?.items));
+      check('وما ليس في القائمة يُضاف إليها بطلب واحد', !!im && cmp(im.items, [{ tmdb: 990001, title: 'Imported Film', year: 2026 }]) && AF.filter(x => x.action === 'import').length === 1, JSON.stringify(im?.items));
+      check('وما جاء من Letterboxd صار معروفاً له فلا يعود في ملف الاستيراد إليه، ويقال ما حدث وما لم يُعرف', calls.some(c => c[0] === '/films/sent' && c[1].kind === 'watched' && c[1].ids.includes(LW.tmdb) && c[1].ids.includes(990001))
+        && calls.some(c => c[0] === '/films/sent' && c[1].kind === 'next' && cmp(c[1].ids, [LN.tmdb])) && /عُلّم «شاهدته» على فيلمين، و«سأشاهده» على فيلم واحد\. وأُضيف منها إلى قائمتك فيلم واحد/.test(msg) && /Mystery Reel \(1999\)/.test(msg), msg);
+      await page.unroute(base + '/api/add-film'); IMP.push(LW.id, LN.id, 'm990001'); }
     await fits('الأفلام: نافذة Letterboxd'); await page.keyboard.press('Escape'); await page.waitForSelector('#lbx', { state: 'hidden' });
     // ما تعلّمه هنا بعد الربط يصل الخادم بمفتاحه كما هو (m ورقم الفيلم في TMDB)، ويخرج من الانتظار
     const until = async f => { for (let i = 0; i < 80 && !f(); i++) await page.waitForTimeout(100); return !!f(); }, MK = FL.find(f => f.kind === 'movie' && f.poster && !log0[f.id] && f.id !== NEWW.id && f.id !== inCol.id);
@@ -286,7 +311,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     await page.keyboard.press('Escape'); await page.waitForSelector('#lbx', { state: 'hidden' });
     await asOther(11); LBS.boot = false; calls.length = 0; await page.reload(); await page.waitForSelector('.tk:not([hidden])');
     check('وبعد عشر دقائق يسأل وحده حين تُفتح الصفحة، ويبدأ من سجلّه', await until(booted) && calls[0][0] === '/', calls.map(c => c[0]));
-    await page.unroute(base + '/api/accounts**'); await page.evaluate(ids => { const p = JSON.parse(localStorage.getItem('filmsg.progress')); for (const k of ids) delete p.films[k]; localStorage.setItem('filmsg.progress', JSON.stringify(p)); ['accounts.on', 'accounts.q', 'accounts.rev', 'animeg.pass'].forEach(k => localStorage.removeItem(k)); }, [NEWW.id, MK.id]);
+    await page.unroute(base + '/api/accounts**'); await page.evaluate(ids => { const p = JSON.parse(localStorage.getItem('filmsg.progress')); for (const k of ids) delete p.films[k]; localStorage.setItem('filmsg.progress', JSON.stringify(p)); ['accounts.on', 'accounts.q', 'accounts.rev', 'accounts.full', 'animeg.pass'].forEach(k => localStorage.removeItem(k)); }, [NEWW.id, MK.id, ...IMP]);
     await page.reload(); await page.waitForSelector('.tk:not([hidden])'); if (await page.$('[data-act=show-all]')) { await tap('[data-act=show-all]'); await page.waitForTimeout(300); } }
   await tap('[data-act=reset]'); await page.waitForTimeout(250);
   const other = FL.find(f => f.id !== inCol.id && f.kind === 'movie' && f.poster); await tap(`#f-${other.id} .seen`); await page.waitForTimeout(1300);

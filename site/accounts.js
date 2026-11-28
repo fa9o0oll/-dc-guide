@@ -47,7 +47,8 @@ export async function accSync({ force = false } = {}) { if (!cx || (!anyOn() && 
       let { status, j } = await call('/sync', whole ? { ...body, full: cx.full(), known: cx.known() } : body);
       if (status === 202) { await new Promise(r => setTimeout(r, 4000)); continue; }
       // أول مزامنة تبدأ من سجلّك كله، فلا تبدأ إلا من جهاز فيه سجلّ: جهاز فارغ لا يجعل الخادم يظن سجلّك فارغاً
-      if (j.needFull && !Object.keys(cx.full()).length) { state.err = 'سجلّك فارغ في هذا المتصفح: تبدأ المزامنة حين تفتح الموقع من جهاز فيه سجلّك.'; break; }
+      // emptyOk: بوابة لا يضرّ أن تبدأ من سجلّ فارغ (الأفلام: ما يصل من Letterboxd يُضاف ولا يمحو)
+      if (j.needFull && !cx.emptyOk && !Object.keys(cx.full()).length) { state.err = 'سجلّك فارغ في هذا المتصفح: تبدأ المزامنة حين تفتح الموقع من جهاز فيه سجلّك.'; break; }
       // needAll: المسلسلات تبدأ من سجل البوابة ولو كان فارغاً (Trakt يجمع ولا يمحو)، وneedKnown: أرقام مسلسلاتها بعد بناء جديد
       if (j.needFull || j.needEps || j.needAll || j.needKnown) { ({ status, j } = await call('/sync', { ...body, full: j.needFull || j.needAll ? cx.full() : null, eps: cx.eps?.() || null, known: j.needAll || j.needKnown ? cx.known?.() || null : null }));
         if (status === 202) { await new Promise(r => setTimeout(r, 4000)); continue; } }
