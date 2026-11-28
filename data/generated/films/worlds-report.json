@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-28T01:48:06.737Z",
+ "generatedAt": "2026-11-28T04:02:57.399Z",
  "counts": {
   "works": 629,
   "withEntry": 375,
@@ -18,7 +18,7 @@
   "chronoAuto": 33,
   "infoEntries": 466,
   "bytes": 205271,
-  "seconds": 13
+  "seconds": 137
  },
  "missing": [
   {
@@ -1250,8 +1250,8 @@
     "sibling:Mortal Kombat Legends: Scorpion's Revenge",
     "sibling:Mortal Kombat: Annihilation",
     "sibling:Mortal Kombat: Conquest",
-    "sibling:Mortal Kombat: Legacy",
     "sibling:Mortal Kombat: Defenders of the Realm",
+    "sibling:Mortal Kombat: Legacy",
     "sibling:Mortal Kombat: The Journey Begins"
    ],
    "src": [
@@ -2584,8 +2584,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "novel:The Wonderful Wizard of Oz",
     "musical:Wicked",
+    "novel:The Wonderful Wizard of Oz",
     "novel:Wicked"
    ]
   },
@@ -4692,21 +4692,21 @@
    ]
   },
   {
-   "g": "Q56070713",
-   "name": "Walt Disney Animation Studios feature film",
-   "why": "catalog",
-   "size": 66,
-   "types": [
-    "animated film series"
-   ]
-  },
-  {
    "g": "Q2732470",
    "name": "list of Pixar films",
    "why": "list",
    "size": 28,
    "types": [
     "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q56070713",
+   "name": "Walt Disney Animation Studios feature film",
+   "why": "catalog",
+   "size": 66,
+   "types": [
+    "animated film series"
    ]
   },
   {
