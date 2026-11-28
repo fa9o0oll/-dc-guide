@@ -1,9 +1,9 @@
 {
- "generatedAt": "2026-11-28T04:02:57.399Z",
+ "generatedAt": "2026-11-28T11:46:08.991Z",
  "counts": {
   "works": 629,
-  "withEntry": 375,
-  "inWorld": 230,
+  "withEntry": 376,
+  "inWorld": 231,
   "worlds": 111,
   "chains": 51,
   "withRelated": 249,
@@ -17,8 +17,8 @@
   "chronoMissed": 27,
   "chronoAuto": 33,
   "infoEntries": 466,
-  "bytes": 205271,
-  "seconds": 137
+  "bytes": 205345,
+  "seconds": 44
  },
  "missing": [
   {
@@ -922,7 +922,8 @@
      "The Mummy: Tomb of the Dragon Emperor",
      "The Scorpion King 3: Battle for Redemption",
      "The Scorpion King 4: Quest for Power",
-     "The Mummy"
+     "The Mummy",
+     "The Mummy: Book of the Dead"
     ],
     "moved": [
      "The Scorpion King ← prequel The Mummy / The Mummy's Hand / The Mummy's Tomb / The Mummy's Ghost [wikipedia,tmdb,wikidata]",
@@ -4452,11 +4453,6 @@
    "y": 2022
   },
   {
-   "k": "m1574840",
-   "t": "The Mummy: Book of the Dead",
-   "y": 2027
-  },
-  {
    "k": "m1817",
    "t": "Phone Booth",
    "y": 2003
@@ -4692,12 +4688,12 @@
    ]
   },
   {
-   "g": "Q2732470",
-   "name": "list of Pixar films",
-   "why": "list",
-   "size": 28,
+   "g": "Q104830727",
+   "name": "Studio Ghibli Feature Films",
+   "why": "catalog",
+   "size": 23,
    "types": [
-    "Wikimedia list article"
+    "animated film series"
    ]
   },
   {
@@ -4710,12 +4706,12 @@
    ]
   },
   {
-   "g": "Q104830727",
-   "name": "Studio Ghibli Feature Films",
-   "why": "catalog",
-   "size": 23,
+   "g": "Q2732470",
+   "name": "list of Pixar films",
+   "why": "list",
+   "size": 28,
    "types": [
-    "animated film series"
+    "Wikimedia list article"
    ]
   }
  ],

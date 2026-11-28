@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-28T04:04:20.473Z",
+ "generatedAt": "2026-11-28T11:47:25.177Z",
  "companies": [
   [
    184898,
@@ -26,30 +26,8 @@
    "DC Vertigo"
   ]
  ],
- "count": 2,
+ "count": 1,
  "rows": [
-  {
-   "kind": "tv",
-   "tmdb": 41246,
-   "imdb": "tt1740828",
-   "title": "Wonder Woman",
-   "date": null,
-   "status": "Pilot",
-   "dc": true,
-   "companies": [
-    "Warner Bros. Television",
-    "DC Entertainment"
-   ],
-   "genres": [
-    "Action & Adventure",
-    "Drama",
-    "Sci-Fi & Fantasy"
-   ],
-   "poster": true,
-   "popularity": 4,
-   "via": "name:Wonder Woman",
-   "overview": "It's the modern day, and being Wonder Woman is complicated. Diana is leading a triple life - running a large corporation out of costume and fighting crime in co"
-  },
   {
    "kind": "movie",
    "tmdb": 1676088,
