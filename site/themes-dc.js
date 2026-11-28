@@ -19,6 +19,8 @@ export const THEMES = {
   movie_st:   { bg: '#130707', c1: '#ff6253', c2: '#f2c14e', motif: 'spiral',   key: 'watchmen-2009' },
   tv_st:      { bg: '#060f19', c1: '#57abff', c2: '#a8d8ff', motif: 'scan',     key: 'gotham-2014' },
   anim_tv_st: { bg: '#05140b', c1: '#5fe272', c2: '#c2ff96', motif: 'stars',    key: 'young-justice-2010' },
+  lego:       { bg: '#170c02', c1: '#ffd21a', c2: '#ff4a3d', motif: 'diamonds', key: 'lego-dc-comics-super-heroes-justice-league-attack-of-the-legion-of-doom-2015' },
+  shorts:     { bg: '#0a1020', c1: '#86b8ff', c2: '#ffd24a', motif: 'spiral',   key: 'dc-showcase-batman-death-in-the-family-2020' },
   anim_mv_st: { bg: '#150606', c1: '#ff4242', c2: '#ffa24a', motif: 'halftone', key: 'batman-under-the-red-hood-2010' },
 };
 // لون يميّز كل مسلسل في ترتيب آروفيرس، ليُعرف المسلسل من أول نظرة
