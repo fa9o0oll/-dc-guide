@@ -2,6 +2,7 @@
 // node tests/accounts.test.mjs
 process.env.URL = 'https://watch.example'; process.env.ADD_FILM_PASSWORD = 'pw'; process.env.MAL_CLIENT_ID_SYNC = 'mal-client'; process.env.TRAKT_GAP_MS = '20';
 const { memStore, simklOps, syncSeries } = await import('../scripts/lib-accounts.mjs');
+const { createHash } = await import('node:crypto');
 const fn = await import('../netlify/functions/accounts.mjs');
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const J = x => JSON.stringify(x);
@@ -38,11 +39,14 @@ globalThis.fetch = async (u, init = {}) => { const url = new URL(u), m = init.me
   if (url.host === 'letterboxd.com') { const user = url.pathname.split('/')[1]; sent.push(['lb', user]); if (user !== 'faisal_test') return new Response('not found', { status: 404 });
     return new Response(`<?xml version='1.0' encoding='utf-8'?><rss version="2.0" xmlns:letterboxd="https://letterboxd.com" xmlns:tmdb="https://themoviedb.org"><channel><title>Letterboxd - Faisal</title>${LBX.map(([id, d, r]) =>
       `<item><title>Film ${id}</title><guid isPermaLink="false">letterboxd-review-${id}</guid><pubDate>${new Date(d).toUTCString()}</pubDate><letterboxd:watchedDate>${d}</letterboxd:watchedDate><letterboxd:rewatch>No</letterboxd:rewatch>${r ? `<letterboxd:memberRating>${r}</letterboxd:memberRating>` : ''}<tmdb:movieId>${id}</tmdb:movieId></item>`).join('')}<item><title>A list</title><guid>letterboxd-list-9</guid></item></channel></rss>`, { status: 200, headers: { 'content-type': 'application/rss+xml' } }); }
+  // Trakt: الربط في auth.trakt.tv بتحدٍّ S256 ومتحقق بلا سر، ورمز التجديد لمرة واحدة
+  if (url.host === 'auth.trakt.tv' && url.pathname === '/oauth/token') { const b = JSON.parse(body || '{}'); sent.push(['tr-token', b.grant_type, b.client_secret ? 'SECRET' : '', b.code_verifier ? 'verifier' : '', b.redirect_uri]);
+    if (b.client_id !== process.env.TRAKT_CLIENT_ID) return res({ error: 'invalid_client' }, 401);
+    if (b.grant_type === 'authorization_code') return TR.challenge && TR.challenge === createHash('sha256').update(b.code_verifier || '').digest('base64url') ? res({ access_token: 'tok-trakt', refresh_token: TR.refresh, expires_in: 604800 }) : res({ error: 'invalid_grant' }, 400);
+    if (TR.down) return res({ error: 'server' }, 503); if (b.refresh_token !== TR.refresh) return res({ error: 'invalid_grant' }, 400);
+    TR.refresh = 'ref-trakt-' + (++TR.refs); return res({ access_token: 'tok-trakt', refresh_token: TR.refresh, expires_in: 604800 }); }
   if (url.host === 'api.trakt.tv') { const h = init.headers || {}, b = body ? JSON.parse(body) : {};
     if (h['trakt-api-key'] !== process.env.TRAKT_CLIENT_ID || h['trakt-api-version'] !== '2' || !h['user-agent']) return res({ error: 'bad headers' }, 403);
-    if (url.pathname === '/oauth/device/code') { sent.push(['tr-code', b.client_id === process.env.TRAKT_CLIENT_ID]); return res({ device_code: 'trdev', user_code: 'TRK-7788', verification_url: 'https://trakt.tv/activate', expires_in: 600, interval: 1 }); }
-    if (url.pathname === '/oauth/device/token') { sent.push(['tr-token', b.client_secret === process.env.TRAKT_CLIENT_SECRET ? 'SECRET' : 'none']); return ++TR.polls < 2 ? res({}, 400) : res({ access_token: 'tok-trakt', refresh_token: 'ref-trakt', expires_in: 86400 }); }
-    if (url.pathname === '/oauth/token') return res({ access_token: 'tok-trakt', refresh_token: 'ref-trakt2', expires_in: 86400 });
     if (h.authorization !== 'Bearer tok-trakt') return res({ error: 'invalid_token' }, 401);
     if (url.pathname === '/sync/last_activities') return res({ all: 'tr-' + TR.act });
     if (url.pathname === '/sync/watched/shows') { if (url.searchParams.get('extended') !== 'progress') return res([]); TR.gets.push(+url.searchParams.get('page')); return pageOf(trProgress(), url); }
@@ -58,7 +62,7 @@ globalThis.fetch = async (u, init = {}) => { const url = new URL(u), m = init.me
   throw new Error('unexpected fetch ' + u); };
 const LBX = [];
 // Trakt المحاكى (E87): سجل المشاهدة بصيغة extended=progress (كل حلقة معروضة وcompleted، والحلقات الخاصة لا تعود فيه)، صفحات من اثنين ليُفحص تتبّعها
-const TR = { shows: new Map(), wl: new Map(), act: 1, polls: 0, posts: [], gets: [], dups: [], unknown: new Set([404]) };
+const TR = { shows: new Map(), wl: new Map(), act: 1, refresh: 'ref-trakt-1', refs: 1, challenge: '', down: false, posts: [], gets: [], dups: [], unknown: new Set([404]) };
 const trShow = (id, aired, w = {}) => { TR.shows.set(id, { aired, w: new Map(Object.entries(w)) }); TR.act++; };
 const trProgress = () => [...TR.shows].filter(([, x]) => x.w.size).map(([id, x]) => ({ last_watched_at: [...x.w.values()].sort().at(-1), show: { title: 'Show ' + id, ids: { trakt: id + 7000, tmdb: id }, aired_episodes: x.aired.reduce((a, b) => a + b, 0) },
   seasons: x.aired.map((n, i) => ({ number: i + 1, aired: n, episodes: [...Array(n)].map((_, e) => { const w = x.w.get(`${i + 1}-${e + 1}`); return { number: e + 1, completed: !!w, last_watched_at: w || null }; }) })) }));
@@ -171,14 +175,17 @@ console.log('\n== الأفلام ↔ Letterboxd (E86)');
 
 console.log('\n== المسلسلات ↔ Trakt (E87)');
 { let B = 'b1'; const dc = (body = {}) => call('/sync', { body: { guide: 'dc', build: B, ...body } }), byId = r => Object.fromEntries(r.j.changes.map(c => [c.id, c])), posts = p => sent.filter(x => x[0] === 'tr' && x[1] === p).map(x => x[2]);
-  let l = await call('/link', { body: { svc: 'trakt' } });
-  check('Trakt قبل لصق رقم التطبيق ورمزه في Netlify: «لم يُجهَّز بعد»، والحال تقول ذلك', l.status === 400 && /لم يُجهَّز/.test(l.j.error) && (await call('', { method: 'GET' })).j.links.trakt.ready === false, l.j);
-  process.env.TRAKT_CLIENT_ID = 'trakt-client'; process.env.TRAKT_CLIENT_SECRET = 'trakt-secret-value';
-  sent.length = 0; l = await call('/link', { body: { svc: 'trakt' } });
-  check('ربط Trakt: رمز ورابط الموافقة trakt.tv/activate، والطلب برقم التطبيق', l.j.code === 'TRK-7788' && l.j.url === 'https://trakt.tv/activate' && J(sent) === J([['tr-code', true]]), [l.j, sent]);
-  const p1 = await call('/poll', { body: { svc: 'trakt' } }), p2 = await call('/poll', { body: { svc: 'trakt' } });
-  check('وينتظر موافقتك ثم يتم، والرمز السري يذهب إلى Trakt وحده: لا في رد ولا في المخزن', !!p1.j.wait && p2.j.done === true && (await S.get('tok/trakt'))?.access === 'tok-trakt' && sent.filter(x => x[0] === 'tr-token').every(x => x[1] === 'SECRET')
-    && !J([p1.j, p2.j, await S.get('tok/trakt'), (await call('', { method: 'GET' })).j]).includes('trakt-secret-value'), [p1.j, p2.j]);
+  let l = await call('/link', { body: { svc: 'trakt', from: 'marvel' } });
+  check('Trakt قبل لصق رقم التطبيق في Netlify: «لم يُجهَّز بعد»، والحال تقول ذلك', l.status === 400 && /لم يُجهَّز/.test(l.j.error) && (await call('', { method: 'GET' })).j.links.trakt.ready === false, l.j);
+  process.env.TRAKT_CLIENT_ID = 'trakt-client'; sent.length = 0;
+  l = await call('/link', { body: { svc: 'trakt', from: 'marvel' } }); const ta = new URL(l.j.url); TR.challenge = ta.searchParams.get('code_challenge');
+  check('ربط Trakt: صفحة موافقته في auth.trakt.tv برقم التطبيق وحده، ورجوع إلى الخادم كما سُجّل في التطبيق، وتحدٍّ S256', ta.origin + ta.pathname === 'https://auth.trakt.tv/oauth/authorize' && ta.searchParams.get('client_id') === 'trakt-client'
+    && ta.searchParams.get('redirect_uri') === 'https://watch.example/api/accounts/callback/trakt' && ta.searchParams.get('response_type') === 'code' && ta.searchParams.get('code_challenge_method') === 'S256' && /^[A-Za-z0-9_-]{43}$/.test(TR.challenge) && !!ta.searchParams.get('state') && !sent.length, l.j);
+  const tb = await call('/callback/trakt?code=c1&state=wrong', { method: 'GET', pass: '' });
+  check('رجوع بحالة غير مطابقة يُرفض ويعود إلى الدليل الذي بدأ الربط', /\/marvel\/\?linked=trakt&fail=state$/.test(tb.location) && !(await S.get('tok/trakt')), tb.location);
+  const tg = await call(`/callback/trakt?code=c1&state=${ta.searchParams.get('state')}`, { method: 'GET', pass: '' });
+  check('والرجوع الصحيح يحفظ الرمز على الخادم ويعيدك إلى دليل مارفل، والتبادل بالمتحقق بلا سر', tg.location === 'https://watch.example/marvel/?linked=trakt' && (await S.get('tok/trakt'))?.access === 'tok-trakt'
+    && J(sent.find(x => x[0] === 'tr-token')) === J(['tr-token', 'authorization_code', '', 'verifier', 'https://watch.example/api/accounts/callback/trakt']) && !(await S.get('pend/trakt')), [tg.location, sent]);
   trShow(100, [4, 2], { '1-2': '2025-03-01T10:00:00.000Z', '1-3': '2025-03-02T10:00:00.000Z' }); trShow(200, [3]); trShow(300, [2], { '1-1': '2025-04-01T10:00:00.000Z' }); TR.wl.set(300, '2025-05-01T00:00:00.000Z');
   trShow(999, [1], { '1-1': '2025-01-01T00:00:00.000Z' });   // ليس في الدليل
   sent.length = 0; let r = await dc();
@@ -191,6 +198,8 @@ console.log('\n== المسلسلات ↔ Trakt (E87)');
   check('وسجل Trakt يُقرأ صفحة صفحة حتى آخرها، بحلقاته (extended=progress)', J(TR.gets) === J([1, 2]), TR.gets);
   sent.length = 0; r = await dc({ since: r.j.rev });
   check('ومسلسل لا يعرفه Trakt (404) لا يُعاد إرساله كل مرة', !sent.some(x => x[0] === 'tr' && J(x[2]).includes('"tmdb":404')), sent);
+  sent.length = 0; r = await dc({ since: r.j.rev, full: { tv100: { e: ['1-2', '2-2'] } } });
+  check('وسجلّ جهاز آخر يُجمع أيضاً (2-2 لم يكن في أول جهاز)، بلا تكرار لما في Trakt', J(posts('/sync/history')[0]?.shows?.find(x => x.ids.tmdb === 100)?.seasons) === J([{ number: 2, episodes: [{ number: 2, watched_at: 'released' }] }]) && !TR.dups.length, posts('/sync/history'));
   const t0 = Date.now(); sent.length = 0;
   r = await dc({ since: r.j.rev, edits: [{ id: 'tv100|1-4', on: 1, t: t0 }, { id: 'tv100|1-1', on: 0, t: t0 }, { id: 'tv200|l', on: 0, t: t0 }] });
   const h1 = posts('/sync/history')[0], hr = posts('/sync/history/remove')[0];
@@ -221,9 +230,15 @@ console.log('\n== المسلسلات ↔ Trakt (E87)');
   check('و«سأشاهده» على مسلسل في القائمة قائمة المشاهدة (700)', TR.wl.has(700), [...TR.wl.keys()]);
   r = await call('/sync', { body: { guide: 'films', build: 'f1', since: r.j.rev } }); ch = byId(r);
   check('وما اكتمل في Trakt يصير «شاهدته» في القائمة (بمفاتيحها t500 وt600)', ch.t500?.done === true && ch.t600?.done === true && !ch.t700?.done, r.j.changes);
+  const tk = await S.get('tok/trakt'); await S.set('tok/trakt', { ...tk, exp: Date.now() + 60e3 }); sent.length = 0; r = await dc({ since: r.j.rev }); const tk2 = await S.get('tok/trakt');
+  check('الرمز يُجدَّد قبل انتهائه بلا سر، ورمز التجديد الجديد يُحفظ في الحال (لمرة واحدة)', J(sent.find(x => x[0] === 'tr-token')) === J(['tr-token', 'refresh_token', '', '', 'https://watch.example/api/accounts/callback/trakt'])
+    && tk2.refresh === TR.refresh && tk2.refresh !== tk.refresh && tk2.exp > Date.now() + 86400e3 && r.status === 200, [sent.filter(x => x[0] === 'tr-token'), tk2.refresh, TR.refresh]);
+  TR.down = true; await S.set('tok/trakt', { ...tk2, access: 'old-access', exp: Date.now() - 60e3 }); TR.act++; r = await dc({ since: r.j.rev }); TR.down = false;
+  check('وتعذّر التجديد لعطل عندهم ليس انتهاء ربط: يقال «تعذّر الاتصال» ويُعاد وحده', r.j.links.trakt.on === true && !r.j.links.trakt.dead && r.j.links.trakt.err === 'net', r.j.links.trakt);
+  r = await dc({ since: r.j.rev }); check('ثم يتجدد في المرة التالية ويعود', (await S.get('tok/trakt')).access === 'tok-trakt' && r.j.links.trakt.err === '' && !r.j.links.trakt.dead, r.j.links.trakt);
   await call('/unlink', { body: { svc: 'trakt' } }); const su = await S.get('series');
   check('فصل Trakt يمحو رمزه وينسى ظله، ويبقي المحور', !su.sh && !su.shOk && Object.keys(su.items).length > 0 && !(await S.get('tok/trakt')) && (await call('', { method: 'GET' })).j.links.trakt.on === false, su.shOk);
-  check('ولا رمز ولا سر في حال المسلسلات المحفوظة', noTok(su) && !J(su).includes('trakt-secret-value')); }
+  check('ولا رمز في حال المسلسلات المحفوظة', noTok(su)); }
 
 console.log('\n== الفصل وانتهاء الربط');
 await call('/unlink', { body: { svc: 'simkl' } }); skRow(1, 'hold', 12); sent.length = 0; r = await call('/sync', { body: { since: r.j.rev } });

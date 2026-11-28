@@ -112,11 +112,12 @@ export function memStore(seed = {}) { const m = new Map(Object.entries(seed).map
 
 // ---------- الربط
 const rand = n => randomBytes(n).toString('base64url');
-export async function linkStart(S, k, redirect) { const s = SVC[k]; if (!s) throw fail('svc', 'خدمة غير معروفة'); if (!s.ready()) throw fail('setup', `${s.name} لم يُجهَّز بعد`);
-  if (s.kind === 'code') { const p = { state: rand(18), verifier: rand(64), until: now() + 15 * 60e3 }; await S.set('pend/' + k, p); return { url: s.authUrl(p, redirect) }; }
+// from: البوابة التي بدأت الربط (dc أو marvel لـTrakt)، فيعود إليها الرجوع بعد الموافقة
+export async function linkStart(S, k, redirect, from = '') { const s = SVC[k]; if (!s) throw fail('svc', 'خدمة غير معروفة'); if (!s.ready()) throw fail('setup', `${s.name} لم يُجهَّز بعد`);
+  if (s.kind === 'code') { const p = { state: rand(18), verifier: rand(64), until: now() + 15 * 60e3, from: /^[a-z]{2,10}$/.test(from) ? from : '' }; await S.set('pend/' + k, p); return { url: s.authUrl(p, redirect) }; }
   const p = await s.start(); await S.set('pend/' + k, p); return { code: p.code, url: p.url, every: p.every, until: p.until }; }
 export async function linkCallback(S, k, code, state, redirect) { const p = await S.get('pend/' + k); if (!p || p.state !== state || p.until < now()) throw fail('state', 'انتهت مهلة الربط، ابدأه من جديد');
-  const t = await SVC[k].exchange(code, p, redirect); await S.set('tok/' + k, t); await S.del('pend/' + k); return true; }
+  const t = await SVC[k].exchange(code, p, redirect); await S.set('tok/' + k, t); await S.del('pend/' + k); return { from: p.from || '' }; }
 export async function linkPoll(S, k) { const p = await S.get('pend/' + k); if (!p || p.until < now()) return { gone: true };
   const t = await SVC[k].poll(p); if (!t) return { wait: p.every }; await S.set('tok/' + k, t); await S.del('pend/' + k); return { done: true }; }
 export async function unlink(S, k) { await S.del('tok/' + k); await S.del('pend/' + k); if (k === 'letterboxd') { const fl = await S.get('films'); if (fl) { fl.lb = { known: {}, wl: {} }; delete fl.err?.letterboxd; await S.set('films', fl); } return; }

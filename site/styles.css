@@ -351,12 +351,10 @@ textarea{width:100%;min-height:120px;background:rgba(0,0,0,.4);color:#9ff0c0;bor
 /* حسابك في Trakt أول «سجلّي» في دليلَي DC ومارفل (E87) */
 .trk{padding-bottom:12px;margin-bottom:4px;border-bottom:1px solid var(--hair)}
 .trk .actions{margin-top:8px}
-.trk-code{margin:10px 0 4px}.trk-code b{font-size:1.7rem;letter-spacing:.14em;font-weight:700;color:var(--c1)}
 .guide .trk-on{color:var(--ok);font-weight:600}
 .guide .trk-msg{color:var(--dim);font-size:.86rem}
 .trk form label{display:grid;gap:6px;font-size:.9rem}
 .trk form input{min-height:44px;border-radius:10px;border:1px solid var(--hair);background:var(--surface);padding:8px 12px;color:var(--ink)}
-.trk .actions a.trk-go{flex:1 1 130px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:var(--c1);color:#0b0b0b;font-weight:700;text-decoration:none}
 #jq{width:100%;min-height:48px;border-radius:8px;border:1px solid var(--hair);background:var(--surface);padding:8px 12px}
 
 .toast.ask{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;width:auto;max-width:min(92vw,560px);padding:12px 14px;line-height:1.7}

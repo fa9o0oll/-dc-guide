@@ -4,7 +4,7 @@ import { shell } from './shell.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { clock, spoken } from './count.js?v=__BUILD__';
 import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
-import { accInit, accMark, accSync, accLink, accPoll, accUnlink, accLinks, accState, accSetPass, accPass } from './accounts.js?v=__BUILD__'; // Trakt للمسلسلات (E87)
+import { accInit, accMark, accSync, accLink, accUnlink, accLinks, accState, accSetPass, accPass } from './accounts.js?v=__BUILD__'; // Trakt للمسلسلات (E87)
 import { portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
@@ -63,7 +63,7 @@ async function boot() {
   }
   renderUnibar(); syncShield(); render(); liftVeil();
   // Trakt (E87): ما وصل منه يُطبَّق على السجل، والصفحة ترسل إليه سجلّها أول مرة وأرقام مسلسلاتها
-  if (TRK) accInit({ guide: G.id, svcs: ['trakt'], build: BUILD, pack: m => ({ on: m?.on ? 1 : 0 }), apply: traktApply, onState: drawTrk,
+  if (TRK) accInit({ guide: G.id, svcs: ['trakt'], build: BUILD, pack: m => ({ on: m?.on ? 1 : 0 }), apply: traktApply, onState: drawTrk, onLinked: trkBack,
     full: () => { const o = {}; for (const id of D.works.keys()) { const t = tvOf(id); if (!t) continue; const e = Object.keys(store.eps[id] || {}), l = store.works[id] === 'list' ? 1 : 0; if (e.length || l) o['tv' + t] = { e, l }; } return o; },
     known: () => [...D.works.keys()].map(tvOf).filter(Boolean) });
   // رابط مباشر لعمل (#w=المعرّف)، تستعمله قائمة الأفلام للانتقال إلى بطاقته في هذا الدليل، عند الفتح أو بتغيير العنوان والصفحة مفتوحة
@@ -608,23 +608,19 @@ function traktApply(changes) { const by = new Map([...D.works.keys()].map(id => 
     if (n) got.add(id); }
   if (!got.size) return; save(); render(true); stats(); const tab = $('#seasonTabs .on'); if (tab) showSeason(tab.dataset.id, +tab.dataset.season);
   toast(`وصل من Trakt تحديث ${cnt(got.size, 'show')}`); }
-// قسم Trakt في «سجلّي»: كلمة سر الموقع مرة في المتصفح، ثم «اربط» (رمز توافق عليه في صفحة Trakt)، ثم «مربوط ✓» و«زامن الآن» و«افصل»
-const TK = { wait: null, msg: '' };
+// قسم Trakt في «سجلّي»: كلمة سر الموقع مرة في المتصفح، ثم «اربط» (صفحة موافقة Trakt ثم الرجوع إلى هنا)، ثم «مربوط ✓» و«زامن الآن» و«افصل»
+const TK = { msg: '' };
 const ago = t => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? 'الآن' : m < 60 ? `قبل ${m} دقيقة` : m < 1440 ? `قبل ${Math.round(m / 60)} ساعة` : `قبل ${Math.round(m / 1440)} يوم`; };
-function trkHTML() { const st = accState(), l = st.links?.trakt || {}, w = TK.wait, msg = TK.msg ? `<p class="trk-msg" role="status">${TK.msg}</p>` : '';
+function trkHTML() { const st = accState(), l = st.links?.trakt || {}, msg = TK.msg ? `<p class="trk-msg" role="status">${TK.msg}</p>` : '';
   if (st.pass || !accPass()) return `<form class="trk-pass"><label>كلمة سر الموقع مرة واحدة في هذا المتصفح (نفسها في «أضف فيلماً»)<input type="password" autocomplete="current-password" required></label><div class="actions"><button type="submit">تم</button></div></form>${msg}`;
-  if (w) return `<p>افتح صفحة Trakt واكتب فيها هذا الرمز ووافق، وهذه النافذة تكمل وحدها.</p><p class="trk-code"><b dir="ltr">${esc(w.code)}</b></p>
-    <div class="actions"><a class="trk-go" href="${esc(w.url)}" target="_blank" rel="noopener">افتح Trakt للموافقة</a><button data-act="trk-cancel">ألغِ</button></div>`;
   const err = l.on && l.err ? `<p class="trk-msg">${l.err === 'net' ? 'تعذّر الاتصال به في آخر مزامنة، ويُعاد وحده.' : l.err === 'auth' ? 'انتهى الربط: افصله واربطه من جديد.' : 'لم يقبل آخر تحديث، ويُعاد وحده.'}</p>` : '';
   if (l.dead) return `<p class="trk-msg">انتهى الربط: افصله واربطه من جديد.</p><div class="actions"><button data-act="trk-unlink">افصل</button></div>${msg}`;
   return (l.on ? `<p class="trk-on">مربوط ✓${l.at ? ` · آخر مزامنة ${ago(l.at)}` : ''}</p>${err}<div class="actions"><button data-act="trk-sync"${st.busy ? ' disabled' : ''}>${st.busy ? 'يزامن…' : 'زامن الآن'}</button><button data-act="trk-unlink">افصل</button></div>`
     : l.ready === false ? '<p>يُجهَّز قريباً.</p>' : '<div class="actions"><button class="cta" data-act="trk-link">اربط حسابك في Trakt</button></div>') + msg + (st.err ? `<p class="trk-msg">${esc(st.err)}</p>` : ''); }
 const drawTrk = () => { const el = $('#trk'); if (el) el.innerHTML = trkHTML(); };
-async function trkGo() { TK.msg = ''; try { const r = await accLink('trakt'); const w = TK.wait = { code: r.code, url: r.url, until: r.until || Date.now() + 6e5 }; drawTrk();
-    while (TK.wait === w && Date.now() < w.until) { await new Promise(res => setTimeout(res, (r.every || 5) * 1000)); if (TK.wait !== w) return;
-      const p = await accPoll('trakt'); if (p.done) { TK.wait = null; TK.msg = 'رُبط Trakt، والمزامنة تبدأ الآن.'; drawTrk(); return; } if (p.gone) break; }
-    if (TK.wait === w) { TK.wait = null; TK.msg = 'انتهت مهلة الرمز قبل الموافقة. اضغط «اربط» من جديد.'; drawTrk(); } }
-  catch (e) { TK.wait = null; TK.msg = e.pass ? '' : esc(e.message || 'تعذّر الربط.'); drawTrk(); } }
+// «اربط»: إلى صفحة موافقة Trakt، ثم يعود إلى هذا الدليل (?linked=trakt) وتُفتح «سجلّي» برسالة
+async function trkGo() { TK.msg = ''; try { await accLink('trakt', { from: G.id }); } catch (e) { TK.msg = e.pass ? '' : esc(e.message || 'تعذّر الربط.'); drawTrk(); } }
+const trkBack = (svc, fail) => { if (svc !== 'trakt') return; TK.msg = !fail ? 'رُبط Trakt، والمزامنة تبدأ الآن.' : fail === 'denied' ? 'لم تكتمل الموافقة في Trakt، فلم يُربط.' : 'تعذّر الربط. اضغط «اربط» من جديد.'; openBackup(); };
 
 // ---------- الفهرس، السجل، الدليل
 function openJump() {
@@ -762,7 +758,6 @@ document.addEventListener('click', ev => {
     case 'bkcopy': navigator.clipboard?.writeText($('#bk').value).then(() => toast('تم النسخ'), () => { $('#bk').select(); toast('حدّد النص وانسخه يدوياً'); }); break;
     case 'bkimport': importCode(); break;
     case 'trk-link': trkGo(); break;
-    case 'trk-cancel': TK.wait = null; drawTrk(); break;
     case 'trk-sync': accSync({ force: true }); break;
     case 'trk-unlink': accUnlink('trakt').then(() => { TK.msg = 'فُصل Trakt: لا تتزامن المسلسلات معه بعد الآن.'; drawTrk(); }, e => { TK.msg = esc(e.message); drawTrk(); }); break;
     case 'guide': openGuide(); break;

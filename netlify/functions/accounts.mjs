@@ -3,9 +3,10 @@
 // المنطق كله في scripts/lib-accounts.mjs، والرموز في Netlify Blobs لا تخرج منها. كل طلب (عدا رجوع MyAnimeList بعد الموافقة)
 // محمي بكلمة سر «أضف لعبة» أو «أضف فيلماً» في الترويسة x-pass. لا يُكتب رمز ولا سر في السجل ولا في الرد.
 //   GET  /api/accounts                 حال كل خدمة (مربوطة؟ آخر مزامنة؟ خطأ؟)
-//   POST /api/accounts/link   {svc}    يبدأ الربط: رابط موافقة MyAnimeList، أو رمز SIMKL أو Trakt ورابطه
-//   POST /api/accounts/poll   {svc}    هل وافقت على رمز SIMKL أو Trakt؟
+//   POST /api/accounts/link   {svc, from}   يبدأ الربط: رابط موافقة MyAnimeList أو Trakt، أو رمز SIMKL ورابطه
+//   POST /api/accounts/poll   {svc}    هل وافقت على رمز SIMKL؟
 //   GET  /api/accounts/callback/mal    رجوع MyAnimeList بعد الموافقة، ثم إلى «أنمياتي»
+//   GET  /api/accounts/callback/trakt  رجوع Trakt بعد الموافقة، ثم إلى الدليل الذي بدأ الربط (dc أو marvel)
 //   POST /api/accounts/unlink {svc}    يفصل الخدمة ويمحو رموزها
 //   POST /api/accounts/sync   {guide, edits, full, eps, known, build, since}   تعديلات الصفحة إلى المحور، وما تغيّر من الخدمات إليها
 //        (guide: anime، أو films: Letterboxd وTrakt وsince لكل منهما { f, s }، أو dc وmarvel: Trakt)
@@ -18,16 +19,17 @@ const json = (status, body) => new Response(JSON.stringify(body), { status, head
 const digest = x => createHash('sha256').update(String(x)).digest(), same = (a, b) => timingSafeEqual(digest(a), digest(b));
 const password = () => process.env.ADD_GAME_PASSWORD || process.env.ADD_FILM_PASSWORD;
 const site = req => (process.env.URL || new URL(req.url).origin).replace(/\/$/, '');
-const back = (req, q) => new Response(null, { status: 302, headers: { location: `${site(req)}/anime/?${q}`, 'cache-control': 'no-store' } });
+// الرجوع بعد الموافقة: MyAnimeList إلى «أنمياتي»، وTrakt إلى الدليل الذي بدأ الربط
+const back = (req, q, k = 'mal', from = '') => new Response(null, { status: 302, headers: { location: `${site(req)}/${k === 'mal' ? 'anime' : ['dc', 'marvel'].includes(from) ? from : 'dc'}/?${q}`, 'cache-control': 'no-store' } });
 let testStore = null; export const _useStore = s => { testStore = s; };
 
 export default async req => {
   const url = new URL(req.url), path = url.pathname.replace(/^\/api\/accounts\/?/, '').replace(/\/$/, ''), S = testStore || await blobStore();
-  const redirect = `${site(req)}/api/accounts/callback/mal`;
-  if (path === 'callback/mal') { const err = url.searchParams.get('error');
-    if (err) return back(req, 'linked=mal&fail=' + encodeURIComponent(err === 'access_denied' ? 'denied' : 'mal'));
-    try { await linkCallback(S, 'mal', url.searchParams.get('code') || '', url.searchParams.get('state') || '', redirect); return back(req, 'linked=mal'); }
-    catch (e) { return back(req, 'linked=mal&fail=' + encodeURIComponent(e.code || 'mal')); } }
+  const redirect = k => `${site(req)}/api/accounts/callback/${k}`;
+  if (path === 'callback/mal' || path === 'callback/trakt') { const k = path.slice(9), err = url.searchParams.get('error'), from = (await S.get('pend/' + k))?.from || '';
+    if (err) return back(req, `linked=${k}&fail=` + encodeURIComponent(err === 'access_denied' ? 'denied' : k), k, from);
+    try { await linkCallback(S, k, url.searchParams.get('code') || '', url.searchParams.get('state') || '', redirect(k)); return back(req, `linked=${k}`, k, from); }
+    catch (e) { return back(req, `linked=${k}&fail=` + encodeURIComponent(e.code || k), k, from); } }
   if (!password()) return json(500, { error: 'إعدادات الخادم ناقصة: كلمة السر (ADD_GAME_PASSWORD أو ADD_FILM_PASSWORD) غير موجودة في Netlify.' });
   const pass = req.headers.get('x-pass') || ''; if (!pass || !same(pass, password())) return json(401, { error: 'كلمة السر غير صحيحة.', pass: true });
   let body = {}; if (req.method === 'POST') { try { body = await req.json(); } catch { return json(400, { error: 'طلب غير مفهوم.' }); } }
@@ -35,7 +37,7 @@ export default async req => {
   try {
     if (req.method === 'GET' && !path) return json(200, { links: await linksOf(S) });
     if (path === 'link' && svc === 'letterboxd') return json(200, await linkLetterboxd(S, body.user));
-    if (path === 'link') return json(200, await linkStart(S, svc, redirect));
+    if (path === 'link') return json(200, await linkStart(S, svc, redirect(svc), String(body.from || '')));
     if (path === 'films/sent') { if (!await S.lock()) return json(202, { busy: true }); try { return json(200, await filmsSent(S, body.kind === 'next' ? 'next' : 'watched', Array.isArray(body.ids) ? body.ids.slice(0, 5000) : [])); } finally { await S.unlock(); } }
     if (path === 'poll') return json(200, await linkPoll(S, svc));
     if (path === 'unlink') { await unlink(S, svc); return json(200, { links: await linksOf(S) }); }

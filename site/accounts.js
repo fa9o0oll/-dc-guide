@@ -4,7 +4,7 @@
 // - المزامنة: حين تُفتح الصفحة، وبعد ثوانٍ من آخر تعديل، وكل عشر دقائق والصفحة ظاهرة، وحين يعود الاتصال أو تعود إلى الصفحة.
 //   ولا شيء من هذا قبل أن يُربط حساب: الصفحة لا تطلب الخادم وأنت لم تربط شيئاً، إلا سؤالاً عن الربط حين تُفتح، كل عشر دقائق على الأكثر وبكلمة السر المحفوظة.
 // - كلمة السر نفسها التي تحفظها «أضف أنمي» أو «أضف فيلماً» أو «أضف لعبة» في هذا المتصفح، فلا تُطلب إلا إن لم تُحفظ.
-const API = '/api/accounts', Q = 'accounts.q', REV = 'accounts.rev', ON = 'accounts.on', PASSES = ['animeg.pass', 'filmsg.pass', 'gamesg.pass'];
+const API = '/api/accounts', Q = 'accounts.q', REV = 'accounts.rev', ON = 'accounts.on', SENT = 'accounts.full', PASSES = ['animeg.pass', 'filmsg.pass', 'gamesg.pass'];
 const WAIT = 2500, WAIT_GONE = 8000, EVERY = 10 * 60e3;
 const ls = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} }, del: k => { try { localStorage.removeItem(k); } catch {} } };
 const jget = (k, d) => { try { return JSON.parse(ls.get(k)) ?? d; } catch { return d; } };
@@ -42,13 +42,16 @@ export function accMark(id, m) { if (!cx || !anyOn()) return; const all = jget(Q
 export async function accSync({ force = false } = {}) { if (!cx || (!anyOn() && !force)) return; if (busy) { again = true; return; } busy = state.busy = true; clearTimeout(timer);
   try { for (let i = 0; i < 4; i++) { const all = jget(Q, {}), q = all[cx.guide] || {}, edits = Object.entries(q).map(([id, e]) => ({ id: /^\d+$/.test(id) ? +id : id, ...e })), t0 = Date.now();
       const rev = jget(REV, {})[cx.guide] || 0, body = { guide: cx.guide, edits, since: rev, build: cx.build };
-      let { status, j } = await call('/sync', body);
+      // المسلسلات (known): كل جهاز يرسل سجلّه كله مرة لكل ربط، فيُجمع ما فيه ولو لم يكن أول جهاز زامن (الخادم يجمع ولا يمحو)
+      const stamp = cx.known ? (cx.svcs || []).map(k => state.links?.[k]?.since || 0).join() : '', whole = !!stamp && jget(SENT, {})[cx.guide] !== stamp;
+      let { status, j } = await call('/sync', whole ? { ...body, full: cx.full(), known: cx.known() } : body);
       if (status === 202) { await new Promise(r => setTimeout(r, 4000)); continue; }
       // أول مزامنة تبدأ من سجلّك كله، فلا تبدأ إلا من جهاز فيه سجلّ: جهاز فارغ لا يجعل الخادم يظن سجلّك فارغاً
       if (j.needFull && !Object.keys(cx.full()).length) { state.err = 'سجلّك فارغ في هذا المتصفح: تبدأ المزامنة حين تفتح الموقع من جهاز فيه سجلّك.'; break; }
       // needAll: المسلسلات تبدأ من سجل البوابة ولو كان فارغاً (Trakt يجمع ولا يمحو)، وneedKnown: أرقام مسلسلاتها بعد بناء جديد
       if (j.needFull || j.needEps || j.needAll || j.needKnown) { ({ status, j } = await call('/sync', { ...body, full: j.needFull || j.needAll ? cx.full() : null, eps: cx.eps?.() || null, known: j.needAll || j.needKnown ? cx.known?.() || null : null }));
         if (status === 202) { await new Promise(r => setTimeout(r, 4000)); continue; } }
+      if (whole) { const m = jget(SENT, {}); m[cx.guide] = stamp; ls.set(SENT, JSON.stringify(m)); }
       keepLinks(j.links); if (j.lb !== undefined) state.lb = j.lb; const now = jget(Q, {}), mine = now[cx.guide] || {}; for (const e of edits) if (mine[e.id] && mine[e.id].t <= t0) delete mine[e.id]; ls.set(Q, JSON.stringify(now));
       if (j.changes?.length) cx.apply(j.changes); const revs = jget(REV, {}); revs[cx.guide] = j.rev || rev; ls.set(REV, JSON.stringify(revs)); state.err = ''; last = Date.now(); break; } }
   catch (e) { state.err = e.pass ? '' : e.message; }

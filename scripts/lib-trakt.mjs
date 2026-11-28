@@ -10,15 +10,21 @@
 // - المحور لا يحمل إلا مسلسلات الموقع (known: أرقامها في كل بوابة)، فلا يُسحب من Trakt ما ليس هنا.
 // - واجهة Trakt منذ يوليو 2026 (trakt-api #775 و#681): سجل المشاهدة وقائمة المشاهدة صفحات، والحلقات لا تأتي إلا مع extended=progress (100 في الصفحة).
 //   والكتابة طلب في الثانية على الأكثر.
-const API = 'https://api.trakt.tv', UA = 'watch-guide/1.0', T = 9000;
+// - الربط (developer.trakt.tv/docs/pkce): تطبيقنا watch-guide-sync من نوع PKCE بلا رمز سري. الموافقة في auth.trakt.tv ثم الرجوع إلى
+//   /api/accounts/callback/trakt (كما سُجّل في التطبيق حرفاً بحرف)، والرمز يُبدَّل بالمتحقق S256 بلا سر. والرمز يعيش 7 أيام، ورمز التجديد لمرة واحدة:
+//   كل تجديد يعطي زوجاً جديداً يُحفظ في الحال.
+import { createHash } from 'node:crypto';
+const API = 'https://api.trakt.tv', AUTH = 'https://auth.trakt.tv', UA = 'watch-guide/1.0', T = 9000;
 const now = () => Date.now(), J = x => JSON.stringify(x), sleep = ms => new Promise(r => setTimeout(r, ms)), GAP = () => +process.env.TRAKT_GAP_MS || 1100;   // بين طلبات الكتابة (الاختبار يقصّرها)
 const fail = (code, msg) => Object.assign(new Error(msg || code), { code });
-// رقم التطبيق ورمزه السري يلصقهما صاحب الموقع في Netlify (TRAKT_CLIENT_ID وTRAKT_CLIENT_SECRET)، ولا يُكتبان في ملف
-export const traktId = () => process.env.TRAKT_CLIENT_ID || '', traktSecret = () => process.env.TRAKT_CLIENT_SECRET || '';
-const keep = (j, old) => ({ access: j.access_token, refresh: j.refresh_token || old?.refresh || null, exp: now() + (+j.expires_in || 86400) * 1000, scope: j.scope || '', at: old?.at || now() });
+// رقم التطبيق يلصقه صاحب الموقع في Netlify (TRAKT_CLIENT_ID)، ولا يُكتب في ملف. ولا رمز سرياً لتطبيق PKCE
+export const traktId = () => process.env.TRAKT_CLIENT_ID || '';
+export const traktRedirect = () => (process.env.URL || 'https://soft-gingersnap-fb1f77.netlify.app').replace(/\/$/, '') + '/api/accounts/callback/trakt';
+const keep = (j, old) => ({ access: j.access_token, refresh: j.refresh_token || old?.refresh || null, exp: now() + (+j.expires_in || 7 * 86400) * 1000, scope: j.scope || '', at: old?.at || now() });
+const s256 = v => createHash('sha256').update(v).digest('base64url');
 
-async function call(path, { method = 'GET', body, tok } = {}) { let r;
-  try { r = await fetch(API + path, { method, body: body ? J(body) : undefined, signal: AbortSignal.timeout(T),
+async function call(path, { method = 'GET', body, tok, base = API } = {}) { let r;
+  try { r = await fetch(base + path, { method, body: body ? J(body) : undefined, signal: AbortSignal.timeout(T),
     headers: { 'content-type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': traktId(), 'user-agent': UA, ...(tok ? { authorization: 'Bearer ' + tok.access } : {}) } }); }
   catch { throw fail('net', 'تعذّر الاتصال بـTrakt'); }
   const text = await r.text(); let j = null; try { j = text ? JSON.parse(text) : null; } catch {}
@@ -40,16 +46,13 @@ export function parseWatched(list) { const items = {};
     items[id] = { e, u, n: +(show.aired_episodes ?? it.aired_episodes ?? 0) || 0 }; }
   return items; }
 
-export const TRAKT = { name: 'Trakt', kind: 'device', ready: () => !!(traktId() && traktSecret()),
-  async start() { const { ok, j } = await call('/oauth/device/code', { method: 'POST', body: { client_id: traktId() } });
-    if (!ok || !j?.device_code) throw fail('svc', 'Trakt لم يعطِ رمز ربط');
-    return { device: j.device_code, code: j.user_code, url: j.verification_url || 'https://trakt.tv/activate', every: Math.max(2, +j.interval || 5), until: now() + (+j.expires_in || 600) * 1000 }; },
-  // 400: لم يوافق بعد، و429: أبطئ، و418: رفض، و410: انتهت مهلة الرمز
-  async poll(p) { const { ok, status, j } = await call('/oauth/device/token', { method: 'POST', body: { code: p.device, client_id: traktId(), client_secret: traktSecret() } });
-    if (ok && j?.access_token) return keep(j); if (status === 400 || status === 429) return null;
-    throw fail(status === 418 ? 'denied' : 'svc', status === 418 ? 'رُفض الربط في Trakt' : status === 410 ? 'انتهت مهلة الرمز قبل الموافقة' : 'Trakt ' + status); },
-  async refresh(t) { const { ok, j } = await call('/oauth/token', { method: 'POST', body: { refresh_token: t.refresh, client_id: traktId(), client_secret: traktSecret(), redirect_uri: 'urn:ietf:wg:oauth:2.0:oob', grant_type: 'refresh_token' } });
-    if (!ok || !j?.access_token) throw fail('auth', 'انتهى الربط'); return keep(j, t); },
+export const TRAKT = { name: 'Trakt', kind: 'code', ready: () => !!traktId(),
+  authUrl: (p, redirect) => `${AUTH}/oauth/authorize?${new URLSearchParams({ response_type: 'code', client_id: traktId(), redirect_uri: redirect, state: p.state, code_challenge: s256(p.verifier), code_challenge_method: 'S256' })}`,
+  async exchange(code, p, redirect) { const { ok, j } = await call('/oauth/token', { base: AUTH, method: 'POST', body: { code, client_id: traktId(), redirect_uri: redirect, grant_type: 'authorization_code', code_verifier: p.verifier } });
+    if (!ok || !j?.access_token) throw fail('auth', j?.error_description || j?.error || 'Trakt رفض الربط'); return keep(j); },
+  // رمز التجديد لمرة واحدة: رفضه (400 أو 401) انتهاء ربط، وغيره عطل عابر يُعاد بعده
+  async refresh(t) { const { ok, status, j } = await call('/oauth/token', { base: AUTH, method: 'POST', body: { refresh_token: t.refresh, client_id: traktId(), redirect_uri: traktRedirect(), grant_type: 'refresh_token' } });
+    if (ok && j?.access_token) return keep(j, t); throw fail(status === 400 || status === 401 ? 'auth' : 'net', 'Trakt ' + status); },
   // last_activities أولاً: إن لم يتغير شيء منذ آخر سحب فلا يُطلب السجل كله
   async pull(tok, mark, until = 0) { const a = await call('/sync/last_activities', { tok }); if (a.status === 401) throw fail('auth', 'انتهى الربط'); if (!a.ok) throw fail('svc', 'Trakt ' + a.status);
     const m = String(a.j?.all || ''); if (m && m === mark) return { same: true };
@@ -143,13 +146,15 @@ export async function syncSeries(S, tok, { guide = '', edits = [], full = null, 
   const st = Object.assign(seriesBlank(), await S.get('series') || {}), g = guide;
   // مسلسلات جديدة على المحور تُسحب حالها من Trakt قبل أي إرسال (السحب لا يكتفي بأن Trakt لم يتغير)
   if (g) { if (Array.isArray(known)) { const was = new Set(st.known[g] || []), now_ = [...new Set(known.map(Number).filter(n => n > 0))]; if (now_.some(n => !was.has(n))) st.mark = ''; st.known[g] = now_; st.kb[g] = build; }
-    if (full && !st.boot[g]) { bootFrom(st, g, full); st.boot[g] = now(); }
+    // سجل كل جهاز يُجمع مرة لكل ربط (الصفحة ترسله): بوقت صفر لا يغلب تعديلاً صريحاً بعده، فلا ضرر من تكراره، ولا يضيع ما في جهاز لم يكن أول من زامن
+    if (full) { bootFrom(st, g, full); st.boot[g] ||= now(); }
     for (const e of edits) applyEdit(st, g, e); }
   const t = await tok.get(); if (!g && !t) return { rev: st.rev, changes: [] };   // المزامنة الدورية وTrakt غير مربوط: لا شيء يُكتب
   if (t?.dead) st.err = 'auth';
   else if (t) { try { if ((pull || !st.sh) && knownAll(st).size) { const R = await TRAKT.pull(t, st.sh ? st.mark : '', deadline ? deadline - 2500 : 0); if (!R.same) { sMerge(st, R); st.mark = R.mark; } }
       if (st.shOk) { const { ops, plan } = sOps(st); if (ops.length) { let done; try { done = await TRAKT.push(t, ops, deadline); } catch (e) { sDone(st, plan, e.done || []); throw e; } sDone(st, plan, done); } }
       st.err = ''; st.at = now(); }
-    catch (e) { st.err = e.code === 'auth' ? 'auth' : e.code === 'net' ? 'net' : String(e.message || 'خطأ').slice(0, 120); if (e.code === 'auth') await tok.kill(t); } }
+    catch (e) { const dead = e.code === 'auth' && t.exp > now();   // رمز انتهى وقته وتعذّر تجديده الآن: عطل عابر لا انتهاء ربط
+      st.err = dead ? 'auth' : e.code === 'auth' || e.code === 'net' ? 'net' : String(e.message || 'خطأ').slice(0, 120); if (dead) await tok.kill(t); } }
   await S.set('series', st);
   return { rev: st.rev, changes: g ? sChanges(st, g, +since || 0) : [], needAll: !!g && !st.boot[g], needKnown: !!g && st.kb[g] !== build }; }
