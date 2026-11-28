@@ -3814,5 +3814,1467 @@
     },
     "idsVerified": true,
     "announced": true
+  },
+  {
+    "id": "batman-beyond-the-movie-1999",
+    "title": "Batman Beyond: The Movie",
+    "year": 1999,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0231237",
+      "tmdb": 64202
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "justice-league-secret-origins-2001",
+    "title": "Justice League: Secret Origins",
+    "year": 2001,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0618170",
+      "tmdb": 300386
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "justice-league-starcrossed-the-movie-2004",
+    "title": "Justice League: Starcrossed - The Movie",
+    "year": 2004,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt4608596",
+      "tmdb": 268899
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "the-zeta-project-2001",
+    "title": "The Zeta Project",
+    "year": 2001,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0260662",
+      "tmdb": 4508
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "gotham-girls-2000",
+    "title": "Gotham Girls",
+    "year": 2000,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0337763",
+      "tmdb": 15185
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "vixen-2015",
+    "title": "Vixen",
+    "year": 2015,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt4406248",
+      "tmdb": 62125
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "vixen-the-movie-2017",
+    "title": "Vixen: The Movie",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt6945882",
+      "tmdb": 457249
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "freedom-fighters-the-ray-2018",
+    "title": "Freedom Fighters: The Ray",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt9293522",
+      "tmdb": 539626
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "the-flash-chronicles-of-cisco-2016",
+    "title": "The Flash: Chronicles of Cisco",
+    "year": 2016,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt5654736",
+      "tmdb": 74556
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "constantine-city-of-demons-web-series-2018",
+    "title": "Constantine: City of Demons",
+    "year": 2018,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt6404896",
+      "tmdb": 78081
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "superman-ii-the-richard-donner-cut-2006",
+    "title": "Superman II: The Richard Donner Cut",
+    "year": 2006,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt0839995",
+      "tmdb": 624479
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "red-2-2013",
+    "title": "RED 2",
+    "year": 2013,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt1821694",
+      "tmdb": 146216
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "the-kitchen-2019",
+    "title": "The Kitchen",
+    "year": 2019,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt5822564",
+      "tmdb": 487680
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "birds-of-prey-2002",
+    "title": "Birds of Prey",
+    "year": 2002,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt0312098",
+      "tmdb": 1469
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "human-target-2010",
+    "title": "Human Target",
+    "year": 2010,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt1439741",
+      "tmdb": 18653
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "powerless-2017",
+    "title": "Powerless",
+    "year": 2017,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt5083928",
+      "tmdb": 68001
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "smallville-chloe-chronicles-2003",
+    "title": "Smallville: Chloe Chronicles",
+    "year": 2003,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt0421167",
+      "tmdb": 39783
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "scalped-2017",
+    "title": "Scalped",
+    "year": 2017,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt6634410",
+      "tmdb": 1657538
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "wonder-woman-2011",
+    "title": "Wonder Woman",
+    "year": 2011,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt1740828",
+      "tmdb": 41246
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "shazam-1974",
+    "title": "Shazam!",
+    "year": 1974,
+    "kind": "series",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt0071050",
+      "tmdb": 10444
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "gen13-1998",
+    "title": "Gen¹³",
+    "year": 1998,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0119185",
+      "tmdb": 15993
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "wildcats-covert-action-teams-1994",
+    "title": "WildC.A.T.S: Covert Action Teams",
+    "year": 1994,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0251515",
+      "tmdb": 9987
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "krypto-the-superdog-2005",
+    "title": "Krypto the Superdog",
+    "year": 2005,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0437018",
+      "tmdb": 1453
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "legion-of-super-heroes-2006",
+    "title": "Legion of Super Heroes",
+    "year": 2006,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0775372",
+      "tmdb": 4028
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "beware-the-batman-2013",
+    "title": "Beware the Batman",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2329077",
+      "tmdb": 41676
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batman-unlimited-2015",
+    "title": "Batman Unlimited",
+    "year": 2015,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt4818178",
+      "tmdb": 100535
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-super-hero-girls-2015",
+    "title": "DC Super Hero Girls",
+    "year": 2015,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt5582302",
+      "tmdb": 64365
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "aquaman-king-of-atlantis-2021",
+    "title": "Aquaman: King of Atlantis",
+    "year": 2021,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt11639062",
+      "tmdb": 98137
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batwheels-2022",
+    "title": "Batwheels",
+    "year": 2022,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt13292830",
+      "tmdb": 155780
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-heroes-united-2024",
+    "title": "DC Heroes United",
+    "year": 2024,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt34771292",
+      "tmdb": 260192
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-metal-force-2024",
+    "title": "DC Metal Force",
+    "year": 2024,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt35128989",
+      "tmdb": 277587
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "get-jiro-2026",
+    "title": "Get Jiro!",
+    "year": 2026,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt33406999",
+      "tmdb": 231801
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "deathstroke-knights-and-dragons-2020",
+    "title": "Deathstroke: Knights & Dragons",
+    "year": 2020,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt10394706",
+      "tmdb": 97456
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "deathstroke-knights-and-dragons-the-movie-2020",
+    "title": "Deathstroke: Knights & Dragons - The Movie",
+    "year": 2020,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt12876132",
+      "tmdb": 703771
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "the-batman-vs-dracula-2005",
+    "title": "The Batman vs. Dracula",
+    "year": 2005,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0472219",
+      "tmdb": 20077
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "superman-brainiac-attacks-2006",
+    "title": "Superman: Brainiac Attacks",
+    "year": 2006,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0800226",
+      "tmdb": 19323
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "teen-titans-trouble-in-tokyo-2006",
+    "title": "Teen Titans: Trouble in Tokyo",
+    "year": 2006,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt0816671",
+      "tmdb": 16237
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "jla-adventures-trapped-in-time-2014",
+    "title": "JLA Adventures: Trapped in Time",
+    "year": 2014,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3468260",
+      "tmdb": 251768
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batman-unlimited-animal-instincts-2015",
+    "title": "Batman Unlimited: Animal Instincts",
+    "year": 2015,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt4437640",
+      "tmdb": 327418
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batman-unlimited-monster-mayhem-2015",
+    "title": "Batman Unlimited: Monster Mayhem",
+    "year": 2015,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt4729754",
+      "tmdb": 342917
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batman-unlimited-mechs-vs-mutants-2016",
+    "title": "Batman Unlimited: Mechs vs. Mutants",
+    "year": 2016,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt5896146",
+      "tmdb": 411802
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-super-hero-girls-super-hero-high-2016",
+    "title": "DC Super Hero Girls: Super Hero High",
+    "year": 2016,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt5779638",
+      "tmdb": 403333
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-super-hero-girls-hero-of-the-year-2016",
+    "title": "DC Super Hero Girls: Hero of the Year",
+    "year": 2016,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt5836262",
+      "tmdb": 401650
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-super-hero-girls-intergalactic-games-2017",
+    "title": "DC Super Hero Girls: Intergalactic Games",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt6869644",
+      "tmdb": 452931
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-super-hero-girls-legends-of-atlantis-2018",
+    "title": "DC Super Hero Girls: Legends of Atlantis",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt8634256",
+      "tmdb": 513730
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-batman-the-movie-dc-super-heroes-unite-2013",
+    "title": "LEGO Batman: The Movie - DC Super Heroes Unite",
+    "year": 2013,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2465238",
+      "tmdb": 177271
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-comics-super-heroes-batman-be-leaguered-2014",
+    "title": "LEGO DC Comics Super Heroes: Batman Be-Leaguered",
+    "year": 2014,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt4189294",
+      "tmdb": 300424
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-comics-super-heroes-justice-league-vs-bizarro-league-2015",
+    "title": "LEGO DC Comics Super Heroes: Justice League vs. Bizarro League",
+    "year": 2015,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt4189260",
+      "tmdb": 322456
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-comics-super-heroes-justice-league-attack-of-the-legion-of-doom-2015",
+    "title": "LEGO DC Comics Super Heroes: Justice League - Attack of the Legion of Doom!",
+    "year": 2015,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt4938416",
+      "tmdb": 353595
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-comics-super-heroes-justice-league-cosmic-clash-2016",
+    "title": "LEGO DC Comics Super Heroes: Justice League - Cosmic Clash",
+    "year": 2016,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt5251438",
+      "tmdb": 382512
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-comics-super-heroes-justice-league-gotham-city-breakout-2016",
+    "title": "LEGO DC Comics Super Heroes: Justice League - Gotham City Breakout",
+    "year": 2016,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt5612702",
+      "tmdb": 396330
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-super-hero-girls-galactic-wonder-2017",
+    "title": "LEGO DC Super Hero Girls: Galactic Wonder",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt6860792",
+      "tmdb": 1081412
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-super-hero-girls-brain-drain-2017",
+    "title": "LEGO DC Super Hero Girls: Brain Drain",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt7158814",
+      "tmdb": 460135
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-comics-super-heroes-the-flash-2018",
+    "title": "LEGO DC Comics Super Heroes: The Flash",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt7877382",
+      "tmdb": 504997
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-super-hero-girls-super-villain-high-2018",
+    "title": "LEGO DC Super Hero Girls: Super-Villain High",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt8050266",
+      "tmdb": 506734
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-comics-super-heroes-aquaman-rage-of-atlantis-2018",
+    "title": "LEGO DC Comics Super Heroes: Aquaman - Rage of Atlantis",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt8457394",
+      "tmdb": 513736
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-batman-family-matters-2019",
+    "title": "LEGO DC Batman: Family Matters",
+    "year": 2019,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt10327712",
+      "tmdb": 602307
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "lego-dc-shazam-magic-and-monsters-2020",
+    "title": "LEGO DC: Shazam! Magic and Monsters",
+    "year": 2020,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt12093878",
+      "tmdb": 690369
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batman-return-of-the-caped-crusaders-2016",
+    "title": "Batman: Return of the Caped Crusaders",
+    "year": 2016,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt5973626",
+      "tmdb": 411736
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batman-vs-two-face-2017",
+    "title": "Batman vs. Two-Face",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt6142314",
+      "tmdb": 464882
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "scooby-doo-and-batman-the-brave-and-the-bold-2018",
+    "title": "Scooby-Doo! & Batman: The Brave and the Bold",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt7578566",
+      "tmdb": 484862
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-super-heroes-vs-eagle-talon-2017",
+    "title": "DC Super Heroes vs. Eagle Talon",
+    "year": 2017,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt7112166",
+      "tmdb": 467172
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "teen-titans-go-vs-teen-titans-2019",
+    "title": "Teen Titans Go! vs. Teen Titans",
+    "year": 2019,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt10548944",
+      "tmdb": 556901
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "teen-titans-go-see-space-jam-2021",
+    "title": "Teen Titans Go! See Space Jam",
+    "year": 2021,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt14851194",
+      "tmdb": 834404
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "teen-titans-go-and-dc-super-hero-girls-mayhem-in-the-multiverse-2022",
+    "title": "Teen Titans Go! & DC Super Hero Girls: Mayhem in the Multiverse",
+    "year": 2022,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt18250460",
+      "tmdb": 913205
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "justice-league-x-rwby-super-heroes-and-huntsmen-part-one-2023",
+    "title": "Justice League x RWBY: Super Heroes & Huntsmen, Part One",
+    "year": 2023,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt24548912",
+      "tmdb": 997776
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "justice-league-x-rwby-super-heroes-and-huntsmen-part-two-2023",
+    "title": "Justice League x RWBY: Super Heroes & Huntsmen, Part Two",
+    "year": 2023,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt28786861",
+      "tmdb": 1150537
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "scooby-doo-and-krypto-too-2023",
+    "title": "Scooby-Doo! and Krypto, Too!",
+    "year": 2023,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt28508231",
+      "tmdb": 1146348
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "zatanna-trial-of-the-crystal-wand-2003",
+    "title": "Zatanna: Trial of the Crystal Wand",
+    "year": 2003,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "tmdb": 133616
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batman-black-and-white-motion-comics-2008",
+    "title": "Batman: Black and White Motion Comics",
+    "year": 2008,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt1458796",
+      "tmdb": 57110
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "tales-of-the-black-freighter-2009",
+    "title": "Tales of the Black Freighter",
+    "year": 2009,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt1295071",
+      "tmdb": 16440
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "under-the-hood-2009",
+    "title": "Under the Hood",
+    "year": 2009,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt1372710",
+      "tmdb": 41207
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-the-spectre-2010",
+    "title": "DC Showcase: The Spectre",
+    "year": 2010,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt1601188",
+      "tmdb": 38180
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-jonah-hex-2010",
+    "title": "DC Showcase: Jonah Hex",
+    "year": 2010,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt1606600",
+      "tmdb": 41988
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-super-friends-the-jokers-playhouse-2010",
+    "title": "DC Super Friends: The Joker's Playhouse",
+    "year": 2010,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt1773355",
+      "tmdb": 355142
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-green-arrow-2010",
+    "title": "DC Showcase: Green Arrow",
+    "year": 2010,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt1663633",
+      "tmdb": 46718
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "superman-shazam-the-return-of-black-adam-2010",
+    "title": "Superman/Shazam!: The Return of Black Adam",
+    "year": 2010,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt1701223",
+      "tmdb": 43641
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-catwoman-2011",
+    "title": "DC Showcase: Catwoman",
+    "year": 2011,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt1986806",
+      "tmdb": 76420
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "new-teen-titans-2011",
+    "title": "New Teen Titans",
+    "year": 2011,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2263761",
+      "tmdb": 283746
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "worlds-funnest-2011",
+    "title": "World's Funnest",
+    "year": 2011,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2273975",
+      "tmdb": 51676
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "plastic-man-2012",
+    "title": "Plastic Man",
+    "year": 2012,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2266141",
+      "tmdb": 293546
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "superman-tokyo-2012",
+    "title": "Superman @ Tokyo",
+    "year": 2012,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2294159",
+      "tmdb": 292845
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "super-best-friends-forever-2012",
+    "title": "Super Best Friends Forever",
+    "year": 2012,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2303889",
+      "tmdb": 285638
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "animal-man-2012",
+    "title": "Animal Man",
+    "year": 2012,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2313615",
+      "tmdb": 139432
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "vibe-2012",
+    "title": "Vibe",
+    "year": 2012,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2304251",
+      "tmdb": 293419
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "sword-of-the-atom-2012",
+    "title": "Sword of the Atom",
+    "year": 2012,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2319439",
+      "tmdb": 293484
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "the-bat-man-of-shanghai-2012",
+    "title": "The Bat Man of Shanghai",
+    "year": 2012,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2273962",
+      "tmdb": 55853
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "robot-chicken-dc-comics-special-2012",
+    "title": "Robot Chicken: DC Comics Special",
+    "year": 2012,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2381287",
+      "tmdb": 145174
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "amethyst-princess-of-gemworld-2013",
+    "title": "Amethyst: Princess of Gemworld",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2303065",
+      "tmdb": 75395
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "thunder-and-lightning-2013",
+    "title": "Thunder and Lightning",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2304199",
+      "tmdb": 112875
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "farm-league-2013",
+    "title": "Farm League",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2182552",
+      "tmdb": 293346
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "shade-the-changing-man-2013",
+    "title": "Shade: The Changing Man",
+    "year": 2013,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2861210",
+      "tmdb": 1078989
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-super-pets-2013",
+    "title": "DC Super-Pets",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2898664",
+      "tmdb": 293547
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "tales-of-metropolis-2013",
+    "title": "Tales of Metropolis",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2912048",
+      "tmdb": 292851
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "the-riddler-riddle-me-this-2013",
+    "title": "The Riddler: Riddle Me This",
+    "year": 2013,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3018178",
+      "tmdb": 761135
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "wonder-woman-2013",
+    "title": "Wonder Woman",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3035862",
+      "tmdb": 293343
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "metal-men-2013",
+    "title": "Metal Men",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3081442",
+      "tmdb": 292997
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "doom-patrol-2013",
+    "title": "Doom Patrol",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt2303377",
+      "tmdb": 293392
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "deadman-2013",
+    "title": "Deadman",
+    "year": 2013,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3209004",
+      "tmdb": 293466
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "superman-75-2013",
+    "title": "Superman 75",
+    "year": 2013,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3254454",
+      "tmdb": 256421
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "robot-chicken-dc-comics-special-ii-villains-in-paradise-2014",
+    "title": "Robot Chicken DC Comics Special II: Villains in Paradise",
+    "year": 2014,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3578794",
+      "tmdb": 263484
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batman-strange-days-2014",
+    "title": "Batman: Strange Days",
+    "year": 2014,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3643208",
+      "tmdb": 264170
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "green-arrow-2014",
+    "title": "Green Arrow",
+    "year": 2014,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3673346",
+      "tmdb": 293001
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "batman-beyond-2014",
+    "title": "Batman Beyond",
+    "year": 2014,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3643216",
+      "tmdb": 269246
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "shazam-2014",
+    "title": "Shazam!",
+    "year": 2014,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3081532",
+      "tmdb": 246090
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "the-creature-commandos-2014",
+    "title": "The Creature Commandos",
+    "year": 2014,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt3851668",
+      "tmdb": 281000
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "nightwing-and-robin-2015",
+    "title": "Nightwing and Robin",
+    "year": 2015,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt7516768",
+      "tmdb": 506452
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "the-robot-chicken-dc-comics-special-iii-magical-friendship-2015",
+    "title": "The Robot Chicken DC Comics Special III: Magical Friendship",
+    "year": 2015,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt5028778",
+      "tmdb": 363863
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "ettas-mission-2017",
+    "title": "Etta's Mission",
+    "year": 2017,
+    "kind": "film",
+    "medium": "live",
+    "ids": {
+      "imdb": "tt7408556",
+      "tmdb": 1255345
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "the-late-batsby-2018",
+    "title": "The Late Batsby",
+    "year": 2018,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt8421602",
+      "tmdb": 536584
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-super-hero-girls-super-shorts-2019",
+    "title": "DC Super Hero Girls: Super Shorts",
+    "year": 2019,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt6927444",
+      "tmdb": 232618
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-sgt-rock-2019",
+    "title": "DC Showcase: Sgt. Rock",
+    "year": 2019,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt10736082",
+      "tmdb": 618346
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-death-2019",
+    "title": "DC Showcase: Death",
+    "year": 2019,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt11229556",
+      "tmdb": 637663
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-the-phantom-stranger-2020",
+    "title": "DC Showcase: The Phantom Stranger",
+    "year": 2020,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt11802028",
+      "tmdb": 618352
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-adam-strange-2020",
+    "title": "DC Showcase: Adam Strange",
+    "year": 2020,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt12272414",
+      "tmdb": 618350
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-batman-death-in-the-family-2020",
+    "title": "DC Showcase - Batman: Death in the Family",
+    "year": 2020,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt12794046",
+      "tmdb": 618353
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-kamandi-the-last-boy-on-earth-2021",
+    "title": "DC Showcase: Kamandi: The Last Boy on Earth!",
+    "year": 2021,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt14577038",
+      "tmdb": 791343
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-the-losers-2021",
+    "title": "DC Showcase: The Losers",
+    "year": 2021,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt14948338",
+      "tmdb": 791344
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-showcase-blue-beetle-2021",
+    "title": "DC Showcase: Blue Beetle",
+    "year": 2021,
+    "kind": "film",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt15129756",
+      "tmdb": 791346
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "krypto-saves-the-day-2025",
+    "title": "Krypto Saves the Day!",
+    "year": 2025,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt37899471",
+      "tmdb": 320096
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "dc-x-sonic-the-hedgehog-2026",
+    "title": "DC x Sonic the Hedgehog",
+    "year": 2026,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "tmdb": 330647
+    },
+    "idsVerified": true
+  },
+  {
+    "id": "freedom-fighters-the-ray-2017",
+    "title": "Freedom Fighters: The Ray",
+    "year": 2017,
+    "kind": "series",
+    "medium": "animation",
+    "ids": {
+      "imdb": "tt5957358",
+      "tmdb": 75486
+    },
+    "idsVerified": true
   }
 ]

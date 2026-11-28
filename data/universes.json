@@ -207,5 +207,27 @@
     "color": "#8b5cf6",
     "motif": "red_hood",
     "description": "أفلام DC الكرتونية المستقلة المقتبسة من أشهر الروايات المصورة."
+  },
+  {
+    "id": "lego",
+    "section": "القسم 20",
+    "name": "ليغو دي سي",
+    "nameEn": "LEGO DC",
+    "serial": false,
+    "status": "أعمال منفردة",
+    "color": "#ffd21a",
+    "motif": "diamonds",
+    "description": "أفلام وحلقات خاصة بشخصيات ليغو، كوميدية وتناسب العائلة."
+  },
+  {
+    "id": "shorts",
+    "section": "القسم 21",
+    "name": "عروض قصيرة",
+    "nameEn": "Shorts & Web Series",
+    "serial": false,
+    "status": "أعمال منفردة",
+    "color": "#86b8ff",
+    "motif": "spiral",
+    "description": "أفلام وحلقات قصيرة لا تتجاوز دقائق: عروض DC Showcase، وفقرات DC Nation، وما عُرض على الإنترنت، والحلقات الخاصة الساخرة."
   }
 ]

@@ -301,29 +301,29 @@
   {
     "universe": "reeve",
     "work": "superman-iii-1983",
-    "position": 3,
-    "label": "3",
+    "position": 4,
+    "label": "4",
     "note": "الجزء الثالث مع غلبة الطابع الكوميدي وتراجع المستوى."
   },
   {
     "universe": "reeve",
     "work": "supergirl-1984",
-    "position": 4,
-    "label": "4 (فرعي)",
+    "position": 5,
+    "label": "5 (فرعي)",
     "note": "فيلم فرعي يدور في نفس العالم الكلاسيكي."
   },
   {
     "universe": "reeve",
     "work": "superman-iv-the-quest-for-peace-1987",
-    "position": 5,
-    "label": "5",
+    "position": 6,
+    "label": "6",
     "note": "الجزء الرابع والأخير لكريستوفر ريف؛ تضرر كثيراً من تقليص الميزانية."
   },
   {
     "universe": "reeve",
     "work": "superman-returns-2006",
-    "position": 6,
-    "label": "6 (تكملة للثاني)",
+    "position": 7,
+    "label": "7 (تكملة للثاني)",
     "note": "صُنع كتكملة مباشرة لأحداث الجزء الثاني مع تجاهل أحداث الثالث والرابع."
   },
   {
@@ -350,43 +350,43 @@
   {
     "universe": "arrow",
     "work": "supergirl-2015",
-    "position": 4,
-    "label": "4",
+    "position": 5,
+    "label": "5",
     "note": "يمتد لـ 6 مواسم (126 حلقة) ويشارك بقوة في جميع حلقات التقاطع السنوية."
   },
   {
     "universe": "arrow",
     "work": "dc-s-legends-of-tomorrow-2016",
-    "position": 5,
-    "label": "5",
+    "position": 6,
+    "label": "6",
     "note": "فريق السفر عبر الزمن بروح كوميدية ومغامرات ممتعة (7 مواسم، 110 حلقات)."
   },
   {
     "universe": "arrow",
     "work": "black-lightning-2018",
-    "position": 6,
-    "label": "6",
+    "position": 9,
+    "label": "9",
     "note": "مسلسل درامي من 4 مواسم (58 حلقة) يتقاطع مع العالم في المراحل المتقدمة."
   },
   {
     "universe": "arrow",
     "work": "batwoman-2019",
-    "position": 7,
-    "label": "7",
+    "position": 10,
+    "label": "10",
     "note": "يمتد لـ 3 مواسم (51 حلقة)؛ يُنصح بالاكتفاء بحلقات التقاطع المشتركة فقط."
   },
   {
     "universe": "arrow",
     "work": "stargirl-2020",
-    "position": 8,
-    "label": "8",
+    "position": 11,
+    "label": "11",
     "note": "عمل شبابي متقن يدور في أرض موازية مستقلة (3 مواسم، 39 حلقة)."
   },
   {
     "universe": "arrow",
     "work": "superman-and-lois-2021",
-    "position": 9,
-    "label": "9 (درة العالم)",
+    "position": 12,
+    "label": "12 (درة العالم)",
     "note": "أفضل مسلسل درامي وعائلي لسوبرمان؛ يدور في أرض موازية مستقلة (4 مواسم، 53 حلقة)."
   },
   {
@@ -497,8 +497,8 @@
   {
     "universe": "dcau",
     "work": "batman-beyond-return-of-the-joker-2000",
-    "position": 12,
-    "label": "12 (ختام المستقبل)",
+    "position": 13,
+    "label": "13 (ختام المستقبل)",
     "note": "فيلم سينمائي يمثل ذروة أحداث مستقبل Batman Beyond (شاهد نسخة Uncut)."
   },
   {
@@ -766,14 +766,14 @@
   {
     "universe": "early_st",
     "work": "wonder-woman-1975",
-    "position": 9,
+    "position": 10,
     "label": "منفرد (1975)",
     "note": "مسلسل ليندا كارتر الكلاسيكي الشهير (3 مواسم، 60 حلقة)."
   },
   {
     "universe": "early_st",
     "work": "swamp-thing-1982",
-    "position": 10,
+    "position": 11,
     "label": "منفرد (1982)",
     "note": "فيلم رعب كلاسيكي بسيط للمخرج ويس كرافن."
   },
@@ -878,224 +878,224 @@
   {
     "universe": "tv_st",
     "work": "gotham-2014",
-    "position": 4,
+    "position": 7,
     "label": "منفرد",
     "note": "يركز على المحقق جيم غوردون ونشأة عالم الجريمة في غوثام (5 مواسم، 100 حلقة)."
   },
   {
     "universe": "tv_st",
     "work": "izombie-2015",
-    "position": 5,
+    "position": 8,
     "label": "منفرد",
     "note": "تحقيقات بوليسية ذكية بطابع كوميدي خفيف (5 مواسم، 71 حلقة)."
   },
   {
     "universe": "tv_st",
     "work": "lucifer-2016",
-    "position": 6,
+    "position": 9,
     "label": "منفرد",
     "note": "مسلسل تحقيقات وفانتازيا ذو شعبية جماهيرية واسعة (6 مواسم، 93 حلقة)."
   },
   {
     "universe": "tv_st",
     "work": "preacher-2016",
-    "position": 7,
+    "position": 10,
     "label": "منفرد",
     "note": "كوميديا سوداء ودموية جريئة من مطبوعات Vertigo (4 مواسم، 43 حلقة)."
   },
   {
     "universe": "tv_st",
     "work": "krypton-2018",
-    "position": 8,
+    "position": 12,
     "label": "منفرد",
     "note": "يروي تاريخ عائلة آل-إل على كوكب كريبتون في الماضي البعيد (موسمان، 20 حلقة)."
   },
   {
     "universe": "tv_st",
     "work": "swamp-thing-2019",
-    "position": 9,
+    "position": 13,
     "label": "منفرد",
     "note": "مسلسل رعب وغموض متقن فنياً (موسم واحد، 10 حلقات)."
   },
   {
     "universe": "tv_st",
     "work": "pennyworth-2019",
-    "position": 10,
+    "position": 14,
     "label": "منفرد",
     "note": "يستعرض شباب ألفريد كعميل سري في لندن الستينيات (3 مواسم، 30 حلقة)."
   },
   {
     "universe": "tv_st",
     "work": "watchmen-2019",
-    "position": 11,
+    "position": 15,
     "label": "منفرد",
     "note": "مسلسل قصير حائز على جوائز إيمي يبني على عالم الرواية المصورة الأصلية (9 حلقات)."
   },
   {
     "universe": "tv_st",
     "work": "sweet-tooth-2021",
-    "position": 12,
+    "position": 16,
     "label": "منفرد",
     "note": "قصة خيال ومغامرة عاطفية مكتملة على نتفليكس (3 مواسم، 24 حلقة)."
   },
   {
     "universe": "tv_st",
     "work": "naomi-2022",
-    "position": 13,
+    "position": 17,
     "label": "منفرد",
     "note": "عمل شبابي مستقل توقف بعد موسم واحد (13 حلقة)."
   },
   {
     "universe": "tv_st",
     "work": "gotham-knights-2023",
-    "position": 14,
+    "position": 18,
     "label": "منفرد",
     "note": "عمل مستقل في عالم موازٍ توقف بعد موسم واحد (13 حلقة)."
   },
   {
     "universe": "tv_st",
     "work": "bodies-2023",
-    "position": 15,
+    "position": 19,
     "label": "منفرد",
     "note": "لغز جريمة وتحقيقات عبر 4 أزمنة مختلفة في لندن (8 حلقات)."
   },
   {
     "universe": "anim_tv_st",
     "work": "teen-titans-2003",
-    "position": 1,
+    "position": 2,
     "label": "منفرد",
     "note": "من أروع مسلسلات الكرتون التي جمعت الأكشن والدراما (5 مواسم، 65 حلقة)."
   },
   {
     "universe": "anim_tv_st",
     "work": "the-batman-2004",
-    "position": 2,
+    "position": 3,
     "label": "منفرد",
     "note": "تقديم عصري سريع الإيقاع لباتمان (5 مواسم، 65 حلقة)."
   },
   {
     "universe": "anim_tv_st",
     "work": "batman-the-brave-and-the-bold-2008",
-    "position": 3,
+    "position": 6,
     "label": "منفرد",
     "note": "يحيي العصر الفضي للكوميكس بروح مرحة (3 مواسم، 65 حلقة)."
   },
   {
     "universe": "anim_tv_st",
     "work": "young-justice-2010",
-    "position": 4,
+    "position": 7,
     "label": "منفرد",
     "note": "مسلسل ناضج جداً ومعقد سياسياً ونفسياً (4 مواسم، 98 حلقة)."
   },
   {
     "universe": "anim_tv_st",
     "work": "green-lantern-the-animated-series-2011",
-    "position": 5,
+    "position": 8,
     "label": "منفرد",
     "note": "أفضل تقديم لعالم الفانوس الأخضر على الإطلاق (26 حلقة)."
   },
   {
     "universe": "anim_tv_st",
     "work": "teen-titans-go-2013",
-    "position": 6,
+    "position": 9,
     "label": "منفرد",
     "note": "مسلسل كوميدي ساخر موجه للأطفال."
   },
   {
     "universe": "anim_tv_st",
     "work": "justice-league-action-2016",
-    "position": 7,
+    "position": 11,
     "label": "منفرد",
     "note": "حلقات قصيرة سريعة وممتعة لكل الأعمار (52 حلقة)."
   },
   {
     "universe": "anim_tv_st",
     "work": "dc-super-hero-girls-2019",
-    "position": 8,
+    "position": 12,
     "label": "منفرد",
     "note": "عمل كرتوني خفيف موجه للفئة العمرية الصغيرة."
   },
   {
     "universe": "anim_tv_st",
     "work": "my-adventures-with-superman-2023",
-    "position": 9,
+    "position": 15,
     "label": "منفرد",
     "note": "إعادة تقديم شبابية رائعة لسوبرمان بطابع أنمي حركي (موسمان+)."
   },
   {
     "universe": "anim_tv_st",
     "work": "suicide-squad-isekai-2024",
-    "position": 10,
+    "position": 16,
     "label": "منفرد",
     "note": "أنمي ياباني ينقل فرقة الانتحار إلى عالم فانتازيا (10 حلقات)."
   },
   {
     "universe": "anim_tv_st",
     "work": "batman-caped-crusader-2024",
-    "position": 11,
+    "position": 17,
     "label": "منفرد",
     "note": "الوريث الروحي لمسلسل التسعينيات في أجواء أربعينيات مظلمة (10 حلقات)."
   },
   {
     "universe": "anim_tv_st",
     "work": "bat-fam-2025",
-    "position": 12,
+    "position": 19,
     "label": "منفرد",
     "note": "كوميديا عائلية كرتونية لطيفة تكمل فيلم Merry Little Batman."
   },
   {
     "universe": "anim_mv_st",
     "work": "superman-doomsday-2007",
-    "position": 1,
+    "position": 8,
     "label": "منفرد",
     "note": "أول فيلم في سلسلة أفلام DC الكرتونية الأصلية المستقلة."
   },
   {
     "universe": "anim_mv_st",
     "work": "justice-league-the-new-frontier-2008",
-    "position": 2,
+    "position": 9,
     "label": "منفرد",
     "note": "يستعرض نشأة فرقة العدالة في حقبة الخمسينيات."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-gotham-knight-2008",
-    "position": 3,
+    "position": 10,
     "label": "منفرد",
     "note": "6 قصص أنمي قصيرة لباتمان من استوديوهات يابانية."
   },
   {
     "universe": "anim_mv_st",
     "work": "wonder-woman-2009",
-    "position": 4,
+    "position": 11,
     "label": "منفرد",
     "note": "فيلم أنميشن ممتاز ألهم الفيلم الواقعي لاحقاً."
   },
   {
     "universe": "anim_mv_st",
     "work": "green-lantern-first-flight-2009",
-    "position": 5,
+    "position": 12,
     "label": "منفرد",
     "note": "يروي حصول هال جوردان على الخاتم وانضمامه للفيلق."
   },
   {
     "universe": "anim_mv_st",
     "work": "superman-batman-public-enemies-2009",
-    "position": 6,
+    "position": 13,
     "label": "منفرد",
     "note": "اتحاد سوبرمان وباتمان في مواجهة مؤامرة كبرى يقودها ليكس لوثر."
   },
   {
     "universe": "anim_mv_st",
     "work": "justice-league-crisis-on-two-earths-2010",
-    "position": 7,
+    "position": 14,
     "label": "منفرد",
     "note": "مواجهة أسطورية لفرقة العدالة ضد نظرائهم في أرض موازية."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-under-the-red-hood-2010",
-    "position": 8,
+    "position": 15,
     "label": "منفرد",
     "note": "أعظم فيلم أنميشن منفرد لباتمان؛ صراع أخلاقي ونفسي عميق ضد حارس غامض في غوثام.",
     "spoiler": "يكشف الفيلم أن شخصية ريد هود هو روبن الثاني (جايسون تود) بعد إحيائه عبر حفرة لازاروس (ينبوع البعث)."
@@ -1103,217 +1103,217 @@
   {
     "universe": "anim_mv_st",
     "work": "superman-batman-apocalypse-2010",
-    "position": 9,
+    "position": 16,
     "label": "منفرد",
     "note": "ثنائية أكشن ممتازة لسوبرمان وباتمان في مواجهة تهديد من كوكب أبوكوليبس."
   },
   {
     "universe": "anim_mv_st",
     "work": "all-star-superman-2011",
-    "position": 10,
+    "position": 17,
     "label": "منفرد",
     "note": "قصة إنسانية وفلسفية ملهمة عن جوهر شخصية سوبرمان."
   },
   {
     "universe": "anim_mv_st",
     "work": "green-lantern-emerald-knights-2011",
-    "position": 11,
+    "position": 18,
     "label": "منفرد",
     "note": "قصص ملحمية عن تاريخ وأساطير فيلق الفانوس الأخضر."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-year-one-2011",
-    "position": 12,
+    "position": 19,
     "label": "منفرد",
     "note": "اقتباس وفيّ جداً لأول سنة لبروس واين وجيم غوردون في غوثام."
   },
   {
     "universe": "anim_mv_st",
     "work": "justice-league-doom-2012",
-    "position": 13,
+    "position": 20,
     "label": "منفرد",
     "note": "إثارة عالية الوتيرة تضع أعضاء فرقة العدالة أمام خطط مضادة تستهدف نقاط ضعفهم."
   },
   {
     "universe": "anim_mv_st",
     "work": "superman-vs-the-elite-2012",
-    "position": 14,
+    "position": 21,
     "label": "منفرد",
     "note": "من أعمق أفلام سوبرمان؛ يناقش المبادئ الأخلاقية للبطل الخارق في عالم حديث."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-the-dark-knight-returns-part-1-2012",
-    "position": 15,
+    "position": 22,
     "label": "منفرد",
     "note": "الجزء الأول: عودة بروس واين في سن الخامسة والخمسين لإنقاذ مدينة غوثام."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-the-dark-knight-returns-part-2-2013",
-    "position": 16,
+    "position": 23,
     "label": "منفرد",
     "note": "الجزء الثاني: الفصل الختامي الملحمي لرواية فرانك ميلر الخالدة."
   },
   {
     "universe": "anim_mv_st",
     "work": "superman-unbound-2013",
-    "position": 17,
+    "position": 24,
     "label": "منفرد",
     "note": "مغامرة فضائية لسوبرمان في مواجهة خطر برينياك."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-assault-on-arkham-2014",
-    "position": 18,
+    "position": 26,
     "label": "منفرد",
     "note": "أفضل فيلم لفرقة الانتحار، وتدور أحداثه في أجواء عالم ألعاب Batman: Arkham."
   },
   {
     "universe": "anim_mv_st",
     "work": "justice-league-gods-and-monsters-2015",
-    "position": 19,
+    "position": 28,
     "label": "منفرد",
     "note": "تخيل مبتكر لعالم موازٍ بنسخ مختلفة تماماً من الثالوث الرئيسي."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-the-killing-joke-2016",
-    "position": 20,
+    "position": 31,
     "label": "منفرد",
     "note": "اقتباس للرواية الشهيرة لآلان مور، أضعفته مقدمة إضافية طويلة في بداية الفيلم."
   },
   {
     "universe": "anim_mv_st",
     "work": "the-lego-batman-movie-2017",
-    "position": 21,
+    "position": 37,
     "label": "منفرد",
     "note": "تحفة كوميدية وبصرية تفهم نفسية باتمان بذكاء مذهل."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-and-harley-quinn-2017",
-    "position": 22,
+    "position": 38,
     "label": "منفرد",
     "note": "مغامرة كوميدية خفيفة بطابع رسم التسعينيات."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-gotham-by-gaslight-2018",
-    "position": 23,
+    "position": 42,
     "label": "منفرد",
     "note": "تحقيق جنائي لباتمان في العصر الفيكتوري عام 1889."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-ninja-2018",
-    "position": 24,
+    "position": 43,
     "label": "منفرد",
     "note": "انتقال باتمان إلى اليابان الإقطاعية بأسلوب أنمي بصري صاخب."
   },
   {
     "universe": "anim_mv_st",
     "work": "teen-titans-go-to-the-movies-2018",
-    "position": 25,
+    "position": 44,
     "label": "منفرد",
     "note": "فيلم سينمائي ساخر ومضحك جداً لجميع الأعمار."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-vs-teenage-mutant-ninja-turtles-2019",
-    "position": 26,
+    "position": 47,
     "label": "منفرد",
     "note": "تقاطع مفاجئ بجودته العالية بين باتمان وسلاحف النينجا."
   },
   {
     "universe": "anim_mv_st",
     "work": "superman-red-son-2020",
-    "position": 27,
+    "position": 49,
     "label": "منفرد",
     "note": "قصة عالم موازٍ: ماذا لو هبطت مركبة سوبرمان في الاتحاد السوفيتي؟"
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-soul-of-the-dragon-2021",
-    "position": 28,
+    "position": 52,
     "label": "منفرد",
     "note": "مغامرة فنون قتالية لباتمان في أجواء السبعينيات."
   },
   {
     "universe": "anim_mv_st",
     "work": "injustice-2021",
-    "position": 29,
+    "position": 53,
     "label": "منفرد",
     "note": "اقتباس سريع ومختصر لقصة عالم Injustice الشهير."
   },
   {
     "universe": "anim_mv_st",
     "work": "catwoman-hunted-2022",
-    "position": 30,
+    "position": 55,
     "label": "منفرد",
     "note": "فيلم سرقة وأكشن مستقل لشخصية كاتوومان بأسلوب الأنمي."
   },
   {
     "universe": "anim_mv_st",
     "work": "dc-league-of-super-pets-2022",
-    "position": 31,
+    "position": 56,
     "label": "منفرد",
     "note": "فيلم سينمائي عائلي ممتع عن الحيوانات الأليفة الخارقة."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-and-superman-battle-of-the-super-sons-2022",
-    "position": 32,
+    "position": 57,
     "label": "منفرد",
     "note": "مغامرة ثلاثية الأبعاد ممتازة تجمع الجيل الجديد من أبناء الأبطال."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-the-doom-that-came-to-gotham-2023",
-    "position": 33,
+    "position": 59,
     "label": "منفرد",
     "note": "غموض ورعب كوني في مدينة غوثام خلال عشرينيات القرن الماضي."
   },
   {
     "universe": "anim_mv_st",
     "work": "merry-little-batman-2023",
-    "position": 34,
+    "position": 60,
     "label": "منفرد",
     "note": "فيلم عائلي دافئ ومبتكر بصرياً في ليلة عيد الميلاد."
   },
   {
     "universe": "anim_mv_st",
     "work": "watchmen-chapter-i-2024",
-    "position": 35,
+    "position": 63,
     "label": "منفرد",
     "note": "الفصل الأول من الاقتباس الكرتوني الثلاثي الأبعاد المطابق للرواية المصورة."
   },
   {
     "universe": "anim_mv_st",
     "work": "watchmen-chapter-ii-2024",
-    "position": 36,
+    "position": 64,
     "label": "منفرد",
     "note": "الفصل الثاني المكمل لاقتباس رواية Watchmen الكرتوني."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-ninja-vs-yakuza-league-2025",
-    "position": 37,
+    "position": 65,
     "label": "منفرد",
     "note": "تكملة أنمي يابانية مستقلة لفيلم Batman Ninja."
   },
   {
     "universe": "anim_mv_st",
     "work": "aztec-batman-clash-of-empires-2025",
-    "position": 38,
+    "position": 66,
     "label": "منفرد",
     "note": "إعادة تخيل مبتكرة لأسطورة الوطواط في حضارة الأزتك التاريخية."
   },
   {
     "universe": "anim_mv_st",
     "work": "batman-knightfall-part-1-2026",
-    "position": 39,
+    "position": 67,
     "label": "منفرد",
     "note": "الجزء الأول (2026): اقتباس الملحمة الشهيرة التي تضع باتمان أمام أصعب اختبار في مسيرته.",
     "spoiler": "يشهد الفيلم خطة بين لتحرير سجناء أركام وإنهاك باتمان حتى كسر ظهره."
@@ -1321,7 +1321,7 @@
   {
     "universe": "anim_mv_st",
     "work": "batman-knightfall-part-2-2026",
-    "position": 40,
+    "position": 68,
     "label": "منفرد",
     "note": "الجزء الثاني (2026): الفصل المكمل لملحمة Knightfall والصراع على حماية غوثام.",
     "spoiler": "يتناول فترة تولي جان بول فالي (أزرائيل) عباءة الوطواط ورحلة تعافي بروس واين."
@@ -1395,7 +1395,7 @@
   {
     "universe": "anim_tv_st",
     "work": "my-adventures-with-green-lantern-tba",
-    "position": 13,
+    "position": 21,
     "label": "قادم",
     "note": "جيسيكا كروز (Jessica Cruz) طالبة ثانوية يختارها خاتم غرين لانترن. أكّد منتجه أنه يدور في الخط الزمني نفسه لمسلسل My Adventures with Superman.",
     "upcoming": {
@@ -1406,7 +1406,7 @@
   {
     "universe": "anim_tv_st",
     "work": "krypto-tba",
-    "position": 14,
+    "position": 22,
     "label": "قادم",
     "note": "مسلسل للصغار عن كريبتو (Krypto) كلب سوبرمان. أُعلن في مهرجان أنسي في يونيو 2026، وليس من أحداث عالم DCU.",
     "upcoming": {
@@ -1417,7 +1417,7 @@
   {
     "universe": "anim_tv_st",
     "work": "starfire-tba",
-    "position": 15,
+    "position": 23,
     "label": "قادم",
     "note": "مغامرات ستارفاير (Starfire) في الفضاء بعد هروبها من كوكبها تاماران. مسلسل للصغار مستقل عن عالم DCU.",
     "upcoming": {
@@ -1428,7 +1428,7 @@
   {
     "universe": "anim_tv_st",
     "work": "dc-super-powers-tba",
-    "position": 16,
+    "position": 24,
     "label": "قادم",
     "note": "طلاب جدد في مدرسة للأبطال يطوّرون قواهم تحت إشراف المدير مارشن مانهنتر (Martian Manhunter). مسلسل للصغار.",
     "upcoming": {
@@ -1439,7 +1439,7 @@
   {
     "universe": "anim_mv_st",
     "work": "dynamic-duo-2028",
-    "position": 41,
+    "position": 69,
     "label": "قادم",
     "note": "بدايات ديك غرايسون وجيسون تود، وصداقة يختبرها اختلاف نظرتيهما للمستقبل. فيلم أنميشن بتقنية الدمى، ولم يُعلن رسمياً انتماؤه لأي عالم. تأجّل من يونيو إلى سبتمبر 2028.",
     "upcoming": {
@@ -1450,7 +1450,7 @@
   {
     "universe": "anim_mv_st",
     "work": "batman-knightfall-part-3-tba",
-    "position": 42,
+    "position": 70,
     "label": "قادم",
     "note": "الجزء الثالث والأخير من ثلاثية Knightfall، ويُشاهد بعد الجزأين الأول والثاني.",
     "upcoming": {
@@ -1472,7 +1472,7 @@
   {
     "universe": "anim_tv_st",
     "work": "absolute-batman-tba",
-    "position": 17,
+    "position": 25,
     "label": "قادم",
     "note": "باتمان بنسخة مختلفة: بطل من الطبقة العاملة بلا ثروة واين. مقتبس من سلسلة Absolute Batman، وأُعلن في يونيو 2026، وليس من أحداث عالم DCU.",
     "upcoming": {
@@ -1483,12 +1483,866 @@
   {
     "universe": "anim_tv_st",
     "work": "joker-laugh-riot-tba",
-    "position": 18,
+    "position": 26,
     "label": "قادم",
     "note": "بعد مقتل باتمان، يطارد الجوكر القاتل في عالم غوثام السفلي. أُعلن في يونيو 2026، وهو قصة مستقلة عن عالم DCU.",
     "upcoming": {
       "stage": "development",
       "source": "https://comicbookmovie.com/dc-studios/dc-studios-announces-absolute-batman-joker-laugh-riot-and-krypto-tv-shows-at-annecy-a228500"
     }
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-beyond-the-movie-1999",
+    "position": 2,
+    "label": "منفرد",
+    "note": "نسخة مجمّعة من الحلقات الأولى لمسلسل Batman Beyond، تحكي كيف صار تيري ماكغينيس باتمان الجديد."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "justice-league-secret-origins-2001",
+    "position": 3,
+    "label": "منفرد",
+    "note": "نسخة مجمّعة من الحلقات الثلاث الأولى لمسلسل Justice League: نشأة الفريق في وجه غزو فضائي."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "justice-league-starcrossed-the-movie-2004",
+    "position": 4,
+    "label": "منفرد",
+    "note": "نسخة مجمّعة من الحلقات الثلاث الأخيرة لمسلسل Justice League (قصة Starcrossed)."
+  },
+  {
+    "universe": "dcau",
+    "work": "the-zeta-project-2001",
+    "position": 12,
+    "label": "12 (مسلسل جانبي)",
+    "note": "مسلسل متفرّع من Batman Beyond: الروبوت زيتا يهرب من الحكومة التي صنعته."
+  },
+  {
+    "universe": "shorts",
+    "work": "gotham-girls-2000",
+    "position": 1,
+    "label": "منفرد",
+    "note": "حلقات فلاش قصيرة على الإنترنت بأسلوب مسلسلات بروس تيم، عن نساء غوثام."
+  },
+  {
+    "universe": "arrow",
+    "work": "vixen-2015",
+    "position": 4,
+    "label": "4 (عرض ويب، اختياري)",
+    "note": "مسلسل أنميشن قصير على CW Seed، وفيه أول ظهور لفيكسن في عالم آروفيرس."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "vixen-the-movie-2017",
+    "position": 35,
+    "label": "منفرد",
+    "note": "نسخة مجمّعة من موسمي مسلسل Vixen في فيلم واحد."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "freedom-fighters-the-ray-2018",
+    "position": 46,
+    "label": "منفرد",
+    "note": "نسخة مجمّعة من موسمي مسلسل Freedom Fighters: The Ray في فيلم واحد."
+  },
+  {
+    "universe": "arrow",
+    "work": "the-flash-chronicles-of-cisco-2016",
+    "position": 7,
+    "label": "7 (عرض ويب، اختياري)",
+    "note": "حلقات ويب قصيرة مع سيسكو رامون في مختبرات ستار."
+  },
+  {
+    "universe": "shorts",
+    "work": "constantine-city-of-demons-web-series-2018",
+    "position": 46,
+    "label": "منفرد",
+    "note": "النسخة الأصلية بحلقات قصيرة على CW Seed لفيلم Constantine: City of Demons."
+  },
+  {
+    "universe": "reeve",
+    "work": "superman-ii-the-richard-donner-cut-2006",
+    "position": 3,
+    "label": "3 (نسخة بديلة من الجزء الثاني)",
+    "note": "الجزء الثاني كما أراده ريتشارد دونر قبل استبداله، أُكمل من لقطاته الأصلية بعد 26 عاماً."
+  },
+  {
+    "universe": "movie_st",
+    "work": "red-2-2013",
+    "position": 12,
+    "label": "منفرد",
+    "note": "تكملة RED: فرانك موزس وفريقه المتقاعد في مطاردة حول العالم."
+  },
+  {
+    "universe": "movie_st",
+    "work": "the-kitchen-2019",
+    "position": 14,
+    "label": "منفرد",
+    "note": "دراما جريمة مقتبسة من قصة مصورة لـVertigo، عن زوجات رجال عصابات في هيلز كيتشن."
+  },
+  {
+    "universe": "tv_st",
+    "work": "birds-of-prey-2002",
+    "position": 4,
+    "label": "منفرد",
+    "note": "مسلسل واقعي قصير العمر عن هنتريس وأوراكل وداينا في نيو غوثام بعد غياب باتمان."
+  },
+  {
+    "universe": "tv_st",
+    "work": "human-target-2010",
+    "position": 5,
+    "label": "منفرد",
+    "note": "دراما أكشن عن الحارس الخاص كريستوفر تشانس، مقتبسة من قصص DC المصورة."
+  },
+  {
+    "universe": "tv_st",
+    "work": "powerless-2017",
+    "position": 11,
+    "label": "منفرد",
+    "note": "كوميديا عن موظفين عاديين في شركة تابعة لوين، في مدينة يملؤها الأبطال والأشرار."
+  },
+  {
+    "universe": "shorts",
+    "work": "smallville-chloe-chronicles-2003",
+    "position": 2,
+    "label": "منفرد",
+    "note": "حلقات ويب قصيرة متفرعة من Smallville، تتابع فيها كلوي سوليفان تحقيقاتها."
+  },
+  {
+    "universe": "movie_st",
+    "work": "scalped-2017",
+    "position": 13,
+    "label": "منفرد",
+    "note": "حلقة تجريبية لمسلسل لم يُعرض، مقتبسة من قصة Vertigo المصورة."
+  },
+  {
+    "universe": "tv_st",
+    "work": "wonder-woman-2011",
+    "position": 6,
+    "label": "منفرد",
+    "note": "حلقة تجريبية لم تُعرض قط: رفضت NBC المسلسل عام 2011."
+  },
+  {
+    "universe": "early_st",
+    "work": "shazam-1974",
+    "position": 9,
+    "label": "منفرد (1974)",
+    "note": "مسلسل واقعي كلاسيكي لكابتن مارفل من إنتاج Filmation."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "gen13-1998",
+    "position": 1,
+    "label": "منفرد",
+    "note": "فيلم أنميشن مقتبس من قصص WildStorm (من إصدارات DC اليوم)، لم يُعرض في أمريكا."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "wildcats-covert-action-teams-1994",
+    "position": 1,
+    "label": "منفرد",
+    "note": "مسلسل كرتوني مقتبس من فريق WildC.A.T.S في قصص WildStorm (من إصدارات DC اليوم)."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "krypto-the-superdog-2005",
+    "position": 4,
+    "label": "منفرد",
+    "note": "مغامرات كوميدية لكريبتو، كلب سوبرمان الخارق، للصغار."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "legion-of-super-heroes-2006",
+    "position": 5,
+    "label": "منفرد",
+    "note": "سوبرمان الشاب في القرن الحادي والثلاثين مع فيلق الأبطال الخارقين."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "beware-the-batman-2013",
+    "position": 10,
+    "label": "منفرد",
+    "note": "باتمان في سنواته الأولى بأنميشن ثلاثي الأبعاد، مع كاتانا وأشرار أقل شهرة."
+  },
+  {
+    "universe": "shorts",
+    "work": "batman-unlimited-2015",
+    "position": 42,
+    "label": "منفرد",
+    "note": "حلقات قصيرة بلا حوار لباتمان وعائلته، صاحبت سلسلة ألعاب Batman Unlimited."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-super-hero-girls-2015",
+    "position": 43,
+    "label": "منفرد",
+    "note": "حلقات ويب قصيرة في ثانوية الأبطال الخارقين، أصل عالم DC Super Hero Girls."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "aquaman-king-of-atlantis-2021",
+    "position": 13,
+    "label": "منفرد",
+    "note": "ميني سلسلة كوميدية من ثلاث حلقات طويلة عن أول أيام أكوامان ملكاً."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "batwheels-2022",
+    "position": 14,
+    "label": "منفرد",
+    "note": "مسلسل لصغار السن عن مركبات باتمان الذكية التي تقاتل الجريمة."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "dc-heroes-united-2024",
+    "position": 18,
+    "label": "منفرد",
+    "note": "مسلسل تفاعلي يقرر فيه المشاهدون مسار القصة في الأرض 212."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-metal-force-2024",
+    "position": 58,
+    "label": "منفرد",
+    "note": "حلقات قصيرة على يوتيوب صاحبت ألعاب DC Metal Force."
+  },
+  {
+    "universe": "anim_tv_st",
+    "work": "get-jiro-2026",
+    "position": 20,
+    "label": "منفرد",
+    "note": "مسلسل للكبار على Adult Swim، مقتبس من قصة Vertigo المصورة لأنتوني بوردين."
+  },
+  {
+    "universe": "shorts",
+    "work": "deathstroke-knights-and-dragons-2020",
+    "position": 51,
+    "label": "منفرد",
+    "note": "سلسلة أنميشن للكبار على CW Seed عن القاتل المأجور ديثستروك."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "deathstroke-knights-and-dragons-the-movie-2020",
+    "position": 50,
+    "label": "منفرد",
+    "note": "نسخة مجمّعة من حلقات Deathstroke: Knights & Dragons في فيلم واحد للكبار."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "the-batman-vs-dracula-2005",
+    "position": 5,
+    "label": "منفرد",
+    "note": "فيلم مسلسل The Batman (2004): باتمان في مواجهة دراكولا نفسه."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "superman-brainiac-attacks-2006",
+    "position": 6,
+    "label": "منفرد",
+    "note": "فيلم أنميشن مستقل بأسلوب Superman: The Animated Series، لكنه خارج عالمه."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "teen-titans-trouble-in-tokyo-2006",
+    "position": 7,
+    "label": "منفرد",
+    "note": "خاتمة مسلسل Teen Titans (2003): الفريق في طوكيو."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "jla-adventures-trapped-in-time-2014",
+    "position": 25,
+    "label": "منفرد",
+    "note": "فيلم عائلي قصير: فرقة العدالة ضد فيلق الهلاك وسيد الزمن."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-unlimited-animal-instincts-2015",
+    "position": 27,
+    "label": "منفرد",
+    "note": "أول أفلام Batman Unlimited: البطريق وفرقته الحيوانية."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-unlimited-monster-mayhem-2015",
+    "position": 29,
+    "label": "منفرد",
+    "note": "ثاني أفلام Batman Unlimited: الجوكر وأشرار الهالوين."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-unlimited-mechs-vs-mutants-2016",
+    "position": 32,
+    "label": "منفرد",
+    "note": "ثالث أفلام Batman Unlimited: روبوتات عملاقة ضد وحوش عملاقة."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "dc-super-hero-girls-super-hero-high-2016",
+    "position": 30,
+    "label": "منفرد",
+    "note": "أول أفلام DC Super Hero Girls: وصول سوبرغيرل إلى ثانوية الأبطال."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "dc-super-hero-girls-hero-of-the-year-2016",
+    "position": 33,
+    "label": "منفرد",
+    "note": "فيلم DC Super Hero Girls: جائزة بطل العام."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "dc-super-hero-girls-intergalactic-games-2017",
+    "position": 36,
+    "label": "منفرد",
+    "note": "فيلم DC Super Hero Girls: الألعاب بين المجرات."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "dc-super-hero-girls-legends-of-atlantis-2018",
+    "position": 45,
+    "label": "منفرد",
+    "note": "فيلم DC Super Hero Girls: سايرن ورمح أتلانتس."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-batman-the-movie-dc-super-heroes-unite-2013",
+    "position": 1,
+    "label": "منفرد",
+    "note": "أول أفلام ليغو دي سي: الجوكر وليكس لوثر ضد فرقة العدالة."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-comics-super-heroes-batman-be-leaguered-2014",
+    "position": 2,
+    "label": "منفرد",
+    "note": "حلقة خاصة قصيرة: باتمان الوحيد يُجرّ إلى العمل مع فرقة العدالة."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-comics-super-heroes-justice-league-vs-bizarro-league-2015",
+    "position": 3,
+    "label": "منفرد",
+    "note": "فرقة العدالة ضد نسخها المقلوبة في عالم بيزارو."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-comics-super-heroes-justice-league-attack-of-the-legion-of-doom-2015",
+    "position": 4,
+    "label": "منفرد",
+    "note": "ليكس لوثر يؤسس فيلق الهلاك ليرد على فرقة العدالة الجديدة."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-comics-super-heroes-justice-league-cosmic-clash-2016",
+    "position": 5,
+    "label": "منفرد",
+    "note": "برينياك يريد الأرض آخر قطعة في مجموعة كواكبه."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-comics-super-heroes-justice-league-gotham-city-breakout-2016",
+    "position": 6,
+    "label": "منفرد",
+    "note": "باتمان في إجازة، وسوبرمان والفرقة يحرسون غوثام بدلاً منه."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-super-hero-girls-galactic-wonder-2017",
+    "position": 7,
+    "label": "منفرد",
+    "note": "حلقة خاصة قصيرة من ليغو DC Super Hero Girls."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-super-hero-girls-brain-drain-2017",
+    "position": 8,
+    "label": "منفرد",
+    "note": "بطلات ثانوية الأبطال يحققن في يوم اختفى من ذاكرتهن."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-comics-super-heroes-the-flash-2018",
+    "position": 9,
+    "label": "منفرد",
+    "note": "ريفرس فلاش يحبس فلاش في يوم يتكرر."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-super-hero-girls-super-villain-high-2018",
+    "position": 10,
+    "label": "منفرد",
+    "note": "مدرسة للأشرار تفتح أمام ثانوية الأبطال."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-comics-super-heroes-aquaman-rage-of-atlantis-2018",
+    "position": 11,
+    "label": "منفرد",
+    "note": "أكوامان وفرقة العدالة في معركة في الجو والبر والبحار السبعة."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-batman-family-matters-2019",
+    "position": 12,
+    "label": "منفرد",
+    "note": "عائلة باتمان أمام ريد هود."
+  },
+  {
+    "universe": "lego",
+    "work": "lego-dc-shazam-magic-and-monsters-2020",
+    "position": 13,
+    "label": "منفرد",
+    "note": "شزام يريد الانضمام إلى فرقة العدالة، لكن أعضاءها صاروا أطفالاً."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-return-of-the-caped-crusaders-2016",
+    "position": 34,
+    "label": "منفرد",
+    "note": "آدم ويست وبيرت وارد يعودان بصوتيهما إلى باتمان وروبن مسلسل 1966."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "batman-vs-two-face-2017",
+    "position": 40,
+    "label": "منفرد",
+    "note": "تكملة Return of the Caped Crusaders، وآخر أداء لآدم ويست، مع ويليام شاتنر في دور تو-فيس."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "scooby-doo-and-batman-the-brave-and-the-bold-2018",
+    "position": 41,
+    "label": "منفرد",
+    "note": "سكوبي دو وعصابة الغموض مع باتمان مسلسل The Brave and the Bold."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "dc-super-heroes-vs-eagle-talon-2017",
+    "position": 39,
+    "label": "منفرد",
+    "note": "فيلم أنمي ياباني كوميدي: فرقة العدالة مع فرقة Eagle Talon اليابانية الساخرة."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "teen-titans-go-vs-teen-titans-2019",
+    "position": 48,
+    "label": "منفرد",
+    "note": "فريقا تايتنز: الكوميدي الحديث ضد نسخة 2003."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "teen-titans-go-see-space-jam-2021",
+    "position": 51,
+    "label": "منفرد",
+    "note": "التايتنز يشاهدون Space Jam مع أشراره."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "teen-titans-go-and-dc-super-hero-girls-mayhem-in-the-multiverse-2022",
+    "position": 54,
+    "label": "منفرد",
+    "note": "لقاء تايتنز غو وبطلات DC Super Hero Girls عبر الأكوان."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "justice-league-x-rwby-super-heroes-and-huntsmen-part-one-2023",
+    "position": 58,
+    "label": "منفرد",
+    "note": "فرقة العدالة في عالم RWBY، الجزء الأول."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "justice-league-x-rwby-super-heroes-and-huntsmen-part-two-2023",
+    "position": 62,
+    "label": "منفرد",
+    "note": "فرقة العدالة وفريق RWBY، الجزء الثاني."
+  },
+  {
+    "universe": "anim_mv_st",
+    "work": "scooby-doo-and-krypto-too-2023",
+    "position": 61,
+    "label": "منفرد",
+    "note": "سكوبي دو وكريبتو يحلّان لغز اختفاء فرقة العدالة."
+  },
+  {
+    "universe": "shorts",
+    "work": "zatanna-trial-of-the-crystal-wand-2003",
+    "position": 3,
+    "label": "منفرد",
+    "note": "حلقتان قصيرتان على الإنترنت عن زاتانا مراهقةً."
+  },
+  {
+    "universe": "shorts",
+    "work": "batman-black-and-white-motion-comics-2008",
+    "position": 4,
+    "label": "منفرد",
+    "note": "قصص مصورة متحركة بالأبيض والأسود من سلسلة Batman: Black and White."
+  },
+  {
+    "universe": "shorts",
+    "work": "tales-of-the-black-freighter-2009",
+    "position": 5,
+    "label": "منفرد",
+    "note": "القصة المصورة داخل Watchmen عن القراصنة، رافقت فيلم Watchmen (2009)."
+  },
+  {
+    "universe": "shorts",
+    "work": "under-the-hood-2009",
+    "position": 6,
+    "label": "منفرد",
+    "note": "وثائقي متخيَّل من داخل عالم Watchmen (2009)، مبني على مذكرات نايت أول."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-the-spectre-2010",
+    "position": 7,
+    "label": "منفرد",
+    "note": "أول عروض DC Showcase القصيرة: الشبح المنتقم."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-jonah-hex-2010",
+    "position": 8,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير: صائد الجوائز المشوّه في الغرب الأمريكي."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-super-friends-the-jokers-playhouse-2010",
+    "position": 9,
+    "label": "منفرد",
+    "note": "فيلم قصير للصغار مرتبط بألعاب DC Super Friends."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-green-arrow-2010",
+    "position": 10,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير: غرين آرو في المطار."
+  },
+  {
+    "universe": "shorts",
+    "work": "superman-shazam-the-return-of-black-adam-2010",
+    "position": 11,
+    "label": "منفرد",
+    "note": "عرض DC Showcase: بيلي باتسون يصير كابتن مارفل في مواجهة بلاك آدم."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-catwoman-2011",
+    "position": 12,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير: كات وومن وشحنة غامضة."
+  },
+  {
+    "universe": "shorts",
+    "work": "new-teen-titans-2011",
+    "position": 13,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة بشخصيات مسلسل Teen Titans (2003)."
+  },
+  {
+    "universe": "shorts",
+    "work": "worlds-funnest-2011",
+    "position": 14,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة بتحريك الدمى: نسخ طريفة من شخصيات DC."
+  },
+  {
+    "universe": "shorts",
+    "work": "plastic-man-2012",
+    "position": 15,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: مغامرات بلاستيك مان المضحكة."
+  },
+  {
+    "universe": "shorts",
+    "work": "superman-tokyo-2012",
+    "position": 16,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة بأسلوب الأنمي الياباني."
+  },
+  {
+    "universe": "shorts",
+    "work": "super-best-friends-forever-2012",
+    "position": 17,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: سوبرغيرل وباتغيرل وواندر غيرل."
+  },
+  {
+    "universe": "shorts",
+    "work": "animal-man-2012",
+    "position": 18,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: باد بيكر رجل الحيوان."
+  },
+  {
+    "universe": "shorts",
+    "work": "vibe-2012",
+    "position": 19,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: فايب في مسابقة رقص."
+  },
+  {
+    "universe": "shorts",
+    "work": "sword-of-the-atom-2012",
+    "position": 20,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: آتوم عالقاً بحجم صغير في الأمازون."
+  },
+  {
+    "universe": "shorts",
+    "work": "the-bat-man-of-shanghai-2012",
+    "position": 21,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: باتمان في شنغهاي الثلاثينيات."
+  },
+  {
+    "universe": "shorts",
+    "work": "robot-chicken-dc-comics-special-2012",
+    "position": 22,
+    "label": "منفرد",
+    "note": "حلقة خاصة ساخرة بتحريك الدمى من فريق Robot Chicken بالشراكة مع DC."
+  },
+  {
+    "universe": "shorts",
+    "work": "amethyst-princess-of-gemworld-2013",
+    "position": 23,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: فتاة تُسحب إلى عالم الجواهر."
+  },
+  {
+    "universe": "shorts",
+    "work": "thunder-and-lightning-2013",
+    "position": 24,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: عائلة بلاك لايتنينغ."
+  },
+  {
+    "universe": "shorts",
+    "work": "farm-league-2013",
+    "position": 25,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: فرقة العدالة حيوانات مزرعة."
+  },
+  {
+    "universe": "shorts",
+    "work": "shade-the-changing-man-2013",
+    "position": 26,
+    "label": "منفرد",
+    "note": "مقطع قصير من فقرات DC Nation."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-super-pets-2013",
+    "position": 27,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: حيوانات الأبطال الأليفة."
+  },
+  {
+    "universe": "shorts",
+    "work": "tales-of-metropolis-2013",
+    "position": 28,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: حكايات من ميتروبوليس."
+  },
+  {
+    "universe": "shorts",
+    "work": "the-riddler-riddle-me-this-2013",
+    "position": 29,
+    "label": "منفرد",
+    "note": "مقطع قصير من فقرات DC Nation."
+  },
+  {
+    "universe": "shorts",
+    "work": "wonder-woman-2013",
+    "position": 30,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة عن واندر وومن."
+  },
+  {
+    "universe": "shorts",
+    "work": "metal-men-2013",
+    "position": 31,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: روبوتات الدكتور ماغنوس."
+  },
+  {
+    "universe": "shorts",
+    "work": "doom-patrol-2013",
+    "position": 32,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة عن أغرب أبطال العالم."
+  },
+  {
+    "universe": "shorts",
+    "work": "deadman-2013",
+    "position": 33,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: ديدمان شبحاً صغيراً."
+  },
+  {
+    "universe": "shorts",
+    "work": "superman-75-2013",
+    "position": 34,
+    "label": "منفرد",
+    "note": "مقطع قصير احتفالاً بخمسة وسبعين عاماً على سوبرمان، من زاك سنايدر وبروس تيم."
+  },
+  {
+    "universe": "shorts",
+    "work": "robot-chicken-dc-comics-special-ii-villains-in-paradise-2014",
+    "position": 35,
+    "label": "منفرد",
+    "note": "الحلقة الخاصة الثانية الساخرة من Robot Chicken وDC."
+  },
+  {
+    "universe": "shorts",
+    "work": "batman-strange-days-2014",
+    "position": 36,
+    "label": "منفرد",
+    "note": "مقطع قصير لبروس تيم احتفالاً بخمسة وسبعين عاماً على باتمان."
+  },
+  {
+    "universe": "shorts",
+    "work": "green-arrow-2014",
+    "position": 37,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: غرين آرو وقوسه الذكي."
+  },
+  {
+    "universe": "shorts",
+    "work": "batman-beyond-2014",
+    "position": 38,
+    "label": "منفرد",
+    "note": "مقطع قصير لدارويك كوك احتفالاً بخمسة وسبعين عاماً على باتمان، في عالم Batman Beyond."
+  },
+  {
+    "universe": "shorts",
+    "work": "shazam-2014",
+    "position": 39,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: بيلي باتسون طفلاً بقدرات شزام."
+  },
+  {
+    "universe": "shorts",
+    "work": "the-creature-commandos-2014",
+    "position": 40,
+    "label": "منفرد",
+    "note": "فقرات DC Nation قصيرة: جنود صاروا وحوشاً."
+  },
+  {
+    "universe": "shorts",
+    "work": "nightwing-and-robin-2015",
+    "position": 41,
+    "label": "منفرد",
+    "note": "مقطع قصير من 45 ثانية في أحداث Justice League: Throne of Atlantis."
+  },
+  {
+    "universe": "shorts",
+    "work": "the-robot-chicken-dc-comics-special-iii-magical-friendship-2015",
+    "position": 44,
+    "label": "منفرد",
+    "note": "الحلقة الخاصة الثالثة الساخرة من Robot Chicken وDC."
+  },
+  {
+    "universe": "shorts",
+    "work": "ettas-mission-2017",
+    "position": 45,
+    "label": "منفرد",
+    "note": "مقطع قصير مع إصدار Wonder Woman (2017) على الفيديو، عن إيتا كاندي بعد الحرب."
+  },
+  {
+    "universe": "shorts",
+    "work": "the-late-batsby-2018",
+    "position": 47,
+    "label": "منفرد",
+    "note": "مقطع قصير من DC Super Hero Girls."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-super-hero-girls-super-shorts-2019",
+    "position": 48,
+    "label": "منفرد",
+    "note": "مقاطع قصيرة على يوتيوب بشخصيات DC Super Hero Girls (2019)."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-sgt-rock-2019",
+    "position": 49,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير: الرقيب روك ضد قاعدة نازية سرية."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-death-2019",
+    "position": 50,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير مقتبس من شخصية «الموت» في عالم ساندمان."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-the-phantom-stranger-2020",
+    "position": 52,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير: رعب في قصر مهجور."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-adam-strange-2020",
+    "position": 53,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير: آدم سترينج في مستعمرة تعدين."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-batman-death-in-the-family-2020",
+    "position": 54,
+    "label": "منفرد",
+    "note": "عرض DC Showcase تفاعلي: تختار فيه مصير جيسون تود."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-kamandi-the-last-boy-on-earth-2021",
+    "position": 55,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير: كاماندي في أرض بعد الكارثة."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-the-losers-2021",
+    "position": 56,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير: فريق الخاسرين في الحرب العالمية الثانية."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-showcase-blue-beetle-2021",
+    "position": 57,
+    "label": "منفرد",
+    "note": "عرض DC Showcase قصير بأسلوب كرتون الستينيات: بلو بيتل تيد كورد."
+  },
+  {
+    "universe": "shorts",
+    "work": "krypto-saves-the-day-2025",
+    "position": 59,
+    "label": "منفرد",
+    "note": "حلقات قصيرة على يوتيوب عن كريبتو، كلب سوبرمان، بعد فيلم Superman (2025)."
+  },
+  {
+    "universe": "shorts",
+    "work": "dc-x-sonic-the-hedgehog-2026",
+    "position": 60,
+    "label": "منفرد",
+    "note": "حلقات قصيرة على يوتيوب: سونيك وأصدقاؤه في عالم فرقة العدالة."
+  },
+  {
+    "universe": "arrow",
+    "work": "freedom-fighters-the-ray-2017",
+    "position": 8,
+    "label": "8 (عرض ويب، اختياري)",
+    "note": "مسلسل أنميشن قصير على CW Seed عن بطل الضوء القادم من الأرض إكس."
   }
 ]
