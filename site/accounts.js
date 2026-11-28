@@ -2,7 +2,7 @@
 // تعديلاتك وتطبّق ما يصلها منه. تُربط الحسابات مرة واحدة من أي جهاز، وتعمل في كل الأجهزة، ولا رمز في المتصفح.
 // - تعديلاتك تنتظر في هذا المتصفح (accounts.q) حتى تصل الخادم، فلا يضيع تعديل بلا اتصال. وما يصل من الخادم يُطبَّق ولا يُعاد إرساله.
 // - المزامنة: حين تُفتح الصفحة، وبعد ثوانٍ من آخر تعديل، وكل عشر دقائق والصفحة ظاهرة، وحين يعود الاتصال أو تعود إلى الصفحة.
-//   ولا شيء من هذا قبل أن يُربط حساب: الصفحة لا تطلب الخادم وأنت لم تربط شيئاً.
+//   ولا شيء من هذا قبل أن يُربط حساب: الصفحة لا تطلب الخادم وأنت لم تربط شيئاً، إلا سؤالاً عن الربط حين تُفتح، كل عشر دقائق على الأكثر وبكلمة السر المحفوظة.
 // - كلمة السر نفسها التي تحفظها «أضف أنمي» أو «أضف فيلماً» أو «أضف لعبة» في هذا المتصفح، فلا تُطلب إلا إن لم تُحفظ.
 const API = '/api/accounts', Q = 'accounts.q', REV = 'accounts.rev', ON = 'accounts.on', PASSES = ['animeg.pass', 'filmsg.pass', 'gamesg.pass'];
 const WAIT = 2500, WAIT_GONE = 8000, EVERY = 10 * 60e3;
@@ -30,8 +30,10 @@ export function accInit(o) { cx = o;
   setInterval(() => { if (!document.hidden) accSync(); }, EVERY);
   // العودة من صفحة موافقة MyAnimeList (?linked=mal): يُنظَّف الرابط، وتُخبَر الصفحة بعد أن تُتم فتح نفسها
   const q = new URLSearchParams(location.search); if (q.get('linked')) { history.replaceState(history.state, '', location.pathname + location.hash); setTimeout(() => cx.onLinked?.(q.get('linked'), q.get('fail') || ''), 0); }
-  // جهاز لم يعرف بعد هل رُبط حساب (أو مضى على ما يعرفه نصف يوم) يسأل الخادم مرة، إن كانت كلمة السر محفوظة فيه
-  setTimeout(async () => { if (accPass() && (!saved || Date.now() - (saved.at || 0) > 12 * 3600e3 || q.get('linked'))) await accLinks(); accSync(); }, q.get('linked') ? 300 : 1500); }
+  // جهاز لم يعرف بعد هل رُبط حساب يسأل الخادم مرة، إن كانت كلمة السر محفوظة فيه: حين لا يعرف شيئاً، أو مضى على ما يعرفه نصف يوم،
+  // أو لم يُربط عنده حساب من خدمات هذه البوابة ومضت عشر دقائق (رُبط من جهاز آخر، أو عرف حساباته من بوابة أخرى قبل ربطه)
+  setTimeout(async () => { const age = Date.now() - (saved?.at || 0), off = (cx.svcs || []).some(k => !saved?.links?.[k]?.on);
+    if (accPass() && (!saved || age > 12 * 3600e3 || (off && age > 10 * 60e3) || q.get('linked'))) await accLinks(); accSync(); }, q.get('linked') ? 300 : 1500); }
 // تعديل منك على عمل: حاله بعد التعديل (أو لا شيء إن أزلته)
 export function accMark(id, m) { if (!cx || !anyOn()) return; const all = jget(Q, {}), q = all[cx.guide] ||= {};
   q[id] = { s: m?.s || null, p: +m?.p || 0, r: +m?.r || 0, t: Date.now() }; ls.set(Q, JSON.stringify(all));

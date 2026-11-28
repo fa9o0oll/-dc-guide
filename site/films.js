@@ -467,7 +467,7 @@ function lbxHTML() { const st = accState(), l = st.links?.letterboxd, on = !!l?.
     : `<form class="lbx-link"><label>اسمك في Letterboxd، أو رابط صفحتك<input dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="letterboxd.com/…" required></label><button class="btn pri" type="submit">اربط</button></form>`)}
     ${LB.msg ? `<p class="msg" role="alert">${LB.msg}</p>` : ''}${st.err ? `<p class="msg">${esc(st.err)}</p>` : ''}`; }
 function drawLbx() { const b = $('#lbx-body'); if (b) b.innerHTML = lbxHTML(); }
-function openLbx() { LB.msg = ''; drawLbx(); const d = $('#lbx'); if (!d.open) d.showModal(); if (accPass()) accLinks().then(drawLbx); }
+function openLbx() { LB.msg = ''; drawLbx(); const d = $('#lbx'); if (!d.open) d.showModal(); if (accPass()) accLinks().then(() => { drawLbx(); accSync(); }); }   // رُبط من جهاز آخر؟ تبدأ المزامنة الآن
 // ملف الاستيراد بصيغة Letterboxd: رقم الفيلم في TMDB يطابقه تماماً، والاسم والسنة للقراءة (letterboxd.com/about/importing-data)
 function lbxFile(k) { const ids = lbPending()[k], q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const rows = ids.map(id => { const f = D.byId.get('m' + id) || D.pool?.get('m' + id); return [id, q(f?.title || ''), f?.year || ''].join(','); });
