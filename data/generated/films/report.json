@@ -11,14 +11,14 @@
  "franchiseProblems": [],
  "counts": {
   "lines": 494,
-  "films": 621,
+  "films": 1039,
   "tv": 8,
-  "added": 15,
-  "collections": 97,
+  "added": 433,
+  "collections": 212,
   "franchises": 116,
-  "withProviders": 375,
+  "withProviders": 704,
   "adult": 0,
-  "arabicOverviews": 629,
+  "arabicOverviews": 1019,
   "ourArabic": 617,
   "noPoster": 8
  }

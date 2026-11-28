@@ -1,24 +1,24 @@
 {
- "generatedAt": "2026-11-28T11:46:08.991Z",
+ "generatedAt": "2026-11-28T13:55:37.643Z",
  "counts": {
-  "works": 629,
-  "withEntry": 376,
-  "inWorld": 231,
-  "worlds": 111,
-  "chains": 51,
-  "withRelated": 249,
-  "missing": 2,
-  "uncurated": 4,
-  "curatedGaps": 0,
-  "collectionGaps": 1,
+  "works": 1047,
+  "withEntry": 680,
+  "inWorld": 481,
+  "worlds": 245,
+  "chains": 90,
+  "withRelated": 384,
+  "missing": 32,
+  "uncurated": 244,
+  "curatedGaps": 1,
+  "collectionGaps": 103,
   "chronoAgree": 28,
   "chronoConflict": 0,
   "chronoReviewed": 2,
   "chronoMissed": 27,
-  "chronoAuto": 33,
-  "infoEntries": 466,
-  "bytes": 205345,
-  "seconds": 44
+  "chronoAuto": 59,
+  "infoEntries": 814,
+  "bytes": 355777,
+  "seconds": 106
  },
  "missing": [
   {
@@ -69,6 +69,1248 @@
      ]
     }
    ]
+  },
+  {
+   "k": "m10681",
+   "t": "WALL·E",
+   "y": 2008,
+   "worlds": [
+    {
+     "name": "WALL·E",
+     "kind": "chain",
+     "size": 2,
+     "order": [
+      "WALL·E",
+      "BURN·E"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m141052",
+   "t": "Justice League",
+   "y": 2017,
+   "worlds": [
+    {
+     "name": "DC Extended Universe",
+     "kind": "franchise",
+     "size": 16,
+     "order": [
+      "Man of Steel",
+      "Batman v Superman: Dawn of Justice",
+      "Suicide Squad",
+      "Wonder Woman",
+      "Justice League",
+      "Aquaman",
+      "Shazam!",
+      "Birds of Prey (and the Fantabulous Emancipation of One Harley Quinn)",
+      "Wonder Woman 1984",
+      "The Suicide Squad",
+      "Black Adam",
+      "Shazam! Fury of the Gods",
+      "Blue Beetle",
+      "Aquaman and the Lost Kingdom",
+      "Peacemaker",
+      "The Flash"
+     ]
+    },
+    {
+     "name": "Batman in film",
+     "kind": "series",
+     "size": 41,
+     "order": [
+      "Batman",
+      "Batman",
+      "Batman Returns",
+      "Batman Forever",
+      "Batman & Robin",
+      "Batman Begins",
+      "Batman: Gotham Knight",
+      "The Dark Knight",
+      "Superman/Batman: Public Enemies",
+      "Batman: Under the Red Hood",
+      "Superman/Batman: Apocalypse",
+      "Batman: Year One",
+      "The Dark Knight Rises",
+      "Batman: The Dark Knight Returns, Part 1",
+      "Batman: The Dark Knight Returns, Part 2",
+      "LEGO Batman: The Movie - DC Super Heroes Unite",
+      "Batman: The Dark Knight Returns",
+      "Son of Batman",
+      "Batman: Assault on Arkham",
+      "LEGO DC Comics Super Heroes: Batman Be-Leaguered",
+      "Batman vs. Robin",
+      "Batman: Bad Blood",
+      "Batman v Superman: Dawn of Justice",
+      "Batman: The Killing Joke",
+      "The Lego Batman Movie",
+      "Batman and Harley Quinn",
+      "Justice League",
+      "Batman: Gotham by Gaslight",
+      "Scooby-Doo! & Batman: The Brave and the Bold",
+      "Batman Ninja",
+      "Batman vs Teenage Mutant Ninja Turtles",
+      "Batman: Hush",
+      "LEGO DC Batman: Family Matters",
+      "DC Showcase - Batman: Death in the Family",
+      "Batman: Soul of the Dragon",
+      "Batman: The Long Halloween, Part One",
+      "Batman: The Long Halloween, Part Two",
+      "Catwoman: Hunted",
+      "The Batman",
+      "Batman: The Long Halloween Deluxe Edition",
+      "Merry Little Batman"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m420426",
+   "t": "Bleach",
+   "y": 2018,
+   "worlds": [
+    {
+     "name": "Bleach",
+     "kind": "franchise",
+     "size": 6,
+     "order": [
+      "Bleach",
+      "Bleach the Movie: Memories of Nobody",
+      "Bleach the Movie: The DiamondDust Rebellion",
+      "Bleach the Movie: Fade to Black",
+      "Bleach the Movie: Hell Verse",
+      "Bleach"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m1724",
+   "t": "The Incredible Hulk",
+   "y": 2008,
+   "worlds": [
+    {
+     "name": "Marvel Cinematic Universe Phase One",
+     "kind": "franchise",
+     "size": 7,
+     "order": [
+      "Iron Man",
+      "The Incredible Hulk",
+      "Iron Man 2",
+      "Thor",
+      "Captain America: The First Avenger",
+      "The Avengers",
+      "Marvel One-Shot: The Consultant"
+     ]
+    },
+    {
+     "name": "Marvel Cinematic Universe",
+     "kind": "universe",
+     "size": 73,
+     "order": [
+      "Iron Man",
+      "The Incredible Hulk",
+      "Iron Man 2",
+      "Thor",
+      "Captain America: The First Avenger",
+      "The Avengers",
+      "Iron Man 3",
+      "Marvel's Agents of S.H.I.E.L.D.",
+      "Thor: The Dark World",
+      "Captain America: The Winter Soldier",
+      "Guardians of the Galaxy",
+      "Marvel's Agent Carter",
+      "Marvel's Daredevil",
+      "Avengers: Age of Ultron",
+      "WHIH Newsfront",
+      "Ant-Man",
+      "Marvel's Jessica Jones",
+      "Captain America: Civil War",
+      "Team Thor",
+      "Marvel's Luke Cage",
+      "Doctor Strange",
+      "Marvel's Iron Fist",
+      "Guardians of the Galaxy Vol. 2",
+      "Spider-Man: Homecoming",
+      "Marvel's The Defenders",
+      "Marvel's Inhumans",
+      "Thor: Ragnarok",
+      "Marvel's The Punisher",
+      "Marvel's Runaways",
+      "Black Panther",
+      "Team Darryl",
+      "Avengers: Infinity War",
+      "Marvel's Cloak & Dagger",
+      "Ant-Man and the Wasp",
+      "Captain Marvel",
+      "Avengers: Endgame",
+      "Spider-Man: Far From Home",
+      "Helstrom",
+      "WandaVision",
+      "The Falcon and the Winter Soldier",
+      "Loki",
+      "Black Widow",
+      "What If...?",
+      "Shang-Chi and the Legend of the Ten Rings",
+      "Eternals",
+      "Hawkeye",
+      "Spider-Man: No Way Home",
+      "Doctor Strange in the Multiverse of Madness",
+      "Ms. Marvel",
+      "Thor: Love and Thunder",
+      "She-Hulk: Attorney at Law",
+      "Werewolf by Night",
+      "Black Panther: Wakanda Forever",
+      "The Guardians of the Galaxy Holiday Special",
+      "Ant-Man and the Wasp: Quantumania",
+      "Guardians of the Galaxy Vol. 3",
+      "Secret Invasion",
+      "The Marvels",
+      "Echo",
+      "Deadpool & Wolverine",
+      "Agatha All Along",
+      "Captain America: Brave New World",
+      "Daredevil: Born Again",
+      "Thunderbolts*",
+      "Ironheart",
+      "The Fantastic 4: First Steps",
+      "Wonder Man",
+      "Spider-Man: Brand New Day",
+      "VisionQuest",
+      "Avengers: Doomsday",
+      "Avengers: Secret Wars",
+      "Untitled X-Men Film",
+      "Black Panther 3"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m211387",
+   "t": "Marvel One-Shot: Agent Carter",
+   "y": 2013,
+   "worlds": [
+    {
+     "name": "Marvel One-Shots",
+     "kind": "series",
+     "size": 5,
+     "order": [
+      "Marvel One-Shot: The Consultant",
+      "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer",
+      "Marvel One-Shot: Item 47",
+      "Marvel One-Shot: Agent Carter",
+      "Marvel One-Shot: All Hail the King"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m76122",
+   "t": "Marvel One-Shot: The Consultant",
+   "y": 2011,
+   "worlds": [
+    {
+     "name": "Marvel One-Shots",
+     "kind": "series",
+     "size": 5,
+     "order": [
+      "Marvel One-Shot: The Consultant",
+      "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer",
+      "Marvel One-Shot: Item 47",
+      "Marvel One-Shot: Agent Carter",
+      "Marvel One-Shot: All Hail the King"
+     ]
+    },
+    {
+     "name": "Marvel Cinematic Universe Phase One",
+     "kind": "franchise",
+     "size": 7,
+     "order": [
+      "Iron Man",
+      "The Incredible Hulk",
+      "Iron Man 2",
+      "Thor",
+      "Captain America: The First Avenger",
+      "The Avengers",
+      "Marvel One-Shot: The Consultant"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m76535",
+   "t": "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer",
+   "y": 2011,
+   "worlds": [
+    {
+     "name": "Marvel One-Shots",
+     "kind": "series",
+     "size": 5,
+     "order": [
+      "Marvel One-Shot: The Consultant",
+      "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer",
+      "Marvel One-Shot: Item 47",
+      "Marvel One-Shot: Agent Carter",
+      "Marvel One-Shot: All Hail the King"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m119569",
+   "t": "Marvel One-Shot: Item 47",
+   "y": 2012,
+   "worlds": [
+    {
+     "name": "Marvel One-Shots",
+     "kind": "series",
+     "size": 5,
+     "order": [
+      "Marvel One-Shot: The Consultant",
+      "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer",
+      "Marvel One-Shot: Item 47",
+      "Marvel One-Shot: Agent Carter",
+      "Marvel One-Shot: All Hail the King"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m253980",
+   "t": "Marvel One-Shot: All Hail the King",
+   "y": 2014,
+   "worlds": [
+    {
+     "name": "Marvel One-Shots",
+     "kind": "series",
+     "size": 5,
+     "order": [
+      "Marvel One-Shot: The Consultant",
+      "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer",
+      "Marvel One-Shot: Item 47",
+      "Marvel One-Shot: Agent Carter",
+      "Marvel One-Shot: All Hail the King"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m447404",
+   "t": "Pokémon Detective Pikachu",
+   "y": 2019,
+   "worlds": [
+    {
+     "name": "Pokémon",
+     "kind": "series",
+     "size": 25,
+     "order": [
+      "Pokémon: The First Movie",
+      "Pokémon the Movie 2000",
+      "Pokémon 3: The Movie",
+      "Pokémon 4Ever",
+      "Pokémon Heroes",
+      "Pokémon: Jirachi Wish Maker",
+      "Pokémon: Destiny Deoxys",
+      "Pokémon: Lucario and the Mystery of Mew",
+      "Pokémon Ranger and the Temple of the Sea",
+      "Pokémon: The Rise of Darkrai",
+      "Pokémon: Giratina and the Sky Warrior",
+      "Pokémon: Arceus and the Jewel of Life",
+      "Pokémon: Zoroark - Master of Illusions",
+      "Pokémon the Movie: Kyurem vs. the Sword of Justice",
+      "Pokémon the Movie: Genesect and the Legend Awakened",
+      "Pokémon the Movie: Diancie and the Cocoon of Destruction",
+      "Pokémon the Movie: Hoopa and the Clash of Ages",
+      "Pokémon the Movie: Volcanion and the Mechanical Marvel",
+      "Pokémon the Movie: I Choose You!",
+      "Pokémon the Movie: The Power of Us",
+      "Pokémon the Movie: Mewtwo Strikes Back - Evolution",
+      "Pokémon the Movie: Secrets of the Jungle",
+      "Pokémon: Mewtwo Returns",
+      "Pokémon: The Mastermind of Mirage Pokémon",
+      "Pokémon Detective Pikachu"
+     ]
+    },
+    {
+     "name": "Pokémon",
+     "kind": "franchise",
+     "size": 35,
+     "order": [
+      "Pokémon",
+      "Pokémon: The First Movie",
+      "Pokémon the Movie 2000",
+      "Pokémon 3: The Movie",
+      "Pikachu & Pichu",
+      "Pokémon 4Ever",
+      "Pokémon: Mewtwo Returns",
+      "Pokémon Heroes",
+      "Pokémon Chronicles",
+      "Pokémon: Jirachi Wish Maker",
+      "Pokémon: Destiny Deoxys",
+      "Pokémon: Lucario and the Mystery of Mew",
+      "Pokémon: The Mastermind of Mirage Pokémon",
+      "Pokémon Ranger and the Temple of the Sea",
+      "Pokémon: The Rise of Darkrai",
+      "Pokémon: Giratina and the Sky Warrior",
+      "Pokémon: Arceus and the Jewel of Life",
+      "Pokémon: Zoroark - Master of Illusions",
+      "Pokémon the Movie: Black - Victini and Reshiram",
+      "Pokémon the Movie: Kyurem vs. the Sword of Justice",
+      "Pokémon the Movie: Genesect and the Legend Awakened",
+      "Pokémon Origins",
+      "Pokémon the Movie: Diancie and the Cocoon of Destruction",
+      "Pokémon the Movie: Hoopa and the Clash of Ages",
+      "Pokémon the Movie: Volcanion and the Mechanical Marvel",
+      "Pokémon Generations",
+      "Pokémon the Movie: I Choose You!",
+      "Pokémon the Movie: The Power of Us",
+      "Pokémon Detective Pikachu",
+      "Pokémon the Movie: Mewtwo Strikes Back - Evolution",
+      "Pokémon the Movie: Secrets of the Jungle",
+      "Pokémon: Hisuian Snow",
+      "Pokémon Horizons",
+      "Pokémon Concierge",
+      "Pokémon: Wild Card"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m51876",
+   "t": "Limitless",
+   "y": 2011,
+   "worlds": [
+    {
+     "name": "Limitless",
+     "kind": "chain",
+     "size": 2,
+     "order": [
+      "Limitless",
+      "Limitless"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m13183",
+   "t": "Watchmen",
+   "y": 2009,
+   "worlds": [
+    {
+     "name": "Watchmen universe",
+     "kind": "universe",
+     "size": 2,
+     "order": [
+      "Watchmen",
+      "Watchmen"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m666243",
+   "t": "The Witcher: Nightmare of the Wolf",
+   "y": 2021,
+   "worlds": [
+    {
+     "name": "The Witcher universe",
+     "kind": "universe",
+     "size": 6,
+     "order": [
+      "The Hexer",
+      "The Witcher",
+      "The Witcher",
+      "The Witcher: Nightmare of the Wolf",
+      "The Witcher: Blood Origin",
+      "The Witcher: Sirens of the Deep"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m177572",
+   "t": "Big Hero 6",
+   "y": 2014,
+   "worlds": [
+    {
+     "name": "Earth-14123",
+     "kind": "universe",
+     "size": 3,
+     "order": [
+      "Big Hero 6",
+      "Big Hero 6 The Series",
+      "Baymax!"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m137116",
+   "t": "Smurfs: The Lost Village",
+   "y": 2017,
+   "worlds": [
+    {
+     "name": "The Smurfs in film",
+     "kind": "series",
+     "size": 3,
+     "order": [
+      "The Smurfs",
+      "The Smurfs 2",
+      "Smurfs: The Lost Village"
+     ]
+    },
+    {
+     "name": "The Smurfs",
+     "kind": "franchise",
+     "size": 8,
+     "order": [
+      "The Smurfs and the Magic Flute",
+      "The Smurfs",
+      "The Smurfs",
+      "The Smurfs: A Christmas Carol",
+      "The Smurfs 2",
+      "The Smurfs: The Legend of Smurfy Hollow",
+      "Smurfs: The Lost Village",
+      "The Smurfs"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m497698",
+   "t": "Black Widow",
+   "y": 2021,
+   "worlds": [
+    {
+     "name": "Marvel Cinematic Universe",
+     "kind": "universe",
+     "size": 73,
+     "order": [
+      "Iron Man",
+      "The Incredible Hulk",
+      "Iron Man 2",
+      "Thor",
+      "Captain America: The First Avenger",
+      "The Avengers",
+      "Iron Man 3",
+      "Marvel's Agents of S.H.I.E.L.D.",
+      "Thor: The Dark World",
+      "Captain America: The Winter Soldier",
+      "Guardians of the Galaxy",
+      "Marvel's Agent Carter",
+      "Marvel's Daredevil",
+      "Avengers: Age of Ultron",
+      "WHIH Newsfront",
+      "Ant-Man",
+      "Marvel's Jessica Jones",
+      "Captain America: Civil War",
+      "Team Thor",
+      "Marvel's Luke Cage",
+      "Doctor Strange",
+      "Marvel's Iron Fist",
+      "Guardians of the Galaxy Vol. 2",
+      "Spider-Man: Homecoming",
+      "Marvel's The Defenders",
+      "Marvel's Inhumans",
+      "Thor: Ragnarok",
+      "Marvel's The Punisher",
+      "Marvel's Runaways",
+      "Black Panther",
+      "Team Darryl",
+      "Avengers: Infinity War",
+      "Marvel's Cloak & Dagger",
+      "Ant-Man and the Wasp",
+      "Captain Marvel",
+      "Avengers: Endgame",
+      "Spider-Man: Far From Home",
+      "Helstrom",
+      "WandaVision",
+      "The Falcon and the Winter Soldier",
+      "Loki",
+      "Black Widow",
+      "What If...?",
+      "Shang-Chi and the Legend of the Ten Rings",
+      "Eternals",
+      "Hawkeye",
+      "Spider-Man: No Way Home",
+      "Doctor Strange in the Multiverse of Madness",
+      "Ms. Marvel",
+      "Thor: Love and Thunder",
+      "She-Hulk: Attorney at Law",
+      "Werewolf by Night",
+      "Black Panther: Wakanda Forever",
+      "The Guardians of the Galaxy Holiday Special",
+      "Ant-Man and the Wasp: Quantumania",
+      "Guardians of the Galaxy Vol. 3",
+      "Secret Invasion",
+      "The Marvels",
+      "Echo",
+      "Deadpool & Wolverine",
+      "Agatha All Along",
+      "Captain America: Brave New World",
+      "Daredevil: Born Again",
+      "Thunderbolts*",
+      "Ironheart",
+      "The Fantastic 4: First Steps",
+      "Wonder Man",
+      "Spider-Man: Brand New Day",
+      "VisionQuest",
+      "Avengers: Doomsday",
+      "Avengers: Secret Wars",
+      "Untitled X-Men Film",
+      "Black Panther 3"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m566525",
+   "t": "Shang-Chi and the Legend of the Ten Rings",
+   "y": 2021,
+   "worlds": [
+    {
+     "name": "Marvel Cinematic Universe",
+     "kind": "universe",
+     "size": 73,
+     "order": [
+      "Iron Man",
+      "The Incredible Hulk",
+      "Iron Man 2",
+      "Thor",
+      "Captain America: The First Avenger",
+      "The Avengers",
+      "Iron Man 3",
+      "Marvel's Agents of S.H.I.E.L.D.",
+      "Thor: The Dark World",
+      "Captain America: The Winter Soldier",
+      "Guardians of the Galaxy",
+      "Marvel's Agent Carter",
+      "Marvel's Daredevil",
+      "Avengers: Age of Ultron",
+      "WHIH Newsfront",
+      "Ant-Man",
+      "Marvel's Jessica Jones",
+      "Captain America: Civil War",
+      "Team Thor",
+      "Marvel's Luke Cage",
+      "Doctor Strange",
+      "Marvel's Iron Fist",
+      "Guardians of the Galaxy Vol. 2",
+      "Spider-Man: Homecoming",
+      "Marvel's The Defenders",
+      "Marvel's Inhumans",
+      "Thor: Ragnarok",
+      "Marvel's The Punisher",
+      "Marvel's Runaways",
+      "Black Panther",
+      "Team Darryl",
+      "Avengers: Infinity War",
+      "Marvel's Cloak & Dagger",
+      "Ant-Man and the Wasp",
+      "Captain Marvel",
+      "Avengers: Endgame",
+      "Spider-Man: Far From Home",
+      "Helstrom",
+      "WandaVision",
+      "The Falcon and the Winter Soldier",
+      "Loki",
+      "Black Widow",
+      "What If...?",
+      "Shang-Chi and the Legend of the Ten Rings",
+      "Eternals",
+      "Hawkeye",
+      "Spider-Man: No Way Home",
+      "Doctor Strange in the Multiverse of Madness",
+      "Ms. Marvel",
+      "Thor: Love and Thunder",
+      "She-Hulk: Attorney at Law",
+      "Werewolf by Night",
+      "Black Panther: Wakanda Forever",
+      "The Guardians of the Galaxy Holiday Special",
+      "Ant-Man and the Wasp: Quantumania",
+      "Guardians of the Galaxy Vol. 3",
+      "Secret Invasion",
+      "The Marvels",
+      "Echo",
+      "Deadpool & Wolverine",
+      "Agatha All Along",
+      "Captain America: Brave New World",
+      "Daredevil: Born Again",
+      "Thunderbolts*",
+      "Ironheart",
+      "The Fantastic 4: First Steps",
+      "Wonder Man",
+      "Spider-Man: Brand New Day",
+      "VisionQuest",
+      "Avengers: Doomsday",
+      "Avengers: Secret Wars",
+      "Untitled X-Men Film",
+      "Black Panther 3"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m524434",
+   "t": "Eternals",
+   "y": 2021,
+   "worlds": [
+    {
+     "name": "Marvel Cinematic Universe",
+     "kind": "universe",
+     "size": 73,
+     "order": [
+      "Iron Man",
+      "The Incredible Hulk",
+      "Iron Man 2",
+      "Thor",
+      "Captain America: The First Avenger",
+      "The Avengers",
+      "Iron Man 3",
+      "Marvel's Agents of S.H.I.E.L.D.",
+      "Thor: The Dark World",
+      "Captain America: The Winter Soldier",
+      "Guardians of the Galaxy",
+      "Marvel's Agent Carter",
+      "Marvel's Daredevil",
+      "Avengers: Age of Ultron",
+      "WHIH Newsfront",
+      "Ant-Man",
+      "Marvel's Jessica Jones",
+      "Captain America: Civil War",
+      "Team Thor",
+      "Marvel's Luke Cage",
+      "Doctor Strange",
+      "Marvel's Iron Fist",
+      "Guardians of the Galaxy Vol. 2",
+      "Spider-Man: Homecoming",
+      "Marvel's The Defenders",
+      "Marvel's Inhumans",
+      "Thor: Ragnarok",
+      "Marvel's The Punisher",
+      "Marvel's Runaways",
+      "Black Panther",
+      "Team Darryl",
+      "Avengers: Infinity War",
+      "Marvel's Cloak & Dagger",
+      "Ant-Man and the Wasp",
+      "Captain Marvel",
+      "Avengers: Endgame",
+      "Spider-Man: Far From Home",
+      "Helstrom",
+      "WandaVision",
+      "The Falcon and the Winter Soldier",
+      "Loki",
+      "Black Widow",
+      "What If...?",
+      "Shang-Chi and the Legend of the Ten Rings",
+      "Eternals",
+      "Hawkeye",
+      "Spider-Man: No Way Home",
+      "Doctor Strange in the Multiverse of Madness",
+      "Ms. Marvel",
+      "Thor: Love and Thunder",
+      "She-Hulk: Attorney at Law",
+      "Werewolf by Night",
+      "Black Panther: Wakanda Forever",
+      "The Guardians of the Galaxy Holiday Special",
+      "Ant-Man and the Wasp: Quantumania",
+      "Guardians of the Galaxy Vol. 3",
+      "Secret Invasion",
+      "The Marvels",
+      "Echo",
+      "Deadpool & Wolverine",
+      "Agatha All Along",
+      "Captain America: Brave New World",
+      "Daredevil: Born Again",
+      "Thunderbolts*",
+      "Ironheart",
+      "The Fantastic 4: First Steps",
+      "Wonder Man",
+      "Spider-Man: Brand New Day",
+      "VisionQuest",
+      "Avengers: Doomsday",
+      "Avengers: Secret Wars",
+      "Untitled X-Men Film",
+      "Black Panther 3"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m337404",
+   "t": "Cruella",
+   "y": 2021,
+   "worlds": [
+    {
+     "name": "101 Dalmatians universe",
+     "kind": "universe",
+     "size": 7,
+     "order": [
+      "One Hundred and One Dalmatians",
+      "101 Dalmatians",
+      "101 Dalmatians: The Series",
+      "102 Dalmatians",
+      "101 Dalmatians II: Patch's London Adventure",
+      "101 Dalmatian Street",
+      "Cruella"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m539681",
+   "t": "DC League of Super-Pets",
+   "y": 2022,
+   "worlds": [
+    {
+     "name": "DC Universe",
+     "kind": "universe",
+     "size": 6,
+     "order": [
+      "Young Justice",
+      "Green Lantern",
+      "Green Lantern: The Animated Series",
+      "Batman vs Teenage Mutant Ninja Turtles",
+      "DC League of Super-Pets",
+      "Creature Commandos"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m559969",
+   "t": "El Camino: A Breaking Bad Movie",
+   "y": 2019,
+   "worlds": [
+    {
+     "name": "Gilliverse",
+     "kind": "universe",
+     "size": 4,
+     "order": [
+      "Breaking Bad",
+      "Better Call Saul",
+      "El Camino: A Breaking Bad Movie",
+      "Better Call Saul Presents: Slippin' Jimmy"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m565770",
+   "t": "Blue Beetle",
+   "y": 2023,
+   "worlds": [
+    {
+     "name": "DC Extended Universe",
+     "kind": "franchise",
+     "size": 16,
+     "order": [
+      "Man of Steel",
+      "Batman v Superman: Dawn of Justice",
+      "Suicide Squad",
+      "Wonder Woman",
+      "Justice League",
+      "Aquaman",
+      "Shazam!",
+      "Birds of Prey (and the Fantabulous Emancipation of One Harley Quinn)",
+      "Wonder Woman 1984",
+      "The Suicide Squad",
+      "Black Adam",
+      "Shazam! Fury of the Gods",
+      "Blue Beetle",
+      "Aquaman and the Lost Kingdom",
+      "Peacemaker",
+      "The Flash"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m774752",
+   "t": "The Guardians of the Galaxy Holiday Special",
+   "y": 2022,
+   "worlds": [
+    {
+     "name": "Marvel Studios Special Presentations",
+     "kind": "series",
+     "size": 3,
+     "order": [
+      "Werewolf by Night",
+      "The Guardians of the Galaxy Holiday Special",
+      "The Punisher: One Last Kill"
+     ]
+    },
+    {
+     "name": "Marvel Cinematic Universe",
+     "kind": "universe",
+     "size": 73,
+     "order": [
+      "Iron Man",
+      "The Incredible Hulk",
+      "Iron Man 2",
+      "Thor",
+      "Captain America: The First Avenger",
+      "The Avengers",
+      "Iron Man 3",
+      "Marvel's Agents of S.H.I.E.L.D.",
+      "Thor: The Dark World",
+      "Captain America: The Winter Soldier",
+      "Guardians of the Galaxy",
+      "Marvel's Agent Carter",
+      "Marvel's Daredevil",
+      "Avengers: Age of Ultron",
+      "WHIH Newsfront",
+      "Ant-Man",
+      "Marvel's Jessica Jones",
+      "Captain America: Civil War",
+      "Team Thor",
+      "Marvel's Luke Cage",
+      "Doctor Strange",
+      "Marvel's Iron Fist",
+      "Guardians of the Galaxy Vol. 2",
+      "Spider-Man: Homecoming",
+      "Marvel's The Defenders",
+      "Marvel's Inhumans",
+      "Thor: Ragnarok",
+      "Marvel's The Punisher",
+      "Marvel's Runaways",
+      "Black Panther",
+      "Team Darryl",
+      "Avengers: Infinity War",
+      "Marvel's Cloak & Dagger",
+      "Ant-Man and the Wasp",
+      "Captain Marvel",
+      "Avengers: Endgame",
+      "Spider-Man: Far From Home",
+      "Helstrom",
+      "WandaVision",
+      "The Falcon and the Winter Soldier",
+      "Loki",
+      "Black Widow",
+      "What If...?",
+      "Shang-Chi and the Legend of the Ten Rings",
+      "Eternals",
+      "Hawkeye",
+      "Spider-Man: No Way Home",
+      "Doctor Strange in the Multiverse of Madness",
+      "Ms. Marvel",
+      "Thor: Love and Thunder",
+      "She-Hulk: Attorney at Law",
+      "Werewolf by Night",
+      "Black Panther: Wakanda Forever",
+      "The Guardians of the Galaxy Holiday Special",
+      "Ant-Man and the Wasp: Quantumania",
+      "Guardians of the Galaxy Vol. 3",
+      "Secret Invasion",
+      "The Marvels",
+      "Echo",
+      "Deadpool & Wolverine",
+      "Agatha All Along",
+      "Captain America: Brave New World",
+      "Daredevil: Born Again",
+      "Thunderbolts*",
+      "Ironheart",
+      "The Fantastic 4: First Steps",
+      "Wonder Man",
+      "Spider-Man: Brand New Day",
+      "VisionQuest",
+      "Avengers: Doomsday",
+      "Avengers: Secret Wars",
+      "Untitled X-Men Film",
+      "Black Panther 3"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m894205",
+   "t": "Werewolf by Night",
+   "y": 2022,
+   "worlds": [
+    {
+     "name": "Marvel Studios Special Presentations",
+     "kind": "series",
+     "size": 3,
+     "order": [
+      "Werewolf by Night",
+      "The Guardians of the Galaxy Holiday Special",
+      "The Punisher: One Last Kill"
+     ]
+    },
+    {
+     "name": "Marvel Cinematic Universe",
+     "kind": "universe",
+     "size": 73,
+     "order": [
+      "Iron Man",
+      "The Incredible Hulk",
+      "Iron Man 2",
+      "Thor",
+      "Captain America: The First Avenger",
+      "The Avengers",
+      "Iron Man 3",
+      "Marvel's Agents of S.H.I.E.L.D.",
+      "Thor: The Dark World",
+      "Captain America: The Winter Soldier",
+      "Guardians of the Galaxy",
+      "Marvel's Agent Carter",
+      "Marvel's Daredevil",
+      "Avengers: Age of Ultron",
+      "WHIH Newsfront",
+      "Ant-Man",
+      "Marvel's Jessica Jones",
+      "Captain America: Civil War",
+      "Team Thor",
+      "Marvel's Luke Cage",
+      "Doctor Strange",
+      "Marvel's Iron Fist",
+      "Guardians of the Galaxy Vol. 2",
+      "Spider-Man: Homecoming",
+      "Marvel's The Defenders",
+      "Marvel's Inhumans",
+      "Thor: Ragnarok",
+      "Marvel's The Punisher",
+      "Marvel's Runaways",
+      "Black Panther",
+      "Team Darryl",
+      "Avengers: Infinity War",
+      "Marvel's Cloak & Dagger",
+      "Ant-Man and the Wasp",
+      "Captain Marvel",
+      "Avengers: Endgame",
+      "Spider-Man: Far From Home",
+      "Helstrom",
+      "WandaVision",
+      "The Falcon and the Winter Soldier",
+      "Loki",
+      "Black Widow",
+      "What If...?",
+      "Shang-Chi and the Legend of the Ten Rings",
+      "Eternals",
+      "Hawkeye",
+      "Spider-Man: No Way Home",
+      "Doctor Strange in the Multiverse of Madness",
+      "Ms. Marvel",
+      "Thor: Love and Thunder",
+      "She-Hulk: Attorney at Law",
+      "Werewolf by Night",
+      "Black Panther: Wakanda Forever",
+      "The Guardians of the Galaxy Holiday Special",
+      "Ant-Man and the Wasp: Quantumania",
+      "Guardians of the Galaxy Vol. 3",
+      "Secret Invasion",
+      "The Marvels",
+      "Echo",
+      "Deadpool & Wolverine",
+      "Agatha All Along",
+      "Captain America: Brave New World",
+      "Daredevil: Born Again",
+      "Thunderbolts*",
+      "Ironheart",
+      "The Fantastic 4: First Steps",
+      "Wonder Man",
+      "Spider-Man: Brand New Day",
+      "VisionQuest",
+      "Avengers: Doomsday",
+      "Avengers: Secret Wars",
+      "Untitled X-Men Film",
+      "Black Panther 3"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m340102",
+   "t": "The New Mutants",
+   "y": 2020,
+   "worlds": [
+    {
+     "name": "X-Men",
+     "kind": "series",
+     "size": 14,
+     "order": [
+      "X-Men",
+      "X2",
+      "X-Men: The Last Stand",
+      "X-Men Origins: Wolverine",
+      "X-Men: First Class",
+      "The Wolverine",
+      "X-Men: Days of Future Past",
+      "Deadpool",
+      "X-Men: Apocalypse",
+      "Logan",
+      "Deadpool 2",
+      "Dark Phoenix",
+      "The New Mutants",
+      "Deadpool & Wolverine"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m541671",
+   "t": "Ballerina",
+   "y": 2025,
+   "worlds": [
+    {
+     "name": "John Wick",
+     "kind": "franchise",
+     "size": 6,
+     "order": [
+      "John Wick",
+      "John Wick: Chapter 2",
+      "John Wick: Chapter 3 - Parabellum",
+      "John Wick: Chapter 4",
+      "Ballerina",
+      "John Wick: Chapter 5"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m986056",
+   "t": "Thunderbolts*",
+   "y": 2025,
+   "worlds": [
+    {
+     "name": "Marvel Cinematic Universe",
+     "kind": "universe",
+     "size": 73,
+     "order": [
+      "Iron Man",
+      "The Incredible Hulk",
+      "Iron Man 2",
+      "Thor",
+      "Captain America: The First Avenger",
+      "The Avengers",
+      "Iron Man 3",
+      "Marvel's Agents of S.H.I.E.L.D.",
+      "Thor: The Dark World",
+      "Captain America: The Winter Soldier",
+      "Guardians of the Galaxy",
+      "Marvel's Agent Carter",
+      "Marvel's Daredevil",
+      "Avengers: Age of Ultron",
+      "WHIH Newsfront",
+      "Ant-Man",
+      "Marvel's Jessica Jones",
+      "Captain America: Civil War",
+      "Team Thor",
+      "Marvel's Luke Cage",
+      "Doctor Strange",
+      "Marvel's Iron Fist",
+      "Guardians of the Galaxy Vol. 2",
+      "Spider-Man: Homecoming",
+      "Marvel's The Defenders",
+      "Marvel's Inhumans",
+      "Thor: Ragnarok",
+      "Marvel's The Punisher",
+      "Marvel's Runaways",
+      "Black Panther",
+      "Team Darryl",
+      "Avengers: Infinity War",
+      "Marvel's Cloak & Dagger",
+      "Ant-Man and the Wasp",
+      "Captain Marvel",
+      "Avengers: Endgame",
+      "Spider-Man: Far From Home",
+      "Helstrom",
+      "WandaVision",
+      "The Falcon and the Winter Soldier",
+      "Loki",
+      "Black Widow",
+      "What If...?",
+      "Shang-Chi and the Legend of the Ten Rings",
+      "Eternals",
+      "Hawkeye",
+      "Spider-Man: No Way Home",
+      "Doctor Strange in the Multiverse of Madness",
+      "Ms. Marvel",
+      "Thor: Love and Thunder",
+      "She-Hulk: Attorney at Law",
+      "Werewolf by Night",
+      "Black Panther: Wakanda Forever",
+      "The Guardians of the Galaxy Holiday Special",
+      "Ant-Man and the Wasp: Quantumania",
+      "Guardians of the Galaxy Vol. 3",
+      "Secret Invasion",
+      "The Marvels",
+      "Echo",
+      "Deadpool & Wolverine",
+      "Agatha All Along",
+      "Captain America: Brave New World",
+      "Daredevil: Born Again",
+      "Thunderbolts*",
+      "Ironheart",
+      "The Fantastic 4: First Steps",
+      "Wonder Man",
+      "Spider-Man: Brand New Day",
+      "VisionQuest",
+      "Avengers: Doomsday",
+      "Avengers: Secret Wars",
+      "Untitled X-Men Film",
+      "Black Panther 3"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m82881",
+   "t": "Tangled Ever After",
+   "y": 2012,
+   "worlds": [
+    {
+     "name": "Tangled",
+     "kind": "chain",
+     "size": 3,
+     "order": [
+      "Tangled",
+      "Tangled Ever After",
+      "Rapunzel's Tangled Adventure"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m1081003",
+   "t": "Supergirl",
+   "y": 2026,
+   "worlds": [
+    {
+     "name": "DC Universe",
+     "kind": "universe",
+     "size": 6,
+     "order": [
+      "Peacemaker",
+      "Creature Commandos",
+      "Superman",
+      "Supergirl",
+      "Clayface",
+      "The People v. Gorilla Grodd"
+     ]
+    }
+   ]
+  },
+  {
+   "k": "m1400940",
+   "t": "Clayface",
+   "y": 2026,
+   "worlds": [
+    {
+     "name": "DC Universe",
+     "kind": "universe",
+     "size": 6,
+     "order": [
+      "Peacemaker",
+      "Creature Commandos",
+      "Superman",
+      "Supergirl",
+      "Clayface",
+      "The People v. Gorilla Grodd"
+     ]
+    }
+   ]
   }
  ],
  "uncurated": [
@@ -99,6 +1341,1686 @@
    "y": 2022,
    "via": "collection",
    "name": "Sisu"
+  },
+  {
+   "k": "m315635",
+   "t": "Spider-Man: Homecoming",
+   "y": 2017,
+   "via": "collection",
+   "name": "Spider-Man (MCU)"
+  },
+  {
+   "k": "m308531",
+   "t": "Teenage Mutant Ninja Turtles: Out of the Shadows",
+   "y": 2016,
+   "via": "collection",
+   "name": "Teenage Mutant Ninja Turtles (Remake)"
+  },
+  {
+   "k": "m166426",
+   "t": "Pirates of the Caribbean: Dead Men Tell No Tales",
+   "y": 2017,
+   "via": "collection",
+   "name": "Pirates of the Caribbean"
+  },
+  {
+   "k": "m603",
+   "t": "The Matrix",
+   "y": 1999,
+   "via": "collection",
+   "name": "The Matrix"
+  },
+  {
+   "k": "m10681",
+   "t": "WALL·E",
+   "y": 2008,
+   "via": "world",
+   "name": "WALL·E"
+  },
+  {
+   "k": "m19995",
+   "t": "Avatar",
+   "y": 2009,
+   "via": "collection",
+   "name": "Avatar"
+  },
+  {
+   "k": "m585",
+   "t": "Monsters, Inc.",
+   "y": 2001,
+   "via": "collection",
+   "name": "Monsters, Inc."
+  },
+  {
+   "k": "m99861",
+   "t": "Avengers: Age of Ultron",
+   "y": 2015,
+   "via": "collection",
+   "name": "The Avengers"
+  },
+  {
+   "k": "m245891",
+   "t": "John Wick",
+   "y": 2014,
+   "via": "collection",
+   "name": "John Wick"
+  },
+  {
+   "k": "m102899",
+   "t": "Ant-Man",
+   "y": 2015,
+   "via": "collection",
+   "name": "Ant-Man"
+  },
+  {
+   "k": "m24428",
+   "t": "The Avengers",
+   "y": 2012,
+   "via": "collection",
+   "name": "The Avengers"
+  },
+  {
+   "k": "m150540",
+   "t": "Inside Out",
+   "y": 2015,
+   "via": "collection",
+   "name": "Inside Out"
+  },
+  {
+   "k": "m426285",
+   "t": "Fullmetal Alchemist",
+   "y": 2017,
+   "via": "collection",
+   "name": "Fullmetal Alchemist (Live-Action)"
+  },
+  {
+   "k": "m141052",
+   "t": "Justice League",
+   "y": 2017,
+   "via": "world",
+   "name": "DC Extended Universe"
+  },
+  {
+   "k": "m354912",
+   "t": "Coco",
+   "y": 2017,
+   "via": "collection",
+   "name": "Coco"
+  },
+  {
+   "k": "m335797",
+   "t": "Sing",
+   "y": 2016,
+   "via": "collection",
+   "name": "Sing"
+  },
+  {
+   "k": "m353486",
+   "t": "Jumanji: Welcome to the Jungle",
+   "y": 2017,
+   "via": "collection",
+   "name": "Jumanji"
+  },
+  {
+   "k": "m284054",
+   "t": "Black Panther",
+   "y": 2018,
+   "via": "collection",
+   "name": "Black Panther"
+  },
+  {
+   "k": "m18785",
+   "t": "The Hangover",
+   "y": 2009,
+   "via": "collection",
+   "name": "The Hangover"
+  },
+  {
+   "k": "m45243",
+   "t": "The Hangover Part II",
+   "y": 2011,
+   "via": "collection",
+   "name": "The Hangover"
+  },
+  {
+   "k": "m109439",
+   "t": "The Hangover Part III",
+   "y": 2013,
+   "via": "collection",
+   "name": "The Hangover"
+  },
+  {
+   "k": "m10634",
+   "t": "Friday",
+   "y": 1995,
+   "via": "collection",
+   "name": "Friday"
+  },
+  {
+   "k": "m72105",
+   "t": "Ted",
+   "y": 2012,
+   "via": "collection",
+   "name": "Ted"
+  },
+  {
+   "k": "m772",
+   "t": "Home Alone 2: Lost in New York",
+   "y": 1992,
+   "via": "collection",
+   "name": "Home Alone"
+  },
+  {
+   "k": "m771",
+   "t": "Home Alone",
+   "y": 1990,
+   "via": "collection",
+   "name": "Home Alone"
+  },
+  {
+   "k": "m346364",
+   "t": "It",
+   "y": 2017,
+   "via": "collection",
+   "name": "It"
+  },
+  {
+   "k": "m419479",
+   "t": "The Babysitter",
+   "y": 2017,
+   "via": "collection",
+   "name": "The Babysitter"
+  },
+  {
+   "k": "m9298",
+   "t": "Ali G Indahouse",
+   "y": 2002,
+   "via": "collection",
+   "name": "Ali G"
+  },
+  {
+   "k": "m107846",
+   "t": "Escape Plan",
+   "y": 2013,
+   "via": "collection",
+   "name": "Escape Plan"
+  },
+  {
+   "k": "m440471",
+   "t": "Escape Plan 2: Hades",
+   "y": 2018,
+   "via": "collection",
+   "name": "Escape Plan"
+  },
+  {
+   "k": "m1771",
+   "t": "Captain America: The First Avenger",
+   "y": 2011,
+   "via": "collection",
+   "name": "Captain America"
+  },
+  {
+   "k": "m100402",
+   "t": "Captain America: The Winter Soldier",
+   "y": 2014,
+   "via": "collection",
+   "name": "Captain America"
+  },
+  {
+   "k": "m271110",
+   "t": "Captain America: Civil War",
+   "y": 2016,
+   "via": "collection",
+   "name": "Captain America"
+  },
+  {
+   "k": "m118340",
+   "t": "Guardians of the Galaxy",
+   "y": 2014,
+   "via": "collection",
+   "name": "Guardians of the Galaxy"
+  },
+  {
+   "k": "m283995",
+   "t": "Guardians of the Galaxy Vol. 2",
+   "y": 2017,
+   "via": "collection",
+   "name": "Guardians of the Galaxy"
+  },
+  {
+   "k": "m198663",
+   "t": "The Maze Runner",
+   "y": 2014,
+   "via": "collection",
+   "name": "The Maze Runner"
+  },
+  {
+   "k": "m294254",
+   "t": "Maze Runner: The Scorch Trials",
+   "y": 2015,
+   "via": "collection",
+   "name": "The Maze Runner"
+  },
+  {
+   "k": "m22",
+   "t": "Pirates of the Caribbean: The Curse of the Black Pearl",
+   "y": 2003,
+   "via": "collection",
+   "name": "Pirates of the Caribbean"
+  },
+  {
+   "k": "m58",
+   "t": "Pirates of the Caribbean: Dead Man's Chest",
+   "y": 2006,
+   "via": "collection",
+   "name": "Pirates of the Caribbean"
+  },
+  {
+   "k": "m285",
+   "t": "Pirates of the Caribbean: At World's End",
+   "y": 2007,
+   "via": "collection",
+   "name": "Pirates of the Caribbean"
+  },
+  {
+   "k": "m1865",
+   "t": "Pirates of the Caribbean: On Stranger Tides",
+   "y": 2011,
+   "via": "collection",
+   "name": "Pirates of the Caribbean"
+  },
+  {
+   "k": "m9762",
+   "t": "Step Up",
+   "y": 2006,
+   "via": "collection",
+   "name": "Step Up"
+  },
+  {
+   "k": "m8328",
+   "t": "Step Up 2: The Streets",
+   "y": 2008,
+   "via": "collection",
+   "name": "Step Up"
+  },
+  {
+   "k": "m41233",
+   "t": "Step Up 3D",
+   "y": 2010,
+   "via": "collection",
+   "name": "Step Up"
+  },
+  {
+   "k": "m85446",
+   "t": "Step Up Revolution",
+   "y": 2012,
+   "via": "collection",
+   "name": "Step Up"
+  },
+  {
+   "k": "m243683",
+   "t": "Step Up All In",
+   "y": 2014,
+   "via": "collection",
+   "name": "Step Up"
+  },
+  {
+   "k": "m156022",
+   "t": "The Equalizer",
+   "y": 2014,
+   "via": "collection",
+   "name": "The Equalizer"
+  },
+  {
+   "k": "m363088",
+   "t": "Ant-Man and the Wasp",
+   "y": 2018,
+   "via": "collection",
+   "name": "Ant-Man"
+  },
+  {
+   "k": "m284052",
+   "t": "Doctor Strange",
+   "y": 2016,
+   "via": "collection",
+   "name": "Doctor Strange"
+  },
+  {
+   "k": "m39514",
+   "t": "RED",
+   "y": 2010,
+   "via": "collection",
+   "name": "RED"
+  },
+  {
+   "k": "m324552",
+   "t": "John Wick: Chapter 2",
+   "y": 2017,
+   "via": "collection",
+   "name": "John Wick"
+  },
+  {
+   "k": "m297761",
+   "t": "Suicide Squad",
+   "y": 2016,
+   "via": "collection",
+   "name": "Suicide Squad"
+  },
+  {
+   "k": "m351286",
+   "t": "Jurassic World: Fallen Kingdom",
+   "y": 2018,
+   "via": "collection",
+   "name": "Jurassic Park"
+  },
+  {
+   "k": "m336843",
+   "t": "Maze Runner: The Death Cure",
+   "y": 2018,
+   "via": "collection",
+   "name": "The Maze Runner"
+  },
+  {
+   "k": "m10137",
+   "t": "Stuart Little",
+   "y": 1999,
+   "via": "collection",
+   "name": "Stuart Little"
+  },
+  {
+   "k": "m10996",
+   "t": "Stuart Little 2",
+   "y": 2002,
+   "via": "collection",
+   "name": "Stuart Little"
+  },
+  {
+   "k": "m30178",
+   "t": "Stuart Little 3: Call of the Wild",
+   "y": 2005,
+   "via": "collection",
+   "name": "Stuart Little"
+  },
+  {
+   "k": "m335983",
+   "t": "Venom",
+   "y": 2018,
+   "via": "collection",
+   "name": "Venom"
+  },
+  {
+   "k": "m297762",
+   "t": "Wonder Woman",
+   "y": 2017,
+   "via": "collection",
+   "name": "Wonder Woman"
+  },
+  {
+   "k": "m420426",
+   "t": "Bleach",
+   "y": 2018,
+   "via": "world",
+   "name": "Bleach"
+  },
+  {
+   "k": "m10195",
+   "t": "Thor",
+   "y": 2011,
+   "via": "collection",
+   "name": "Thor"
+  },
+  {
+   "k": "m76338",
+   "t": "Thor: The Dark World",
+   "y": 2013,
+   "via": "collection",
+   "name": "Thor"
+  },
+  {
+   "k": "m299537",
+   "t": "Captain Marvel",
+   "y": 2019,
+   "via": "collection",
+   "name": "Captain Marvel"
+  },
+  {
+   "k": "m1726",
+   "t": "Iron Man",
+   "y": 2008,
+   "via": "collection",
+   "name": "Iron Man"
+  },
+  {
+   "k": "m1724",
+   "t": "The Incredible Hulk",
+   "y": 2008,
+   "via": "world",
+   "name": "Marvel Cinematic Universe Phase One"
+  },
+  {
+   "k": "m10138",
+   "t": "Iron Man 2",
+   "y": 2010,
+   "via": "collection",
+   "name": "Iron Man"
+  },
+  {
+   "k": "m68721",
+   "t": "Iron Man 3",
+   "y": 2013,
+   "via": "collection",
+   "name": "Iron Man"
+  },
+  {
+   "k": "m479",
+   "t": "Shaft",
+   "y": 2000,
+   "via": "collection",
+   "name": "Shaft (Reboot)"
+  },
+  {
+   "k": "m49519",
+   "t": "The Croods",
+   "y": 2013,
+   "via": "collection",
+   "name": "The Croods"
+  },
+  {
+   "k": "m211387",
+   "t": "Marvel One-Shot: Agent Carter",
+   "y": 2013,
+   "via": "world",
+   "name": "Marvel One-Shots"
+  },
+  {
+   "k": "m76122",
+   "t": "Marvel One-Shot: The Consultant",
+   "y": 2011,
+   "via": "world",
+   "name": "Marvel One-Shots"
+  },
+  {
+   "k": "m76535",
+   "t": "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer",
+   "y": 2011,
+   "via": "world",
+   "name": "Marvel One-Shots"
+  },
+  {
+   "k": "m119569",
+   "t": "Marvel One-Shot: Item 47",
+   "y": 2012,
+   "via": "world",
+   "name": "Marvel One-Shots"
+  },
+  {
+   "k": "m253980",
+   "t": "Marvel One-Shot: All Hail the King",
+   "y": 2014,
+   "via": "world",
+   "name": "Marvel One-Shots"
+  },
+  {
+   "k": "m284053",
+   "t": "Thor: Ragnarok",
+   "y": 2017,
+   "via": "collection",
+   "name": "Thor"
+  },
+  {
+   "k": "m299536",
+   "t": "Avengers: Infinity War",
+   "y": 2018,
+   "via": "collection",
+   "name": "The Avengers"
+  },
+  {
+   "k": "m299534",
+   "t": "Avengers: Endgame",
+   "y": 2019,
+   "via": "collection",
+   "name": "The Avengers"
+  },
+  {
+   "k": "m429617",
+   "t": "Spider-Man: Far From Home",
+   "y": 2019,
+   "via": "collection",
+   "name": "Spider-Man (MCU)"
+  },
+  {
+   "k": "m475557",
+   "t": "Joker",
+   "y": 2019,
+   "via": "collection",
+   "name": "Joker"
+  },
+  {
+   "k": "m514999",
+   "t": "Murder Mystery",
+   "y": 2019,
+   "via": "collection",
+   "name": "Murder Mystery"
+  },
+  {
+   "k": "m546554",
+   "t": "Knives Out",
+   "y": 2019,
+   "via": "collection",
+   "name": "Knives Out"
+  },
+  {
+   "k": "m38700",
+   "t": "Bad Boys for Life",
+   "y": 2020,
+   "via": "collection",
+   "name": "Bad Boys"
+  },
+  {
+   "k": "m1634",
+   "t": "Free Willy",
+   "y": 1993,
+   "via": "collection",
+   "name": "Free Willy"
+  },
+  {
+   "k": "m238",
+   "t": "The Godfather",
+   "y": 1972,
+   "via": "collection",
+   "name": "The Godfather"
+  },
+  {
+   "k": "m240",
+   "t": "The Godfather Part II",
+   "y": 1974,
+   "via": "collection",
+   "name": "The Godfather"
+  },
+  {
+   "k": "m242",
+   "t": "The Godfather Part III",
+   "y": 1990,
+   "via": "collection",
+   "name": "The Godfather"
+  },
+  {
+   "k": "m324857",
+   "t": "Spider-Man: Into the Spider-Verse",
+   "y": 2018,
+   "via": "collection",
+   "name": "Spider-Man: Spider-Verse"
+  },
+  {
+   "k": "m36657",
+   "t": "X-Men",
+   "y": 2000,
+   "via": "collection",
+   "name": "X-Men"
+  },
+  {
+   "k": "m36658",
+   "t": "X2",
+   "y": 2003,
+   "via": "collection",
+   "name": "X-Men"
+  },
+  {
+   "k": "m287947",
+   "t": "Shazam!",
+   "y": 2019,
+   "via": "collection",
+   "name": "Shazam!"
+  },
+  {
+   "k": "m297802",
+   "t": "Aquaman",
+   "y": 2018,
+   "via": "collection",
+   "name": "Aquaman"
+  },
+  {
+   "k": "m36668",
+   "t": "X-Men: The Last Stand",
+   "y": 2006,
+   "via": "collection",
+   "name": "X-Men"
+  },
+  {
+   "k": "m396535",
+   "t": "Train to Busan",
+   "y": 2016,
+   "via": "collection",
+   "name": "Train to Busan"
+  },
+  {
+   "k": "m2080",
+   "t": "X-Men Origins: Wolverine",
+   "y": 2009,
+   "via": "collection",
+   "name": "The Wolverine"
+  },
+  {
+   "k": "m49538",
+   "t": "X-Men: First Class",
+   "y": 2011,
+   "via": "collection",
+   "name": "X-Men"
+  },
+  {
+   "k": "m76170",
+   "t": "The Wolverine",
+   "y": 2013,
+   "via": "collection",
+   "name": "The Wolverine"
+  },
+  {
+   "k": "m127585",
+   "t": "X-Men: Days of Future Past",
+   "y": 2014,
+   "via": "collection",
+   "name": "X-Men"
+  },
+  {
+   "k": "m706503",
+   "t": "Lost Bullet",
+   "y": 2020,
+   "via": "collection",
+   "name": "Lost Bullet"
+  },
+  {
+   "k": "m293660",
+   "t": "Deadpool",
+   "y": 2016,
+   "via": "collection",
+   "name": "Deadpool"
+  },
+  {
+   "k": "m246655",
+   "t": "X-Men: Apocalypse",
+   "y": 2016,
+   "via": "collection",
+   "name": "X-Men"
+  },
+  {
+   "k": "m263115",
+   "t": "Logan",
+   "y": 2017,
+   "via": "collection",
+   "name": "The Wolverine"
+  },
+  {
+   "k": "m383498",
+   "t": "Deadpool 2",
+   "y": 2018,
+   "via": "collection",
+   "name": "Deadpool"
+  },
+  {
+   "k": "m320288",
+   "t": "Dark Phoenix",
+   "y": 2019,
+   "via": "collection",
+   "name": "X-Men"
+  },
+  {
+   "k": "m545609",
+   "t": "Extraction",
+   "y": 2020,
+   "via": "collection",
+   "name": "Extraction"
+  },
+  {
+   "k": "m447404",
+   "t": "Pokémon Detective Pikachu",
+   "y": 2019,
+   "via": "world",
+   "name": "Pokémon"
+  },
+  {
+   "k": "m581600",
+   "t": "Spenser Confidential",
+   "y": 2020,
+   "via": "collection",
+   "name": "Spenser Confidential"
+  },
+  {
+   "k": "m948",
+   "t": "Halloween",
+   "y": 1978,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m11281",
+   "t": "Halloween II",
+   "y": 1981,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m10676",
+   "t": "Halloween III: Season of the Witch",
+   "y": 1982,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m11357",
+   "t": "Halloween 4: The Return of Michael Myers",
+   "y": 1988,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m22794",
+   "t": "Cloudy with a Chance of Meatballs",
+   "y": 2009,
+   "via": "collection",
+   "name": "Cloudy with a Chance of Meatballs"
+  },
+  {
+   "k": "m11361",
+   "t": "Halloween 5: The Revenge of Michael Myers",
+   "y": 1989,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m10987",
+   "t": "Halloween: The Curse of Michael Myers",
+   "y": 1995,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m11675",
+   "t": "Halloween H20: 20 Years Later",
+   "y": 1998,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m11442",
+   "t": "Halloween: Resurrection",
+   "y": 2002,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m109451",
+   "t": "Cloudy with a Chance of Meatballs 2",
+   "y": 2013,
+   "via": "collection",
+   "name": "Cloudy with a Chance of Meatballs"
+  },
+  {
+   "k": "m146216",
+   "t": "RED 2",
+   "y": 2013,
+   "via": "collection",
+   "name": "RED"
+  },
+  {
+   "k": "m301528",
+   "t": "Toy Story 4",
+   "y": 2019,
+   "via": "collection",
+   "name": "Toy Story"
+  },
+  {
+   "k": "m863",
+   "t": "Toy Story 2",
+   "y": 1999,
+   "via": "collection",
+   "name": "Toy Story"
+  },
+  {
+   "k": "m10193",
+   "t": "Toy Story 3",
+   "y": 2010,
+   "via": "collection",
+   "name": "Toy Story"
+  },
+  {
+   "k": "m862",
+   "t": "Toy Story",
+   "y": 1995,
+   "via": "collection",
+   "name": "Toy Story"
+  },
+  {
+   "k": "m2082",
+   "t": "Halloween",
+   "y": 2007,
+   "via": "collection",
+   "name": "Halloween (Rob Zombie Series)"
+  },
+  {
+   "k": "m24150",
+   "t": "Halloween II",
+   "y": 2009,
+   "via": "collection",
+   "name": "Halloween (Rob Zombie Series)"
+  },
+  {
+   "k": "m424139",
+   "t": "Halloween",
+   "y": 2018,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m647",
+   "t": "Final Fantasy VII: Advent Children",
+   "y": 2005,
+   "via": "collection",
+   "name": "Final Fantasy VII"
+  },
+  {
+   "k": "m390734",
+   "t": "Kingsglaive: Final Fantasy XV",
+   "y": 2016,
+   "via": "collection",
+   "name": "Final Fantasy Triple"
+  },
+  {
+   "k": "m547016",
+   "t": "The Old Guard",
+   "y": 2020,
+   "via": "collection",
+   "name": "The Old Guard"
+  },
+  {
+   "k": "m497582",
+   "t": "Enola Holmes",
+   "y": 2020,
+   "via": "collection",
+   "name": "Enola Holmes"
+  },
+  {
+   "k": "m105",
+   "t": "Back to the Future",
+   "y": 1985,
+   "via": "collection",
+   "name": "Back to the Future"
+  },
+  {
+   "k": "m8681",
+   "t": "Taken",
+   "y": 2008,
+   "via": "collection",
+   "name": "Taken"
+  },
+  {
+   "k": "m82675",
+   "t": "Taken 2",
+   "y": 2012,
+   "via": "collection",
+   "name": "Taken"
+  },
+  {
+   "k": "m260346",
+   "t": "Taken 3",
+   "y": 2014,
+   "via": "collection",
+   "name": "Taken"
+  },
+  {
+   "k": "m165",
+   "t": "Back to the Future Part II",
+   "y": 1989,
+   "via": "collection",
+   "name": "Back to the Future"
+  },
+  {
+   "k": "m196",
+   "t": "Back to the Future Part III",
+   "y": 1990,
+   "via": "collection",
+   "name": "Back to the Future"
+  },
+  {
+   "k": "m1271",
+   "t": "300",
+   "y": 2007,
+   "via": "collection",
+   "name": "300"
+  },
+  {
+   "k": "m53182",
+   "t": "300: Rise of an Empire",
+   "y": 2014,
+   "via": "collection",
+   "name": "300"
+  },
+  {
+   "k": "m51876",
+   "t": "Limitless",
+   "y": 2011,
+   "via": "world",
+   "name": "Limitless"
+  },
+  {
+   "k": "m49521",
+   "t": "Man of Steel",
+   "y": 2013,
+   "via": "collection",
+   "name": "Man of Steel"
+  },
+  {
+   "k": "m13183",
+   "t": "Watchmen",
+   "y": 2009,
+   "via": "world",
+   "name": "Watchmen universe"
+  },
+  {
+   "k": "m454626",
+   "t": "Sonic the Hedgehog",
+   "y": 2020,
+   "via": "collection",
+   "name": "Sonic the Hedgehog"
+  },
+  {
+   "k": "m580489",
+   "t": "Venom: Let There Be Carnage",
+   "y": 2021,
+   "via": "collection",
+   "name": "Venom"
+  },
+  {
+   "k": "m557",
+   "t": "Spider-Man",
+   "y": 2002,
+   "via": "collection",
+   "name": "Spider-Man"
+  },
+  {
+   "k": "m558",
+   "t": "Spider-Man 2",
+   "y": 2004,
+   "via": "collection",
+   "name": "Spider-Man"
+  },
+  {
+   "k": "m559",
+   "t": "Spider-Man 3",
+   "y": 2007,
+   "via": "collection",
+   "name": "Spider-Man"
+  },
+  {
+   "k": "m1930",
+   "t": "The Amazing Spider-Man",
+   "y": 2012,
+   "via": "collection",
+   "name": "The Amazing Spider-Man"
+  },
+  {
+   "k": "m102382",
+   "t": "The Amazing Spider-Man 2",
+   "y": 2014,
+   "via": "collection",
+   "name": "The Amazing Spider-Man"
+  },
+  {
+   "k": "m634649",
+   "t": "Spider-Man: No Way Home",
+   "y": 2021,
+   "via": "collection",
+   "name": "Spider-Man (MCU)"
+  },
+  {
+   "k": "m2109",
+   "t": "Rush Hour",
+   "y": 1998,
+   "via": "collection",
+   "name": "Rush Hour"
+  },
+  {
+   "k": "m5175",
+   "t": "Rush Hour 2",
+   "y": 2001,
+   "via": "collection",
+   "name": "Rush Hour"
+  },
+  {
+   "k": "m666243",
+   "t": "The Witcher: Nightmare of the Wolf",
+   "y": 2021,
+   "via": "world",
+   "name": "The Witcher universe"
+  },
+  {
+   "k": "m9502",
+   "t": "Kung Fu Panda",
+   "y": 2008,
+   "via": "collection",
+   "name": "Kung Fu Panda"
+  },
+  {
+   "k": "m20352",
+   "t": "Despicable Me",
+   "y": 2010,
+   "via": "collection",
+   "name": "Despicable Me"
+  },
+  {
+   "k": "m49444",
+   "t": "Kung Fu Panda 2",
+   "y": 2011,
+   "via": "collection",
+   "name": "Kung Fu Panda"
+  },
+  {
+   "k": "m10191",
+   "t": "How to Train Your Dragon",
+   "y": 2010,
+   "via": "collection",
+   "name": "How to Train Your Dragon"
+  },
+  {
+   "k": "m82702",
+   "t": "How to Train Your Dragon 2",
+   "y": 2014,
+   "via": "collection",
+   "name": "How to Train Your Dragon"
+  },
+  {
+   "k": "m920",
+   "t": "Cars",
+   "y": 2006,
+   "via": "collection",
+   "name": "Cars"
+  },
+  {
+   "k": "m49013",
+   "t": "Cars 2",
+   "y": 2011,
+   "via": "collection",
+   "name": "Cars"
+  },
+  {
+   "k": "m10674",
+   "t": "Mulan",
+   "y": 1998,
+   "via": "collection",
+   "name": "Mulan"
+  },
+  {
+   "k": "m11688",
+   "t": "The Emperor's New Groove",
+   "y": 2000,
+   "via": "collection",
+   "name": "The Emperor's New Groove"
+  },
+  {
+   "k": "m109445",
+   "t": "Frozen",
+   "y": 2013,
+   "via": "collection",
+   "name": "Frozen"
+  },
+  {
+   "k": "m330457",
+   "t": "Frozen II",
+   "y": 2019,
+   "via": "collection",
+   "name": "Frozen"
+  },
+  {
+   "k": "m9836",
+   "t": "Happy Feet",
+   "y": 2006,
+   "via": "collection",
+   "name": "Happy Feet"
+  },
+  {
+   "k": "m404368",
+   "t": "Ralph Breaks the Internet",
+   "y": 2018,
+   "via": "collection",
+   "name": "Wreck-It Ralph"
+  },
+  {
+   "k": "m153518",
+   "t": "The Angry Birds Movie",
+   "y": 2016,
+   "via": "collection",
+   "name": "The Angry Birds"
+  },
+  {
+   "k": "m177572",
+   "t": "Big Hero 6",
+   "y": 2014,
+   "via": "world",
+   "name": "Earth-14123"
+  },
+  {
+   "k": "m137106",
+   "t": "The Lego Movie",
+   "y": 2014,
+   "via": "collection",
+   "name": "The Lego Movie"
+  },
+  {
+   "k": "m37135",
+   "t": "Tarzan",
+   "y": 1999,
+   "via": "collection",
+   "name": "Tarzan (Animation)"
+  },
+  {
+   "k": "m137116",
+   "t": "Smurfs: The Lost Village",
+   "y": 2017,
+   "via": "world",
+   "name": "The Smurfs in film"
+  },
+  {
+   "k": "m82690",
+   "t": "Wreck-It Ralph",
+   "y": 2012,
+   "via": "collection",
+   "name": "Wreck-It Ralph"
+  },
+  {
+   "k": "m93456",
+   "t": "Despicable Me 2",
+   "y": 2013,
+   "via": "collection",
+   "name": "Despicable Me"
+  },
+  {
+   "k": "m497698",
+   "t": "Black Widow",
+   "y": 2021,
+   "via": "world",
+   "name": "Marvel Cinematic Universe"
+  },
+  {
+   "k": "m566525",
+   "t": "Shang-Chi and the Legend of the Ten Rings",
+   "y": 2021,
+   "via": "world",
+   "name": "Marvel Cinematic Universe"
+  },
+  {
+   "k": "m524434",
+   "t": "Eternals",
+   "y": 2021,
+   "via": "world",
+   "name": "Marvel Cinematic Universe"
+  },
+  {
+   "k": "m453395",
+   "t": "Doctor Strange in the Multiverse of Madness",
+   "y": 2022,
+   "via": "collection",
+   "name": "Doctor Strange"
+  },
+  {
+   "k": "m756999",
+   "t": "The Black Phone",
+   "y": 2022,
+   "via": "collection",
+   "name": "The Black Phone"
+  },
+  {
+   "k": "m438148",
+   "t": "Minions: The Rise of Gru",
+   "y": 2022,
+   "via": "collection",
+   "name": "Minions"
+  },
+  {
+   "k": "m13648",
+   "t": "Resident Evil: Degeneration",
+   "y": 2008,
+   "via": "collection",
+   "name": "Resident Evil (Animated)"
+  },
+  {
+   "k": "m361743",
+   "t": "Top Gun: Maverick",
+   "y": 2022,
+   "via": "collection",
+   "name": "Top Gun"
+  },
+  {
+   "k": "m337404",
+   "t": "Cruella",
+   "y": 2021,
+   "via": "world",
+   "name": "101 Dalmatians universe"
+  },
+  {
+   "k": "m133121",
+   "t": "Resident Evil: Damnation",
+   "y": 2012,
+   "via": "collection",
+   "name": "Resident Evil (Animated)"
+  },
+  {
+   "k": "m400136",
+   "t": "Resident Evil: Vendetta",
+   "y": 2017,
+   "via": "collection",
+   "name": "Resident Evil (Animated)"
+  },
+  {
+   "k": "m539681",
+   "t": "DC League of Super-Pets",
+   "y": 2022,
+   "via": "world",
+   "name": "DC Universe"
+  },
+  {
+   "k": "m512200",
+   "t": "Jumanji: The Next Level",
+   "y": 2019,
+   "via": "collection",
+   "name": "Jumanji"
+  },
+  {
+   "k": "m829280",
+   "t": "Enola Holmes 2",
+   "y": 2022,
+   "via": "collection",
+   "name": "Enola Holmes"
+  },
+  {
+   "k": "m615457",
+   "t": "Nobody",
+   "y": 2021,
+   "via": "collection",
+   "name": "Nobody"
+  },
+  {
+   "k": "m315162",
+   "t": "Puss in Boots: The Last Wish",
+   "y": 2022,
+   "via": "collection",
+   "name": "Puss in Boots"
+  },
+  {
+   "k": "m458156",
+   "t": "John Wick: Chapter 3 - Parabellum",
+   "y": 2019,
+   "via": "collection",
+   "name": "John Wick"
+  },
+  {
+   "k": "m603692",
+   "t": "John Wick: Chapter 4",
+   "y": 2023,
+   "via": "collection",
+   "name": "John Wick"
+  },
+  {
+   "k": "m505642",
+   "t": "Black Panther: Wakanda Forever",
+   "y": 2022,
+   "via": "collection",
+   "name": "Black Panther"
+  },
+  {
+   "k": "m559969",
+   "t": "El Camino: A Breaking Bad Movie",
+   "y": 2019,
+   "via": "world",
+   "name": "Gilliverse"
+  },
+  {
+   "k": "m697843",
+   "t": "Extraction 2",
+   "y": 2023,
+   "via": "collection",
+   "name": "Extraction"
+  },
+  {
+   "k": "m610253",
+   "t": "Halloween Kills",
+   "y": 2021,
+   "via": "collection",
+   "name": "Halloween"
+  },
+  {
+   "k": "m565770",
+   "t": "Blue Beetle",
+   "y": 2023,
+   "via": "world",
+   "name": "DC Extended Universe"
+  },
+  {
+   "k": "m774752",
+   "t": "The Guardians of the Galaxy Holiday Special",
+   "y": 2022,
+   "via": "world",
+   "name": "Marvel Studios Special Presentations"
+  },
+  {
+   "k": "m569094",
+   "t": "Spider-Man: Across the Spider-Verse",
+   "y": 2023,
+   "via": "collection",
+   "name": "Spider-Man: Spider-Verse"
+  },
+  {
+   "k": "m522681",
+   "t": "Escape Room",
+   "y": 2019,
+   "via": "collection",
+   "name": "Escape Room"
+  },
+  {
+   "k": "m1029575",
+   "t": "The Family Plan",
+   "y": 2023,
+   "via": "collection",
+   "name": "The Family Plan"
+  },
+  {
+   "k": "m866398",
+   "t": "The Beekeeper",
+   "y": 2024,
+   "via": "collection",
+   "name": "The Beekeeper"
+  },
+  {
+   "k": "m616037",
+   "t": "Thor: Love and Thunder",
+   "y": 2022,
+   "via": "collection",
+   "name": "Thor"
+  },
+  {
+   "k": "m894205",
+   "t": "Werewolf by Night",
+   "y": 2022,
+   "via": "world",
+   "name": "Marvel Studios Special Presentations"
+  },
+  {
+   "k": "m605",
+   "t": "The Matrix Revolutions",
+   "y": 2003,
+   "via": "collection",
+   "name": "The Matrix"
+  },
+  {
+   "k": "m604",
+   "t": "The Matrix Reloaded",
+   "y": 2003,
+   "via": "collection",
+   "name": "The Matrix"
+  },
+  {
+   "k": "m624860",
+   "t": "The Matrix Resurrections",
+   "y": 2021,
+   "via": "collection",
+   "name": "The Matrix"
+  },
+  {
+   "k": "m640146",
+   "t": "Ant-Man and the Wasp: Quantumania",
+   "y": 2023,
+   "via": "collection",
+   "name": "Ant-Man"
+  },
+  {
+   "k": "m447365",
+   "t": "Guardians of the Galaxy Vol. 3",
+   "y": 2023,
+   "via": "collection",
+   "name": "Guardians of the Galaxy"
+  },
+  {
+   "k": "m609681",
+   "t": "The Marvels",
+   "y": 2023,
+   "via": "collection",
+   "name": "Captain Marvel"
+  },
+  {
+   "k": "m340102",
+   "t": "The New Mutants",
+   "y": 2020,
+   "via": "world",
+   "name": "X-Men"
+  },
+  {
+   "k": "m124905",
+   "t": "Godzilla",
+   "y": 2014,
+   "via": "collection",
+   "name": "Godzilla"
+  },
+  {
+   "k": "m293167",
+   "t": "Kong: Skull Island",
+   "y": 2017,
+   "via": "collection",
+   "name": "Godzilla x Kong"
+  },
+  {
+   "k": "m373571",
+   "t": "Godzilla: King of the Monsters",
+   "y": 2019,
+   "via": "collection",
+   "name": "Godzilla"
+  },
+  {
+   "k": "m399566",
+   "t": "Godzilla vs. Kong",
+   "y": 2021,
+   "via": "collection",
+   "name": "Godzilla"
+  },
+  {
+   "k": "m585216",
+   "t": "Escape Room: Tournament of Champions",
+   "y": 2021,
+   "via": "collection",
+   "name": "Escape Room"
+  },
+  {
+   "k": "m64688",
+   "t": "21 Jump Street",
+   "y": 2012,
+   "via": "collection",
+   "name": "Jump Street"
+  },
+  {
+   "k": "m187017",
+   "t": "22 Jump Street",
+   "y": 2014,
+   "via": "collection",
+   "name": "Jump Street"
+  },
+  {
+   "k": "m359410",
+   "t": "Road House",
+   "y": 2024,
+   "via": "collection",
+   "name": "Road House (Remake)"
+  },
+  {
+   "k": "m533535",
+   "t": "Deadpool & Wolverine",
+   "y": 2024,
+   "via": "collection",
+   "name": "Deadpool"
+  },
+  {
+   "k": "m619264",
+   "t": "The Platform",
+   "y": 2019,
+   "via": "collection",
+   "name": "The Platform"
+  },
+  {
+   "k": "m912649",
+   "t": "Venom: The Last Dance",
+   "y": 2024,
+   "via": "collection",
+   "name": "Venom"
+  },
+  {
+   "k": "m950387",
+   "t": "A Minecraft Movie",
+   "y": 2025,
+   "via": "collection",
+   "name": "Minecraft Movie"
+  },
+  {
+   "k": "m529203",
+   "t": "The Croods: A New Age",
+   "y": 2020,
+   "via": "collection",
+   "name": "The Croods"
+  },
+  {
+   "k": "m552524",
+   "t": "Lilo & Stitch",
+   "y": 2025,
+   "via": "collection",
+   "name": "Lilo & Stitch (Live-Action)"
+  },
+  {
+   "k": "m1087192",
+   "t": "How to Train Your Dragon",
+   "y": 2025,
+   "via": "collection",
+   "name": "How to Train Your Dragon (Live-Action)"
+  },
+  {
+   "k": "m541671",
+   "t": "Ballerina",
+   "y": 2025,
+   "via": "world",
+   "name": "John Wick"
+  },
+  {
+   "k": "m1011477",
+   "t": "Karate Kid: Legends",
+   "y": 2025,
+   "via": "collection",
+   "name": "The Karate Kid"
+  },
+  {
+   "k": "m986056",
+   "t": "Thunderbolts*",
+   "y": 2025,
+   "via": "world",
+   "name": "Marvel Cinematic Universe"
+  },
+  {
+   "k": "m882598",
+   "t": "Smile",
+   "y": 2022,
+   "via": "collection",
+   "name": "Smile"
+  },
+  {
+   "k": "m1100782",
+   "t": "Smile 2",
+   "y": 2024,
+   "via": "collection",
+   "name": "Smile"
+  },
+  {
+   "k": "m439079",
+   "t": "The Nun",
+   "y": 2018,
+   "via": "collection",
+   "name": "The Nun"
+  },
+  {
+   "k": "m38757",
+   "t": "Tangled",
+   "y": 2010,
+   "via": "collection",
+   "name": "Tangled"
+  },
+  {
+   "k": "m82881",
+   "t": "Tangled Ever After",
+   "y": 2012,
+   "via": "world",
+   "name": "Tangled"
+  },
+  {
+   "k": "m76600",
+   "t": "Avatar: The Way of Water",
+   "y": 2022,
+   "via": "collection",
+   "name": "Avatar"
+  },
+  {
+   "k": "m484718",
+   "t": "Coming 2 America",
+   "y": 2021,
+   "via": "collection",
+   "name": "Coming to America"
+  },
+  {
+   "k": "m1081003",
+   "t": "Supergirl",
+   "y": 2026,
+   "via": "world",
+   "name": "DC Universe"
+  },
+  {
+   "k": "m1084244",
+   "t": "Toy Story 5",
+   "y": 2026,
+   "via": "collection",
+   "name": "Toy Story"
+  },
+  {
+   "k": "m969681",
+   "t": "Spider-Man: Brand New Day",
+   "y": 2026,
+   "via": "collection",
+   "name": "Spider-Man (MCU)"
+  },
+  {
+   "k": "m75780",
+   "t": "Jack Reacher",
+   "y": 2012,
+   "via": "collection",
+   "name": "Jack Reacher"
+  },
+  {
+   "k": "m343611",
+   "t": "Jack Reacher: Never Go Back",
+   "y": 2016,
+   "via": "collection",
+   "name": "Jack Reacher"
+  },
+  {
+   "k": "m1400940",
+   "t": "Clayface",
+   "y": 2026,
+   "via": "world",
+   "name": "DC Universe"
+  },
+  {
+   "k": "m436969",
+   "t": "The Suicide Squad",
+   "y": 2021,
+   "via": "collection",
+   "name": "Suicide Squad"
+  },
+  {
+   "k": "m1061474",
+   "t": "Superman",
+   "y": 2025,
+   "via": "collection",
+   "name": "Superman (DCU)"
   }
  ],
  "chronoAudit": {
@@ -983,6 +3905,300 @@
     ]
    },
    {
+    "group": "Monsters, Inc.",
+    "order": [
+     "Monsters University",
+     "Monsters, Inc.",
+     "Mike's New Car",
+     "Party Central",
+     "Monsters at Work"
+    ],
+    "moved": [
+     "Monsters University ← prequel Monsters, Inc. [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "Inside Out",
+    "order": [
+     "Inside Out",
+     "Dream Productions",
+     "Inside Out 2"
+    ],
+    "moved": [
+     "Dream Productions ← between Inside Out / Inside Out 2 [wikipedia]"
+    ]
+   },
+   {
+    "group": "Ted",
+    "order": [
+     "ted",
+     "Ted",
+     "Ted 2"
+    ],
+    "moved": [
+     "ted ← prequel Ted [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "Peter Jackson's Middle-earth film series",
+    "order": [
+     "The Hobbit: An Unexpected Journey",
+     "The Hobbit: The Desolation of Smaug",
+     "The Hobbit: The Battle of the Five Armies",
+     "The Lord of the Rings: The Fellowship of the Ring",
+     "The Lord of the Rings: The Two Towers",
+     "The Lord of the Rings: The Return of the King"
+    ],
+    "moved": [
+     "The Hobbit: An Unexpected Journey ← prequel The Lord of the Rings: The Fellowship of the Ring / The Lord of the Rings: The Two Towers / The Lord of the Rings: The Return of the King [wikipedia]",
+     "The Hobbit: The Desolation of Smaug ← prequel The Lord of the Rings: The Fellowship of the Ring / The Lord of the Rings: The Two Towers / The Lord of the Rings: The Return of the King [wikipedia]",
+     "The Hobbit: The Battle of the Five Armies ← prequel The Lord of the Rings: The Fellowship of the Ring / The Lord of the Rings: The Two Towers / The Lord of the Rings: The Return of the King [wikipedia]"
+    ]
+   },
+   {
+    "group": "Jurassic Park",
+    "order": [
+     "Jurassic Park",
+     "The Lost World: Jurassic Park",
+     "Jurassic Park III",
+     "LEGO Jurassic World: The Secret Exhibit",
+     "LEGO: Jurassic World - Legend of Isla Nublar",
+     "Jurassic World",
+     "LEGO Jurassic World: The Indominus Escape",
+     "Jurassic World: Fallen Kingdom",
+     "Battle at Big Rock",
+     "Jurassic World Camp Cretaceous",
+     "Jurassic World Dominion",
+     "Jurassic World: Chaos Theory"
+    ],
+    "moved": [
+     "LEGO Jurassic World: The Secret Exhibit ← prequel Jurassic World [wikipedia]",
+     "LEGO: Jurassic World - Legend of Isla Nublar ← prequel Jurassic World [wikipedia]"
+    ]
+   },
+   {
+    "group": "X-Men",
+    "order": [
+     "X-Men Origins: Wolverine",
+     "X-Men: First Class",
+     "X-Men",
+     "X2",
+     "X-Men: The Last Stand",
+     "The Wolverine",
+     "X-Men: Days of Future Past",
+     "X-Men: Apocalypse",
+     "Dark Phoenix",
+     "Deadpool",
+     "Logan",
+     "Deadpool 2",
+     "The New Mutants",
+     "Deadpool & Wolverine"
+    ],
+    "moved": [
+     "X-Men Origins: Wolverine ← prequel X-Men [wikipedia,tmdb]",
+     "X-Men: First Class ← prequel X-Men [wikipedia,tmdb]",
+     "X-Men: Apocalypse ← before Dark Phoenix [wikipedia,wikidata,tmdb]",
+     "Dark Phoenix ← year Deadpool / Logan / Deadpool 2 [wikidata,tmdb]"
+    ]
+   },
+   {
+    "group": "Pokémon",
+    "order": [
+     "Pokémon",
+     "Pokémon: The First Movie",
+     "Pokémon the Movie 2000",
+     "Pokémon 3: The Movie",
+     "Pikachu & Pichu",
+     "Pokémon 4Ever",
+     "Pokémon: Mewtwo Returns",
+     "Pokémon Heroes",
+     "Pokémon Chronicles",
+     "Pokémon: Jirachi Wish Maker",
+     "Pokémon: Destiny Deoxys",
+     "Pokémon: Lucario and the Mystery of Mew",
+     "Pokémon: The Mastermind of Mirage Pokémon",
+     "Pokémon: Hisuian Snow",
+     "Pokémon Ranger and the Temple of the Sea",
+     "Pokémon: The Rise of Darkrai",
+     "Pokémon: Giratina and the Sky Warrior",
+     "Pokémon: Arceus and the Jewel of Life",
+     "Pokémon: Zoroark - Master of Illusions",
+     "Pokémon the Movie: Black - Victini and Reshiram",
+     "Pokémon the Movie: Kyurem vs. the Sword of Justice",
+     "Pokémon the Movie: Genesect and the Legend Awakened",
+     "Pokémon Origins",
+     "Pokémon the Movie: Diancie and the Cocoon of Destruction",
+     "Pokémon the Movie: Hoopa and the Clash of Ages",
+     "Pokémon the Movie: Volcanion and the Mechanical Marvel",
+     "Pokémon Generations",
+     "Pokémon the Movie: I Choose You!",
+     "Pokémon the Movie: The Power of Us",
+     "Pokémon Detective Pikachu",
+     "Pokémon the Movie: Mewtwo Strikes Back - Evolution",
+     "Pokémon the Movie: Secrets of the Jungle",
+     "Pokémon Horizons",
+     "Pokémon Concierge",
+     "Pokémon: Wild Card"
+    ],
+    "moved": [
+     "Pokémon: Hisuian Snow ← prequel Pokémon Ranger and the Temple of the Sea [wikipedia]"
+    ]
+   },
+   {
+    "group": "Final Fantasy VII universe",
+    "order": [
+     "Final Fantasy VII: Last Order",
+     "Final Fantasy VII: Advent Children"
+    ],
+    "moved": [
+     "Final Fantasy VII: Last Order ← before Final Fantasy VII: Advent Children [wikipedia]"
+    ]
+   },
+   {
+    "group": "The Witcher universe",
+    "order": [
+     "The Hexer",
+     "The Witcher",
+     "The Witcher: Blood Origin",
+     "The Witcher",
+     "The Witcher: Nightmare of the Wolf",
+     "The Witcher: Sirens of the Deep"
+    ],
+    "moved": [
+     "The Witcher: Blood Origin ← prequel The Witcher [wikipedia]"
+    ]
+   },
+   {
+    "group": "Despicable Me universe",
+    "order": [
+     "Minions",
+     "Despicable Me",
+     "Despicable Me 2",
+     "Despicable Me 3",
+     "Minions: The Rise of Gru",
+     "Despicable Me 4"
+    ],
+    "moved": [
+     "Minions ← prequel Despicable Me [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "Despicable Me",
+    "order": [
+     "Minions & Monsters",
+     "Minions: The Rise of Gru",
+     "Minions",
+     "Despicable Me",
+     "Banana",
+     "Home Makeover",
+     "Orientation Day",
+     "Despicable Me 2",
+     "Mower Minions",
+     "Despicable Me 3"
+    ],
+    "moved": [
+     "Minions ← prequel Despicable Me [wikipedia,tmdb]",
+     "Minions: The Rise of Gru ← year Despicable Me / Banana / Home Makeover / Orientation Day [wikidata,tmdb]",
+     "Minions & Monsters ← before Minions / Minions: The Rise of Gru [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "How to Train Your Dragon universe",
+    "order": [
+     "How to Train Your Dragon",
+     "Legend of the BoneKnapper Dragon",
+     "How to Train Your Dragon: Legends",
+     "Book of Dragons",
+     "Dragons: Gift of the Night Fury",
+     "DreamWorks Dragons",
+     "How to Train Your Dragon 2",
+     "Dragons: Dawn of the Dragon Racers",
+     "How to Train Your Dragon: Homecoming",
+     "How to Train Your Dragon: The Hidden World",
+     "Dragons: Rescue Riders",
+     "How to Train Your Dragon: Snoggletog Log",
+     "Dragons: Rescue Riders: Hunt for the Golden Dragon",
+     "Dragons: Rescue Riders: Secrets of the Songwing",
+     "Dragons: Rescue Riders: Huttsgalor Holiday",
+     "Dragons: The Nine Realms",
+     "How to Train Your Dragon"
+    ],
+    "moved": [
+     "How to Train Your Dragon: Homecoming ← before How to Train Your Dragon: The Hidden World [wikipedia]"
+    ]
+   },
+   {
+    "group": "Gilliverse",
+    "order": [
+     "Better Call Saul",
+     "Breaking Bad",
+     "El Camino: A Breaking Bad Movie",
+     "Better Call Saul Presents: Slippin' Jimmy"
+    ],
+    "moved": [
+     "Better Call Saul ← before Breaking Bad [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "The Platform",
+    "order": [
+     "The Platform 2",
+     "The Platform"
+    ],
+    "moved": [
+     "The Platform 2 ← prequel The Platform [wikipedia]"
+    ]
+   },
+   {
+    "group": "The Karate Kid",
+    "order": [
+     "The Karate Kid Part III",
+     "The Next Karate Kid",
+     "The Karate Kid",
+     "The Karate Kid Part II",
+     "The Karate Kid",
+     "Karate Kid: Legends"
+    ],
+    "moved": [
+     "The Karate Kid Part III ← prequel The Karate Kid / The Karate Kid Part II / The Next Karate Kid / The Karate Kid [wikipedia]",
+     "The Next Karate Kid ← prequel The Karate Kid / The Karate Kid Part II / The Karate Kid / Karate Kid: Legends [wikipedia]"
+    ]
+   },
+   {
+    "group": "The Conjuring Universe",
+    "order": [
+     "Annabelle: Creation",
+     "Annabelle",
+     "The Nun",
+     "Annabelle Comes Home",
+     "The Nun II",
+     "The Conjuring",
+     "The Conjuring 2",
+     "The Nurse",
+     "The Curse of La Llorona",
+     "The Conjuring: The Devil Made Me Do It",
+     "The Conjuring: Last Rites"
+    ],
+    "moved": [
+     "Annabelle ← prequel The Conjuring [wikipedia,tmdb]",
+     "Annabelle: Creation ← prequel Annabelle [wikipedia,tmdb]",
+     "The Nun ← prequel The Conjuring 2 [wikipedia]",
+     "Annabelle Comes Home ← prequel The Conjuring [wikipedia]",
+     "The Nun II ← prequel The Conjuring 2 [wikipedia,wikidata,tmdb]"
+    ]
+   },
+   {
+    "group": "Tangled",
+    "order": [
+     "Tangled",
+     "Rapunzel's Tangled Adventure",
+     "Tangled Ever After"
+    ],
+    "moved": [
+     "Rapunzel's Tangled Adventure ← before Tangled Ever After [wikipedia]"
+    ]
+   },
+   {
     "group": "col Saw",
     "order": [
      "Saw",
@@ -1131,10 +4347,130 @@
     "moved": [
      "Carlito's Way: Rise to Power ← prequel Carlito's Way [wikipedia,tmdb]"
     ]
+   },
+   {
+    "group": "col Monsters, Inc.",
+    "order": [
+     "Monsters University",
+     "Monsters, Inc."
+    ],
+    "moved": [
+     "Monsters University ← prequel Monsters, Inc. [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col Shaft (Reboot)",
+    "order": [
+     "Shaft",
+     "Shaft"
+    ],
+    "moved": [
+     "Shaft ← before Shaft [wikipedia]"
+    ]
+   },
+   {
+    "group": "col Furie",
+    "order": [
+     "Furies",
+     "Furie"
+    ],
+    "moved": [
+     "Furies ← prequel Furie [wikipedia]"
+    ]
+   },
+   {
+    "group": "col X-Men",
+    "order": [
+     "X-Men: First Class",
+     "X-Men",
+     "X2",
+     "X-Men: The Last Stand",
+     "X-Men: Days of Future Past",
+     "X-Men: Apocalypse",
+     "Dark Phoenix"
+    ],
+    "moved": [
+     "X-Men: First Class ← prequel X-Men [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col Final Fantasy VII",
+    "order": [
+     "Final Fantasy VII: Last Order",
+     "Final Fantasy VII: Advent Children",
+     "Final Fantasy VII: On the Way to a Smile - Episode Denzel"
+    ],
+    "moved": [
+     "Final Fantasy VII: Last Order ← before Final Fantasy VII: Advent Children [wikipedia]"
+    ]
+   },
+   {
+    "group": "col Army of the Dead",
+    "order": [
+     "Army of Thieves",
+     "Army of the Dead"
+    ],
+    "moved": [
+     "Army of Thieves ← prequel Army of the Dead [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col Minions",
+    "order": [
+     "Minions & Monsters",
+     "Minions: The Rise of Gru",
+     "Minions"
+    ],
+    "moved": [
+     "Minions: The Rise of Gru ← year Minions [wikidata,tmdb]",
+     "Minions & Monsters ← before Minions / Minions: The Rise of Gru [wikipedia,tmdb]"
+    ]
+   },
+   {
+    "group": "col The Platform",
+    "order": [
+     "The Platform 2",
+     "The Platform"
+    ],
+    "moved": [
+     "The Platform 2 ← prequel The Platform [wikipedia]"
+    ]
+   },
+   {
+    "group": "col The Karate Kid",
+    "order": [
+     "The Karate Kid Part III",
+     "The Next Karate Kid",
+     "The Karate Kid",
+     "The Karate Kid Part II",
+     "The Karate Kid",
+     "Karate Kid: Legends"
+    ],
+    "moved": [
+     "The Karate Kid Part III ← prequel The Karate Kid / The Karate Kid Part II / The Next Karate Kid / The Karate Kid [wikipedia]",
+     "The Next Karate Kid ← prequel The Karate Kid / The Karate Kid Part II / The Karate Kid / Karate Kid: Legends [wikipedia]"
+    ]
    }
   ]
  },
- "curatedGaps": [],
+ "curatedGaps": [
+  {
+   "cur": "mortal-kombat",
+   "k": "m460465",
+   "t": "Mortal Kombat",
+   "world": "Mortal Kombat",
+   "kind": "franchise",
+   "gap": [
+    "m9312 Mortal Kombat",
+    "m72886 Mortal Kombat: The Journey Begins",
+    "m9823 Mortal Kombat: Annihilation",
+    "t237 Mortal Kombat: Conquest",
+    "t61579 Mortal Kombat: Legacy",
+    "m664767 Mortal Kombat Legends: Scorpion's Revenge",
+    "m1007401 Mortal Kombat Legends: Snow Blind"
+   ]
+  }
+ ],
  "collectionGaps": [
   {
    "k": "m4488",
@@ -1146,6 +4482,1459 @@
     "t213562 Crystal Lake"
    ],
    "lack": []
+  },
+  {
+   "k": "m308531",
+   "t": "Teenage Mutant Ninja Turtles: Out of the Shadows",
+   "col": "Teenage Mutant Ninja Turtles (Remake)",
+   "world": "Teenage Mutant Ninja Turtles film series",
+   "extra": [
+    "m1498 Teenage Mutant Ninja Turtles",
+    "m1497 Teenage Mutant Ninja Turtles II: The Secret of the Ooze",
+    "m1499 Teenage Mutant Ninja Turtles III",
+    "m1273 TMNT",
+    "m34003 Turtles Forever",
+    "m581997 Batman vs Teenage Mutant Ninja Turtles",
+    "m765172 Rise of the Teenage Mutant Ninja Turtles: The Movie",
+    "m614930 Teenage Mutant Ninja Turtles: Mutant Mayhem"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m166426",
+   "t": "Pirates of the Caribbean: Dead Men Tell No Tales",
+   "col": "Pirates of the Caribbean",
+   "world": "Pirates of the Caribbean",
+   "extra": [
+    "m230652 Pirates of the Caribbean: Tales of the Code: Wedlocked"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m585",
+   "t": "Monsters, Inc.",
+   "col": "Monsters, Inc.",
+   "world": "Monsters, Inc.",
+   "extra": [
+    "m13931 Mike's New Car",
+    "m258152 Party Central",
+    "t90461 Monsters at Work"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m245891",
+   "t": "John Wick",
+   "col": "John Wick",
+   "world": "John Wick",
+   "extra": [
+    "m1457759 John Wick: Chapter 5"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m150540",
+   "t": "Inside Out",
+   "col": "Inside Out",
+   "world": "Inside Out",
+   "extra": [
+    "t255868 Dream Productions"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m426285",
+   "t": "Fullmetal Alchemist",
+   "col": "Fullmetal Alchemist (Live-Action)",
+   "world": "Fullmetal Alchemist",
+   "extra": [
+    "t37863 Fullmetal Alchemist",
+    "m14003 Fullmetal Alchemist the Movie: Conqueror of Shamballa",
+    "t31911 Fullmetal Alchemist: Brotherhood",
+    "m80518 Fullmetal Alchemist: The Sacred Star of Milos"
+   ],
+   "lack": [
+    "m960700 m960700",
+    "m960704 m960704"
+   ]
+  },
+  {
+   "k": "m335797",
+   "t": "Sing",
+   "col": "Sing",
+   "world": "Sing",
+   "extra": [],
+   "lack": [
+    "m1108794 m1108794"
+   ]
+  },
+  {
+   "k": "m353486",
+   "t": "Jumanji: Welcome to the Jungle",
+   "col": "Jumanji",
+   "world": "Jumanji",
+   "extra": [
+    "t2118 Jumanji",
+    "m6795 Zathura: A Space Adventure"
+   ],
+   "lack": [
+    "m1260649 m1260649"
+   ]
+  },
+  {
+   "k": "m10634",
+   "t": "Friday",
+   "col": "Friday",
+   "world": "Friday",
+   "extra": [],
+   "lack": [
+    "m487560 m487560"
+   ]
+  },
+  {
+   "k": "m72105",
+   "t": "Ted",
+   "col": "Ted",
+   "world": "Ted",
+   "extra": [
+    "t201834 ted"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m772",
+   "t": "Home Alone 2: Lost in New York",
+   "col": "Home Alone",
+   "world": "Home Alone",
+   "extra": [
+    "m134375 Home Alone: The Holiday Heist",
+    "m654974 Home Sweet Home Alone"
+   ],
+   "lack": [
+    "m1832995 m1832995"
+   ]
+  },
+  {
+   "k": "m771",
+   "t": "Home Alone",
+   "col": "Home Alone",
+   "world": "Home Alone",
+   "extra": [
+    "m134375 Home Alone: The Holiday Heist",
+    "m654974 Home Sweet Home Alone"
+   ],
+   "lack": [
+    "m1832995 m1832995"
+   ]
+  },
+  {
+   "k": "m22",
+   "t": "Pirates of the Caribbean: The Curse of the Black Pearl",
+   "col": "Pirates of the Caribbean",
+   "world": "Pirates of the Caribbean",
+   "extra": [
+    "m230652 Pirates of the Caribbean: Tales of the Code: Wedlocked"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m58",
+   "t": "Pirates of the Caribbean: Dead Man's Chest",
+   "col": "Pirates of the Caribbean",
+   "world": "Pirates of the Caribbean",
+   "extra": [
+    "m230652 Pirates of the Caribbean: Tales of the Code: Wedlocked"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m285",
+   "t": "Pirates of the Caribbean: At World's End",
+   "col": "Pirates of the Caribbean",
+   "world": "Pirates of the Caribbean",
+   "extra": [
+    "m230652 Pirates of the Caribbean: Tales of the Code: Wedlocked"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m1865",
+   "t": "Pirates of the Caribbean: On Stranger Tides",
+   "col": "Pirates of the Caribbean",
+   "world": "Pirates of the Caribbean",
+   "extra": [
+    "m230652 Pirates of the Caribbean: Tales of the Code: Wedlocked"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m9762",
+   "t": "Step Up",
+   "col": "Step Up",
+   "world": "Step Up",
+   "extra": [
+    "m593680 Step Up: Year of the Dance"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m8328",
+   "t": "Step Up 2: The Streets",
+   "col": "Step Up",
+   "world": "Step Up",
+   "extra": [
+    "m593680 Step Up: Year of the Dance"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m41233",
+   "t": "Step Up 3D",
+   "col": "Step Up",
+   "world": "Step Up",
+   "extra": [
+    "m593680 Step Up: Year of the Dance"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m85446",
+   "t": "Step Up Revolution",
+   "col": "Step Up",
+   "world": "Step Up",
+   "extra": [
+    "m593680 Step Up: Year of the Dance"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m243683",
+   "t": "Step Up All In",
+   "col": "Step Up",
+   "world": "Step Up",
+   "extra": [
+    "m593680 Step Up: Year of the Dance"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m156022",
+   "t": "The Equalizer",
+   "col": "The Equalizer",
+   "world": "The Equalizer",
+   "extra": [
+    "t4297 The Equalizer",
+    "t95205 The Equalizer"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m324552",
+   "t": "John Wick: Chapter 2",
+   "col": "John Wick",
+   "world": "John Wick",
+   "extra": [
+    "m1457759 John Wick: Chapter 5"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m297761",
+   "t": "Suicide Squad",
+   "col": "Suicide Squad",
+   "world": "DC Extended Universe",
+   "extra": [
+    "m49521 Man of Steel",
+    "m209112 Batman v Superman: Dawn of Justice",
+    "m297762 Wonder Woman",
+    "m141052 Justice League",
+    "m297802 Aquaman",
+    "m287947 Shazam!",
+    "m495764 Birds of Prey (and the Fantabulous Emancipation of One Harley Quinn)",
+    "m464052 Wonder Woman 1984",
+    "m436270 Black Adam",
+    "m594767 Shazam! Fury of the Gods",
+    "m565770 Blue Beetle",
+    "m572802 Aquaman and the Lost Kingdom",
+    "t110492 Peacemaker",
+    "m298618 The Flash"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m351286",
+   "t": "Jurassic World: Fallen Kingdom",
+   "col": "Jurassic Park",
+   "world": "Jurassic Park",
+   "extra": [],
+   "lack": [
+    "m1714034 m1714034"
+   ]
+  },
+  {
+   "k": "m297762",
+   "t": "Wonder Woman",
+   "col": "Wonder Woman",
+   "world": "DC Extended Universe",
+   "extra": [
+    "m49521 Man of Steel",
+    "m209112 Batman v Superman: Dawn of Justice",
+    "m297761 Suicide Squad",
+    "m141052 Justice League",
+    "m297802 Aquaman",
+    "m287947 Shazam!",
+    "m495764 Birds of Prey (and the Fantabulous Emancipation of One Harley Quinn)",
+    "m436969 The Suicide Squad",
+    "m436270 Black Adam",
+    "m594767 Shazam! Fury of the Gods",
+    "m565770 Blue Beetle",
+    "m572802 Aquaman and the Lost Kingdom",
+    "t110492 Peacemaker",
+    "m298618 The Flash"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m299537",
+   "t": "Captain Marvel",
+   "col": "Captain Marvel",
+   "world": "Marvel Cinematic Universe",
+   "extra": [
+    "m1726 Iron Man",
+    "m1724 The Incredible Hulk",
+    "m10138 Iron Man 2",
+    "m10195 Thor",
+    "m1771 Captain America: The First Avenger",
+    "m24428 The Avengers",
+    "m68721 Iron Man 3",
+    "t1403 Marvel's Agents of S.H.I.E.L.D.",
+    "m76338 Thor: The Dark World",
+    "m100402 Captain America: The Winter Soldier",
+    "m118340 Guardians of the Galaxy",
+    "t61550 Marvel's Agent Carter",
+    "t61889 Marvel's Daredevil",
+    "m99861 Avengers: Age of Ultron",
+    "t69069 WHIH Newsfront",
+    "m102899 Ant-Man",
+    "t38472 Marvel's Jessica Jones",
+    "m271110 Captain America: Civil War",
+    "m413279 Team Thor",
+    "t62126 Marvel's Luke Cage",
+    "m284052 Doctor Strange",
+    "t62127 Marvel's Iron Fist",
+    "m283995 Guardians of the Galaxy Vol. 2",
+    "m315635 Spider-Man: Homecoming",
+    "t62285 Marvel's The Defenders",
+    "t68716 Marvel's Inhumans",
+    "m284053 Thor: Ragnarok",
+    "t67178 Marvel's The Punisher",
+    "t67466 Marvel's Runaways",
+    "m284054 Black Panther",
+    "m505945 Team Darryl",
+    "m299536 Avengers: Infinity War",
+    "t66190 Marvel's Cloak & Dagger",
+    "m363088 Ant-Man and the Wasp",
+    "m299534 Avengers: Endgame",
+    "m429617 Spider-Man: Far From Home",
+    "t88987 Helstrom",
+    "t85271 WandaVision",
+    "t88396 The Falcon and the Winter Soldier",
+    "t84958 Loki",
+    "m497698 Black Widow",
+    "t91363 What If...?",
+    "m566525 Shang-Chi and the Legend of the Ten Rings",
+    "m524434 Eternals",
+    "t88329 Hawkeye",
+    "m634649 Spider-Man: No Way Home",
+    "m453395 Doctor Strange in the Multiverse of Madness",
+    "t92782 Ms. Marvel",
+    "m616037 Thor: Love and Thunder",
+    "t92783 She-Hulk: Attorney at Law",
+    "m894205 Werewolf by Night",
+    "m505642 Black Panther: Wakanda Forever",
+    "m774752 The Guardians of the Galaxy Holiday Special",
+    "m640146 Ant-Man and the Wasp: Quantumania",
+    "m447365 Guardians of the Galaxy Vol. 3",
+    "t114472 Secret Invasion",
+    "t122226 Echo",
+    "m533535 Deadpool & Wolverine",
+    "t138501 Agatha All Along",
+    "m822119 Captain America: Brave New World",
+    "t202555 Daredevil: Born Again",
+    "m986056 Thunderbolts*",
+    "t114471 Ironheart",
+    "m617126 The Fantastic 4: First Steps",
+    "t198178 Wonder Man",
+    "m969681 Spider-Man: Brand New Day",
+    "t213375 VisionQuest",
+    "m1003596 Avengers: Doomsday",
+    "m1003598 Avengers: Secret Wars",
+    "m1293690 Untitled X-Men Film",
+    "m1386618 Black Panther 3"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m479",
+   "t": "Shaft",
+   "col": "Shaft (Reboot)",
+   "world": "Shaft",
+   "extra": [
+    "m482 Shaft",
+    "m493 Shaft's Big Score!",
+    "m494 Shaft in Africa"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m1634",
+   "t": "Free Willy",
+   "col": "Free Willy",
+   "world": "Free Willy",
+   "extra": [
+    "m34751 Free Willy: Escape from Pirate's Cove"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m324857",
+   "t": "Spider-Man: Into the Spider-Verse",
+   "col": "Spider-Man: Spider-Verse",
+   "world": "Spider-Verse",
+   "extra": [
+    "m1106299 The Spider Within: A Spider-Verse Story"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m36657",
+   "t": "X-Men",
+   "col": "X-Men",
+   "world": "X-Men original trilogy",
+   "extra": [],
+   "lack": [
+    "m49538 X-Men: First Class",
+    "m127585 X-Men: Days of Future Past",
+    "m246655 X-Men: Apocalypse",
+    "m320288 Dark Phoenix"
+   ]
+  },
+  {
+   "k": "m36658",
+   "t": "X2",
+   "col": "X-Men",
+   "world": "X-Men original trilogy",
+   "extra": [],
+   "lack": [
+    "m49538 X-Men: First Class",
+    "m127585 X-Men: Days of Future Past",
+    "m246655 X-Men: Apocalypse",
+    "m320288 Dark Phoenix"
+   ]
+  },
+  {
+   "k": "m287947",
+   "t": "Shazam!",
+   "col": "Shazam!",
+   "world": "DC Extended Universe",
+   "extra": [
+    "m49521 Man of Steel",
+    "m209112 Batman v Superman: Dawn of Justice",
+    "m297761 Suicide Squad",
+    "m297762 Wonder Woman",
+    "m141052 Justice League",
+    "m297802 Aquaman",
+    "m495764 Birds of Prey (and the Fantabulous Emancipation of One Harley Quinn)",
+    "m464052 Wonder Woman 1984",
+    "m436969 The Suicide Squad",
+    "m436270 Black Adam",
+    "m565770 Blue Beetle",
+    "m572802 Aquaman and the Lost Kingdom",
+    "t110492 Peacemaker",
+    "m298618 The Flash"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m297802",
+   "t": "Aquaman",
+   "col": "Aquaman",
+   "world": "DC Extended Universe",
+   "extra": [
+    "m49521 Man of Steel",
+    "m209112 Batman v Superman: Dawn of Justice",
+    "m297761 Suicide Squad",
+    "m297762 Wonder Woman",
+    "m141052 Justice League",
+    "m287947 Shazam!",
+    "m495764 Birds of Prey (and the Fantabulous Emancipation of One Harley Quinn)",
+    "m464052 Wonder Woman 1984",
+    "m436969 The Suicide Squad",
+    "m436270 Black Adam",
+    "m594767 Shazam! Fury of the Gods",
+    "m565770 Blue Beetle",
+    "t110492 Peacemaker",
+    "m298618 The Flash"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m36668",
+   "t": "X-Men: The Last Stand",
+   "col": "X-Men",
+   "world": "X-Men original trilogy",
+   "extra": [],
+   "lack": [
+    "m49538 X-Men: First Class",
+    "m127585 X-Men: Days of Future Past",
+    "m246655 X-Men: Apocalypse",
+    "m320288 Dark Phoenix"
+   ]
+  },
+  {
+   "k": "m396535",
+   "t": "Train to Busan",
+   "col": "Train to Busan",
+   "world": "Train to Busan",
+   "extra": [
+    "m389868 Seoul Station"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m2080",
+   "t": "X-Men Origins: Wolverine",
+   "col": "The Wolverine",
+   "world": "Wolverine",
+   "extra": [
+    "m533535 Deadpool & Wolverine"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m49538",
+   "t": "X-Men: First Class",
+   "col": "X-Men",
+   "world": "X-Men Beginnings",
+   "extra": [],
+   "lack": [
+    "m36657 X-Men",
+    "m36658 X2",
+    "m36668 X-Men: The Last Stand"
+   ]
+  },
+  {
+   "k": "m76170",
+   "t": "The Wolverine",
+   "col": "The Wolverine",
+   "world": "Wolverine",
+   "extra": [
+    "m533535 Deadpool & Wolverine"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m127585",
+   "t": "X-Men: Days of Future Past",
+   "col": "X-Men",
+   "world": "X-Men Beginnings",
+   "extra": [],
+   "lack": [
+    "m36657 X-Men",
+    "m36658 X2",
+    "m36668 X-Men: The Last Stand"
+   ]
+  },
+  {
+   "k": "m293660",
+   "t": "Deadpool",
+   "col": "Deadpool",
+   "world": "Deadpool",
+   "extra": [
+    "m558144 Deadpool: No Good Deed",
+    "m567604 Once Upon a Deadpool"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m246655",
+   "t": "X-Men: Apocalypse",
+   "col": "X-Men",
+   "world": "X-Men Beginnings",
+   "extra": [],
+   "lack": [
+    "m36657 X-Men",
+    "m36658 X2",
+    "m36668 X-Men: The Last Stand"
+   ]
+  },
+  {
+   "k": "m263115",
+   "t": "Logan",
+   "col": "The Wolverine",
+   "world": "Wolverine",
+   "extra": [
+    "m533535 Deadpool & Wolverine"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m383498",
+   "t": "Deadpool 2",
+   "col": "Deadpool",
+   "world": "Deadpool",
+   "extra": [
+    "m558144 Deadpool: No Good Deed",
+    "m567604 Once Upon a Deadpool"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m320288",
+   "t": "Dark Phoenix",
+   "col": "X-Men",
+   "world": "X-Men Beginnings",
+   "extra": [],
+   "lack": [
+    "m36657 X-Men",
+    "m36658 X2",
+    "m36668 X-Men: The Last Stand"
+   ]
+  },
+  {
+   "k": "m948",
+   "t": "Halloween",
+   "col": "Halloween",
+   "world": "Halloween",
+   "extra": [
+    "m2082 Halloween",
+    "m24150 Halloween II"
+   ],
+   "lack": [
+    "m424139 Halloween",
+    "m610253 Halloween Kills",
+    "m616820 Halloween Ends"
+   ]
+  },
+  {
+   "k": "m11281",
+   "t": "Halloween II",
+   "col": "Halloween",
+   "world": "Halloween",
+   "extra": [
+    "m2082 Halloween",
+    "m24150 Halloween II"
+   ],
+   "lack": [
+    "m424139 Halloween",
+    "m610253 Halloween Kills",
+    "m616820 Halloween Ends"
+   ]
+  },
+  {
+   "k": "m10676",
+   "t": "Halloween III: Season of the Witch",
+   "col": "Halloween",
+   "world": "Halloween",
+   "extra": [
+    "m2082 Halloween",
+    "m24150 Halloween II"
+   ],
+   "lack": [
+    "m424139 Halloween",
+    "m610253 Halloween Kills",
+    "m616820 Halloween Ends"
+   ]
+  },
+  {
+   "k": "m11357",
+   "t": "Halloween 4: The Return of Michael Myers",
+   "col": "Halloween",
+   "world": "Halloween",
+   "extra": [
+    "m2082 Halloween",
+    "m24150 Halloween II"
+   ],
+   "lack": [
+    "m424139 Halloween",
+    "m610253 Halloween Kills",
+    "m616820 Halloween Ends"
+   ]
+  },
+  {
+   "k": "m11361",
+   "t": "Halloween 5: The Revenge of Michael Myers",
+   "col": "Halloween",
+   "world": "Halloween",
+   "extra": [
+    "m2082 Halloween",
+    "m24150 Halloween II"
+   ],
+   "lack": [
+    "m424139 Halloween",
+    "m610253 Halloween Kills",
+    "m616820 Halloween Ends"
+   ]
+  },
+  {
+   "k": "m10987",
+   "t": "Halloween: The Curse of Michael Myers",
+   "col": "Halloween",
+   "world": "Halloween",
+   "extra": [
+    "m2082 Halloween",
+    "m24150 Halloween II"
+   ],
+   "lack": [
+    "m424139 Halloween",
+    "m610253 Halloween Kills",
+    "m616820 Halloween Ends"
+   ]
+  },
+  {
+   "k": "m11675",
+   "t": "Halloween H20: 20 Years Later",
+   "col": "Halloween",
+   "world": "Halloween",
+   "extra": [
+    "m2082 Halloween",
+    "m24150 Halloween II"
+   ],
+   "lack": [
+    "m424139 Halloween",
+    "m610253 Halloween Kills",
+    "m616820 Halloween Ends"
+   ]
+  },
+  {
+   "k": "m11442",
+   "t": "Halloween: Resurrection",
+   "col": "Halloween",
+   "world": "Halloween",
+   "extra": [
+    "m2082 Halloween",
+    "m24150 Halloween II"
+   ],
+   "lack": [
+    "m424139 Halloween",
+    "m610253 Halloween Kills",
+    "m616820 Halloween Ends"
+   ]
+  },
+  {
+   "k": "m301528",
+   "t": "Toy Story 4",
+   "col": "Toy Story",
+   "world": "Toy Story",
+   "extra": [
+    "m16187 Buzz Lightyear of Star Command: The Adventure Begins",
+    "t3744 Buzz Lightyear of Star Command",
+    "m594530 Lamp Life",
+    "m718789 Lightyear"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m863",
+   "t": "Toy Story 2",
+   "col": "Toy Story",
+   "world": "Toy Story",
+   "extra": [
+    "m16187 Buzz Lightyear of Star Command: The Adventure Begins",
+    "t3744 Buzz Lightyear of Star Command",
+    "m594530 Lamp Life",
+    "m718789 Lightyear"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m10193",
+   "t": "Toy Story 3",
+   "col": "Toy Story",
+   "world": "Toy Story",
+   "extra": [
+    "m16187 Buzz Lightyear of Star Command: The Adventure Begins",
+    "t3744 Buzz Lightyear of Star Command",
+    "m594530 Lamp Life",
+    "m718789 Lightyear"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m862",
+   "t": "Toy Story",
+   "col": "Toy Story",
+   "world": "Toy Story",
+   "extra": [
+    "m16187 Buzz Lightyear of Star Command: The Adventure Begins",
+    "t3744 Buzz Lightyear of Star Command",
+    "m594530 Lamp Life",
+    "m718789 Lightyear"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m2082",
+   "t": "Halloween",
+   "col": "Halloween (Rob Zombie Series)",
+   "world": "Halloween",
+   "extra": [
+    "m948 Halloween",
+    "m11281 Halloween II",
+    "m10676 Halloween III: Season of the Witch",
+    "m11357 Halloween 4: The Return of Michael Myers",
+    "m11361 Halloween 5: The Revenge of Michael Myers",
+    "m10987 Halloween: The Curse of Michael Myers",
+    "m11675 Halloween H20: 20 Years Later",
+    "m11442 Halloween: Resurrection"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m24150",
+   "t": "Halloween II",
+   "col": "Halloween (Rob Zombie Series)",
+   "world": "Halloween",
+   "extra": [
+    "m948 Halloween",
+    "m11281 Halloween II",
+    "m10676 Halloween III: Season of the Witch",
+    "m11357 Halloween 4: The Return of Michael Myers",
+    "m11361 Halloween 5: The Revenge of Michael Myers",
+    "m10987 Halloween: The Curse of Michael Myers",
+    "m11675 Halloween H20: 20 Years Later",
+    "m11442 Halloween: Resurrection"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m647",
+   "t": "Final Fantasy VII: Advent Children",
+   "col": "Final Fantasy VII",
+   "world": "Final Fantasy VII universe",
+   "extra": [],
+   "lack": [
+    "m59300 m59300"
+   ]
+  },
+  {
+   "k": "m8681",
+   "t": "Taken",
+   "col": "Taken",
+   "world": "Taken",
+   "extra": [
+    "t68006 Taken"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m82675",
+   "t": "Taken 2",
+   "col": "Taken",
+   "world": "Taken",
+   "extra": [
+    "t68006 Taken"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m260346",
+   "t": "Taken 3",
+   "col": "Taken",
+   "world": "Taken",
+   "extra": [
+    "t68006 Taken"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m49521",
+   "t": "Man of Steel",
+   "col": "Man of Steel",
+   "world": "DC Extended Universe",
+   "extra": [
+    "m297761 Suicide Squad",
+    "m297762 Wonder Woman",
+    "m141052 Justice League",
+    "m297802 Aquaman",
+    "m287947 Shazam!",
+    "m495764 Birds of Prey (and the Fantabulous Emancipation of One Harley Quinn)",
+    "m464052 Wonder Woman 1984",
+    "m436969 The Suicide Squad",
+    "m436270 Black Adam",
+    "m594767 Shazam! Fury of the Gods",
+    "m565770 Blue Beetle",
+    "m572802 Aquaman and the Lost Kingdom",
+    "t110492 Peacemaker",
+    "m298618 The Flash"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m454626",
+   "t": "Sonic the Hedgehog",
+   "col": "Sonic the Hedgehog",
+   "world": "Sonic triple trouble",
+   "extra": [
+    "t44 Adventures of Sonic the Hedgehog",
+    "t2404 Sonic the Hedgehog",
+    "m16355 Sonic the Hedgehog: The Movie",
+    "t10926 Sonic X",
+    "t62211 Sonic Boom"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m1930",
+   "t": "The Amazing Spider-Man",
+   "col": "The Amazing Spider-Man",
+   "world": "The Amazing Spider-Man",
+   "extra": [
+    "m634649 Spider-Man: No Way Home"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m102382",
+   "t": "The Amazing Spider-Man 2",
+   "col": "The Amazing Spider-Man",
+   "world": "The Amazing Spider-Man",
+   "extra": [
+    "m634649 Spider-Man: No Way Home"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m634649",
+   "t": "Spider-Man: No Way Home",
+   "col": "Spider-Man (MCU)",
+   "world": "The Amazing Spider-Man",
+   "extra": [
+    "m1930 The Amazing Spider-Man",
+    "m102382 The Amazing Spider-Man 2"
+   ],
+   "lack": [
+    "m315635 Spider-Man: Homecoming",
+    "m429617 Spider-Man: Far From Home",
+    "m969681 Spider-Man: Brand New Day"
+   ]
+  },
+  {
+   "k": "m2109",
+   "t": "Rush Hour",
+   "col": "Rush Hour",
+   "world": "Rush Hour",
+   "extra": [],
+   "lack": [
+    "m1059776 m1059776"
+   ]
+  },
+  {
+   "k": "m5175",
+   "t": "Rush Hour 2",
+   "col": "Rush Hour",
+   "world": "Rush Hour",
+   "extra": [],
+   "lack": [
+    "m1059776 m1059776"
+   ]
+  },
+  {
+   "k": "m9502",
+   "t": "Kung Fu Panda",
+   "col": "Kung Fu Panda",
+   "world": "Kung Fu Panda universe",
+   "extra": [
+    "m15854 Kung Fu Panda: Secrets of the Furious Five",
+    "m381693 Kung Fu Panda: Secrets of the Scroll"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m49444",
+   "t": "Kung Fu Panda 2",
+   "col": "Kung Fu Panda",
+   "world": "Kung Fu Panda universe",
+   "extra": [
+    "m15854 Kung Fu Panda: Secrets of the Furious Five",
+    "m381693 Kung Fu Panda: Secrets of the Scroll"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m10674",
+   "t": "Mulan",
+   "col": "Mulan",
+   "world": "Disney's Mulan universe",
+   "extra": [
+    "m337401 Mulan"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m11688",
+   "t": "The Emperor's New Groove",
+   "col": "The Emperor's New Groove",
+   "world": "The Emperor's New Groove universe",
+   "extra": [
+    "t4623 The Emperor's New School"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m109445",
+   "t": "Frozen",
+   "col": "Frozen",
+   "world": "Frozen",
+   "extra": [
+    "m431562 LEGO Frozen Northern Lights"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m330457",
+   "t": "Frozen II",
+   "col": "Frozen",
+   "world": "Frozen",
+   "extra": [
+    "m431562 LEGO Frozen Northern Lights"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m153518",
+   "t": "The Angry Birds Movie",
+   "col": "The Angry Birds",
+   "world": "Angry Birds universe",
+   "extra": [
+    "t46848 Angry Birds Toons",
+    "t154647 Angry Birds: Summer Madness"
+   ],
+   "lack": [
+    "m1300926 m1300926"
+   ]
+  },
+  {
+   "k": "m137106",
+   "t": "The Lego Movie",
+   "col": "The Lego Movie",
+   "world": "The LEGO Movie",
+   "extra": [
+    "t74739 Unikitty!"
+   ],
+   "lack": [
+    "m280217 The Lego Movie 2: The Second Part"
+   ]
+  },
+  {
+   "k": "m37135",
+   "t": "Tarzan",
+   "col": "Tarzan (Animation)",
+   "world": "Tarzan",
+   "extra": [
+    "t2395 The Legend of Tarzan"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m438148",
+   "t": "Minions: The Rise of Gru",
+   "col": "Minions",
+   "world": "Despicable Me universe",
+   "extra": [
+    "m20352 Despicable Me",
+    "m93456 Despicable Me 2",
+    "m324852 Despicable Me 3",
+    "m519182 Despicable Me 4"
+   ],
+   "lack": [
+    "m1315772 Minions & Monsters"
+   ]
+  },
+  {
+   "k": "m13648",
+   "t": "Resident Evil: Degeneration",
+   "col": "Resident Evil (Animated)",
+   "world": "Resident Evil universe",
+   "extra": [
+    "m1576 Resident Evil",
+    "m1577 Resident Evil: Apocalypse",
+    "m7737 Resident Evil: Extinction",
+    "m35791 Resident Evil: Afterlife",
+    "m71679 Resident Evil: Retribution",
+    "m173897 Resident Evil: The Final Chapter",
+    "m460458 Resident Evil: Welcome to Raccoon City"
+   ],
+   "lack": [
+    "m400136 Resident Evil: Vendetta",
+    "m1083862 Resident Evil: Death Island"
+   ]
+  },
+  {
+   "k": "m361743",
+   "t": "Top Gun: Maverick",
+   "col": "Top Gun",
+   "world": "Top Gun universe",
+   "extra": [],
+   "lack": [
+    "m1229934 m1229934"
+   ]
+  },
+  {
+   "k": "m133121",
+   "t": "Resident Evil: Damnation",
+   "col": "Resident Evil (Animated)",
+   "world": "Resident Evil universe",
+   "extra": [
+    "m1576 Resident Evil",
+    "m1577 Resident Evil: Apocalypse",
+    "m7737 Resident Evil: Extinction",
+    "m35791 Resident Evil: Afterlife",
+    "m71679 Resident Evil: Retribution",
+    "m173897 Resident Evil: The Final Chapter",
+    "m460458 Resident Evil: Welcome to Raccoon City"
+   ],
+   "lack": [
+    "m400136 Resident Evil: Vendetta",
+    "m1083862 Resident Evil: Death Island"
+   ]
+  },
+  {
+   "k": "m512200",
+   "t": "Jumanji: The Next Level",
+   "col": "Jumanji",
+   "world": "Jumanji",
+   "extra": [
+    "t2118 Jumanji",
+    "m6795 Zathura: A Space Adventure"
+   ],
+   "lack": [
+    "m1260649 m1260649"
+   ]
+  },
+  {
+   "k": "m315162",
+   "t": "Puss in Boots: The Last Wish",
+   "col": "Puss in Boots",
+   "world": "Shrek",
+   "extra": [
+    "m808 Shrek",
+    "m26840 Shrek in the Swamp Karaoke Dance Party",
+    "m25523 Shrek 3-D",
+    "m809 Shrek 2",
+    "m810 Shrek the Third",
+    "m13394 Shrek the Halls",
+    "m10192 Shrek Forever After",
+    "m48466 Scared Shrekless",
+    "m51256 Donkey's Christmas Shrektacular",
+    "m82530 The Pig Who Cried Werewolf",
+    "m83201 Puss in Boots: The Three Diablos",
+    "t61886 The Adventures of Puss in Boots",
+    "m421892 Shrek 5"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m458156",
+   "t": "John Wick: Chapter 3 - Parabellum",
+   "col": "John Wick",
+   "world": "John Wick",
+   "extra": [
+    "m1457759 John Wick: Chapter 5"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m603692",
+   "t": "John Wick: Chapter 4",
+   "col": "John Wick",
+   "world": "John Wick",
+   "extra": [
+    "m1457759 John Wick: Chapter 5"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m569094",
+   "t": "Spider-Man: Across the Spider-Verse",
+   "col": "Spider-Man: Spider-Verse",
+   "world": "Spider-Verse",
+   "extra": [
+    "m1106299 The Spider Within: A Spider-Verse Story"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m609681",
+   "t": "The Marvels",
+   "col": "Captain Marvel",
+   "world": "Marvel Cinematic Universe",
+   "extra": [
+    "m1726 Iron Man",
+    "m1724 The Incredible Hulk",
+    "m10138 Iron Man 2",
+    "m10195 Thor",
+    "m1771 Captain America: The First Avenger",
+    "m24428 The Avengers",
+    "m68721 Iron Man 3",
+    "t1403 Marvel's Agents of S.H.I.E.L.D.",
+    "m76338 Thor: The Dark World",
+    "m100402 Captain America: The Winter Soldier",
+    "m118340 Guardians of the Galaxy",
+    "t61550 Marvel's Agent Carter",
+    "t61889 Marvel's Daredevil",
+    "m99861 Avengers: Age of Ultron",
+    "t69069 WHIH Newsfront",
+    "m102899 Ant-Man",
+    "t38472 Marvel's Jessica Jones",
+    "m271110 Captain America: Civil War",
+    "m413279 Team Thor",
+    "t62126 Marvel's Luke Cage",
+    "m284052 Doctor Strange",
+    "t62127 Marvel's Iron Fist",
+    "m283995 Guardians of the Galaxy Vol. 2",
+    "m315635 Spider-Man: Homecoming",
+    "t62285 Marvel's The Defenders",
+    "t68716 Marvel's Inhumans",
+    "m284053 Thor: Ragnarok",
+    "t67178 Marvel's The Punisher",
+    "t67466 Marvel's Runaways",
+    "m284054 Black Panther",
+    "m505945 Team Darryl",
+    "m299536 Avengers: Infinity War",
+    "t66190 Marvel's Cloak & Dagger",
+    "m363088 Ant-Man and the Wasp",
+    "m299534 Avengers: Endgame",
+    "m429617 Spider-Man: Far From Home",
+    "t88987 Helstrom",
+    "t85271 WandaVision",
+    "t88396 The Falcon and the Winter Soldier",
+    "t84958 Loki",
+    "m497698 Black Widow",
+    "t91363 What If...?",
+    "m566525 Shang-Chi and the Legend of the Ten Rings",
+    "m524434 Eternals",
+    "t88329 Hawkeye",
+    "m634649 Spider-Man: No Way Home",
+    "m453395 Doctor Strange in the Multiverse of Madness",
+    "t92782 Ms. Marvel",
+    "m616037 Thor: Love and Thunder",
+    "t92783 She-Hulk: Attorney at Law",
+    "m894205 Werewolf by Night",
+    "m505642 Black Panther: Wakanda Forever",
+    "m774752 The Guardians of the Galaxy Holiday Special",
+    "m640146 Ant-Man and the Wasp: Quantumania",
+    "m447365 Guardians of the Galaxy Vol. 3",
+    "t114472 Secret Invasion",
+    "t122226 Echo",
+    "m533535 Deadpool & Wolverine",
+    "t138501 Agatha All Along",
+    "m822119 Captain America: Brave New World",
+    "t202555 Daredevil: Born Again",
+    "m986056 Thunderbolts*",
+    "t114471 Ironheart",
+    "m617126 The Fantastic 4: First Steps",
+    "t198178 Wonder Man",
+    "m969681 Spider-Man: Brand New Day",
+    "t213375 VisionQuest",
+    "m1003596 Avengers: Doomsday",
+    "m1003598 Avengers: Secret Wars",
+    "m1293690 Untitled X-Men Film",
+    "m1386618 Black Panther 3"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m124905",
+   "t": "Godzilla",
+   "col": "Godzilla",
+   "world": "MonsterVerse",
+   "extra": [
+    "m293167 Kong: Skull Island",
+    "m823464 Godzilla x Kong: The New Empire",
+    "m1288438 Godzilla x Kong: Supernova",
+    "t202411 Monarch: Legacy of Monsters"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m293167",
+   "t": "Kong: Skull Island",
+   "col": "Godzilla x Kong",
+   "world": "MonsterVerse",
+   "extra": [
+    "m124905 Godzilla",
+    "m373571 Godzilla: King of the Monsters",
+    "m399566 Godzilla vs. Kong",
+    "t202411 Monarch: Legacy of Monsters"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m373571",
+   "t": "Godzilla: King of the Monsters",
+   "col": "Godzilla",
+   "world": "MonsterVerse",
+   "extra": [
+    "m293167 Kong: Skull Island",
+    "m823464 Godzilla x Kong: The New Empire",
+    "m1288438 Godzilla x Kong: Supernova",
+    "t202411 Monarch: Legacy of Monsters"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m399566",
+   "t": "Godzilla vs. Kong",
+   "col": "Godzilla",
+   "world": "MonsterVerse",
+   "extra": [
+    "m293167 Kong: Skull Island",
+    "m823464 Godzilla x Kong: The New Empire",
+    "m1288438 Godzilla x Kong: Supernova",
+    "t202411 Monarch: Legacy of Monsters"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m64688",
+   "t": "21 Jump Street",
+   "col": "Jump Street",
+   "world": "Jump Street",
+   "extra": [
+    "t1486 21 Jump Street"
+   ],
+   "lack": [
+    "m1712303 m1712303"
+   ]
+  },
+  {
+   "k": "m187017",
+   "t": "22 Jump Street",
+   "col": "Jump Street",
+   "world": "Jump Street",
+   "extra": [
+    "t1486 21 Jump Street"
+   ],
+   "lack": [
+    "m1712303 m1712303"
+   ]
+  },
+  {
+   "k": "m533535",
+   "t": "Deadpool & Wolverine",
+   "col": "Deadpool",
+   "world": "Wolverine",
+   "extra": [
+    "m2080 X-Men Origins: Wolverine",
+    "m76170 The Wolverine",
+    "m263115 Logan"
+   ],
+   "lack": [
+    "m293660 Deadpool",
+    "m383498 Deadpool 2"
+   ]
+  },
+  {
+   "k": "m552524",
+   "t": "Lilo & Stitch",
+   "col": "Lilo & Stitch (Live-Action)",
+   "world": "Lilo & Stitch",
+   "extra": [
+    "m11544 Lilo & Stitch",
+    "m15567 Stitch! The Movie",
+    "t2355 Lilo & Stitch: The Series",
+    "m20760 Lilo & Stitch 2: Stitch Has a Glitch",
+    "m120115 The Origin of Stitch",
+    "m21316 Leroy & Stitch",
+    "t20757 Stitch!"
+   ],
+   "lack": [
+    "m1504349 m1504349"
+   ]
+  },
+  {
+   "k": "m439079",
+   "t": "The Nun",
+   "col": "The Nun",
+   "world": "The Conjuring Universe",
+   "extra": [
+    "m138843 The Conjuring",
+    "m250546 Annabelle",
+    "m259693 The Conjuring 2",
+    "m396422 Annabelle: Creation",
+    "m471501 The Nurse",
+    "m480414 The Curse of La Llorona",
+    "m521029 Annabelle Comes Home",
+    "m423108 The Conjuring: The Devil Made Me Do It",
+    "m1038392 The Conjuring: Last Rites"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m38757",
+   "t": "Tangled",
+   "col": "Tangled",
+   "world": "Tangled",
+   "extra": [
+    "m82881 Tangled Ever After",
+    "t70047 Rapunzel's Tangled Adventure"
+   ],
+   "lack": [
+    "m438747 Tangled: Before Ever After"
+   ]
+  },
+  {
+   "k": "m1084244",
+   "t": "Toy Story 5",
+   "col": "Toy Story",
+   "world": "Toy Story",
+   "extra": [
+    "m16187 Buzz Lightyear of Star Command: The Adventure Begins",
+    "t3744 Buzz Lightyear of Star Command",
+    "m594530 Lamp Life",
+    "m718789 Lightyear"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m436969",
+   "t": "The Suicide Squad",
+   "col": "Suicide Squad",
+   "world": "DC Extended Universe",
+   "extra": [
+    "m49521 Man of Steel",
+    "m209112 Batman v Superman: Dawn of Justice",
+    "m297762 Wonder Woman",
+    "m141052 Justice League",
+    "m297802 Aquaman",
+    "m287947 Shazam!",
+    "m495764 Birds of Prey (and the Fantabulous Emancipation of One Harley Quinn)",
+    "m464052 Wonder Woman 1984",
+    "m436270 Black Adam",
+    "m594767 Shazam! Fury of the Gods",
+    "m565770 Blue Beetle",
+    "m572802 Aquaman and the Lost Kingdom",
+    "t110492 Peacemaker",
+    "m298618 The Flash"
+   ],
+   "lack": []
+  },
+  {
+   "k": "m1061474",
+   "t": "Superman",
+   "col": "Superman (DCU)",
+   "world": "DC Universe",
+   "extra": [
+    "t110492 Peacemaker",
+    "t219543 Creature Commandos",
+    "m1081003 Supergirl",
+    "m1400940 Clayface",
+    "t332083 The People v. Gorilla Grodd"
+   ],
+   "lack": [
+    "m1523140 m1523140"
+   ]
   }
  ],
  "related": [
@@ -1251,8 +6040,8 @@
     "sibling:Mortal Kombat Legends: Scorpion's Revenge",
     "sibling:Mortal Kombat: Annihilation",
     "sibling:Mortal Kombat: Conquest",
-    "sibling:Mortal Kombat: Defenders of the Realm",
     "sibling:Mortal Kombat: Legacy",
+    "sibling:Mortal Kombat: Defenders of the Realm",
     "sibling:Mortal Kombat: The Journey Begins"
    ],
    "src": [
@@ -1738,8 +6527,8 @@
     "sibling:Untitled James Bond Film*"
    ],
    "src": [
-    "novels:James Bond",
-    "story:Quantum of Solace"
+    "story:Quantum of Solace",
+    "novels:James Bond"
    ]
   },
   {
@@ -2585,8 +7374,8 @@
     "sibling:Toto: The Dog-Gone Amazing Story of Wizard of Oz"
    ],
    "src": [
-    "musical:Wicked",
     "novel:The Wonderful Wizard of Oz",
+    "musical:Wicked",
     "novel:Wicked"
    ]
   },
@@ -3031,7 +7820,7 @@
    "k": "m805320",
    "t": "Bird Box Barcelona",
    "rel": [
-    "original:Bird Box"
+    "original:Bird Box*"
    ],
    "src": []
   },
@@ -3399,6 +8188,1181 @@
    "src": [
     "book:Fantastic Beasts: The Secrets of Dumbledore — The Original Screenplay"
    ]
+  },
+  {
+   "k": "m259316",
+   "t": "Fantastic Beasts and Where to Find Them",
+   "rel": [],
+   "src": [
+    "book:Fantastic Beasts and Where to Find Them: The Original Screenplay"
+   ]
+  },
+  {
+   "k": "m278927",
+   "t": "The Jungle Book",
+   "rel": [
+    "sibling:The Jungle Book",
+    "sibling:Mowgli: Legend of the Jungle*",
+    "sibling:The Jungle Book 2",
+    "sibling:The Jungle Book",
+    "sibling:Jungle Book",
+    "sibling:The Adventures of Mowgli",
+    "sibling:The Jungle Book: Mowgli's Story",
+    "sibling:The Second Jungle Book: Mowgli & Baloo",
+    "sibling:The Jungle Book: The Adventures of Mowgli"
+   ],
+   "src": [
+    "story:The Jungle Book"
+   ]
+  },
+  {
+   "k": "m308531",
+   "t": "Teenage Mutant Ninja Turtles: Out of the Shadows",
+   "rel": [],
+   "src": [
+    "comic:Teenage Mutant Ninja Turtles"
+   ]
+  },
+  {
+   "k": "m400106",
+   "t": "Bright",
+   "rel": [
+    "derived:Bright: Samurai Soul"
+   ],
+   "src": []
+  },
+  {
+   "k": "m603",
+   "t": "The Matrix",
+   "rel": [
+    "derived:The Animatrix"
+   ],
+   "src": []
+  },
+  {
+   "k": "m9806",
+   "t": "The Incredibles",
+   "rel": [
+    "derived:Mr. Incredible and Pals"
+   ],
+   "src": []
+  },
+  {
+   "k": "m207703",
+   "t": "Kingsman: The Secret Service",
+   "rel": [],
+   "src": [
+    "comic:The Secret Service"
+   ]
+  },
+  {
+   "k": "m585",
+   "t": "Monsters, Inc.",
+   "rel": [
+    "derived:Mike's New Car"
+   ],
+   "src": []
+  },
+  {
+   "k": "m426284",
+   "t": "Blade of the Immortal",
+   "rel": [
+    "sibling:Blade of the Immortal",
+    "sibling:Blade of the Immortal"
+   ],
+   "src": [
+    "manga:Blade of the Immortal"
+   ]
+  },
+  {
+   "k": "m426285",
+   "t": "Fullmetal Alchemist",
+   "rel": [],
+   "src": [
+    "manga:Fullmetal Alchemist"
+   ]
+  },
+  {
+   "k": "m353486",
+   "t": "Jumanji: Welcome to the Jungle",
+   "rel": [],
+   "src": [
+    "book:Jumanji"
+   ]
+  },
+  {
+   "k": "m220447",
+   "t": "Black Butler",
+   "rel": [
+    "sibling:Black Butler",
+    "sibling:Black Butler: Book of the Atlantic"
+   ],
+   "src": [
+    "manga:Black Butler"
+   ]
+  },
+  {
+   "k": "m11045",
+   "t": "Taxi",
+   "rel": [
+    "original:Taxi"
+   ],
+   "src": []
+  },
+  {
+   "k": "m72105",
+   "t": "Ted",
+   "rel": [
+    "derived:Made in Egypt"
+   ],
+   "src": []
+  },
+  {
+   "k": "m771",
+   "t": "Home Alone",
+   "rel": [
+    "derived:Home Sweet Home Alone"
+   ],
+   "src": []
+  },
+  {
+   "k": "m257344",
+   "t": "Pixels",
+   "rel": [
+    "original:Pixels"
+   ],
+   "src": []
+  },
+  {
+   "k": "m346364",
+   "t": "It",
+   "rel": [
+    "sibling:IT: Welcome to Derry"
+   ],
+   "src": [
+    "novel:It"
+   ]
+  },
+  {
+   "k": "m433251",
+   "t": "Naked",
+   "rel": [
+    "original:Naked"
+   ],
+   "src": []
+  },
+  {
+   "k": "m9298",
+   "t": "Ali G Indahouse",
+   "rel": [
+    "original:Da Ali G Show"
+   ],
+   "src": []
+  },
+  {
+   "k": "m485415",
+   "t": "Day of the Dead: Bloodline",
+   "rel": [
+    "original:Day of the Dead"
+   ],
+   "src": []
+  },
+  {
+   "k": "m299687",
+   "t": "The 5th Wave",
+   "rel": [],
+   "src": [
+    "novel:The 5th Wave"
+   ]
+  },
+  {
+   "k": "m23168",
+   "t": "The Town",
+   "rel": [],
+   "src": [
+    "book:Prince of Thieves"
+   ]
+  },
+  {
+   "k": "m118340",
+   "t": "Guardians of the Galaxy",
+   "rel": [
+    "derived:Marvel's Guardians of the Galaxy"
+   ],
+   "src": []
+  },
+  {
+   "k": "m198663",
+   "t": "The Maze Runner",
+   "rel": [],
+   "src": [
+    "novel:The Maze Runner"
+   ]
+  },
+  {
+   "k": "m294254",
+   "t": "Maze Runner: The Scorch Trials",
+   "rel": [],
+   "src": [
+    "novel:The Scorch Trials"
+   ]
+  },
+  {
+   "k": "m1865",
+   "t": "Pirates of the Caribbean: On Stranger Tides",
+   "rel": [],
+   "src": [
+    "novel:On Stranger Tides"
+   ]
+  },
+  {
+   "k": "m120",
+   "t": "The Lord of the Rings: The Fellowship of the Ring",
+   "rel": [],
+   "src": [
+    "novel:The Fellowship of the Ring"
+   ]
+  },
+  {
+   "k": "m122",
+   "t": "The Lord of the Rings: The Return of the King",
+   "rel": [
+    "sibling:The Return of the King"
+   ],
+   "src": [
+    "novel:The Return of the King"
+   ]
+  },
+  {
+   "k": "m121",
+   "t": "The Lord of the Rings: The Two Towers",
+   "rel": [],
+   "src": [
+    "novel:The Two Towers"
+   ]
+  },
+  {
+   "k": "m156022",
+   "t": "The Equalizer",
+   "rel": [
+    "original:The Equalizer"
+   ],
+   "src": []
+  },
+  {
+   "k": "m333339",
+   "t": "Ready Player One",
+   "rel": [],
+   "src": [
+    "novel:Ready Player One"
+   ]
+  },
+  {
+   "k": "m136797",
+   "t": "Need for Speed",
+   "rel": [],
+   "src": [
+    "games:Need for Speed"
+   ]
+  },
+  {
+   "k": "m146239",
+   "t": "Delivery Man",
+   "rel": [
+    "original:Starbuck"
+   ],
+   "src": []
+  },
+  {
+   "k": "m44826",
+   "t": "Hugo",
+   "rel": [],
+   "src": [
+    "novel:The Invention of Hugo Cabret"
+   ]
+  },
+  {
+   "k": "m39514",
+   "t": "RED",
+   "rel": [],
+   "src": [
+    "comic:Red"
+   ]
+  },
+  {
+   "k": "m14160",
+   "t": "Up",
+   "rel": [
+    "derived:Dug Days",
+    "derived:Dug's Special Mission",
+    "derived:Carl's Date"
+   ],
+   "src": []
+  },
+  {
+   "k": "m117",
+   "t": "The Untouchables",
+   "rel": [
+    "sibling:The Untouchables"
+   ],
+   "src": [
+    "book:The Untouchables"
+   ]
+  },
+  {
+   "k": "m137113",
+   "t": "Edge of Tomorrow",
+   "rel": [
+    "sibling:ALL YOU NEED IS KILL"
+   ],
+   "src": [
+    "novel:All You Need Is Kill"
+   ]
+  },
+  {
+   "k": "m336843",
+   "t": "Maze Runner: The Death Cure",
+   "rel": [],
+   "src": [
+    "novel:The Death Cure"
+   ]
+  },
+  {
+   "k": "m752",
+   "t": "V for Vendetta",
+   "rel": [],
+   "src": [
+    "comic:V for Vendetta"
+   ]
+  },
+  {
+   "k": "m10137",
+   "t": "Stuart Little",
+   "rel": [],
+   "src": [
+    "book:Stuart Little"
+   ]
+  },
+  {
+   "k": "m10996",
+   "t": "Stuart Little 2",
+   "rel": [],
+   "src": [
+    "book:Stuart Little"
+   ]
+  },
+  {
+   "k": "m407436",
+   "t": "Mowgli: Legend of the Jungle",
+   "rel": [
+    "sibling:The Jungle Book*",
+    "sibling:The Jungle Book",
+    "sibling:The Jungle Book 2",
+    "sibling:The Jungle Book",
+    "sibling:Jungle Book",
+    "sibling:The Adventures of Mowgli",
+    "sibling:The Jungle Book: Mowgli's Story",
+    "sibling:The Second Jungle Book: Mowgli & Baloo",
+    "sibling:The Jungle Book: The Adventures of Mowgli"
+   ],
+   "src": [
+    "story:The Jungle Book"
+   ]
+  },
+  {
+   "k": "m77",
+   "t": "Memento",
+   "rel": [
+    "derived:A Break We'll Be Right Back"
+   ],
+   "src": [
+    "story:Memento Mori"
+   ]
+  },
+  {
+   "k": "m1726",
+   "t": "Iron Man",
+   "rel": [
+    "derived:WHIH Newsfront"
+   ],
+   "src": []
+  },
+  {
+   "k": "m479",
+   "t": "Shaft",
+   "rel": [],
+   "src": [
+    "novel:Shaft"
+   ]
+  },
+  {
+   "k": "m211387",
+   "t": "Marvel One-Shot: Agent Carter",
+   "rel": [
+    "derived:Marvel's Agent Carter"
+   ],
+   "src": []
+  },
+  {
+   "k": "m531503",
+   "t": "Point Blank",
+   "rel": [
+    "original:Point Blank"
+   ],
+   "src": []
+  },
+  {
+   "k": "m110415",
+   "t": "Snowpiercer",
+   "rel": [
+    "derived:Snowpiercer"
+   ],
+   "src": [
+    "comic:Le Transperceneige"
+   ]
+  },
+  {
+   "k": "m238",
+   "t": "The Godfather",
+   "rel": [
+    "sibling:Mario Puzo's The Godfather: The Complete Novel for Television"
+   ],
+   "src": [
+    "novel:The Godfather"
+   ]
+  },
+  {
+   "k": "m240",
+   "t": "The Godfather Part II",
+   "rel": [
+    "sibling:Mario Puzo's The Godfather: The Complete Novel for Television"
+   ],
+   "src": [
+    "novel:The Godfather"
+   ]
+  },
+  {
+   "k": "m242",
+   "t": "The Godfather Part III",
+   "rel": [
+    "sibling:Mario Puzo's The Godfather: The Complete Novel for Television"
+   ],
+   "src": [
+    "novel:The Godfather"
+   ]
+  },
+  {
+   "k": "m127585",
+   "t": "X-Men: Days of Future Past",
+   "rel": [],
+   "src": [
+    "comic:Days of Future Past"
+   ]
+  },
+  {
+   "k": "m281957",
+   "t": "The Revenant",
+   "rel": [],
+   "src": [
+    "novel:The Revenant"
+   ]
+  },
+  {
+   "k": "m16523",
+   "t": "Where the Wild Things Are",
+   "rel": [],
+   "src": [
+    "book:Where the Wild Things Are"
+   ]
+  },
+  {
+   "k": "m383498",
+   "t": "Deadpool 2",
+   "rel": [
+    "derived:Once Upon a Deadpool"
+   ],
+   "src": []
+  },
+  {
+   "k": "m320288",
+   "t": "Dark Phoenix",
+   "rel": [],
+   "src": [
+    "comic:The Dark Phoenix Saga"
+   ]
+  },
+  {
+   "k": "m545609",
+   "t": "Extraction",
+   "rel": [],
+   "src": [
+    "comic:Ciudad"
+   ]
+  },
+  {
+   "k": "m447404",
+   "t": "Pokémon Detective Pikachu",
+   "rel": [],
+   "src": [
+    "game:Detective Pikachu"
+   ]
+  },
+  {
+   "k": "m581600",
+   "t": "Spenser Confidential",
+   "rel": [],
+   "src": [
+    "book:Robert B. Parker's Wonderland"
+   ]
+  },
+  {
+   "k": "m948",
+   "t": "Halloween",
+   "rel": [
+    "derived:Halloween*"
+   ],
+   "src": []
+  },
+  {
+   "k": "m398978",
+   "t": "The Irishman",
+   "rel": [],
+   "src": [
+    "book:I Heard You Paint Houses"
+   ]
+  },
+  {
+   "k": "m22794",
+   "t": "Cloudy with a Chance of Meatballs",
+   "rel": [],
+   "src": [
+    "book:Cloudy with a Chance of Meatballs"
+   ]
+  },
+  {
+   "k": "m109451",
+   "t": "Cloudy with a Chance of Meatballs 2",
+   "rel": [],
+   "src": [
+    "book:Cloudy with a Chance of Meatballs"
+   ]
+  },
+  {
+   "k": "m146216",
+   "t": "RED 2",
+   "rel": [],
+   "src": [
+    "comic:Red"
+   ]
+  },
+  {
+   "k": "m862",
+   "t": "Toy Story",
+   "rel": [
+    "derived:Lightyear"
+   ],
+   "src": []
+  },
+  {
+   "k": "m2082",
+   "t": "Halloween",
+   "rel": [
+    "original:Halloween*"
+   ],
+   "src": []
+  },
+  {
+   "k": "m575604",
+   "t": "The Call",
+   "rel": [
+    "original:The Caller"
+   ],
+   "src": []
+  },
+  {
+   "k": "m527261",
+   "t": "The Silence",
+   "rel": [],
+   "src": [
+    "book:The Silence"
+   ]
+  },
+  {
+   "k": "m405774",
+   "t": "Bird Box",
+   "rel": [
+    "derived:Bird Box Barcelona*"
+   ],
+   "src": [
+    "novel:Bird Box"
+   ]
+  },
+  {
+   "k": "m1124",
+   "t": "The Prestige",
+   "rel": [],
+   "src": [
+    "novel:The Prestige"
+   ]
+  },
+  {
+   "k": "m647",
+   "t": "Final Fantasy VII: Advent Children",
+   "rel": [],
+   "src": [
+    "game:Final Fantasy VII"
+   ]
+  },
+  {
+   "k": "m390734",
+   "t": "Kingsglaive: Final Fantasy XV",
+   "rel": [],
+   "src": [
+    "game:Final Fantasy XV"
+   ]
+  },
+  {
+   "k": "m547016",
+   "t": "The Old Guard",
+   "rel": [],
+   "src": [
+    "comic:The Old Guard"
+   ]
+  },
+  {
+   "k": "m460465",
+   "t": "Mortal Kombat",
+   "rel": [
+    "sibling:Mortal Kombat: Defenders of the Realm"
+   ],
+   "src": [
+    "games:Mortal Kombat",
+    "game:Mortal Kombat X"
+   ]
+  },
+  {
+   "k": "m80274",
+   "t": "Ender's Game",
+   "rel": [],
+   "src": [
+    "novel:Ender's Game",
+    "novel:Ender's Shadow"
+   ]
+  },
+  {
+   "k": "m497582",
+   "t": "Enola Holmes",
+   "rel": [],
+   "src": [
+    "novels:The Enola Holmes Mysteries"
+   ]
+  },
+  {
+   "k": "m300671",
+   "t": "13 Hours: The Secret Soldiers of Benghazi",
+   "rel": [],
+   "src": [
+    "book:13 Hours: The Inside Account of What Really Happened in Benghazi"
+   ]
+  },
+  {
+   "k": "m169917",
+   "t": "A Walk Among the Tombstones",
+   "rel": [],
+   "src": [
+    "novel:A Walk Among the Tombstones"
+   ]
+  },
+  {
+   "k": "m607259",
+   "t": "Fatherhood",
+   "rel": [],
+   "src": [
+    "book:Two Kisses for Maddy: A Memoir of Loss and Love"
+   ]
+  },
+  {
+   "k": "m105",
+   "t": "Back to the Future",
+   "rel": [
+    "derived:Partner",
+    "derived:Sameer & Shaheer & Baheer"
+   ],
+   "src": []
+  },
+  {
+   "k": "m1271",
+   "t": "300",
+   "rel": [],
+   "src": [
+    "comic:300"
+   ]
+  },
+  {
+   "k": "m53182",
+   "t": "300: Rise of an Empire",
+   "rel": [],
+   "src": [
+    "comic:Xerxes"
+   ]
+  },
+  {
+   "k": "m51876",
+   "t": "Limitless",
+   "rel": [
+    "derived:Limitless"
+   ],
+   "src": [
+    "novel:The Dark Fields"
+   ]
+  },
+  {
+   "k": "m190859",
+   "t": "American Sniper",
+   "rel": [],
+   "src": [
+    "book:American Sniper"
+   ]
+  },
+  {
+   "k": "m13183",
+   "t": "Watchmen",
+   "rel": [
+    "sibling:Watchmen: Chapter I",
+    "sibling:Watchmen: Chapter II",
+    "sibling:Watchmen: Motion Comic"
+   ],
+   "src": [
+    "comic:Watchmen"
+   ]
+  },
+  {
+   "k": "m454626",
+   "t": "Sonic the Hedgehog",
+   "rel": [
+    "sibling:Sonic Prime",
+    "sibling:Sonic Underground"
+   ],
+   "src": [
+    "games:Sonic the Hedgehog"
+   ]
+  },
+  {
+   "k": "m2109",
+   "t": "Rush Hour",
+   "rel": [
+    "derived:Rush Hour"
+   ],
+   "src": []
+  },
+  {
+   "k": "m666243",
+   "t": "The Witcher: Nightmare of the Wolf",
+   "rel": [],
+   "src": [
+    "novels:The Witcher"
+   ]
+  },
+  {
+   "k": "m9502",
+   "t": "Kung Fu Panda",
+   "rel": [
+    "derived:Kung Fu Panda: Secrets of the Furious Five"
+   ],
+   "src": []
+  },
+  {
+   "k": "m10191",
+   "t": "How to Train Your Dragon",
+   "rel": [
+    "derived:How to Train Your Dragon*",
+    "derived:DreamWorks Dragons",
+    "derived:Dragons: Gift of the Night Fury",
+    "sibling:How to Train Your Dragon 2"
+   ],
+   "src": [
+    "book:How to Train Your Dragon",
+    "novels:How to Train Your Dragon"
+   ]
+  },
+  {
+   "k": "m82702",
+   "t": "How to Train Your Dragon 2",
+   "rel": [
+    "derived:How to Train Your Dragon 2"
+   ],
+   "src": [
+    "novels:How to Train Your Dragon"
+   ]
+  },
+  {
+   "k": "m920",
+   "t": "Cars",
+   "rel": [
+    "derived:Mater and the Ghostlight"
+   ],
+   "src": []
+  },
+  {
+   "k": "m10674",
+   "t": "Mulan",
+   "rel": [
+    "derived:Mulan"
+   ],
+   "src": []
+  },
+  {
+   "k": "m11688",
+   "t": "The Emperor's New Groove",
+   "rel": [
+    "derived:The Emperor's New School"
+   ],
+   "src": [
+    "film:Kingdom of the Sun"
+   ]
+  },
+  {
+   "k": "m109445",
+   "t": "Frozen",
+   "rel": [
+    "derived:LEGO Frozen Northern Lights",
+    "sibling:The Snow Queen",
+    "sibling:The Snow Queen",
+    "sibling:Snow Queen",
+    "sibling:The Snow Queen",
+    "sibling:The Snow Queen"
+   ],
+   "src": [
+    "tale:The Snow Queen"
+   ]
+  },
+  {
+   "k": "m228161",
+   "t": "Home",
+   "rel": [
+    "derived:Home: Adventures with Tip & Oh"
+   ],
+   "src": [
+    "book:The True Meaning of Smekday"
+   ]
+  },
+  {
+   "k": "m137106",
+   "t": "The Lego Movie",
+   "rel": [
+    "derived:The Lego Batman Movie",
+    "derived:Unikitty!"
+   ],
+   "src": []
+  },
+  {
+   "k": "m37135",
+   "t": "Tarzan",
+   "rel": [
+    "sibling:Greystoke: The Legend of Tarzan, Lord of the Apes",
+    "sibling:Tarzan the Ape Man",
+    "sibling:Tarzan the Ape Man",
+    "sibling:Tarzan of the Apes"
+   ],
+   "src": [
+    "novel:Tarzan of the Apes"
+   ]
+  },
+  {
+   "k": "m137116",
+   "t": "Smurfs: The Lost Village",
+   "rel": [],
+   "src": [
+    "comic:The Smurfs"
+   ]
+  },
+  {
+   "k": "m68735",
+   "t": "Warcraft",
+   "rel": [],
+   "src": [
+    "game:Warcraft III: Reign of Chaos"
+   ]
+  },
+  {
+   "k": "m137",
+   "t": "Groundhog Day",
+   "rel": [
+    "derived:1000 Mabrouk"
+   ],
+   "src": []
+  },
+  {
+   "k": "m277216",
+   "t": "Straight Outta Compton",
+   "rel": [],
+   "src": [
+    "musical:N.W.A."
+   ]
+  },
+  {
+   "k": "m756999",
+   "t": "The Black Phone",
+   "rel": [],
+   "src": [
+    "story:The Black Phone"
+   ]
+  },
+  {
+   "k": "m725201",
+   "t": "The Gray Man",
+   "rel": [],
+   "src": [
+    "novel:The Gray Man"
+   ]
+  },
+  {
+   "k": "m512200",
+   "t": "Jumanji: The Next Level",
+   "rel": [],
+   "src": [
+    "book:Jumanji"
+   ]
+  },
+  {
+   "k": "m829280",
+   "t": "Enola Holmes 2",
+   "rel": [],
+   "src": [
+    "novels:The Enola Holmes Mysteries"
+   ]
+  },
+  {
+   "k": "m718930",
+   "t": "Bullet Train",
+   "rel": [],
+   "src": [
+    "book:Bullet Train"
+   ]
+  },
+  {
+   "k": "m64690",
+   "t": "Drive",
+   "rel": [],
+   "src": [
+    "novel:Drive"
+   ]
+  },
+  {
+   "k": "m559969",
+   "t": "El Camino: A Breaking Bad Movie",
+   "rel": [
+    "original:Breaking Bad"
+   ],
+   "src": []
+  },
+  {
+   "k": "m502356",
+   "t": "The Super Mario Bros. Movie",
+   "rel": [
+    "sibling:Super Mario Brothers: Great Mission to Rescue Princess Peach"
+   ],
+   "src": [
+    "games:Mario"
+   ]
+  },
+  {
+   "k": "m205596",
+   "t": "The Imitation Game",
+   "rel": [],
+   "src": [
+    "book:Alan Turing: The Enigma"
+   ]
+  },
+  {
+   "k": "m632856",
+   "t": "Spirited",
+   "rel": [],
+   "src": [
+    "story:A Christmas Carol"
+   ]
+  },
+  {
+   "k": "m776503",
+   "t": "CODA",
+   "rel": [
+    "original:The Bélier Family"
+   ],
+   "src": []
+  },
+  {
+   "k": "m64688",
+   "t": "21 Jump Street",
+   "rel": [
+    "original:21 Jump Street"
+   ],
+   "src": []
+  },
+  {
+   "k": "m187017",
+   "t": "22 Jump Street",
+   "rel": [
+    "original:21 Jump Street"
+   ],
+   "src": []
+  },
+  {
+   "k": "m359410",
+   "t": "Road House",
+   "rel": [
+    "original:Road House"
+   ],
+   "src": []
+  },
+  {
+   "k": "m365177",
+   "t": "Borderlands",
+   "rel": [],
+   "src": [
+    "games:Borderlands"
+   ]
+  },
+  {
+   "k": "m950387",
+   "t": "A Minecraft Movie",
+   "rel": [],
+   "src": [
+    "game:Minecraft"
+   ]
+  },
+  {
+   "k": "m552524",
+   "t": "Lilo & Stitch",
+   "rel": [
+    "original:Lilo & Stitch"
+   ],
+   "src": []
+  },
+  {
+   "k": "m1087192",
+   "t": "How to Train Your Dragon",
+   "rel": [
+    "original:How to Train Your Dragon*"
+   ],
+   "src": [
+    "book:How to Train Your Dragon"
+   ]
+  },
+  {
+   "k": "m1011477",
+   "t": "Karate Kid: Legends",
+   "rel": [
+    "original:The Karate Kid"
+   ],
+   "src": []
+  },
+  {
+   "k": "m882598",
+   "t": "Smile",
+   "rel": [
+    "original:Laura Hasn't Slept"
+   ],
+   "src": []
+  },
+  {
+   "k": "m339964",
+   "t": "Valerian and the City of a Thousand Planets",
+   "rel": [],
+   "src": [
+    "comic:Valérian and Laureline",
+    "comic:Ambassador of the Shadows"
+   ]
+  },
+  {
+   "k": "m941109",
+   "t": "Play Dirty",
+   "rel": [],
+   "src": [
+    "novels:Parker"
+   ]
+  },
+  {
+   "k": "m38757",
+   "t": "Tangled",
+   "rel": [
+    "derived:Tangled",
+    "sibling:Barbie as Rapunzel"
+   ],
+   "src": [
+    "tale:Rapunzel"
+   ]
+  },
+  {
+   "k": "m9506",
+   "t": "Anger Management",
+   "rel": [
+    "derived:Anger Management"
+   ],
+   "src": []
+  },
+  {
+   "k": "m341013",
+   "t": "Atomic Blonde",
+   "rel": [],
+   "src": [
+    "book:The Coldest City"
+   ]
+  },
+  {
+   "k": "m687163",
+   "t": "Project Hail Mary",
+   "rel": [],
+   "src": [
+    "novel:Project Hail Mary"
+   ]
+  },
+  {
+   "k": "m1083381",
+   "t": "Backrooms",
+   "rel": [],
+   "src": [
+    "tale:The Backrooms"
+   ]
+  },
+  {
+   "k": "m1081003",
+   "t": "Supergirl",
+   "rel": [],
+   "src": [
+    "comic:Supergirl: Woman of Tomorrow"
+   ]
+  },
+  {
+   "k": "m969681",
+   "t": "Spider-Man: Brand New Day",
+   "rel": [],
+   "src": [
+    "comic:Spider-Man: Brand New Day"
+   ]
+  },
+  {
+   "k": "m75780",
+   "t": "Jack Reacher",
+   "rel": [],
+   "src": [
+    "novel:One Shot"
+   ]
+  },
+  {
+   "k": "m343611",
+   "t": "Jack Reacher: Never Go Back",
+   "rel": [],
+   "src": [
+    "novel:Never Go Back"
+   ]
+  },
+  {
+   "k": "m436969",
+   "t": "The Suicide Squad",
+   "rel": [
+    "derived:Peacemaker"
+   ],
+   "src": []
   }
  ],
  "noItem": [
@@ -4666,6 +10630,576 @@
    "k": "m1263337",
    "t": "Heart of the Beast",
    "y": 2026
+  },
+  {
+   "k": "m27205",
+   "t": "Inception",
+   "y": 2010
+  },
+  {
+   "k": "m194662",
+   "t": "Birdman or (The Unexpected Virtue of Ignorance)",
+   "y": 2014
+  },
+  {
+   "k": "m18501",
+   "t": "Gamer",
+   "y": 2009
+  },
+  {
+   "k": "m244786",
+   "t": "Whiplash",
+   "y": 2014
+  },
+  {
+   "k": "m27576",
+   "t": "Salt",
+   "y": 2010
+  },
+  {
+   "k": "m521647",
+   "t": "Darc",
+   "y": 2018
+  },
+  {
+   "k": "m503619",
+   "t": "The Package",
+   "y": 2018
+  },
+  {
+   "k": "m388",
+   "t": "Inside Man",
+   "y": 2006
+  },
+  {
+   "k": "m284427",
+   "t": "Who Am I",
+   "y": 2014
+  },
+  {
+   "k": "m206563",
+   "t": "Trash",
+   "y": 2014
+  },
+  {
+   "k": "m76493",
+   "t": "The Dictator",
+   "y": 2012
+  },
+  {
+   "k": "m433245",
+   "t": "Take the 10",
+   "y": 2017
+  },
+  {
+   "k": "m59961",
+   "t": "Safe House",
+   "y": 2012
+  },
+  {
+   "k": "m242582",
+   "t": "Nightcrawler",
+   "y": 2014
+  },
+  {
+   "k": "m339403",
+   "t": "Baby Driver",
+   "y": 2017
+  },
+  {
+   "k": "m7840",
+   "t": "10,000 BC",
+   "y": 2008
+  },
+  {
+   "k": "m47971",
+   "t": "xXx: Return of Xander Cage",
+   "y": 2017
+  },
+  {
+   "k": "m296216",
+   "t": "Inner Demon",
+   "y": 2014
+  },
+  {
+   "k": "m297222",
+   "t": "PK",
+   "y": 2014
+  },
+  {
+   "k": "m302699",
+   "t": "Central Intelligence",
+   "y": 2016
+  },
+  {
+   "k": "m455980",
+   "t": "Tag",
+   "y": 2018
+  },
+  {
+   "k": "m8909",
+   "t": "Wanted",
+   "y": 2008
+  },
+  {
+   "k": "m22164",
+   "t": "Blood and Bone",
+   "y": 2009
+  },
+  {
+   "k": "m40805",
+   "t": "The Green Hornet",
+   "y": 2011
+  },
+  {
+   "k": "m14423",
+   "t": "First Sunday",
+   "y": 2008
+  },
+  {
+   "k": "m252838",
+   "t": "The Wedding Ringer",
+   "y": 2015
+  },
+  {
+   "k": "m586347",
+   "t": "The Hard Way",
+   "y": 2019
+  },
+  {
+   "k": "m603519",
+   "t": "Beats",
+   "y": 2019
+  },
+  {
+   "k": "m591121",
+   "t": "Maria",
+   "y": 2019
+  },
+  {
+   "k": "m331313",
+   "t": "Keeping Up with the Joneses",
+   "y": 2016
+  },
+  {
+   "k": "m9470",
+   "t": "Kung Fu Hustle",
+   "y": 2004
+  },
+  {
+   "k": "m132232",
+   "t": "Mama",
+   "y": 2013
+  },
+  {
+   "k": "m486589",
+   "t": "Red Shoes and the Seven Dwarfs",
+   "y": 2019
+  },
+  {
+   "k": "m567973",
+   "t": "Furie",
+   "y": 2019
+  },
+  {
+   "k": "m11001",
+   "t": "Blue Streak",
+   "y": 1999
+  },
+  {
+   "k": "m199928",
+   "t": "The Outsider",
+   "y": 2018
+  },
+  {
+   "k": "m256311",
+   "t": "Stereo",
+   "y": 2014
+  },
+  {
+   "k": "m11078",
+   "t": "National Security",
+   "y": 2003
+  },
+  {
+   "k": "m62206",
+   "t": "30 Minutes or Less",
+   "y": 2011
+  },
+  {
+   "k": "m376658",
+   "t": "Love Beats Rhymes",
+   "y": 2017
+  },
+  {
+   "k": "m100",
+   "t": "Lock, Stock and Two Smoking Barrels",
+   "y": 1998
+  },
+  {
+   "k": "m807",
+   "t": "Se7en",
+   "y": 1995
+  },
+  {
+   "k": "m8363",
+   "t": "Superbad",
+   "y": 2007
+  },
+  {
+   "k": "m605116",
+   "t": "Project Power",
+   "y": 2020
+  },
+  {
+   "k": "m671039",
+   "t": "Rogue City",
+   "y": 2020
+  },
+  {
+   "k": "m157336",
+   "t": "Interstellar",
+   "y": 2014
+  },
+  {
+   "k": "m426426",
+   "t": "Roma",
+   "y": 2018
+  },
+  {
+   "k": "m615177",
+   "t": "Coffee & Kareem",
+   "y": 2020
+  },
+  {
+   "k": "m184346",
+   "t": "Deliver Us from Evil",
+   "y": 2014
+  },
+  {
+   "k": "m508018",
+   "t": "The Warning",
+   "y": 2018
+  },
+  {
+   "k": "m496243",
+   "t": "Parasite",
+   "y": 2019
+  },
+  {
+   "k": "m473033",
+   "t": "Uncut Gems",
+   "y": 2019
+  },
+  {
+   "k": "m309886",
+   "t": "Blood Father",
+   "y": 2016
+  },
+  {
+   "k": "m613658",
+   "t": "The Rescue",
+   "y": 2020
+  },
+  {
+   "k": "m509635",
+   "t": "Alone",
+   "y": 2020
+  },
+  {
+   "k": "m445571",
+   "t": "Game Night",
+   "y": 2018
+  },
+  {
+   "k": "m20662",
+   "t": "Robin Hood",
+   "y": 2010
+  },
+  {
+   "k": "m521935",
+   "t": "Cam",
+   "y": 2018
+  },
+  {
+   "k": "m192141",
+   "t": "No Escape",
+   "y": 2015
+  },
+  {
+   "k": "m550988",
+   "t": "Free Guy",
+   "y": 2021
+  },
+  {
+   "k": "m49530",
+   "t": "In Time",
+   "y": 2011
+  },
+  {
+   "k": "m240832",
+   "t": "Lucy",
+   "y": 2014
+  },
+  {
+   "k": "m760883",
+   "t": "Blood Red Sky",
+   "y": 2021
+  },
+  {
+   "k": "m503736",
+   "t": "Army of the Dead",
+   "y": 2021
+  },
+  {
+   "k": "m618162",
+   "t": "The Harder They Fall",
+   "y": 2021
+  },
+  {
+   "k": "m512195",
+   "t": "Red Notice",
+   "y": 2021
+  },
+  {
+   "k": "m8916",
+   "t": "Antz",
+   "y": 1998
+  },
+  {
+   "k": "m5559",
+   "t": "Bee Movie",
+   "y": 2007
+  },
+  {
+   "k": "m446894",
+   "t": "Smallfoot",
+   "y": 2018
+  },
+  {
+   "k": "m696806",
+   "t": "The Adam Project",
+   "y": 2022
+  },
+  {
+   "k": "m667739",
+   "t": "The Man from Toronto",
+   "y": 2022
+  },
+  {
+   "k": "m762504",
+   "t": "Nope",
+   "y": 2022
+  },
+  {
+   "k": "m912770",
+   "t": "Route 10",
+   "y": 2022
+  },
+  {
+   "k": "m862551",
+   "t": "Me Time",
+   "y": 2022
+  },
+  {
+   "k": "m646380",
+   "t": "Don't Look Up",
+   "y": 2021
+  },
+  {
+   "k": "m508442",
+   "t": "Soul",
+   "y": 2020
+  },
+  {
+   "k": "m755566",
+   "t": "Day Shift",
+   "y": 2022
+  },
+  {
+   "k": "m991814",
+   "t": "Re/Member",
+   "y": 2022
+  },
+  {
+   "k": "m1077280",
+   "t": "Die Hart",
+   "y": 2023
+  },
+  {
+   "k": "m705861",
+   "t": "Hustle",
+   "y": 2022
+  },
+  {
+   "k": "m517814",
+   "t": "Capernaum",
+   "y": 2018
+  },
+  {
+   "k": "m1153366",
+   "t": "Head to Head",
+   "y": 2023
+  },
+  {
+   "k": "m787726",
+   "t": "The Tambour of Retribution",
+   "y": 2021
+  },
+  {
+   "k": "m1046157",
+   "t": "Sattar",
+   "y": 2022
+  },
+  {
+   "k": "m680",
+   "t": "Pulp Fiction",
+   "y": 1994
+  },
+  {
+   "k": "m550",
+   "t": "Fight Club",
+   "y": 1999
+  },
+  {
+   "k": "m469945",
+   "t": "Farce",
+   "y": 2017
+  },
+  {
+   "k": "m585511",
+   "t": "Luck",
+   "y": 2022
+  },
+  {
+   "k": "m522402",
+   "t": "Finch",
+   "y": 2021
+  },
+  {
+   "k": "m1157577",
+   "t": "Night Courier",
+   "y": 2023
+  },
+  {
+   "k": "m9339",
+   "t": "Click",
+   "y": 2006
+  },
+  {
+   "k": "m1073635",
+   "t": "Hwjn",
+   "y": 2024
+  },
+  {
+   "k": "m807356",
+   "t": "Watcher",
+   "y": 2022
+  },
+  {
+   "k": "m763215",
+   "t": "Damsel",
+   "y": 2024
+  },
+  {
+   "k": "m1076270",
+   "t": "Alhamour H.A.",
+   "y": 2023
+  },
+  {
+   "k": "m308639",
+   "t": "Dope",
+   "y": 2015
+  },
+  {
+   "k": "m1022690",
+   "t": "Ricky Stanicky",
+   "y": 2024
+  },
+  {
+   "k": "m4982",
+   "t": "American Gangster",
+   "y": 2007
+  },
+  {
+   "k": "m1327526",
+   "t": "Il Signore",
+   "y": 2024
+  },
+  {
+   "k": "m1197306",
+   "t": "A Working Man",
+   "y": 2025
+  },
+  {
+   "k": "m1233413",
+   "t": "Sinners",
+   "y": 2025
+  },
+  {
+   "k": "m1087891",
+   "t": "The Amateur",
+   "y": 2025
+  },
+  {
+   "k": "m1212855",
+   "t": "Fight or Flight",
+   "y": 2025
+  },
+  {
+   "k": "m1316421",
+   "t": "Project X",
+   "y": 2025
+  },
+  {
+   "k": "m1262408",
+   "t": "Al-Tahlea robbery",
+   "y": 2023
+  },
+  {
+   "k": "m447362",
+   "t": "Life in a Year",
+   "y": 2020
+  },
+  {
+   "k": "m1084199",
+   "t": "Companion",
+   "y": 2025
+  },
+  {
+   "k": "m840430",
+   "t": "The Holdovers",
+   "y": 2023
+  },
+  {
+   "k": "m1319895",
+   "t": "Hostile Takeover",
+   "y": 2025
+  },
+  {
+   "k": "m508943",
+   "t": "Luca",
+   "y": 2021
+  },
+  {
+   "k": "m438747",
+   "t": "Tangled: Before Ever After",
+   "y": 2017
+  },
+  {
+   "k": "m2123",
+   "t": "Me, Myself & Irene",
+   "y": 2000
+  },
+  {
+   "k": "m560057",
+   "t": "The Sea Beast",
+   "y": 2022
+  },
+  {
+   "k": "m1375646",
+   "t": "Colony",
+   "y": 2026
   }
  ],
  "excludedGroups": [
@@ -4683,6 +11217,15 @@
    "name": "BBC's 100 Greatest Films of the 21st Century",
    "why": "list",
    "size": 102,
+   "types": [
+    "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q2732470",
+   "name": "list of Pixar films",
+   "why": "list",
+   "size": 28,
    "types": [
     "Wikimedia list article"
    ]
@@ -4706,12 +11249,39 @@
    ]
   },
   {
-   "g": "Q2732470",
-   "name": "list of Pixar films",
+   "g": "Q2307877",
+   "name": "Spider-Man in film",
+   "why": "catalog",
+   "size": 14,
+   "types": [
+    "portrayal of subject on film"
+   ]
+  },
+  {
+   "g": "Q2158362",
+   "name": "Superman in film",
+   "why": "catalog",
+   "size": 32,
+   "types": [
+    "portrayal of subject on film"
+   ]
+  },
+  {
+   "g": "Q65071834",
+   "name": "list of Sony Pictures Animation productions",
    "why": "list",
-   "size": 28,
+   "size": 24,
    "types": [
     "Wikimedia list article"
+   ]
+  },
+  {
+   "g": "Q26196748",
+   "name": "DreamWorks Animation feature films",
+   "why": "catalog",
+   "size": 46,
+   "types": [
+    "animated film series"
    ]
   }
  ],
