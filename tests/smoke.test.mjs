@@ -272,9 +272,13 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     await page.waitForFunction(() => /لا شيء/.test(document.querySelector('#lbx .lbx-row p')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
     check('وبعد تنزيله صار معروفاً له: لا ينتظر شيء، ويقال أين يُرفع', calls.some(c => c[0] === '/films/sent' && c[1].kind === 'watched' && c[1].ids.length === seen0.length) && /لا شيء/.test(await page.textContent('#lbx .lbx-row p')) && /ارفعه من صفحة الاستيراد/.test(await page.textContent('#lbx .msg')));
     await fits('الأفلام: نافذة Letterboxd'); await page.keyboard.press('Escape'); await page.waitForSelector('#lbx', { state: 'hidden' });
+    // ما تعلّمه هنا بعد الربط يصل الخادم بمفتاحه كما هو (m ورقم الفيلم في TMDB)، ويخرج من الانتظار
+    const until = async f => { for (let i = 0; i < 80 && !f(); i++) await page.waitForTimeout(100); return !!f(); }, MK = FL.find(f => f.kind === 'movie' && f.poster && !log0[f.id] && f.id !== NEWW.id && f.id !== inCol.id);
+    await tap(`#f-${MK.id} .seen`); const sent = () => calls.some(c => c[0] === '/sync' && c[1]?.edits?.some(e => e.id === MK.id && e.s === 'watched'));
+    check('الأفلام: ما تعلّمه بعد ربط Letterboxd يصل الخادم برقمه، ولا يبقى ينتظر', await until(sent) && await page.waitForFunction(() => !Object.keys(JSON.parse(localStorage.getItem('accounts.q') || '{}').films || {}).length, null, { timeout: 5000 }).then(() => true, () => false), calls.filter(c => c[0] === '/sync').map(c => c[1]?.edits));
     // جهاز عرف حساباته من «أنمياتي» قبل أن يُربط Letterboxd من جهاز آخر: لا يسأل الخادم عند كل فتح، ويسأل بعد عشر دقائق أو حين تفتح النافذة، فيبدأ من سجلّه بلا ضغطة أخرى
     const asOther = mins => page.evaluate(m => { localStorage.setItem('accounts.on', JSON.stringify({ links: { mal: { on: true }, simkl: { on: false } }, at: Date.now() - m * 60e3 })); localStorage.removeItem('accounts.rev'); }, mins);
-    const until = async f => { for (let i = 0; i < 80 && !f(); i++) await page.waitForTimeout(100); return !!f(); }, booted = () => calls.some(c => c[0] === '/sync' && c[1]?.full && Object.keys(c[1].full).length);
+    const booted = () => calls.some(c => c[0] === '/sync' && c[1]?.full && Object.keys(c[1].full).length);
     await asOther(1); LBS.boot = false; calls.length = 0; await page.reload(); await page.waitForSelector('.tk:not([hidden])'); await page.waitForTimeout(2500);
     check('جهاز آخر عرف حساباته قبل دقيقة: لا يسأل الخادم عند كل فتح', calls.length === 0, calls.map(c => c[0]));
     await tap('.top [data-act=lbx]'); await page.waitForSelector('#lbx[open]');
@@ -282,7 +286,7 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     await page.keyboard.press('Escape'); await page.waitForSelector('#lbx', { state: 'hidden' });
     await asOther(11); LBS.boot = false; calls.length = 0; await page.reload(); await page.waitForSelector('.tk:not([hidden])');
     check('وبعد عشر دقائق يسأل وحده حين تُفتح الصفحة، ويبدأ من سجلّه', await until(booted) && calls[0][0] === '/', calls.map(c => c[0]));
-    await page.unroute(base + '/api/accounts**'); await page.evaluate(id => { const p = JSON.parse(localStorage.getItem('filmsg.progress')); delete p.films[id]; localStorage.setItem('filmsg.progress', JSON.stringify(p)); ['accounts.on', 'accounts.q', 'accounts.rev', 'animeg.pass'].forEach(k => localStorage.removeItem(k)); }, NEWW.id);
+    await page.unroute(base + '/api/accounts**'); await page.evaluate(ids => { const p = JSON.parse(localStorage.getItem('filmsg.progress')); for (const k of ids) delete p.films[k]; localStorage.setItem('filmsg.progress', JSON.stringify(p)); ['accounts.on', 'accounts.q', 'accounts.rev', 'animeg.pass'].forEach(k => localStorage.removeItem(k)); }, [NEWW.id, MK.id]);
     await page.reload(); await page.waitForSelector('.tk:not([hidden])'); if (await page.$('[data-act=show-all]')) { await tap('[data-act=show-all]'); await page.waitForTimeout(300); } }
   await tap('[data-act=reset]'); await page.waitForTimeout(250);
   const other = FL.find(f => f.id !== inCol.id && f.kind === 'movie' && f.poster); await tap(`#f-${other.id} .seen`); await page.waitForTimeout(1300);

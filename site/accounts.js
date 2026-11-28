@@ -39,7 +39,7 @@ export function accMark(id, m) { if (!cx || !anyOn()) return; const all = jget(Q
   q[id] = { s: m?.s || null, p: +m?.p || 0, r: +m?.r || 0, t: Date.now() }; ls.set(Q, JSON.stringify(all));
   clearTimeout(timer); timer = setTimeout(() => accSync(), Object.values(q).some(e => !e.s) ? WAIT_GONE : WAIT); tell(); }
 export async function accSync({ force = false } = {}) { if (!cx || (!anyOn() && !force)) return; if (busy) { again = true; return; } busy = state.busy = true; clearTimeout(timer);
-  try { for (let i = 0; i < 4; i++) { const all = jget(Q, {}), q = all[cx.guide] || {}, edits = Object.entries(q).map(([id, e]) => ({ id: +id, ...e })), t0 = Date.now();
+  try { for (let i = 0; i < 4; i++) { const all = jget(Q, {}), q = all[cx.guide] || {}, edits = Object.entries(q).map(([id, e]) => ({ id: /^\d+$/.test(id) ? +id : id, ...e })), t0 = Date.now();
       const rev = jget(REV, {})[cx.guide] || 0, body = { guide: cx.guide, edits, since: rev, build: cx.build };
       let { status, j } = await call('/sync', body);
       if (status === 202) { await new Promise(r => setTimeout(r, 4000)); continue; }
