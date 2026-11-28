@@ -8,6 +8,7 @@
 // - ما يحتاجه الصفحة: ما تغيّر في المحور من الخدمات بعد رقم مراجعتها (rev)، فتطبّقه على سجلها وتزامنه مزامنتها المعتادة.
 import { randomBytes } from 'node:crypto';
 import { shapeSimkl } from '../site/anime-simkl.js';
+import { TRAKT, syncSeries as seriesCore } from './lib-trakt.mjs';
 
 export const SIMKL_ID = '6c4e4c56c81ae9e92bb2470d2d296d4db7413c112d0b2671927225e8a43a738e';   // عام بنص SIMKL (انظر site/anime-simkl.js)
 // تطبيق watch-guide-sync في MyAnimeList (نوعه Other: بلا سر، فرقمه عام كرقم SIMKL)، ورابط رجوعه /api/accounts/callback/mal على موقع Netlify
@@ -95,6 +96,10 @@ export const SVC = {
       return list.map(x => x.id); } },
 };
 
+// Trakt للمسلسلات (scripts/lib-trakt.mjs): يُربط كغيره، وتزامنه syncSeries لا syncAnime
+SVC.trakt = TRAKT;
+const ANIME = ['mal', 'simkl'];
+
 // ---------- المخزن: S = { get(k), set(k, v), del(k), lock(), unlock() } فوق Netlify Blobs (أو مخزن في الذاكرة للاختبار)
 export async function blobStore(name = 'accounts') { const { getStore } = await import('@netlify/blobs'); const b = getStore({ name, consistency: 'strong' });
   return { get: k => b.get(k, { type: 'json' }), set: (k, v) => b.setJSON(k, v), del: k => b.delete(k),
@@ -114,14 +119,17 @@ export async function linkCallback(S, k, code, state, redirect) { const p = awai
   const t = await SVC[k].exchange(code, p, redirect); await S.set('tok/' + k, t); await S.del('pend/' + k); return true; }
 export async function linkPoll(S, k) { const p = await S.get('pend/' + k); if (!p || p.until < now()) return { gone: true };
   const t = await SVC[k].poll(p); if (!t) return { wait: p.every }; await S.set('tok/' + k, t); await S.del('pend/' + k); return { done: true }; }
-export async function unlink(S, k) { await S.del('tok/' + k); await S.del('pend/' + k); if (k === 'letterboxd') { const fl = await S.get('films'); if (fl) { fl.lb = { known: {}, wl: {} }; delete fl.err?.letterboxd; await S.set('films', fl); } return; } const st = await S.get('anime'); if (st) { delete st.shadow?.[k]; delete st.mark?.[k]; delete st.err?.[k]; await S.set('anime', st); } }
+export async function unlink(S, k) { await S.del('tok/' + k); await S.del('pend/' + k); if (k === 'letterboxd') { const fl = await S.get('films'); if (fl) { fl.lb = { known: {}, wl: {} }; delete fl.err?.letterboxd; await S.set('films', fl); } return; }
+  // Trakt: يُنسى ظله، فإن رُبط من جديد بدأ بمصالحة تجمع ولا تمحو (والمحور يبقى)
+  if (k === 'trakt') { const se = await S.get('series'); if (se) { Object.assign(se, { sh: null, shOk: 0, mark: '', pend: {}, nf: {}, err: '', at: 0 }); await S.set('series', se); } return; } const st = await S.get('anime'); if (st) { delete st.shadow?.[k]; delete st.mark?.[k]; delete st.err?.[k]; await S.set('anime', st); } }
 async function token(S, k) { let t = await S.get('tok/' + k); if (!t) return null;
   if (t.refresh && t.exp - now() < 10 * 60e3) { try { t = await SVC[k].refresh(t); await S.set('tok/' + k, t); } catch (e) { if (e.code === 'auth') { t.dead = 1; await S.set('tok/' + k, t); } } }
   return t.dead ? { dead: 1 } : t; }
 export async function linksOf(S) { const st = await S.get('anime') || {}, o = {}, fl = await S.get('films') || {}, lb = await S.get('tok/letterboxd');
   o.letterboxd = { on: !!lb, user: lb?.user || '', since: lb?.at || 0, ready: true, err: fl.err?.letterboxd || '', at: fl.at?.letterboxd || 0 };
-  for (const k of Object.keys(SVC)) { const t = await S.get('tok/' + k), p = await S.get('pend/' + k);
-    o[k] = { on: !!t && !t.dead, dead: !!t?.dead, since: t?.at || 0, ready: SVC[k].ready(), waiting: !!p && p.until > now(), err: st.err?.[k] || '', at: st.at?.[k] || 0 }; }
+  const se = await S.get('series') || {};
+  for (const k of Object.keys(SVC)) { const t = await S.get('tok/' + k), p = await S.get('pend/' + k), from = k === 'trakt' ? { err: { trakt: se.err }, at: { trakt: se.at } } : st;
+    o[k] = { on: !!t && !t.dead, dead: !!t?.dead, since: t?.at || 0, ready: SVC[k].ready(), waiting: !!p && p.until > now(), err: from.err?.[k] || '', at: from.at?.[k] || 0 }; }
   return o; }
 
 // ---------- المزامنة. edits: تعديلات الصفحة [{ id, s, p, r, t }]. full: سجل الصفحة كله لأول مرة. eps: عدد حلقات كل عمل (من كتالوج الصفحة)
@@ -158,12 +166,15 @@ export async function syncAnime(S, { edits = [], full = null, eps = null, build 
   for (const e of edits) if (/^\d+$/.test(String(e.id))) put(st, String(e.id), val(e), +e.t || now(), 'site');
   // السحب من كل الخدمات أولاً ثم الدفع إليها كلها، فتعديل في إحداها يصل الأخرى في المزامنة نفسها
   const live = {}, oops = async (k, t, e) => { st.err[k] = e.code === 'auth' ? 'auth' : e.code === 'net' ? 'net' : String(e.message || 'خطأ').slice(0, 120); delete live[k]; if (e.code === 'auth') { t.dead = 1; await S.set('tok/' + k, t); } };
-  for (const k of Object.keys(SVC)) { const t = await token(S, k); if (!t) continue; if (t.dead) { st.err[k] = 'auth'; continue; } live[k] = t;
+  for (const k of ANIME) { const t = await token(S, k); if (!t) continue; if (t.dead) { st.err[k] = 'auth'; continue; } live[k] = t;
     try { if (pull || !st.shadow[k]) { const R = await SVC[k].pull(t, st.mark[k], st.eps); if (!R.same) { merge(st, k, R); if (R.mark) st.mark[k] = R.mark; } } } catch (e) { await oops(k, t, e); } }
   for (const [k, t] of Object.entries(live)) { if (deadline && Date.now() > deadline) break; try { await pushTo(S, st, k, t, budget, deadline); st.err[k] = ''; st.at[k] = now(); } catch (e) { await oops(k, t, e); } }
   await S.set('anime', st);
   const changes = Object.entries(st.items).filter(([, h]) => h.rev > since && h.src !== 'site').map(([id, h]) => ({ id: +id, ...(val(h) || { s: null }), src: h.src }));
   return { rev: st.rev, changes, needEps: !!build && st.build !== build }; }
+
+// ---------- المسلسلات ↔ Trakt (E87، التفاصيل في scripts/lib-trakt.mjs): الرمز يُجدَّد هنا كغيره، وانتهاء الربط يُحفظ
+export const syncSeries = (S, o) => seriesCore(S, { get: () => token(S, 'trakt'), kill: async t => { t.dead = 1; await S.set('tok/trakt', t); } }, o);
 
 // ---------- الأفلام ↔ Letterboxd (E86). Letterboxd لا يسمح لأي موقع أن يكتب في حسابك (لا واجهة مفتوحة)، فالمزامنة نصفان:
 // - منه إلى الموقع تلقائياً: يومياتك العامة (letterboxd.com/<اسمك>/rss/) فيها كل فيلم تسجله برقمه في TMDB، فيصير هنا «شاهدته».

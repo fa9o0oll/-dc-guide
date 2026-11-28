@@ -4,6 +4,7 @@ import { shell } from './shell.js?v=__BUILD__';
 import { ar } from './bidi.js?v=__BUILD__';
 import { clock, spoken } from './count.js?v=__BUILD__';
 import { initSync, touch as syncTouch, syncLabel } from './sync.js?v=__BUILD__';
+import { accInit, accMark, accSync, accLink, accPoll, accUnlink, accLinks, accState, accSetPass, accPass } from './accounts.js?v=__BUILD__'; // Trakt للمسلسلات (E87)
 import { portalBack } from './portal.js?v=__BUILD__';
 import { prepare, find, fold } from './find.js?v=__BUILD__';
 import './zoom.js?v=__BUILD__'; // البوسترات المشتركة بين البوابات: التكبير والقرص بإصبعين والميلان مع الجوال (data-zoom وdata-zoom-pinch)
@@ -61,6 +62,10 @@ async function boot() {
     $('#main').innerHTML = `<p class="empty">تعذّر تحميل البيانات. حدّث الصفحة، وإذا استمر الخطأ فالسبب: ${esc(e.message)}</p>`; return;
   }
   renderUnibar(); syncShield(); render(); liftVeil();
+  // Trakt (E87): ما وصل منه يُطبَّق على السجل، والصفحة ترسل إليه سجلّها أول مرة وأرقام مسلسلاتها
+  if (TRK) accInit({ guide: G.id, svcs: ['trakt'], build: BUILD, pack: m => ({ on: m?.on ? 1 : 0 }), apply: traktApply, onState: drawTrk,
+    full: () => { const o = {}; for (const id of D.works.keys()) { const t = tvOf(id); if (!t) continue; const e = Object.keys(store.eps[id] || {}), l = store.works[id] === 'list' ? 1 : 0; if (e.length || l) o['tv' + t] = { e, l }; } return o; },
+    known: () => [...D.works.keys()].map(tvOf).filter(Boolean) });
   // رابط مباشر لعمل (#w=المعرّف)، تستعمله قائمة الأفلام للانتقال إلى بطاقته في هذا الدليل، عند الفتح أو بتغيير العنوان والصفحة مفتوحة
   { const deep = () => { const w = new URLSearchParams(location.hash.slice(1)).get('w'); if (w && D.works.has(w)) { history.replaceState(history.state, '', location.pathname + location.search); openWork(w); } };
     deep(); addEventListener('hashchange', deep); }
@@ -587,7 +592,39 @@ function prevYes(scope) { const a = pv.cur, box = $('.pv.on'); if (!a) return; c
     toast(`عُلّمت ${cnt(list.length, 'ep')} قبلها`, () => { for (const [s, e] of list) setEp(id, s, e, false); save(); stats(); syncEps(id); ui.dirty = true; const sa = $('#eps [data-act=seasonall]'); if (sa?.dataset.id === id) showSeason(id, +sa.dataset.season); }); }, here.length * step + (reduce.matches ? 0 : 520)); }
 function prevNo() { const a = pv.cur; if (a) { const k = `${a.id}#${a.season}`, set = pv.no.get(k) || pv.no.set(k, new Set()).get(k); for (const [s, e] of [...a.same, ...a.before]) set.add(`${s}-${e}`);
     try { localStorage.setItem(KEY + '.pvno', JSON.stringify(Object.fromEntries([...pv.no].map(([k, v]) => [k, [...v]])))); } catch {} } prevClose(); }
-function setEp(id, s, e, on) { const o = store.eps[id] ||= {}; if (on) o[`${s}-${e}`] = 1; else delete o[`${s}-${e}`]; if (!Object.keys(o).length) delete store.eps[id]; }
+// quiet: ما وصل من Trakt يُكتب في السجل ولا يُعاد إرساله إليه
+function setEp(id, s, e, on, quiet) { const o = store.eps[id] ||= {}; if (on) o[`${s}-${e}`] = 1; else delete o[`${s}-${e}`]; if (!Object.keys(o).length) delete store.eps[id];
+  const t = !quiet && tvOf(id); if (t) accMark(`tv${t}|${s}-${e}`, { on }); }
+// ---------- المسلسلات ↔ Trakt (E87): في دليلَي DC ومارفل وحدهما (Fate أنمي: مكانه MyAnimeList وSIMKL في «أنمياتي»). المنطق على الخادم (scripts/lib-trakt.mjs):
+// تُرسل إليه كل حلقة تعلّمها أو تزيل علامتها، و«سأشاهده» على المسلسل كله (قائمة المشاهدة هناك)، ويصل منه ما تغيّر في Trakt
+const TRK = G.id === 'dc' || G.id === 'marvel';
+const tvOf = id => { const w = TRK && D.works.get(id); return w?.seasons?.length && w.tmdb ? w.tmdb : 0; };
+const listMark = (k, was) => { const t = !k.includes('#') && tvOf(k), on = store.works[k] === 'list'; if (t && (was === 'list') !== on) accMark(`tv${t}|l`, { on }); };
+function traktApply(changes) { const by = new Map([...D.works.keys()].map(id => [tvOf(id), id]).filter(([t]) => t)), got = new Set();
+  for (const c of changes) { const id = by.get(+c.id); if (!id) continue; let n = 0;
+    for (const k of c.e || []) { const [s, e] = k.split('-').map(Number); if (!epDone(id, s, e)) { setEp(id, s, e, true, true); n++; } }
+    for (const k of c.x || []) { const [s, e] = k.split('-').map(Number); if (epDone(id, s, e)) { setEp(id, s, e, false, true); n++; } }
+    if (c.l === 1 && !store.works[id]) { store.works[id] = 'list'; n++; } else if (c.l === 0 && store.works[id] === 'list') { delete store.works[id]; n++; }
+    if (n) got.add(id); }
+  if (!got.size) return; save(); render(true); stats(); const tab = $('#seasonTabs .on'); if (tab) showSeason(tab.dataset.id, +tab.dataset.season);
+  toast(`وصل من Trakt تحديث ${cnt(got.size, 'show')}`); }
+// قسم Trakt في «سجلّي»: كلمة سر الموقع مرة في المتصفح، ثم «اربط» (رمز توافق عليه في صفحة Trakt)، ثم «مربوط ✓» و«زامن الآن» و«افصل»
+const TK = { wait: null, msg: '' };
+const ago = t => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? 'الآن' : m < 60 ? `قبل ${m} دقيقة` : m < 1440 ? `قبل ${Math.round(m / 60)} ساعة` : `قبل ${Math.round(m / 1440)} يوم`; };
+function trkHTML() { const st = accState(), l = st.links?.trakt || {}, w = TK.wait, msg = TK.msg ? `<p class="trk-msg" role="status">${TK.msg}</p>` : '';
+  if (st.pass || !accPass()) return `<form class="trk-pass"><label>كلمة سر الموقع مرة واحدة في هذا المتصفح (نفسها في «أضف فيلماً»)<input type="password" autocomplete="current-password" required></label><div class="actions"><button type="submit">تم</button></div></form>${msg}`;
+  if (w) return `<p>افتح صفحة Trakt واكتب فيها هذا الرمز ووافق، وهذه النافذة تكمل وحدها.</p><p class="trk-code"><b dir="ltr">${esc(w.code)}</b></p>
+    <div class="actions"><a class="trk-go" href="${esc(w.url)}" target="_blank" rel="noopener">افتح Trakt للموافقة</a><button data-act="trk-cancel">ألغِ</button></div>`;
+  const err = l.on && l.err ? `<p class="trk-msg">${l.err === 'net' ? 'تعذّر الاتصال به في آخر مزامنة، ويُعاد وحده.' : l.err === 'auth' ? 'انتهى الربط: افصله واربطه من جديد.' : 'لم يقبل آخر تحديث، ويُعاد وحده.'}</p>` : '';
+  if (l.dead) return `<p class="trk-msg">انتهى الربط: افصله واربطه من جديد.</p><div class="actions"><button data-act="trk-unlink">افصل</button></div>${msg}`;
+  return (l.on ? `<p class="trk-on">مربوط ✓${l.at ? ` · آخر مزامنة ${ago(l.at)}` : ''}</p>${err}<div class="actions"><button data-act="trk-sync"${st.busy ? ' disabled' : ''}>${st.busy ? 'يزامن…' : 'زامن الآن'}</button><button data-act="trk-unlink">افصل</button></div>`
+    : l.ready === false ? '<p>يُجهَّز قريباً.</p>' : '<div class="actions"><button class="cta" data-act="trk-link">اربط حسابك في Trakt</button></div>') + msg + (st.err ? `<p class="trk-msg">${esc(st.err)}</p>` : ''); }
+const drawTrk = () => { const el = $('#trk'); if (el) el.innerHTML = trkHTML(); };
+async function trkGo() { TK.msg = ''; try { const r = await accLink('trakt'); const w = TK.wait = { code: r.code, url: r.url, until: r.until || Date.now() + 6e5 }; drawTrk();
+    while (TK.wait === w && Date.now() < w.until) { await new Promise(res => setTimeout(res, (r.every || 5) * 1000)); if (TK.wait !== w) return;
+      const p = await accPoll('trakt'); if (p.done) { TK.wait = null; TK.msg = 'رُبط Trakt، والمزامنة تبدأ الآن.'; drawTrk(); return; } if (p.gone) break; }
+    if (TK.wait === w) { TK.wait = null; TK.msg = 'انتهت مهلة الرمز قبل الموافقة. اضغط «اربط» من جديد.'; drawTrk(); } }
+  catch (e) { TK.wait = null; TK.msg = e.pass ? '' : esc(e.message || 'تعذّر الربط.'); drawTrk(); } }
 
 // ---------- الفهرس، السجل، الدليل
 function openJump() {
@@ -613,12 +650,13 @@ function openJump() {
 }
 const encode = o => btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 function openBackup() {
-  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px"><p>فعّل المزامنة ليصل سجلك إلى كل أجهزتك تلقائياً، في لحظته.</p>
+  openSheet('سجل المشاهدة', `<div class="dw guide" style="padding-top:14px">${TRK ? `<section class="trk"><h4><bdi dir="ltr">Trakt</bdi></h4><p>حلقات المسلسلات و«سأشاهده» تتزامن بالاتجاهين مع حسابك في Trakt، ولو كانت الصفحة مغلقة.</p><div id="trk">${trkHTML()}</div></section><h4>أجهزتك</h4>` : ''}<p>فعّل المزامنة ليصل سجلك إلى كل أجهزتك تلقائياً، في لحظته.</p>
     <div class="actions"><button data-sync-open><span data-sync-label>${syncLabel()}</span></button></div>
     <h4>نسخة يدوية</h4><p>الكود التالي هو سجلك كاملاً. احتفظ به نسخةً احتياطية، أو الصقه في جهاز آخر لاسترجاع السجل.</p>
     <textarea id="bk" aria-label="كود السجل">${encode(store)}</textarea>
     <div class="actions"><button data-act="bkcopy">نسخ الكود</button><button data-act="bkimport">استيراد الكود الملصوق</button></div>
     ${G.legacyImport ? '<h4>النقل من النسخة القديمة</h4><p>افتح موقعك القديم واضغط «نسخ احتياطي» وانسخ الكود، ثم الصقه هنا واضغط «استيراد الكود الملصوق». يتحوّل تلقائياً إلى النظام الجديد.</p>' : ''}</div>`, 'backup');
+  if (TRK && accPass()) accLinks().then(() => { drawTrk(); accSync(); });   // رُبط من جهاز آخر؟ تبدأ المزامنة الآن
 }
 function importCode() {
   let raw; try { raw = JSON.parse(decodeURIComponent(escape(atob($('#bk').value.trim())))); } catch { return toast('الكود غير صالح'); }
@@ -688,6 +726,7 @@ function pickGo() { $('#q').value = ''; $('#fType').value = ''; $('#fStatus').va
   scrollTo(0, 0); el.scrollIntoView({ block: 'center', behavior: 'instant' }); flash(el); }
 
 // ---------- الأحداث
+document.addEventListener('submit', ev => { const f = ev.target; if (!f.matches?.('.trk-pass')) return; ev.preventDefault(); accSetPass(f.querySelector('input').value); TK.msg = ''; accLinks().then(drawTrk); });
 document.addEventListener('click', ev => {
   const b = ev.target.closest('[data-act]'); if (!b) { if (ev.target.id === 'backdrop') closeSheet(); return; }
   const d = b.dataset, id = d.id, season = d.season ? +d.season : undefined;
@@ -700,7 +739,7 @@ document.addEventListener('click', ev => {
     case 'path': ui.path = d.path; render(true); break;
     case 'close': closeSheet(); break;
     case 'shield': if (ui.sheet) closeSheet(); store.shield = !store.shield; save(); syncShield(); render(true); toast(store.shield ? 'درع الحرق مفعّل' : 'درع الحرق متوقف'); break;
-    case 'status': { const k = b.closest('[data-k]').dataset.k; if (store.works[k] === d.s) delete store.works[k]; else store.works[k] = d.s; save();
+    case 'status': { const k = b.closest('[data-k]').dataset.k, was = store.works[k]; if (store.works[k] === d.s) delete store.works[k]; else store.works[k] = d.s; save(); listMark(k, was);
       if (store.works[k] === 'watched') offerEps(k); else if (ask.fn) { ask.fn = null; $('#toast').hidden = true; }
       if ($('#fStatus').value) { render(true); break; } // مع تصفية الحالة قد يخرج العمل من القائمة نفسها
       syncStatus(k); stats(); refreshProgress(); refreshPick(); break; }
@@ -722,11 +761,15 @@ document.addEventListener('click', ev => {
     case 'backup': openBackup(); break;
     case 'bkcopy': navigator.clipboard?.writeText($('#bk').value).then(() => toast('تم النسخ'), () => { $('#bk').select(); toast('حدّد النص وانسخه يدوياً'); }); break;
     case 'bkimport': importCode(); break;
+    case 'trk-link': trkGo(); break;
+    case 'trk-cancel': TK.wait = null; drawTrk(); break;
+    case 'trk-sync': accSync({ force: true }); break;
+    case 'trk-unlink': accUnlink('trakt').then(() => { TK.msg = 'فُصل Trakt: لا تتزامن المسلسلات معه بعد الآن.'; drawTrk(); }, e => { TK.msg = esc(e.message); drawTrk(); }); break;
     case 'guide': openGuide(); break;
     case 'tonight': if (ui.sheet) closeSheet(); setTimeout(SG ? pickGo : tonight, 60); break;
     case 'pick-next': refreshPick(1); break;
     case 'pick-mood': { const g = d.g; SG.moods = !g ? [] : SG.moods.includes(g) ? SG.moods.filter(x => x !== g) : [...SG.moods, g]; try { localStorage.setItem(KEY + '.mood', SG.moods.join('|')); } catch {} SG.id = ''; refreshPick(); break; }
-    case 'pick-start': { const k = d.k; store.works[k] = 'watching'; save(); syncStatus(k); stats(); refreshProgress(); refreshPick(); toast('بدأته: صار في «أشاهده»'); break; }
+    case 'pick-start': { const k = d.k, was = store.works[k]; store.works[k] = 'watching'; save(); listMark(k, was); syncStatus(k); stats(); refreshProgress(); refreshPick(); toast('بدأته: صار في «أشاهده»'); break; }
   }
 });
 addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });

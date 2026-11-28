@@ -1,7 +1,7 @@
 // يفحص خادم ربط الحسابات (E84): الربط، والمزامنة بالاتجاهين بين «أنمياتي» وMyAnimeList وSIMKL، بخدمتين مُحاكاتين ومخزن في الذاكرة.
 // node tests/accounts.test.mjs
-process.env.URL = 'https://watch.example'; process.env.ADD_FILM_PASSWORD = 'pw'; process.env.MAL_CLIENT_ID_SYNC = 'mal-client';
-const { memStore, simklOps } = await import('../scripts/lib-accounts.mjs');
+process.env.URL = 'https://watch.example'; process.env.ADD_FILM_PASSWORD = 'pw'; process.env.MAL_CLIENT_ID_SYNC = 'mal-client'; process.env.TRAKT_GAP_MS = '20';
+const { memStore, simklOps, syncSeries } = await import('../scripts/lib-accounts.mjs');
 const fn = await import('../netlify/functions/accounts.mjs');
 let fail = 0; const check = (name, ok, info) => { console.log(`  ${ok ? '✓' : '✗'} ${name}${ok ? '' : ' — ' + JSON.stringify(info)}`); if (!ok) fail++; };
 const J = x => JSON.stringify(x);
@@ -38,8 +38,32 @@ globalThis.fetch = async (u, init = {}) => { const url = new URL(u), m = init.me
   if (url.host === 'letterboxd.com') { const user = url.pathname.split('/')[1]; sent.push(['lb', user]); if (user !== 'faisal_test') return new Response('not found', { status: 404 });
     return new Response(`<?xml version='1.0' encoding='utf-8'?><rss version="2.0" xmlns:letterboxd="https://letterboxd.com" xmlns:tmdb="https://themoviedb.org"><channel><title>Letterboxd - Faisal</title>${LBX.map(([id, d, r]) =>
       `<item><title>Film ${id}</title><guid isPermaLink="false">letterboxd-review-${id}</guid><pubDate>${new Date(d).toUTCString()}</pubDate><letterboxd:watchedDate>${d}</letterboxd:watchedDate><letterboxd:rewatch>No</letterboxd:rewatch>${r ? `<letterboxd:memberRating>${r}</letterboxd:memberRating>` : ''}<tmdb:movieId>${id}</tmdb:movieId></item>`).join('')}<item><title>A list</title><guid>letterboxd-list-9</guid></item></channel></rss>`, { status: 200, headers: { 'content-type': 'application/rss+xml' } }); }
+  if (url.host === 'api.trakt.tv') { const h = init.headers || {}, b = body ? JSON.parse(body) : {};
+    if (h['trakt-api-key'] !== process.env.TRAKT_CLIENT_ID || h['trakt-api-version'] !== '2' || !h['user-agent']) return res({ error: 'bad headers' }, 403);
+    if (url.pathname === '/oauth/device/code') { sent.push(['tr-code', b.client_id === process.env.TRAKT_CLIENT_ID]); return res({ device_code: 'trdev', user_code: 'TRK-7788', verification_url: 'https://trakt.tv/activate', expires_in: 600, interval: 1 }); }
+    if (url.pathname === '/oauth/device/token') { sent.push(['tr-token', b.client_secret === process.env.TRAKT_CLIENT_SECRET ? 'SECRET' : 'none']); return ++TR.polls < 2 ? res({}, 400) : res({ access_token: 'tok-trakt', refresh_token: 'ref-trakt', expires_in: 86400 }); }
+    if (url.pathname === '/oauth/token') return res({ access_token: 'tok-trakt', refresh_token: 'ref-trakt2', expires_in: 86400 });
+    if (h.authorization !== 'Bearer tok-trakt') return res({ error: 'invalid_token' }, 401);
+    if (url.pathname === '/sync/last_activities') return res({ all: 'tr-' + TR.act });
+    if (url.pathname === '/sync/watched/shows') { if (url.searchParams.get('extended') !== 'progress') return res([]); TR.gets.push(+url.searchParams.get('page')); return pageOf(trProgress(), url); }
+    if (url.pathname === '/sync/watchlist/shows') return pageOf([...TR.wl].map(([id, at]) => ({ listed_at: at, type: 'show', show: { ids: { tmdb: id } } })), url);
+    TR.posts.push([url.pathname, Date.now()]); sent.push(['tr', url.pathname, b]);
+    const nf = { shows: [] }, at = x => x === 'released' ? '2000-01-01T00:00:00.000Z' : x || new Date().toISOString();
+    for (const it of b.shows || []) { const id = it.ids.tmdb, sh = TR.shows.get(id); if (TR.unknown.has(id) || (!sh && !url.pathname.includes('watchlist'))) { nf.shows.push({ ids: { tmdb: id } }); continue; }
+      const mark = (k, w) => { if (sh.w.has(k)) TR.dups.push(id + '|' + k); sh.w.set(k, at(w)); };
+      if (url.pathname === '/sync/history') { if (!it.seasons) sh.aired.forEach((n, i) => { for (let e = 1; e <= n; e++) mark(`${i + 1}-${e}`, it.watched_at); }); else for (const se of it.seasons) for (const ep of se.episodes) mark(`${se.number}-${ep.number}`, ep.watched_at); }
+      if (url.pathname === '/sync/history/remove') for (const se of it.seasons || []) for (const ep of se.episodes) sh.w.delete(`${se.number}-${ep.number}`);
+      if (url.pathname === '/sync/watchlist') TR.wl.set(id, new Date().toISOString()); if (url.pathname === '/sync/watchlist/remove') TR.wl.delete(id); }
+    TR.act++; return res({ added: {}, not_found: nf }, 201); }
   throw new Error('unexpected fetch ' + u); };
 const LBX = [];
+// Trakt المحاكى (E87): سجل المشاهدة بصيغة extended=progress (كل حلقة معروضة وcompleted، والحلقات الخاصة لا تعود فيه)، صفحات من اثنين ليُفحص تتبّعها
+const TR = { shows: new Map(), wl: new Map(), act: 1, polls: 0, posts: [], gets: [], dups: [], unknown: new Set([404]) };
+const trShow = (id, aired, w = {}) => { TR.shows.set(id, { aired, w: new Map(Object.entries(w)) }); TR.act++; };
+const trProgress = () => [...TR.shows].filter(([, x]) => x.w.size).map(([id, x]) => ({ last_watched_at: [...x.w.values()].sort().at(-1), show: { title: 'Show ' + id, ids: { trakt: id + 7000, tmdb: id }, aired_episodes: x.aired.reduce((a, b) => a + b, 0) },
+  seasons: x.aired.map((n, i) => ({ number: i + 1, aired: n, episodes: [...Array(n)].map((_, e) => { const w = x.w.get(`${i + 1}-${e + 1}`); return { number: e + 1, completed: !!w, last_watched_at: w || null }; }) })) }));
+const pageOf = (list, url) => { const per = Math.min(2, +url.searchParams.get('limit') || 100), page = +url.searchParams.get('page') || 1, pages = Math.max(1, Math.ceil(list.length / per));
+  return new Response(J(list.slice((page - 1) * per, page * per)), { status: 200, headers: { 'content-type': 'application/json', 'x-pagination-page': String(page), 'x-pagination-page-count': String(pages) } }); };
 
 const S = memStore(); fn._useStore(S);
 const call = async (path, { method = 'POST', body, pass = 'pw' } = {}) => { const r = await fn.default(new Request('https://watch.example/api/accounts' + path, { method, headers: { 'x-pass': pass, 'content-type': 'application/json' }, body: body ? J(body) : undefined }));
@@ -144,6 +168,62 @@ console.log('\n== الأفلام ↔ Letterboxd (E86)');
   check('حال Letterboxd: مربوط باسمه وآخر قراءة', links.letterboxd.on && links.letterboxd.user === 'faisal_test' && links.letterboxd.at > 0, links.letterboxd);
   await call('/unlink', { body: { svc: 'letterboxd' } });
   check('وفصله يمحو اسمه وما يعرفه', !(await S.get('tok/letterboxd')) && J((await S.get('films')).lb) === J({ known: {}, wl: {} })); }
+
+console.log('\n== المسلسلات ↔ Trakt (E87)');
+{ let B = 'b1'; const dc = (body = {}) => call('/sync', { body: { guide: 'dc', build: B, ...body } }), byId = r => Object.fromEntries(r.j.changes.map(c => [c.id, c])), posts = p => sent.filter(x => x[0] === 'tr' && x[1] === p).map(x => x[2]);
+  let l = await call('/link', { body: { svc: 'trakt' } });
+  check('Trakt قبل لصق رقم التطبيق ورمزه في Netlify: «لم يُجهَّز بعد»، والحال تقول ذلك', l.status === 400 && /لم يُجهَّز/.test(l.j.error) && (await call('', { method: 'GET' })).j.links.trakt.ready === false, l.j);
+  process.env.TRAKT_CLIENT_ID = 'trakt-client'; process.env.TRAKT_CLIENT_SECRET = 'trakt-secret-value';
+  sent.length = 0; l = await call('/link', { body: { svc: 'trakt' } });
+  check('ربط Trakt: رمز ورابط الموافقة trakt.tv/activate، والطلب برقم التطبيق', l.j.code === 'TRK-7788' && l.j.url === 'https://trakt.tv/activate' && J(sent) === J([['tr-code', true]]), [l.j, sent]);
+  const p1 = await call('/poll', { body: { svc: 'trakt' } }), p2 = await call('/poll', { body: { svc: 'trakt' } });
+  check('وينتظر موافقتك ثم يتم، والرمز السري يذهب إلى Trakt وحده: لا في رد ولا في المخزن', !!p1.j.wait && p2.j.done === true && (await S.get('tok/trakt'))?.access === 'tok-trakt' && sent.filter(x => x[0] === 'tr-token').every(x => x[1] === 'SECRET')
+    && !J([p1.j, p2.j, await S.get('tok/trakt'), (await call('', { method: 'GET' })).j]).includes('trakt-secret-value'), [p1.j, p2.j]);
+  trShow(100, [4, 2], { '1-2': '2025-03-01T10:00:00.000Z', '1-3': '2025-03-02T10:00:00.000Z' }); trShow(200, [3]); trShow(300, [2], { '1-1': '2025-04-01T10:00:00.000Z' }); TR.wl.set(300, '2025-05-01T00:00:00.000Z');
+  trShow(999, [1], { '1-1': '2025-01-01T00:00:00.000Z' });   // ليس في الدليل
+  sent.length = 0; let r = await dc();
+  check('أول مزامنة لدليل DC: يُطلب سجلّه وأرقام مسلسلاته (ولو كان سجلّه فارغاً)، ولا يُرسل شيء قبلها', r.j.needAll === true && r.j.needKnown === true && !sent.some(x => x[0] === 'tr'), r.j);
+  r = await dc({ full: { tv100: { e: ['1-1', '1-2'], l: 0 }, tv200: { e: [], l: 1 }, tv404: { e: ['1-1'] } }, known: [100, 200, 300, 404] }); let ch = byId(r);
+  check('ما شوهد في Trakt وليس هنا يصل الدليل (100: 1-3، و300: حلقته وقائمة المشاهدة)، ولا شيء من مسلسل ليس فيه', J(ch[100]?.e) === J(['1-3']) && J(ch[300]?.e) === J(['1-1']) && ch[300]?.l === 1 && !ch[999] && !r.j.needAll && !r.j.needKnown, r.j.changes);
+  const h0 = posts('/sync/history')[0];
+  check('وما شوهد هنا وليس في Trakt يُضاف إليه بتاريخ عرضه (100: 1-1)، بلا تكرار لما فيه (1-2)', J(h0?.shows?.find(x => x.ids.tmdb === 100)?.seasons) === J([{ number: 1, episodes: [{ number: 1, watched_at: 'released' }] }]) && !TR.dups.length && TR.shows.get(100).w.has('1-1'), h0);
+  check('و«سأشاهده» هنا يصير في قائمة المشاهدة هناك (200)، والكتابة طلباً بعد طلب بمهلة بينهما', TR.wl.has(200) && TR.posts.length >= 2 && TR.posts.every((x, i) => !i || x[1] - TR.posts[i - 1][1] >= 20), TR.posts);
+  check('وسجل Trakt يُقرأ صفحة صفحة حتى آخرها، بحلقاته (extended=progress)', J(TR.gets) === J([1, 2]), TR.gets);
+  sent.length = 0; r = await dc({ since: r.j.rev });
+  check('ومسلسل لا يعرفه Trakt (404) لا يُعاد إرساله كل مرة', !sent.some(x => x[0] === 'tr' && J(x[2]).includes('"tmdb":404')), sent);
+  const t0 = Date.now(); sent.length = 0;
+  r = await dc({ since: r.j.rev, edits: [{ id: 'tv100|1-4', on: 1, t: t0 }, { id: 'tv100|1-1', on: 0, t: t0 }, { id: 'tv200|l', on: 0, t: t0 }] });
+  const h1 = posts('/sync/history')[0], hr = posts('/sync/history/remove')[0];
+  check('حلقة تعلّمها في الدليل تصل Trakt بوقت تعليمك، وحلقة تزيل علامتها تُزال منه، ولا يرجع إلى الدليل شيء', h1?.shows?.[0]?.seasons?.[0]?.episodes?.[0]?.watched_at === new Date(t0).toISOString() && TR.shows.get(100).w.has('1-4') && !TR.shows.get(100).w.has('1-1')
+    && J(hr?.shows?.[0]?.seasons) === J([{ number: 1, episodes: [{ number: 1 }] }]) && !r.j.changes.length, [h1, hr, r.j.changes]);
+  check('وإخراجه من «سأشاهده» يخرجه من قائمة المشاهدة', !TR.wl.has(200), [...TR.wl.keys()]);
+  TR.shows.get(100).w.set('2-1', '2026-11-27T20:00:00.000Z'); TR.shows.get(100).w.delete('1-3'); TR.act++;
+  await syncSeries(S, { pull: true }); r = await dc({ since: r.j.rev }); ch = byId(r);
+  check('حلقة شاهدتها في Trakt وأخرى أزلتها هناك تصلان الدليل (المزامنة الدورية والصفحة مغلقة)', J(ch[100]?.e) === J(['2-1']) && J(ch[100]?.x) === J(['1-3']), r.j.changes);
+  for (const id of [501, 502, 503, 504]) trShow(id, [2], { '1-1': '2025-01-01T00:00:00.000Z' }); B = 'b2';
+  r = await dc({ since: r.j.rev, known: [100, 200, 300, 404, 501, 502, 503, 504] });
+  check('مسلسلات صارت في الدليل بعد بنائه الجديد تدخل المزامنة بما شوهد منها', [501, 502, 503, 504].every(id => J(byId(r)[id]?.e) === J(['1-1'])), r.j.changes);
+  for (const id of [501, 502, 503, 504]) TR.shows.get(id).w.clear(); TR.act++; r = await dc({ since: r.j.rev });
+  check('واختفاء حلقات مسلسلات كثيرة من Trakt دفعة واحدة خلل لا يُمحى به شيء', !r.j.changes.some(c => c.x?.length), r.j.changes);
+  for (const id of [501, 502, 503, 504]) TR.shows.get(id).w.set('1-1', '2025-01-01T00:00:00.000Z'); TR.act++; r = await dc({ since: r.j.rev });
+  r = await dc({ since: r.j.rev, edits: [{ id: 'tv100|0-1', on: 1, t: Date.now() }] });   // حلقة خاصة: Trakt يقبلها ولا يعيدها في سجله
+  const s0 = await S.get('series'); check('حلقة أُرسلت تنتظر ظهورها في سجل Trakt', !!s0.pend['100|0-1'], s0.pend);
+  s0.pend['100|0-1'] = Date.now() - 16 * 60e3; await S.set('series', s0); TR.act++; sent.length = 0; r = await dc({ since: r.j.rev }); const s1 = await S.get('series');
+  check('وما لم يظهر بعد ربع ساعة لا يُعاد إرساله ولا يُحسب إزالة منك', s1.nf['100|0-1'] === 1 && !s1.pend['100|0-1'] && !posts('/sync/history').length && !r.j.changes.some(c => c.x?.includes('0-1')), [s1.nf, sent]);
+  // قائمة أفلامي: مسلسلاتها مع Trakt، وأفلامها مع Letterboxd، ولكلٍّ رقم مراجعته
+  trShow(500, [3], { '1-1': '2025-02-01T00:00:00.000Z' }); trShow(600, [2]); trShow(700, [5]); TR.dups.length = 0; sent.length = 0;
+  r = await call('/sync', { body: { guide: 'films', build: 'f1', since: 0 } });
+  check('قائمة أفلامي وTrakt مربوط: يُطلب سجلّها وأرقام مسلسلاتها، ورقم المراجعة صار لكلٍّ منهما', r.j.needAll === true && r.j.needKnown === true && typeof r.j.rev === 'object' && 'f' in r.j.rev && 's' in r.j.rev, r.j);
+  r = await call('/sync', { body: { guide: 'films', build: 'f1', since: r.j.rev, full: { t500: 'watched', t600: 'watched', t700: 'next', m27205: 'watched' }, known: [500, 600, 700] } });
+  const fh = posts('/sync/history').at(-1), f500 = fh?.shows?.find(x => x.ids.tmdb === 500), f600 = fh?.shows?.find(x => x.ids.tmdb === 600);
+  check('«شاهدته» على مسلسل يُرسل حلقاته المعروضة التي لم تُشاهد هناك (500: 1-2 و1-3 بتاريخ عرضهما)، وما لم يُشاهد منه شيء كاملاً (600)', J(f500?.seasons) === J([{ number: 1, episodes: [{ number: 2, watched_at: 'released' }, { number: 3, watched_at: 'released' }] }])
+    && J(f600) === J({ ids: { tmdb: 600 }, watched_at: 'released' }) && !TR.dups.length, fh);
+  check('و«سأشاهده» على مسلسل في القائمة قائمة المشاهدة (700)', TR.wl.has(700), [...TR.wl.keys()]);
+  r = await call('/sync', { body: { guide: 'films', build: 'f1', since: r.j.rev } }); ch = byId(r);
+  check('وما اكتمل في Trakt يصير «شاهدته» في القائمة (بمفاتيحها t500 وt600)', ch.t500?.done === true && ch.t600?.done === true && !ch.t700?.done, r.j.changes);
+  await call('/unlink', { body: { svc: 'trakt' } }); const su = await S.get('series');
+  check('فصل Trakt يمحو رمزه وينسى ظله، ويبقي المحور', !su.sh && !su.shOk && Object.keys(su.items).length > 0 && !(await S.get('tok/trakt')) && (await call('', { method: 'GET' })).j.links.trakt.on === false, su.shOk);
+  check('ولا رمز ولا سر في حال المسلسلات المحفوظة', noTok(su) && !J(su).includes('trakt-secret-value')); }
 
 console.log('\n== الفصل وانتهاء الربط');
 await call('/unlink', { body: { svc: 'simkl' } }); skRow(1, 'hold', 12); sent.length = 0; r = await call('/sync', { body: { since: r.j.rev } });

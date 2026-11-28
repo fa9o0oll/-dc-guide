@@ -1,4 +1,4 @@
-// ربط الحسابات من الصفحة (E84): الخادم (/api/accounts) يحمل رموز MyAnimeList وSIMKL ويزامن بالاتجاهين، والصفحة ترسل إليه
+// ربط الحسابات من الصفحة (E84): الخادم (/api/accounts) يحمل رموز MyAnimeList وSIMKL (والأنمي) وTrakt (المسلسلات، E87) ويقرأ يوميات Letterboxd (E86)، ويزامن بالاتجاهين، والصفحة ترسل إليه
 // تعديلاتك وتطبّق ما يصلها منه. تُربط الحسابات مرة واحدة من أي جهاز، وتعمل في كل الأجهزة، ولا رمز في المتصفح.
 // - تعديلاتك تنتظر في هذا المتصفح (accounts.q) حتى تصل الخادم، فلا يضيع تعديل بلا اتصال. وما يصل من الخادم يُطبَّق ولا يُعاد إرساله.
 // - المزامنة: حين تُفتح الصفحة، وبعد ثوانٍ من آخر تعديل، وكل عشر دقائق والصفحة ظاهرة، وحين يعود الاتصال أو تعود إلى الصفحة.
@@ -24,7 +24,8 @@ async function call(path, body) { const pass = accPass(); if (!pass) { state.pas
   if (!r.ok && r.status !== 202) throw new Error(j.error || 'تعذّر الطلب.'); return { status: r.status, j }; }
 const keepLinks = links => { if (!links) return; state.links = links; ls.set(ON, JSON.stringify({ links, at: Date.now() })); };
 
-// guide: اسم البوابة، وsvcs: خدماتها. full(): سجلها كله. eps(): عدد حلقات كل عمل (والفيلم -1، للأنمي وحده). apply(changes): تطبيق ما وصل. onState(st)
+// guide: اسم البوابة، وsvcs: خدماتها. full(): سجلها كله. eps(): عدد حلقات كل عمل (والفيلم -1، للأنمي وحده). known(): أرقام مسلسلاتها في TMDB (لـTrakt)
+// pack(m): صيغة التعديل في الانتظار (الأنمي والأفلام { s, p, r }، والمسلسلات { on }). apply(changes): تطبيق ما وصل. onState(st)
 export function accInit(o) { cx = o;
   addEventListener('online', () => accSync()); document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - last > 2 * 60e3) accSync(); });
   setInterval(() => { if (!document.hidden) accSync(); }, EVERY);
@@ -36,8 +37,8 @@ export function accInit(o) { cx = o;
     if (accPass() && (!saved || age > 12 * 3600e3 || (off && age > 10 * 60e3) || q.get('linked'))) await accLinks(); accSync(); }, q.get('linked') ? 300 : 1500); }
 // تعديل منك على عمل: حاله بعد التعديل (أو لا شيء إن أزلته)
 export function accMark(id, m) { if (!cx || !anyOn()) return; const all = jget(Q, {}), q = all[cx.guide] ||= {};
-  q[id] = { s: m?.s || null, p: +m?.p || 0, r: +m?.r || 0, t: Date.now() }; ls.set(Q, JSON.stringify(all));
-  clearTimeout(timer); timer = setTimeout(() => accSync(), Object.values(q).some(e => !e.s) ? WAIT_GONE : WAIT); tell(); }
+  q[id] = { ...(cx.pack ? cx.pack(m) : { s: m?.s || null, p: +m?.p || 0, r: +m?.r || 0 }), t: Date.now() }; ls.set(Q, JSON.stringify(all));
+  clearTimeout(timer); timer = setTimeout(() => accSync(), Object.values(q).some(e => e.s === null || e.on === 0) ? WAIT_GONE : WAIT); tell(); }
 export async function accSync({ force = false } = {}) { if (!cx || (!anyOn() && !force)) return; if (busy) { again = true; return; } busy = state.busy = true; clearTimeout(timer);
   try { for (let i = 0; i < 4; i++) { const all = jget(Q, {}), q = all[cx.guide] || {}, edits = Object.entries(q).map(([id, e]) => ({ id: /^\d+$/.test(id) ? +id : id, ...e })), t0 = Date.now();
       const rev = jget(REV, {})[cx.guide] || 0, body = { guide: cx.guide, edits, since: rev, build: cx.build };
@@ -45,7 +46,9 @@ export async function accSync({ force = false } = {}) { if (!cx || (!anyOn() && 
       if (status === 202) { await new Promise(r => setTimeout(r, 4000)); continue; }
       // أول مزامنة تبدأ من سجلّك كله، فلا تبدأ إلا من جهاز فيه سجلّ: جهاز فارغ لا يجعل الخادم يظن سجلّك فارغاً
       if (j.needFull && !Object.keys(cx.full()).length) { state.err = 'سجلّك فارغ في هذا المتصفح: تبدأ المزامنة حين تفتح الموقع من جهاز فيه سجلّك.'; break; }
-      if (j.needFull || j.needEps) { ({ status, j } = await call('/sync', { ...body, full: j.needFull ? cx.full() : null, eps: cx.eps?.() || null })); if (status === 202) { await new Promise(r => setTimeout(r, 4000)); continue; } }
+      // needAll: المسلسلات تبدأ من سجل البوابة ولو كان فارغاً (Trakt يجمع ولا يمحو)، وneedKnown: أرقام مسلسلاتها بعد بناء جديد
+      if (j.needFull || j.needEps || j.needAll || j.needKnown) { ({ status, j } = await call('/sync', { ...body, full: j.needFull || j.needAll ? cx.full() : null, eps: cx.eps?.() || null, known: j.needAll || j.needKnown ? cx.known?.() || null : null }));
+        if (status === 202) { await new Promise(r => setTimeout(r, 4000)); continue; } }
       keepLinks(j.links); if (j.lb !== undefined) state.lb = j.lb; const now = jget(Q, {}), mine = now[cx.guide] || {}; for (const e of edits) if (mine[e.id] && mine[e.id].t <= t0) delete mine[e.id]; ls.set(Q, JSON.stringify(now));
       if (j.changes?.length) cx.apply(j.changes); const revs = jget(REV, {}); revs[cx.guide] = j.rev || rev; ls.set(REV, JSON.stringify(revs)); state.err = ''; last = Date.now(); break; } }
   catch (e) { state.err = e.pass ? '' : e.message; }

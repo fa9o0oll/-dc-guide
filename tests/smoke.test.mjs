@@ -263,8 +263,8 @@ for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['fo
     await page.fill('#lbx .lbx-link input', 'https://letterboxd.com/fa9o0oll/'); await page.press('#lbx .lbx-link input', 'Enter'); await page.waitForSelector('#lbx .lbx-on');
     await page.waitForFunction(id => JSON.parse(localStorage.getItem('filmsg.progress') || '{"films":{}}').films[id] === 'watched', NEWW.id, { timeout: 8000 }).catch(() => {});
     const full = calls.find(c => c[0] === '/sync' && c[1]?.full)?.[1].full || {};
-    check('ربط Letterboxd باسم صفحتك، ويبدأ من سجلّ الأفلام كله (الأفلام وحدها، بلا المسلسلات)', calls.some(c => c[0] === '/link' && c[1].svc === 'letterboxd' && c[1].user === 'https://letterboxd.com/fa9o0oll/')
-      && /letterboxd\.com\/fa9o0oll/.test(await page.textContent('#lbx .lbx-on')) && Object.keys(full).length === Object.keys(log0).filter(k => /^m\d+$/.test(k)).length && Object.keys(full).every(k => /^m\d+$/.test(k)), Object.keys(full));
+    check('ربط Letterboxd باسم صفحتك، ويبدأ من سجلّ القائمة كله (أفلامها لـLetterboxd ومسلسلاتها لـTrakt)', calls.some(c => c[0] === '/link' && c[1].svc === 'letterboxd' && c[1].user === 'https://letterboxd.com/fa9o0oll/')
+      && /letterboxd\.com\/fa9o0oll/.test(await page.textContent('#lbx .lbx-on')) && Object.keys(full).length === Object.keys(log0).filter(k => /^[mt]\d+$/.test(k)).length && Object.keys(full).every(k => /^[mt]\d+$/.test(k)), Object.keys(full));
     check('ما سجّلته في يومياتك يصير هنا «شاهدته» ويقال ذلك', await page.evaluate(id => JSON.parse(localStorage.getItem('filmsg.progress')).films[id] === 'watched', NEWW.id) && /وصل من يومياتك في Letterboxd: فيلم واحد/.test(await page.textContent('#toast')));
     await page.waitForSelector('#lbx [data-act=lbx-file][data-k=watched]');
     const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#lbx [data-act=lbx-file][data-k=watched]')]), csv = fs.readFileSync(await dl.path(), 'utf8').trim().split('\n');

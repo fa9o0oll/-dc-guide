@@ -214,6 +214,45 @@ for (const [name, viewport, mobile] of [['desktop', { width: 1440, height: 900 }
   await page.goto(url + '#w=the-dark-knight-rises-2012'); await page.waitForSelector('#sheet:not([hidden])'); await page.waitForTimeout(300);
   check('عمل بلا منصات في السعودية: يُقال ذلك صراحة', /لا تذكر بيانات JustWatch منصة تعرضه في السعودية حالياً/.test(await page.textContent('#sheet .where')) && await page.locator('#sheet .where a').count() === 0);
   check('رابط #w= يفتح بطاقة العمل ثم يُزال من العنوان', (await page.textContent('#sheetTitle')).includes('The Dark Knight Rises') && (await page.evaluate(() => location.hash)) === '');
+  // Trakt (E87، على الكمبيوتر): ربط مرة واحدة من «سجلّي»، ثم حلقات المسلسلات و«سأشاهده» بالاتجاهين. الخادم مُحاكى
+  if (name === 'desktop') { const calls = [], T = { on: false, polls: 0, boot: false, next: [] }, until = async f => { for (let i = 0; i < 100 && !f(); i++) await page.waitForTimeout(100); return !!f(); };
+    const CAT = JSON.parse(fs.readFileSync(path.join(siteDir, 'dc/data/catalog.json'))), tm = id => CAT.works.find(w => w.id === id).tmdb, PM = tm('peacemaker-2022'), FL = tm('the-flash-2014');
+    const sync = () => calls.filter(c => c[0] === '/sync'), edits = () => sync().flatMap(c => c[1]?.edits || []);
+    await page.route('**/api/accounts**', r => { const q = r.request(), p = new URL(q.url()).pathname.replace('/api/accounts', ''), b = JSON.parse(q.postData() || 'null');
+      const J = o => r.fulfill({ contentType: 'application/json', body: JSON.stringify(o) }), links = { trakt: T.on ? { on: true, ready: true, at: Date.now() } : { on: false, ready: true } }; calls.push([p || '/', b]);
+      if (q.headers()['x-pass'] !== 'pw-dc') return r.fulfill({ status: 401, contentType: 'application/json', body: '{"pass":true,"error":"كلمة السر غير صحيحة."}' });
+      if (!p) return J({ links }); if (p === '/link') return J({ code: 'TRK-7788', url: 'https://trakt.tv/activate', every: 1, until: Date.now() + 6e5 });
+      if (p === '/poll') { if (++T.polls < 2) return J({ wait: 1 }); T.on = true; return J({ done: true }); }
+      if (p === '/unlink') { T.on = false; return J({ links: { trakt: { on: false, ready: true } } }); }
+      if (p === '/sync') { if (!T.boot && !b.full) return J({ needAll: true, needKnown: true, rev: 0, changes: [], links }); if (b.full) T.boot = true; const ch = T.next; T.next = []; return J({ rev: (b.since || 0) + ch.length, changes: ch, links }); }
+      return J({}); });
+    if (await page.isVisible('#sheet')) { await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); }
+    await page.evaluate(() => ['animeg.pass', 'filmsg.pass', 'gamesg.pass', 'accounts.on', 'accounts.q', 'accounts.rev'].forEach(k => localStorage.removeItem(k)));
+    await tap('[data-act=backup]'); await page.waitForSelector('#trk .trk-pass');
+    check('«سجلّي»: قسم Trakt أوله، وبلا كلمة سر في المتصفح تُطلب أولاً', await page.evaluate(() => document.querySelector('#sheetBody .dw').firstElementChild?.classList.contains('trk')));
+    await page.fill('#trk .trk-pass input', 'pw-dc'); await page.press('#trk .trk-pass input', 'Enter'); await page.waitForSelector('#trk [data-act=trk-link]');
+    await tap('#trk [data-act=trk-link]'); await page.waitForSelector('#trk .trk-code');
+    check('ربط Trakt: رمز تكتبه في صفحة موافقته، ورابطها', (await page.textContent('#trk .trk-code')).trim() === 'TRK-7788' && await page.getAttribute('#trk a.trk-go', 'href') === 'https://trakt.tv/activate');
+    await page.waitForSelector('#trk .trk-on', { timeout: 8000 }); const boot = () => sync().find(c => c[1]?.full);
+    check('وبعد الموافقة: «مربوط ✓»، ويُرسل سجلّ الدليل وأرقام مسلسلاته مرة واحدة', /مربوط ✓/.test(await page.textContent('#trk')) && await until(boot) && boot()[1].known.length === CAT.works.filter(w => w.seasons?.length).length
+      && boot()[1].full['tv' + PM]?.e?.length > 0 && boot()[1].full['tv' + FL]?.l === 1 && Object.keys(boot()[1].full).every(k => /^tv\d+$/.test(k)), JSON.stringify(boot()?.[1]?.full || {}).slice(0, 160));
+    await overflow('سجلّي مع Trakt'); await snap('8-trakt');
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    await tap('#c-dcu-peacemaker-2022-s1 [data-act=open]'); await page.waitForSelector('.ep:not(.skel)');
+    const k = await page.locator('.ep [data-act=ep][aria-pressed=false]').first().evaluate(b => { b.click(); return '1-' + b.dataset.ep; });
+    check('حلقة تعلّمها تصل الخادم بعد ثوانٍ: tv ورقم المسلسل في TMDB والموسم والحلقة', await until(() => edits().some(e => e.id === `tv${PM}|${k}` && e.on === 1)), JSON.stringify(edits()).slice(0, 200));
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' });
+    await page.evaluate(id => document.querySelector(`[data-k="${id}"] [data-act=status][data-s=watching]`).click(), 'the-flash-2014');
+    check('وتغيير «سأشاهده» على المسلسل إلى غيره يُخرجه من قائمة المشاهدة في Trakt', await until(() => edits().some(e => e.id === `tv${FL}|l` && e.on === 0)), JSON.stringify(edits()).slice(-200));
+    T.next = [{ id: PM, e: ['1-8'], x: [k], l: null, done: false }]; const n0 = edits().length;
+    await tap('[data-act=backup]'); await page.waitForSelector('#trk [data-act=trk-sync]'); await tap('#trk [data-act=trk-sync]');
+    await page.waitForFunction(id => { const e = JSON.parse(localStorage.getItem('dcg.progress')).eps[id] || {}; return e['1-8'] === 1; }, 'peacemaker-2022', { timeout: 6000 }).catch(() => {});
+    const E = await page.evaluate(() => JSON.parse(localStorage.getItem('dcg.progress')).eps['peacemaker-2022'] || {}); await page.waitForTimeout(3200);
+    check('ما وصل من Trakt (حلقة شاهدتها هناك وأخرى أزلتها) يدخل سجلّك ويقال ذلك، ولا يُعاد إرساله', E['1-8'] === 1 && !E[k] && /وصل من Trakt تحديث مسلسل واحد/.test(await page.textContent('#toast')) && !edits().slice(n0).some(e => e.id.startsWith(`tv${PM}|`)), [E, edits().slice(n0)]);
+    await tap('#trk [data-act=trk-unlink]'); await page.waitForFunction(() => /فُصل Trakt/.test(document.querySelector('#trk')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
+    check('«افصل» يفصله: يعود زر «اربط»', /فُصل Trakt/.test(await page.textContent('#trk')) && await page.locator('#trk [data-act=trk-link]').count() === 1);
+    await page.keyboard.press('Escape'); await page.waitForSelector('#sheet', { state: 'hidden' }); await page.unroute('**/api/accounts**');
+    await page.evaluate(() => ['animeg.pass', 'accounts.on', 'accounts.q', 'accounts.rev'].forEach(k => localStorage.removeItem(k))); }
   check('بلا أخطاء برمجية', errs.length === 0, errs.slice(0, 3).join(' | '));
   await ctx.close();
 }

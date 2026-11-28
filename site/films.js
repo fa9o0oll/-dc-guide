@@ -474,9 +474,14 @@ function lbxFile(k) { const ids = lbPending()[k], q = v => `"${String(v ?? '').r
   const u = URL.createObjectURL(new Blob(['tmdbID,Title,Year\n' + rows.join('\n') + '\n'], { type: 'text/csv;charset=utf-8' }));
   Object.assign(document.createElement('a'), { href: u, download: `letterboxd-${k === 'next' ? 'watchlist' : 'watched'}-${new Date().toISOString().slice(0, 10)}.csv` }).click(); setTimeout(() => URL.revokeObjectURL(u), 4000);
   accSent(k, ids).then(() => { LB.msg = `نزل ملف فيه ${nFilms(ids.length)}. ارفعه من صفحة ${k === 'next' ? 'قائمة المشاهدة' : 'الاستيراد'} في Letterboxd.`; drawLbx(); }, e => { LB.msg = esc(e.message); drawLbx(); }); }
-// ما وصل من يومياتك: يصير «شاهدته» هنا ولا يُعاد إرساله
-function lbApply(changes) { let n = 0; for (const c of changes) { const cur = st(c.id); if (c.s ? cur === c.s : !cur) continue; if (c.s) P.films[c.id] = c.s; else delete P.films[c.id]; n++; }
-  if (!n) return; save(); renderGrid(); moodChips(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); toast(`وصل من يومياتك في Letterboxd: ${nFilms(n)}`); }
+// ما وصل من يومياتك في Letterboxd: يصير «شاهدته» هنا ولا يُعاد إرساله. ومن Trakt (E87) للمسلسلات (tرقم): ما اكتمل هناك «شاهدته»،
+// وقائمة المشاهدة «سأشاهده» (لا تنزل بمسلسل شاهدته)، والخروج منها يخرجه من «سأشاهده» وحدها
+function accApply(changes) { let n = 0, tv = 0;
+  for (const c of changes) { const cur = st(c.id);
+    if (/^t\d+$/.test(c.id)) { const to = c.done ? 'watched' : c.l === 1 && cur !== 'watched' ? 'next' : c.l === 0 && cur === 'next' ? null : cur; if (to === cur) continue; if (to) P.films[c.id] = to; else delete P.films[c.id]; tv++; continue; }
+    if (c.s ? cur === c.s : !cur) continue; if (c.s) P.films[c.id] = c.s; else delete P.films[c.id]; n++; }
+  if (!n && !tv) return; save(); renderGrid(); moodChips(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML();
+  toast([n ? `وصل من يومياتك في Letterboxd: ${nFilms(n)}` : '', tv ? `وصل من Trakt تحديث ${tv === 1 ? 'مسلسل واحد' : tv === 2 ? 'مسلسلين' : tv <= 10 ? tv + ' مسلسلات' : tv + ' مسلسلاً'}` : ''].filter(Boolean).join('، و')); }
 document.addEventListener('submit', async e => { const f = e.target;
   if (f.matches?.('.lbx-pass')) { e.preventDefault(); accSetPass(f.querySelector('input').value); await accLinks(); drawLbx(); return; }
   if (f.matches?.('.lbx-link')) { e.preventDefault(); const v = f.querySelector('input').value, b = f.querySelector('button'); b.disabled = true; LB.msg = '';
@@ -611,8 +616,9 @@ try {
   // حين تغيب الترويسة ينزل زر البوابات إلى أول الشريط الثابت
   { const bar = $('.bar'), g = bar.querySelector('.gate'); new IntersectionObserver(([e]) => { const on = !e.isIntersecting; bar.classList.toggle('docked', on); g.tabIndex = on ? 0 : -1; g.setAttribute('aria-hidden', String(!on)); dockEye(on); }).observe($('.top')); }
   // تغيير وصل من جهاز آخر: نعيد قراءة السجل ونرسم
-  accInit({ guide: 'films', svcs: ['letterboxd'], build: BUILD, apply: lbApply, onState: () => { if ($('#lbx').open) drawLbx(); },
-    full: () => Object.fromEntries(Object.entries(P.films).filter(([k, v]) => /^m\d+$/.test(k) && (v === 'watched' || v === 'next'))) });
+  // الأفلام مع Letterboxd، والمسلسلات (tرقم) مع Trakt (E87): سجلّها كله أول مرة، وأرقام مسلسلاتها في TMDB
+  accInit({ guide: 'films', svcs: ['letterboxd', 'trakt'], build: BUILD, apply: accApply, onState: () => { if ($('#lbx').open) drawLbx(); },
+    full: () => Object.fromEntries(Object.entries(P.films).filter(([k, v]) => /^[mt]\d+$/.test(k) && (v === 'watched' || v === 'next'))), known: () => [...D.pool.values()].filter(f => f.kind === 'tv').map(f => f.tmdb) });
   initSync(id => { if (id !== 'films') return; try { P = { films: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {} renderGrid(); if (ui.view === 'series') $('#series').innerHTML = seriesHTML(); });
   // ‎#add=اسم وسنة: من بوابة أخرى (ألعابي تقترح إضافة فيلم اقتُبس من لعبة) يفتح «أضف فيلماً» بالبحث عنه
   const h = location.hash.slice(1); if (h && D.byId.has(h)) openFilm(h, false);

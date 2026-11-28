@@ -1,16 +1,18 @@
-// دالة ربط الحسابات (/api/accounts، E84): الربط مرة واحدة على الخادم، والمزامنة بالاتجاهين بين «أنمياتي» وMyAnimeList وSIMKL.
+// دالة ربط الحسابات (/api/accounts، E84): الربط مرة واحدة على الخادم، والمزامنة بالاتجاهين بين «أنمياتي» وMyAnimeList وSIMKL،
+// وقائمة أفلامي وLetterboxd (E86)، والمسلسلات في دليلَي DC ومارفل وقائمة أفلامي وTrakt (E87).
 // المنطق كله في scripts/lib-accounts.mjs، والرموز في Netlify Blobs لا تخرج منها. كل طلب (عدا رجوع MyAnimeList بعد الموافقة)
 // محمي بكلمة سر «أضف لعبة» أو «أضف فيلماً» في الترويسة x-pass. لا يُكتب رمز ولا سر في السجل ولا في الرد.
 //   GET  /api/accounts                 حال كل خدمة (مربوطة؟ آخر مزامنة؟ خطأ؟)
-//   POST /api/accounts/link   {svc}    يبدأ الربط: رابط موافقة MyAnimeList، أو رمز SIMKL ورابطه
-//   POST /api/accounts/poll   {svc}    هل وافقت على رمز SIMKL؟
+//   POST /api/accounts/link   {svc}    يبدأ الربط: رابط موافقة MyAnimeList، أو رمز SIMKL أو Trakt ورابطه
+//   POST /api/accounts/poll   {svc}    هل وافقت على رمز SIMKL أو Trakt؟
 //   GET  /api/accounts/callback/mal    رجوع MyAnimeList بعد الموافقة، ثم إلى «أنمياتي»
 //   POST /api/accounts/unlink {svc}    يفصل الخدمة ويمحو رموزها
-//   POST /api/accounts/sync   {guide, edits, full, eps, build, since}   تعديلات الصفحة إلى المحور، وما تغيّر من الخدمات إليها (guide: anime أو films)
+//   POST /api/accounts/sync   {guide, edits, full, eps, known, build, since}   تعديلات الصفحة إلى المحور، وما تغيّر من الخدمات إليها
+//        (guide: anime، أو films: Letterboxd وTrakt وsince لكل منهما { f, s }، أو dc وmarvel: Trakt)
 //   POST /api/accounts/link   {svc: 'letterboxd', user}   Letterboxd باسم صفحتك العامة وحده (E86)
 //   POST /api/accounts/films/sent {kind, ids}   ما نزّلته في ملف استيراد Letterboxd صار معروفاً له
 import { createHash, timingSafeEqual } from 'node:crypto';
-import { blobStore, linkStart, linkPoll, linkCallback, unlink, linksOf, syncAnime, syncFilms, filmsSent, linkLetterboxd, SVC } from '../../scripts/lib-accounts.mjs';
+import { blobStore, linkStart, linkPoll, linkCallback, unlink, linksOf, syncAnime, syncFilms, syncSeries, filmsSent, linkLetterboxd, SVC } from '../../scripts/lib-accounts.mjs';
 
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
 const digest = x => createHash('sha256').update(String(x)).digest(), same = (a, b) => timingSafeEqual(digest(a), digest(b));
@@ -39,9 +41,14 @@ export default async req => {
     if (path === 'unlink') { await unlink(S, svc); return json(200, { links: await linksOf(S) }); }
     if (path === 'sync') { if (!await S.lock()) return json(202, { busy: true });
       // السحب يسبق الدفع دائماً، فلا يغلب تعديلٌ قديم من جهاز كان بلا اتصال تعديلاً أحدث منه في حسابك
-      try { const edits = Array.isArray(body.edits) ? body.edits.slice(0, 500) : [];
-        const r = body.guide === 'films' ? await syncFilms(S, { edits, full: body.full || null, since: +body.since || 0, pull: true })
-          : await syncAnime(S, { edits, full: body.full || null, eps: body.eps || null, build: body.build || '', since: +body.since || 0, pull: true, budget: 15, deadline: Date.now() + 6500 });
+      try { const edits = Array.isArray(body.edits) ? body.edits.slice(0, 5000) : [], g = String(body.guide || 'anime'), dl = Date.now() + 6500, full = body.full || null;
+        const known = Array.isArray(body.known) ? body.known.slice(0, 5000) : null, build = String(body.build || '');
+        // قائمة أفلامي: أفلامها مع Letterboxd ومسلسلاتها مع Trakt، ولكلٍّ رقم مراجعته (since { f, s }؛ والرقم وحده من صفحة قديمة رقم الأفلام)
+        if (g === 'films') { const sv = body.since && typeof body.since === 'object' ? body.since : { f: +body.since || 0, s: 0 }, lb = await S.get('tok/letterboxd'), tr = await S.get('tok/trakt');
+          const F = await syncFilms(S, { edits, full, since: +sv.f || 0, pull: true }), R = tr ? await syncSeries(S, { guide: g, edits, full, known, build, since: +sv.s || 0, deadline: dl }) : null;
+          return json(200, { rev: { f: F.rev, s: R ? R.rev : +sv.s || 0 }, changes: [...F.changes, ...(R?.changes || [])], lb: F.lb, needFull: !!F.needFull && !!lb, needAll: !!R?.needAll, needKnown: !!R?.needKnown, links: await linksOf(S) }); }
+        if (g === 'dc' || g === 'marvel') return json(200, { ...await syncSeries(S, { guide: g, edits, full, known, build, since: +body.since || 0, deadline: dl }), links: await linksOf(S) });
+        const r = await syncAnime(S, { edits, full, eps: body.eps || null, build, since: +body.since || 0, pull: true, budget: 15, deadline: dl });
         return json(200, { ...r, links: await linksOf(S) }); }
       finally { await S.unlock(); } }
     return json(404, { error: 'غير موجود.' });
